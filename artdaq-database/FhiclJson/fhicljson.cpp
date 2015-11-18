@@ -60,7 +60,7 @@ bool fhicl_to_json(std::string const& fcl, std::string& json)
     return result;
 }
 
-bool json_to_fhicl(std::string const& json, std::string& fcl)
+bool json_to_fhicl(std::string const& json [[gnu::unused]], std::string& fcl [[gnu::unused]])
 {
     assert(!json.empty());
     assert(fcl.empty());
