@@ -88,9 +88,16 @@ struct fcl2json final {
             if (!result.empty())
                 table[field] = result;
         };
+	
+	auto dequote = [](auto s) {
+	    if(s[0]=='"' && s[s.length()-1]=='"')
+	      return s.substr(1,s.length()-2);
+	    else
+	      return s;
+	  };
 
         auto linenum = parse_linenum(value.src_info);
-
+	
         switch (value.tag) {
         case fhicl::UNKNOWN:
         case fhicl::NIL:
@@ -104,22 +111,15 @@ struct fcl2json final {
         }
 
         case fhicl::STRING: {
-            table[literal::value] = ext_value::atom_t(value);
+            table[literal::value] = dequote(ext_value::atom_t(value));
             add_comment(comment_at, literal::comment, linenum - 1);
             add_comment(annotaion_at, literal::annotaion, linenum);
 
         }
 
         case fhicl::COMPLEX: {
-            /*      auto dequote = [](auto s_) {
-                           auto s =std::move(s_);
-                      if(s[0]=='"' && s[s.length()-1]=='"')
-                        return s.substr(1,s.length()-2);
-                      else
-                        return s;
-                    };
-            */
-            table[literal::value] =  ext_value::atom_t(value);  //dequote(ext_value::atom_t(value));
+            
+            table[literal::value] = dequote(ext_value::atom_t(value));
             add_comment(comment_at, literal::comment, linenum - 1);
             add_comment(annotaion_at, literal::annotaion, linenum);
 
