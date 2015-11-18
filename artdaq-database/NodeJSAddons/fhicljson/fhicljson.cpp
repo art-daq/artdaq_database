@@ -6,7 +6,7 @@
 #include "artdaq-database/FhiclJson/fhicljson.h"
 using namespace artdaq::database::fhicljson;
 
-std::pair<bool, std::string> tojson(std::string const& file_name) {
+result_pair_t tojson(std::string const& file_name) {
   if(file_name.empty())
     return std::make_pair(false,"");
   
