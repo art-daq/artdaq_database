@@ -134,7 +134,7 @@ struct fcl2json final {
             tmpSeq.reserve(ext_value::sequence_t(value).size());
 
             for (auto const& tmpVal : ext_value::sequence_t(value))
-                tmpSeq.push_back(ext_value::atom_t(tmpVal));
+                tmpSeq.push_back(dequote(ext_value::atom_t(tmpVal)));
 
             break;
         }
