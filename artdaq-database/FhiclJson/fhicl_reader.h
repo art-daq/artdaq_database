@@ -48,17 +48,23 @@ struct fhicl_comments_parser_grammar
     using  boost::phoenix::end;
 
     whitespace_rule = *(ascii::char_ - (lit("#") | lit("//")));
+    
+    whitespace_b4quotedstring_rule =  *(ascii::char_ -  (lit("\"") | lit("#") | lit("//")));
 
+    quoted_string_rule =  '"' >> +(ascii::char_ - '"') >> '"';
+    
+    padded_quoted_string_rule = whitespace_b4quotedstring_rule >> *(quoted_string_rule >> whitespace_b4quotedstring_rule);
+    
     string_rule = +(ascii::char_ - (eol | eoi));
 
     comment_rule  = raw[ string_rule ]
                     [ _val = construct<linenum_comment_t>(get_line_(begin(_1)),
                              construct<std::string>(begin(_1), end(_1))) ];
 
-    comments_rule = (whitespace_rule >>  comment_rule) %  eol ;
+    comments_rule = (padded_quoted_string_rule >> whitespace_rule >>  comment_rule) %  eol ;
 }
 
-qi::rule< Iter>                                whitespace_rule;
+qi::rule< Iter>                                whitespace_rule,whitespace_b4quotedstring_rule,padded_quoted_string_rule,quoted_string_rule;
 qi::rule< Iter, std::string()>                 string_rule;
 qi::rule< Iter, linenum_comment_t()>           comment_rule;
 qi::rule< Iter, comments_t(), qi::blank_type>  comments_rule;
