@@ -133,8 +133,8 @@ struct fcl2json final {
         }
 
         case fhicl::SEQUENCE: {
-            table[literal::children] = adj::sequence_t();
-            auto& tmpSeq = boost::get<adj::sequence_t>(table[literal::children]);
+            table[literal::values] = adj::sequence_t();
+            auto& tmpSeq = boost::get<adj::sequence_t>(table[literal::values]);
 
             tmpSeq.reserve(ext_value::sequence_t(value).size());
 

@@ -88,11 +88,11 @@ struct json2fcl final {
 
 using artdaq::database::fhicl::FhiclWriter;
 
-bool FhiclWriter::write(adj::table_t const& json_ast, std::string& out)
+bool FhiclWriter::write(adj::table_t const& json_ast [[gnu::unused]], std::string& out)
 {
     assert(out.empty());
     assert(!json_ast.empty());
-
+       
     using artdaq::database::fhicl::fhicl_generator_grammar;
 
     auto result = bool(false);
@@ -101,8 +101,9 @@ bool FhiclWriter::write(adj::table_t const& json_ast, std::string& out)
 
     auto fhicl_ast = adf::table_t();
 
-   // for (auto const & atom : json_ast)
-   //     fhicl_ast[atom.key] = json2fcl(atom, atom);
+   
+    //for (auto const & atom : json_ast)
+    //    fhicl_ast[atom.key] = json2fcl(atom, atom);
 
     auto sink = std::back_insert_iterator<std::string>(buffer);
 
