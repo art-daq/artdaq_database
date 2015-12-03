@@ -69,7 +69,7 @@ struct json2fcl final {
             };
         };
 	
-	copy_attribute_from_to(literal::annotaion)(json_table_value)(fhicl_table_value);
+	copy_attribute_from_to(literal::annotation)(json_table_value)(fhicl_table_value);
 	copy_attribute_from_to(literal::comment)(json_table_value)(fhicl_table_value);
 	*/
 	//assert();

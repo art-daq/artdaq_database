@@ -63,7 +63,7 @@ struct fcl2json final {
             return boost::lexical_cast<int>(tmp);
         };
 
-        auto annotaion_at = [this](int linenum) ->std::string {
+        auto annotation_at = [this](int linenum) ->std::string {
 	    assert(linenum>-1);
 	    
             if (comments.empty() || linenum<1)
@@ -76,10 +76,10 @@ struct fcl2json final {
             return search->second;
         };
 
-        auto comment_at = [&annotaion_at](int linenum) ->std::string {
+        auto comment_at = [&annotation_at](int linenum) ->std::string {
 	    assert(linenum>-1);
 	    
-            auto comment = annotaion_at(linenum);
+            auto comment = annotation_at(linenum);
             if (!comment.empty() && comment.at(0) != '/')
                 return comment;
 
@@ -104,42 +104,42 @@ struct fcl2json final {
 
         auto linenum = parse_linenum(value.src_info);
 	
-        switch (value.tag) {
+        add_comment(comment_at, literal::comment, linenum - 1);
+
+	if(value.tag!=fhicl::TABLE)
+	     add_comment(annotation_at, literal::annotation, linenum); 
+
+	
+        switch (value.tag) {        
+	default: 
+           throw ::fhicl::exception(::fhicl::parse_error, literal::name) << ("Failure while parsing fcl node name=" + key);  
+	
         case fhicl::UNKNOWN:
         case fhicl::NIL:
         case fhicl::BOOL:
         case fhicl::NUMBER: {
             table[literal::value] = ext_value::atom_t(value);
-            add_comment(comment_at, literal::comment, linenum - 1);
-            add_comment(annotaion_at, literal::annotaion, linenum);
-
             break;
         }
 
         case fhicl::STRING: {
             table[literal::value] = dequote(ext_value::atom_t(value));
-            add_comment(comment_at, literal::comment, linenum - 1);
-            add_comment(annotaion_at, literal::annotaion, linenum);
-
+	    break;
         }
 
-        case fhicl::COMPLEX: {
-            
+        case fhicl::COMPLEX: {            
             table[literal::value] = dequote(ext_value::atom_t(value));
-            add_comment(comment_at, literal::comment, linenum - 1);
-            add_comment(annotaion_at, literal::annotaion, linenum);
-
             break;
         }
 
         case fhicl::SEQUENCE: {
             table[literal::values] = adj::sequence_t();
             auto& tmpSeq = boost::get<adj::sequence_t>(table[literal::values]);
-
+	    
             tmpSeq.reserve(ext_value::sequence_t(value).size());
 
             for (auto const& tmpVal : ext_value::sequence_t(value))
-                tmpSeq.push_back(dequote(ext_value::atom_t(tmpVal)));
+	      tmpSeq.push_back(dequote(ext_value::atom_t(tmpVal)));
 
             break;
         }
@@ -154,7 +154,7 @@ struct fcl2json final {
 
             break;
         }
-        default:
+
         case fhicl::TABLEID: {
             table[literal::value] = value.to_string();
 
