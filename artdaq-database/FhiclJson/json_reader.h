@@ -2,19 +2,20 @@
 #define _ARTDAQ_DATABASE_FHICLJSON_JSON_READER_H_
 
 #include "artdaq-database/FhiclJson/common.h"
-#include "artdaq-database/FhiclJson/fhicl_json.h"
+#include "artdaq-database/FhiclJson/json_types.h"
+#include "artdaq-database/FhiclJson/shared_literals.h"
 
 #include <boost/spirit/include/qi.hpp>
 
 namespace artdaq{
 namespace database{
-namespace fhicljson{
+namespace json{
 
 using namespace boost::spirit;
 
 template <typename Iter>
 struct json_parser_grammar
-: qi::grammar< Iter, any_value_t() , ascii::space_type > {
+: qi::grammar< Iter, table_t() , ascii::space_type > {
     json_parser_grammar()
         : json_parser_grammar::base_type(start) {
     quoted_string = qi::lexeme[
@@ -27,7 +28,9 @@ struct json_parser_grammar
                    >> atom_rule % ','
                    >> '}';
 
-    atom_rule     = quoted_string
+    key_rule      = quoted_string;
+
+    atom_rule     = key_rule
                     >> ':'
                     >> value_rule;
 
@@ -42,23 +45,30 @@ struct json_parser_grammar
                      | qi::double_
                      | qi::bool_ ;
 
-    start         = value_rule;
+    start         = table_rule;
+
+    BOOST_SPIRIT_DEBUG_NODE(key_rule);
+    BOOST_SPIRIT_DEBUG_NODE(value_rule);
+    BOOST_SPIRIT_DEBUG_NODE(atom_rule);
+    BOOST_SPIRIT_DEBUG_NODE(table_rule);
+    BOOST_SPIRIT_DEBUG_NODE(sequence_rule);
+    BOOST_SPIRIT_DEBUG_NODE(start);
 }
 
-qi::rule< Iter, any_value_t(), ascii::space_type > start;
-qi::rule< Iter, std::string(), ascii::space_type > quoted_string;
-qi::rule< Iter, any_value_t(), ascii::space_type > value_rule;
-qi::rule< Iter, atom_t(),      ascii::space_type > atom_rule;
-qi::rule< Iter, table_t(),     ascii::space_type > table_rule;
-qi::rule< Iter, sequence_t(),  ascii::space_type > sequence_rule;
+qi::rule< Iter, std::string(),  ascii::space_type > quoted_string;
+qi::rule< Iter, value_t(),      ascii::space_type > value_rule;
+qi::rule< Iter, key_t(),        ascii::space_type > key_rule;
+qi::rule< Iter, atom_t(),       ascii::space_type > atom_rule;
+qi::rule< Iter, table_t(),      ascii::space_type > start, table_rule;
+qi::rule< Iter, sequence_t(),   ascii::space_type > sequence_rule;
 };
 
 struct JsonReader final {
-    bool read(std::string const&, fhicljson::any_value_t&);
+    bool read(std::string const&, table_t&);
 };
 
 
-} //namespace fhicljson
+} //namespace json
 } //namespace database
 } //namespace artdaq
 #endif /* _ARTDAQ_DATABASE_FHICLJSON_JSON_READER_H_ */

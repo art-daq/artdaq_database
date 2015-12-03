@@ -1,5 +1,9 @@
 #include "artdaq-database/FhiclJson/common.h"
-#include "artdaq-database/FhiclJson/fhicl_json.h"
+
+#include "artdaq-database/FhiclJson/fhicl_types.h"
+#include "artdaq-database/FhiclJson/json_types.h"
+#include "artdaq-database/FhiclJson/shared_literals.h"
+
 
 #include "artdaq-database/FhiclJson/fhicl_reader.h"
 
@@ -9,8 +13,9 @@
 
 #include  <boost/variant/get.hpp>
 
-using namespace artdaq::database;
-using namespace fhicl;
+namespace adj = artdaq::database::json;
+
+using comments_t = artdaq::database::fhicl::comments_t;
 
 std::string tag_as_string(fhicl::value_tag tag)
 {
@@ -37,7 +42,7 @@ struct fcl2json final {
 		      comments_t const&             comments_)
         : self {self_}, parent {parent_}, comments {comments_} {};
 
-    operator table_t()
+    operator adj::table_t()
     try {
         auto const& key   = self.first;
         auto const& value = self.second;
@@ -45,9 +50,10 @@ struct fcl2json final {
         assert(!key.empty());
         assert(!comments.empty());
 
-        auto table = table_t();
+        auto table = adj::table_t();
 
         table[literal::type] = tag_as_string(value.tag);
+        table[literal::name] = key;
 
         auto parse_linenum = [](std::string const& str) ->int {
 	    if(str.empty())
@@ -127,9 +133,8 @@ struct fcl2json final {
         }
 
         case fhicl::SEQUENCE: {
-            table[literal::value] = fhicljson::sequence_t();
-
-            auto& tmpSeq = boost::get<fhicljson::sequence_t>(table[literal::value]);
+            table[literal::children] = adj::sequence_t();
+            auto& tmpSeq = boost::get<adj::sequence_t>(table[literal::children]);
 
             tmpSeq.reserve(ext_value::sequence_t(value).size());
 
@@ -139,12 +144,13 @@ struct fcl2json final {
             break;
         }
         case fhicl::TABLE: {
-            table[literal::value] = fhicljson::table_t();
+            table[literal::children] = adj::sequence_t();
+	    auto& tmpSeq = boost::get<adj::sequence_t>(table[literal::children]);
 
-            auto& tmpTable =  boost::get<fhicljson::table_t>(table[literal::value]);
-
+	    tmpSeq.reserve(ext_value::table_t(value).size());
+	    
             for (auto const& kvp : ext_value::table_t(value))
-                tmpTable[kvp.first] = fcl2json(kvp, self, comments);
+                tmpSeq.push_back(fcl2json(kvp, self, comments));
 
             break;
         }
@@ -158,13 +164,13 @@ struct fcl2json final {
 
         return table;
     } catch (boost::bad_lexical_cast const& e) {
-        throw fhicl::exception(cant_insert, self.first) << e.what();
+        throw ::fhicl::exception(::fhicl::cant_insert, self.first) << e.what();
     } catch (boost::bad_numeric_cast const& e) {
-        throw fhicl::exception(cant_insert, self.first) << e.what();
+        throw ::fhicl::exception(::fhicl::cant_insert, self.first) << e.what();
     } catch (fhicl::exception const& e) {
-        throw fhicl::exception(cant_insert, self.first, e);
+        throw ::fhicl::exception(::fhicl::cant_insert, self.first, e);
     } catch (std::exception const& e) {
-        throw fhicl::exception(cant_insert, self.first) << e.what();
+        throw ::fhicl::exception(::fhicl::cant_insert, self.first) << e.what();
     }
 
     fhicl_key_value_pair_t const& self;
@@ -172,7 +178,10 @@ struct fcl2json final {
     comments_t const& comments;
 };
 
-bool FhiclReader::read(std::string const& in, table_t& outAst)
+
+using artdaq::database::fhicl::FhiclReader;
+
+bool FhiclReader::read(std::string const& in, adj::sequence_t& outAst)
 {
     assert(!in.empty());
     assert(outAst.empty());
@@ -180,8 +189,11 @@ bool FhiclReader::read(std::string const& in, table_t& outAst)
     try {
         using boost::spirit::qi::phrase_parse;
         using boost::spirit::qi::blank;
-
-        fhicl_comments_parser_grammar< pos_iterator_t > grammar;
+	
+	using artdaq::database::fhicl::fhicl_comments_parser_grammar;
+	using artdaq::database::fhicl::pos_iterator_t;
+        
+	fhicl_comments_parser_grammar< pos_iterator_t > grammar;
 
         auto start = pos_iterator_t(in.begin());
         auto end = pos_iterator_t(in.end());
@@ -189,25 +201,26 @@ bool FhiclReader::read(std::string const& in, table_t& outAst)
         auto comments = comments_t();
 
         if (!phrase_parse(start, end, grammar, blank, comments))
-            throw fhicl::exception(parse_error, literal::comments_node) << "Failure while parsing fcl comments";
+            throw ::fhicl::exception(::fhicl::parse_error, literal::comments_node) << "Failure while parsing fcl comments";
 
-        auto tmpTable = table_t();
+        auto sequence = adj::sequence_t();
 
-        fhicl::intermediate_table tbl;
-        fhicl::parse_document(in, tbl);
-
+        ::fhicl::intermediate_table tbl;
+        ::fhicl::parse_document(in, tbl);
+	
         for (auto const& kvp : tbl)
-            tmpTable[kvp.first] = fcl2json(kvp, kvp, comments);
+            sequence.push_back(fcl2json(kvp, kvp, comments));
 
-        outAst.swap(tmpTable);
+        outAst.swap(sequence);
 
         return true;
 
-    } catch (fhicl::exception const& e) {
+    } catch (::fhicl::exception const& e) {
         std::cerr << "Caught fhicl::exception message="<< e.what() << "\n";
 	throw;
     }
 }
+
 
 bool FhiclReader::read_comments(std::string const& in, comments_t& comments)
 {
@@ -218,6 +231,9 @@ bool FhiclReader::read_comments(std::string const& in, comments_t& comments)
         using boost::spirit::qi::phrase_parse;
         using boost::spirit::qi::blank;
 
+	using artdaq::database::fhicl::fhicl_comments_parser_grammar;
+	using artdaq::database::fhicl::pos_iterator_t;
+	
         fhicl_comments_parser_grammar< pos_iterator_t > grammar;
 
         auto start = pos_iterator_t(in.begin());
@@ -232,7 +248,7 @@ bool FhiclReader::read_comments(std::string const& in, comments_t& comments)
 
         return result;
 
-    } catch (fhicl::exception const& e) {
+    } catch (::fhicl::exception const& e) {
         std::cerr << "Caught fhicl::exception message="<< e.what() << "\n";
 	throw;
     }

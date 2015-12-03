@@ -18,4 +18,7 @@
 #include <boost/core/demangle.hpp>
 #include <boost/mpl/print.hpp>
 
+//#define BOOST_SPIRIT_KARMA_DEBUG
+//#define BOOST_SPIRIT_QI_DEBUG
+
 #endif /* _ARTDAQ_DATABASE_FHICLJSON_COMMONN_H_ */

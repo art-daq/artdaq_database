@@ -2,7 +2,8 @@
 #define _ARTDAQ_DATABASE_FHICLJSON_FHICL_READER_H_
 
 #include "artdaq-database/FhiclJson/common.h"
-#include "artdaq-database/FhiclJson/fhicl_json.h"
+#include "artdaq-database/FhiclJson/fhicl_types.h"
+#include "artdaq-database/FhiclJson/json_types.h"
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
@@ -10,7 +11,10 @@
 
 namespace artdaq{
 namespace database{
-namespace fhicljson{
+namespace fhicl{
+
+namespace adf = artdaq::database::fhicl;
+namespace adj = artdaq::database::json;
 
 using namespace boost::spirit;
 
@@ -48,13 +52,13 @@ struct fhicl_comments_parser_grammar
     using  boost::phoenix::end;
 
     whitespace_rule = *(ascii::char_ - (lit("#") | lit("//")));
-    
-    whitespace_b4quotedstring_rule =  *(ascii::char_ -  (lit("\"") | lit("#") | lit("//")));
+
+    whitespace_b4quotedstring_rule =  *(ascii::char_ - (lit("\"") | lit("#") | lit("//")));
 
     quoted_string_rule =  '"' >> +(ascii::char_ - '"') >> '"';
-    
+
     padded_quoted_string_rule = whitespace_b4quotedstring_rule >> *(quoted_string_rule >> whitespace_b4quotedstring_rule);
-    
+
     string_rule = +(ascii::char_ - (eol | eoi));
 
     comment_rule  = raw[ string_rule ]
@@ -64,7 +68,7 @@ struct fhicl_comments_parser_grammar
     comments_rule = (padded_quoted_string_rule >> whitespace_rule >>  comment_rule) %  eol ;
 }
 
-qi::rule< Iter>                                whitespace_rule,whitespace_b4quotedstring_rule,padded_quoted_string_rule,quoted_string_rule;
+qi::rule< Iter>                                whitespace_rule, whitespace_b4quotedstring_rule, padded_quoted_string_rule, quoted_string_rule;
 qi::rule< Iter, std::string()>                 string_rule;
 qi::rule< Iter, linenum_comment_t()>           comment_rule;
 qi::rule< Iter, comments_t(), qi::blank_type>  comments_rule;
@@ -73,13 +77,14 @@ boost::phoenix::function<get_line_f> get_line_;
 
 };
 
+namespace adj = artdaq::database::json;
 
 struct FhiclReader final {
-    bool read(std::string const&, table_t&);
+    bool read(std::string const&, adj::sequence_t&);
     bool read_comments(std::string const&, comments_t&);
 };
 
-} //namespace fhicljson
+} //namespace fhicl
 } //namespace database
 } //namespace artdaq
 #endif /* _ARTDAQ_DATABASE_FHICLJSON_FHICL_READER_H_ */
