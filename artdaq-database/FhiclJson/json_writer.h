@@ -14,11 +14,11 @@ using namespace boost::spirit;
 
 template <typename Iter>
 struct json_generator_grammar
-: karma::grammar< Iter, table_t() > {
+: karma::grammar< Iter, object_t() > {
     json_generator_grammar()
         : json_generator_grammar::base_type(start) {
-    value_rule    =   table_rule
-                      | sequence_rule 
+    value_rule    =   object_rule
+                      | array_rule
                       | quoted_string
                       | karma::int_
                       | karma::double_
@@ -30,40 +30,40 @@ struct json_generator_grammar
 
     key_rule  =      quoted_string;
 
-    atom_rule =      key_rule
+    data_rule =      key_rule
                      << " : "
                      << value_rule;
 
 
-    table_rule =     "{\n" <<
-                     atom_rule % ",\n"
-                     << "\n}";
+    object_rule =     "{\n" <<
+                      data_rule % ",\n"
+                      << "\n}";
 
 
-    sequence_rule = "[\n"
-                    << value_rule % ",\n"
-                    << "\n]";
+    array_rule = "[\n"
+                 << value_rule % ",\n"
+                 << "\n]";
 
-    start =      table_rule;
+    start =      object_rule;
 
     BOOST_SPIRIT_DEBUG_NODE(key_rule);
     BOOST_SPIRIT_DEBUG_NODE(value_rule);
-    BOOST_SPIRIT_DEBUG_NODE(atom_rule);
-    BOOST_SPIRIT_DEBUG_NODE(table_rule);
-    BOOST_SPIRIT_DEBUG_NODE(sequence_rule);
+    BOOST_SPIRIT_DEBUG_NODE(data_rule);
+    BOOST_SPIRIT_DEBUG_NODE(object_rule);
+    BOOST_SPIRIT_DEBUG_NODE(array_rule);
     BOOST_SPIRIT_DEBUG_NODE(start);
 }
 
 karma::rule< Iter, std::string()   > quoted_string;
 karma::rule< Iter, value_t()       > value_rule;
 karma::rule< Iter, key_t()         > key_rule;
-karma::rule< Iter, atom_t()        > atom_rule;
-karma::rule< Iter, table_t()       > start, table_rule;
-karma::rule< Iter, sequence_t()    > sequence_rule;
+karma::rule< Iter, data_t()        > data_rule;
+karma::rule< Iter, object_t()      > start, object_rule;
+karma::rule< Iter, array_t()       > array_rule;
 };
 
 struct JsonWriter final {
-    bool write(table_t const&, std::string&);
+    bool write(object_t const&, std::string&);
 };
 
 } //namespace json

@@ -5,10 +5,10 @@
 using namespace boost::spirit;
 using namespace artdaq::database;
 
-using artdaq::database::json::table_t;
+using artdaq::database::json::object_t;
 using artdaq::database::json::JsonWriter;
 
-bool JsonWriter::write(table_t const& ast, std::string& out)
+bool JsonWriter::write(object_t const& ast, std::string& out)
 {
     assert(out.empty());
     assert(!ast.empty());

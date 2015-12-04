@@ -11,9 +11,11 @@
 #include "fhiclcpp/intermediate_table.h"
 #include "fhiclcpp/parse.h"
 
+#include <cmath>
+
 #include  <boost/variant/get.hpp>
 
-namespace adj = artdaq::database::json;
+namespace jsn = artdaq::database::json;
 
 using comments_t = artdaq::database::fhicl::comments_t;
 
@@ -33,16 +35,21 @@ std::string tag_as_string(fhicl::value_tag tag)
     }
 }
 
+bool isDouble(std::string const& str) {
+  std::regex ex( {regex::parse_double});
+  return std::regex_match(str,ex);
+}
+
 struct fcl2json final {
-    using ext_value = fhicl::extended_value;
-    using fhicl_key_value_pair_t = std::pair<std::string, ext_value> const;
+    using fcl_value = fhicl::extended_value;
+    using fhicl_key_value_pair_t = std::pair<std::string, fcl_value> const;
     
     explicit fcl2json(fhicl_key_value_pair_t const& self_, 
 		      fhicl_key_value_pair_t const& parent_, 
 		      comments_t const&             comments_)
         : self {self_}, parent {parent_}, comments {comments_} {};
 
-    operator adj::table_t()
+    operator jsn::object_t()
     try {
         auto const& key   = self.first;
         auto const& value = self.second;
@@ -50,10 +57,10 @@ struct fcl2json final {
         assert(!key.empty());
         assert(!comments.empty());
 
-        auto table = adj::table_t();
+        auto object = jsn::object_t();
 
-        table[literal::type] = tag_as_string(value.tag);
-        table[literal::name] = key;
+        object[literal::type] = tag_as_string(value.tag);
+        object[literal::name] = key;
 
         auto parse_linenum = [](std::string const& str) ->int {
 	    if(str.empty())
@@ -86,13 +93,13 @@ struct fcl2json final {
             return literal::whitespace;
         };
 
-        auto add_comment = [&table](auto& func, std::string field, int linenum) {
+        auto add_comment = [&object](auto& func, std::string field, int linenum) {
 	    assert(linenum>-1);
 	    
             auto result = func(linenum);
 	    
             if (!result.empty())
-                table[field] = result;
+                object[field] = result;
         };
 	
 	auto dequote = [](auto s) {
@@ -113,56 +120,70 @@ struct fcl2json final {
         switch (value.tag) {        
 	default: 
            throw ::fhicl::exception(::fhicl::parse_error, literal::name) << ("Failure while parsing fcl node name=" + key);  
-	
+
         case fhicl::UNKNOWN:
         case fhicl::NIL:
-        case fhicl::BOOL:
-        case fhicl::NUMBER: {
-            table[literal::value] = ext_value::atom_t(value);
-            break;
-        }
-
         case fhicl::STRING: {
-            table[literal::value] = dequote(ext_value::atom_t(value));
+            object[literal::value] = dequote(fcl_value::atom_t(value));
 	    break;
-        }
-
-        case fhicl::COMPLEX: {            
-            table[literal::value] = dequote(ext_value::atom_t(value));
+        }	   
+        case fhicl::BOOL: {
+	    bool boolean;
+	    std::istringstream(fcl_value::atom_t(value)) >> std::boolalpha >> boolean;
+            object[literal::value] = boolean;
+            break;
+	}	
+        case fhicl::NUMBER: {
+	    std::string str=fcl_value::atom_t(value);
+	    
+	    if(isDouble(str)) {
+	      auto dbl = boost::lexical_cast<double>(str);
+	      
+	      if(std::fmod(dbl, static_cast<decltype(dbl)>(1.0)) == 0.0)
+		object[literal::value] = int(dbl);
+	      else
+		object[literal::value] = dbl;
+	    } else {
+	      object[literal::value] = boost::lexical_cast<int>(str);
+	    }
+	    
             break;
         }
-
+        case fhicl::COMPLEX: {            
+            object[literal::value] = dequote(fcl_value::atom_t(value));
+            break;
+        }
         case fhicl::SEQUENCE: {
-            table[literal::values] = adj::sequence_t();
-            auto& tmpSeq = boost::get<adj::sequence_t>(table[literal::values]);
+            object[literal::values] = jsn::array_t();
+            auto& tmpArray = boost::get<jsn::array_t>(object[literal::values]);
 	    
-            tmpSeq.reserve(ext_value::sequence_t(value).size());
+            tmpArray.reserve(fcl_value::sequence_t(value).size());
 
-            for (auto const& tmpVal : ext_value::sequence_t(value))
-	      tmpSeq.push_back(dequote(ext_value::atom_t(tmpVal)));
+            for (auto const& tmpVal : fcl_value::sequence_t(value))
+	      tmpArray.push_back(dequote(fcl_value::atom_t(tmpVal)));
 
             break;
         }
         case fhicl::TABLE: {
-            table[literal::children] = adj::sequence_t();
-	    auto& tmpSeq = boost::get<adj::sequence_t>(table[literal::children]);
+            object[literal::children] = jsn::array_t();
+	    auto& tmpArray = boost::get<jsn::array_t>(object[literal::children]);
 
-	    tmpSeq.reserve(ext_value::table_t(value).size());
+	    tmpArray.reserve(fcl_value::table_t(value).size());
 	    
-            for (auto const& kvp : ext_value::table_t(value))
-                tmpSeq.push_back(fcl2json(kvp, self, comments));
+            for (auto const& kvp : fcl_value::table_t(value))
+                tmpArray.push_back(fcl2json(kvp, self, comments));
 
             break;
         }
 
         case fhicl::TABLEID: {
-            table[literal::value] = value.to_string();
+            object[literal::value] = value.to_string();
 
             break;
         }
         }
 
-        return table;
+        return object;
     } catch (boost::bad_lexical_cast const& e) {
         throw ::fhicl::exception(::fhicl::cant_insert, self.first) << e.what();
     } catch (boost::bad_numeric_cast const& e) {
@@ -181,10 +202,10 @@ struct fcl2json final {
 
 using artdaq::database::fhicl::FhiclReader;
 
-bool FhiclReader::read(std::string const& in, adj::sequence_t& outAst)
+bool FhiclReader::read(std::string const& in, jsn::array_t& json_array)
 {
     assert(!in.empty());
-    assert(outAst.empty());
+    assert(json_array.empty());
 
     try {
         using boost::spirit::qi::phrase_parse;
@@ -203,15 +224,15 @@ bool FhiclReader::read(std::string const& in, adj::sequence_t& outAst)
         if (!phrase_parse(start, end, grammar, blank, comments))
             throw ::fhicl::exception(::fhicl::parse_error, literal::comments_node) << "Failure while parsing fcl comments";
 
-        auto sequence = adj::sequence_t();
+        auto array = jsn::array_t();
 
-        ::fhicl::intermediate_table tbl;
-        ::fhicl::parse_document(in, tbl);
+        ::fhicl::intermediate_table fhicl_table;
+        ::fhicl::parse_document(in, fhicl_table);
 	
-        for (auto const& kvp : tbl)
-            sequence.push_back(fcl2json(kvp, kvp, comments));
+        for (auto const& atom : fhicl_table)
+            array.push_back(fcl2json(atom, atom, comments));
 
-        outAst.swap(sequence);
+        json_array.swap(array);
 
         return true;
 

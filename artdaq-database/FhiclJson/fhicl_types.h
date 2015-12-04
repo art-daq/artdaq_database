@@ -24,7 +24,7 @@ using sharedtypes::basic_key_t;
 
 using key_t = sharedtypes::key_of<basic_key_t, optional_comment_t>;
 using value_t = sharedtypes::value_of<variant_value_t, optional_annotation_t>;
-using atom_t = sharedtypes::atom_of<key_t, value_t>;
+using atom_t = sharedtypes::kv_pair_of<key_t, value_t>;
 
 struct table_t : sharedtypes::table_of<atom_t> {};
 struct sequence_t : sharedtypes::vector_of<value_t> {};
@@ -33,24 +33,25 @@ struct sequence_t : sharedtypes::vector_of<value_t> {};
 } //namespace database
 } //namespace artdaq
 
-namespace adf = artdaq::database::fhicl;
+namespace fcl = artdaq::database::fhicl;
 
 BOOST_FUSION_ADAPT_STRUCT(
-    adf::atom_t,
-    (adf::key_t,key)
-    (adf::value_t,value)
+    fcl::atom_t,
+    (fcl::key_t,key)
+    (fcl::value_t,value)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    adf::key_t,
-    (adf::optional_comment_t,comment)
-    (adf::basic_key_t,key)
+    fcl::key_t,
+    (fcl::optional_comment_t,comment)
+    (fcl::basic_key_t,key)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    adf::value_t,
-    (adf::variant_value_t,value)
-    (adf::optional_annotation_t,annotation)
+    fcl::value_t,
+    (fcl::variant_value_t,value)
+    (fcl::optional_annotation_t,annotation)
 )
+
 #endif /* _ARTDAQ_DATABASE_FHICLTYPES_H_ */
 

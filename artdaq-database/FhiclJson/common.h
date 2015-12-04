@@ -14,6 +14,8 @@
 #include <ostream>
 #include <iostream>
 #include <chrono>
+#include <stdexcept>
+#include <regex>
 
 #include <boost/core/demangle.hpp>
 #include <boost/mpl/print.hpp>

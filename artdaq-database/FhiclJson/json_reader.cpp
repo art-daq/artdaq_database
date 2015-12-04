@@ -5,16 +5,16 @@
 using namespace boost::spirit;
 using namespace artdaq::database;
 
-using artdaq::database::json::table_t;
+using artdaq::database::json::object_t;
 using artdaq::database::json::JsonReader;
 
-bool JsonReader::read(std::string const& in, table_t& ast)
+bool JsonReader::read(std::string const& in, object_t& ast)
 {
     assert(!in.empty());
     assert(ast.empty());
 
     auto result = bool(false);
-    table_t buffer;
+    object_t buffer;
 
     json_parser_grammar< std::string::const_iterator > grammar;
 

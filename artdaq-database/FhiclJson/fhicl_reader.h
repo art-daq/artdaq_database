@@ -13,9 +13,6 @@ namespace artdaq{
 namespace database{
 namespace fhicl{
 
-namespace adf = artdaq::database::fhicl;
-namespace adj = artdaq::database::json;
-
 using namespace boost::spirit;
 
 using comment_t = std::string;
@@ -77,10 +74,10 @@ boost::phoenix::function<get_line_f> get_line_;
 
 };
 
-namespace adj = artdaq::database::json;
+namespace jsn = artdaq::database::json;
 
 struct FhiclReader final {
-    bool read(std::string const&, adj::sequence_t&);
+    bool read(std::string const&, jsn::array_t&);
     bool read_comments(std::string const&, comments_t&);
 };
 

@@ -18,8 +18,12 @@ constexpr auto annotation = "annotation";
 constexpr auto children = "children";
 constexpr auto name = "name";
 constexpr auto values = "values";
+constexpr auto unknown = "unknown";
+}
 
-
+namespace regex
+{
+  constexpr auto parse_double ="-?\\d*\\.?\\d+e[+-]?\\d+";
 }
 
 #endif /* _ARTDAQ_DATABASE_SHAREDLITERALS_H_ */

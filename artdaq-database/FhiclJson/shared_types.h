@@ -122,12 +122,12 @@ struct vector_of {
 };
 
 template <typename KEYTYPE, typename VALUETYPE>
-struct atom_of {
+struct kv_pair_of {
     using key_type = KEYTYPE;
     using value_type = VALUETYPE;
 
-    static atom_of make_atom(key_type const& key,
-                             value_type const& value) {
+    static kv_pair_of make(key_type const& key,
+                           value_type const& value) {
         return  {key, value};
     }
 
@@ -135,33 +135,73 @@ struct atom_of {
     value_type value;
 };
 
-template <typename ATOM>
-struct table_of : vector_of<ATOM> {
-    using atom_type = ATOM;
+template <typename KVP>
+struct table_of : vector_of<KVP> {
+    using value_type = KVP;
+    using key_type =  typename value_type::key_type;
+    using mapped_type = typename value_type::value_type;
 
-    typename atom_type::value_type& operator[](typename atom_type::key_type const& key) {
-        auto& atoms = vector_of<ATOM>::values;
+    mapped_type& operator[](key_type const& key) {
+        auto& pairs = vector_of<value_type>::values;
 
-        for (auto & atom : atoms) {
-            if (key == atom.key)
-                return atom.value;
+        for (auto & pair : pairs) {
+            if (key == pair.key)
+                return pair.value;
         }
 
-        atoms.push_back(atom_type::make_atom(key, {false}));
+        pairs.push_back(value_type::make(key, {false}));
 
-        return atoms.back().value;
+        return pairs.back().value;
     }
+
+    mapped_type& at(key_type const& key) {
+        auto& pairs = vector_of<value_type>::values;
+
+        for (auto & pair : pairs) {
+            if (key == pair.key)
+                return pair.value;
+        }
+
+        throw std::out_of_range("Key not found");
+    }
+
+    mapped_type const& at(key_type const& key) const {
+        auto const& pairs = vector_of<value_type>::values;
+
+        for (auto const & pair : pairs) {
+            if (key == pair.key)
+                return pair.value;
+        }
+
+        throw std::out_of_range("Key not found");
+    }
+
 };
 
-template <typename TABLE, typename SEQUENCE>
+template <typename TABLE_OF, typename VECTOR_OF>
 using variant_value_of = boost::variant <
-                         boost::recursive_wrapper<TABLE>,
-                         boost::recursive_wrapper<SEQUENCE>,
+                         boost::recursive_wrapper<TABLE_OF>,
+                         boost::recursive_wrapper<VECTOR_OF>,
                          std::string,
                          double,
                          int,
                          bool
                          >;
+
+template<typename A>
+struct unwrapper {
+    unwrapper(A& a): any(a) {}
+
+    template<typename T>
+    T& value_as();
+
+    A& any;
+};
+
+template<typename A>
+unwrapper<A> unwrap(A& any){
+  return unwrapper<A>(any);
+}
 
 } //namespace sharedtypes
 } //namespace database

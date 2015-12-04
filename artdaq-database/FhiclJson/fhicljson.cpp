@@ -12,8 +12,8 @@ namespace artdaq{
 namespace database{
 namespace fhicljson{
 
-namespace adf = artdaq::database::fhicl;
-namespace adj = artdaq::database::json;
+namespace fcl = artdaq::database::fhicl;
+namespace jsn = artdaq::database::json;
 
 using artdaq::database::json::JsonReader;
 using artdaq::database::json::JsonWriter;
@@ -28,10 +28,10 @@ bool fhicl_to_json(std::string const& fcl, std::string& json)
 
     auto result = bool(false);
 
-    auto rootNode = adj::table_t();
+    auto json_root = jsn::object_t();
 
-    auto get_node = [&rootNode](std::string const & name)->auto& {
-        return  boost::get<adj::table_t>(rootNode[name]);
+    auto get_object = [&json_root](std::string const & name)->auto& {
+        return  boost::get<jsn::object_t>(json_root[name]);
     };
 
     auto get_time_as_string = []() {
@@ -41,15 +41,15 @@ bool fhicl_to_json(std::string const& fcl, std::string& json)
         return timestr.substr(0, timestr.size() - 1);
     };
 
-    rootNode[literal::data_node] = adj::sequence_t();
-    rootNode[literal::comments_node] = adj::table_t();
-    rootNode[literal::origin_node] = adj::table_t();
+    json_root[literal::data_node] = jsn::array_t();
+    json_root[literal::comments_node] = jsn::object_t();
+    json_root[literal::origin_node] = jsn::object_t();
 
-    get_node(literal::comments_node)[literal::source] = std::string("fhicl_to_json");
-    get_node(literal::origin_node)[literal::timestamp] = get_time_as_string();
+    get_object(literal::comments_node)[literal::source] = std::string("fhicl_to_json");
+    get_object(literal::origin_node)[literal::timestamp] = get_time_as_string();
 
     auto reader = FhiclReader();
-    result = reader.read(fcl,  boost::get<adj::sequence_t>(rootNode[literal::data_node]));
+    result = reader.read(fcl,  boost::get<jsn::array_t>(json_root[literal::data_node]));
 
     if (!result)
         return result;
@@ -57,7 +57,7 @@ bool fhicl_to_json(std::string const& fcl, std::string& json)
     auto json1 = std::string();
 
     auto writer = JsonWriter();
-    result = writer.write(rootNode, json1);
+    result = writer.write(json_root, json1);
 
     if (result)
         json.swap(json1);
@@ -69,16 +69,13 @@ bool json_to_fhicl(std::string const& json , std::string& fcl)
 {
     assert(!json.empty());
     assert(fcl.empty());
+    
     auto result = bool(false);
 
-    auto rootNode = adj::table_t();
+    auto json_root = jsn::object_t();
 
-    auto get_node = [&rootNode](std::string const & name)->auto& {
-        return boost::get<adj::table_t>(rootNode[name]);
-    };
-    
     auto reader = JsonReader();
-    result = reader.read(json, rootNode);
+    result = reader.read(json, json_root);
 
     auto json1 = std::string();
     
@@ -88,8 +85,8 @@ bool json_to_fhicl(std::string const& json , std::string& fcl)
     auto fcl1 = std::string();
 
     auto writer = FhiclWriter();
-    
-    result = writer.write(get_node(literal::data_node), fcl1);
+        
+    result = writer.write(json_root, fcl1);
 
     if (result)
         fcl.swap(fcl1);

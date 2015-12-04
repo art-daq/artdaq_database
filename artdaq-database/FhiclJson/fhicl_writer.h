@@ -11,8 +11,8 @@ namespace artdaq{
 namespace database{
 namespace fhicl{
 
-namespace adf = artdaq::database::fhicl;
-namespace adj = artdaq::database::json;
+namespace fcl = artdaq::database::fhicl;
+namespace jsn = artdaq::database::json;
 
 using namespace boost::spirit;
 
@@ -73,7 +73,7 @@ karma::rule< Iter, sequence_t()        >    sequence_rule;
 };
 
 struct FhiclWriter final {
-    bool write(adj::table_t const&, std::string&);
+    bool write(jsn::object_t const&, std::string&);
 };
 
 } //namespace fhicl

@@ -10,106 +10,189 @@
 #include "fhiclcpp/extended_value.h"
 
 
-namespace adf = artdaq::database::fhicl;
-namespace adj = artdaq::database::json;
+namespace fcl = artdaq::database::fhicl;
+namespace jsn = artdaq::database::json;
 
 fhicl::value_tag string_as_tag(std::string str)
 {
-    if(str=="nil")
-      return fhicl::NIL;
-    else if(str=="string")
-      return fhicl::STRING;
-    else if(str=="bool")
-      return fhicl::BOOL;
-    else if(str=="number")
-      return fhicl::NUMBER;
-    else if(str=="complex")
-      return fhicl::COMPLEX;
-    else if(str=="sequence")
-      return fhicl::SEQUENCE;
-    else if(str=="table")
-      return fhicl::TABLE;
-    else if(str=="tableid")
-      return fhicl::TABLEID;
+    if (str == "nil")
+        return fhicl::NIL;
+    else if (str == "string")
+        return fhicl::STRING;
+    else if (str == "bool")
+        return fhicl::BOOL;
+    else if (str == "number")
+        return fhicl::NUMBER;
+    else if (str == "complex")
+        return fhicl::COMPLEX;
+    else if (str == "sequence")
+        return fhicl::SEQUENCE;
+    else if (str == "table")
+        return fhicl::TABLE;
+    else if (str == "tableid")
+        return fhicl::TABLEID;
 
     throw fhicl::exception(fhicl::parse_error, literal::data_node) << ("FHiCL atom type \"" + str + "\" is not implemented.");
 }
 
+using artdaq::database::sharedtypes::unwrap;
+using artdaq::database::sharedtypes::unwrapper;
+
+template<>
+template<typename T>
+T&  unwrapper<jsn::value_t>::value_as()
+{
+    return boost::get<T>(any);
+}
+
+template<>
+template<typename T>
+T const&  unwrapper<const jsn::value_t>::value_as()
+{
+    using V = typename std::remove_const<T>::type;
+
+    return boost::get<V>(any);
+}
+
+
+    
+template<>
+template<typename T>
+T&  unwrapper<fcl::value_t>::value_as()
+{
+    return boost::get<T>(any.value);
+}
+
 struct json2fcl final {
 
-    explicit json2fcl(adj::atom_t const& self_,
-                      adj::atom_t const& parent_)
+    explicit json2fcl(jsn::value_t const& self_,
+                      jsn::value_t const& parent_)
         : self {self_}, parent {parent_} {};
 
-    operator adf::table_t()
+	
+    operator fcl::value_t()
+    try {	  
+	  if (self.type() != typeid(bool)) {
+	    return fcl::value_t(unwrap(self).value_as<const bool>());
+	  }  else if (self.type() != typeid(int)) {
+	    return fcl::value_t(unwrap(self).value_as<const int>());
+	  }  else if (self.type() != typeid(double)) {
+	    return fcl::value_t(unwrap(self).value_as<const double>());
+	  }  else if (self.type() != typeid(std::string)) {
+	    return fcl::value_t(unwrap(self).value_as<const std::string>());
+	  }
+	  
+	  return fcl::value_t(literal::unknown);
+    } catch (std::exception const& e) {
+        throw;
+    }
+    
+    operator fcl::atom_t() 
     try {
-	auto table = adf::table_t();
-	
-	auto const& self_key   = self.key;
-	auto const& self_value = self.value;      
-        
-	//if(self_value.value.type()!=typeid(adj::table_t))
-	//    throw ::fhicl::exception(::fhicl::parse_error, literal::data_node) << ("JSON element \"" + self_key.key + "\" is not a table_t type.");
-	
-	//auto const& json_table_value = unwarap_value_as<fhicljson::table_t>(self_value);
-/*	
-	table[self_key]=fhicljson::atom_t();
-	
-        auto& fhicl_table_value = table[self_key];
+        if (self.type() != typeid(jsn::object_t))
+            throw ::fhicl::exception(::fhicl::parse_error, literal::data_node) << ("JSON element is not a object_t type.");
 
-        auto copy_attribute_from_to = [](auto const& key) {
-            return [ = ](auto const & from) {
-                auto const& it = from.find(key);
-                if (it != from.end()) {
-                    auto const& value = it->second;
-                    return [ = ](auto & to) {
-                        to[key] = value;
-                    };
-                }
-            };
-        };
-	
-	copy_attribute_from_to(literal::annotation)(json_table_value)(fhicl_table_value);
-	copy_attribute_from_to(literal::comment)(json_table_value)(fhicl_table_value);
-	*/
-	//assert();
-	
-	//auto const& current = 
-	
-	
-        return table;
+        auto const& json_object = unwrap(self).value_as<const jsn::object_t>();
+
+        auto type = string_as_tag(boost::get<std::string>(json_object.at(literal::type)));
+
+        auto fcl_value = fcl::value_t();
+
+        switch (type) {
+        case fhicl::UNKNOWN:
+        case fhicl::NIL:
+        case fhicl::STRING: {
+            fcl_value.value = boost::get<std::string>(json_object.at(literal::value));
+            break;
+        }
+
+        case fhicl::BOOL: {
+            fcl_value.value = boost::get<bool>(json_object.at(literal::value));
+            break;
+        }
+
+        case fhicl::NUMBER: {
+            fcl_value.value = boost::get<double>(json_object.at(literal::value));
+            break;
+        }
+
+        case fhicl::COMPLEX: {
+            fcl_value.value = boost::get<std::string>(json_object.at(literal::value));
+            break;
+        }
+
+        case fhicl::SEQUENCE: {
+            fcl_value.value = fcl::sequence_t();
+            auto& sequence =  unwrap(fcl_value).value_as<fcl::sequence_t>();
+
+            auto& values = boost::get<jsn::array_t>(json_object.at(literal::values));
+
+            for (auto const & val : values)
+                sequence.push_back(json2fcl(val, self));
+
+            break;
+        }
+        case fhicl::TABLE: {
+            fcl_value.value = fcl::table_t();
+            auto& table =  unwrap(fcl_value).value_as<fcl::table_t>();
+
+            auto& values = boost::get<jsn::array_t>(json_object.at(literal::children));
+
+            for (auto const & val : values)
+                table.push_back(json2fcl(val, self));
+
+            break;
+        }
+
+        case fhicl::TABLEID: {
+            fcl_value.value = boost::get<std::string>(json_object.at(literal::value));
+            break;
+        }
+        }
+
+        auto const& name = boost::get<std::string>(json_object.at(literal::name));
+        auto const& comment = boost::get<std::string>(json_object.at(literal::comment));
+        auto fcl_key = fcl::key_t(name, comment);
+
+        if (type != fhicl::TABLE) //table does not have annotation
+            fcl_value.annotation = boost::get<std::string>(json_object.at(literal::annotation));
+
+        return  {fcl_key, fcl_value};
+
     } catch (std::exception const& e) {
         throw;
     }
 
-    adj::atom_t const& self;
-    adj::atom_t const& parent;
+    jsn::value_t const& self;
+    jsn::value_t const& parent;
 };
 
 using artdaq::database::fhicl::FhiclWriter;
 
-bool FhiclWriter::write(adj::table_t const& json_ast [[gnu::unused]], std::string& out)
+bool FhiclWriter::write(jsn::object_t const& json_root, std::string& out)
 {
     assert(out.empty());
-    assert(!json_ast.empty());
-       
+    assert(!json_root.empty());
+
     using artdaq::database::fhicl::fhicl_generator_grammar;
 
     auto result = bool(false);
     auto buffer = std::string();
 
+    auto fhicl_table = fcl::table_t();
 
-    auto fhicl_ast = adf::table_t();
+    auto const& data_key = jsn::object_t::key_type(literal::data_node);
 
-   
-    //for (auto const & atom : json_ast)
-    //    fhicl_ast[atom.key] = json2fcl(atom, atom);
+    auto const& json_array = boost::get<jsn::array_t>(json_root.at(data_key));
+
+    for (auto const & json_value : json_array)
+        fhicl_table.push_back(json2fcl(json_value, json_value));
 
     auto sink = std::back_insert_iterator<std::string>(buffer);
 
     fhicl_generator_grammar<decltype(sink)> grammar;
 
-    result  = karma::generate(sink, grammar, fhicl_ast);
+    result  = karma::generate(sink, grammar, fhicl_table);
 
     if (result)
         out.swap(buffer);
