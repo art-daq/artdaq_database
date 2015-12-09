@@ -55,7 +55,7 @@ T const&  unwrapper<const jsn::value_t>::value_as()
 }
 
 
-    
+
 template<>
 template<typename T>
 T&  unwrapper<fcl::value_t>::value_as()
@@ -69,25 +69,25 @@ struct json2fcl final {
                       jsn::value_t const& parent_)
         : self {self_}, parent {parent_} {};
 
-	
+
     operator fcl::value_t()
-    try {	  
-	  if (self.type() != typeid(bool)) {
-	    return fcl::value_t(unwrap(self).value_as<const bool>());
-	  }  else if (self.type() != typeid(int)) {
-	    return fcl::value_t(unwrap(self).value_as<const int>());
-	  }  else if (self.type() != typeid(double)) {
-	    return fcl::value_t(unwrap(self).value_as<const double>());
-	  }  else if (self.type() != typeid(std::string)) {
-	    return fcl::value_t(unwrap(self).value_as<const std::string>());
-	  }
-	  
-	  return fcl::value_t(literal::unknown);
-    } catch (std::exception const& e) {
+    try {
+        if (self.type() == typeid(bool)) {
+            return fcl::value_t(unwrap(self).value_as<const bool>());
+        }  else if (self.type() == typeid(int)) {
+            return fcl::value_t(unwrap(self).value_as<const int>());
+        }  else if (self.type() == typeid(double)) {
+            return fcl::value_t(unwrap(self).value_as<const double>());
+        }  else if (self.type() == typeid(std::string)) {
+            return fcl::value_t(unwrap(self).value_as<const std::string>());
+        }
+
+        return fcl::value_t(literal::unknown);
+    } catch (std::exception const&) {
         throw;
     }
-    
-    operator fcl::atom_t() 
+
+    operator fcl::atom_t()
     try {
         if (self.type() != typeid(jsn::object_t))
             throw ::fhicl::exception(::fhicl::parse_error, literal::data_node) << ("JSON element is not a object_t type.");
@@ -103,6 +103,7 @@ struct json2fcl final {
         case fhicl::NIL:
         case fhicl::STRING: {
             fcl_value.value = boost::get<std::string>(json_object.at(literal::value));
+
             break;
         }
 
@@ -112,23 +113,33 @@ struct json2fcl final {
         }
 
         case fhicl::NUMBER: {
-            fcl_value.value = boost::get<double>(json_object.at(literal::value));
+            if (json_object.at(literal::value).type() == typeid(int))
+                fcl_value.value = boost::get<int>(json_object.at(literal::value));
+            else
+                fcl_value.value = boost::get<double>(json_object.at(literal::value));
+
             break;
         }
 
         case fhicl::COMPLEX: {
             fcl_value.value = boost::get<std::string>(json_object.at(literal::value));
+
             break;
         }
 
         case fhicl::SEQUENCE: {
+
             fcl_value.value = fcl::sequence_t();
             auto& sequence =  unwrap(fcl_value).value_as<fcl::sequence_t>();
 
-            auto& values = boost::get<jsn::array_t>(json_object.at(literal::values));
+            try {
+                auto& values = boost::get<jsn::array_t>(json_object.at(literal::values));
 
-            for (auto const & val : values)
-                sequence.push_back(json2fcl(val, self));
+                for (auto const & val : values)
+                    sequence.push_back(json2fcl(val, self));
+
+            } catch (std::out_of_range const&) {
+            }
 
             break;
         }
@@ -136,16 +147,21 @@ struct json2fcl final {
             fcl_value.value = fcl::table_t();
             auto& table =  unwrap(fcl_value).value_as<fcl::table_t>();
 
-            auto& values = boost::get<jsn::array_t>(json_object.at(literal::children));
+            try {
+                auto& values = boost::get<jsn::array_t>(json_object.at(literal::children));
 
-            for (auto const & val : values)
-                table.push_back(json2fcl(val, self));
+                for (auto const & val : values)
+                    table.push_back(json2fcl(val, self));
+
+            } catch (std::out_of_range const&) {
+            }
 
             break;
         }
 
         case fhicl::TABLEID: {
             fcl_value.value = boost::get<std::string>(json_object.at(literal::value));
+
             break;
         }
         }
@@ -169,10 +185,10 @@ struct json2fcl final {
 
 using artdaq::database::fhicl::FhiclWriter;
 
-bool FhiclWriter::write(jsn::object_t const& json_root, std::string& out)
+bool FhiclWriter::write_data(jsn::array_t const& json_array, std::string& out)
 {
     assert(out.empty());
-    assert(!json_root.empty());
+    assert(!json_array.empty());
 
     using artdaq::database::fhicl::fhicl_generator_grammar;
 
@@ -180,10 +196,6 @@ bool FhiclWriter::write(jsn::object_t const& json_root, std::string& out)
     auto buffer = std::string();
 
     auto fhicl_table = fcl::table_t();
-
-    auto const& data_key = jsn::object_t::key_type(literal::data_node);
-
-    auto const& json_array = boost::get<jsn::array_t>(json_root.at(data_key));
 
     for (auto const & json_value : json_array)
         fhicl_table.push_back(json2fcl(json_value, json_value));
@@ -200,3 +212,36 @@ bool FhiclWriter::write(jsn::object_t const& json_root, std::string& out)
     return result;
 }
 
+std::string unescape(std::string const& str) 
+{
+  return std::regex_replace(str, std::regex("\\\""),"\"");
+}
+
+bool FhiclWriter::write_includes(jsn::array_t const& json_array, std::string& out)
+{
+    assert(out.empty());
+    assert(!json_array.empty());
+
+    using artdaq::database::fhicl::fhicl_include_generator_grammar;
+
+    auto result = bool(false);
+    auto buffer = std::string();
+  
+    auto includes = includes_t();
+    
+    includes.reserve(json_array.size());
+ 
+    for (auto const & json_value : json_array)
+        includes.push_back(unescape(boost::get<std::string>(json_value)));
+	
+    auto sink = std::back_insert_iterator<std::string>(buffer);
+
+    fhicl_include_generator_grammar<decltype(sink)> grammar;
+
+    result  = karma::generate(sink, grammar, includes);
+
+    if (result)
+        out.swap(buffer);
+
+    return result;
+}

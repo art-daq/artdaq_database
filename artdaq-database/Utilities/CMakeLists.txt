@@ -14,5 +14,12 @@ art_make_exec(tofhicl
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 ) 
 
+art_make_exec(readfhicl
+  LIBRARIES
+  artdaq-database_FhiclJson
+  ${FHICLCPP}  
+  ${CETLIB}
+  ${Boost_PROGRAM_OPTIONS_LIBRARY}
+) 
 install_headers()
 install_source()

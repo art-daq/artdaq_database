@@ -37,28 +37,19 @@ struct fhicl_generator_grammar
                      << string
                      << '"';
 
-    comment       =  "\n"
-                     << string
-                     << "\n";
-
-    annotation    =  string
-                     << "\n";
+    comment       =  -(string <<  karma::eol);
+    
+    annotation    =  " " << string <<  karma::eol;
 
     commented_key_rule  = -comment << string;
 
-    annotated_atom_rule     =  commented_key_rule
-                               << " : "
-                               << annotated_value_rule;
+    annotated_atom_rule     =  commented_key_rule << ": " << annotated_value_rule;
 
-    table_rule =     "{\n" <<
-                     annotated_atom_rule % ",\n"
-                     << "\n}";
+    table_rule =     "{" <<  karma::eol << *(annotated_atom_rule) <<  karma::eol << "}";
 
-    toplevel_table = annotated_atom_rule % ",\n";
+    toplevel_table = *(annotated_atom_rule);
 
-    sequence_rule = "[\n"
-                    << annotated_value_rule % ",\n"
-                    << "\n]";
+    sequence_rule = "[" <<  annotated_value_rule  % ", " << "]";
 
     start =      toplevel_table;
 }
@@ -72,8 +63,28 @@ karma::rule< Iter, table_t()           >    start, table_rule, toplevel_table;
 karma::rule< Iter, sequence_t()        >    sequence_rule;
 };
 
+
+using  include_t =  std::string;
+using  includes_t = std::vector<include_t>;
+
+
+template <typename Iter>
+struct fhicl_include_generator_grammar
+: karma::grammar< Iter, includes_t() > {
+    fhicl_include_generator_grammar()
+        : fhicl_include_generator_grammar::base_type(includes_rule) {
+
+    include_rule   =  karma::string;
+    includes_rule  =  ("#include \"" <<  include_rule << "\"") % karma::eol;
+}
+
+karma::rule< Iter, include_t()       >    include_rule;
+karma::rule< Iter, includes_t()      >    includes_rule;
+};
+
 struct FhiclWriter final {
-    bool write(jsn::object_t const&, std::string&);
+    bool write_data(jsn::array_t const&, std::string&);
+    bool write_includes(jsn::array_t const&, std::string&);
 };
 
 } //namespace fhicl

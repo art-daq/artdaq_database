@@ -40,6 +40,10 @@ struct  key_of {
         key = k; return *this;
     }
 
+    operator std::string() const {
+      return key + ", comment=" + comment;
+    }
+    
     key_type      key;
     comment_type  comment;
 };
@@ -64,6 +68,7 @@ struct  value_of {
     value_of(value_type const& v): value(v) {}
     value_of(value_type const& v, typename annotation_type::value_type const& a)
         : value(v), annotation(a) {}
+    
     value_type value;
     annotation_type annotation;
 };
@@ -74,11 +79,11 @@ using any_value_of = boost::variant <VALUE, value_of<VALUE, ANNOTATION>>;
 template <typename TYPE>
 struct vector_of {
     using value_type = TYPE;
-    using values_t = std::vector<value_type>;
+    using collection_type = std::vector<value_type>;
 
-    using const_iterator = typename values_t::const_iterator;
-    using iterator = typename values_t::iterator;
-    using size_type = typename values_t::size_type;
+    using const_iterator = typename collection_type::const_iterator;
+    using iterator = typename collection_type::iterator;
+    using size_type = typename collection_type::size_type;
 
     bool empty() const {
         return values.empty();
@@ -95,6 +100,10 @@ struct vector_of {
         return values.end();
     }
 
+    value_type& back() {
+        return values.back();
+    }
+    
     const_iterator begin() const {
         return values.begin();
     }
@@ -102,6 +111,10 @@ struct vector_of {
         return values.end();
     }
 
+    value_type const& back() const{
+        return values.back();
+    }
+    
     iterator insert(iterator position,  value_type const& val) {
         return values.insert(position, val);
     }
@@ -110,15 +123,19 @@ struct vector_of {
         values.reserve(n);
     }
 
+    size_type size() const {
+        return values.size();
+    }
+    
     void push_back(value_type const& val) {
         return values.push_back(val);
     }
 
-    values_t& operator()() {
+    collection_type& operator()() {
         return values;
     }
 
-    values_t values;
+    collection_type values;
 };
 
 template <typename KEYTYPE, typename VALUETYPE>
@@ -162,7 +179,7 @@ struct table_of : vector_of<KVP> {
                 return pair.value;
         }
 
-        throw std::out_of_range("Key not found");
+        throw std::out_of_range("Key not found; key=" + key);
     }
 
     mapped_type const& at(key_type const& key) const {
@@ -173,7 +190,7 @@ struct table_of : vector_of<KVP> {
                 return pair.value;
         }
 
-        throw std::out_of_range("Key not found");
+        throw std::out_of_range("Key not found; key=" + key);
     }
 
 };

@@ -20,6 +20,10 @@ using linenum_t = int;
 using comments_t = std::map<linenum_t, comment_t>;
 using linenum_comment_t = std::pair<linenum_t, comment_t>;
 
+using  include_t =  std::string;
+using  includes_t = std::vector<include_t>;
+
+
 using pos_iterator_t = boost::spirit::line_pos_iterator<std::string::const_iterator>;
 
 struct get_line_f {
@@ -74,11 +78,38 @@ boost::phoenix::function<get_line_f> get_line_;
 
 };
 
+
+template <typename Iter>
+struct fhicl_includes_parser_grammar
+: qi::grammar<Iter, includes_t() , qi::blank_type > {
+
+    fhicl_includes_parser_grammar()
+        : fhicl_includes_parser_grammar::base_type(includes_rule) {
+    using boost::spirit::qi::lit;
+    using boost::spirit::qi::eol;
+    using boost::spirit::qi::eoi;
+    using boost::spirit::qi::space;
+    using boost::spirit::qi::omit;
+    
+    include_rule = omit[*space] >> lit("#include")  >>  omit[*space];
+    
+    filename_rule =  '"' >> +(ascii::char_ - '"') >> '"';
+
+    includes_rule = ( include_rule >> filename_rule ) % eol;
+}
+
+qi::rule< Iter>                                include_rule;
+qi::rule< Iter, include_t()>                   filename_rule;
+qi::rule< Iter, includes_t(), qi::blank_type>  includes_rule;
+
+};
 namespace jsn = artdaq::database::json;
 
 struct FhiclReader final {
-    bool read(std::string const&, jsn::array_t&);
-    bool read_comments(std::string const&, comments_t&);
+    bool read_data(std::string const&, jsn::array_t&);
+    bool read_comments(std::string const&, jsn::array_t&);
+    bool read_includes(std::string const&, jsn::array_t&);
+
 };
 
 } //namespace fhicl
