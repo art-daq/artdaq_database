@@ -56,8 +56,8 @@ bool fhicl_to_json(std::string const& fcl, std::string& json)
 
     result = reader.read_includes(fcl,  boost::get<jsn::array_t>(json_root[literal::includes_node]));
 
-    if (!result)
-        return result;
+    //if (!result)
+     //   return result;
 
     result = reader.read_comments(fcl,  boost::get<jsn::array_t>(json_root[literal::comments_node]));
 
@@ -107,12 +107,16 @@ bool json_to_fhicl(std::string const& json , std::string& fcl)
     auto fcl_includes = std::string();
     {
         auto const& includes_key = jsn::object_t::key_type(literal::includes_node);
+	try {
         auto const& json_array = boost::get<jsn::array_t>(json_root.at(includes_key));
 
         result = writer.write_includes(json_array, fcl_includes);
 
         if (!result)
             return result;
+	}catch(std::out_of_range const&) {
+	  
+	}
     }
 
     auto fcl_data = std::string();

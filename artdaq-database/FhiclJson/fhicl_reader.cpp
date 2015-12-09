@@ -225,8 +225,8 @@ bool FhiclReader::read_data(std::string const& in, jsn::array_t& json_array)
         auto start = pos_iterator_t(in.begin());
         auto end = pos_iterator_t(in.end());
 
-        if (!phrase_parse(start, end, grammar, blank, comments))
-            throw ::fhicl::exception(::fhicl::parse_error, literal::comments_node) << "Failure while parsing fcl comments";
+        if(!phrase_parse(start, end, grammar, blank, comments))
+	  comments[0]="No comments";
 
         auto array = jsn::array_t();
 
@@ -270,6 +270,11 @@ bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
 
         auto result  = phrase_parse(start, end, grammar, blank, comments);
 	
+	if(!result) {
+ 	  comments[0]="No comments";
+	  result =true;
+	}
+	
 	auto array = jsn::array_t();
 	array.reserve(comments.size());
 		
@@ -280,8 +285,8 @@ bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
 	  object.push_back(jsn::data_t::make(literal::value, filter_quotes(comment.second))); 
 	}
 	
-        if (result)
-            json_array.swap(array);
+        
+        json_array.swap(array);
 
         return result;
 
@@ -316,8 +321,6 @@ bool FhiclReader::read_includes(std::string const& in, jsn::array_t& json_array)
 
 	auto array = jsn::array_t();
 	array.reserve(includes.size());
-	
-	std::cout << "parsed includes" <<std::flush;
 	
 	for(auto const& include : includes)
 	  array.push_back(include);
