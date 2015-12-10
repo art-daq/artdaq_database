@@ -21,5 +21,8 @@ art_make_exec(readfhicl
   ${CETLIB}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 ) 
+
+cet_script(readwrite.js)
+
 install_headers()
 install_source()
