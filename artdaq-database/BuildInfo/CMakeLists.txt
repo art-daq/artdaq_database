@@ -14,5 +14,10 @@ art_make_library( LIBRARY_NAME artdaq-database_BuildInfo
 		  ${CMAKE_CURRENT_BINARY_DIR}/GetPackageBuildInfo.cc
                  )
 
+art_make_library( LIBRARY_NAME artdaq-database_StackTrace
+		  SOURCE
+		  printStackTrace.cpp
+                 )
+                 
 install_headers()
 install_source()

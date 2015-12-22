@@ -252,7 +252,7 @@ bool FhiclReader::read_data(std::string const& in, jsn::array_t& json_array)
 bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
 {
     assert(!in.empty());
-    assert(comments.empty());
+    assert(json_array.empty());
 
     try {
         using boost::spirit::qi::phrase_parse;
