@@ -1,6 +1,5 @@
 #include "artdaq-database/StorageProviders/common.h"
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
-
 #include "artdaq-database/BasicTypes/basictypes.h"
 
 
@@ -12,6 +11,12 @@
 #include <mongocxx/instance.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <bsoncxx/stdx/string_view.hpp>
+
+#ifdef TRACE_NAME
+  #undef TRACE_NAME
+#endif
+
+#define TRACE_NAME "PRVDR:MongoDB_C"
 
 namespace bbs = bsoncxx::builder::stream;
 
@@ -60,9 +65,9 @@ std::vector<JsonData> StorageProvider<JsonData, MongoDB>::load(JsonData const& s
 
     try {
         filter = nested_document("filter").get_document();
-      //  std::cout << "search filter=" <<  bsoncxx::to_json(filter) << "\n";
+        TRACE_( 2, "search filter=" <<  bsoncxx::to_json(filter) );
     } catch (cet::exception const&) {
-
+	TRACE_( 2, "search filter is missing");
     }
 
     auto size = collection.count(filter);
@@ -70,7 +75,7 @@ std::vector<JsonData> StorageProvider<JsonData, MongoDB>::load(JsonData const& s
     
     auto cursor = collection.find(filter);
     
-    //std::cout << "found_count=" << size << "\n";
+    TRACE_( 3,  "found_count=" << size );
 
     for (auto & doc : cursor)
         returnCollection.emplace_back(bsoncxx::to_json(doc));
@@ -110,11 +115,11 @@ void StorageProvider<JsonData, MongoDB>::store(JsonData const& data)
     try {
         auto document_id = nested_document(collection_name + "_id");
         filter << (collection_name + "_id") << document_id;
-        //std::cout << "search filter=" <<  bsoncxx::to_json(filter) << "\n";
+	TRACE_( 4,   "search filter=" <<  bsoncxx::to_json(filter));
 
         isNew = false;
     } catch (cet::exception const&) {
-
+	TRACE_( 4, "search filter is missing");
     }
 
     if (isNew) {
@@ -124,7 +129,7 @@ void StorageProvider<JsonData, MongoDB>::store(JsonData const& data)
 
         auto result [[gnu::unused]] =  collection.insert_one(insert);
 
-        //std::cout << "inserted_id=" <<  bsoncxx::to_json(result->inserted_id()) << "\n";
+        TRACE_(5, "inserted_id=" <<  bsoncxx::to_json(result->inserted_id()));
 
     } else {
         auto update = bbs::document {};
@@ -136,7 +141,7 @@ void StorageProvider<JsonData, MongoDB>::store(JsonData const& data)
 
         auto result [[gnu::unused]] = collection.update_many(filter, update);
 
-        //std::cout << "modified_count=" << result->modified_count() << "\n";
+        TRACE_( 6,"modified_count=" << result->modified_count());
     }
 }
 
@@ -148,6 +153,17 @@ std::string dequote(std::string s)
     else
         return s;
 }
+namespace mongo{
+  void  trace_enable()
+  {
+    TRACE_CNTL( "name",    TRACE_NAME);
+    TRACE_CNTL( "lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL ); 
+    TRACE_CNTL( "modeM", 1LL );
+    TRACE_CNTL( "modeS", 1LL );
 
+    
+    TRACE_( 0, "artdaq::database::mongo::" << "trace_enable");
+  }
+} // namespace mongo
 } //namespace database
 } //namespace artdaq

@@ -51,7 +51,7 @@ find_ups_product( cetpkgsupport v1_08_03 )
 #find_ups_product( messagefacility v1_14_01 )
 find_ups_product( mongodb v3_0_7 )
 find_ups_product( swig v3_0_7 )
-
+find_ups_product( TRACE v3_06_01 )
 #find_ups_product( sqlite v3_08_05_00 )
 #find_ups_product( tbb v4_1 )
 #find_ups_root( v5_34_20 )

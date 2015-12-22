@@ -8,6 +8,7 @@
 #include <cassert>
 #include <type_traits>
 #include <iostream>
+#include "trace.h"
 
 #include <boost/core/demangle.hpp>
 

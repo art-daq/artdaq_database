@@ -16,6 +16,8 @@ int main(int argc [[gnu::unused]], char * argv[] [[gnu::unused]])
   using  artdaq::database::basictypes::JsonData;
   
   namespace DBI= artdaq::database::mongo;
+  TRACE_CNTL("reset");
+  DBI::trace_enable();
   
   auto config =DBI::DBConfig{};  
   auto database = DBI::DB::create(config);  
@@ -25,11 +27,11 @@ int main(int argc [[gnu::unused]], char * argv[] [[gnu::unused]])
 
   provider.store(json1);
 
-  auto json2 = JsonData{"{\"document\":{\"aa\":14}, \"collection\":\"test_V100\", \"test_V100_id\":0}"};
+  auto json2 = JsonData{"{\"document\":{\"aa\":14, \"key\":\"sdgfdsgf.dfgdfg\"}, \"collection\":\"test_V100\", \"test_V100_id\":0}"};
 
   provider.store(json2);
   
-  auto json3 = JsonData{"{\"filter\":{\"test_V100_id\":0, \"document.aa\":14}, \"collection\":\"test_V100\" }"};
+  auto json3 = JsonData{"{\"filte1r\":{\"test_V100_id\":0, \"document.aa\":14}, \"collection\":\"test_V100\" }"};
   
   auto collection = provider.load(json3);
   

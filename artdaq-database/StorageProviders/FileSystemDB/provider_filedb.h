@@ -4,10 +4,18 @@
 #include "artdaq-database/StorageProviders/common.h"
 #include "artdaq-database/StorageProviders/storage_providers.h"
 
+#ifdef TRACE_NAME
+  #undef TRACE_NAME
+#endif
+
+#define TRACE_NAME "PRVDR:FileDB_H"
+
 namespace artdaq{
 namespace database{
 namespace filesystem{
 
+void  trace_enable();
+  
 struct DBConfig final {
     std::string hostname = "127.0.0.1";
     std::string path = "path";
