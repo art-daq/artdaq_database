@@ -9,8 +9,7 @@
 
 int main(int argc [[gnu::unused]], char * argv[] [[gnu::unused]])
 {
-   registerAbortHandler();
-   registerUncaughtExceptionHandler();
+   debug::registerUngracefullExitHandlers();
 
   using  artdaq::database::basictypes::FhiclData;
   using  artdaq::database::basictypes::JsonData;
@@ -31,7 +30,7 @@ int main(int argc [[gnu::unused]], char * argv[] [[gnu::unused]])
 
   provider.store(json2);
   
-  auto json3 = JsonData{"{\"filte1r\":{\"test_V100_id\":0, \"document.aa\":14}, \"collection\":\"test_V100\" }"};
+  auto json3 = JsonData{"{\"filter\":{\"test_V100_id\":0, \"document.aa\":14}, \"collection\":\"test_V100\" }"};
   
   auto collection = provider.load(json3);
   
