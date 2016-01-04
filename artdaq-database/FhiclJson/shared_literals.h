@@ -28,7 +28,7 @@ constexpr auto linenum = "linenum";
 namespace regex
 {
   constexpr auto parse_double ="-?\\d*\\.?\\d+e[+-]?\\d+";
-  constexpr auto parse_include ="(#include)";
+  constexpr auto parse_include ="(#include)";  
 }
 
 #endif /* _ARTDAQ_DATABASE_SHAREDLITERALS_H_ */

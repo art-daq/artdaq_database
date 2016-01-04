@@ -8,7 +8,10 @@
 #include <cassert>
 #include <type_traits>
 #include <iostream>
+#include <iterator>
+#include <string> 
 #include "trace.h"
+#include <regex>
 
 #include <boost/core/demangle.hpp>
 

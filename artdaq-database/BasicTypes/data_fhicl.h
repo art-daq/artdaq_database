@@ -3,13 +3,26 @@
 
 #include "artdaq-database/BasicTypes/common.h"
 
-namespace artdaq {
-namespace database {
-namespace basictypes {
+#ifdef TRACE_NAME
+#undef TRACE_NAME
+#endif
+
+#define TRACE_NAME "FhiclData_H"
+
+namespace artdaq{
+namespace database{
+namespace basictypes{
+
+struct JsonData;
 
 struct FhiclData {
+    FhiclData(std::string const&);
+
+    FhiclData(JsonData const&);
+    operator JsonData() const;
+
     static constexpr auto type_version() {
-        return "V1.0.0";
+        return "V100";
     }
 
     std::string fhicl_buffer;

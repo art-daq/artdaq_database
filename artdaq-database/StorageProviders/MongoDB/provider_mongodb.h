@@ -41,11 +41,11 @@ public:
         return std::make_shared<MongoDB, DBConfig const&, PassKeyIdiom const&>(config, {});
     }
 
-    class PassKeyIdiom
+    class PassKeyIdiom final
     {
     private:
-        friend std::shared_ptr<MongoDB> MongoDB::create(DBConfig const& config);
-        PassKeyIdiom() {}
+        friend std::shared_ptr<MongoDB> MongoDB::create(DBConfig const&);
+        PassKeyIdiom() =default;
     };
 
     explicit MongoDB(DBConfig const& config, PassKeyIdiom const&):
@@ -71,6 +71,8 @@ template <typename TYPE>
 using DBProvider = MongoDBProvider<TYPE>;
 
 using DB = MongoDB;
+
+
 } // namespace mongo
 } //namespace database
 } //namespace artdaq

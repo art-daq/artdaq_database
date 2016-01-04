@@ -3,20 +3,38 @@
 
 #include "artdaq-database/StorageProviders/common.h"
 
-namespace artdaq {
-namespace database {
+namespace artdaq{
+namespace database{
 
 template <typename TYPE, typename IMPL>
 class StorageProvider final
 {
 public:
-    StorageProvider (std::shared_ptr<IMPL> const& provider)
-    :_provider(provider){}
-    
+    using StorableType = TYPE; 
+    using Provider = StorageProvider<TYPE, IMPL>;
+    using ProviderSPtr = std::shared_ptr<Provider>;
+
+    static  ProviderSPtr create(std::shared_ptr<IMPL> const& provider) {
+        return std::make_shared < Provider, std::shared_ptr<IMPL> const&,
+        PassKeyIdiom const& > (provider, {});
+    }
+
+    class PassKeyIdiom final
+    {
+    private:
+	template <typename T, typename I>      
+        friend ProviderSPtr create(std::shared_ptr<I> const&);
+        PassKeyIdiom()=default;
+    };
+
+    StorageProvider(std::shared_ptr<IMPL> const& provider, PassKeyIdiom const&)
+        : _provider(provider) {}
+
+
     template <typename FILTER>
     std::vector<TYPE> load(FILTER const&);
-    void store(TYPE const&);    
-private:    
+    void store(TYPE const&);
+private:
     std::shared_ptr<IMPL> _provider;
 };
 } //namespace database

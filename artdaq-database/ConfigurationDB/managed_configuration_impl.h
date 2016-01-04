@@ -2,60 +2,62 @@
 
 using artdaq::database::configuration::ManagedConfiguration;
   
-template <typename TYPE, template <typename TYPE> class PROVIDER>
+template <typename CONF, typename PROVIDER>
 template <typename FILTER>
-std::vector<typename ManagedConfiguration<TYPE,PROVIDER>::SelfType>
-ManagedConfiguration<TYPE,PROVIDER>::load(FILTER& f)
+std::vector<typename ManagedConfiguration<CONF,PROVIDER>::SelfType>
+ManagedConfiguration<CONF,PROVIDER>::load(FILTER& f)
 {
    return provider()->load(f);
 }
 
-template <typename TYPE, template <typename TYPE> class PROVIDER>
-typename ManagedConfiguration<TYPE,PROVIDER>::SelfType&
-ManagedConfiguration<TYPE,PROVIDER>::store()
+template <typename CONF, typename PROVIDER>
+typename ManagedConfiguration<CONF,PROVIDER>::SelfType&
+ManagedConfiguration<CONF,PROVIDER>::store()
 {
-  provider()->store(self());
+  std::stringstream os;
+  self().write(os);  
+  provider()->store(StorableType(os.str()));
   return self();
 }
 
-template <typename TYPE, template <typename TYPE> class PROVIDER>
-typename ManagedConfiguration<TYPE,PROVIDER>::SelfType&
-ManagedConfiguration<TYPE,PROVIDER>::assignAlias(std::string const&)
-{
-  return self();
-}
-
-template <typename TYPE, template <typename TYPE> class PROVIDER>
-typename ManagedConfiguration<TYPE,PROVIDER>::SelfType&
-ManagedConfiguration<TYPE,PROVIDER>::addToGlobalConfiguration(std::string const&)
+template <typename CONF, typename PROVIDER>
+typename ManagedConfiguration<CONF,PROVIDER>::SelfType&
+ManagedConfiguration<CONF,PROVIDER>::assignAlias(std::string const&)
 {
   return self();
 }
 
-template <typename TYPE, template <typename TYPE> class PROVIDER>
-typename ManagedConfiguration<TYPE,PROVIDER>::SelfType&
-ManagedConfiguration<TYPE,PROVIDER>::markDeleted()
+template <typename CONF, typename PROVIDER>
+typename ManagedConfiguration<CONF,PROVIDER>::SelfType&
+ManagedConfiguration<CONF,PROVIDER>::addToGlobalConfiguration(std::string const&)
 {
   return self();
 }
 
-template <typename TYPE, template <typename TYPE> class PROVIDER>
+template <typename CONF, typename PROVIDER>
+typename ManagedConfiguration<CONF,PROVIDER>::SelfType&
+ManagedConfiguration<CONF,PROVIDER>::markDeleted()
+{
+  return self();
+}
+
+template <typename CONF, typename PROVIDER>
 std::vector<std::string>
-ManagedConfiguration<TYPE,PROVIDER>::listAliases()
+ManagedConfiguration<CONF,PROVIDER>::listAliases()
 {
   return {};
 }
 
-template <typename TYPE, template <typename TYPE> class PROVIDER>        
+template <typename CONF, typename PROVIDER>        
 std::vector<std::tuple<std::string, std::time_t>> 
-ManagedConfiguration<TYPE,PROVIDER>::listAliasHistory()
+ManagedConfiguration<CONF,PROVIDER>::listAliasHistory()
 {
   return {};
 }
 
-template <typename TYPE, template <typename TYPE> class PROVIDER>        
+template <typename CONF, typename PROVIDER>        
 std::vector<std::string> 
-ManagedConfiguration<TYPE,PROVIDER>::listGlobalConfigurations()
+ManagedConfiguration<CONF,PROVIDER>::listGlobalConfigurations()
 {
   return {};
 }	

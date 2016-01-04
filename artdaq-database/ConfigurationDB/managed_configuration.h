@@ -8,18 +8,22 @@ namespace artdaq{
 namespace database{
 namespace configuration{
 
-template <typename TYPE, template <typename TYPE> class PROVIDER>
-class ManagedConfiguration : public Configuration <TYPE, PROVIDER>
+template <typename CONF>
+using ConfigurationImpl = Configuration <CONF, JSON>;
+  
+template <typename CONF, typename PROVIDER>
+class ManagedConfiguration : public ConfigurationImpl<CONF>
 {
-    using SelfType = ManagedConfiguration<TYPE,PROVIDER>;
-    using UserType = TYPE;
-    using PersistType = Configuration<TYPE,PROVIDER>;
-
+    using UserType = CONF;
+    using StorableType = typename PROVIDER::StorableType;
+    using SelfType = ManagedConfiguration<CONF,PROVIDER>;
+    using PersistType = ConfigurationImpl<CONF>;
+    
 public:
-    template <typename ...ARGS>
-    ManagedConfiguration(ARGS && ...args)
-        : Configuration <TYPE,PROVIDER>(std::forward<ARGS>(args)...),
-         _collection_name(Configuration<TYPE,PROVIDER>::versioned_typename()){}
+    ManagedConfiguration(CONF const& conf, std::shared_ptr<PROVIDER> const& provider)
+        : ConfigurationImpl<CONF>(conf),
+         _collection_name(ConfigurationImpl<CONF>::versioned_typename()),
+         _provider(provider){}
 
     template <typename FILTER>
     std::vector<SelfType> load(FILTER&);
@@ -30,8 +34,6 @@ public:
         assert(!collection.empty());
         return *collection.begin();
     }
-
-
     
     SelfType& store();
     SelfType& assignAlias(std::string const&);
@@ -42,21 +44,19 @@ public:
     std::vector<std::tuple<std::string, std::time_t>> listAliasHistory();
     std::vector<std::string> listGlobalConfigurations();
     
-    void useProvider(std::shared_ptr<PROVIDER<TYPE>> provider){_provider=provider;}
-    
 private:
     SelfType& self(){ 
       return *this;      
     }
     
-    std::shared_ptr<PROVIDER<TYPE>>& provider(){
+    std::shared_ptr<PROVIDER>& provider(){
     assert(_provider);
     return _provider;
     }
     
 private:    
     std::string _collection_name;
-    std::shared_ptr<PROVIDER<TYPE>> _provider;
+    std::shared_ptr<PROVIDER> _provider;
 };
 
 } //namespace configuration

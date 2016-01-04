@@ -8,16 +8,16 @@ namespace artdaq{
 namespace database{
 namespace configuration{
 
-template <typename TYPE, template <typename TYPE> class PROVIDER>
-class ManagedConfigurationAlias : public Configuration <TYPE, PROVIDER>
+template <typename CONF, template <typename CONF> class PROVIDER>
+class ManagedConfigurationAlias : public Configuration <CONF, PROVIDER>
 {
-    using SelfType = ManagedConfigurationAlias<TYPE, PROVIDER>;
+    using SelfType = ManagedConfigurationAlias<CONF, PROVIDER>;
 
 public:
     template <typename ...ARGS>
     ManagedConfigurationAlias(ARGS && ...args)
-        : Configuration <TYPE,PROVIDER>(std::forward<ARGS>(args)...),
-         collection_name(TYPE::versioned_typename()){}
+        : Configuration <CONF,PROVIDER>(std::forward<ARGS>(args)...),
+         collection_name(CONF::versioned_typename()){}
          
     template <typename FILTER>
     std::vector<SelfType> load(FILTER&);
@@ -28,7 +28,7 @@ public:
 
     template <typename ARG>
     SelfType& assignConfigAlias(ARG && arg) {
-        Configuration<TYPE,PROVIDER>::self().assignConfigAlias(std::forward<ARG>(arg));
+        Configuration<CONF,PROVIDER>::self().assignConfigAlias(std::forward<ARG>(arg));
         return *this;
     }
 
