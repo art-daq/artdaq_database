@@ -1,0 +1,71 @@
+{
+    "document" : {
+        "data" : {
+            "aa" : 3, 
+            "b" : {
+                "c" : "2", 
+                "dd" : [
+                    2, 
+                    5, 
+                    6, 
+                    7
+                ]
+            }
+        }, 
+        "metadata" : {
+            "comments" : {
+                "empty" : "empty"
+            }
+        }, 
+        "search" : [
+            {
+                "name" : "find any", 
+                "query" : "not defined"
+            }
+        ]
+    }, 
+    "version" : "version1", 
+    "source" : {
+        "encoding" : "base64", 
+        "format" : "json", 
+        "rawdata" : "as"
+    }, 
+    "configurations" : [
+        {
+            "name" : "test", 
+            "assigned" : "Mon Feb  8 14:00:30 2016"
+        }    
+    ], 
+    "aliases" : {
+        "active" : [
+            {
+                "name" : "alias012", 
+                "assigned" : "Mon Feb  8 14:00:30 2016"
+            }, 
+            {
+                "name" : "alias02", 
+                "assigned" : "Mon Feb  8 14:00:30 2016"
+            }
+        ], 
+        "history" : [
+            {
+                "name" : "alias01", 
+                "assigned" : "Mon Feb  8 14:00:30 2016", 
+                "removed" : "Mon Feb  8 14:00:30 2016"
+            }
+        ]
+    }, 
+    "bookkeeping" : {
+        "isdeleted" : false, 
+        "isreadonly" : false, 
+        "created" : "Tue Dec 29 18:19:25 2015", 
+        "updates" : [
+            {
+                "addAlias" : "Mon Feb  8 14:00:30 2016"
+            }, 
+            {
+                "removeAlias" : "Mon Feb  8 14:00:30 2016"
+            }
+        ]
+    }
+}

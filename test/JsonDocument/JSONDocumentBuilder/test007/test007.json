@@ -1,0 +1,7 @@
+{ 
+  "operation":"setVersion",
+  "begin-state":"begin-state.json", 
+  "end-state":"end-state.json",
+  "delta":"version.json",
+  "must-succeed":1
+}
