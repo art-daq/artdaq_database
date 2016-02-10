@@ -7,7 +7,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "JsonData_H"
+#define TRACE_NAME "BTYPES:JsonData_H"
 
 
 namespace artdaq{

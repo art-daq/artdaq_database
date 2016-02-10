@@ -3,10 +3,12 @@
 #include <fstream>
 #include <streambuf>
 #include "boost/program_options.hpp"
-#include "artdaq-database/FhiclJson/fhicljson.h"
+#include "artdaq-database/FhiclJson/fhicljsongui.h"
+#include "artdaq-database/FhiclJson/fhicljsondb.h"
 
 namespace  bpo = boost::program_options;
-using namespace artdaq::database::fhicljson;
+using namespace artdaq::database;
+
 
 
 int main(int argc, char * argv[]) try
@@ -22,6 +24,7 @@ int main(int argc, char * argv[]) try
 
   desc.add_options()
   ("config,c", bpo::value<std::string>(), "Configuration file.")
+  ("outputformat,f", bpo::value<std::string>(), "Output file format.")  
   ("help,h", "produce help message");
 
   bpo::variables_map vm;
@@ -50,6 +53,7 @@ int main(int argc, char * argv[]) try
   }
 
   auto file_name= vm["config"].as<std::string>();
+  auto format = vm["outputformat"].as<std::string>();
 
   std::ifstream is(file_name);
   
@@ -60,7 +64,11 @@ int main(int argc, char * argv[]) try
   auto fhicl=fhicl_buffer.str();
   auto json =std::string();
   
-  fhicl_to_json(fhicl,json);
+    if(format.compare("db")==0 || format.compare("database")==0 ){
+      fhicljsondb::fhicl_to_json(fhicl,json);
+    }else {
+      fhicljsongui::fhicl_to_json(fhicl,json);
+    }  
 
   std::ofstream os(file_name+".json");
   os << json;

@@ -106,11 +106,15 @@ qi::rule< Iter, includes_t(), qi::blank_type>  includes_rule;
 namespace jsn = artdaq::database::json;
 
 struct FhiclReader final {
-    bool read_data(std::string const&, jsn::array_t&);
+    bool read_data_gui(std::string const&, jsn::array_t&);
+    bool read_data_db(std::string const&, jsn::object_t&);
+
     bool read_comments(std::string const&, jsn::array_t&);
     bool read_includes(std::string const&, jsn::array_t&);
 
 };
+
+void trace_enable_FhiclReader();
 
 } //namespace fhicl
 } //namespace database

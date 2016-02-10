@@ -83,9 +83,13 @@ karma::rule< Iter, includes_t()      >    includes_rule;
 };
 
 struct FhiclWriter final {
-    bool write_data(jsn::array_t const&, std::string&);
+    bool write_data_gui(jsn::array_t const&, std::string&);
+    bool write_data_db(jsn::object_t const&, std::string&);
+    
     bool write_includes(jsn::array_t const&, std::string&);
 };
+
+void trace_enable_FhiclWriter();
 
 } //namespace fhicl
 } //namespace database

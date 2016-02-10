@@ -3,6 +3,7 @@
 
 namespace literal
 {
+constexpr auto document_node = "document";
 constexpr auto data_node = "data";
 constexpr auto comments_node = "comments";
 constexpr auto origin_node = "origin";
@@ -22,6 +23,7 @@ constexpr auto values = "values";
 constexpr auto unknown = "unknown";
 constexpr auto include = "#include";
 constexpr auto linenum = "linenum";
+constexpr auto metadata_node = "metadata";
 
 }
 

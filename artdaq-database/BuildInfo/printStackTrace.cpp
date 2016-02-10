@@ -192,7 +192,7 @@ void  trace_enable()
     TRACE_CNTL("name",    TRACE_NAME);
     TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
     TRACE_CNTL("modeM", 1LL);
-    TRACE_CNTL("modeS", 0LL);
+    TRACE_CNTL("modeS", 1LL);
 }
 
 void registerUngracefullExitHandlers()

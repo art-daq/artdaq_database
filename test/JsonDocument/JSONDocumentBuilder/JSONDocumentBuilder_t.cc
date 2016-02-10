@@ -28,7 +28,7 @@ bool test_addToGlobalConfig(std::string const& conf);
 
 
 
-int main(int argc, char* argv[]) try
+int main(int argc, char* argv[]) 
 {
     artdaq::database::jsonutils::trace_enable_JSONDocument();
 
@@ -105,23 +105,6 @@ int main(int argc, char* argv[]) try
     auto testResult= runTest(name(conf))(conf);
 
     return !testResult;
-}
-
-catch (std::string& x)
-{
-    std::cerr << "Exception (type string) caught in driver: " << x << "\n";
-    return 1;
-}
-
-catch (char const* m)
-{
-    std::cerr << "Exception (type char const*) caught in driver: " << std::endl;
-    if (m) {
-        std::cerr << m;
-    } else {
-        std::cerr << "[the value was a null pointer, so no message is available]";
-    }
-    std::cerr << '\n';
 }
 
 namespace literal

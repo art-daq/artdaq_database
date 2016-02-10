@@ -4,7 +4,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "JsonData_C"
+#define TRACE_NAME "BTYPES:JsonData_C"
 
 using artdaq::database::basictypes::JsonData;
 

@@ -7,7 +7,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "FhiclData_H"
+#define TRACE_NAME "BTYPES:FhiclData_H"
 
 namespace artdaq{
 namespace database{
@@ -18,6 +18,8 @@ struct JsonData;
 struct FhiclData {
     FhiclData(std::string const&);
 
+    FhiclData()=default;
+    
     FhiclData(JsonData const&);
     operator JsonData() const;
 
@@ -27,6 +29,8 @@ struct FhiclData {
 
     std::string fhicl_buffer;
 };
+
+std::istream& operator>>(std::istream&, artdaq::database::basictypes::FhiclData&);
 
 } //namespace basictypes
 } //namespace database

@@ -7,4 +7,7 @@ include(CetTest)
 cet_test_env("FHICL_FILE_PATH=.")
 
 #add_subdirectory(Data)
-add_subdirectory(StorageProviders)
+
+#add_subdirectory(StorageProviders)
+add_subdirectory(JsonDocument)
+add_subdirectory(FhiclJson)

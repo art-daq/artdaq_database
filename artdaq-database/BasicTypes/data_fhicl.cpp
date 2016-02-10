@@ -14,7 +14,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "FhiclData_C"
+#define TRACE_NAME "BTYPES:FhiclData_C"
 
 namespace regex
 {
@@ -27,7 +27,7 @@ namespace basictypes{
 
 template<>
 bool JsonData::convert_to(FhiclData& fhicl) const
-{
+{    
     using artdaq::database::fhicljson::json_to_fhicl;
 
     return json_to_fhicl(json_buffer, fhicl.fhicl_buffer);
@@ -112,6 +112,15 @@ FhiclData::operator JsonData() const
     TRACE_(8, "FHICL document=" << os.str());
 
     return {os.str()};
+}
+
+
+std::istream& operator>>(std::istream& is, FhiclData& data)
+{
+    auto str = std::string(std::istreambuf_iterator<char>(is), {});
+    auto json = JsonData(str);    
+    data = FhiclData(json);    
+    return is;
 }
 
 } //namespace basictypes
