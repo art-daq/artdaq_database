@@ -4,6 +4,12 @@
 #include "artdaq-database/ConfigurationDB/common.h"
 #include "artdaq-database/JsonConvert/class_introspection.h"
 
+#ifdef TRACE_NAME
+#undef TRACE_NAME
+#endif
+
+#define TRACE_NAME "CONF:ConfigDB_H"
+
 namespace artdaq{
 namespace database{
 namespace configuration{
@@ -39,8 +45,9 @@ public:
         return boost::core::demangle(typeid(CONF).name()) + "_" + CONF::type_version();
     }
 
-    CONF& get(){return _configuration;};
+    CONF& get(){return _configuration;}
     
+    metadata& metadata(){return _metadata;}
 private:
     CONF _configuration;
     metadata _metadata;

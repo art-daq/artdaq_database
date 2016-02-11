@@ -10,12 +10,5 @@ art_make(
   ${CETLIB}
   )
 
-art_make_exec(MongoDB_t
-  LIBRARIES
-  artdaq-database_FhiclJson
-  ${FHICLCPP}
-  ${CETLIB}
-) 
-
 install_headers()
 install_source()
