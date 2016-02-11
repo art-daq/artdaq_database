@@ -1,0 +1,26 @@
+process_name: "DAQ"
+ 
+services: {
+ 
+scheduler: {
+ 
+fileMode: "NOMERGE"  
+
+} 
+user: {
+ 
+NetMonTransportServiceInterface: {
+ 
+data_receiver_count: 1 # 2
+ 
+first_data_receiver_rank: 6  
+ 
+max_fragment_size_words: 2097152  
+ 
+mpi_buffer_count: 8  
+ 
+service_provider: "NetMonTransportService"  
+
+}
+}
+}

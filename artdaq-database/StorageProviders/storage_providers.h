@@ -6,6 +6,8 @@
 namespace artdaq{
 namespace database{
 
+using object_id_t = std::string;
+  
 template <typename TYPE, typename IMPL>
 class StorageProvider final
 {
@@ -32,8 +34,8 @@ public:
 
 
     template <typename FILTER>
-    std::vector<TYPE> load(FILTER const&);
-    void store(TYPE const&);
+    std::vector<TYPE> load(FILTER const&);    
+    object_id_t store(TYPE const&);
 private:
     std::shared_ptr<IMPL> _provider;
 };

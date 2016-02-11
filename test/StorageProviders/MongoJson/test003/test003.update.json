@@ -1,0 +1,10 @@
+{
+"document" : {
+"data" : {
+"daq" : {
+"event_builder" : {
+"first_fragment_receiver_rank" : 0,
+"demo123" : 16,
+"use_art" : true,
+"verbose" : false
+}}}}}

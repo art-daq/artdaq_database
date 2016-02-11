@@ -1,0 +1,13 @@
+{
+"document" : {
+"data" : {
+"daq" : {
+"event_builder" : {
+"expected_fragments_per_event" : 2,
+"first_fragment_receiver_rank" : 0,
+"fragment_receiver_count" : 2,
+"mpi_buffer_count" : 33,
+"print_event_store_stats" : true,
+"use_art" : true,
+"verbose" : false
+}}}}}

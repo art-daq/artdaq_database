@@ -27,9 +27,10 @@ std::vector<JsonData> StorageProvider<JsonData, FileSystemDB>::load(JsonData con
 
 
 template<>
-void StorageProvider<JsonData, FileSystemDB>::store(JsonData const& data [[gnu::unused]])
+object_id_t StorageProvider<JsonData, FileSystemDB>::store(JsonData const& data [[gnu::unused]])
 {
   //FIXME:: implement this
+  return "error";
 }
 
 namespace filesystem{

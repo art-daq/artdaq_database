@@ -26,7 +26,7 @@ namespace artdaq {
 namespace database {
 namespace jsonutils {
 
-using value_type_t = bsoncxx::v0::type;
+using value_type_t = bsoncxx::type;
 
 template <typename T>
 constexpr std::uint8_t static_cast_as_uint8_t(T const& t)
@@ -487,14 +487,19 @@ JSONDocument JSONDocument::deleteChild(path_t const& path)
                 TRACE_(3, "deleteChild() recurse() childElement=<" << bsoncxx::to_json(childElement) << ">");
 
                 if (path_tokens.at(currentDepth) == childElement.key().to_string()) {
-                    deleted_json_buffer = bsoncxx::to_json(childElement.get_value());
+		    deleted_json_buffer = bsoncxx::to_json(childElement.get_value());
 
+		    if(path == "_id") {
+		        std::replace(deleted_json_buffer.begin(),deleted_json_buffer.end(),'$','_');
+		    }
+		    
                     TRACE_(3, "deleteChild() recurse() Delete succeeded.");
                     wasUpdated = true;
                     continue;
                 }
-
-                resultDocument <<  childElement.key().to_string() << childElement.get_value();
+   
+		
+		resultDocument << childElement.key().to_string() << childElement.get_value();
             }
 
             return resultDocument;
@@ -533,7 +538,7 @@ JSONDocument JSONDocument::deleteChild(path_t const& path)
     if (!wasUpdated) {
         TRACE_(3, "deleteChild() recurse() Error: Delete failed path =<" << path << ">, call findChild() instead.");
 
-        throw cet::exception("JSONDocument") << "elete failed path =<" << path << ">, call findChild() instead.";
+        throw cet::exception("JSONDocument") << "Delete failed path =<" << path << ">, call findChild() instead.";
     }
 
     _json_buffer = bsoncxx::to_json(updatedDocument);
