@@ -151,7 +151,7 @@ JSONDocument toJSONDocument<std::pair<std::string,std::string>>(std::pair<std::s
     ss << '}';
     
     return {ss.str()};
-};
+}
 
 
 JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& document)
