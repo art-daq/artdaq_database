@@ -142,6 +142,18 @@ JSONDocument  JSONDocumentBuilder::_bookkeeping_update_payload(std::string actio
     return _wrap_as_payload( {ss.str()});
 }
 
+
+template <> 
+JSONDocument toJSONDocument<std::pair<std::string,std::string>>(std::pair<std::string,std::string> const& pair) {
+    std::stringstream ss;
+    ss << '{';
+    ss << quoted_(pair.first) << colon << quoted_(pair.second);
+    ss << '}';
+    
+    return {ss.str()};
+};
+
+
 JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& document)
 {
     TRACE_(2, "createFrom() args  document=<" << document << ">");
