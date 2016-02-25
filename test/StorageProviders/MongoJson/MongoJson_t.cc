@@ -8,7 +8,9 @@
 #include "boost/program_options.hpp"
 #include "artdaq-database/StorageProviders/common.h"
 #include "artdaq-database/BasicTypes/basictypes.h"
+#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/BuildInfo/printStackTrace.h"
+#include <boost/exception/diagnostic_information.hpp>
 
 #include "artdaq-database/StorageProviders/storage_providers.h"
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
@@ -28,7 +30,7 @@ bool test_search1(std::string const&, std::string const&,std::string const&);
 bool test_search2(std::string const&, std::string const&,std::string const&);
 bool test_update(std::string const&, std::string const&,std::string const&);
 
-int main(int argc, char* argv[])
+int main(int argc, char* argv[])try
 {
     artdaq::database::mongo::trace_enable();
     //artdaq::database::jsonutils::trace_enable_JSONDocument();
@@ -61,20 +63,21 @@ int main(int argc, char* argv[])
     } catch (bpo::error const& e) {
         std::cerr << "Exception from command line processing in " << argv[0]
                   << ": " << e.what() << "\n";
-        return -1;
+        return process_exit_code::INVALID_ARGUMENT;
     }
-
+    
     if (vm.count("help")) {
         std::cout << desc << std::endl;
-        return 1;
+        return process_exit_code::HELP;
     }
+    
     if (!vm.count("source")) {
         std::cerr << "Exception from command line processing in " << argv[0]
                   << ": no source file given.\n"
                   << "For usage and an options list, please do '"
                   << argv[0] <<  " --help"
                   << "'.\n";
-        return 2;
+        return  process_exit_code::INVALID_ARGUMENT|1;
     }
 
     if (!vm.count("compare")) {
@@ -83,7 +86,7 @@ int main(int argc, char* argv[])
                   << "For usage and an options list, please do '"
                   << argv[0] <<  " --help"
                   << "'.\n";
-        return 3;
+        return  process_exit_code::INVALID_ARGUMENT|2;
     }
 
     if (!vm.count("testname")) {
@@ -92,7 +95,7 @@ int main(int argc, char* argv[])
                   << "For usage and an options list, please do '"
                   << argv[0] <<  " --help"
                   << "'.\n";
-        return 4;
+        return  process_exit_code::INVALID_ARGUMENT|3;
     }
 
     auto input_name = vm["source"].as<std::string>();
@@ -139,9 +142,16 @@ int main(int argc, char* argv[])
 
     auto testResult = runTest(test_name)(input, compare, options);
 
-    return !testResult;
-}
+    if(testResult)
+        return process_exit_code::SUCCESS;
 
+    return process_exit_code::FAILURE;
+}
+catch(...)
+{
+    std::cerr << "Process exited with error: " << boost::current_exception_diagnostic_information();
+    return process_exit_code::UNCAUGHT_EXCEPTION;
+}
 
 bool test_insert(std::string const& source, std::string const& compare,std::string const& filter)
 {
@@ -175,7 +185,7 @@ bool test_insert(std::string const& source, std::string const& compare,std::stri
   auto collection = provider->load(search);
   
   if(collection.size()!=1) {    
-      std::cout << "Search returned " << collection.size() << "results \n";
+      std::cout << "Search returned " << collection.size() << " results.\n";
     
       for (auto&& element : collection) {
 		std::cout << element.json_buffer  << "\n";
@@ -230,7 +240,7 @@ bool test_search1(std::string const& source, std::string const& compare,std::str
   auto collection = provider->load(search);
   
   if(collection.size()!=1) {    
-      std::cout << "Search returned " << collection.size() << "results \n";
+      std::cout << "Search returned " << collection.size() << " results.\n";
     
       for (auto&& element : collection) {
 		std::cout << element.json_buffer  << "\n";
@@ -295,7 +305,7 @@ bool test_search2(std::string const& source, std::string const& compare,std::str
   auto collection = provider->load(search);
   
   if(collection.size()!=repeatCount) {    
-      std::cout << "Search returned " << collection.size() << "results \n";
+      std::cout << "Search returned " << collection.size() << " results.\n";
     
       for (auto&& element : collection) {
 		std::cout << element.json_buffer  << "\n";
@@ -340,7 +350,7 @@ bool test_update(std::string const& source, std::string const& compare,std::stri
   auto collection = provider->load(search);
   
   if(collection.size()!=1) {    
-      std::cout << "Search returned " << collection.size() << "results \n";
+      std::cout << "Search returned " << collection.size() << " results.\n";
     
       for (auto&& element : collection) {
 		std::cout << element.json_buffer  << "\n";
@@ -359,7 +369,7 @@ bool test_update(std::string const& source, std::string const& compare,std::stri
   collection = provider->load(search);
   
   if(collection.size()!=1) {    
-      std::cout << "Search returned " << collection.size() << "results \n";
+      std::cout << "Search returned " << collection.size() << " results.\n";
     
       for (auto&& element : collection) {
 		std::cout << element.json_buffer  << "\n";

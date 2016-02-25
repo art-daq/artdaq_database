@@ -28,6 +28,7 @@ constexpr auto bookkeeping_isdeleted  = "bookkeeping.isdeleted";
 constexpr auto bookkeeping_isreadonly = "bookkeeping.isreadonly";
 
 constexpr auto configurations = "configurations";
+constexpr auto configurations_name           = "configurations.name";
 
 }
 
@@ -69,9 +70,8 @@ constexpr auto template__default_document =
 "\t    \"rawdata\": \"as\"\n"
 "    },\n"
 "    \n"
-"    \"version\": \"version1\",\n"
+"    \"version\": \"default\",\n"
 "    \"configurations\": [\n"
-"        \"config1\"\n"
 "    ],\n"
 "    \"aliases\": {\n"
 "        \"active\": [\n"

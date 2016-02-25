@@ -32,7 +32,7 @@ bool fhicl_to_json(std::string const& fcl, std::string& json)
     assert(!fcl.empty());
     assert(json.empty());
     
-    TRACE_(2, "fhicl_to_json begin");
+    TRACE_(2, "fhicl_to_json: begin");
 
     auto result = bool(false);
 
@@ -47,7 +47,7 @@ bool fhicl_to_json(std::string const& fcl, std::string& json)
     json_root[literal::origin_node] = jsn::object_t();
     json_root[literal::includes_node] = jsn::array_t();
 
-    TRACE_(2, "fhicl_to_json created root nodes");
+    TRACE_(2, "fhicl_to_json: Created root nodes");
 
     get_object(literal::origin_node)[literal::source] = std::string("fhicl_to_json");
     get_object(literal::origin_node)[literal::timestamp] = artdaq::database::fhicljson::timestamp();
@@ -79,14 +79,14 @@ bool fhicl_to_json(std::string const& fcl, std::string& json)
 
     auto writer = JsonWriter();
 
-    TRACE_(2, "JsonWriter::write() begin");
+    TRACE_(2, "fhicl_to_json: write() begin");
     result = writer.write(json_root, json1);
-    TRACE_(2, "JsonWriter::write() end");
+    TRACE_(2, "fhicl_to_json: write() end");
 
     if (result)
         json.swap(json1);
 
-    TRACE_(2, "fhicl_to_json end");
+    TRACE_(2, "fhicl_to_json: end");
     
     return result;
 }
@@ -96,17 +96,22 @@ bool json_to_fhicl(std::string const& json , std::string& fcl)
     assert(!json.empty());
     assert(fcl.empty());
 
+    TRACE_(3, "json_to_fhicl: begin");
+    
     auto result = bool(false);
 
     auto json_root = jsn::object_t();
 
     auto reader = JsonReader();
     
+    TRACE_(3, "json_to_fhicl: Reading json root nodes");
+    
     result = reader.read(json, json_root);
 
-    if (!result)
+    if (!result) {
+	TRACE_(3, "json_to_fhicl: Failed to read json root nodes");
         return result;
-
+    }
 
 //    auto writer = JsonWriter();
 //    result = writer.write(json_root, fcl1);
@@ -128,7 +133,9 @@ bool json_to_fhicl(std::string const& json , std::string& fcl)
 	  
 	}
     }
+    TRACE_(3, "json_to_fhicl: fcl_includes=<" <<fcl_includes << ">");
 
+    
     auto fcl_data = std::string();
     {
         auto const& document_object =  boost::get<jsn::object_t>(json_root[literal::document_node]);
@@ -138,6 +145,8 @@ bool json_to_fhicl(std::string const& json , std::string& fcl)
         if (!result)
             return result;
     }
+    
+    TRACE_(3, "json_to_fhicl: fcl_data=<" <<fcl_data << ">");
 
     if (result) {
       std::stringstream ss;
@@ -152,6 +161,9 @@ bool json_to_fhicl(std::string const& json , std::string& fcl)
       
       fcl.swap(result);
     }
+    
+    TRACE_(3, "json_to_fhicl: fcl=<" <<fcl<< ">");
+    TRACE_(3, "json_to_fhicl: end");
     
     return result;
 }

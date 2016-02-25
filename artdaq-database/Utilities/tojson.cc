@@ -6,90 +6,82 @@
 #include "artdaq-database/FhiclJson/fhicljsongui.h"
 #include "artdaq-database/FhiclJson/fhicljsondb.h"
 
+#include "artdaq-database/BuildInfo/process_exit_codes.h"
+#include <boost/exception/diagnostic_information.hpp>
+
 namespace  bpo = boost::program_options;
 using namespace artdaq::database;
 
-
-
 int main(int argc, char * argv[]) try
 {
- // Get the input parameters via the boost::program_options library,
-  // designed to make it relatively simple to define arguments and
-  // issue errors if argument list is supplied incorrectly
+// Get the input parameters via the boost::program_options library,
+    // designed to make it relatively simple to define arguments and
+    // issue errors if argument list is supplied incorrectly
 
-  std::ostringstream descstr;
-  descstr << argv[0] << " <-c <config-file>> <other-options>";
+    std::ostringstream descstr;
+    descstr << argv[0] << " <-c <config-file>> <other-options>";
 
-  bpo::options_description desc = descstr.str();
+    bpo::options_description desc = descstr.str();
 
-  desc.add_options()
-  ("config,c", bpo::value<std::string>(), "Configuration file.")
-  ("outputformat,f", bpo::value<std::string>(), "Output file format.")  
-  ("help,h", "produce help message");
+    desc.add_options()
+    ("config,c", bpo::value<std::string>(), "Configuration file.")
+    ("outputformat,f", bpo::value<std::string>(), "Output file format.")
+    ("help,h", "produce help message");
 
-  bpo::variables_map vm;
+    bpo::variables_map vm;
 
-  try {
-    bpo::store(bpo::command_line_parser(argc, argv).options(desc).run(), vm);
-    bpo::notify(vm);
-  }
-  catch (bpo::error const & e) {
-    std::cerr << "Exception from command line processing in " << argv[0]
-              << ": " << e.what() << "\n";
-    return -1;
-  }
+    try {
+        bpo::store(bpo::command_line_parser(argc, argv).options(desc).run(), vm);
+        bpo::notify(vm);
+    } catch (bpo::error const& e) {
+        std::cerr << "Exception from command line processing in " << argv[0]
+                  << ": " << e.what() << "\n";
+        return process_exit_code::INVALID_ARGUMENT;
+    }
 
-  if (vm.count("help")) {
-    std::cout << desc << std::endl;
-    return 1;
-  }
-  if (!vm.count("config")) {
-    std::cerr << "Exception from command line processing in " << argv[0]
-              << ": no configuration file given.\n"
-              << "For usage and an options list, please do '"
-              << argv[0] <<  " --help"
-              << "'.\n";
-    return 2;
-  }
+    if (vm.count("help")) {
+        std::cout << desc << std::endl;
+        return process_exit_code::HELP;
+    }
 
-  auto file_name= vm["config"].as<std::string>();
-  auto format = vm["outputformat"].as<std::string>();
 
-  std::ifstream is(file_name);
-  
-  std::stringstream fhicl_buffer;
-  fhicl_buffer << is.rdbuf();
-  is.close();
-  
-  auto fhicl=fhicl_buffer.str();
-  auto json =std::string();
-  
-    if(format.compare("db")==0 || format.compare("database")==0 ){
-      fhicljsondb::fhicl_to_json(fhicl,json);
-    }else {
-      fhicljsongui::fhicl_to_json(fhicl,json);
-    }  
+    if (!vm.count("config")) {
+        std::cerr << "Exception from command line processing in " << argv[0]
+                  << ": no configuration file given.\n"
+                  << "For usage and an options list, please do '"
+                  << argv[0] <<  " --help"
+                  << "'.\n";
+        return  process_exit_code::INVALID_ARGUMENT|1;
+    }
 
-  std::ofstream os(file_name+".json");
-  os << json;
-  os.close();
-    
-  std::cout << json << "\n";
-  return 0;
+    auto file_name= vm["config"].as<std::string>();
+    auto format = vm["outputformat"].as<std::string>();
+
+    std::ifstream is(file_name);
+
+    std::stringstream fhicl_buffer;
+    fhicl_buffer << is.rdbuf();
+    is.close();
+
+    auto fhicl=fhicl_buffer.str();
+    auto json =std::string();
+
+    if(format.compare("db")==0 || format.compare("database")==0 ) {
+        fhicljsondb::fhicl_to_json(fhicl,json);
+    } else {
+        fhicljsongui::fhicl_to_json(fhicl,json);
+    }
+
+    std::ofstream os(file_name+".json");
+    os << json;
+    os.close();
+
+    std::cout << json << "\n";
+    return process_exit_code::SUCCESS;
 }
-
-catch (std::string & x)
+catch(...)
 {
-  std::cerr << "Exception (type string) caught in driver: " << x << "\n";
-  return 1;
+    std::cerr << "Process exited with error: " << boost::current_exception_diagnostic_information();
+    return process_exit_code::UNCAUGHT_EXCEPTION;
 }
 
-catch (char const * m)
-{
-  std::cerr << "Exception (type char const*) caught in driver: " << std::endl;
-  if (m)
-    { std::cerr << m; }
-  else
-    { std::cerr << "[the value was a null pointer, so no message is available]"; }
-  std::cerr << '\n';
-}

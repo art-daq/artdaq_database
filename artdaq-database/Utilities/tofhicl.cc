@@ -6,6 +6,9 @@
 #include "artdaq-database/FhiclJson/fhicljsongui.h"
 #include "artdaq-database/FhiclJson/fhicljsondb.h"
 
+#include "artdaq-database/BuildInfo/process_exit_codes.h"
+#include <boost/exception/diagnostic_information.hpp>
+
 namespace  bpo = boost::program_options;
 using namespace artdaq::database;
 
@@ -34,20 +37,21 @@ int main(int argc, char* argv[]) try
     } catch (bpo::error const& e) {
         std::cerr << "Exception from command line processing in " << argv[0]
                   << ": " << e.what() << "\n";
-        return -1;
+        return process_exit_code::INVALID_ARGUMENT;
     }
 
     if (vm.count("help")) {
         std::cout << desc << std::endl;
-        return 1;
+        return process_exit_code::HELP;
     }
+
     if (!vm.count("config")) {
         std::cerr << "Exception from command line processing in " << argv[0]
                   << ": no configuration file given.\n"
                   << "For usage and an options list, please do '"
                   << argv[0] <<  " --help"
                   << "'.\n";
-        return 2;
+        return  process_exit_code::INVALID_ARGUMENT|1;
     }
 
     auto file_name = vm["config"].as<std::string>();
@@ -75,22 +79,10 @@ int main(int argc, char* argv[]) try
     os.close();
 
     std::cout << fhicl << "\n";
-    return 0;
+    return process_exit_code::SUCCESS;
 }
-
-catch (std::string& x)
+catch(...)
 {
-    std::cerr << "Exception (type string) caught in driver: " << x << "\n";
-    return 1;
-}
-
-catch (char const* m)
-{
-    std::cerr << "Exception (type char const*) caught in driver: " << std::endl;
-    if (m) {
-        std::cerr << m;
-    } else {
-        std::cerr << "[the value was a null pointer, so no message is available]";
-    }
-    std::cerr << '\n';
+    std::cerr << "Process exited with error: " << boost::current_exception_diagnostic_information();
+    return process_exit_code::UNCAUGHT_EXCEPTION;
 }

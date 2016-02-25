@@ -7,6 +7,7 @@
 #include <boost/fusion/include/adapt_assoc_struct.hpp>
 
 using namespace artdaq::database::demo;
+
 namespace cfg = artdaq::database::demo;
 
 namespace BasicSampleBKeys

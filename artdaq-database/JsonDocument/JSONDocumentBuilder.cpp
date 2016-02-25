@@ -142,9 +142,10 @@ JSONDocument  JSONDocumentBuilder::_bookkeeping_update_payload(std::string actio
     return _wrap_as_payload( {ss.str()});
 }
 
+using string_pair_t = std::pair<std::string,std::string>;
 
 template <> 
-JSONDocument toJSONDocument<std::pair<std::string,std::string>>(std::pair<std::string,std::string> const& pair) {
+JSONDocument toJSONDocument<string_pair_t>(string_pair_t const& pair) {
     std::stringstream ss;
     ss << '{';
     ss << quoted_(pair.first) << colon << quoted_(pair.second);

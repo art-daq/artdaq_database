@@ -4,6 +4,7 @@
 
 #include "fhicljson.h"
 #include "artdaq-database/FhiclJson/fhicljson.h"
+#include <boost/exception/diagnostic_information.hpp>
 
 using namespace artdaq::database::fhicljson;
 
@@ -28,10 +29,8 @@ result_pair_t tojson(std::string const& file_name)
         auto result = fhicl_to_json(fhicl, json);
 	
 	return std::make_pair(result, json);
-    } catch (std::exception const& e) {
-        return std::make_pair(false, make_error_msg(e.what()) );
-    } catch (...) {
-        return std::make_pair(false, make_error_msg("Unknown exception."));
+    } catch(...) {
+        return std::make_pair(false, boost::current_exception_diagnostic_information());
     }
 }
 
@@ -55,10 +54,8 @@ result_pair_t tofhicl(std::string const& file_name, std::string const& json)
         os.close();
 
         return std::make_pair(true, "");
-    } catch (std::exception const& e) {
-        return std::make_pair(false,make_error_msg(e.what()));
-    } catch (...) {
-        return std::make_pair(false, make_error_msg("Unknown exception."));
+    } catch(...) {
+        return std::make_pair(false, boost::current_exception_diagnostic_information());
     }
 }
 

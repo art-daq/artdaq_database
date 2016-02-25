@@ -59,11 +59,8 @@ private:
 bool useFakeTime(bool );
 std::string timestamp();
 
-
 template <typename T> 
-JSONDocument toJSONDocument(T const& t) {
-  throw cet::exception("toJSONDocument") << "toJSONDocument is not implemented for type=<" << boost::core::demangle(typeid(t).name()) << ">";
-}
+JSONDocument toJSONDocument(T const& t);
 
 void  trace_enable_JSONDocumentBuilder();
 } //namespace jsonutils

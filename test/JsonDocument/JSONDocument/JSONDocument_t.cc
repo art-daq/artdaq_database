@@ -5,7 +5,9 @@
 #include "boost/program_options.hpp"
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "cetlib/coded_exception.h"
+#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/BuildInfo/printStackTrace.h"
+#include <boost/exception/diagnostic_information.hpp>
 
 
 namespace  bpo = boost::program_options;
@@ -21,7 +23,7 @@ bool test_appendChild(std::string const& conf);
 bool test_removeChild(std::string const& conf);
 
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[]) try
 {
     artdaq::database::jsonutils::trace_enable_JSONDocument();
 
@@ -48,20 +50,21 @@ int main(int argc, char* argv[])
     } catch (bpo::error const& e) {
         std::cerr << "Exception from command line processing in " << argv[0]
                   << ": " << e.what() << "\n";
-        return -1;
+        return process_exit_code::INVALID_ARGUMENT;
     }
 
     if (vm.count("help")) {
         std::cout << desc << std::endl;
-        return 1;
+        return process_exit_code::HELP;
     }
+
     if (!vm.count("config")) {
         std::cerr << "Exception from command line processing in " << argv[0]
                   << ": no configuration file given.\n"
                   << "For usage and an options list, please do '"
                   << argv[0] <<  " --help"
                   << "'.\n";
-        return 2;
+        return  process_exit_code::INVALID_ARGUMENT|1;
     }
 
     auto file_name = vm["config"].as<std::string>();
@@ -71,29 +74,37 @@ int main(int argc, char* argv[])
 
     std::string conf((std::istreambuf_iterator<char>(is)),
                      std::istreambuf_iterator<char>());
-	
+
     auto name = [](auto const & conf) {
-      return JSONDocument(conf).value_as<std::string>("operation");
+        return JSONDocument(conf).value_as<std::string>("operation");
     };
-    
-    auto runTest = [](std::string const& name){
-      auto tests = std::map<std::string,test_case> {
-    {"insertChild",test_insertChild},
-    {"replaceChild",test_replaceChild},
-    {"deleteChild",test_deleteChild},
-    {"findChild",test_findChild},
-    {"appendChild",test_appendChild},
-    {"removeChild",test_removeChild}	
-      };
 
-    std::cout << "Running test:<" << name << ">\n";
+    auto runTest = [](std::string const& name) {
+        auto tests = std::map<std::string,test_case> {
+            {"insertChild",test_insertChild},
+            {"replaceChild",test_replaceChild},
+            {"deleteChild",test_deleteChild},
+            {"findChild",test_findChild},
+            {"appendChild",test_appendChild},
+            {"removeChild",test_removeChild}
+        };
 
-    return tests.at(name);
+        std::cout << "Running test:<" << name << ">\n";
+
+        return tests.at(name);
     };
-    
+
     auto testResult= runTest(name(conf))(conf);
-    
-    return !testResult;
+
+    if(testResult)
+        return process_exit_code::SUCCESS;
+
+    return process_exit_code::FAILURE;
+}
+catch(...)
+{
+    std::cerr << "Process exited with error: " << boost::current_exception_diagnostic_information();
+    return process_exit_code::UNCAUGHT_EXCEPTION;
 }
 
 namespace literal
@@ -123,18 +134,18 @@ bool test_insertChild(std::string const& conf)
 
     try {
         auto returned = std::move(begin.insertChild(delta, path));
-        
-	if (begin != end) {
+
+        if (begin != end) {
             std::cout << "Error invalid end state. \n" ;
-	    std::cerr << "begin:\n" << begin << "\n";
-	    std::cerr << "end:\n" << end << "\n";	    
+            std::cerr << "begin:\n" << begin << "\n";
+            std::cerr << "end:\n" << end << "\n";
             return false;
         }
-        
+
         if (returned != expected) {
             std::cout << "Error returned!=expected.\n";
-	    std::cerr << "returned:\n" << returned << "\n";
-	    std::cerr << "expected:\n" << expected << "\n";
+            std::cerr << "returned:\n" << returned << "\n";
+            std::cerr << "expected:\n" << expected << "\n";
             return false;
         }
     } catch (cet::exception const& e) {
@@ -160,18 +171,18 @@ bool test_replaceChild(std::string const& conf)
 
     try {
         auto returned = std::move(begin.replaceChild(delta, path));
-        
-	if (begin != end) {
+
+        if (begin != end) {
             std::cout << "Error invalid end state. \n" ;
-	    std::cerr << "begin:\n" << begin << "\n";
-	    std::cerr << "end:\n" << end << "\n";	    
+            std::cerr << "begin:\n" << begin << "\n";
+            std::cerr << "end:\n" << end << "\n";
             return false;
         }
-        
+
         if (returned != expected) {
             std::cout << "Error returned!=expected.\n";
-	    std::cerr << "returned:\n" << returned << "\n";
-	    std::cerr << "expected:\n" << expected << "\n";
+            std::cerr << "returned:\n" << returned << "\n";
+            std::cerr << "expected:\n" << expected << "\n";
             return false;
         }
     } catch (cet::exception const& e) {
@@ -266,18 +277,18 @@ bool test_appendChild(std::string const& conf)
 
     try {
         auto returned = std::move(begin.appendChild(delta, path));
-        
-	if (begin != end) {
+
+        if (begin != end) {
             std::cout << "Error invalid end state. \n" ;
-	    std::cerr << "begin:\n" << begin << "\n";
-	    std::cerr << "end:\n" << end << "\n";	    
+            std::cerr << "begin:\n" << begin << "\n";
+            std::cerr << "end:\n" << end << "\n";
             return false;
         }
-        
+
         if (returned != expected) {
             std::cout << "Error returned!=expected.\n";
-	    std::cerr << "returned:\n" << returned << "\n";
-	    std::cerr << "expected:\n" << expected << "\n";
+            std::cerr << "returned:\n" << returned << "\n";
+            std::cerr << "expected:\n" << expected << "\n";
             return false;
         }
     } catch (cet::exception const& e) {
@@ -305,21 +316,21 @@ bool test_removeChild(std::string const& conf)
 
     try {
         auto returned = std::move(begin.removeChild(delta, path));
-        
-	if (begin != end) {
+
+        if (begin != end) {
             std::cout << "Error invalid end state. \n" ;
-	    std::cerr << "begin:\n" << begin << "\n";
-	    std::cerr << "end:\n" << end << "\n";	    
+            std::cerr << "begin:\n" << begin << "\n";
+            std::cerr << "end:\n" << end << "\n";
             return false;
         }
-        
+
         if (returned != expected) {
             std::cout << "Error returned!=expected.\n";
-	    std::cerr << "returned:\n" << returned << "\n";
-	    std::cerr << "expected:\n" << expected << "\n";
+            std::cerr << "returned:\n" << returned << "\n";
+            std::cerr << "expected:\n" << expected << "\n";
             return false;
         }
-        
+
     } catch (cet::exception const& e) {
         if (mustsucceed)
             throw;

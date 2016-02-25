@@ -7,16 +7,10 @@
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
 
-#ifdef TRACE_NAME
-  #undef TRACE_NAME
-#endif
+namespace artdaq {
+namespace database {
+namespace mongo {
 
-#define TRACE_NAME "PRVDR:MongoDB_H"
-
-namespace artdaq{
-namespace database{
-namespace mongo{
-  
 void  trace_enable();
 
 struct DBConfig final {

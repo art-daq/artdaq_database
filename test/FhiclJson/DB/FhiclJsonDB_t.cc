@@ -4,9 +4,11 @@
 #include <streambuf>
 #include "boost/program_options.hpp"
 #include "artdaq-database/FhiclJson/fhicljsondb.h"
-#include <artdaq-database/FhiclJson/healper_functions.h>
+#include "artdaq-database/FhiclJson/healper_functions.h"
 #include "cetlib/coded_exception.h"
+#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/BuildInfo/printStackTrace.h"
+#include <boost/exception/diagnostic_information.hpp>
 
 
 namespace  bpo = boost::program_options;
@@ -20,7 +22,7 @@ bool test_convert2json(std::string const&, std::string const&);
 bool test_roundconvertfcl(std::string const&, std::string const&);
 bool test_roundconvertjson(std::string const&, std::string const&);
 
-int main(int argc, char* argv[])
+int main(int argc, char* argv[]) try
 {
     artdaq::database::fhicl::trace_enable_FhiclReader();
     artdaq::database::fhicl::trace_enable_FhiclWriter();
@@ -54,20 +56,21 @@ int main(int argc, char* argv[])
     } catch (bpo::error const& e) {
         std::cerr << "Exception from command line processing in " << argv[0]
                   << ": " << e.what() << "\n";
-        return -1;
+        return process_exit_code::INVALID_ARGUMENT;
     }
-
+    
     if (vm.count("help")) {
         std::cout << desc << std::endl;
-        return 1;
+        return process_exit_code::HELP;
     }
+    
     if (!vm.count("source")) {
         std::cerr << "Exception from command line processing in " << argv[0]
                   << ": no source file given.\n"
                   << "For usage and an options list, please do '"
                   << argv[0] <<  " --help"
                   << "'.\n";
-        return 2;
+        return process_exit_code::INVALID_ARGUMENT|1;
     }
 
     if (!vm.count("compare")) {
@@ -76,7 +79,7 @@ int main(int argc, char* argv[])
                   << "For usage and an options list, please do '"
                   << argv[0] <<  " --help"
                   << "'.\n";
-        return 3;
+        return process_exit_code::INVALID_ARGUMENT|2;
     }
 
     if (!vm.count("testname")) {
@@ -85,7 +88,7 @@ int main(int argc, char* argv[])
                   << "For usage and an options list, please do '"
                   << argv[0] <<  " --help"
                   << "'.\n";
-        return 4;
+        return process_exit_code::INVALID_ARGUMENT|3;
     }
 
     auto input_name = vm["source"].as<std::string>();
@@ -119,7 +122,15 @@ int main(int argc, char* argv[])
 
     auto testResult = runTest(test_name)(input, compare);
 
-    return !testResult;
+    if(testResult)
+        return process_exit_code::SUCCESS;
+
+    return process_exit_code::FAILURE;
+}
+catch(...)
+{
+    std::cerr << "Process exited with error: " << boost::current_exception_diagnostic_information();
+    return process_exit_code::UNCAUGHT_EXCEPTION;
 }
 
 bool test_convert2fcl(std::string const& input, std::string const& compare)

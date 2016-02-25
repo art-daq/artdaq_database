@@ -4,24 +4,17 @@
 #include "artdaq-database/StorageProviders/common.h"
 #include "artdaq-database/StorageProviders/storage_providers.h"
 
-#ifdef TRACE_NAME
-  #undef TRACE_NAME
-#endif
-
-#define TRACE_NAME "PRVDR:FileDB_H"
-
-namespace artdaq{
-namespace database{
-namespace filesystem{
+namespace artdaq {
+namespace database {
+namespace filesystem {
 
 void  trace_enable();
-  
+
 struct DBConfig final {
-    std::string hostname = "127.0.0.1";
     std::string path = "path";
     std::string db_name = "test_configuration_db";
     const std::string connectionURI() const {
-        return "file://" + hostname + "/" + path;
+        return "file://" + path;
     };
 };
 
@@ -47,11 +40,11 @@ public:
 
     explicit FileSystemDB(DBConfig const& config, PassKeyIdiom const&):
         _config {config},
-        _client {_config.connectionURI()},
-        _connection{_config.connectionURI()}{
+            _client {_config.connectionURI()},
+    _connection {_config.connectionURI()} {
     }
 
-
+  
 private:
     DBConfig _config;
     std::string _client;
