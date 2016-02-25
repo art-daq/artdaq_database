@@ -1,50 +1,52 @@
 {
-    "document": {  
-        "data": {
-            "a": 1,
-            "b": {
-                "c": "2",
-                "dd": [
-                    2,
-                    5,
-                    6,
+    "document" : {
+        "data" : {
+            "a" : 1, 
+            "b" : {
+                "c" : "2", 
+                "dd" : [
+                    2, 
+                    5, 
+                    6, 
                     7
                 ]
             }
-        },
-	"metadata": {
-	    "comments": { "empty":"empty"
-		}
-	    },
-	    "search": [
-		{
-		    "name": "find any",
-		    "query": "not defined"
-		}
-	    ]
-	},
-	"source": {
-	    "encoding": "base64",
-	    "format": "json",
-	    "rawdata": "as"
-    },
-    
-    "version": "version1",
-    "configurations": [
-        "config1"
-    ],
-    "aliases": {
-        "active": [
-        ],
-        "history": [
+        }, 
+        "metadata" : {
+            "comments" : {
+                "empty" : "empty"
+            }
+        }, 
+        "search" : [
+            {
+                "name" : "find any", 
+                "query" : "not defined"
+            }
         ]
-    },
-    "bookkeeping": {
-        "isdeleted": false,
-        "isreadonly": true,
-        "created": "Tue Dec 29 18:19:25 2015",
-        "updates": [
-            
+    }, 
+    "source" : {
+        "encoding" : "base64", 
+        "format" : "json", 
+        "rawdata" : "as"
+    }, 
+    "version" : "default", 
+    "configurations" : [
+
+    ], 
+    "aliases" : {
+        "active" : [
+
+        ], 
+        "history" : [
+
+        ]
+    }, 
+    "bookkeeping" : {
+        "isdeleted" : false, 
+        "isreadonly" : true, 
+        "created" : "Tue Dec 29 18:19:25 2015", 
+        "updates" : [
+
         ]
     }
 }

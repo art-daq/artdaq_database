@@ -1,48 +1,52 @@
 {
-   "document":{
-      "data":{
-            "aa": 3,
-            "b": {
-                "c": "2",
-                "dd": [
-                    2,5,6,7
+    "document" : {
+        "data" : {
+            "aa" : 3, 
+            "b" : {
+                "c" : "2", 
+                "dd" : [
+                    2, 
+                    5, 
+                    6, 
+                    7
                 ]
             }
-      },
-      "metadata":{
-         "comments":{
-            "empty":"empty"
-         }
-      },
-      "search":[
-         {
-            "name":"find any",
-            "query":"not defined"
-         }
-      ]
-   },
-   "source":{
-      "encoding":"base64",
-      "format":"json",
-      "rawdata":"as"
-   },
-   "configurations":[
-      "config1"
-   ],
-   "version":"version1",      
-   "aliases":{
-      "active":[
+        }, 
+        "metadata" : {
+            "comments" : {
+                "empty" : "empty"
+            }
+        }, 
+        "search" : [
+            {
+                "name" : "find any", 
+                "query" : "not defined"
+            }
+        ]
+    }, 
+    "source" : {
+        "encoding" : "base64", 
+        "format" : "json", 
+        "rawdata" : "as"
+    }, 
+    "version" : "default", 
+    "configurations" : [
 
-      ],
-      "history":[
+    ], 
+    "aliases" : {
+        "active" : [
 
-      ]
-   },
-   "bookkeeping":{
-      "isdeleted":false,
-      "isreadonly":true,
-      "created":"Tue Dec 29 18:19:25 2015",
-      "updates":[
-      ]
-   }
+        ], 
+        "history" : [
+
+        ]
+    }, 
+    "bookkeeping" : {
+        "isdeleted" : false, 
+        "isreadonly" : true, 
+        "created" : "Tue Dec 29 18:19:25 2015", 
+        "updates" : [
+
+        ]
+    }
 }
