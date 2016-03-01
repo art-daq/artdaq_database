@@ -42,6 +42,9 @@ private:
     void  _removeConfiguration(object_id_t const&,std::string const&);
     std::vector<object_id_t>  _matchVersion(std::string const&);
     std::vector<object_id_t>  _matchConfiguration(std::string const&);
+    std::vector<object_id_t>  _matchObjectId(std::string const&);
+    std::vector<object_id_t>  _matchObjectIds(std::string const&); 
+
 private:
     bool _open(boost::filesystem::path const&);
     bool _create(boost::filesystem::path const&);    

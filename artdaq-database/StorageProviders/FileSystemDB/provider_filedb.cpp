@@ -24,9 +24,12 @@ using artdaq::database::filesystem::FileSystemDB;
 using artdaq::database::filesystem::index::SearchIndex;
 
 using artdaq::database::jsonutils::JSONDocumentBuilder;
+using artdaq::database::jsonutils::JSONDocument;
 
 std::string mkdir(std::string const&);
 object_id_t generate_oid();
+object_id_t extract_oid(std::string const&);
+
 std::string expand_environment_variables(std::string var);
 
 template<>
@@ -41,7 +44,7 @@ std::vector<JsonData> StorageProvider<JsonData, FileSystemDB>::load(JsonData con
     auto collection_name = builder.extract().findChild("collection").value();
     auto search_filter = builder.extract().findChild("filter").value();
 
-    auto collection = _provider->connection().append(collection_name);
+    auto collection = _provider->connection()+collection_name;
     collection = expand_environment_variables(collection);
 
     TRACE_(4, "StorageProvider::FileSystemDB::load() collection_path=<" << collection << ">." );
@@ -80,6 +83,7 @@ template<>
 object_id_t StorageProvider<JsonData, FileSystemDB>::store(JsonData const& data)
 {
     TRACE_(4, "StorageProvider::FileSystemDB::store() begin");
+    TRACE_(4, "StorageProvider::FileSystemDB::store() args data=<" << data.json_buffer << ">");
 
     auto builder = JSONDocumentBuilder {data.json_buffer};
 
@@ -96,8 +100,14 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::store(JsonData const& data)
 
     auto collection_name = builder.extract().findChild("collection").value();
 
+    try {
+	auto filter  = builder.extract().findChild("filter").value();
+	TRACE_(4, "StorageProvider::FileSystemDB::store() found filter=<" << filter << ">." );
+	oid=extract_oid(filter);
+	TRACE_(4, "StorageProvider::FileSystemDB::store() using provided oid=<" << oid << ">." );
+    }catch(...){}
 
-    auto collection = _provider->connection().append(collection_name);
+    auto collection = _provider->connection()+collection_name;
 
     collection = expand_environment_variables(collection);
 
@@ -123,7 +133,7 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::store(JsonData const& data)
         TRACE_(4, "StorageProvider::FileSystemDB Failed updating SearchIndex." );
     }
 
-    return oid;
+    return { "{ \"$oid\" : \"" + oid + "\"}"};
 }
 
 
@@ -210,6 +220,46 @@ std::string expand_environment_variables(std::string var) {
     ::wordfree( &p );
 
     return ss.str();
+}
+
+object_id_t extract_oid(std::string const& filter)
+{
+    auto ex = std::regex("^\\{[^:]+:\\s+([\\s\\S]+)\\}$");
+
+    auto results = std::smatch();
+
+    if (!std::regex_search(filter, results, ex))
+        throw cet::exception("JSONDocument")
+                << ("Regex search failed; JSON buffer:" + filter);
+
+    if (results.size() != 2) {
+        //we are interested in a second match
+        TRACE_(12, "value()" << "JSON regex_search() result count=" << results.size());
+        for (auto const & result : results) {
+            TRACE_(12, "value()" << "JSON regex_search() result=" << result);
+        }
+
+        throw cet::exception("JSONDocument")
+                << ("Regex search failed, regex_search().size()!=1; JSON buffer: " + filter);
+    }
+
+    auto match = std::string(results[1]);
+
+    match.erase(match.find_last_not_of(" \n\r\t") + 1);
+
+    auto dequote = [](auto s) {
+
+        if (s[0] == '"' && s[s.length() - 1] == '"')
+            return s.substr(1, s.length() - 2);
+        else
+            return s;
+    };
+
+    match = dequote(match);
+
+    TRACE_(12, "value()" << "JSON regex_search() result=" << match);
+
+    return match;
 }
 
 namespace filesystem {

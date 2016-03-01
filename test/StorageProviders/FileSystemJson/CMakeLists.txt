@@ -6,16 +6,16 @@ include_directories($ENV{MONGODB_FQ_DIR}/include/mongocxx/v0.3)
 find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_FQ_DIR}/lib )
 find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_FQ_DIR}/lib )
 
- art_make_exec(MongoFhicl_t
+ art_make_exec(FileSystemJson_t
   LIBRARIES
   artdaq-database_StackTrace  
   artdaq-database_BasicTypes
   artdaq-database_FhiclJson
   artdaq-database_JsonDocument
-  artdaq-database_StorageProviders_MongoDB
+  artdaq-database_StorageProviders_FileSystemDB
   ${FHICLCPP}
   ${CETLIB}
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}    
+  ${Boost_PROGRAM_OPTIONS_LIBRARY}  
 ) 
 
 add_subdirectory(test001)

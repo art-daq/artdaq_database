@@ -71,6 +71,8 @@ std::vector<object_id_t> SearchIndex::findDocumentIDs(JsonData const& search)
         auto matching_function_map = std::map<std::string, matching_function_t> {
             {"version", &SearchIndex::_matchVersion}
             ,{"configurations.name", &SearchIndex::_matchConfiguration}
+            ,{"$oid", &SearchIndex::_matchObjectId}
+            ,{"_id", &SearchIndex::_matchObjectIds}
         };
 
         return matching_function_map.at(name);
@@ -80,12 +82,26 @@ std::vector<object_id_t> SearchIndex::findDocumentIDs(JsonData const& search)
     ouids.reserve(128);
 
     for(auto const& search_criterion : search_ast) {
-        auto const& value=boost::get<std::string>(search_criterion.value);
-        auto matches = (this->*runMatchingFunction(search_criterion.key))(value);
-        ouids.insert( ouids.end(), matches.begin(), matches.end() );
+	if(search_criterion.value.type() == typeid(std::string)){      
+	  auto const& value=boost::get<std::string>(search_criterion.value);
+	  auto matches = (this->*runMatchingFunction(search_criterion.key))(value);
+	  ouids.insert( ouids.end(), matches.begin(), matches.end() );
+	}else if ( search_criterion.value.type() == typeid(jsn::object_t)) {
+	  auto const& value=boost::get<jsn::object_t>(search_criterion.value);
+	  auto writer=JsonWriter{};
+	  auto json=std::string();  
+	  if(!writer.write(value,json)) {
+	      TRACE_(5, "StorageProvider::FileSystemDB::index::findDocumentIDs() Failed to write an AST to json, key=<" << search_criterion.key << ">." );
+	      throw cet::exception("FileSystemDB") << "StorageProvider::FileSystemDB::index::findDocumentIDs() Failed to write an AST to json.";
+	  }
+	  
+	  auto matches = (this->*runMatchingFunction(search_criterion.key))(json);
+	  ouids.insert( ouids.end(), matches.begin(), matches.end() );	  
+	}
     }
 
-    ouids.erase( std::unique( ouids.begin(), ouids.end() ), ouids.end());
+    if(ouids.size() >1)
+      ouids.erase( std::unique( ouids.begin(), ouids.end() ), ouids.end());
 
     return ouids;
 }
@@ -387,6 +403,48 @@ void  SearchIndex::_removeVersion(object_id_t const& ouid,std::string const& ver
     }
 }
 
+std::vector<object_id_t>  SearchIndex::_matchObjectId(std::string const& objectid){
+    auto ouids= std::vector<object_id_t> {};
+
+    assert(!objectid.empty());
+
+    TRACE_(16, "StorageProvider::FileSystemDB::index::_matchObjectId() begin");
+    TRACE_(16, "StorageProvider::FileSystemDB::index::_matchObjectId() args objectid=<" << objectid<< ">.");
+    
+    ouids.push_back(objectid);
+    
+    return ouids;
+}
+
+std::vector<object_id_t>  SearchIndex::_matchObjectIds(std::string const& objectids){
+    auto ouids= std::vector<object_id_t> {};
+
+    assert(!objectids.empty());
+
+    TRACE_(16, "StorageProvider::FileSystemDB::index::_matchObjectIds() begin");
+    TRACE_(16, "StorageProvider::FileSystemDB::index::_matchObjectIds() args objectid=<" << objectids<< ">.");
+    
+    auto reader=JsonReader {};
+
+    object_t  objectids_ast;
+
+    if(!reader.read(objectids, objectids_ast)) {
+        TRACE_(16, "StorageProvider::FileSystemDB::index::_matchObjectIds() Failed to create an AST from objectids.");
+        return ouids;
+    }
+
+    auto ouid_list = boost::get<jsn::array_t>(objectids_ast.at("$in"));
+
+    TRACE_(5, "StorageProvider::FileSystemDB::index::_matchObjectIds() found " << ouid_list.size() << " ouids.");
+    
+    for(auto& ouid_entry :ouid_list) {      
+	 auto const& ouid= boost::get<std::string>(boost::get<jsn::object_t>(ouid_entry).at("$oid"));	 
+	 TRACE_(16, "StorageProvider::FileSystemDB::index::_matchObjectIds() found ouid=<" <<  ouid << ">.");
+	 ouids.push_back(ouid);
+    }
+    
+    return ouids;
+}
 void  SearchIndex::_removeConfiguration(object_id_t const& ouid,std::string const& configuration) {
     assert(!ouid.empty());
     assert(!configuration.empty());
