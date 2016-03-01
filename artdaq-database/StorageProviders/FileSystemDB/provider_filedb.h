@@ -10,11 +10,17 @@ namespace filesystem {
 
 void  trace_enable();
 
+namespace literal
+{
+constexpr auto FILEURI = "file://";
+constexpr auto search_index = "index.json";
+}
+
 struct DBConfig final {
-    std::string path = "path";
+    std::string path = "${HOME}/databases/filesystemdb";
     std::string db_name = "test_configuration_db";
     const std::string connectionURI() const {
-        return "file://" + path;
+        return std::string {literal::FILEURI}  + path;
     };
 };
 
@@ -41,15 +47,14 @@ public:
     explicit FileSystemDB(DBConfig const& config, PassKeyIdiom const&):
         _config {config},
             _client {_config.connectionURI()},
-    _connection {_config.connectionURI()} {
+    _connection {_config.connectionURI()+"/"} {
     }
 
-  
+
 private:
     DBConfig _config;
     std::string _client;
     std::string _connection;
-
 };
 
 using  artdaq::database::StorageProvider;
@@ -62,7 +67,7 @@ using DBProvider = FileSystemDBProvider<TYPE>;
 
 using DB = FileSystemDB;
 
-} // namespace mongo
+} // namespace filesystem
 } //namespace database
 } //namespace artdaq
 

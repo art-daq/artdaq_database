@@ -10,6 +10,8 @@
 #include <boost/exception/diagnostic_information.hpp>
 
 #include "artdaq-database/FhiclJson/fhicljsondb.h"
+#include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
+#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 
 namespace  bpo = boost::program_options;
 
@@ -35,11 +37,15 @@ int main(int argc, char* argv[]) try
     cf::trace_enable_LoadStoreOperationMongo();
     cf::trace_enable_LoadStoreOperationFileSystem();
 
+    db::filesystem::trace_enable();
+    
     db::fhicljson::trace_enable_fcl2jsondb();
     db::fhicl::trace_enable_FhiclReader();
     db::fhicl::trace_enable_FhiclWriter();
     db::fhicljsondb::trace_enable_fhicljsondb();
 
+    db::jsonutils::trace_enable_JSONDocumentBuilder();
+    
     // Get the input parameters via the boost::program_options library,
     // designed to make it relatively simple to define arguments and
     // issue errors if argument list is supplied incorrectly

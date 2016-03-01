@@ -14,9 +14,9 @@
 
 #define TRACE_NAME "FHJS:fhicljsondb_C"
 
-namespace artdaq{
-namespace database{
-namespace fhicljsondb{
+namespace artdaq {
+namespace database {
+namespace fhicljsondb {
 
 namespace fcl = artdaq::database::fhicl;
 namespace jsn = artdaq::database::json;
@@ -31,7 +31,7 @@ bool fhicl_to_json(std::string const& fcl, std::string& json)
 {
     assert(!fcl.empty());
     assert(json.empty());
-    
+
     TRACE_(2, "fhicl_to_json: begin");
 
     auto result = bool(false);
@@ -53,20 +53,20 @@ bool fhicl_to_json(std::string const& fcl, std::string& json)
     get_object(literal::origin_node)[literal::timestamp] = artdaq::database::fhicljson::timestamp();
 
     auto reader = FhiclReader();
-    
+
     TRACE_(2, "read_includes begin");
     result = reader.read_includes(fcl,  boost::get<jsn::array_t>(json_root[literal::includes_node]));
     TRACE_(2, "read_includes end result=" << std::to_string(result));
     //if (!result)
-     //   return result;
+    //   return result;
 
-    TRACE_(2, "read_comments begin");    
+    TRACE_(2, "read_comments begin");
     result = reader.read_comments(fcl,  boost::get<jsn::array_t>(json_root[literal::comments_node]));
     TRACE_(2, "read_comments end result=" << std::to_string(result));
 
     if (!result)
         return result;
-    
+
     TRACE_(2, "read_data_db begin");
     result = reader.read_data_db(fcl,  boost::get<jsn::object_t>(json_root[literal::document_node]));
     TRACE_(2, "read_data_db end result=" << std::to_string(result));
@@ -87,7 +87,7 @@ bool fhicl_to_json(std::string const& fcl, std::string& json)
         json.swap(json1);
 
     TRACE_(2, "fhicl_to_json: end");
-    
+
     return result;
 }
 
@@ -97,19 +97,19 @@ bool json_to_fhicl(std::string const& json , std::string& fcl)
     assert(fcl.empty());
 
     TRACE_(3, "json_to_fhicl: begin");
-    
+
     auto result = bool(false);
 
     auto json_root = jsn::object_t();
 
     auto reader = JsonReader();
-    
+
     TRACE_(3, "json_to_fhicl: Reading json root nodes");
-    
+
     result = reader.read(json, json_root);
 
     if (!result) {
-	TRACE_(3, "json_to_fhicl: Failed to read json root nodes");
+        TRACE_(3, "json_to_fhicl: Failed to read json root nodes");
         return result;
     }
 
@@ -118,24 +118,26 @@ bool json_to_fhicl(std::string const& json , std::string& fcl)
 
 
     auto writer = FhiclWriter();
-    
+
     auto fcl_includes = std::string();
     {
         auto const& includes_key = jsn::object_t::key_type(literal::includes_node);
-	try {
-        auto const& json_array = boost::get<jsn::array_t>(json_root.at(includes_key));
+        try {
+            auto const& json_array = boost::get<jsn::array_t>(json_root.at(includes_key));
 
-        result = writer.write_includes(json_array, fcl_includes);
+            if(!json_array.empty()) {
+                result = writer.write_includes(json_array, fcl_includes);
+		
+                if (!result)
+                    return result;
+            }
+        } catch(std::out_of_range const&) {
 
-        if (!result)
-            return result;
-	}catch(std::out_of_range const&) {
-	  
-	}
+        }
     }
     TRACE_(3, "json_to_fhicl: fcl_includes=<" <<fcl_includes << ">");
 
-    
+
     auto fcl_data = std::string();
     {
         auto const& document_object =  boost::get<jsn::object_t>(json_root[literal::document_node]);
@@ -145,26 +147,26 @@ bool json_to_fhicl(std::string const& json , std::string& fcl)
         if (!result)
             return result;
     }
-    
+
     TRACE_(3, "json_to_fhicl: fcl_data=<" <<fcl_data << ">");
 
     if (result) {
-      std::stringstream ss;
-      
-      ss << fcl_includes;
-      
-      ss << "\n\n";
-      
-      ss << fcl_data;
-      
-      auto result = ss.str();
-      
-      fcl.swap(result);
+        std::stringstream ss;
+
+        ss << fcl_includes;
+
+        ss << "\n\n";
+
+        ss << fcl_data;
+
+        auto result = ss.str();
+
+        fcl.swap(result);
     }
-    
+
     TRACE_(3, "json_to_fhicl: fcl=<" <<fcl<< ">");
     TRACE_(3, "json_to_fhicl: end");
-    
+
     return result;
 }
 

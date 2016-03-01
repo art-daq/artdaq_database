@@ -30,6 +30,7 @@ constexpr auto bookkeeping_isreadonly = "bookkeeping.isreadonly";
 constexpr auto configurations = "configurations";
 constexpr auto configurations_name           = "configurations.name";
 
+constexpr auto document_root       = "root";  
 }
 
 namespace actions

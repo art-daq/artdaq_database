@@ -214,7 +214,7 @@ JSONDocument JSONDocument::insertChild(JSONDocument const& newChild , path_t con
         TRACE_(2, "insertChild() recurse() args currentView=<" << bsoncxx::to_json(currentView) << ">");
 
         if (currentDepth == 0) {
-            if (!currentView.empty()) {
+            if (!currentView.empty() && path_tokens.at(currentDepth)!="root") {
                 for (auto const & childElement : currentView) {
                     TRACE_(2, "insertChild() recurse() insert() path,key=<" << path_tokens.at(currentDepth) << "," << childElement.key().to_string() << ">");
                     TRACE_(2, "insertChild() recurse() insert() childDocument=<" <<  bsoncxx::to_json(childElement.get_value()) << ">");

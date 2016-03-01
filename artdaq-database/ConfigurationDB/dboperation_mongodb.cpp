@@ -28,6 +28,16 @@ void cfd::store( Options const& options, JsonData const& insert_payload ) {
     assert( options.provider().compare( cfo::literal::database_provider_mongo ) == 0 );
     assert( options.operation().compare( cfo::literal::operation_store ) == 0 );
 
+    if(options.operation().compare( cfo::literal::operation_store ) != 0) {
+        throw cet::exception( "store_configuration" )
+                << "Wrong operation option; operation=<" << options.operation() << ">.";
+    }
+
+    if(options.provider().compare( cfo::literal::database_provider_mongo ) != 0) {
+        throw cet::exception( "store_configuration" )
+                << "Wrong provider option; provider=<" << options.provider() << ">.";
+    }
+
     TRACE_( 15, "store: begin" );
 
     auto config = DBI::DBConfig {};
@@ -43,6 +53,16 @@ void cfd::store( Options const& options, JsonData const& insert_payload ) {
 JsonData cfd::load( Options const& options, JsonData const& search_payload ) {
     assert( options.provider().compare( cfo::literal::database_provider_mongo ) == 0 );
     assert( options.operation().compare( cfo::literal::operation_load ) == 0 );
+
+    if(options.operation().compare( cfo::literal::operation_load ) != 0) {
+        throw cet::exception( "load_configuration" )
+                << "Wrong operation option; operation=<" << options.operation() << ">.";
+    }
+
+    if(options.provider().compare( cfo::literal::database_provider_mongo ) != 0) {
+        throw cet::exception( "load_configuration" )
+                << "Wrong provider option; provider=<" << options.provider() << ">.";
+    }
 
     TRACE_( 16, "load: begin" );
 

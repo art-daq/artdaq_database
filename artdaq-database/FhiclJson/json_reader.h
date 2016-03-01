@@ -25,7 +25,7 @@ struct json_parser_grammar
                     ];
 
     object_rule   = '{'
-                    >> data_rule % ','
+                    >> -(data_rule % ',')
                     >> '}';
 
     key_rule      = quoted_string;
@@ -35,7 +35,7 @@ struct json_parser_grammar
                     >> value_rule;
 
     array_rule =  '['
-                  >> value_rule % ','
+                  >> -(value_rule % ',')
                   >> ']';
 
     value_rule =     object_rule

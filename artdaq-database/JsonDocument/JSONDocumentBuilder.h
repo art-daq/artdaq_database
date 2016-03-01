@@ -21,7 +21,8 @@ public:
    JSONDocumentBuilder& removeAlias(JSONDocument const&);
    JSONDocumentBuilder& markReadonly();
    JSONDocumentBuilder& markDeleted();   
-   
+   JSONDocumentBuilder& setObjectID(JSONDocument const& objectId);
+
    void enforce() const;
 
    JSONDocument&  extract() {return _document;}
@@ -42,7 +43,8 @@ private:
   JSONDocument _makeHistoryAlias(JSONDocument const&) const;
   JSONDocument _makeAlias(JSONDocument const&) const;
   JSONDocument _makeaddToGlobalConfig(JSONDocument const&) const;
-
+  JSONDocument _makeObjectId(JSONDocument const&)const;
+  
   JSONDocument _makeReadonly() const;
   JSONDocument _makeDeleted() const;
   JSONDocument _wrap_as_payload(JSONDocument const&) const;

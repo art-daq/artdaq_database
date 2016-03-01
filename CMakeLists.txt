@@ -39,6 +39,8 @@ cet_set_compiler_flags(DIAGS VIGILANT
 
 cet_report_compiler_flags()
 
+set(mongodb_product_version v3_0_7)
+
 # these are minimum required versions, not the actual product versions
 find_ups_boost(v1_57_0)
 find_ups_product (cetbuildtools v4_09_02)
@@ -49,7 +51,7 @@ find_ups_product( cetpkgsupport v1_08_03 )
 #find_ups_product( clhep v2_2_0_3 )
 #find_ups_product( fhiclcpp v3_04_00 )
 #find_ups_product( messagefacility v1_14_01 )
-find_ups_product( mongodb v3_0_7 )
+find_ups_product( mongodb ${mongodb_product_version} )
 find_ups_product( swig v3_0_7 )
 find_ups_product( TRACE v3_06_05 )
 #find_ups_product( sqlite v3_08_05_00 )

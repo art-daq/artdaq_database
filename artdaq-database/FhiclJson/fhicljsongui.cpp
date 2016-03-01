@@ -9,9 +9,9 @@
 #include "fhiclcpp/make_ParameterSet.h"
 
 
-namespace artdaq{
-namespace database{
-namespace fhicljsongui{
+namespace artdaq {
+namespace database {
+namespace fhicljsongui {
 
 namespace fcl = artdaq::database::fhicl;
 namespace jsn = artdaq::database::json;
@@ -48,7 +48,7 @@ bool fhicl_to_json(std::string const& fcl, std::string& json)
     result = reader.read_includes(fcl,  boost::get<jsn::array_t>(json_root[literal::includes_node]));
 
     //if (!result)
-     //   return result;
+    //   return result;
 
     result = reader.read_comments(fcl,  boost::get<jsn::array_t>(json_root[literal::comments_node]));
 
@@ -82,7 +82,7 @@ bool json_to_fhicl(std::string const& json , std::string& fcl)
     auto json_root = jsn::object_t();
 
     auto reader = JsonReader();
-    
+
     result = reader.read(json, json_root);
 
     if (!result)
@@ -94,20 +94,22 @@ bool json_to_fhicl(std::string const& json , std::string& fcl)
 
 
     auto writer = FhiclWriter();
-    
+
     auto fcl_includes = std::string();
     {
         auto const& includes_key = jsn::object_t::key_type(literal::includes_node);
-	try {
-        auto const& json_array = boost::get<jsn::array_t>(json_root.at(includes_key));
+        try {
+            auto const& json_array = boost::get<jsn::array_t>(json_root.at(includes_key));
 
-        result = writer.write_includes(json_array, fcl_includes);
+            if(!json_array.empty()) {
+                result = writer.write_includes(json_array, fcl_includes);
 
-        if (!result)
-            return result;
-	}catch(std::out_of_range const&) {
-	  
-	}
+                if (!result)
+                    return result;
+            }
+        } catch(std::out_of_range const&) {
+
+        }
     }
 
     auto fcl_data = std::string();
@@ -122,19 +124,19 @@ bool json_to_fhicl(std::string const& json , std::string& fcl)
     }
 
     if (result) {
-      std::stringstream ss;
-      
-      ss << fcl_includes;
-      
-      ss << "\n\n";
-      
-      ss << fcl_data;
-      
-      auto result = ss.str();
-      
-      fcl.swap(result);
+        std::stringstream ss;
+
+        ss << fcl_includes;
+
+        ss << "\n\n";
+
+        ss << fcl_data;
+
+        auto result = ss.str();
+
+        fcl.swap(result);
     }
-    
+
     return result;
 }
 

@@ -36,11 +36,11 @@ struct json_generator_grammar
 
 
     object_rule =     "{\n" <<
-                      data_rule % ",\n"
+                      -(data_rule % ",\n")
                       << "\n}";
 
     array_rule = "[\n"
-                 << value_rule % ",\n"
+                 << -(value_rule % ",\n")
                  << "\n]";
 
     start =      object_rule;

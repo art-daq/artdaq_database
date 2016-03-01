@@ -63,6 +63,18 @@ JSONDocument JSONDocumentBuilder::_makeAlias(JSONDocument const& newAlias) const
     return {ss.str()};
 }
 
+JSONDocument JSONDocumentBuilder::_makeObjectId(JSONDocument const& objectId) const {
+    std::stringstream ss;
+
+    ss << '{';
+    ss << "_id"_quoted << colon << quoted_(JSONDocument::value(objectId));
+    ss << '}';
+
+    TRACE_(10, "_makeObjectId() objectId<" << ss.str() << ">");
+
+    return {ss.str()};
+}
+
 JSONDocument JSONDocumentBuilder::_makeaddToGlobalConfig(JSONDocument const& config) const {
     std::stringstream ss;
     ss << '{';
@@ -239,6 +251,21 @@ JSONDocumentBuilder& JSONDocumentBuilder::addToGlobalConfig(JSONDocument const& 
     auto tmp_document = _document;
     tmp_document.appendChild(newGlobalConfig,literal::configurations);
     tmp_document.appendChild(_bookkeeping_update_payload(actions::addToGlobalConfig),literal::bookkeeping_updates);
+
+    _document=std::move(tmp_document);
+
+    return self();
+}
+
+JSONDocumentBuilder& JSONDocumentBuilder::setObjectID(JSONDocument const& objectId) {
+    TRACE_(8, "setObjectID() args  objectId=<" << objectId << ">");
+
+    enforce();
+
+    auto newObjectID = _wrap_as_payload(_makeObjectId(objectId));
+
+    auto tmp_document = _document;
+    tmp_document.insertChild(newObjectID,literal::document_root);
 
     _document=std::move(tmp_document);
 
