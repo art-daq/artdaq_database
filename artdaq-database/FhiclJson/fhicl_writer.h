@@ -49,7 +49,7 @@ struct fhicl_generator_grammar
 
     toplevel_table = *(annotated_atom_rule);
 
-    sequence_rule = "[" <<  annotated_value_rule  % ", " << "]";
+    sequence_rule = "[" <<  -(annotated_value_rule  % ", ") << "]";
 
     start =      toplevel_table;
 }

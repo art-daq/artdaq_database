@@ -73,6 +73,16 @@ int main(int argc, char* argv[]) try
      return process_exit_code::FAILURE;
    }
 
+   auto writer= jsn::JsonWriter{};
+   
+   auto jsonout = std::string();
+   
+   if(!writer.write(doc_ast,jsonout)){
+     return process_exit_code::FAILURE;
+   }
+
+   std::cout << "Source:" << json << "\n";
+   std::cout << "Result:" << jsonout << "\n";
    return process_exit_code::SUCCESS;
 }
 catch(...)

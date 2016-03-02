@@ -374,7 +374,8 @@ void load_configuration( Options const& options, std::string& conf ) {
             throw cet::exception( "load_configuration" )
                     << "Unable to reverse fhicl-to-json convertion";
         }
-
+	returnValue = fhicl.fhicl_buffer;
+	
         returnValueChanged=true;
 
         break;

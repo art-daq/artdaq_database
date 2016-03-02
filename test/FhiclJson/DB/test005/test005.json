@@ -22,17 +22,20 @@
 }
 },
 "outputs" : {
-"netMonOutput" : {
+"rootMPIOutput" : {
 "SelectEvents" : {
 "SelectEvents" : [
 "pmod2",
 "pmod3"
 ]
 },
-"module_type" : "NetMonOutput"
+"module_type" : "RootMPIOutput"
 }
 },
 "physics" : {
+"analyzers" : {
+
+},
 "filters" : {
 "prescaleMod2" : {
 "module_type" : "NthEvent",
@@ -44,34 +47,65 @@
 }
 },
 "my_output_modules" : [
-"netMonOutput"
+"rootMPIOutput"
+],
+"p1" : [
+
 ],
 "pmod2" : [
 "prescaleMod2"
 ],
 "pmod3" : [
 "prescaleMod3"
-]
+],
+"producers" : {
+
+}
 },
 "process_name" : "DAQ",
 "services" : {
-"scheduler" : {
-"fileMode" : "NOMERGE"
-},
-"user" : {
 "NetMonTransportServiceInterface" : {
 "data_receiver_count" : 1,
-"first_data_receiver_rank" : 6,
+"first_data_receiver_rank" : 4,
 "max_fragment_size_words" : 2097152,
 "mpi_buffer_count" : 8,
 "service_provider" : "NetMonTransportService"
-}
+},
+"scheduler" : {
+"errorOnFailureToPut" : false,
+"fileMode" : "NOMERGE"
 }
 },
 "source" : {
+"fragment_type_map" : [
+[
+1,
+"missed"
+],
+[
+3,
+"V1720"
+],
+[
+4,
+"V1724"
+],
+[
+6,
+"TOY1"
+],
+[
+7,
+"TOY2"
+],
+[
+8,
+"ASCII"
+]
+],
 "module_type" : "RawInput",
 "resume_after_timeout" : true,
-"waiting_time" : 900
+"waiting_time" : 2500000
 }
 },
 "metadata" : {
@@ -136,7 +170,7 @@
 "fileName" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : "//demoe"
+"annotation" : " "
 },
 "level" : {
 "type" : "number",
@@ -163,17 +197,17 @@
 "type" : "table",
 "comment" : " ",
 "children" : {
-"netMonOutput" : {
+"rootMPIOutput" : {
 "type" : "table",
 "comment" : " ",
 "children" : {
 "SelectEvents" : {
 "type" : "table",
-"comment" : "#Failure 5 not a satom ",
+"comment" : " ",
 "children" : {
 "SelectEvents" : {
 "type" : "sequence",
-"comment" : "#Failure 5 not a satom ",
+"comment" : " ",
 "annotation" : " "
 }
 }
@@ -191,22 +225,29 @@
 "type" : "table",
 "comment" : " ",
 "children" : {
+"analyzers" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+
+}
+},
 "filters" : {
 "type" : "table",
 "comment" : " ",
 "children" : {
 "prescaleMod2" : {
 "type" : "table",
-"comment" : "#Failure 4 not a satom ",
+"comment" : " ",
 "children" : {
 "module_type" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : "#//Success 5 right of satom"
+"annotation" : " "
 },
 "nth" : {
 "type" : "number",
-"comment" : "#//Success 5 right of satom",
+"comment" : " ",
 "annotation" : " "
 }
 }
@@ -223,13 +264,18 @@
 "nth" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : "//#Success 4 right of satom"
+"annotation" : " "
 }
 }
 }
 }
 },
 "my_output_modules" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " "
+},
+"p1" : {
 "type" : "sequence",
 "comment" : " ",
 "annotation" : " "
@@ -241,8 +287,15 @@
 },
 "pmod3" : {
 "type" : "sequence",
-"comment" : "#Failure 2 not a satom ",
+"comment" : " ",
 "annotation" : " "
+},
+"producers" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+
+}
 }
 }
 },
@@ -252,21 +305,6 @@
 "annotation" : " "
 },
 "services" : {
-"type" : "table",
-"comment" : " ",
-"children" : {
-"scheduler" : {
-"type" : "table",
-"comment" : " ",
-"children" : {
-"fileMode" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
-}
-}
-},
-"user" : {
 "type" : "table",
 "comment" : " ",
 "children" : {
@@ -300,6 +338,20 @@
 "annotation" : " "
 }
 }
+},
+"scheduler" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"errorOnFailureToPut" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : " "
+},
+"fileMode" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
 }
 }
 }
@@ -309,20 +361,25 @@
 "type" : "table",
 "comment" : " ",
 "children" : {
+"fragment_type_map" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " "
+},
 "module_type" : {
 "type" : "string",
-"comment" : "#Success 1  above satom",
+"comment" : " ",
 "annotation" : " "
 },
 "resume_after_timeout" : {
 "type" : "bool",
 "comment" : " ",
-"annotation" : "#Success 3 right of satom"
+"annotation" : " "
 },
 "waiting_time" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : "//Success 2 right of satom"
+"annotation" : " "
 }
 }
 }
@@ -338,96 +395,48 @@
 "value" : "#broadcast_sends: true"
 },
 {
-"linenum" : 17,
+"linenum" : 16,
 "value" : "#SimpleMemoryCheck: { }"
 },
 {
-"linenum" : 35,
-"value" : "//demoe"
-},
-{
 "linenum" : 44,
-"value" : "#Failure 5 not a satom "
-},
-{
-"linenum" : 46,
 "value" : "#outputCommands: [ |keep *|, |drop artdaq::Fragments_daq_V1720_*|, |drop artdaq::Fragments_daq_V1724_*| ]"
 },
 {
-"linenum" : 48,
+"linenum" : 46,
 "value" : "#normalOutput: {"
 },
 {
-"linenum" : 49,
+"linenum" : 47,
 "value" : "#  module_type: RootOutput"
 },
 {
-"linenum" : 50,
-"value" : "#  fileName: |/tmp/artdaqdemo_eb04_r%06r_sr%02s_%to.root|"
+"linenum" : 48,
+"value" : "#  fileName: |/tmp/artdaqdemo_eb00_r%06r_sr%02s_%to.root|"
 },
 {
-"linenum" : 51,
+"linenum" : 49,
 "value" : "#  compressionLevel: 0"
 },
 {
-"linenum" : 52,
+"linenum" : 50,
 "value" : "#  SelectEvents: { SelectEvents: [ pmod2,pmod3 ] }"
 },
 {
-"linenum" : 53,
+"linenum" : 51,
 "value" : "#  #outputCommands: [ |keep *|, |drop artdaq::Fragments_daq_V1720_*|, |drop artdaq::Fragments_daq_V1724_*| ]"
 },
 {
-"linenum" : 54,
+"linenum" : 52,
 "value" : "#}"
 },
 {
-"linenum" : 61,
-"value" : "#Failure 4 not a satom "
-},
-{
-"linenum" : 63,
-"value" : "#//Success 5 right of satom"
-},
-{
-"linenum" : 68,
-"value" : "#Failure 3 not directly above satom "
-},
-{
-"linenum" : 71,
-"value" : "//#Success 4 right of satom"
-},
-{
-"linenum" : 75,
-"value" : "//Failure 1 not a comment"
-},
-{
-"linenum" : 77,
-"value" : "#Failure 2 not a satom "
-},
-{
-"linenum" : 81,
+"linenum" : 85,
 "value" : "#a1: [ app, wf ]"
 },
 {
-"linenum" : 84,
+"linenum" : 88,
 "value" : "#my_output_modules: [ normalOutput ]"
-},
-{
-"linenum" : 87,
-"value" : "#Success 1  above satom"
-},
-{
-"linenum" : 89,
-"value" : "//Success 2 right of satom"
-},
-{
-"linenum" : 90,
-"value" : "#Success 3 right of satom"
-},
-{
-"linenum" : 91,
-"value" : "// fragment_type_map: [[1, |missed|], [3, |V1720|], [4, |V1724|], [6, |TOY1|], [7, |TOY2|], [8, |ASCII|]]"
 }
 ],
 "origin" : {

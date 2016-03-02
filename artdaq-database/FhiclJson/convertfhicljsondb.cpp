@@ -26,8 +26,8 @@ using artdaq::database::fhicljson::fcl2jsondb;
 using artdaq::database::fhicljson::json2fcldb;
 
 fcl2jsondb::fcl2jsondb(fhicl_key_value_pair_t const& self_,
-                         fhicl_key_value_pair_t const& parent_,
-                         comments_t const&             comments_)
+                       fhicl_key_value_pair_t const& parent_,
+                       comments_t const&             comments_)
     : self {self_}, parent {parent_}, comments {comments_} {}
 
 fcl2jsondb::operator datapair_t()
@@ -45,14 +45,14 @@ try
     assert(!comments.empty());
 
     auto returnValue = datapair_t();
-    auto pair = return_pair{returnValue};
-    
+    auto pair = return_pair {returnValue};
+
     pair.data.key=key;
     pair.metadata.key=key;
     pair.metadata.value=jsn::object_t();
-    
+
     auto& object = pair.metadata_<jsn::object_t>();
-    
+
     object[literal::type] = tag_as_string(value.tag);
 
     auto parse_linenum = [](std::string const & str) ->int {
@@ -109,6 +109,7 @@ try
     if (value.tag != ::fhicl::TABLE)
         add_comment(annotation_at, literal::annotation, linenum);
 
+    TRACE_(2, "fcl2jsondb() value type=<" <<  tag_as_string(value.tag) << ">");
 
     switch (value.tag) {
     default:
@@ -152,24 +153,72 @@ try
 
         tmpDataArray.reserve(fcl_value::sequence_t(value).size());
 
-        for (auto const & tmpVal : fcl_value::sequence_t(value))
-            tmpDataArray.push_back(dequote(fcl_value::atom_t(tmpVal)));
-	
+        for (auto const & tmpVal : fcl_value::sequence_t(value)) {
+            if(tmpVal.tag == ::fhicl::SEQUENCE) {
+                tmpDataArray.push_back(jsn::array_t {});
+                auto& subDataArray = boost::get<jsn::array_t>(tmpDataArray.back());
+                for (auto const & subTmpVal : fcl_value::sequence_t(tmpVal)) {
+                    switch (subTmpVal.tag) {
+                    case ::fhicl::UNKNOWN:
+                    case ::fhicl::NIL:
+                    case ::fhicl::STRING: {
+                        subDataArray.push_back(dequote(fcl_value::atom_t(subTmpVal)));
+                        break;
+                    }
+                    case ::fhicl::BOOL: {
+                        bool boolean;
+                        std::istringstream(fcl_value::atom_t(subTmpVal)) >> std::boolalpha >> boolean;
+                        subDataArray.push_back(boolean);
+                        break;
+                    }
+                    case ::fhicl::NUMBER: {
+                        std::string str = fcl_value::atom_t(subTmpVal);
+
+                        if (isDouble(str)) {
+                            auto dbl = boost::lexical_cast<double>(str);
+
+                            if (std::fmod(dbl, static_cast<decltype(dbl)>(1.0)) == 0.0)
+                                subDataArray.push_back( int(dbl));
+                            else
+                                subDataArray.push_back( dbl);
+                        } else {
+                            subDataArray.push_back(boost::lexical_cast<int>(str));
+                        }
+                        break;
+                    }
+                    case ::fhicl::COMPLEX: {
+                        subDataArray.push_back(dequote(fcl_value::atom_t(subTmpVal)));
+                        break;
+                    }
+                    case ::fhicl::TABLEID:
+                    case ::fhicl::TABLE:
+		    case ::fhicl::SEQUENCE:{
+                        subDataArray.push_back(subTmpVal.to_string());
+                        break;
+                    }
+                    }
+
+                }
+            } else {
+                tmpDataArray.push_back(dequote(fcl_value::atom_t(tmpVal)));
+            }
+        }
+
         break;
     }
     case ::fhicl::TABLE: {
         pair.data.value = jsn::object_t();
-	pair.metadata_<jsn::object_t>()[literal::children]=jsn::object_t();
+        pair.metadata_<jsn::object_t>()[literal::children]=jsn::object_t();
 
         auto& tmpDataObject = pair.data_<jsn::object_t>();
         auto& tmpMetadataObject = boost::get<jsn::object_t>(pair.metadata_<jsn::object_t>()[literal::children]);
 
-        for (auto const & kvp : fcl_value::table_t(value)){
-	     datapair_t pair=std::move(fcl2jsondb(kvp, self, comments));
-             tmpDataObject.push_back(std::move(pair.first));
-             tmpMetadataObject.push_back(std::move(pair.second));
-	}
-	
+        for (auto const & kvp : fcl_value::table_t(value)) {
+            datapair_t pair=std::move(fcl2jsondb(kvp, self, comments));
+            tmpDataObject.push_back(std::move(pair.first));
+            tmpMetadataObject.push_back(std::move(pair.second));
+        }
+
         break;
     }
 
@@ -205,7 +254,7 @@ json2fcldb::operator fcl::value_t()
 try
 {
     auto const& self_value=std::get<1>(self);
-    
+
     if (self_value.type() == typeid(bool)) {
         return fcl::value_t(unwrap(self_value).value_as<const bool>());
     }  else if (self_value.type() == typeid(int)) {
@@ -236,7 +285,7 @@ try
 
     // if (self_metadata.type() != typeid(jsn::object_t))
     //    throw ::fhicl::exception(::fhicl::parse_error, literal::metadata_node) << ("JSON element is not a object_t type.");
-    
+
     //auto const& data_object = unwrap(self_data).value_as<const jsn::object_t>();
     auto const& metadata_object = unwrap(self_metadata).value_as<const jsn::object_t>();
 
@@ -245,20 +294,20 @@ try
     auto fcl_value = fcl::value_t();
 
     switch (type) {
-      case ::fhicl::UNKNOWN:
-      case ::fhicl::NIL:
-      case ::fhicl::STRING: {
+    case ::fhicl::UNKNOWN:
+    case ::fhicl::NIL:
+    case ::fhicl::STRING: {
         fcl_value.value = boost::get<std::string>(self_data);
 
         break;
     }
 
-      case ::fhicl::BOOL: {
+    case ::fhicl::BOOL: {
         fcl_value.value = boost::get<bool>(self_data);
         break;
     }
 
-      case ::fhicl::NUMBER: {
+    case ::fhicl::NUMBER: {
         if (self_data.type() == typeid(int))
             fcl_value.value = boost::get<int>(self_data);
         else
@@ -267,13 +316,13 @@ try
         break;
     }
 
-      case ::fhicl::COMPLEX: {
+    case ::fhicl::COMPLEX: {
         fcl_value.value = boost::get<std::string>(self_data);
 
         break;
     }
 
-      case ::fhicl::SEQUENCE: {
+    case ::fhicl::SEQUENCE: {
 
         fcl_value.value = fcl::sequence_t();
         auto& sequence =  unwrap(fcl_value).value_as<fcl::sequence_t>();
@@ -282,26 +331,26 @@ try
             auto const& values = boost::get<jsn::array_t>(self_data);
 
             for (auto const& val : values) {
-	      	valuetuple_t value_tuple =  std::forward_as_tuple(self_key,val,self_metadata);		
+                valuetuple_t value_tuple =  std::forward_as_tuple(self_key,val,self_metadata);
                 sequence.push_back(json2fcldb(value_tuple, self));
-	    }
+            }
         } catch (std::out_of_range const&) {
         }
 
         break;
     }
-      case ::fhicl::TABLE: {
+    case ::fhicl::TABLE: {
         fcl_value.value = fcl::table_t();
         auto& table =  unwrap(fcl_value).value_as<fcl::table_t>();
 
         try {
             auto const& object = boost::get<jsn::object_t>(self_data);
-	    auto const& children = boost::get<jsn::object_t>(metadata_object.at(literal::children));
-            for (auto const& data : object){
-	      	valuetuple_t value_tuple =  std::forward_as_tuple(data.key,data.value,children.at(data.key));
+            auto const& children = boost::get<jsn::object_t>(metadata_object.at(literal::children));
+            for (auto const& data : object) {
+                valuetuple_t value_tuple =  std::forward_as_tuple(data.key,data.value,children.at(data.key));
 
                 table.push_back(json2fcldb(value_tuple, self));
-	    }
+            }
 
         } catch (std::out_of_range const&) {
         }
@@ -309,7 +358,7 @@ try
         break;
     }
 
-      case ::fhicl::TABLEID: {
+    case ::fhicl::TABLEID: {
         fcl_value.value = boost::get<std::string>(self_data);
 
         break;

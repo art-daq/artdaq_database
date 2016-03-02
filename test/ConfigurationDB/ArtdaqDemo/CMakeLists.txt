@@ -26,5 +26,9 @@ find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_FQ_DIR}/lib )
 
 #add_subdirectory(test003)
 #add_subdirectory(test004)
-add_subdirectory(test005)
+#add_subdirectory(test005)
+
+add_subdirectory(test007)
+add_subdirectory(test008)
+
 install_source()
