@@ -6,7 +6,7 @@ include_directories($ENV{MONGODB_FQ_DIR}/include/mongocxx/v0.3)
 find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_FQ_DIR}/lib )
 find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_FQ_DIR}/lib )
 
- art_make_exec(ArtdaqDemo_t
+ art_make_exec(OtsDaqDemo_t
   LIBRARIES
   artdaq-database_StackTrace  
   artdaq-database_BasicTypes
@@ -23,12 +23,5 @@ find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_FQ_DIR}/lib )
 
 add_subdirectory(test001)
 add_subdirectory(test002)
-
-add_subdirectory(test003)
-add_subdirectory(test004)
-add_subdirectory(test005)
-
-add_subdirectory(test007)
-add_subdirectory(test008)
 
 install_source()

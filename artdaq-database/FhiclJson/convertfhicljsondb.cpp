@@ -192,7 +192,7 @@ try
                     }
                     case ::fhicl::TABLEID:
                     case ::fhicl::TABLE:
-		    case ::fhicl::SEQUENCE:{
+                    case ::fhicl::SEQUENCE: {
                         subDataArray.push_back(subTmpVal.to_string());
                         break;
                     }
@@ -323,18 +323,37 @@ try
     }
 
     case ::fhicl::SEQUENCE: {
-
         fcl_value.value = fcl::sequence_t();
         auto& sequence =  unwrap(fcl_value).value_as<fcl::sequence_t>();
 
         try {
             auto const& values = boost::get<jsn::array_t>(self_data);
 
-            for (auto const& val : values) {
-                valuetuple_t value_tuple =  std::forward_as_tuple(self_key,val,self_metadata);
-                sequence.push_back(json2fcldb(value_tuple, self));
+            for (auto const& tmpVal : values) {
+                if (tmpVal.type() == typeid(jsn::array_t)) {
+                    sequence.push_back(fcl::value_t(fcl::sequence_t()));
+
+                    auto& sub_sequence =  unwrap(sequence.back()).value_as<fcl::sequence_t>();
+
+                    auto const& sub_values=boost::get<jsn::array_t>(tmpVal);
+
+                    for (auto const & subTmpVal : sub_values) {
+                        if(subTmpVal.type()==typeid(std::string)) {
+                            sub_sequence.push_back(fcl::value_t(boost::get<std::string>(subTmpVal)));
+                        } else if (subTmpVal.type()==typeid(bool)) {
+                            sub_sequence.push_back(fcl::value_t(boost::get<bool>(subTmpVal)));
+                        } else if (subTmpVal.type()==typeid(int)) {
+                            sub_sequence.push_back(fcl::value_t(boost::get<int>(subTmpVal)));
+                        } else if (subTmpVal.type()==typeid(double)) {
+                            sub_sequence.push_back(fcl::value_t(boost::get<double>(subTmpVal)));
+                        } 
+                    }
+                } else {
+                    valuetuple_t value_tuple =  std::forward_as_tuple(self_key,tmpVal,self_metadata);
+                    sequence.push_back(json2fcldb(value_tuple, self));
+                }
             }
-        } catch (std::out_of_range const&) {
+        }catch (std::out_of_range const&) {
         }
 
         break;
@@ -374,7 +393,8 @@ try
 
     return  {fcl_key, fcl_value};
 
-} catch (std::exception const& e)
+}
+catch (std::exception const& e)
 {
     throw;
 }
