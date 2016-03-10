@@ -30,12 +30,17 @@ constexpr auto bookkeeping_isreadonly = "bookkeeping.isreadonly";
 constexpr auto configurations = "configurations";
 constexpr auto configurations_name           = "configurations.name";
 
+constexpr auto name                		= "name";
+constexpr auto configurable_entity              = "configurable_entity";
+constexpr auto configurable_entity_name         = "configurable_entity.name";
+
 constexpr auto document_root       = "root";  
 }
 
 namespace actions
 {
 constexpr auto addAlias       	= "addAlias";  
+constexpr auto setConfigurableEntity       	= "setConfigurableEntity";  
 constexpr auto removeAlias    	= "removeAlias";
 constexpr auto addToGlobalConfig= "addToGlobalConfig"; 
 constexpr auto setVersion       = "setVersion";  

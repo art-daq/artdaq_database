@@ -5,4 +5,5 @@ set(CMAKE_MODULE_PATH
 
 include(NodeJSAddon)
 
-add_subdirectory(fhicljson)
+#add_subdirectory(fhicljson)
+add_subdirectory(conftool)

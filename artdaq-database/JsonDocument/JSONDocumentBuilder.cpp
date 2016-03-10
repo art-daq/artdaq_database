@@ -288,6 +288,26 @@ JSONDocumentBuilder& JSONDocumentBuilder::setVersion(JSONDocument const& version
     return self();
 }
 
+
+
+JSONDocumentBuilder& JSONDocumentBuilder::setConfigurableEntity(JSONDocument const& entity)
+{
+    TRACE_(9, "setConfigurableEntity() args  entity=<" << entity << ">");
+
+    enforce();
+
+    auto newEntity = _wrap_as_payload(entity);
+
+    auto tmp_document = _document;
+    tmp_document.insertChild(newEntity,literal::configurable_entity);
+    tmp_document.appendChild(_bookkeeping_update_payload(actions::setConfigurableEntity),literal::bookkeeping_updates);
+
+    _document=std::move(tmp_document);
+
+    return self();
+}
+
+   
 JSONDocumentBuilder& JSONDocumentBuilder::markReadonly() {
     TRACE_(6, "markReadonly()");
 

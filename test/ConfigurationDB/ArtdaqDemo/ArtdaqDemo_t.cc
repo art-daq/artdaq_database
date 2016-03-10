@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) try
 namespace cfol = artdaq::database::configuration::options::literal;
     std::ostringstream descstr;
     descstr << argv[0] << " <-o <operation>>  <-c <config-file>>  <-f <file-format>>";
-    descstr <<"  <-t <type>> <-v <version>>  <-g <globalid>>  <-d <database>>" ;
+    descstr <<"  <-t <type>> <-v <version>>  <-g <globalid>>  <-d <database>> <-e <configurable-entity>>" ;
 
     bpo::options_description desc = descstr.str();
 
@@ -63,6 +63,7 @@ namespace cfol = artdaq::database::configuration::options::literal;
     ("configuration,c", bpo::value<std::string>(),  "Configuration file name.")
     ("format,f", bpo::value<std::string>(),  "Configuration file format [fhicl/json/gui].")
     ("type,t", bpo::value<std::string>(), "Configuration collection type name.")
+    ("entity,e", bpo::value<std::string>(), "Configurable entity name.")
     ("version,v", bpo::value<std::string>(), "Configuration version.")
     ("globalid,g", bpo::value<std::string>(), "Gloval config id.")
     ("database,d", bpo::value<std::string>(), "Database provider name.")
@@ -153,6 +154,10 @@ namespace cfol = artdaq::database::configuration::options::literal;
         options.dataFormat(vm["format"].as<std::string>());
     }
 
+    if (vm.count("entity")) {
+        options.configurableEntity(vm["entity"].as<std::string>());
+    }
+    
     if( options.operation().compare(cfol::operation_store)==0) {
         if (!vm.count("version")) {
             std::cerr << "Exception from command line processing in " << argv[0]
@@ -160,7 +165,7 @@ namespace cfol = artdaq::database::configuration::options::literal;
                       << "For usage and an options list, please do '"
                       << argv[0] <<  " --help"
                       << "'.\n";
-            return process_exit_code::INVALID_ARGUMENT|7;
+            return process_exit_code::INVALID_ARGUMENT|8;
         } else {
             options.version(vm["version"].as<std::string>());
         }

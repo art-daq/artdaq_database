@@ -21,7 +21,7 @@ namespace cf = db::configuration;
 namespace cfo = cf::options;
 namespace cfd = cf::mongo;
 
-using Options = cfo::LoadStoreOperation;
+using Options = cfo::LoadStoreOperation; 
 using artdaq::database::basictypes::JsonData;
 
 void cfd::store( Options const& options, JsonData const& insert_payload ) {

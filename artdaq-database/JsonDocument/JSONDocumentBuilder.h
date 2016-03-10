@@ -18,6 +18,8 @@ public:
    JSONDocumentBuilder& addAlias(JSONDocument const&);
    JSONDocumentBuilder& addToGlobalConfig(JSONDocument const&);
    JSONDocumentBuilder& setVersion(JSONDocument const&);
+   JSONDocumentBuilder& setConfigurableEntity(JSONDocument const&);
+
    JSONDocumentBuilder& removeAlias(JSONDocument const&);
    JSONDocumentBuilder& markReadonly();
    JSONDocumentBuilder& markDeleted();   

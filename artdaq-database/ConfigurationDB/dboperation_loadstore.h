@@ -22,6 +22,17 @@ constexpr auto version_prefix = "test version";
 constexpr auto global_configuration_prefix = "global config";
 constexpr auto database_provider_mongo = "mongo";
 constexpr auto database_provider_filesystem = "filesystem";
+constexpr auto configuration_entity_any="any";
+
+constexpr auto operation="operation";
+constexpr auto version="version";
+constexpr auto configuration="configuration";
+constexpr auto dbprovider="dbprovider";
+constexpr auto filter="filter";
+constexpr auto collection="collection";
+constexpr auto configurable_entity="configurable_entity";
+
+constexpr auto default_filter="{\"configurable_entity\":\"any\"}";
 }
 
 using artdaq::database::jsonutils::JSONDocument;
@@ -51,6 +62,12 @@ public:
     std::string const& provider() const noexcept;
     std::string const& provider ( std::string const& );
 
+    std::string const& configurableEntity() const noexcept;
+    std::string const& configurableEntity ( std::string const& );
+    JSONDocument configurableEntity_jsndoc() const;
+
+    void read(std::string const& );
+    
     data_format_t const& dataFormat() const noexcept;
     data_format_t const& dataFormat (data_format_t const& );
     data_format_t const& dataFormat (std::string const& );
@@ -62,6 +79,10 @@ private:
     std::string _global_configuration_id = {literal::global_configuration_prefix};
     std::string _provider = {literal::database_provider_filesystem};
     data_format_t _data_format ={data_format_t::unknown};
+    std::string _configurable_entity = {literal::configuration_entity_any};
+
+    std::string _search_filter= {literal::default_filter};
+    
 };
 
 } //namespace options
@@ -72,6 +93,10 @@ using Options= options::LoadStoreOperation;
 result_pair_t store_configuration ( Options const& /*options*/, std::string& /*conf*/ ) noexcept;
 result_pair_t load_configuration ( Options const& /*options*/, std::string& /*conf*/ ) noexcept;
 
+namespace guiexports {
+result_pair_t store_configuration ( std::string const& /*search_filter*/, std::string const& /*conf*/ ) noexcept;
+result_pair_t load_configuration ( std::string const& /*search_filter*/, std::string& /*conf*/ ) noexcept;
+}
 void  trace_enable_LoadStoreOperation();
 void  trace_enable_LoadStoreOperationMongo();
 void  trace_enable_LoadStoreOperationFileSystem();

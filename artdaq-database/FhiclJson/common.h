@@ -14,12 +14,19 @@
 #include <ostream>
 #include <iostream>
 #include <chrono>
+#include <cmath>
 #include <stdexcept>
 #include <regex>
-#include "trace.h"
+#include <type_traits> 
 
 #include <boost/core/demangle.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/mpl/print.hpp>
+#include <boost/exception/diagnostic_information.hpp>
+
+#include "cetlib/coded_exception.h"
+#include "trace.h"
+
 
 //#define BOOST_SPIRIT_KARMA_DEBUG
 //#define BOOST_SPIRIT_QI_DEBUG

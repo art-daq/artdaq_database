@@ -29,7 +29,10 @@ bool not_equal( std::string const& left, std::string const& right ) {
 }
 
 namespace db = artdaq::database;
+namespace dbjsu=db::jsonutils;
+namespace dbjsul=db::jsonutils::literal;
 namespace cf = db::configuration;
+namespace cfgui = cf::guiexports;
 namespace cfo = cf::options;
 namespace cfol = cfo::literal;
 
@@ -52,6 +55,39 @@ std::string decode(data_format_t const& f) {
     case data_format_t::gui :
         return "gui";
     }
+}
+
+void LoadStoreOperation::read(std::string const& search_filter){
+      assert( !search_filter.empty() );
+
+     auto filter_document=JSONDocument{search_filter};
+     
+     _data_format=cfo::data_format_t::json;
+     
+     _version=filter_document.value_as<std::string>(cfol::version);
+     
+     try {
+     _global_configuration_id=filter_document.value_as<std::string>(cfol::configuration);
+     }catch(...){}
+     try {
+     _configurable_entity=filter_document.value_as<std::string>(cfol::configurable_entity);
+     }catch(...){}
+     
+     try {
+       operation(filter_document.value_as<std::string>(cfol::operation));
+    }catch(...){}
+    
+     try {
+       _search_filter=filter_document.value_as<std::string>(cfol::filter);
+    }catch(...){}
+
+     try {
+       type(filter_document.value_as<std::string>(cfol::collection));
+    }catch(...){}
+
+     try {
+       provider(filter_document.value_as<std::string>(cfol::dbprovider));
+    }catch(...){}    
 }
 
 std::string const& LoadStoreOperation::operation() const noexcept {
@@ -122,6 +158,29 @@ std::string const& LoadStoreOperation::version( std::string const& version ) {
 
 }
 
+std::string const& LoadStoreOperation::configurableEntity() const noexcept{
+    assert( !_configurable_entity.empty() );
+
+    return _configurable_entity;
+}
+
+std::string const& LoadStoreOperation::configurableEntity(std::string const& entity ){
+    assert( !entity.empty() );
+
+    if ( entity.empty() ) {
+        throw cet::exception( "Options" )
+                << "Invalid version; entity is empty.";
+    }
+
+    TRACE_( 13, "Options: Updating entity from "
+            << _configurable_entity << " to " << entity << "." );
+
+    _configurable_entity = entity;
+
+    return _configurable_entity;
+}
+
+    
 std::string const& LoadStoreOperation::globalConfigurationId() const noexcept {
     assert( !_global_configuration_id.empty() );
 
@@ -282,6 +341,8 @@ void store_configuration( Options const& options, std::string& conf ) {
     builder.createFromData( data.json_buffer );
     builder.addToGlobalConfig( options.globalConfigurationId_jsndoc() );
     builder.setVersion( options.version_jsndoc() );
+    builder.setConfigurableEntity( options.configurableEntity_jsndoc() );
+
     auto document = std::move( builder.extract() );
     auto insert_payload = JsonData {"{\"document\":" + document.to_string()
                                     + ", \"collection\":\"" + options.type() + "\"}"
@@ -410,6 +471,40 @@ cf::result_pair_t cf::load_configuration ( Options const& options, std::string& 
     }
 }
 
+
+cf::result_pair_t cfgui::store_configuration( std::string const& search_filter, std::string const& conf ) noexcept {
+     try {
+          auto options = Options{};
+          options.read( search_filter );
+	  
+	  //convert to database_format
+	  auto database_format = std::string(conf);
+	  
+          detail::store_configuration( options, database_format );
+          return cf::result_pair_t {true, database_format};
+     } catch ( ... ) {
+          return cf::result_pair_t {false, boost::current_exception_diagnostic_information()};
+     }
+}
+
+cf::result_pair_t cfgui::load_configuration( std::string const& search_filter, std::string& conf ) noexcept {
+     try {
+          auto options = Options{};
+          options.read( search_filter );
+
+ 	  auto database_format = std::string(conf);
+
+          detail::load_configuration( options, database_format );
+	  
+	  //convert to gui
+	  conf = database_format;
+	  
+          return cf::result_pair_t {true, "Success"};
+     } catch ( ... ) {
+          return cf::result_pair_t {false, boost::current_exception_diagnostic_information()};
+     }
+}
+
 namespace jul = artdaq::database::jsonutils::literal;
 using namespace artdaq::database::jsonutils;
 
@@ -422,6 +517,13 @@ JSONDocument LoadStoreOperation::version_jsndoc() const {
 JSONDocument LoadStoreOperation::globalConfigurationId_jsndoc() const {
     auto kvp = std::make_pair<std::string, std::string>(
                    jul::configurations, _global_configuration_id.c_str() );
+
+    return toJSONDocument( kvp );
+}
+
+JSONDocument LoadStoreOperation::configurableEntity_jsndoc() const {
+    auto kvp = std::make_pair<std::string, std::string>(
+                   jul::name, _configurable_entity.c_str() );
 
     return toJSONDocument( kvp );
 }

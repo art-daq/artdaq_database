@@ -1,0 +1,20 @@
+{
+"data" : [
+{
+"type" : "sequence",
+"name" : "tt",
+"comment" : " ",
+"children" : [
+"mm",
+1,
+[
+"aa",
+"zz"
+],
+{
+"xx" : true
+}
+]
+}
+]
+}

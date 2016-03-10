@@ -8,9 +8,9 @@
 
 #include <sstream>
 
-namespace artdaq{
-namespace database{
-namespace sharedtypes{
+namespace artdaq {
+namespace database {
+namespace sharedtypes {
 
 using basic_key_t = std::string;
 using optional_comment_t  = boost::optional<std::string>;
@@ -22,28 +22,29 @@ struct  key_of {
     using comment_type = COMMENT;
 
     key_of() = default;
-    key_of(key_of&) = default;
-    key_of(key_of const&) = default;
-    key_of& operator=(key_of const&) = default;
+    key_of ( key_of& ) = default;
+    key_of ( key_of const& ) = default;
+    key_of& operator= ( key_of const& ) = default;
 
-    key_of(std::string const& k)
-        : key(k) {}
+    key_of ( std::string const& k )
+        : key ( k ) {}
 
-    key_of(std::string const& k, typename comment_type::value_type const& c)
-        : key(k), comment(c) {}
+    key_of ( std::string const& k, typename comment_type::value_type const& c )
+        : key ( k ), comment ( c ) {}
 
-    bool operator==(key_of const& other) const {
+    bool operator== ( key_of const& other ) const {
         return other.key == key;
     }
 
-    key_of& operator=(key_type const& k) {
-        key = k; return *this;
+    key_of& operator= ( key_type const& k ) {
+        key = k;
+        return *this;
     }
 
     operator std::string() const {
-      return key + ", comment=" + comment;
+        return key + ", comment=" + comment;
     }
-    
+
     key_type      key;
     comment_type  comment;
 };
@@ -57,18 +58,18 @@ struct  value_of {
     using  annotation_type = ANNOTATION;
 
     value_of() = default;
-    value_of(value_of&) = default;
-    value_of(value_of const&) = default;
-    value_of& operator=(value_of const&) = default;
+    value_of ( value_of& ) = default;
+    value_of ( value_of const& ) = default;
+    value_of& operator= ( value_of const& ) = default;
 
     operator value_type() {
         return value;
     };
 
-    value_of(value_type const& v): value(v) {}
-    value_of(value_type const& v, typename annotation_type::value_type const& a)
-        : value(v), annotation(a) {}
-    
+    value_of ( value_type const& v ) : value ( v ) {}
+    value_of ( value_type const& v, typename annotation_type::value_type const& a )
+        : value ( v ), annotation ( a ) {}
+
     value_type value;
     annotation_type annotation;
 };
@@ -89,8 +90,8 @@ struct vector_of {
         return values.empty();
     }
 
-    void swap(vector_of<value_type>& other) {
-        values.swap(other.values);
+    void swap ( vector_of<value_type>& other ) {
+        values.swap ( other.values );
     }
 
     iterator begin() {
@@ -103,7 +104,7 @@ struct vector_of {
     value_type& back() {
         return values.back();
     }
-    
+
     const_iterator begin() const {
         return values.begin();
     }
@@ -111,27 +112,27 @@ struct vector_of {
         return values.end();
     }
 
-    value_type const& back() const{
+    value_type const& back() const {
         return values.back();
     }
-    
-    iterator insert(iterator position,  value_type const& val) {
-        return values.insert(position, val);
+
+    iterator insert ( iterator position,  value_type const& val ) {
+        return values.insert ( position, val );
     }
 
-    void reserve(size_type n) {
-        values.reserve(n);
+    void reserve ( size_type n ) {
+        values.reserve ( n );
     }
 
     size_type size() const {
         return values.size();
     }
-    
-    void push_back(value_type const& val) {
-        return values.push_back(val);
+
+    void push_back ( value_type const& val ) {
+        return values.push_back ( val );
     }
 
-    collection_type& operator()() {
+    collection_type& operator() () {
         return values;
     }
 
@@ -143,8 +144,8 @@ struct kv_pair_of {
     using key_type = KEYTYPE;
     using value_type = VALUETYPE;
 
-    static kv_pair_of make(key_type const& key,
-                           value_type const& value) {
+    static kv_pair_of make ( key_type const& key,
+                             value_type const& value ) {
         return  {key, value};
     }
 
@@ -158,39 +159,42 @@ struct table_of : vector_of<KVP> {
     using key_type =  typename value_type::key_type;
     using mapped_type = typename value_type::value_type;
 
-    mapped_type& operator[](key_type const& key) {
+    mapped_type& operator[] ( key_type const& key ) {
         auto& pairs = vector_of<value_type>::values;
 
-        for (auto & pair : pairs) {
-            if (key == pair.key)
+        for ( auto & pair : pairs ) {
+            if ( key == pair.key ) {
                 return pair.value;
+            }
         }
 
-        pairs.push_back(value_type::make(key, {false}));
+        pairs.push_back ( value_type::make ( key, {false} ) );
 
         return pairs.back().value;
     }
 
-    mapped_type& at(key_type const& key) {
+    mapped_type& at ( key_type const& key ) {
         auto& pairs = vector_of<value_type>::values;
 
-        for (auto & pair : pairs) {
-            if (key == pair.key)
+        for ( auto & pair : pairs ) {
+            if ( key == pair.key ) {
                 return pair.value;
+            }
         }
 
-        throw std::out_of_range("Key not found; key=" + key);
+        throw std::out_of_range ( "Key not found; key=" + key );
     }
 
-    mapped_type const& at(key_type const& key) const {
+    mapped_type const& at ( key_type const& key ) const {
         auto const& pairs = vector_of<value_type>::values;
 
-        for (auto const & pair : pairs) {
-            if (key == pair.key)
+        for ( auto const & pair : pairs ) {
+            if ( key == pair.key ) {
                 return pair.value;
+            }
         }
 
-        throw std::out_of_range("Key not found; key=" + key);
+        throw std::out_of_range ( "Key not found; key=" + key );
     }
 
 };
@@ -207,17 +211,21 @@ using variant_value_of = boost::variant <
 
 template<typename A>
 struct unwrapper {
-    unwrapper(A& a): any(a) {}
+    unwrapper ( A& a ) : any ( a ) {}
 
     template<typename T>
     T& value_as();
+
+    template<typename T>
+    T& value_as ( std::string const& /*child*/ );
 
     A& any;
 };
 
 template<typename A>
-unwrapper<A> unwrap(A& any){
-  return unwrapper<A>(any);
+unwrapper<A> unwrap ( A& any )
+{
+    return unwrapper<A> ( any );
 }
 
 } //namespace sharedtypes

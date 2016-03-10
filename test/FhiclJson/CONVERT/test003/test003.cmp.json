@@ -1,0 +1,25 @@
+{
+"data" : [
+{
+"type" : "table",
+"name" : "daq",
+"comment" : "comment 1",
+"children" : [
+{
+"type" : "table",
+"name" : "event_builder",
+"comment" : "comment 2",
+"children" : [
+{
+"type" : "number",
+"name" : "expected_fragments_per_event",
+"comment" : "comment 3",
+"value" : 2,
+"annotation" : "annotation 1"
+}
+]
+}
+]
+}
+]
+}

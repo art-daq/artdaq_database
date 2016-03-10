@@ -1,0 +1,458 @@
+{
+"data" : [
+{
+"type" : "table",
+"name" : "daq",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "event_builder",
+"comment" : " ",
+"children" : [
+{
+"type" : "number",
+"name" : "expected_fragments_per_event",
+"comment" : " ",
+"annotation" : " ",
+"value" : 2
+},
+{
+"type" : "number",
+"name" : "first_fragment_receiver_rank",
+"comment" : " ",
+"annotation" : " ",
+"value" : 0
+},
+{
+"type" : "number",
+"name" : "fragment_receiver_count",
+"comment" : " ",
+"annotation" : " ",
+"value" : 2
+},
+{
+"type" : "number",
+"name" : "mpi_buffer_count",
+"comment" : " ",
+"annotation" : " ",
+"value" : 16
+},
+{
+"type" : "bool",
+"name" : "print_event_store_stats",
+"comment" : " ",
+"annotation" : " ",
+"value" : true
+},
+{
+"type" : "bool",
+"name" : "use_art",
+"comment" : " ",
+"annotation" : " ",
+"value" : true
+},
+{
+"type" : "bool",
+"name" : "verbose",
+"comment" : " ",
+"annotation" : " ",
+"value" : false
+}
+]
+},
+{
+"type" : "number",
+"name" : "max_fragment_size_words",
+"comment" : " ",
+"annotation" : " ",
+"value" : 2097152
+},
+{
+"type" : "table",
+"name" : "metrics",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "evbFile",
+"comment" : " ",
+"children" : [
+{
+"type" : "string",
+"name" : "fileName",
+"comment" : " ",
+"annotation" : "//demoe",
+"value" : "/tmp/eventbuilder/evb_%UID%_met // rics.log"
+},
+{
+"type" : "number",
+"name" : "level",
+"comment" : " ",
+"annotation" : " ",
+"value" : 3
+},
+{
+"type" : "string",
+"name" : "metricPluginType",
+"comment" : " ",
+"annotation" : " ",
+"value" : "file"
+},
+{
+"type" : "bool",
+"name" : "uniquify",
+"comment" : " ",
+"annotation" : " ",
+"value" : true
+}
+]
+}
+]
+}
+]
+},
+{
+"type" : "table",
+"name" : "outputs",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "netMonOutput",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "SelectEvents",
+"comment" : "#Failure 5 not a satom ",
+"children" : [
+{
+"type" : "sequence",
+"name" : "SelectEvents",
+"comment" : "#Failure 5 not a satom ",
+"annotation" : " ",
+"values" : [
+"pmod2",
+"pmod3"
+]
+}
+]
+},
+{
+"type" : "string",
+"name" : "module_type",
+"comment" : " ",
+"annotation" : " ",
+"value" : "NetMonOutput"
+}
+]
+}
+]
+},
+{
+"type" : "table",
+"name" : "physics",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "analyzers",
+"comment" : " "
+},
+{
+"type" : "table",
+"name" : "filters",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "prescaleMod2",
+"comment" : "#Failure 4 not a satom ",
+"children" : [
+{
+"type" : "string",
+"name" : "module_type",
+"comment" : " ",
+"annotation" : "#//Success 5 right of satom",
+"value" : "NthEvent"
+},
+{
+"type" : "number",
+"name" : "nth",
+"comment" : "#//Success 5 right of satom",
+"annotation" : " ",
+"value" : 2
+}
+]
+},
+{
+"type" : "table",
+"name" : "prescaleMod3",
+"comment" : " ",
+"children" : [
+{
+"type" : "string",
+"name" : "module_type",
+"comment" : " ",
+"annotation" : " ",
+"value" : "NthEvent"
+},
+{
+"type" : "number",
+"name" : "nth",
+"comment" : " ",
+"annotation" : "//#Success 4 right of satom",
+"value" : 3
+}
+]
+}
+]
+},
+{
+"type" : "sequence",
+"name" : "my_output_modules",
+"comment" : " ",
+"annotation" : " ",
+"values" : [
+"netMonOutput"
+]
+},
+{
+"type" : "sequence",
+"name" : "pmod2",
+"comment" : " ",
+"annotation" : " ",
+"values" : [
+"prescaleMod2"
+]
+},
+{
+"type" : "sequence",
+"name" : "pmod3",
+"comment" : "#Failure 2 not a satom ",
+"annotation" : " ",
+"values" : [
+"prescaleMod3"
+]
+},
+{
+"type" : "table",
+"name" : "producers",
+"comment" : " "
+}
+]
+},
+{
+"type" : "string",
+"name" : "process_name",
+"comment" : " ",
+"annotation" : " ",
+"value" : "DAQ"
+},
+{
+"type" : "table",
+"name" : "services",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "scheduler",
+"comment" : " ",
+"children" : [
+{
+"type" : "string",
+"name" : "fileMode",
+"comment" : " ",
+"annotation" : " ",
+"value" : "NOMERGE"
+}
+]
+},
+{
+"type" : "table",
+"name" : "user",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "NetMonTransportServiceInterface",
+"comment" : " ",
+"children" : [
+{
+"type" : "number",
+"name" : "data_receiver_count",
+"comment" : " ",
+"annotation" : "# 2",
+"value" : 1
+},
+{
+"type" : "number",
+"name" : "first_data_receiver_rank",
+"comment" : " ",
+"annotation" : " ",
+"value" : 6
+},
+{
+"type" : "number",
+"name" : "max_fragment_size_words",
+"comment" : " ",
+"annotation" : " ",
+"value" : 2097152
+},
+{
+"type" : "number",
+"name" : "mpi_buffer_count",
+"comment" : " ",
+"annotation" : " ",
+"value" : 8
+},
+{
+"type" : "string",
+"name" : "service_provider",
+"comment" : " ",
+"annotation" : " ",
+"value" : "NetMonTransportService"
+}
+]
+}
+]
+}
+]
+},
+{
+"type" : "table",
+"name" : "source",
+"comment" : " ",
+"children" : [
+{
+"type" : "string",
+"name" : "module_type",
+"comment" : "#Success 1  above satom",
+"annotation" : " ",
+"value" : "RawInput"
+},
+{
+"type" : "bool",
+"name" : "resume_after_timeout",
+"comment" : " ",
+"annotation" : "#Success 3 right of satom",
+"value" : true
+},
+{
+"type" : "number",
+"name" : "waiting_time",
+"comment" : " ",
+"annotation" : "//Success 2 right of satom",
+"value" : 900
+}
+]
+}
+],
+"comments" : [
+{
+"linenum" : 12,
+"value" : "# 2"
+},
+{
+"linenum" : 13,
+"value" : "#broadcast_sends: true"
+},
+{
+"linenum" : 17,
+"value" : "#SimpleMemoryCheck: { }"
+},
+{
+"linenum" : 35,
+"value" : "//demoe"
+},
+{
+"linenum" : 44,
+"value" : "#Failure 5 not a satom "
+},
+{
+"linenum" : 46,
+"value" : "#outputCommands: [ |keep *|, |drop artdaq::Fragments_daq_V1720_*|, |drop artdaq::Fragments_daq_V1724_*| ]"
+},
+{
+"linenum" : 48,
+"value" : "#normalOutput: {"
+},
+{
+"linenum" : 49,
+"value" : "#  module_type: RootOutput"
+},
+{
+"linenum" : 50,
+"value" : "#  fileName: |/tmp/artdaqdemo_eb04_r%06r_sr%02s_%to.root|"
+},
+{
+"linenum" : 51,
+"value" : "#  compressionLevel: 0"
+},
+{
+"linenum" : 52,
+"value" : "#  SelectEvents: { SelectEvents: [ pmod2,pmod3 ] }"
+},
+{
+"linenum" : 53,
+"value" : "#  #outputCommands: [ |keep *|, |drop artdaq::Fragments_daq_V1720_*|, |drop artdaq::Fragments_daq_V1724_*| ]"
+},
+{
+"linenum" : 54,
+"value" : "#}"
+},
+{
+"linenum" : 71,
+"value" : "#Failure 4 not a satom "
+},
+{
+"linenum" : 73,
+"value" : "#//Success 5 right of satom"
+},
+{
+"linenum" : 78,
+"value" : "#Failure 3 not directly above satom "
+},
+{
+"linenum" : 81,
+"value" : "//#Success 4 right of satom"
+},
+{
+"linenum" : 85,
+"value" : "//Failure 1 not a comment"
+},
+{
+"linenum" : 87,
+"value" : "#Failure 2 not a satom "
+},
+{
+"linenum" : 91,
+"value" : "#a1: [ app, wf ]"
+},
+{
+"linenum" : 94,
+"value" : "#my_output_modules: [ normalOutput ]"
+},
+{
+"linenum" : 97,
+"value" : "#Success 1  above satom"
+},
+{
+"linenum" : 99,
+"value" : "//Success 2 right of satom"
+},
+{
+"linenum" : 100,
+"value" : "#Success 3 right of satom"
+},
+{
+"linenum" : 101,
+"value" : "// fragment_type_map: [[1, |missed|], [3, |V1720|], [4, |V1724|], [6, |TOY1|], [7, |TOY2|], [8, |ASCII|]]"
+}
+],
+"origin" : {
+"source" : "fhicl_to_json",
+"timestamp" : "Mon Feb  8 14:00:30 2016"
+}
+}

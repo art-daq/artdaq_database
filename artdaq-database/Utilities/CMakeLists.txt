@@ -30,6 +30,14 @@ art_make_exec(readjson
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 ) 
 
+art_make_exec(convertjson
+  LIBRARIES
+  artdaq-database_FhiclJson
+  ${FHICLCPP}  
+  ${CETLIB}
+  ${Boost_PROGRAM_OPTIONS_LIBRARY}
+) 
+
 find_ups_product( mongodb ${mongodb_product_version} )
 
 include_directories($ENV{MONGODB_FQ_DIR}/include/bsoncxx/v0.3)

@@ -5,19 +5,14 @@ add_subdirectory(FhiclJson)
 add_subdirectory(JsonDocument)
 add_subdirectory(BasicTypes)
 add_subdirectory(StorageProviders)
-
 add_subdirectory(Utilities)
-
 add_subdirectory(ConfigurationDB)
+add_subdirectory(NodeJSAddons)
 
 
-#add_subdirectory(JsonConvert)
-#add_subdirectory(JsonDocument)
+add_subdirectory(JsonConvert)
 
-#add_subdirectory(DemoTypes)
+add_subdirectory(DemoTypes)
 
-#add_subdirectory(ConfigurationDB)
-#add_subdirectory(DemoConfigurationDB)
-#add_subdirectory(NodeJSAddons)
 
 
