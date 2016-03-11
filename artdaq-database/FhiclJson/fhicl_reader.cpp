@@ -145,7 +145,6 @@ bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
 	}
 	
 	auto array = jsn::array_t();
-	array.reserve(comments.size());
 		
 	for(auto const& comment : comments) {
 	  array.push_back(jsn::object_t());
@@ -189,7 +188,6 @@ bool FhiclReader::read_includes(std::string const& in, jsn::array_t& json_array)
         auto result  = phrase_parse(start, end, grammar, blank, includes);
 
 	auto array = jsn::array_t();
-	array.reserve(includes.size());
 	
 	for(auto const& include : includes)
 	  array.push_back(include);

@@ -126,35 +126,42 @@ public:
     }
     
     template<typename T, typename O>
-    T& makeChild(O const& o){
-	using namespace artdaq::database::sharedtypes;
-      
-	assert(type()==type_t::OBJECT || type()==type_t::ARRAY);  
-	auto const node_name = unwrap( o ).value_as<const std::string>( literal::name );
-  	TRACE_( 16, "json_node_t() makeChild() node_name=<" << node_name<<">");
+    T& makeChild(O const& o) {
+        using namespace artdaq::database::sharedtypes;
 
-	if(type()==type_t::OBJECT) {
-	 TRACE_( 16, "json_node_t() makeChild() OBJECT 1");
-	  
-	 object_t& object = value_as<object_t>();
-	 TRACE_( 16, "json_node_t() makeChild() OBJECT 2");
+        assert(type()==type_t::OBJECT || type()==type_t::ARRAY);
 
-	 object[node_name]=T{};
-	 TRACE_( 16, "json_node_t() makeChild() OBJECT 3");
+        auto const node_name = unwrap( o ).value_as<const std::string>( literal::name );
 
-	  return unwrap(object.at(node_name)).value_as<T>();
-	} else if ( type()==type_t::ARRAY) {
-	TRACE_( 16, "json_node_t() makeChild() ARRAY 1");	  
-	   array_t& array = value_as<array_t>();
-	 	TRACE_( 16, "json_node_t() makeChild() ARRAY 2");	  
-  
-	  array.push_back(T{});
-	TRACE_( 16, "json_node_t() makeChild() ARRAY 3");	  
-	  return unwrap(array.back()).value_as<T>();
-	}
-	
-       throw cet::exception( "json_node_t" ) << "Value was not created";	
+        TRACE_( 16, "json_node_t() makeChild() node_name=<" << node_name<<">");
+
+        if(type()==type_t::OBJECT) {
+            object_t& object = value_as<object_t>();
+            object[node_name]=T {};
+	    
+            return unwrap(object.at(node_name)).value_as<T>();
+        } else if ( type()==type_t::ARRAY) {
+            array_t& array = value_as<array_t>();
+            array.push_back(T {});
+	    
+            return unwrap(array.back()).value_as<T>();
+        }
+
+        throw cet::exception( "json_node_t" ) << "Value was not created";
     }
+    
+    template<typename T, typename O>
+    T& makeChildOfChildren(O const& o){
+        using namespace artdaq::database::sharedtypes;
+	
+        assert(type()==type_t::OBJECT || type()==type_t::ARRAY);
+        TRACE_( 16, "json_node_t() makeChildOfChildren() node_name=<children>");
+
+        object_t& object = value_as<object_t>();
+	object[literal::children]=object_t();
+	
+ 	return json_node_t{unwrap(object.at(literal::children)).value_as<object_t>()}.makeChild<T,O>(o);
+    }    
     
     type_t type() const {
 	assert(!_any.empty());

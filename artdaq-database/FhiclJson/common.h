@@ -17,7 +17,8 @@
 #include <cmath>
 #include <stdexcept>
 #include <regex>
-#include <type_traits> 
+#include <type_traits>
+#include <list>
 
 #include <boost/core/demangle.hpp>
 #include <boost/lexical_cast.hpp>

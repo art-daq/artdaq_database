@@ -6,6 +6,6 @@
 "configurable_entity":"EventBuilder_topol",
 "configuration":"configA002",
 "dbprovider":"filesystem",
-"operation":"load",
+"operation":"store",
 "dataformat":"gui"
 }

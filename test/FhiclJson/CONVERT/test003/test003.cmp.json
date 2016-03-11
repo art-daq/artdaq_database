@@ -1,5 +1,33 @@
 {
-"data" : [
+"document" : {
+"data" : {
+"daq" : {
+"event_builder" : {
+"expected_fragments_per_event" : 2
+}
+}
+},
+"metadata" : {
+"daq" : {
+"type" : "table",
+"comment" : "comment 1",
+"children" : {
+"event_builder" : {
+"type" : "table",
+"comment" : "comment 2",
+"children" : {
+"expected_fragments_per_event" : {
+"type" : "number",
+"comment" : "comment 3",
+"annotation" : "annotation 1"
+}
+}
+}
+}
+}
+},
+"converted" : {
+"guidata" : [
 {
 "type" : "table",
 "name" : "daq",
@@ -22,4 +50,6 @@
 ]
 }
 ]
+}
+}
 }

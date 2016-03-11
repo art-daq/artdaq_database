@@ -133,8 +133,6 @@ try
         object[literal::values] = jsn::array_t();
         auto& tmpArray = boost::get<jsn::array_t>(object[literal::values]);
 
-        tmpArray.reserve(fcl_value::sequence_t(value).size());
-
         for (auto const & tmpVal : fcl_value::sequence_t(value))
             tmpArray.push_back(dequote(fcl_value::atom_t(tmpVal)));
 
@@ -143,8 +141,6 @@ try
     case ::fhicl::TABLE: {
         object[literal::children] = jsn::array_t();
         auto& tmpArray = boost::get<jsn::array_t>(object[literal::children]);
-
-        tmpArray.reserve(fcl_value::table_t(value).size());
 
         for (auto const & kvp : fcl_value::table_t(value))
             tmpArray.push_back(fcl2jsongui(kvp, self, comments));

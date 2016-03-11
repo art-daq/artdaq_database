@@ -80,7 +80,7 @@ using any_value_of = boost::variant <VALUE, value_of<VALUE, ANNOTATION>>;
 template <typename TYPE>
 struct vector_of {
     using value_type = TYPE;
-    using collection_type = std::vector<value_type>;
+    using collection_type = std::list<value_type>;
 
     using const_iterator = typename collection_type::const_iterator;
     using iterator = typename collection_type::iterator;
@@ -119,11 +119,11 @@ struct vector_of {
     iterator insert ( iterator position,  value_type const& val ) {
         return values.insert ( position, val );
     }
-
+/*
     void reserve ( size_type n ) {
         values.reserve ( n );
     }
-
+*/
     size_type size() const {
         return values.size();
     }

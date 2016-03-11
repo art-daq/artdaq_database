@@ -151,8 +151,6 @@ try
         pair.data.value = jsn::array_t();
         auto& tmpDataArray = pair.data_<jsn::array_t>();
 
-        tmpDataArray.reserve(fcl_value::sequence_t(value).size());
-
         for (auto const & tmpVal : fcl_value::sequence_t(value)) {
             if(tmpVal.tag == ::fhicl::SEQUENCE) {
                 tmpDataArray.push_back(jsn::array_t {});

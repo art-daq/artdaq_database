@@ -456,7 +456,6 @@ void  SearchIndex::_removeVersion(object_id_t const& ouid,std::string const& ver
     try {
         auto& version_ouid_list = boost::get<jsn::array_t>(versions.at(version));
         auto new_version_ouid_list=jsn::array_t {};
-        new_version_ouid_list.reserve(version_ouid_list.size());
 
         for(auto& version_ouid :version_ouid_list) {
             auto this_ouid=unwrap(version_ouid).value_as<std::string>();
@@ -529,7 +528,6 @@ void  SearchIndex::_removeConfiguration(object_id_t const& ouid,std::string cons
     try {
         auto& configuration_ouid_list = boost::get<jsn::array_t>(configurations.at(configuration));
         auto new_configuration_ouid_list=jsn::array_t {};
-        new_configuration_ouid_list.reserve(configuration_ouid_list.size());
 
         for(auto& configuration_ouid :configuration_ouid_list) {
             auto this_ouid=unwrap(configuration_ouid).value_as<std::string>();
@@ -558,7 +556,6 @@ void  SearchIndex::_removeConfigurableEntity(object_id_t const& ouid,std::string
     try {
         auto& entity_ouid_list = boost::get<jsn::array_t>(entities.at(entity));
         auto new_entity_ouid_list=jsn::array_t {};
-        new_entity_ouid_list.reserve(entity_ouid_list.size());
 
         for(auto& entity_ouid :entity_ouid_list) {
             auto this_ouid=unwrap(entity_ouid).value_as<std::string>();
