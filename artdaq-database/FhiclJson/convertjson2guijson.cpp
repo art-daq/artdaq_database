@@ -39,9 +39,8 @@ T&  unwrapper<object_t>::value_as( std::string const& name ) {
 
 template<> template<typename T>
 T&  unwrapper<value_t>::value_as() {
-     return boost::get<T&>( any );
+     return boost::get<T>( any );
 }
-
 
 std::string metadata_node_t::_string_value_of( std::string const& name ) const {
      assert( !name.empty() );
@@ -52,7 +51,7 @@ std::string metadata_node_t::_string_value_of( std::string const& name ) const {
      auto const& value_table = _node.value_as<object_t>();
      auto const& type = value_table.at( name );
 
-     return unwrap( type ).value_as<const std::string>();
+     return boost::get<std::string>( type );
 }
 
 json_node_t metadata_node_t::child( std::string const& name )const {
@@ -109,8 +108,11 @@ bool artdaq::database::json_db_to_gui( std::string const& db_json, std::string& 
                {unwrap( document ).value_as<const object_t>( literal::metadata_node )}
           }( gui_node );
 
-          guiAST.back().key = literal::data_node;
-
+          guiAST.back().key = literal::gui_data_node;
+	  auto & doc_node= unwrap( dbAST ).value_as<object_t>( literal::document_node );	  
+          doc_node[literal::converted] = object_t {};	  
+	  unwrap( doc_node ).value_as<object_t>(literal::converted).swap(guiAST); ;
+	  
      } catch ( ... ) {
           TRACE_( 10, "json_db_to_gui() Uncaught exception:"
                   << boost::current_exception_diagnostic_information() );
@@ -121,7 +123,7 @@ bool artdaq::database::json_db_to_gui( std::string const& db_json, std::string& 
 
      auto json = std::string();
 
-     if ( !JsonWriter {} .write( guiAST, json ) ) {
+     if ( !JsonWriter {} .write( dbAST, json ) ) {
           throw cet::exception( "json_db_to_gui" ) << "Unable to write JSON buffer.";
      }
 
@@ -264,25 +266,30 @@ bool artdaq::database::json_gui_to_db( std::string const& gui_json, std::string&
      if ( !JsonReader {} .read( gui_json, guiAST ) ) {
           throw cet::exception( "json_gui_to_db" ) << "Unable to read JSON buffer.";
      }
+     
+     auto& gui_document =  unwrap( guiAST ).value_as<object_t>( literal::document_node );
+     auto& converted =   unwrap( gui_document ).value_as<object_t>( literal::converted );
 
      TRACE_( 14, "json_gui_to_db() read guiAST" );
 
      auto dbAST = object_t {};
 
      dbAST[literal::document_node] = object_t {};
-     auto& document =  unwrap( dbAST ).value_as<object_t>( literal::document_node );
+     auto& db_document =  unwrap( dbAST ).value_as<object_t>( literal::document_node );
 
-     document[literal::data_node] = object_t {};
-     auto& data =   unwrap( document ).value_as<object_t>( literal::data_node );
+     db_document[literal::data_node] = object_t {};
+     auto& data =   unwrap( db_document ).value_as<object_t>( literal::data_node );
 
-     document[literal::metadata_node] = object_t {};
-     auto& metadata =  unwrap( document ).value_as<object_t>( literal::metadata_node );
+     db_document[literal::metadata_node] = object_t {};
+     auto& metadata =  unwrap( db_document ).value_as<object_t>( literal::metadata_node );
 
      auto data_node =  json_node_t( data );
      auto metadata_node =  json_node_t( metadata );
 
+     TRACE_( 14, "json_gui_to_db() created dbAST" );
+     
      try {
-          auto const& gui_node = unwrap( guiAST.at( literal::data_node ) ).value_as<array_t>();
+          auto const& gui_node = unwrap( converted.at( literal::data_node ) ).value_as<array_t>();
           gui2db {gui_node}( data_node, metadata_node );
      } catch ( ... ) {
           TRACE_( 14, "json_gui_to_db() Uncaught exception:"

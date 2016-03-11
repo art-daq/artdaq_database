@@ -30,7 +30,9 @@ constexpr auto table = "table";
 constexpr auto array = "array";
 constexpr auto sequence = "sequence";
 
-  
+constexpr auto gui_data_node = "guidata";
+constexpr auto converted = "converted";  
+
 }
 
 namespace regex

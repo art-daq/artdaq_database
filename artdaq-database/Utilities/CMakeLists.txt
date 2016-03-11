@@ -60,5 +60,19 @@ find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_FQ_DIR}/lib )
   ${Boost_PROGRAM_OPTIONS_LIBRARY}  
 )
 
+ art_make_exec(conftool2
+  LIBRARIES
+  artdaq-database_StackTrace  
+  artdaq-database_BasicTypes
+  artdaq-database_FhiclJson
+  artdaq-database_JsonDocument
+  artdaq-database_ConfigurationDB
+  artdaq-database_StorageProviders_MongoDB
+  artdaq-database_StorageProviders_FileSystemDB
+  ${FHICLCPP}
+  ${CETLIB}
+  ${Boost_PROGRAM_OPTIONS_LIBRARY}  
+)
+
 install_headers()
 install_source()

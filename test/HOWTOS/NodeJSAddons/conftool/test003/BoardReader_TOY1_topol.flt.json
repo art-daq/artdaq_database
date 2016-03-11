@@ -1,0 +1,10 @@
+{"filter":{
+ "configurable_entity.name":"BoardReader_TOY1_topol"
+}, 
+"collection":"artdaq_BoardReader",
+"configurable_entity":"BoardReader_TOY1_topol",
+"configuration":"configA001",
+"dbprovider":"filesystem",
+"operation":"load",
+"dataformat":"gui"
+}

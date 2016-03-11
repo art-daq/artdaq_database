@@ -36,7 +36,12 @@ namespace cfgui = cf::guiexports;
 namespace cfo = cf::options;
 namespace cfol = cfo::literal;
 
-
+namespace artdaq {
+namespace database {
+bool json_db_to_gui ( std::string const&, std::string& );
+bool json_gui_to_db ( std::string const&, std::string& );
+}
+}
 using cfo::LoadStoreOperation;
 using cfo::data_format_t;
 
@@ -54,40 +59,48 @@ std::string decode(data_format_t const& f) {
 
     case data_format_t::gui :
         return "gui";
+    case data_format_t::db :
+        return "db";
     }
 }
 
-void LoadStoreOperation::read(std::string const& search_filter){
-      assert( !search_filter.empty() );
+void LoadStoreOperation::read(std::string const& search_filter) {
+    assert( !search_filter.empty() );
 
-     auto filter_document=JSONDocument{search_filter};
-     
-     _data_format=cfo::data_format_t::json;
-     
-     _version=filter_document.value_as<std::string>(cfol::version);
-     
-     try {
-     _global_configuration_id=filter_document.value_as<std::string>(cfol::configuration);
-     }catch(...){}
-     try {
-     _configurable_entity=filter_document.value_as<std::string>(cfol::configurable_entity);
-     }catch(...){}
-     
-     try {
-       operation(filter_document.value_as<std::string>(cfol::operation));
-    }catch(...){}
-    
-     try {
-       _search_filter=filter_document.value_as<std::string>(cfol::filter);
-    }catch(...){}
+    auto filter_document=JSONDocument {search_filter};
 
-     try {
-       type(filter_document.value_as<std::string>(cfol::collection));
-    }catch(...){}
+    _data_format=cfo::data_format_t::json;
 
-     try {
-       provider(filter_document.value_as<std::string>(cfol::dbprovider));
-    }catch(...){}    
+    try {
+        dataFormat(filter_document.value_as<std::string>(cfol::dataformat));
+    } catch(...) {}
+
+    try {
+        _version=filter_document.value_as<std::string>(cfol::version);
+    } catch(...) {}
+
+    try {
+        _global_configuration_id=filter_document.value_as<std::string>(cfol::configuration);
+    } catch(...) {}
+    try {
+        _configurable_entity=filter_document.value_as<std::string>(cfol::configurable_entity);
+    } catch(...) {}
+
+    try {
+        operation(filter_document.value_as<std::string>(cfol::operation));
+    } catch(...) {}
+
+    try {
+        _search_filter=filter_document.value_as<std::string>(cfol::filter);
+    } catch(...) {}
+
+    try {
+        type(filter_document.value_as<std::string>(cfol::collection));
+    } catch(...) {}
+
+    try {
+        provider(filter_document.value_as<std::string>(cfol::dbprovider));
+    } catch(...) {}
 }
 
 std::string const& LoadStoreOperation::operation() const noexcept {
@@ -158,13 +171,13 @@ std::string const& LoadStoreOperation::version( std::string const& version ) {
 
 }
 
-std::string const& LoadStoreOperation::configurableEntity() const noexcept{
+std::string const& LoadStoreOperation::configurableEntity() const noexcept {
     assert( !_configurable_entity.empty() );
 
     return _configurable_entity;
 }
 
-std::string const& LoadStoreOperation::configurableEntity(std::string const& entity ){
+std::string const& LoadStoreOperation::configurableEntity(std::string const& entity ) {
     assert( !entity.empty() );
 
     if ( entity.empty() ) {
@@ -180,7 +193,7 @@ std::string const& LoadStoreOperation::configurableEntity(std::string const& ent
     return _configurable_entity;
 }
 
-    
+
 std::string const& LoadStoreOperation::globalConfigurationId() const noexcept {
     assert( !_global_configuration_id.empty() );
 
@@ -253,6 +266,8 @@ data_format_t const& LoadStoreOperation::dataFormat(std::string const& format)
         dataFormat(data_format_t::json);
     } else if (format.compare("gui")==0) {
         dataFormat(data_format_t::gui);
+    } else if (format.compare("db")==0) {
+        dataFormat(data_format_t::db);
     } else {
         dataFormat(data_format_t::unknown);
     }
@@ -306,12 +321,21 @@ void store_configuration( Options const& options, std::string& conf ) {
         //do nothing
         break;
 
-    case data_format_t::unknown:
+    case data_format_t::unknown: {
         throw cet::exception( "store_configuration" ) << "Invalid data format; data format="
                 <<  decode(options.dataFormat()) << ".";
         break;
+    }
+    case data_format_t::gui: {
+        if(!db::json_gui_to_db(conf,returnValue)) {
+            throw cet::exception( "load_configuration" )
+                    << "GUI to DB data convertion failed";
+        }
+        returnValueChanged=true;
 
-    case data_format_t::fhicl:
+        break;
+    }
+    case data_format_t::fhicl: {
         //convert from fhicl to json and back to fhicl
         data = FhiclData { conf };
 
@@ -330,7 +354,7 @@ void store_configuration( Options const& options, std::string& conf ) {
         returnValueChanged=true;
 
         break;
-
+    }
     }
 
     TRACE_( 15, "store_configuration: json_buffer=<" << data.json_buffer << ">" );
@@ -411,6 +435,22 @@ void load_configuration( Options const& options, std::string& conf ) {
     switch(options.dataFormat())
     {
     default:
+    case data_format_t::db: {
+        returnValue=search_result.json_buffer;
+        returnValueChanged=true;
+        break;
+    }
+
+    case data_format_t::gui: {
+        if(!db::json_db_to_gui( search_result.json_buffer,returnValue)) {
+            throw cet::exception( "load_configuration" )
+                    << "DB to GUI data convertion failed";
+        }
+
+        returnValueChanged=true;
+        break;
+    }
+
     case data_format_t::json: {
         auto document = JSONDocument {search_result.json_buffer};
         returnValue=document.findChild(db::jsonutils::literal::document).to_string();
@@ -435,8 +475,8 @@ void load_configuration( Options const& options, std::string& conf ) {
             throw cet::exception( "load_configuration" )
                     << "Unable to reverse fhicl-to-json convertion";
         }
-	returnValue = fhicl.fhicl_buffer;
-	
+        returnValue = fhicl.fhicl_buffer;
+
         returnValueChanged=true;
 
         break;
@@ -473,36 +513,36 @@ cf::result_pair_t cf::load_configuration ( Options const& options, std::string& 
 
 
 cf::result_pair_t cfgui::store_configuration( std::string const& search_filter, std::string const& conf ) noexcept {
-     try {
-          auto options = Options{};
-          options.read( search_filter );
-	  
-	  //convert to database_format
-	  auto database_format = std::string(conf);
-	  
-          detail::store_configuration( options, database_format );
-          return cf::result_pair_t {true, database_format};
-     } catch ( ... ) {
-          return cf::result_pair_t {false, boost::current_exception_diagnostic_information()};
-     }
+    try {
+        auto options = Options{};
+        options.read( search_filter );
+
+        //convert to database_format
+        auto database_format = std::string(conf);
+
+        detail::store_configuration( options, database_format );
+        return cf::result_pair_t {true, database_format};
+    } catch ( ... ) {
+        return cf::result_pair_t {false, boost::current_exception_diagnostic_information()};
+    }
 }
 
 cf::result_pair_t cfgui::load_configuration( std::string const& search_filter, std::string& conf ) noexcept {
-     try {
-          auto options = Options{};
-          options.read( search_filter );
+    try {
+        auto options = Options{};
+        options.read( search_filter );
 
- 	  auto database_format = std::string(conf);
+        auto database_format = std::string(conf);
 
-          detail::load_configuration( options, database_format );
-	  
-	  //convert to gui
-	  conf = database_format;
-	  
-          return cf::result_pair_t {true, "Success"};
-     } catch ( ... ) {
-          return cf::result_pair_t {false, boost::current_exception_diagnostic_information()};
-     }
+        detail::load_configuration( options, database_format );
+
+        //convert to gui
+        conf = database_format;
+
+        return cf::result_pair_t {true, "Success"};
+    } catch ( ... ) {
+        return cf::result_pair_t {false, boost::current_exception_diagnostic_information()};
+    }
 }
 
 namespace jul = artdaq::database::jsonutils::literal;
@@ -535,10 +575,26 @@ std::string  quoted_( std::string const& text ) {
 }
 
 JSONDocument LoadStoreOperation::search_filter_jsondoc() const {
+
+    if(_search_filter!=cfol::notprovided) {
+        return {_search_filter};
+    }
+
     std::stringstream ss;
     ss << "{";
-    ss << quoted_( jul::configurations_name ) << colon << quoted_( _global_configuration_id );
-    //ss<<"," << quoted_( jul::version) << colon << quoted_(_version);
+
+    if(_global_configuration_id!=cfol::notprovided) {
+        ss << quoted_( jul::configurations_name ) << colon << quoted_( _global_configuration_id );
+    }
+
+    if(_version!=cfol::notprovided) {
+        ss << quoted_( jul::version ) << colon << quoted_( _version );
+    }
+
+    if(_configurable_entity!=cfol::notprovided) {
+        ss << quoted_( jul::configurable_entity_name ) << colon << quoted_( _configurable_entity );
+    }
+
     ss << "}";
 
     return {ss.str()};

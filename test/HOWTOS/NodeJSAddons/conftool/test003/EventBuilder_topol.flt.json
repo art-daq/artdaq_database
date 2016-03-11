@@ -1,0 +1,11 @@
+{"filter":{
+ "configurable_entity.name":"EventBuilder_topol",
+ "configurations.name":"configA001"
+}, 
+"collection":"artdaq_EventBuilder",
+"configurable_entity":"EventBuilder_topol",
+"configuration":"configA001",
+"dbprovider":"filesystem",
+"operation":"load",
+"dataformat":"gui"
+}

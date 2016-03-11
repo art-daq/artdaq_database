@@ -28,16 +28,20 @@ constexpr auto operation="operation";
 constexpr auto version="version";
 constexpr auto configuration="configuration";
 constexpr auto dbprovider="dbprovider";
+
+constexpr auto dataformat="dataformat";
 constexpr auto filter="filter";
 constexpr auto collection="collection";
 constexpr auto configurable_entity="configurable_entity";
+
+constexpr auto notprovided="notprovided";
 
 constexpr auto default_filter="{\"configurable_entity\":\"any\"}";
 }
 
 using artdaq::database::jsonutils::JSONDocument;
 
-enum struct data_format_t{unknown, json, fhicl, gui};
+enum struct data_format_t{unknown, json, fhicl, gui,db};
 
 class LoadStoreOperation final: public JsonSerializable
 {
@@ -75,13 +79,13 @@ public:
 private:
     std::string _operation= {literal::operation_load};
     std::string _type= {literal::type_default};
-    std::string _version= {literal::version_prefix};
-    std::string _global_configuration_id = {literal::global_configuration_prefix};
+    std::string _version= {literal::notprovided};
+    std::string _global_configuration_id = {literal::notprovided};
     std::string _provider = {literal::database_provider_filesystem};
     data_format_t _data_format ={data_format_t::unknown};
-    std::string _configurable_entity = {literal::configuration_entity_any};
+    std::string _configurable_entity = {literal::notprovided};
 
-    std::string _search_filter= {literal::default_filter};
+    std::string _search_filter= {literal::notprovided};
     
 };
 

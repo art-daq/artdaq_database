@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) try
 namespace cfol = artdaq::database::configuration::options::literal;
     std::ostringstream descstr;
     descstr << argv[0] << " <-o <operation>>  <-c <config-file>>  <-f <file-format>>";
-    descstr <<"  <-t <type>> <-v <version>>  <-g <globalid>>  <-d <database>>" ;
+    descstr <<"  <-t <type>> <-v <version>>  <-g <globalid>>  <-d <database>> <-e <configurable-entity>> ";
 
     bpo::options_description desc = descstr.str();
 
@@ -65,6 +65,7 @@ namespace cfol = artdaq::database::configuration::options::literal;
     ("type,t", bpo::value<std::string>(), "Configuration collection type name.")
     ("version,v", bpo::value<std::string>(), "Configuration version.")
     ("globalid,g", bpo::value<std::string>(), "Gloval config id.")
+    ("entity,e", bpo::value<std::string>(), "Configurable entity name.")
     ("database,d", bpo::value<std::string>(), "Database provider name.")
     ("help,h", "produce help message");
 
@@ -164,6 +165,10 @@ namespace cfol = artdaq::database::configuration::options::literal;
         } else {
             options.version(vm["version"].as<std::string>());
         }
+    }
+
+    if (vm.count("entity")) {
+        options.configurableEntity(vm["entity"].as<std::string>());
     }
     
     std::cout << "Running :<" << options.operation() << ">\n";

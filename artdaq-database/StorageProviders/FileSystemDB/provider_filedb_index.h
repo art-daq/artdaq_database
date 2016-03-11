@@ -38,10 +38,15 @@ public:
 private:
     void  _addVersion(object_id_t const&,std::string const&);
     void  _addConfiguration(object_id_t const&,std::string const&);
+    void  _addConfigurableEntity(object_id_t const&,std::string const&);
+      
+    
     void  _removeVersion(object_id_t const&,std::string const&);
     void  _removeConfiguration(object_id_t const&,std::string const&);
+    void  _removeConfigurableEntity(object_id_t const&,std::string const&);    
     std::vector<object_id_t>  _matchVersion(std::string const&);
     std::vector<object_id_t>  _matchConfiguration(std::string const&);
+    std::vector<object_id_t>  _matchConfigurableEntity(std::string const&);
     std::vector<object_id_t>  _matchObjectId(std::string const&);
     std::vector<object_id_t>  _matchObjectIds(std::string const&); 
 

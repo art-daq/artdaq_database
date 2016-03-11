@@ -1,0 +1,11 @@
+{"filter":{
+ "configurable_entity.name":"Aggregator_topol",
+ "configurations.name":"configA002"
+}, 
+"collection":"artdaq_Aggregator",
+"configurable_entity":"Aggregator_topol",
+"configuration":"configA002",
+"dbprovider":"filesystem",
+"operation":"store",
+"dataformat":"gui"
+}

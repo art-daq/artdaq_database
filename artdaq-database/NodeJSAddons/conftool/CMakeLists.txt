@@ -6,7 +6,8 @@ art_make(
   ${FHICLCPP}
   ${CETLIB}
   )
-  
+
+set (V8_DEFINE_STRING "45103")  
 set (NODEJS_ADDON_INCLUDES ${CMAKE_SOURCE_DIR}/artdaq-database)
 
 set (NODEJS_ADDON_LIBS "artdaq-database_ConfigurationDB")

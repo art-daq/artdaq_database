@@ -1,0 +1,12 @@
+source  /products/setup
+setup artdaq_database v1_00_00 -q debug:e9:s21
+
+cd ~/artdaq-demo-base/artdaq-utilities-database/test/HOWTOS/NodeJSAddons/conftool/test001/
+
+conftool2 -o load -c BoardReader_TOY1_topol.flt.json -j BoardReader_TOY1_topol.fnal.gov_5205.gui.json
+conftool2 -o load -c BoardReader_TOY2_topol.flt.json -j BoardReader_TOY2_topol.fnal.gov_5206.gui.json
+conftool2 -o load -c EventBuilder_topol.flt.json -j EventBuilder_topol.fnal.gov_5235.gui.json
+conftool2 -o load -c Aggregator_topol.flt.json -j Aggregator_topol.fnal.gov_5266.gui.json
+
+
+
