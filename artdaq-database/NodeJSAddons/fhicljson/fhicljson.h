@@ -1,7 +1,7 @@
-#include <utility>
 #include <string>
+#include <utility>
 
-typedef   std::pair<bool, std::string> result_pair_t;
+typedef std::pair<bool, std::string> result_pair_t;
 
 result_pair_t tojson(std::string const& file_name);
 result_pair_t tofhicl(std::string const& file_name, std::string const& json);

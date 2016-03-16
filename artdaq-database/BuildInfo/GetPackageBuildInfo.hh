@@ -4,13 +4,11 @@
 #include <string>
 #include "artdaq-core/Data/PackageBuildInfo.hh"
 
-namespace artdaqdatabase{
+namespace artdaqdatabase {
 
 struct GetPackageBuildInfo {
-
-    static artdaq::PackageBuildInfo getPackageBuildInfo();
+  static artdaq::PackageBuildInfo getPackageBuildInfo();
 };
-
 }
 
 #endif /* artdaq_database_BuildInfo_GetPackageBuildInfo_hh */

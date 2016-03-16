@@ -68,7 +68,8 @@ struct members_impl {
 // End condition of sequence iteration
 template <typename Visitor, typename S>
 struct members_impl<Visitor, S, typename size<S>::type> {
-  static inline void handle(Visitor&, S&) { /*Nothing to do*/ }
+  static inline void handle(Visitor&, S&) { /*Nothing to do*/
+  }
 };
 
 // Iterate over struct/sequence. Base template

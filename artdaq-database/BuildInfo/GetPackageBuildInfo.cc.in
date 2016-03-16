@@ -1,17 +1,14 @@
 #include "artdaq-database/BuildInfo/GetPackageBuildInfo.hh"
 
-#include <string>
 #include <iostream>
+#include <string>
 
-namespace artdaqdatabase{
-artdaq::PackageBuildInfo GetPackageBuildInfo::getPackageBuildInfo()
-{
-    artdaq::PackageBuildInfo pkg;
-    pkg.setPackageName("artdaq-database");
-    pkg.setPackageVersion("@version@");
-    pkg.setBuildTimestamp("@utcDateTime@");
-    return pkg;
+namespace artdaqdatabase {
+artdaq::PackageBuildInfo GetPackageBuildInfo::getPackageBuildInfo() {
+  artdaq::PackageBuildInfo pkg;
+  pkg.setPackageName("artdaq-database");
+  pkg.setPackageVersion("@version@");
+  pkg.setBuildTimestamp("@utcDateTime@");
+  return pkg;
 }
-
 }
-

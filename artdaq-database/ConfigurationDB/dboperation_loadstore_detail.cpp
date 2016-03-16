@@ -235,7 +235,6 @@ void load_configuration(Options const& options, std::string& conf) {
 }
 }
 
-
 void cf::trace_enable_LoadStoreOperationDetail() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);

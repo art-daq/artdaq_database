@@ -44,8 +44,8 @@ bool json_gui_to_db(std::string const&, std::string&);
 }
 
 namespace detail {
-  void store_configuration(LoadStoreOperation const&, std::string& );
-  void load_configuration(LoadStoreOperation const&, std::string&);
+void store_configuration(LoadStoreOperation const&, std::string&);
+void load_configuration(LoadStoreOperation const&, std::string&);
 }
 
 void LoadStoreOperation::read(std::string const& search_filter) {

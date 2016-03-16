@@ -28,7 +28,6 @@ namespace cfol = cfo::literal;
 using cfo::FindConfigsOperation;
 using cfo::data_format_t;
 
-
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::basictypes::FhiclData;
 using artdaq::database::jsonutils::JSONDocument;

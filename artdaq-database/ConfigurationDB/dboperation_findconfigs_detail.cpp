@@ -43,24 +43,19 @@ bool json_gui_to_db(std::string const&, std::string&);
 }
 
 namespace detail {
-void find_global_configurations(FindConfigsOperation const& options, std::string& configs)
-{
+void find_global_configurations(FindConfigsOperation const& options, std::string& configs) {
   assert(configs.empty());
   assert(options.operation().compare(cfo::literal::operation_findconfigs) == 0);
 
   TRACE_(11, "find_global_configurations: begin");
- 
 }
-void build_global_configuration_search_filter(FindConfigsOperation const& options, std::string& filter){
+void build_global_configuration_search_filter(FindConfigsOperation const& options, std::string& filter) {
   assert(filter.empty());
   assert(options.operation().compare(cfo::literal::operation_buildfilter) == 0);
 
   TRACE_(12, "build_global_configuration_search_filter: begin");
-
-  
 }
 }
-
 
 void cf::trace_enable_FindConfigsOperationDetail() {
   TRACE_CNTL("name", TRACE_NAME);
