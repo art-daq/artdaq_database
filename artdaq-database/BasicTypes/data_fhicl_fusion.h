@@ -8,9 +8,6 @@
 
 namespace cfg = artdaq::database::basictypes;
 
-BOOST_FUSION_ADAPT_STRUCT(
-    cfg::FhiclData,
-    (std::string, fhicl_buffer )
-)
+BOOST_FUSION_ADAPT_STRUCT(cfg::FhiclData, (std::string, fhicl_buffer))
 
 #endif /* _ARTDAQ_DATABASE_BASICTYPES_FHICL_FUSION_H_ */

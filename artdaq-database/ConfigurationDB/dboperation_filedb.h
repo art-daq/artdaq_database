@@ -3,25 +3,30 @@
 
 #include "artdaq-database/ConfigurationDB/common.h"
 
-namespace artdaq{
-namespace database{
-namespace basictypes{
-class  JsonData;
-}//namespace basictypes
-namespace configuration{
-namespace options{
+namespace artdaq {
+namespace database {
+namespace basictypes {
+class JsonData;
+}  // namespace basictypes
+namespace configuration {
+namespace options {
 class LoadStoreOperation;
-}//namespace options
+class FindConfigsOperation;
+}  // namespace options
 
-namespace filesystem{
-using Options= artdaq::database::configuration::options::LoadStoreOperation;
+namespace filesystem {
 using artdaq::database::basictypes::JsonData;
 
-void store ( Options const& /*options*/, JsonData const& /*insert_payload*/ );
-JsonData load ( Options const& /*options*/, JsonData const& /*search_payload*/);
+namespace cfo = artdaq::database::configuration::options;
 
-} //namespace filesystem
-} //namespace configuration
-} //namespace database
-} //namespace artdaq
+void store(cfo::LoadStoreOperation const& /*options*/, JsonData const& /*insert_payload*/);
+JsonData load(cfo::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
+
+std::vector<JsonData> findGlobalConfigs(cfo::FindConfigsOperation const& /*options*/, JsonData const& /*search_payload*/);
+std::vector<JsonData> buildConfigSearchFilter(cfo::FindConfigsOperation const& /*options*/, JsonData const& /*search_payload*/);
+
+}  // namespace filesystem
+}  // namespace configuration
+}  // namespace database
+}  // namespace artdaq
 #endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_LOADSTORE_FILESYSTEM_H_ */

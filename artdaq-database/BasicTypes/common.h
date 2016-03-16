@@ -1,17 +1,17 @@
 #ifndef _ARTDAQ_DATABASE_BASICTYPES_COMMON_H_
 #define _ARTDAQ_DATABASE_BASICTYPES_COMMON_H_
 
-#include <memory>
-#include <tuple>
-#include <vector>
-#include <ctime>
 #include <cassert>
-#include <type_traits>
+#include <ctime>
 #include <iostream>
 #include <iterator>
-#include <string> 
-#include "trace.h"
+#include <memory>
 #include <regex>
+#include <string>
+#include <tuple>
+#include <type_traits>
+#include <vector>
+#include "trace.h"
 
 #include <boost/core/demangle.hpp>
 

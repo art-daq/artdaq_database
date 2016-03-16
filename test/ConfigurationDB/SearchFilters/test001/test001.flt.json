@@ -1,0 +1,5 @@
+{"filter":{}, 
+"dbprovider":"mongo",
+"operation":"findconfigs",
+"dataformat":"gui"
+}

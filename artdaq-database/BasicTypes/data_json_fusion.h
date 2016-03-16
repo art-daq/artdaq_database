@@ -8,9 +8,6 @@
 
 namespace cfg = artdaq::database::basictypes;
 
-BOOST_FUSION_ADAPT_STRUCT(
-    cfg::JsonData,
-    (std::string, json_buffer )
-)
+BOOST_FUSION_ADAPT_STRUCT(cfg::JsonData, (std::string, json_buffer))
 
 #endif /* _ARTDAQ_DATABASE_BASICTYPES_JSON_FUSION_H_ */

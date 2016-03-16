@@ -8,67 +8,54 @@ namespace artdaq {
 namespace database {
 namespace filesystem {
 
-void  trace_enable();
+void trace_enable();
 
-namespace literal
-{
+namespace literal {
 constexpr auto FILEURI = "file://";
 constexpr auto search_index = "index.json";
 }
 
 struct DBConfig final {
-    std::string path = "${HOME}/databases/filesystemdb";
-    std::string db_name = "test_configuration_db";
-    const std::string connectionURI() const {
-        return std::string {literal::FILEURI}  + path;
-    };
+  std::string path = "${HOME}/databases/filesystemdb";
+  std::string db_name = "test_configuration_db";
+  const std::string connectionURI() const { return std::string{literal::FILEURI} + path; };
 };
 
+class FileSystemDB final {
+ public:
+  auto& connection() { return _connection; }
 
-class FileSystemDB final
-{
+  static std::shared_ptr<FileSystemDB> create(DBConfig const& config) {
+    return std::make_shared<FileSystemDB, DBConfig const&, PassKeyIdiom const&>(config, {});
+  }
 
-public:
-    auto& connection() {
-        return _connection;
-    }
+  class PassKeyIdiom {
+   private:
+    friend std::shared_ptr<FileSystemDB> FileSystemDB::create(DBConfig const& config);
+    PassKeyIdiom() {}
+  };
 
-    static std::shared_ptr<FileSystemDB> create(DBConfig const& config) {
-        return std::make_shared<FileSystemDB, DBConfig const&, PassKeyIdiom const&>(config, {});
-    }
+  explicit FileSystemDB(DBConfig const& config, PassKeyIdiom const&)
+      : _config{config}, _client{_config.connectionURI()}, _connection{_config.connectionURI() + "/"} {}
 
-    class PassKeyIdiom
-    {
-    private:
-        friend std::shared_ptr<FileSystemDB> FileSystemDB::create(DBConfig const& config);
-        PassKeyIdiom() {}
-    };
-
-    explicit FileSystemDB(DBConfig const& config, PassKeyIdiom const&):
-        _config {config},
-            _client {_config.connectionURI()},
-    _connection {_config.connectionURI()+"/"} {
-    }
-
-
-private:
-    DBConfig _config;
-    std::string _client;
-    std::string _connection;
+ private:
+  DBConfig _config;
+  std::string _client;
+  std::string _connection;
 };
 
-using  artdaq::database::StorageProvider;
+using artdaq::database::StorageProvider;
 
 template <typename TYPE>
-using  FileSystemDBProvider = StorageProvider<TYPE,FileSystemDB>;
+using FileSystemDBProvider = StorageProvider<TYPE, FileSystemDB>;
 
 template <typename TYPE>
 using DBProvider = FileSystemDBProvider<TYPE>;
 
 using DB = FileSystemDB;
 
-} // namespace filesystem
-} //namespace database
-} //namespace artdaq
+}  // namespace filesystem
+}  // namespace database
+}  // namespace artdaq
 
 #endif /* _ARTDAQ_DATABASE_PROVIDER_FILESYSTEM_H_ */
