@@ -1,0 +1,15 @@
+{
+"search" : [
+{
+  "name" : "configA001",
+  "query" : 
+  {
+    "filter":{ "configurations.name":"configA001"}, 
+    "dbprovider":"filesystem",
+    "operation":"buildfilter",
+    "dataformat":"gui"
+  }
+}
+]
+}
+

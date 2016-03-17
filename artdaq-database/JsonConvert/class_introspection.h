@@ -9,18 +9,16 @@ namespace jsonconvert {
 namespace visitor {
 
 template <typename Visitor, typename UserData>
-struct VisitorApplication : public detail::select_application<Visitor, UserData>::type {
-};
+struct VisitorApplication : public detail::select_application<Visitor, UserData>::type {};
 
 template <typename Visitor, typename UserData>
-void runVisitor(Visitor& visitor, UserData& data)
-{
-    visitor::VisitorApplication<Visitor, UserData>::handle(visitor, data);
+void runVisitor(Visitor& visitor, UserData& data) {
+  visitor::VisitorApplication<Visitor, UserData>::handle(visitor, data);
 }
 
-} //namespace visitor
-} //namespace configuration
-} //namespace database
-} //namespace artdaq
+}  // namespace visitor
+}  // namespace configuration
+}  // namespace database
+}  // namespace artdaq
 
 #endif /* _ARTDAQ_DATABASE_DATAINTROSPECTION_H_ */

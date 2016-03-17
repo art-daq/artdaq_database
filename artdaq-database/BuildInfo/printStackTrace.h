@@ -1,7 +1,7 @@
 #ifndef PRINTSTACKTRACE_H
 #define PRINTSTACKTRACE_H
 
-namespace debug{
+namespace debug {
 void registerAbortHandler();
 void registerTerminateHandler();
 void registerUncaughtExceptionHandler();
@@ -10,6 +10,3 @@ void trace_enable();
 }
 
 #endif /* #ifndef PRINTSTACKTRACE_H */
-
-
-

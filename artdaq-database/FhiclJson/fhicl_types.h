@@ -7,9 +7,9 @@
 #include <boost/fusion/adapted/struct/adapt_struct.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 
-namespace artdaq{
-namespace database{
-namespace fhicl{
+namespace artdaq {
+namespace database {
+namespace fhicl {
 
 using namespace artdaq::database;
 
@@ -29,29 +29,16 @@ using atom_t = sharedtypes::kv_pair_of<key_t, value_t>;
 struct table_t : sharedtypes::table_of<atom_t> {};
 struct sequence_t : sharedtypes::vector_of<value_t> {};
 
-} //namespace fhicl
-} //namespace database
-} //namespace artdaq
+}  // namespace fhicl
+}  // namespace database
+}  // namespace artdaq
 
 namespace fcl = artdaq::database::fhicl;
 
-BOOST_FUSION_ADAPT_STRUCT(
-    fcl::atom_t,
-    (fcl::key_t,key)
-    (fcl::value_t,value)
-)
+BOOST_FUSION_ADAPT_STRUCT(fcl::atom_t, (fcl::key_t, key)(fcl::value_t, value))
 
-BOOST_FUSION_ADAPT_STRUCT(
-    fcl::key_t,
-    (fcl::optional_comment_t,comment)
-    (fcl::basic_key_t,key)
-)
+BOOST_FUSION_ADAPT_STRUCT(fcl::key_t, (fcl::optional_comment_t, comment)(fcl::basic_key_t, key))
 
-BOOST_FUSION_ADAPT_STRUCT(
-    fcl::value_t,
-    (fcl::variant_value_t,value)
-    (fcl::optional_annotation_t,annotation)
-)
+BOOST_FUSION_ADAPT_STRUCT(fcl::value_t, (fcl::variant_value_t, value)(fcl::optional_annotation_t, annotation))
 
 #endif /* _ARTDAQ_DATABASE_FHICLTYPES_H_ */
-

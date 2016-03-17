@@ -8,20 +8,14 @@
 
 using artdaq::database::basictypes::JsonData;
 
-JsonData::JsonData(std::string const& buffer)
-    : json_buffer {buffer} {
+JsonData::JsonData(std::string const& buffer) : json_buffer{buffer} {}
 
+std::ostream& operator<<(std::ostream& os, JsonData const& data) {
+  os << data.json_buffer;
+  return os;
 }
 
-
-std::ostream& operator<<(std::ostream& os, JsonData const& data)
-{
-    os << data.json_buffer;
-    return os;
-}
-
-std::istream& operator>>(std::istream& is, JsonData& data)
-{
-    data.json_buffer = std::string(std::istreambuf_iterator<char>(is), {});
-    return is;
+std::istream& operator>>(std::istream& is, JsonData& data) {
+  data.json_buffer = std::string(std::istreambuf_iterator<char>(is), {});
+  return is;
 }

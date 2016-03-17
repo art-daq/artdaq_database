@@ -9,31 +9,27 @@
 
 #define TRACE_NAME "BTYPES:JsonData_H"
 
+namespace artdaq {
+namespace database {
+namespace basictypes {
 
-namespace artdaq{
-namespace database{
-namespace basictypes{
+struct JsonData {
+  JsonData(std::string const&);
 
-struct JsonData {  
-    JsonData(std::string const&);
-    
-    template<typename TYPE>
-    bool convert_to(TYPE&) const;
+  template <typename TYPE>
+  bool convert_to(TYPE&) const;
 
-    template<typename TYPE>
-    bool convert_from(TYPE const&);
+  template <typename TYPE>
+  bool convert_from(TYPE const&);
 
-    static constexpr auto type_version() {
-        return "V1.0.0";
-    }
+  static constexpr auto type_version() { return "V1.0.0"; }
 
-    std::string json_buffer;
+  std::string json_buffer;
 };
 
-
-} //namespace basictypes
-} //namespace database
-} //namespace artdaq
+}  // namespace basictypes
+}  // namespace database
+}  // namespace artdaq
 
 std::ostream& operator<<(std::ostream&, artdaq::database::basictypes::JsonData const&);
 std::istream& operator>>(std::istream&, artdaq::database::basictypes::JsonData&);

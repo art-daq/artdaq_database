@@ -1,0 +1,6 @@
+{
+"filter":{"configurations.name":"/^config/"}, 
+"dbprovider":"filesystem",
+"operation":"findconfigs",
+"dataformat":"gui"
+}

@@ -1,0 +1,6 @@
+{
+"filter":{"configurations.name":"/^test/"}, 
+"dbprovider":"mongo",
+"operation":"findconfigs",
+"dataformat":"gui"
+}

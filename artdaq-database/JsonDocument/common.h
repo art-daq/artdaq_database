@@ -1,22 +1,22 @@
 #ifndef _ARTDAQ_DATABASE_JSONUTILS_COMMON_H_
 #define _ARTDAQ_DATABASE_JSONUTILS_COMMON_H_
 
-#include <memory>
-#include <tuple>
-#include <vector>
-#include <ctime>
-#include <cstdio>
-#include <cassert>
-#include <type_traits>
-#include <iostream>
-#include <string>
-#include <sstream>
 #include <algorithm>
-#include <iterator>
-#include <fstream>
-#include <streambuf>
-#include <regex>
+#include <cassert>
 #include <cstddef>
+#include <cstdio>
+#include <ctime>
+#include <fstream>
+#include <iostream>
+#include <iterator>
+#include <memory>
+#include <regex>
+#include <sstream>
+#include <streambuf>
+#include <string>
+#include <tuple>
+#include <type_traits>
+#include <vector>
 #include "trace.h"
 
 #include <boost/core/demangle.hpp>
