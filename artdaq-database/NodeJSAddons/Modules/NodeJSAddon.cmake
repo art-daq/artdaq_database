@@ -17,6 +17,16 @@ function(create_nodejs_addon NODEJS_ADDON_NAME NODEJS_ADDON_INCLUDES NODEJS_ADDO
       ${NODE_ROOT_DIR}/deps/uv/include
     )
 
+    execute_process(COMMAND node -e "var arr = process.versions.v8.split('.');arr.push('EXTRA');console.log(arr.join(';'));" OUTPUT_VARIABLE V8_STRING)
+
+    list(GET V8_STRING 0 V8_STRING_MAJOR)
+    list(GET V8_STRING 1 V8_STRING_MINOR)
+    list(GET V8_STRING 2 V8_STRING_PATCH)
+
+    execute_process(COMMAND printf %d%02d%02d ${V8_STRING_MAJOR} ${V8_STRING_MINOR} ${V8_STRING_PATCH} OUTPUT_VARIABLE V8_DEFINE_STRING)
+
+    message("V8_DEFINE_STRING is ${V8_DEFINE_STRING}")
+
     set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
 
     file(GLOB NODEJS_ADDON_SOURCES  *.i)
