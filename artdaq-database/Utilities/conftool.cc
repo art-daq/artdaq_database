@@ -32,8 +32,8 @@ int main(int argc, char* argv[]) try {
   //    artdaq::database::fhicljson::useFakeTime(true);
 
   cf::trace_enable_LoadStoreOperation();
-  cf::trace_enable_LoadStoreOperationMongo();
-  cf::trace_enable_LoadStoreOperationFileSystem();
+  cf::trace_enable_DBOperationMongo();
+  cf::trace_enable_DBOperationFileSystem();
 
   db::filesystem::trace_enable();
 

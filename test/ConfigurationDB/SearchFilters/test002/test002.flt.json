@@ -1,6 +1,5 @@
-{"filter":{}, 
-"configuration":"configA001",
-
+{
+"filter":{"configurations.name":"configA001"},  
 "dbprovider":"mongo",
 "operation":"buildfilter",
 "dataformat":"gui"

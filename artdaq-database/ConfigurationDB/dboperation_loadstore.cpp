@@ -111,6 +111,11 @@ std::string const& LoadStoreOperation::version(std::string const& version) {
   return _version;
 }
 
+JSONDocument LoadStoreOperation::version_jsndoc() const {
+  auto kvp = std::make_pair<std::string, std::string>(jul::version, _version.c_str());
+  return toJSONDocument(kvp);
+}
+
 std::string const& LoadStoreOperation::configurableEntity() const noexcept {
   assert(!_configurable_entity.empty());
 
@@ -129,11 +134,6 @@ std::string const& LoadStoreOperation::configurableEntity(std::string const& ent
   _configurable_entity = entity;
 
   return _configurable_entity;
-}
-
-JSONDocument LoadStoreOperation::version_jsndoc() const {
-  auto kvp = std::make_pair<std::string, std::string>(jul::version, _version.c_str());
-  return toJSONDocument(kvp);
 }
 
 JSONDocument LoadStoreOperation::configurableEntity_jsndoc() const {

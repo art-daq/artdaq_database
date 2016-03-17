@@ -49,8 +49,8 @@ result_pair_t load_configuration(std::string const& /*search_filter*/, std::stri
 }
 void trace_enable_LoadStoreOperation();
 void trace_enable_LoadStoreOperationDetail();
-void trace_enable_LoadStoreOperationMongo();
-void trace_enable_LoadStoreOperationFileSystem();
+void trace_enable_DBOperationMongo();
+void trace_enable_DBOperationFileSystem();
 }  // namespace configuration
 }  // namespace database
 }  // namespace artdaq

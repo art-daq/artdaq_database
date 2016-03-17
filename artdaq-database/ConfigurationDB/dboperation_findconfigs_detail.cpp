@@ -48,12 +48,19 @@ void find_global_configurations(FindConfigsOperation const& options, std::string
   assert(options.operation().compare(cfo::literal::operation_findconfigs) == 0);
 
   TRACE_(11, "find_global_configurations: begin");
+  TRACE_(11, "find_global_configurations args options=<" << options.to_string() << ">");
+
+  configs="{\"aaa\":\"aaa\"}";
 }
 void build_global_configuration_search_filter(FindConfigsOperation const& options, std::string& filter) {
   assert(filter.empty());
   assert(options.operation().compare(cfo::literal::operation_buildfilter) == 0);
 
   TRACE_(12, "build_global_configuration_search_filter: begin");
+  TRACE_(11, "build_global_configuration_search_filter args options=<" << options.to_string() << ">");
+  
+  filter="{\"aaa\":\"aaa\"}";
+
 }
 }
 

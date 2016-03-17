@@ -1,6 +1,6 @@
 {
 "filter":{"configurations.name":"/^test/"}, 
-"dbprovider":"mongo",
+"dbprovider":"filesystem",
 "operation":"findconfigs",
 "dataformat":"gui"
 }

@@ -67,7 +67,10 @@ class JsonSerializable {
   virtual JSONDocument search_filter_jsondoc() const;
 
   virtual void read(std::string const&);
+  virtual JSONDocument to_jsondoc()const;
 
+  std::string to_string()const;
+  
  private:
   std::string _operation = {literal::operation_load};
   std::string _global_configuration_id = {literal::notprovided};

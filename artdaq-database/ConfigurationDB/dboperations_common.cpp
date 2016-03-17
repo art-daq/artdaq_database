@@ -174,11 +174,27 @@ JSONDocument JsonSerializable::search_filter_jsondoc() const {
 
   std::stringstream ss;
   ss << "{";
-
+  if (_global_configuration_id != cfol::notprovided) {
+    ss << cf::quoted_(dbjsul::configurations_name) << cfol::colon << cf::quoted_(_global_configuration_id);
+  }
   ss << "}";
 
   return {ss.str()};
 }
+
+JSONDocument JsonSerializable::to_jsondoc() const {
+  std::stringstream ss;
+  ss << "{";
+  ss << cf::quoted_(cfol::filter) << cfol::colon << search_filter_jsondoc().to_string();
+  ss << ",\n" << cf::quoted_(cfol::dbprovider) << cfol::colon << quoted_(provider());
+  ss << ",\n" << cf::quoted_(cfol::operation) << cfol::colon << quoted_(operation());
+  ss << ",\n" << cf::quoted_(cfol::dataformat) << cfol::colon << quoted_(cf::decode(dataFormat()));
+  ss << "}";
+
+  return {ss.str()};
+}
+
+std::string JsonSerializable::to_string() const { return to_jsondoc().to_string(); }
 
 std::string cf::decode(data_format_t const& f) {
   switch (f) {

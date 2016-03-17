@@ -21,20 +21,28 @@ namespace bpo = boost::program_options;
 namespace db = artdaq::database;
 namespace cf = db::configuration;
 namespace cfo = cf::options;
+namespace gui = cf::guiexports;
 namespace cfol = cfo::literal;
 
 typedef bool (*test_case)(std::string const& /*filter*/, std::string const& /*json*/);
 
 bool test_storeconfig(std::string const&, std::string const&);
 bool test_loadconfig(std::string const&, std::string const&);
+bool test_findconfigs(std::string const&, std::string const&);
+bool test_buildfilter(std::string const&, std::string const&);
 
 int main(int argc, char* argv[]) try {
   debug::registerUngracefullExitHandlers();
   //    artdaq::database::fhicljson::useFakeTime(true);
 
   cf::trace_enable_LoadStoreOperation();
-  cf::trace_enable_LoadStoreOperationMongo();
-  cf::trace_enable_LoadStoreOperationFileSystem();
+  cf::trace_enable_FindConfigsOperationDetail();
+
+  cf::trace_enable_FindConfigsOperation();
+  cf::trace_enable_FindConfigsOperationDetail();
+  
+  cf::trace_enable_DBOperationMongo();
+  cf::trace_enable_DBOperationFileSystem();
 
   db::filesystem::trace_enable();
 
@@ -56,11 +64,11 @@ int main(int argc, char* argv[]) try {
 
   bpo::options_description desc = descstr.str();
 
-  desc.add_options()("operation,o", bpo::value<std::string>(), "Operation [load/store].")(
-      "configuration,c", bpo::value<std::string>(), "Configuration file name.")("json,j", bpo::value<std::string>(),
-                                                                                "JSON source file name.")
-
-      ("help,h", "produce help message");
+  desc.add_options()
+  ("operation,o", bpo::value<std::string>(), "Operation [load/store/findconfigs/buildfilter].")
+  ("configuration,c", bpo::value<std::string>(), "Configuration file name.")
+  ("json,j", bpo::value<std::string>(),"JSON source file name.")
+  ("help,h", "produce help message");
 
   bpo::variables_map vm;
 
@@ -105,7 +113,10 @@ int main(int argc, char* argv[]) try {
   std::cout << "Running :<" << operation << ">\n";
 
   auto runTest = [](std::string const& name) {
-    auto tests = std::map<std::string, test_case>{{"store", test_storeconfig}, {"load", test_loadconfig}};
+    auto tests = std::map<std::string, test_case>{{"store", test_storeconfig},
+                                                  {"load", test_loadconfig},
+                                                  {"findconfigs", test_findconfigs},
+                                                  {"buildfilter", test_buildfilter}};
 
     return tests.at(name);
   };
@@ -129,7 +140,7 @@ result_pair_t load_configuration(std::string const& search_filter) {
 
     auto json_result = std::string();
 
-    auto result = artdaq::database::configuration::guiexports::load_configuration(search_filter, json_result);
+    auto result = gui::load_configuration(search_filter, json_result);
 
     if (result.first)
       return std::make_pair(true, json_result);
@@ -147,7 +158,31 @@ result_pair_t store_configuration(std::string const& search_filter, std::string 
 
     if (json_document.empty()) return std::make_pair(false, make_error_msg("JSON document is empty"));
 
-    auto result = artdaq::database::configuration::guiexports::store_configuration(search_filter, json_document);
+    auto result = gui::store_configuration(search_filter, json_document);
+
+    return result;
+  } catch (...) {
+    return std::make_pair(false, boost::current_exception_diagnostic_information());
+  }
+}
+
+result_pair_t find_global_configurations(std::string const& search_filter) {
+  try {
+    if (search_filter.empty()) return std::make_pair(false, make_error_msg("Search filter is empty"));
+
+    auto result = gui::find_global_configurations(search_filter);
+
+    return result;
+  } catch (...) {
+    return std::make_pair(false, boost::current_exception_diagnostic_information());
+  }
+}
+
+result_pair_t build_global_configuration_search_filter(std::string const& search_filter) {
+  try {
+    if (search_filter.empty()) return std::make_pair(false, make_error_msg("Search filter is empty"));
+
+    auto result = gui::build_global_configuration_search_filter(search_filter);
 
     return result;
   } catch (...) {
@@ -199,6 +234,55 @@ bool test_loadconfig(std::string const& config_name, std::string const& json_nam
   auto result = load_configuration(search_filter);
 
   if (!result.first) {
+    return false;
+  }
+
+  std::ofstream os(json_name);
+  std::copy(result.second.begin(), result.second.end(), std::ostream_iterator<char>(os));
+
+  os.close();
+
+  return true;
+}
+
+bool test_findconfigs(std::string const& config_name, std::string const& json_name) {
+  assert(!config_name.empty());
+  assert(!json_name.empty());
+
+  std::ifstream is(config_name);
+
+  std::string search_filter((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+
+  is.close();
+
+  auto result = find_global_configurations(search_filter);
+
+  if (!result.first) {
+    return false;
+  }
+
+  std::ofstream os(json_name);
+  std::copy(result.second.begin(), result.second.end(), std::ostream_iterator<char>(os));
+
+  os.close();
+
+  return true;
+}
+
+bool test_buildfilter(std::string const& config_name, std::string const& json_name) {
+  assert(!config_name.empty());
+  assert(!json_name.empty());
+
+  std::ifstream is(config_name);
+
+  std::string search_filter((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+
+  is.close();
+
+  auto result = build_global_configuration_search_filter(search_filter);
+
+  if (!result.first) {
+    std::cerr << "Error message: " << result.second << "\n";
     return false;
   }
 

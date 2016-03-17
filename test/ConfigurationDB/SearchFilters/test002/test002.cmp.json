@@ -1,0 +1,48 @@
+{
+"search" : [
+{
+  "name" : "configA001:Aggregator_topol",
+  "query" : 
+  {
+    "filter":{"configurations.name":"configA001", "configurable_entity.name":"Aggregator_topol"},
+    "collection":"artdaq_Aggregator",
+    "dbprovider":"mongo",
+    "operation":"load",
+    "dataformat":"gui"
+  }
+},
+{
+  "name" : "configA001:BoardReader_TOY1_topol",
+  "query" : 
+  {
+    "filter":{"configurations.name":"configA001", "configurable_entity.name":"BoardReader_TOY1_topol"},
+    "collection":"artdaq_BoardReader",
+    "dbprovider":"mongo",
+    "operation":"load",
+    "dataformat":"gui"
+  }
+},
+{
+  "name" : "configA001:BoardReader_TOY2_topol",
+  "query" : 
+  {
+    "filter":{"configurations.name":"configA001", "configurable_entity.name":"BoardReader_TOY2_topol"},
+    "collection":"artdaq_BoardReader",
+    "dbprovider":"mongo",
+    "operation":"load",
+    "dataformat":"gui"
+  }
+},
+{
+  "name" : "configA001:EventBuilder_topol",
+  "query" : 
+  {
+    "filter":{"configurations.name":"configA001", "configurable_entity.name":"EventBuilder_topol"},
+    "collection":"artdaq_EventBuilder",
+    "dbprovider":"mongo",
+    "operation":"load",
+    "dataformat":"gui"
+  }
+}
+]
+}

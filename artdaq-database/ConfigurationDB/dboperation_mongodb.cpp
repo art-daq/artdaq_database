@@ -82,27 +82,62 @@ JsonData cfd::load(cfo::LoadStoreOperation const& options, JsonData const& searc
   return data;
 }
 
-std::vector<JsonData> cfd::findGlobalConfigs(cfo::FindConfigsOperation const& options,
+JsonData cfd::findGlobalConfigs(cfo::FindConfigsOperation const& options,
                                              JsonData const& search_payload[[gnu::unused]]) {
-  assert(options.provider().compare(cfo::literal::database_provider_filesystem) == 0);
+  assert(options.provider().compare(cfo::literal::database_provider_mongo) == 0);
   assert(options.operation().compare(cfo::literal::operation_findconfigs) == 0);
 
-  auto global_configs = std::vector<JsonData>{};
+  if (options.operation().compare(cfo::literal::operation_findconfigs) != 0) {
+    throw cet::exception("operation_findconfigs") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  }
 
-  return global_configs;
+  if (options.provider().compare(cfo::literal::database_provider_mongo) != 0) {
+    throw cet::exception("operation_findconfigs") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  }
+  
+  TRACE_(17, "operation_findconfigs: begin");
+  
+  auto config = DBI::DBConfig{};
+  auto database = DBI::DB::create(config);
+  auto provider = DBI::DBProvider<JsonData>::create(database);
+
+  auto global_configs = provider->findGlobalConfigs(search_payload);
+  
+  if(global_configs.empty()){
+    throw cet::exception("operation_findconfigs") << "No global configurations were found.";
+  }
+  std::stringstream ss;
+  
+  for(auto const& global_config[[gnu::unused]]: global_configs){
+      
+  }
+  
+  auto returnValue =JsonData{"{}"};
+
+  return returnValue;
 }
 
-std::vector<JsonData> cfd::buildConfigSearchFilter(cfo::FindConfigsOperation const& options,
+JsonData cfd::buildConfigSearchFilter(cfo::FindConfigsOperation const& options,
                                                    JsonData const& search_payload[[gnu::unused]]) {
-  assert(options.provider().compare(cfo::literal::database_provider_filesystem) == 0);
+  assert(options.provider().compare(cfo::literal::database_provider_mongo) == 0);
   assert(options.operation().compare(cfo::literal::operation_buildfilter) == 0);
 
-  auto global_configs_filters = std::vector<JsonData>{};
+  if (options.operation().compare(cfo::literal::operation_findconfigs) != 0) {
+    throw cet::exception("operation_buildfilter") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  }
+
+  if (options.provider().compare(cfo::literal::database_provider_mongo) != 0) {
+    throw cet::exception("operation_buildfilter") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  }
+  
+  TRACE_(18, "operation_buildfilter: begin");
+  
+  auto global_configs_filters = JsonData{"{}"};
 
   return global_configs_filters;
 }
 
-void cf::trace_enable_LoadStoreOperationMongo() {
+void cf::trace_enable_DBOperationMongo() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", 1LL);

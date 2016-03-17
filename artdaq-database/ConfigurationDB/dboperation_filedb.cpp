@@ -82,27 +82,27 @@ JsonData cfd::load(cfo::LoadStoreOperation const& options, JsonData const& searc
   return data;
 }
 
-std::vector<JsonData> cfd::findGlobalConfigs(cfo::FindConfigsOperation const& options,
+JsonData cfd::findGlobalConfigs(cfo::FindConfigsOperation const& options[[gnu::unused]],
                                              JsonData const& search_payload[[gnu::unused]]) {
   assert(options.provider().compare(cfo::literal::database_provider_mongo) == 0);
   assert(options.operation().compare(cfo::literal::operation_findconfigs) == 0);
 
-  auto global_configs = std::vector<JsonData>{};
+  auto global_configs = JsonData{"{}"};
 
   return global_configs;
 }
 
-std::vector<JsonData> cfd::buildConfigSearchFilter(cfo::FindConfigsOperation const& options,
+JsonData cfd::buildConfigSearchFilter(cfo::FindConfigsOperation const& options[[gnu::unused]],
                                                    JsonData const& search_payload[[gnu::unused]]) {
   assert(options.provider().compare(cfo::literal::database_provider_mongo) == 0);
   assert(options.operation().compare(cfo::literal::database_provider_mongo) == 0);
 
-  auto global_configs_filters = std::vector<JsonData>{};
+  auto global_configs_filters = JsonData{"{}"};
 
   return global_configs_filters;
 }
 
-void cf::trace_enable_LoadStoreOperationFileSystem() {
+void cf::trace_enable_DBOperationFileSystem() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", 1LL);
