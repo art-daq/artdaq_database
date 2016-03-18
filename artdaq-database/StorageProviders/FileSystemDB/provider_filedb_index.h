@@ -26,6 +26,7 @@ class SearchIndex final {
   ~SearchIndex();
 
   std::vector<object_id_t> findDocumentIDs(JsonData const&);
+  std::vector<std::pair<std::string,std::string>> findAllGlobalConfigurations(JsonData const&);
   bool addDocument(JsonData const&, object_id_t const&);
   bool removeDocument(JsonData const&, object_id_t const&);
 

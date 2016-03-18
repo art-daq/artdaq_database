@@ -8,6 +8,7 @@ art_make(
   ${CETLIB}
   ${Boost_FILESYSTEM_LIBRARY}    
   ${Boost_SYSTEM_LIBRARY}    
+  ${Boost_REGEX_LIBRARY}    
 )
 
 install_headers()

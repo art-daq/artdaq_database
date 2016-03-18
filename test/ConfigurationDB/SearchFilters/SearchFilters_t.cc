@@ -51,7 +51,8 @@ int main(int argc, char* argv[]) try {
   db::fhicljsondb::trace_enable_fhicljsondb();
 
   db::jsonutils::trace_enable_JSONDocumentBuilder();
-
+  db::jsonutils::trace_enable_JSONDocument();
+  
   // Get the input parameters via the boost::program_options library,
   // designed to make it relatively simple to define arguments and
   // issue errors if argument list is supplied incorrectly

@@ -107,6 +107,78 @@ std::vector<object_id_t> SearchIndex::findDocumentIDs(JsonData const& search) {
   return ouids;
 }
 
+std::vector<std::pair<std::string, std::string>> SearchIndex::findAllGlobalConfigurations(JsonData const& search) {
+  assert(!search.json_buffer.empty());
+  auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations() begin");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations() args search=<" << search.json_buffer
+                                                                                                << ">.");
+
+  auto reader = JsonReader{};
+
+  object_t search_ast;
+
+  if (!reader.read(search.json_buffer, search_ast)) {
+    TRACE_(5, "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations()"
+                  << " Failed to create an AST from search.");
+    return returnCollection;
+  }
+
+  auto configFilter = std::string{};
+  auto haveFilter = bool{false};
+
+  try {
+    configFilter = boost::get<std::string>(search_ast.at("configurations.name"));
+
+    TRACE_(5, "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations()"
+                  << " Found filter=<" << configFilter << ">.");
+
+    haveFilter = true;
+  } catch (...) {
+  }
+
+  auto acceptConfigName = [&configFilter, &haveFilter](auto const& config) {
+    if (haveFilter) {
+      if (std::equal(configFilter.begin(), configFilter.end(), config.begin())) return true;
+    }
+
+    return false;
+  };
+
+  auto ouid2entity_map = std::map<std::string, std::string>{};
+
+  auto& configurationentities = boost::get<jsn::object_t>(_index.at("configurable_entity.name"));
+
+  for (auto& configurationentity : configurationentities) {
+    auto& configuration_ouid_list = boost::get<jsn::array_t>(configurationentity.value);
+
+    for (auto& configuration_ouid : configuration_ouid_list) {
+      ouid2entity_map[unwrap(configuration_ouid).value_as<std::string>()] = configurationentity.key;
+    }
+  }
+
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations()"
+                << " ouid2entity_map has " << ouid2entity_map.size() << " enties.");
+
+  auto& configurations = boost::get<jsn::object_t>(_index.at("configurations.name"));
+
+  for (auto& configuration : configurations) {
+    if (!acceptConfigName(configuration.key)) continue;
+
+    auto& configuration_ouid_list = boost::get<jsn::array_t>(configuration.value);
+
+    for (auto& configuration_ouid : configuration_ouid_list) {
+      returnCollection.emplace_back(configuration.key,
+                                    ouid2entity_map.at(unwrap(configuration_ouid).value_as<std::string>()));
+    }
+  }
+
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations()"
+                << " Found " << returnCollection.size() << "configs.");
+
+  return returnCollection;
+}
+
 bool SearchIndex::addDocument(JsonData const& document, object_id_t const& ouid) {
   assert(!document.json_buffer.empty());
   assert(!ouid.empty());
