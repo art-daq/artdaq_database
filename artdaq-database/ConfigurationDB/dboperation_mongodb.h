@@ -22,10 +22,8 @@ namespace cfo = artdaq::database::configuration::options;
 void store(cfo::LoadStoreOperation const& /*options*/, JsonData const& /*insert_payload*/);
 JsonData load(cfo::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
 
-JsonData findGlobalConfigs(cfo::FindConfigsOperation const& /*options*/,
-                                        JsonData const& /*search_payload*/);
-JsonData buildConfigSearchFilter(cfo::FindConfigsOperation const& /*options*/,
-                                              JsonData const& /*search_payload*/);
+JsonData findGlobalConfigs(cfo::FindConfigsOperation const& /*options*/, JsonData const& /*search_payload*/);
+JsonData buildConfigSearchFilter(cfo::FindConfigsOperation const& /*options*/, JsonData const& /*search_payload*/);
 
 }  // namespace mongo
 }  // namespace configuration

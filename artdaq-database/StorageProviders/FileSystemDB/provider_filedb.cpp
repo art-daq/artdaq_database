@@ -34,7 +34,7 @@ std::string expand_environment_variables(std::string var);
 
 template <>
 template <>
-std::vector<JsonData> StorageProvider<JsonData, FileSystemDB>::load(JsonData const& filter) {
+std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::load(JsonData const& filter) {
   TRACE_(3, "StorageProvider::FileSystemDB::load() begin");
   TRACE_(3, "StorageProvider::FileSystemDB::load() args search=<" << filter.json_buffer << ">");
 
@@ -56,8 +56,8 @@ std::vector<JsonData> StorageProvider<JsonData, FileSystemDB>::load(JsonData con
 
   auto oids = search_index.findDocumentIDs(search_filter);
 
-  auto returnCollection = std::vector<JsonData>();
-  returnCollection.reserve(oids.size());
+  auto returnCollection = std::list<JsonData>();
+  
   TRACE_(4, "StorageProvider::FileSystemDB::load() search returned " << oids.size() << " documents.");
 
   for (auto const& oid : oids) {
@@ -69,7 +69,8 @@ std::vector<JsonData> StorageProvider<JsonData, FileSystemDB>::load(JsonData con
     std::string json((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
 
     is.close();
-    returnCollection.push_back({json});
+    
+    returnCollection.emplace_back(json);
   }
 
   return returnCollection;
@@ -262,9 +263,9 @@ object_id_t extract_oid(std::string const& filter) {
 
 template <>
 template <>
-std::vector<JsonData> StorageProvider<JsonData, FileSystemDB>::findGlobalConfigs(JsonData const& search) {
+std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findGlobalConfigs(JsonData const& search) {
   assert(!search.json_buffer.empty());
-  auto returnCollection = std::vector<JsonData>();
+  auto returnCollection = std::list<JsonData>();
 
   TRACE_(4, "StorageProvider::FileSystemDB::findGlobalConfigs() begin");
   TRACE_(4, "StorageProvider::FileSystemDB::findGlobalConfigs() args data=<" << search.json_buffer << ">");
@@ -274,9 +275,9 @@ std::vector<JsonData> StorageProvider<JsonData, FileSystemDB>::findGlobalConfigs
 
 template <>
 template <>
-std::vector<JsonData> StorageProvider<JsonData, FileSystemDB>::buildConfigSearchFilter(JsonData const& search) {
+std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::buildConfigSearchFilter(JsonData const& search) {
   assert(!search.json_buffer.empty());
-  auto returnCollection = std::vector<JsonData>();
+  auto returnCollection = std::list<JsonData>();
 
   TRACE_(4, "StorageProvider::FileSystemDB::buildConfigSearchFilter() begin");
   TRACE_(4, "StorageProvider::FileSystemDB::buildConfigSearchFilter() args data=<" << search.json_buffer << ">");

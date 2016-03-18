@@ -8,6 +8,7 @@
 #include <tuple>
 #include <type_traits>
 #include <vector>
+#include <list>
 #include "trace.h"
 
 #include <boost/core/demangle.hpp>

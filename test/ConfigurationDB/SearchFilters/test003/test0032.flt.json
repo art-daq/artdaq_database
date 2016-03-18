@@ -1,5 +1,5 @@
 {
-"filter":{"configurations.name":"/^test/"}, 
+"filter":{"configurations.name":{"$regex":"^@TEST_CONFIG_NAME@"}}, 
 "dbprovider":"filesystem",
 "operation":"findconfigs",
 "dataformat":"gui"

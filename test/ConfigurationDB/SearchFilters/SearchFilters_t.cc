@@ -14,6 +14,7 @@
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
+#include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 
 namespace bpo = boost::program_options;
 
@@ -42,6 +43,7 @@ int main(int argc, char* argv[]) try {
   cf::trace_enable_DBOperationFileSystem();
 
   db::filesystem::trace_enable();
+  db::mongo::trace_enable();
 
   db::fhicljson::trace_enable_fcl2jsondb();
   db::fhicl::trace_enable_FhiclReader();

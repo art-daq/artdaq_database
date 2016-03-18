@@ -29,14 +29,14 @@ class StorageProvider final {
   StorageProvider(std::shared_ptr<IMPL> const& provider, PassKeyIdiom const&) : _provider(provider) {}
 
   template <typename FILTER>
-  std::vector<TYPE> load(FILTER const&);
+  std::list<TYPE> load(FILTER const&);
   object_id_t store(TYPE const&);
 
   template <typename FILTER>
-  std::vector<FILTER> findGlobalConfigs(FILTER const&);
+  std::list<FILTER> findGlobalConfigs(FILTER const&);
 
   template <typename FILTER>
-  std::vector<FILTER> buildConfigSearchFilter(FILTER const&);
+  std::list<FILTER> buildConfigSearchFilter(FILTER const&);
 
  private:
   std::shared_ptr<IMPL> _provider;

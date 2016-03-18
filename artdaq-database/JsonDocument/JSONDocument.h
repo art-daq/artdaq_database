@@ -54,7 +54,7 @@ class JSONDocument final {
   static std::string validate(std::string const&);
   static std::string value(JSONDocument const&);
   static std::string value_at(JSONDocument const&, std::size_t);
-
+  
   static JSONDocument loadFromFile(std::string const&);
 
   // defaults

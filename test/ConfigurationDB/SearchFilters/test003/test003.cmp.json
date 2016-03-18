@@ -1,10 +1,10 @@
 {
 "search" : [
 {
-  "name" : "configA001",
+  "name" : "@TEST_CONFIG_NAME@",
   "query" : 
   {
-    "filter":{ "configurations.name":"configA001"}, 
+    "filter":{ "testConfigurations.name":"@TEST_CONFIG_NAME@"}, 
     "dbprovider":"mongo",
     "operation":"buildfilter",
     "dataformat":"gui"

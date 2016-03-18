@@ -26,7 +26,6 @@ class FindConfigsOperation final : public JsonSerializable {
  private:
   std::string _search_filter = {literal::notprovided};
   std::string _configurable_entity = {literal::notprovided};
-  
 };
 
 }  // namespace options
