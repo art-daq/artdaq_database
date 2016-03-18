@@ -6,7 +6,8 @@ include(CetTest)
 # re-initialize the test environment.
 cet_test_env("FHICL_FILE_PATH=.")
 
-#add_subdirectory(JsonDocument)
-#add_subdirectory(FhiclJson)
-#add_subdirectory(StorageProviders)
+#test order is important
+add_subdirectory(JsonDocument)
+add_subdirectory(FhiclJson)
 add_subdirectory(ConfigurationDB)
+add_subdirectory(StorageProviders)

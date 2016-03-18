@@ -162,14 +162,13 @@ JSONDocument JsonSerializable::globalConfigurationId_jsndoc() const {
 
 std::string const& JsonSerializable::searchFilter() const noexcept {
   assert(!_search_filter.empty());
-  assert(_search_filter != literal::notprovided);
 
   return _search_filter;
 }
 
 JSONDocument JsonSerializable::search_filter_jsondoc() const {
-  if (_search_filter != cfol::notprovided) {
-    return {_search_filter};
+  if (searchFilter() != cfol::notprovided) {
+    return {searchFilter()};
   }
 
   std::stringstream ss;

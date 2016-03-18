@@ -54,7 +54,7 @@ void FindConfigsOperation::read(std::string const& search_filter) {
   auto filter_document = JSONDocument{search_filter};
 
   try {
-    _search_filter = filter_document.value_as<std::string>(cfol::filter);
+    _configurable_entity = filter_document.value_as<std::string>(cfol::configurable_entity);
   } catch (...) {
   }
 }
@@ -86,8 +86,8 @@ JSONDocument FindConfigsOperation::configurableEntity_jsndoc() const {
 }
 
 JSONDocument FindConfigsOperation::search_filter_jsondoc() const {
-  if (_search_filter != cfol::notprovided) {
-    return {_search_filter};
+  if (searchFilter() != cfol::notprovided) {
+    return {searchFilter()};
   }
 
   std::stringstream ss;

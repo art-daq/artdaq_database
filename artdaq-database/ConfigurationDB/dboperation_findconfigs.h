@@ -24,7 +24,6 @@ class FindConfigsOperation final : public JsonSerializable {
   JSONDocument configurableEntity_jsndoc() const;
 
  private:
-  std::string _search_filter = {literal::notprovided};
   std::string _configurable_entity = {literal::notprovided};
 };
 
