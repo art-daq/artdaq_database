@@ -1,0 +1,48 @@
+{
+"search" : [
+{
+  "name" : "version004",
+  "query" : 
+  {
+    "filter":{"version":"version004", "configurable_entity.name":"Aggregator_topol"},
+    "collection":"artdaq_Aggregator",
+    "dbprovider":"filesystem",
+    "operation":"load",
+    "dataformat":"gui"
+  }
+},
+{
+  "name" : "version003",
+  "query" : 
+  {
+    "filter":{"version":"version003", "configurable_entity.name":"Aggregator_topol"},
+    "collection":"artdaq_Aggregator",
+    "dbprovider":"filesystem",
+    "operation":"load",
+    "dataformat":"gui"
+  }
+},
+{
+  "name" : "version002",
+  "query" : 
+  {
+    "filter":{"version":"version002", "configurable_entity.name":"Aggregator_topol"},
+    "collection":"artdaq_Aggregator",
+    "dbprovider":"filesystem",
+    "operation":"load",
+    "dataformat":"gui"
+  }
+},
+{
+  "name" : "version001",
+  "query" : 
+  {
+    "filter":{"version":"version001", "configurable_entity.name":"Aggregator_topol"},
+    "collection":"artdaq_Aggregator",
+    "dbprovider":"filesystem",
+    "operation":"load",
+    "dataformat":"gui"
+  }
+}
+]
+}
