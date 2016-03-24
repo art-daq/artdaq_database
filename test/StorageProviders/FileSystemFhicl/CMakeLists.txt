@@ -19,7 +19,7 @@ find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_FQ_DIR}/lib )
 ) 
 
 add_subdirectory(test001)
-#add_subdirectory(test002)
+##add_subdirectory(test002) #not included into the search index
 add_subdirectory(test003)
 add_subdirectory(test004)
 

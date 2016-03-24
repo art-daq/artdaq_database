@@ -23,7 +23,7 @@ constexpr auto unknown = "unknown";
 constexpr auto include = "#include";
 constexpr auto linenum = "linenum";
 constexpr auto metadata_node = "metadata";
-
+constexpr auto changelog="changelog";
 constexpr auto object = "object";
 constexpr auto table = "table";
 constexpr auto array = "array";

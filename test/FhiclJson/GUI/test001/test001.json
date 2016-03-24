@@ -158,7 +158,10 @@
 {
 "type" : "table",
 "name" : "analyzers",
-"comment" : " "
+"comment" : " ",
+"children" : [
+
+]
 },
 {
 "type" : "table",
@@ -239,7 +242,10 @@
 {
 "type" : "table",
 "name" : "producers",
-"comment" : " "
+"comment" : " ",
+"children" : [
+
+]
 }
 ]
 },
@@ -454,5 +460,8 @@
 "origin" : {
 "source" : "fhicl_to_json",
 "timestamp" : "Mon Feb  8 14:00:30 2016"
-}
+},
+"includes" : [
+
+]
 }

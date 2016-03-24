@@ -133,7 +133,7 @@ bool test_convert2gui(std::string const& input, std::string const& compare)
     else {
         std::cout << "Convertion failed. \n" ;
         std::cerr << "output:\n" << output << "\n";
-     //   std::cerr << "expected:\n" << compare << "\n";
+        std::cerr << "expected:\n" << compare << "\n";
     }
 
     return false;

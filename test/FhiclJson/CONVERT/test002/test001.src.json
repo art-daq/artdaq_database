@@ -343,8 +343,6 @@
 }
 ],
 "converted" : {
-  changelog:"asefasqfasdfasd",
-  
 "guidata" : [
 {
 "type" : "table",
@@ -725,12 +723,7 @@
 {
 "setConfigurableEntity" : "Thu Mar 10 16:50:25 2016"
 }
-],
-//REPLACE
-"changelog": "2016-03-24T16:17:38.089Z: Edit - Table: configA001:Aggregator_topol/outputs, Name: level, Column: Value, Value: 4356543
-2016-03-24T16:14:14.483Z: Edit - Table: configA001:Aggregator_topol/daq/metrics/aggFile, Name: level, Column: Value, Value: 8
-2016-03-24T15:36:51.378Z: Edit - Table: configA001:Aggregator_topol/daq/metrics/aggFile, Name: level, Column: Value, Value: 5
-undefined"
+]
 },
 "configurable_entity" : {
 "name" : "Aggregator_topol"

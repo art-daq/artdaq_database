@@ -96,13 +96,20 @@ std::vector<object_id_t> SearchIndex::findDocumentIDs(JsonData const& search) {
 
   if (ouids.size() < 2) return ouids;
 
+
   auto unique_ouids = std::vector<object_id_t>{};
   std::unique_copy(ouids.begin(), ouids.end(), back_inserter(unique_ouids));
+
+  if (unique_ouids.size() == ouids.size()) return ouids;
+
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findDocumentIDs() distinct having count() >1; starting with "
+                << ouids.size() << " keys.");
+  
   auto nonUnique_ouids = std::vector<object_id_t>{};
   std::set_difference(ouids.begin(), ouids.end(), unique_ouids.begin(), unique_ouids.end(),
                       back_inserter(nonUnique_ouids));
 
-  ouids.swap(nonUnique_ouids);
+  if (!nonUnique_ouids.empty()) ouids.swap(nonUnique_ouids);
 
   return ouids;
 }

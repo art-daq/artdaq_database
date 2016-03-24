@@ -2,24 +2,19 @@
 "document" : {
 "data" : {
 "daq" : {
-"aggregator" : {
-"event_builder_count" : 2,
-"event_queue_depth" : 2,
-"event_queue_wait_time" : 1,
-"expected_events_per_bunch" : 1,
-"file_duration" : 0,
-"file_event_count" : 0,
-"file_size_MB" : 8000,
-"first_event_builder_rank" : 2,
-"mpi_buffer_count" : 8,
-"onmon_event_prescale" : 1,
+"event_builder" : {
+"expected_fragments_per_event" : 2,
+"first_fragment_receiver_rank" : 0,
+"fragment_receiver_count" : 2,
+"mpi_buffer_count" : 16,
 "print_event_store_stats" : true,
-"xmlrpc_client_list" : ";http://topol.fnal.gov:5205/RPC2,3;http://topol.fnal.gov:5206/RPC2,3;http://topol.fnal.gov:5235/RPC2,4;http://topol.fnal.gov:5236/RPC2,4;http://topol.fnal.gov:5265/RPC2,5;http://topol.fnal.gov:5266/RPC2,5"
+"use_art" : true,
+"verbose" : false
 },
 "max_fragment_size_words" : 2097152,
 "metrics" : {
-"aggFile" : {
-"fileName" : "/tmp/aggregator/agg_%UID%_metrics.log",
+"evbFile" : {
+"fileName" : "/tmp/eventbuilder/evb_%UID%_metrics.log",
 "level" : 3,
 "metricPluginType" : "file",
 "uniquify" : true
@@ -27,7 +22,15 @@
 }
 },
 "outputs" : {
-
+"rootMPIOutput" : {
+"SelectEvents" : {
+"SelectEvents" : [
+"pmod2",
+"pmod3"
+]
+},
+"module_type" : "RootMPIOutput"
+}
 },
 "physics" : {
 "analyzers" : {
@@ -43,11 +46,11 @@
 "nth" : 3
 }
 },
+"my_output_modules" : [
+"rootMPIOutput"
+],
 "p1" : [
 
-],
-"p2" : [
-"BuildInfo"
 ],
 "pmod2" : [
 "prescaleMod2"
@@ -56,24 +59,53 @@
 "prescaleMod3"
 ],
 "producers" : {
-"BuildInfo" : {
-"instance_name" : "ArtdaqDemo",
-"module_type" : "ArtdaqDemoBuildInfo"
-}
+
 }
 },
-"process_name" : "DAQAG",
+"process_name" : "DAQ",
 "services" : {
 "NetMonTransportServiceInterface" : {
+"data_receiver_count" : 1,
+"first_data_receiver_rank" : 4,
 "max_fragment_size_words" : 2097152,
+"mpi_buffer_count" : 8,
 "service_provider" : "NetMonTransportService"
 },
 "scheduler" : {
+"errorOnFailureToPut" : false,
 "fileMode" : "NOMERGE"
 }
 },
 "source" : {
-"module_type" : "NetMonInput"
+"fragment_type_map" : [
+[
+1,
+"missed"
+],
+[
+3,
+"V1720"
+],
+[
+4,
+"V1724"
+],
+[
+6,
+"TOY1"
+],
+[
+7,
+"TOY2"
+],
+[
+8,
+"ASCII"
+]
+],
+"module_type" : "RawInput",
+"resume_after_timeout" : true,
+"waiting_time" : 2500000
 }
 },
 "metadata" : {
@@ -81,46 +113,21 @@
 "type" : "table",
 "comment" : " ",
 "children" : {
-"aggregator" : {
+"event_builder" : {
 "type" : "table",
 "comment" : " ",
 "children" : {
-"event_builder_count" : {
+"expected_fragments_per_event" : {
 "type" : "number",
 "comment" : " ",
 "annotation" : " "
 },
-"event_queue_depth" : {
+"first_fragment_receiver_rank" : {
 "type" : "number",
 "comment" : " ",
 "annotation" : " "
 },
-"event_queue_wait_time" : {
-"type" : "number",
-"comment" : " ",
-"annotation" : " "
-},
-"expected_events_per_bunch" : {
-"type" : "number",
-"comment" : " ",
-"annotation" : " "
-},
-"file_duration" : {
-"type" : "number",
-"comment" : " ",
-"annotation" : " "
-},
-"file_event_count" : {
-"type" : "number",
-"comment" : " ",
-"annotation" : " "
-},
-"file_size_MB" : {
-"type" : "number",
-"comment" : " ",
-"annotation" : " "
-},
-"first_event_builder_rank" : {
+"fragment_receiver_count" : {
 "type" : "number",
 "comment" : " ",
 "annotation" : " "
@@ -130,18 +137,18 @@
 "comment" : " ",
 "annotation" : " "
 },
-"onmon_event_prescale" : {
-"type" : "number",
-"comment" : " ",
-"annotation" : " "
-},
 "print_event_store_stats" : {
 "type" : "bool",
 "comment" : " ",
 "annotation" : " "
 },
-"xmlrpc_client_list" : {
-"type" : "string",
+"use_art" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : " "
+},
+"verbose" : {
+"type" : "bool",
 "comment" : " ",
 "annotation" : " "
 }
@@ -156,7 +163,7 @@
 "type" : "table",
 "comment" : " ",
 "children" : {
-"aggFile" : {
+"evbFile" : {
 "type" : "table",
 "comment" : " ",
 "children" : {
@@ -190,7 +197,28 @@
 "type" : "table",
 "comment" : " ",
 "children" : {
-
+"rootMPIOutput" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"SelectEvents" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"SelectEvents" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " "
+}
+}
+},
+"module_type" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
 }
 },
 "physics" : {
@@ -242,12 +270,12 @@
 }
 }
 },
-"p1" : {
+"my_output_modules" : {
 "type" : "sequence",
 "comment" : " ",
 "annotation" : " "
 },
-"p2" : {
+"p1" : {
 "type" : "sequence",
 "comment" : " ",
 "annotation" : " "
@@ -266,22 +294,7 @@
 "type" : "table",
 "comment" : " ",
 "children" : {
-"BuildInfo" : {
-"type" : "table",
-"comment" : " ",
-"children" : {
-"instance_name" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
-},
-"module_type" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
-}
-}
-}
+
 }
 }
 }
@@ -299,7 +312,22 @@
 "type" : "table",
 "comment" : " ",
 "children" : {
+"data_receiver_count" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "# 2"
+},
+"first_data_receiver_rank" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
 "max_fragment_size_words" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"mpi_buffer_count" : {
 "type" : "number",
 "comment" : " ",
 "annotation" : " "
@@ -315,6 +343,11 @@
 "type" : "table",
 "comment" : " ",
 "children" : {
+"errorOnFailureToPut" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : " "
+},
 "fileMode" : {
 "type" : "string",
 "comment" : " ",
@@ -328,8 +361,23 @@
 "type" : "table",
 "comment" : " ",
 "children" : {
+"fragment_type_map" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " "
+},
 "module_type" : {
 "type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"resume_after_timeout" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : " "
+},
+"waiting_time" : {
+"type" : "number",
 "comment" : " ",
 "annotation" : " "
 }
@@ -343,8 +391,7 @@
 }
 ],
 "converted" : {
-  changelog:"asefasqfasdfasd",
-  
+"changelog":"Edit: comment",
 "guidata" : [
 {
 "type" : "table",
@@ -353,61 +400,26 @@
 "children" : [
 {
 "type" : "table",
-"name" : "aggregator",
+"name" : "event_builder",
 "comment" : " ",
 "children" : [
 {
 "type" : "number",
-"name" : "event_builder_count",
+"name" : "expected_fragments_per_event",
 "comment" : " ",
 "value" : 2,
 "annotation" : " "
 },
 {
 "type" : "number",
-"name" : "event_queue_depth",
-"comment" : " ",
-"value" : 2,
-"annotation" : " "
-},
-{
-"type" : "number",
-"name" : "event_queue_wait_time",
-"comment" : " ",
-"value" : 1,
-"annotation" : " "
-},
-{
-"type" : "number",
-"name" : "expected_events_per_bunch",
-"comment" : " ",
-"value" : 1,
-"annotation" : " "
-},
-{
-"type" : "number",
-"name" : "file_duration",
+"name" : "first_fragment_receiver_rank",
 "comment" : " ",
 "value" : 0,
 "annotation" : " "
 },
 {
 "type" : "number",
-"name" : "file_event_count",
-"comment" : " ",
-"value" : 0,
-"annotation" : " "
-},
-{
-"type" : "number",
-"name" : "file_size_MB",
-"comment" : " ",
-"value" : 8000,
-"annotation" : " "
-},
-{
-"type" : "number",
-"name" : "first_event_builder_rank",
+"name" : "fragment_receiver_count",
 "comment" : " ",
 "value" : 2,
 "annotation" : " "
@@ -416,14 +428,7 @@
 "type" : "number",
 "name" : "mpi_buffer_count",
 "comment" : " ",
-"value" : 8,
-"annotation" : " "
-},
-{
-"type" : "number",
-"name" : "onmon_event_prescale",
-"comment" : " ",
-"value" : 1,
+"value" : 16,
 "annotation" : " "
 },
 {
@@ -434,10 +439,17 @@
 "annotation" : " "
 },
 {
-"type" : "string",
-"name" : "xmlrpc_client_list",
+"type" : "bool",
+"name" : "use_art",
 "comment" : " ",
-"value" : ";http://topol.fnal.gov:5205/RPC2,3;http://topol.fnal.gov:5206/RPC2,3;http://topol.fnal.gov:5235/RPC2,4;http://topol.fnal.gov:5236/RPC2,4;http://topol.fnal.gov:5265/RPC2,5;http://topol.fnal.gov:5266/RPC2,5",
+"value" : true,
+"annotation" : " "
+},
+{
+"type" : "bool",
+"name" : "verbose",
+"comment" : " ",
+"value" : false,
 "annotation" : " "
 }
 ]
@@ -456,14 +468,14 @@
 "children" : [
 {
 "type" : "table",
-"name" : "aggFile",
+"name" : "evbFile",
 "comment" : " ",
 "children" : [
 {
 "type" : "string",
 "name" : "fileName",
 "comment" : " ",
-"value" : "/tmp/aggregator/agg_%UID%_metrics.log",
+"value" : "/tmp/eventbuilder/evb_%UID%_metrics.log",
 "annotation" : " "
 },
 {
@@ -498,7 +510,36 @@
 "name" : "outputs",
 "comment" : " ",
 "children" : [
-
+{
+"type" : "table",
+"name" : "rootMPIOutput",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "SelectEvents",
+"comment" : " ",
+"children" : [
+{
+"type" : "sequence",
+"name" : "SelectEvents",
+"comment" : " ",
+"children" : [
+"pmod2",
+"pmod3"
+]
+}
+]
+},
+{
+"type" : "string",
+"name" : "module_type",
+"comment" : " ",
+"value" : "RootMPIOutput",
+"annotation" : " "
+}
+]
+}
 ]
 },
 {
@@ -565,18 +606,18 @@
 },
 {
 "type" : "sequence",
-"name" : "p1",
+"name" : "my_output_modules",
 "comment" : " ",
 "children" : [
-
+"rootMPIOutput"
 ]
 },
 {
 "type" : "sequence",
-"name" : "p2",
+"name" : "p1",
 "comment" : " ",
 "children" : [
-"BuildInfo"
+
 ]
 },
 {
@@ -600,27 +641,7 @@
 "name" : "producers",
 "comment" : " ",
 "children" : [
-{
-"type" : "table",
-"name" : "BuildInfo",
-"comment" : " ",
-"children" : [
-{
-"type" : "string",
-"name" : "instance_name",
-"comment" : " ",
-"value" : "ArtdaqDemo",
-"annotation" : " "
-},
-{
-"type" : "string",
-"name" : "module_type",
-"comment" : " ",
-"value" : "ArtdaqDemoBuildInfo",
-"annotation" : " "
-}
-]
-}
+
 ]
 }
 ]
@@ -629,7 +650,7 @@
 "type" : "string",
 "name" : "process_name",
 "comment" : " ",
-"value" : "DAQAG",
+"value" : "DAQ",
 "annotation" : " "
 },
 {
@@ -644,9 +665,30 @@
 "children" : [
 {
 "type" : "number",
+"name" : "data_receiver_count",
+"comment" : " ",
+"value" : 1,
+"annotation" : "# 2"
+},
+{
+"type" : "number",
+"name" : "first_data_receiver_rank",
+"comment" : " ",
+"value" : 4,
+"annotation" : " "
+},
+{
+"type" : "number",
 "name" : "max_fragment_size_words",
 "comment" : " ",
 "value" : 2097152,
+"annotation" : " "
+},
+{
+"type" : "number",
+"name" : "mpi_buffer_count",
+"comment" : " ",
+"value" : 8,
 "annotation" : " "
 },
 {
@@ -664,6 +706,13 @@
 "comment" : " ",
 "children" : [
 {
+"type" : "bool",
+"name" : "errorOnFailureToPut",
+"comment" : " ",
+"value" : false,
+"annotation" : " "
+},
+{
 "type" : "string",
 "name" : "fileMode",
 "comment" : " ",
@@ -680,10 +729,55 @@
 "comment" : " ",
 "children" : [
 {
+"type" : "sequence",
+"name" : "fragment_type_map",
+"comment" : " ",
+"children" : [
+[
+1,
+"missed"
+],
+[
+3,
+"V1720"
+],
+[
+4,
+"V1724"
+],
+[
+6,
+"TOY1"
+],
+[
+7,
+"TOY2"
+],
+[
+8,
+"ASCII"
+]
+]
+},
+{
 "type" : "string",
 "name" : "module_type",
 "comment" : " ",
-"value" : "NetMonInput",
+"value" : "RawInput",
+"annotation" : " "
+},
+{
+"type" : "bool",
+"name" : "resume_after_timeout",
+"comment" : " ",
+"value" : true,
+"annotation" : " "
+},
+{
+"type" : "number",
+"name" : "waiting_time",
+"comment" : " ",
+"value" : 2500000,
 "annotation" : " "
 }
 ]
@@ -725,14 +819,9 @@
 {
 "setConfigurableEntity" : "Thu Mar 10 16:50:25 2016"
 }
-],
-//REPLACE
-"changelog": "2016-03-24T16:17:38.089Z: Edit - Table: configA001:Aggregator_topol/outputs, Name: level, Column: Value, Value: 4356543
-2016-03-24T16:14:14.483Z: Edit - Table: configA001:Aggregator_topol/daq/metrics/aggFile, Name: level, Column: Value, Value: 8
-2016-03-24T15:36:51.378Z: Edit - Table: configA001:Aggregator_topol/daq/metrics/aggFile, Name: level, Column: Value, Value: 5
-undefined"
+]
 },
 "configurable_entity" : {
-"name" : "Aggregator_topol"
+"name" : "EventBuilder_topol"
 }
 }

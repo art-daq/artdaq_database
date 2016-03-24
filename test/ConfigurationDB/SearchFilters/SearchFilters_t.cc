@@ -33,6 +33,10 @@ typedef bool (*test_case)(Options const& /*options*/, std::string const& /*file_
 bool test_findconfigs(Options const&, std::string const&);
 bool test_buildfilter(Options const&, std::string const&);
 
+bool test_findversions(Options const&, std::string const&);
+bool test_addconfig(Options const&, std::string const&);
+bool test_newconfig(Options const&, std::string const&);
+
 int main(int argc, char* argv[]) try {
   debug::registerUngracefullExitHandlers();
   //    artdaq::database::fhicljson::useFakeTime(true);
@@ -196,4 +200,96 @@ bool test_buildfilter(Options const& options, std::string const& file_name) {
   }
 
   return false;
+}
+
+
+bool test_findversions(Options const& options, std::string const& file_name)
+{
+  assert(!file_name.empty());
+
+  std::ifstream is(file_name);
+
+  std::string expected_json((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+
+  is.close();
+
+  auto result = cf::find_configuration_versions(options);
+
+  if (!result.first) {
+    std::cerr << "Error message: " << result.second << "\n";
+    return false;
+  }
+
+  auto expected = JSONDocument(expected_json);
+  auto returned = JSONDocument(result.second);
+
+  if (returned == expected) {
+    return true;
+  } else {
+    std::cout << "Search failed. \n";
+    std::cerr << "returned:\n" << returned << "\n";
+    std::cerr << "expected:\n" << expected << "\n";
+  }
+
+  return false;  
+}
+
+bool test_addconfig(Options const& options, std::string const& file_name){
+  assert(!file_name.empty());
+
+  std::ifstream is(file_name);
+
+  std::string expected_json((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+
+  is.close();
+
+  auto result = cf::add_configuration_to_global_configuration(options);
+
+  if (!result.first) {
+    std::cerr << "Error message: " << result.second << "\n";
+    return false;
+  }
+
+  auto expected = JSONDocument(expected_json);
+  auto returned = JSONDocument(result.second);
+
+  if (returned == expected) {
+    return true;
+  } else {
+    std::cout << "Failed adding a config to a global config.\n";
+    std::cerr << "returned:\n" << returned << "\n";
+    std::cerr << "expected:\n" << expected << "\n";
+  }
+
+  return false;  
+}
+
+bool test_newconfig(Options const& options, std::string const& file_name){
+  assert(!file_name.empty());
+
+  std::ifstream is(file_name);
+
+  std::string expected_json((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+
+  is.close();
+
+  auto result = cf::create_new_global_configuration(options);
+
+  if (!result.first) {
+    std::cerr << "Error message: " << result.second << "\n";
+    return false;
+  }
+
+  auto expected = JSONDocument(expected_json);
+  auto returned = JSONDocument(result.second);
+
+  if (returned == expected) {
+    return true;
+  } else {
+    std::cout << "Failed creating a new configuration.\n";
+    std::cerr << "returned:\n" << returned << "\n";
+    std::cerr << "expected:\n" << expected << "\n";
+  }
+
+  return false;    
 }
