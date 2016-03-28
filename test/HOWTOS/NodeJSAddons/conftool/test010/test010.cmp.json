@@ -1,0 +1,48 @@
+{
+"search" : [
+{
+  "name" : "Aggregator_topol",
+  "query" : 
+    {
+    "filter":{"configurable_entity.name":"Aggregator_topol"},
+    "collection":"artdaq_Aggregator",
+    "dbprovider":"filesystem",
+    "operation":"findversions",
+    "dataformat":"gui"
+  }
+},
+{
+  "name" : "BoardReader_TOY1_topol",
+  "query" :
+  {
+    "filter":{"configurable_entity.name":"BoardReader_TOY1_topol"},
+    "collection":"artdaq_BoardReader",
+    "dbprovider":"filesystem",
+    "operation":"findversions",
+    "dataformat":"gui"
+  }
+},
+{
+  "name" : "BoardReader_TOY2_topol",
+  "query" :
+  {
+    "filter":{"configurable_entity.name":"BoardReader_TOY2_topol"},
+    "collection":"artdaq_BoardReader",
+    "dbprovider":"filesystem",
+    "operation":"findversions",
+    "dataformat":"gui"
+  }
+},
+{
+  "name" : "EventBuilder_topol",
+  "query" :
+  {
+    "filter":{ "configurable_entity.name":"EventBuilder_topol"},
+    "collection":"artdaq_EventBuilder",
+    "dbprovider":"filesystem",
+    "operation":"findversions",
+    "dataformat":"gui"
+  }
+}
+]
+}
