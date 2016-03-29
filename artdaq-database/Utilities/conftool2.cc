@@ -38,6 +38,10 @@ bool test_findentities(std::string const&, std::string const&);
 int main(int argc, char* argv[]) try {
   debug::registerUngracefullExitHandlers();
   //    artdaq::database::fhicljson::useFakeTime(true);
+  
+  
+  cf::trace_enable_CreateConfigsOperation();
+  cf::trace_enable_CreateConfigsOperationDetail();
 
   cf::trace_enable_LoadStoreOperation();
   cf::trace_enable_FindConfigsOperationDetail();
@@ -45,8 +49,10 @@ int main(int argc, char* argv[]) try {
   cf::trace_enable_FindConfigsOperation();
   cf::trace_enable_FindConfigsOperationDetail();
 
+  /*
   cf::trace_enable_DBOperationMongo();
   cf::trace_enable_DBOperationFileSystem();
+  
 
   db::filesystem::trace_enable();
   db::mongo::trace_enable();
@@ -57,7 +63,8 @@ int main(int argc, char* argv[]) try {
   db::fhicljsondb::trace_enable_fhicljsondb();
 
   db::jsonutils::trace_enable_JSONDocumentBuilder();
-
+  */
+  
   // Get the input parameters via the boost::program_options library,
   // designed to make it relatively simple to define arguments and
   // issue errors if argument list is supplied incorrectly

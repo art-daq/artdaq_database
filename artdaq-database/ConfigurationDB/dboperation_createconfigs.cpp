@@ -44,7 +44,7 @@ bool json_gui_to_db(std::string const&, std::string&);
 }
 namespace detail {
 void add_configuration_to_global_configuration(LoadStoreOperation const&, std::string&);
-void create_new_global_configuration(LoadStoreOperation const&, std::string&);
+void create_new_global_configuration(std::string const&, std::string&);
 void find_configuration_versions(LoadStoreOperation const&, std::string&);
 void find_configuration_entities(LoadStoreOperation const&, std::string&);
 }
@@ -60,16 +60,8 @@ cf::result_pair_t cf::add_configuration_to_global_configuration(LoadStoreOperati
   }
 }
 
-cf::result_pair_t cf::create_new_global_configuration(LoadStoreOperation const& options) noexcept {
-  try {
-    auto returnValue = std::string{};
-
-    detail::create_new_global_configuration(options, returnValue);
-
-    return cf::result_pair_t{true, returnValue};
-  } catch (...) {
-    return cf::result_pair_t{false, boost::current_exception_diagnostic_information()};
-  }
+cf::result_pair_t cf::create_new_global_configuration(LoadStoreOperation const& /*options*/) noexcept {
+    return cf::result_pair_t{false, "Not Implemented"};
 }
 
 cf::result_pair_t cf::find_configuration_versions(LoadStoreOperation const& options) noexcept {
@@ -111,14 +103,11 @@ cf::result_pair_t cfgui::add_configuration_to_global_configuration(std::string c
   }
 }
 
-cf::result_pair_t cfgui::create_new_global_configuration(std::string const& search_filter) noexcept {
+cf::result_pair_t cfgui::create_new_global_configuration(std::string const& operations) noexcept {
   try {
-    auto options = LoadStoreOperation{};
-    options.read(search_filter);
-
     auto returnValue = std::string{};
 
-    detail::create_new_global_configuration(options, returnValue);
+    detail::create_new_global_configuration(operations, returnValue);
 
     return cf::result_pair_t{true, returnValue};
   } catch (...) {

@@ -1,36 +1,72 @@
 {
-"operations" : [
-  {
-    "filter":{"version":"version004", "configurable_entity.name":"Aggregator_topol"},
-    "configuration":"configA002",      
-    "collection":"artdaq_Aggregator",
-    "dbprovider":"filesystem",
-    "operation":"addconfig",
-    "dataformat":"gui"
-  },
-  {
-    "filter":{"version":"version004", "configurable_entity.name":"BoardReader_TOY1_topol"},
-    "configuration":"configA002",  
-    "collection":"artdaq_BoardReader",
-    "dbprovider":"filesystem",
-    "operation":"addconfig",
-    "dataformat":"gui"
-  },
-  {
-    "filter":{"version":"version004", "configurable_entity.name":"BoardReader_TOY2_topol"},
-    "configuration":"configA002",  
-    "collection":"artdaq_BoardReader",
-    "dbprovider":"filesystem",
-    "operation":"addconfig",
-    "dataformat":"gui"
-  },
-  {
-    "filter":{"version":"version004", "configurable_entity.name":"EventBuilder_topol"},
-    "configuration":"configA002",      
-    "collection":"artdaq_EventBuilder",
-    "dbprovider":"filesystem",
-    "operation":"addconfig",
-    "dataformat":"gui"
-  }
-]
+   "operations":[
+      {
+         "collection":"artdaq_Aggregator",
+         "dbprovider":"filesystem",
+         "dataformat":"gui",
+         "operation":"addconfig",
+         "configuration":"configA005",
+         "filter":{
+            "version":"version002",
+            "configurable_entity.name":"DAQ_HOST_001"
+         }
+      },
+      {
+         "collection":"artdaq_Aggregator",
+         "dbprovider":"filesystem",
+         "dataformat":"gui",
+         "operation":"addconfig",
+         "configuration":"configA005",
+         "filter":{
+            "version":"version002",
+            "configurable_entity.name":"DAQ_HOST_002"
+         }
+      },
+      {
+         "collection":"artdaq_BoardReader",
+         "dbprovider":"filesystem",
+         "dataformat":"gui",
+         "operation":"addconfig",
+         "configuration":"configA005",
+         "filter":{
+            "version":"version002",
+            "configurable_entity.name":"DAQ_HOST_001"
+         }
+      },
+      {
+         "collection":"artdaq_BoardReader",
+         "dbprovider":"filesystem",
+         "dataformat":"gui",
+         "operation":"addconfig",
+         "configuration":"configA005",
+         "filter":{
+            "version":"version002",
+            "configurable_entity.name":"DAQ_HOST_002"
+         }
+      },
+      {
+         "collection":"artdaq_EventBuilder",
+         "dbprovider":"filesystem",
+         "dataformat":"gui",
+         "operation":"addconfig",
+         "configuration":"configA005",
+         "filter":{
+            "version":"version002",
+            "configurable_entity.name":"DAQ_HOST_001"
+         }
+      },
+      {
+         "collection":"artdaq_EventBuilder",
+         "dbprovider":"filesystem",
+         "dataformat":"gui",
+         "operation":"addconfig",
+         "configuration":"configA005",
+         "filter":{
+            "version":"version002",
+            "configurable_entity.name":"DAQ_HOST_002"
+         }
+      }
+   ]
 }
+
+

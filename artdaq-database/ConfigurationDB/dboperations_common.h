@@ -43,6 +43,9 @@ constexpr auto configurable_entity = "configurable_entity";
 
 constexpr auto notprovided = "notprovided";
 
+constexpr auto operations = "operations";
+
+
 constexpr auto default_filter = "{\"configurable_entity\":\"any\"}";
 
 constexpr auto colon = ":";

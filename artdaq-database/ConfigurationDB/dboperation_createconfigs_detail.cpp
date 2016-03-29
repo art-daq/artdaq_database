@@ -7,6 +7,7 @@
 #include "artdaq-database/ConfigurationDB/dboperation_mongodb.h"
 
 #include "artdaq-database/BasicTypes/basictypes.h"
+#include "artdaq-database/FhiclJson/json_common.h"
 #include "artdaq-database/FhiclJson/shared_literals.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/JsonDocument/JSONDocument_template.h"
@@ -26,6 +27,10 @@ namespace cf = db::configuration;
 namespace cfgui = cf::guiexports;
 namespace cfo = cf::options;
 namespace cfol = cfo::literal;
+namespace jsn = db::json;
+
+using jsn::JsonReader;
+using jsn::JsonWriter;
 
 using cfo::LoadStoreOperation;
 using cfo::data_format_t;
@@ -48,7 +53,6 @@ namespace detail {
 
 typedef JsonData (*provider_findversions_t)(Options const& /*options*/, JsonData const& /*search_filter*/);
 typedef JsonData (*provider_findentities_t)(Options const& /*options*/, JsonData const& /*search_filter*/);
-typedef JsonData (*provider_newglobalconfig_t)(Options const& /*options*/, JsonData const& /*search_filter*/);
 typedef JsonData (*provider_addtoglobalconfig_t)(Options const& /*options*/, JsonData const& /*search_filter*/);
 
 void add_configuration_to_global_configuration(LoadStoreOperation const& options, std::string& configs) {
@@ -103,24 +107,43 @@ void add_configuration_to_global_configuration(LoadStoreOperation const& options
   TRACE_(11, "add_configuration_to_global_configuration: end");
 }
 
-void create_new_global_configuration(LoadStoreOperation const& options, std::string& configs[[gnu::unused]]) {
+void create_new_global_configuration(std::string const& operations, std::string& configs) {
+  assert(!operations.empty());
   assert(configs.empty());
-  assert(options.operation().compare(cfo::literal::operation_newconfig) == 0);
+
+  using namespace artdaq::database::json;
 
   TRACE_(11, "create_new_global_configuration: begin");
-  TRACE_(11, "create_new_global_configuration args options=<" << options.to_string() << ">");
+  TRACE_(11, "create_new_global_configuration args operations=<" << operations << ">");
 
-  if (cf::not_equal(options.provider(), cfol::database_provider_filesystem) &&
-      cf::not_equal(options.provider(), cfol::database_provider_mongo)) {
-    TRACE_(11, "Error in create_new_global_configuration:"
-                   << " Invalid database provider; database provider=" << options.provider() << ".");
+  auto reader = JsonReader{};
+  object_t operations_ast;
 
-    throw cet::exception("create_new_global_configuration")
-        << "Invalid database provider; database provider=" << options.provider() << ".";
+  if (!reader.read(operations, operations_ast)) {
+    TRACE_(11, "create_new_global_configuration() Failed to create an AST from operations JSON.");
+
+    throw cet::exception("create_new_global_configuration") << "Failed to create an AST from operations JSON.";
+  }
+
+  auto const& operations_list = boost::get<array_t>(operations_ast.at(cfo::literal::operations));
+
+  TRACE_(11, "create_new_global_configuration: found " << operations_list.size() << " operations.");
+
+  for (auto const& operation_entry : operations_list) {
+    auto buff = std::string{};
+    JsonWriter{}.write(boost::get<object_t>(operation_entry), buff);
+
+    TRACE_(11, "create_new_global_configuration() Found operation=<" << buff << ">.");
+
+    auto addconfig = LoadStoreOperation{};
+    addconfig.read(buff);
+
+    configs.clear();
+
+    add_configuration_to_global_configuration(addconfig, configs);
   }
 
   TRACE_(11, "create_new_global_configuration: end");
-  throw cet::exception("create_new_global_configuration") << "Not Implemented. ";
 }
 
 void find_configuration_versions(LoadStoreOperation const& options, std::string& versions) {
@@ -228,7 +251,6 @@ void find_configuration_entities(LoadStoreOperation const& options, std::string&
   TRACE_(11, "find_configuration_entities: end entities=" << entities);
 }
 }
-
 
 void cf::trace_enable_CreateConfigsOperationDetail() {
   TRACE_CNTL("name", TRACE_NAME);

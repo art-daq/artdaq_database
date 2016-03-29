@@ -1,4 +1,4 @@
-%module fhicljson
+%module conftool
 
 %{
     #include "conftool.h"

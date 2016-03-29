@@ -27,6 +27,8 @@ constexpr auto bookkeeping_updates = "bookkeeping.updates";
 constexpr auto bookkeeping_isdeleted = "bookkeeping.isdeleted";
 constexpr auto bookkeeping_isreadonly = "bookkeeping.isreadonly";
 
+constexpr auto configuration = "configuration";
+
 constexpr auto configurations = "configurations";
 constexpr auto configurations_name = "configurations.name";
 

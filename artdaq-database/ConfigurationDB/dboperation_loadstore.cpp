@@ -181,7 +181,7 @@ JSONDocument LoadStoreOperation::to_jsondoc() const {
   ss << cf::quoted_(cfol::filter) << cfol::colon << search_filter_jsondoc().to_string();
 
   if (operation() == cfol::operation_addconfig) {
-    ss << ",\n" << cf::quoted_(jul::configurations_name) << cfol::colon << quoted_(globalConfigurationId());
+    ss << ",\n" << cf::quoted_(jul::configuration) << cfol::colon << quoted_(globalConfigurationId());
   }
 
   ss << ",\n" << cf::quoted_(cfol::collection) << cfol::colon << quoted_(type());
