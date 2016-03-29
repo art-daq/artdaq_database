@@ -4,7 +4,7 @@ setup artdaq_database v1_00_00 -q debug:e9:s21
 cd ~/artdaq-demo-base/artdaq-utilities-database/test/HOWTOS/NodeJSAddons/conftool/test001/
 
 conftool -d filesystem -o store -t artdaq_BoardReader -c BoardReader_TOY1_topol.fnal.gov_5205.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_001
-conftool -d filesystem -o store -t artdaq_BoardReader -c BoardReader_TOY2_topol.fnal.gov_5206.fcl -f fhicl -v version002 -g configA001 -e DAQ_HOST_002
+conftool -d filesystem -o store -t artdaq_BoardReader -c BoardReader_TOY2_topol.fnal.gov_5206.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_002
 
 conftool -d filesystem -o store -t artdaq_EventBuilder -c EventBuilder_topol.fnal.gov_5235.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_001
 conftool -d filesystem -o store -t artdaq_EventBuilder -c EventBuilder_topol.fnal.gov_5235.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_002
@@ -14,7 +14,7 @@ conftool -d filesystem -o store -t artdaq_Aggregator -c Aggregator_topol.fnal.go
 
 
 conftool -d mongo -o store -t artdaq_BoardReader -c BoardReader_TOY1_topol.fnal.gov_5205.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_001
-conftool -d mongo -o store -t artdaq_BoardReader -c BoardReader_TOY2_topol.fnal.gov_5206.fcl -f fhicl -v version002 -g configA001 -e DAQ_HOST_002
+conftool -d mongo -o store -t artdaq_BoardReader -c BoardReader_TOY2_topol.fnal.gov_5206.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_002
 
 conftool -d mongo -o store -t artdaq_EventBuilder -c EventBuilder_topol.fnal.gov_5235.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_001
 conftool -d mongo -o store -t artdaq_EventBuilder -c EventBuilder_topol.fnal.gov_5235.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_002
