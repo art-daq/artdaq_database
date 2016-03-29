@@ -1,4 +1,4 @@
-%module conftool
+%module conftoolg
 
 %{
     #include "conftool.h"
