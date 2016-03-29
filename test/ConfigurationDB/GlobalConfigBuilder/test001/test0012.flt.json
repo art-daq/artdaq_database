@@ -1,0 +1,7 @@
+{
+  "filter":{"configurable_entity.name":"@TEST_ENTITY_NAME@"},
+  "collection":"artdaq_Aggregator",
+  "dbprovider":"filesystem",
+  "operation":"findversions",
+  "dataformat":"gui"
+}

@@ -26,7 +26,10 @@ class SearchIndex final {
   ~SearchIndex();
 
   std::vector<object_id_t> findDocumentIDs(JsonData const&);
-  std::vector<std::pair<std::string,std::string>> findAllGlobalConfigurations(JsonData const&);
+  std::vector<std::pair<std::string, std::string>> findAllGlobalConfigurations(JsonData const&);
+  std::vector<std::pair<std::string, std::string>> findConfigVersions(JsonData const&);
+  std::vector<std::string> findConfigEntities(JsonData const&);
+
   bool addDocument(JsonData const&, object_id_t const&);
   bool removeDocument(JsonData const&, object_id_t const&);
 
@@ -50,6 +53,16 @@ class SearchIndex final {
   std::vector<object_id_t> _matchObjectId(std::string const&);
   std::vector<object_id_t> _matchObjectIds(std::string const&);
 
+  void _build_ouid_map(std::map<std::string, std::string>&, std::string const&) const;
+
+  template <typename TYPE>
+  void _make_unique_sorted(jsn::array_t&);
+
+  std::vector<std::pair<std::string, std::string>> _indexed_filtered_innerjoin_over_ouid(std::string const&,
+                                                                                         std::string const&,
+                                                                                         std::string const&) const;
+  std::vector<std::string> _filtered_attribute_list(std::string const& attribute, std::string const& attribute_with);
+
  private:
   bool _open(boost::filesystem::path const&);
   bool _create(boost::filesystem::path const&);
@@ -60,6 +73,24 @@ class SearchIndex final {
   boost::filesystem::path _path;
   bool _isOpen;
 };
+
+template <typename TYPE>
+void SearchIndex::_make_unique_sorted(jsn::array_t& ouids) {
+  auto tmp = std::vector<std::string>{};
+
+  tmp.reserve(ouids.size());
+
+  std::for_each(ouids.begin(), ouids.end(),
+                [&tmp](jsn::value_t const& value) { tmp.emplace_back(boost::get<TYPE>(value)); });
+
+  std::sort(tmp.begin(), tmp.end());
+
+  tmp.erase(std::unique(tmp.begin(), tmp.end()), tmp.end());
+
+  ouids.erase(ouids.begin(), ouids.end());
+
+  std::for_each(tmp.begin(), tmp.end(), [&ouids](TYPE& value) { ouids.push_back(value); });
+}
 
 void trace_enable();
 

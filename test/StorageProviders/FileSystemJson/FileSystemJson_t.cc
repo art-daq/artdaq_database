@@ -194,7 +194,7 @@ bool test_insert(std::string const& source, std::string const& compare,std::stri
   }
   
   auto result = JSONDocument(collection.begin()->json_buffer);
-  //result.deleteChild("_id");
+  result.deleteChild("_id");
 
   if (result == expected)
         return true;
@@ -249,7 +249,7 @@ bool test_search1(std::string const& source, std::string const& compare,std::str
   }
   
   auto result = JSONDocument(collection.begin()->json_buffer);
-  //result.deleteChild("_id");
+  result.deleteChild("_id");
 
   if (result == expected)
         return true;
@@ -359,7 +359,7 @@ bool test_update(std::string const& source, std::string const& compare,std::stri
   }
   
   auto result = JSONDocument(collection.begin()->json_buffer);
-  //result.deleteChild("_id");
+  result.deleteChild("_id");
   result.replaceChild(changes,"document");
   
   json = JsonData{"{\"document\":" + result.to_string() + ", \"filter\":" + object_id +  ",\"collection\":\"" +colle11ctionName +"\"}"};
@@ -378,7 +378,7 @@ bool test_update(std::string const& source, std::string const& compare,std::stri
   }  
   
   auto updated = JSONDocument(collection.begin()->json_buffer);
-  //updated.deleteChild("_id");
+  updated.deleteChild("_id");
 
   if (updated == expected)
         return true;

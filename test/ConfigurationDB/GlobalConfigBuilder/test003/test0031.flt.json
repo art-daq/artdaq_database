@@ -1,6 +1,6 @@
   {
     "filter":{},
-    "dbprovider":"filesystem",
+    "dbprovider":"mongo",
     "operation":"findentities",
     "dataformat":"gui"
   }

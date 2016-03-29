@@ -36,11 +36,23 @@ class StorageProvider final {
   std::list<FILTER> findGlobalConfigs(FILTER const&);
 
   template <typename FILTER>
+  std::list<FILTER> addConfigToGlobalConfig(FILTER const&);
+  
+  template <typename FILTER>
+  std::list<FILTER> findConfigVersions(FILTER const&);
+
+  template <typename FILTER>
+  std::list<FILTER> findConfigEntities(FILTER const&);
+  
+  template <typename FILTER>
   std::list<FILTER> buildConfigSearchFilter(FILTER const&);
 
  private:
   std::shared_ptr<IMPL> _provider;
 };
+
+constexpr auto ouid_invalid = "000000000000000000000000";
+
 }  // namespace database
 }  // namespace artdaq
 

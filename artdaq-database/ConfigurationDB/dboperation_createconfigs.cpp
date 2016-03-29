@@ -1,7 +1,7 @@
 #include "artdaq-database/ConfigurationDB/common.h"
 
 #include "artdaq-database/ConfigurationDB/dboperation_filedb.h"
-#include "artdaq-database/ConfigurationDB/dboperation_findconfigs.h"
+#include "artdaq-database/ConfigurationDB/dboperation_loadstore.h"
 #include "artdaq-database/ConfigurationDB/dboperation_createconfigs.h"
 #include "artdaq-database/ConfigurationDB/dboperation_mongodb.h"
 
@@ -26,7 +26,7 @@ namespace cfgui = cf::guiexports;
 namespace cfo = cf::options;
 namespace cfol = cfo::literal;
 
-using cfo::FindConfigsOperation;
+using cfo::LoadStoreOperation;
 using cfo::data_format_t;
 
 using namespace artdaq::database::jsonutils;
@@ -43,12 +43,13 @@ bool json_gui_to_db(std::string const&, std::string&);
 }
 }
 namespace detail {
-void add_configuration_to_global_configuration(FindConfigsOperation const&, std::string&);
-void create_new_global_configuration(FindConfigsOperation const&, std::string&);
-void find_configuration_versions(FindConfigsOperation const&, std::string&);
+void add_configuration_to_global_configuration(LoadStoreOperation const&, std::string&);
+void create_new_global_configuration(LoadStoreOperation const&, std::string&);
+void find_configuration_versions(LoadStoreOperation const&, std::string&);
+void find_configuration_entities(LoadStoreOperation const&, std::string&);
 }
 
-cf::result_pair_t cf::add_configuration_to_global_configuration(FindConfigsOperation const& options) noexcept {
+cf::result_pair_t cf::add_configuration_to_global_configuration(LoadStoreOperation const& options) noexcept {
   try {
     auto returnValue = std::string{};
 
@@ -59,7 +60,7 @@ cf::result_pair_t cf::add_configuration_to_global_configuration(FindConfigsOpera
   }
 }
 
-cf::result_pair_t cf::create_new_global_configuration(FindConfigsOperation const& options) noexcept {
+cf::result_pair_t cf::create_new_global_configuration(LoadStoreOperation const& options) noexcept {
   try {
     auto returnValue = std::string{};
 
@@ -71,7 +72,7 @@ cf::result_pair_t cf::create_new_global_configuration(FindConfigsOperation const
   }
 }
 
-cf::result_pair_t cf::find_configuration_versions(FindConfigsOperation const& options) noexcept {
+cf::result_pair_t cf::find_configuration_versions(LoadStoreOperation const& options) noexcept {
   try {
     auto returnValue = std::string{};
 
@@ -83,9 +84,22 @@ cf::result_pair_t cf::find_configuration_versions(FindConfigsOperation const& op
   }
 }
 
+cf::result_pair_t cf::find_configuration_entities(LoadStoreOperation const& options) noexcept {
+  try {
+    auto returnValue = std::string{};
+
+    detail::find_configuration_entities(options, returnValue);
+
+    return cf::result_pair_t{true, returnValue};
+  } catch (...) {
+    return cf::result_pair_t{false, boost::current_exception_diagnostic_information()};
+  }
+}
+
+
 cf::result_pair_t cfgui::add_configuration_to_global_configuration(std::string const& search_filter) noexcept {
   try {
-    auto options = FindConfigsOperation{};
+    auto options = LoadStoreOperation{};
     options.read(search_filter);
 
     auto returnValue = std::string{};
@@ -99,7 +113,7 @@ cf::result_pair_t cfgui::add_configuration_to_global_configuration(std::string c
 
 cf::result_pair_t cfgui::create_new_global_configuration(std::string const& search_filter) noexcept {
   try {
-    auto options = FindConfigsOperation{};
+    auto options = LoadStoreOperation{};
     options.read(search_filter);
 
     auto returnValue = std::string{};
@@ -114,7 +128,7 @@ cf::result_pair_t cfgui::create_new_global_configuration(std::string const& sear
 
 cf::result_pair_t cfgui::find_configuration_versions(std::string const& search_filter) noexcept {
   try {
-    auto options = FindConfigsOperation{};
+    auto options = LoadStoreOperation{};
     options.read(search_filter);
 
     auto returnValue = std::string{};
@@ -127,6 +141,20 @@ cf::result_pair_t cfgui::find_configuration_versions(std::string const& search_f
   }
 }
 
+cf::result_pair_t cfgui::find_configuration_entities(std::string const& search_filter) noexcept {
+  try {
+    auto options = LoadStoreOperation{};
+    options.read(search_filter);
+
+    auto returnValue = std::string{};
+
+    detail::find_configuration_entities(options, returnValue);
+
+    return cf::result_pair_t{true, returnValue};
+  } catch (...) {
+    return cf::result_pair_t{false, boost::current_exception_diagnostic_information()};
+  }
+}
 
 void cf::trace_enable_CreateConfigsOperation() {
   TRACE_CNTL("name", TRACE_NAME);

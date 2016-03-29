@@ -19,6 +19,11 @@ constexpr auto operation_load = "load";
 constexpr auto operation_findconfigs = "findconfigs";
 constexpr auto operation_buildfilter = "buildfilter";
 
+constexpr auto operation_findversions = "findversions";
+constexpr auto operation_findentities = "findentities";
+constexpr auto operation_addconfig = "addconfig";
+constexpr auto operation_newconfig = "newconfig";
+
 constexpr auto type_default = "test_Default_Type001";
 constexpr auto version_prefix = "test version";
 constexpr auto global_configuration_prefix = "global config";
@@ -67,10 +72,10 @@ class JsonSerializable {
   virtual JSONDocument search_filter_jsondoc() const;
 
   virtual void read(std::string const&);
-  virtual JSONDocument to_jsondoc()const;
+  virtual JSONDocument to_jsondoc() const;
 
-  std::string to_string()const;
-  
+  virtual std::string to_string() const;
+
  private:
   std::string _operation = {literal::operation_load};
   std::string _global_configuration_id = {literal::notprovided};

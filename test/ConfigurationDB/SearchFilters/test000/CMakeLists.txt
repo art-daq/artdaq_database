@@ -1,5 +1,5 @@
 SET ( TEST_NUMBER "000" )
-SET ( TEST_NAME "seeddata" )
+SET ( TEST_NAME "seeddatasf" )
 
 #conftool -d filesystem -o store -t artdaq_BoardReader -c BoardReader_TOY1_topol.fnal.gov_5205.fcl -f fhicl -v version003 -g testConfigA001 -e BoardReader_TOY1_topol
 

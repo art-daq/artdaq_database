@@ -143,25 +143,51 @@ JSONDocument LoadStoreOperation::configurableEntity_jsndoc() const {
 }
 
 JSONDocument LoadStoreOperation::search_filter_jsondoc() const {
-  if (searchFilter() != cfol::notprovided) {
+    if (searchFilter() != cfol::notprovided) {
     return {searchFilter()};
   }
+  
+  auto needComma = bool{false};
+  auto printComma = [&needComma]() {
+    if (needComma) return ", ";
+    needComma = true;
+    return " ";
+  };
 
   std::stringstream ss;
   ss << "{";
 
-  if (globalConfigurationId() != cfol::notprovided) {
-    ss << cf::quoted_(jul::configurations_name) << cfol::colon << cf::quoted_(globalConfigurationId());
+  if (globalConfigurationId() != cfol::notprovided && operation() != cfol::operation_addconfig) {
+    ss << printComma() << cf::quoted_(jul::configurations_name) << cfol::colon << cf::quoted_(globalConfigurationId());
   }
 
   if (_version != cfol::notprovided) {
-    ss << cf::quoted_(jul::version) << cfol::colon << cf::quoted_(_version);
+    ss << printComma() << cf::quoted_(jul::version) << cfol::colon << cf::quoted_(_version);
   }
 
   if (_configurable_entity != cfol::notprovided) {
-    ss << cf::quoted_(jul::configurable_entity_name) << cfol::colon << cf::quoted_(_configurable_entity);
+    ss << printComma() << cf::quoted_(jul::configurable_entity_name) << cfol::colon
+       << cf::quoted_(_configurable_entity);
   }
 
+  ss << "}";
+  
+  return {ss.str()};
+}
+
+JSONDocument LoadStoreOperation::to_jsondoc() const {
+  std::stringstream ss;
+  ss << "{";
+  ss << cf::quoted_(cfol::filter) << cfol::colon << search_filter_jsondoc().to_string();
+
+  if (operation() == cfol::operation_addconfig) {
+    ss << ",\n" << cf::quoted_(jul::configurations_name) << cfol::colon << quoted_(globalConfigurationId());
+  }
+
+  ss << ",\n" << cf::quoted_(cfol::collection) << cfol::colon << quoted_(type());
+  ss << ",\n" << cf::quoted_(cfol::dbprovider) << cfol::colon << quoted_(provider());
+  ss << ",\n" << cf::quoted_(cfol::operation) << cfol::colon << quoted_(operation());
+  ss << ",\n" << cf::quoted_(cfol::dataformat) << cfol::colon << quoted_(cf::decode(dataFormat()));
   ss << "}";
 
   return {ss.str()};

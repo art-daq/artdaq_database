@@ -107,12 +107,7 @@ int main(int argc, char* argv[]) try {
     options.type(vm["type"].as<std::string>());
   }
 
-  if (!vm.count("globalid")) {
-    std::cerr << "Exception from command line processing in " << argv[0] << ": no globalid file given.\n"
-              << "For usage and an options list, please do '" << argv[0] << " --help"
-              << "'.\n";
-    return process_exit_code::INVALID_ARGUMENT | 4;
-  } else {
+  if (vm.count("globalid")) {
     options.globalConfigurationId(vm["globalid"].as<std::string>());
   }
 

@@ -23,22 +23,25 @@ namespace cf = db::configuration;
 namespace cfo = cf::options;
 namespace cfol = cfo::literal;
 
-using Options = cfo::FindConfigsOperation;
+using Options = cfo::LoadStoreOperation;
 
 using artdaq::database::jsonutils::JSONDocument;
 using artdaq::database::basictypes::JsonData;
 
 typedef bool (*test_case)(Options const& /*options*/, std::string const& /*file_name*/);
 
-bool test_findconfigs(Options const&, std::string const&);
-bool test_buildfilter(Options const&, std::string const&);
+bool test_findversions(Options const&, std::string const&);
+bool test_findentities(Options const&, std::string const&);
+
+bool test_addconfig(Options const&, std::string const&);
+bool test_newconfig(Options const&, std::string const&);
 
 int main(int argc, char* argv[]) try {
   debug::registerUngracefullExitHandlers();
   //    artdaq::database::fhicljson::useFakeTime(true);
 
-  cf::trace_enable_FindConfigsOperation();
-  cf::trace_enable_FindConfigsOperationDetail();
+  cf::trace_enable_CreateConfigsOperation();
+  cf::trace_enable_CreateConfigsOperationDetail();
   cf::trace_enable_DBOperationMongo();
   cf::trace_enable_DBOperationFileSystem();
 
@@ -52,7 +55,7 @@ int main(int argc, char* argv[]) try {
 
   db::jsonutils::trace_enable_JSONDocumentBuilder();
   db::jsonutils::trace_enable_JSONDocument();
-
+  
   // Get the input parameters via the boost::program_options library,
   // designed to make it relatively simple to define arguments and
   // issue errors if argument list is supplied incorrectly
@@ -60,14 +63,21 @@ int main(int argc, char* argv[]) try {
   namespace db = artdaq::database;
   namespace cfol = artdaq::database::configuration::options::literal;
   std::ostringstream descstr;
-  descstr << argv[0] << " <-o <operation>>  <-d <database>> <-c <compare-file>>  <-g <globalid>> ";
-
+  
+  descstr << argv[0] << " <-o <operation>>  <-d <database>>  <-c <compare-file>>";
+  descstr << "  <-t <type>> <-v <version>>  <-g <globalid>>  <-e <configurable-entity>>";
+  
   bpo::options_description desc = descstr.str();
 
-  desc.add_options()("operation,o", bpo::value<std::string>(), "Operation [findconfigs/buildfilter].")(
-      "database,d", bpo::value<std::string>(), "Database provider name.")("compare,c", bpo::value<std::string>(),
-                                                                          "Expected result file name.")(
-      "globalid,g", bpo::value<std::string>(), "Gloval config id.")("help,h", "produce help message");
+  desc.add_options()
+  ("operation,o", bpo::value<std::string>(), "Operation [findconfigs/buildfilter].")
+  ("database,d", bpo::value<std::string>(), "Database provider name.")  
+  ("globalid,g", bpo::value<std::string>(), "Gloval config id.")  
+  ("type,t", bpo::value<std::string>(), "Configuration collection type name.")
+  ("entity,e", bpo::value<std::string>(),"Configurable-entity name")
+  ("version,v", bpo::value<std::string>(), "Configuration version.")
+  ("compare,c", bpo::value<std::string>(),"Expected result file name.")
+  ("help,h", "produce help message");
 
   bpo::variables_map vm;
 
@@ -114,6 +124,18 @@ int main(int argc, char* argv[]) try {
     options.globalConfigurationId(vm["globalid"].as<std::string>());
   }
 
+  if (vm.count("version")) {
+    options.version(vm["version"].as<std::string>());
+  }
+
+  if (vm.count("type")) {
+    options.type(vm["type"].as<std::string>());
+  }
+
+  if (vm.count("entity")) {
+    options.configurableEntity(vm["entity"].as<std::string>());
+  }
+  
   options.dataFormat("gui");
 
   auto file_name = vm["compare"].as<std::string>();
@@ -121,7 +143,12 @@ int main(int argc, char* argv[]) try {
   std::cout << "Running test:<" << options.operation() << ">\n";
 
   auto runTest = [](std::string const& name) {
-    auto tests = std::map<std::string, test_case>{{"findconfigs", test_findconfigs}, {"buildfilter", test_buildfilter}};
+    auto tests = std::map<std::string, test_case>{
+      {"findversions", test_findversions}, 
+      {"addconfig", test_addconfig},
+      {"newconfig", test_newconfig},
+      {"findentities", test_findentities}
+    };
 
     return tests.at(name);
   };
@@ -136,7 +163,8 @@ int main(int argc, char* argv[]) try {
   return process_exit_code::UNCAUGHT_EXCEPTION;
 }
 
-bool test_findconfigs(Options const& options, std::string const& file_name) {
+bool test_findversions(Options const& options, std::string const& file_name)
+{
   assert(!file_name.empty());
 
   std::ifstream is(file_name);
@@ -145,7 +173,7 @@ bool test_findconfigs(Options const& options, std::string const& file_name) {
 
   is.close();
 
-  auto result = cf::find_global_configurations(options);
+  auto result = cf::find_configuration_versions(options);
 
   if (!result.first) {
     std::cerr << "Error message: " << result.second << "\n";
@@ -163,10 +191,11 @@ bool test_findconfigs(Options const& options, std::string const& file_name) {
     std::cerr << "expected:\n" << expected << "\n";
   }
 
-  return false;
+  return false;  
 }
 
-bool test_buildfilter(Options const& options, std::string const& file_name) {
+bool test_findentities(Options const& options, std::string const& file_name)
+{
   assert(!file_name.empty());
 
   std::ifstream is(file_name);
@@ -175,7 +204,7 @@ bool test_buildfilter(Options const& options, std::string const& file_name) {
 
   is.close();
 
-  auto result = cf::build_global_configuration_search_filter(options);
+  auto result = cf::find_configuration_entities(options);
 
   if (!result.first) {
     std::cerr << "Error message: " << result.second << "\n";
@@ -193,5 +222,65 @@ bool test_buildfilter(Options const& options, std::string const& file_name) {
     std::cerr << "expected:\n" << expected << "\n";
   }
 
-  return false;
+  return false;  
+}
+
+bool test_addconfig(Options const& options, std::string const& file_name){
+  assert(!file_name.empty());
+
+  std::ifstream is(file_name);
+
+  std::string expected_json((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+
+  is.close();
+
+  auto result = cf::add_configuration_to_global_configuration(options);
+
+  if (!result.first) {
+    std::cerr << "Error message: " << result.second << "\n";
+    return false;
+  }
+
+  auto expected = JSONDocument(expected_json);
+  auto returned = JSONDocument(result.second);
+
+  if (returned == expected) {
+    return true;
+  } else {
+    std::cout << "Failed adding a config to a global config.\n";
+    std::cerr << "returned:\n" << returned << "\n";
+    std::cerr << "expected:\n" << expected << "\n";
+  }
+
+  return false;  
+}
+
+bool test_newconfig(Options const& options, std::string const& file_name){
+  assert(!file_name.empty());
+
+  std::ifstream is(file_name);
+
+  std::string expected_json((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+
+  is.close();
+
+  auto result = cf::create_new_global_configuration(options);
+
+  if (!result.first) {
+    std::cerr << "Error message: " << result.second << "\n";
+    return false;
+  }
+
+  auto expected = JSONDocument(expected_json);
+  auto returned = JSONDocument(result.second);
+
+  if (returned == expected) {
+    return true;
+  } else {
+    std::cout << "Failed creating a new configuration.\n";
+    std::cerr << "returned:\n" << returned << "\n";
+    std::cerr << "expected:\n" << expected << "\n";
+  }
+
+  return false;    
 }

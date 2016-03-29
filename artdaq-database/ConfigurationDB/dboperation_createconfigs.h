@@ -7,18 +7,20 @@ namespace artdaq {
 namespace database {
 namespace configuration {
 namespace options {
-class FindConfigsOperation;
+class LoadStoreOperation;
 }  // namespace options
 
 // both functions return converted conf file
-result_pair_t add_configuration_to_global_configuration(options::FindConfigsOperation const& /*options*/) noexcept;
-result_pair_t create_new_global_configuration(options::FindConfigsOperation const& /*options*/) noexcept;
-result_pair_t find_configuration_versions(options::FindConfigsOperation const& /*options*/) noexcept;
+result_pair_t add_configuration_to_global_configuration(options::LoadStoreOperation const& /*options*/) noexcept;
+result_pair_t create_new_global_configuration(options::LoadStoreOperation const& /*options*/) noexcept;
+result_pair_t find_configuration_versions(options::LoadStoreOperation const& /*options*/) noexcept;
+result_pair_t find_configuration_entities(options::LoadStoreOperation const& /*options*/) noexcept;
 
 namespace guiexports {
 result_pair_t add_configuration_to_global_configuration(std::string const& /*search_filter*/) noexcept;
 result_pair_t create_new_global_configuration(std::string const& /*search_filter*/) noexcept;
 result_pair_t find_configuration_versions(std::string const& /*search_filter*/) noexcept;
+result_pair_t find_configuration_entities(std::string const& /*search_filter*/) noexcept;
 }
 
 void trace_enable_CreateConfigsOperation();

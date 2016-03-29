@@ -90,7 +90,10 @@ struct vector_of {
   const_iterator end() const { return values.end(); }
 
   value_type const& back() const { return values.back(); }
-
+  
+  iterator erase(iterator position) {return values.erase(position);}
+  iterator erase(iterator first, iterator last) {return values.erase(first,last);}
+  
   iterator insert(iterator position, value_type const& val) { return values.insert(position, val); }
   /*
       void reserve ( size_type n ) {

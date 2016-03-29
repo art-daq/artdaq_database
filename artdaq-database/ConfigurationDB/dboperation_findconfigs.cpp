@@ -90,15 +90,24 @@ JSONDocument FindConfigsOperation::search_filter_jsondoc() const {
     return {searchFilter()};
   }
 
+  auto needComma = bool{false};
+  auto printComma = [&needComma]() {
+    if (needComma) return ", ";
+    needComma = true;
+    return " ";
+  };
+
   std::stringstream ss;
   ss << "{";
 
   if (globalConfigurationId() != cfol::notprovided) {
-    ss << cf::quoted_(dbjsul::configurations_name) << cfol::colon << cf::quoted_(globalConfigurationId());
+    ss << printComma() << cf::quoted_(dbjsul::configurations_name) << cfol::colon
+       << cf::quoted_(globalConfigurationId());
   }
 
   if (_configurable_entity != cfol::notprovided) {
-    ss << cf::quoted_(dbjsul::configurable_entity_name) << cfol::colon << cf::quoted_(configurableEntity());
+    ss << printComma() << cf::quoted_(dbjsul::configurable_entity_name) << cfol::colon
+       << cf::quoted_(configurableEntity());
   }
 
   ss << "}";

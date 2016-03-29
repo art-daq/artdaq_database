@@ -25,6 +25,11 @@ JsonData load(cfo::LoadStoreOperation const& /*options*/, JsonData const& /*sear
 JsonData findGlobalConfigs(cfo::FindConfigsOperation const& /*options*/, JsonData const& /*search_payload*/);
 JsonData buildConfigSearchFilter(cfo::FindConfigsOperation const& /*options*/, JsonData const& /*search_payload*/);
 
+JsonData findConfigVersions(cfo::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
+JsonData addConfigToGlobalConfig(cfo::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
+
+JsonData findConfigEntities(cfo::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
+
 }  // namespace mongo
 }  // namespace configuration
 }  // namespace database

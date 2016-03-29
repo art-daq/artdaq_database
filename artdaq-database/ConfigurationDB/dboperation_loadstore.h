@@ -28,9 +28,10 @@ class LoadStoreOperation final : public JsonSerializable {
   std::string const& configurableEntity(std::string const&);
   JSONDocument configurableEntity_jsndoc() const;
   void read(std::string const&) override final;
+  JSONDocument to_jsondoc() const override final;
 
  private:
-  std::string _type = {literal::type_default};
+  std::string _type = {literal::notprovided};
   std::string _version = {literal::notprovided};
   std::string _configurable_entity = {literal::notprovided};
 };

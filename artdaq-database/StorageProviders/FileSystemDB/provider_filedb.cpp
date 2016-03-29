@@ -41,10 +41,10 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::load(JsonData const
   TRACE_(3, "StorageProvider::FileSystemDB::load() begin");
   TRACE_(3, "StorageProvider::FileSystemDB::load() args search=<" << filter.json_buffer << ">");
 
-  auto builder = JSONDocumentBuilder{filter.json_buffer};
+  auto search_filter_document = JSONDocument{filter.json_buffer};
 
-  auto collection_name = builder.extract().findChild("collection").value();
-  auto search_filter = builder.extract().findChild("filter").value();
+  auto collection_name = search_filter_document.findChild("collection").value();
+  auto search_filter = search_filter_document.findChild("filter").value();
 
   auto collection = _provider->connection() + collection_name;
   collection = expand_environment_variables(collection);
@@ -86,18 +86,9 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::store(JsonData const& data)
 
   auto builder = JSONDocumentBuilder{data.json_buffer};
 
-  auto oid = generate_oid();
-  TRACE_(4, "StorageProvider::FileSystemDB::store() oid=<" << oid << ">.");
-
-  std::stringstream ss;
-
-  ss << "{ \"_id\":\"" << oid << "\"}";
-
-  // builder.setObjectID( {ss.str()} );
-
-  TRACE_(4, "StorageProvider::FileSystemDB::store() document=<" << builder.extract() << ">.");
-
   auto collection_name = builder.extract().findChild("collection").value();
+
+  auto oid = object_id_t{ouid_invalid};
 
   try {
     auto filter = builder.extract().findChild("filter").value();
@@ -106,6 +97,16 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::store(JsonData const& data)
     TRACE_(4, "StorageProvider::FileSystemDB::store() using provided oid=<" << oid << ">.");
   } catch (...) {
   }
+
+  if (oid == object_id_t{ouid_invalid}) {
+    oid = generate_oid();
+  }
+
+  std::stringstream ss;
+  ss << "{ \"_id\":\"" << oid << "\"}";
+  builder.setObjectID({ss.str()});
+
+  TRACE_(4, "StorageProvider::FileSystemDB::store() using generated oid=<" << oid << ">.");
 
   auto collection = _provider->connection() + collection_name;
 
@@ -237,6 +238,128 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::buildConfigSearchFi
   return returnCollection;
 }
 
+template <>
+template <>
+std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigVersions(JsonData const& filter) {
+  assert(!filter.json_buffer.empty());
+  auto returnCollection = std::list<JsonData>();
+
+  TRACE_(7, "StorageProvider::FileSystemDB::findConfigVersions() begin");
+  TRACE_(7, "StorageProvider::FileSystemDB::findConfigVersions() args data=<" << filter.json_buffer << ">");
+
+  auto search_filter_document = JSONDocument{filter.json_buffer};
+
+  auto collection_name = search_filter_document.findChild("collection").value();
+  auto search_filter = search_filter_document.findChild("filter").value();
+
+  auto collection = _provider->connection() + collection_name;
+  collection = expand_environment_variables(collection);
+
+  TRACE_(7, "StorageProvider::FileSystemDB::load() collection_path=<" << collection << ">.");
+
+  auto dir_name = mkdir(collection);
+
+  auto index_path = boost::filesystem::path(dir_name.c_str()).append(dbfsl::search_index);
+
+  SearchIndex search_index(index_path);
+
+  auto versionentityname_pairs = search_index.findConfigVersions(search_filter);
+
+  TRACE_(7, "StorageProvider::FileSystemDB::findConfigVersions() search returned " << versionentityname_pairs.size()
+                                                                                   << " configurations.");
+
+  for (auto const& versionentityname_pair : versionentityname_pairs) {
+    std::stringstream ss;
+
+    ss << "{";
+    ss << "\"collection\" : \"" << collection_name << "\",";
+    ss << "\"dbprovider\" : \"filesystem\",";
+    ss << "\"dataformat\" : \"gui\",";
+    ss << "\"operation\" : \"load\",";
+    ss << "\"filter\" : {";
+    ss << "\"version\" : \"" << versionentityname_pair.second << "\"";
+    ss << ", \"configurable_entity.name\" : \"" << versionentityname_pair.first << "\"";
+    ss << "}";
+    ss << "}";
+
+    TRACE_(7, "StorageProvider::FileSystemDB::findConfigVersions() found document=<" << ss.str() << ">");
+
+    returnCollection.emplace_back(ss.str());
+  }
+
+  return returnCollection;
+}
+
+template <>
+template <>
+std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigEntities(JsonData const& search_filter) {
+  assert(!search_filter.json_buffer.empty());
+  auto returnCollection = std::list<JsonData>();
+
+  TRACE_(9, "StorageProvider::FileSystemDB::findConfigEntities() begin");
+  TRACE_(9, "StorageProvider::FileSystemDB::findConfigEntities() args data=<" << search_filter.json_buffer << ">");
+
+  auto collection = _provider->connection();
+  collection = expand_environment_variables(collection);
+
+  auto dir_name = mkdir(collection);
+  auto collection_names = find_subdirs(dir_name);
+
+  for (auto const& collection_name : collection_names) {
+    TRACE_(9, "StorageProvider::FileSystemDB::findConfigEntities() querying collection_name=<" << collection_name
+                                                                                               << ">");
+
+    auto index_path = boost::filesystem::path(dir_name.c_str()).append(collection_name).append(dbfsl::search_index);
+
+    SearchIndex search_index(index_path);
+
+    auto configentity_names = search_index.findConfigEntities(search_filter);
+
+    if (configentity_names.size() > 1) {
+      std::sort(configentity_names.begin(), configentity_names.end());
+      auto unique_configentity_names = std::vector<std::string>{};
+
+      std::unique_copy(configentity_names.begin(), configentity_names.end(), back_inserter(unique_configentity_names));
+      configentity_names.swap(unique_configentity_names);
+    }
+
+    TRACE_(9, "StorageProvider::FileSystemDB::findConfigEntities() search returned " << configentity_names.size()
+                                                                                     << " configurations.");
+
+    for (auto const& configentity_name : configentity_names) {
+      std::stringstream ss;
+
+      ss << "{";
+      ss << "\"collection\" : \"" << collection_name << "\",";
+      ss << "\"dbprovider\" : \"filesystem\",";
+      ss << "\"dataformat\" : \"gui\",";
+      ss << "\"operation\" : \"findversions\",";
+      ss << "\"filter\" : {";
+      ss << "\"configurable_entity.name\" : \"" << configentity_name << "\"";
+      ss << "}";
+      ss << "}";
+
+      TRACE_(9, "StorageProvider::FileSystemDB::findConfigEntities() found document=<" << ss.str() << ">");
+
+      returnCollection.emplace_back(ss.str());
+    }
+  }
+
+  return returnCollection;
+}
+
+template <>
+template <>
+std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::addConfigToGlobalConfig(JsonData const& search_filter) {
+  assert(!search_filter.json_buffer.empty());
+  auto returnCollection = std::list<JsonData>();
+
+  TRACE_(8, "StorageProvider::FileSystemDB::addConfigToGlobalConfig() begin");
+  TRACE_(8, "StorageProvider::FileSystemDB::addConfigToGlobalConfig() args data=<" << search_filter.json_buffer << ">");
+
+  return returnCollection;
+}
+
 std::string mkdir(std::string const& d) {
   assert(!d.empty());
 
@@ -324,8 +447,9 @@ std::list<std::string> find_subdirs(std::string const& d) {
   boost::filesystem::directory_iterator end_iter;
 
   for (boost::filesystem::directory_iterator dir_iter(path); dir_iter != end_iter; ++dir_iter) {
-    if (!boost::filesystem::is_directory(dir_iter->status())) continue;    
-    TRACE_(11, "StorageProvider::FileSystemDB Found subdirectory, path=<" << dir_iter->path().filename().string() << ">");
+    if (!boost::filesystem::is_directory(dir_iter->status())) continue;
+    TRACE_(11, "StorageProvider::FileSystemDB Found subdirectory, path=<" << dir_iter->path().filename().string()
+                                                                          << ">");
 
     returnValue.emplace_back(dir_iter->path().filename().string());
   }
@@ -359,10 +483,10 @@ std::string expand_environment_variables(std::string var) {
   for (size_t i = 0; i < p.we_wordc; i++) ss << w[i] << "/";
 
   ::wordfree(&p);
-  
+
   return ss.str();
- // auto retValue = ss.str();  
- // return retValue.substr(0, retValue.find_last_of("\\/"));;
+  // auto retValue = ss.str();
+  // return retValue.substr(0, retValue.find_last_of("\\/"));;
 }
 
 object_id_t extract_oid(std::string const& filter) {

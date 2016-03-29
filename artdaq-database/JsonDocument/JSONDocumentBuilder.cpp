@@ -58,7 +58,7 @@ JSONDocument JSONDocumentBuilder::_makeObjectId(JSONDocument const& objectId) co
   std::stringstream ss;
 
   ss << '{';
-  ss << "_id"_quoted << colon << quoted_(JSONDocument::value(objectId));
+  ss << "_oid"_quoted << colon << quoted_(JSONDocument::value(objectId));
   ss << '}';
 
   TRACE_(10, "_makeObjectId() objectId<" << ss.str() << ">");
@@ -254,7 +254,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::setObjectID(JSONDocument const& object
   auto newObjectID = _wrap_as_payload(_makeObjectId(objectId));
 
   auto tmp_document = _document;
-  tmp_document.insertChild(newObjectID, literal::document_root);
+  tmp_document.insertChild(newObjectID, literal::id);
 
   _document = std::move(tmp_document);
 

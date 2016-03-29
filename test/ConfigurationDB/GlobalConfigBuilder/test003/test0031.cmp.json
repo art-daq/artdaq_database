@@ -1,0 +1,18 @@
+{
+    "search" : [
+        {
+            "name" : "@TEST_ENTITY_NAME@", 
+            "query" : {
+                "collection" : "artdaq_Aggregator", 
+                "dbprovider" : "mongo", 
+                "dataformat" : "gui", 
+                "operation" : "findversions", 
+                "filter" : {
+                    "configurable_entity.name" :"@TEST_ENTITY_NAME@"
+                }
+            }
+        }
+    ]
+}
+
+
