@@ -1,0 +1,9 @@
+{
+   "dbprovider":"mongo",
+   "dataformat":"gui",
+   "operation":"buildfilter",
+   "filter":{
+      "configurations.name":"configA001"
+   }
+}
+

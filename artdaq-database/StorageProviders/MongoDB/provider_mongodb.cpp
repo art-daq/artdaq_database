@@ -264,25 +264,22 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findGlobalConfigs(JsonDa
         throw cet::exception("MongoDB") << "MongoDB returned invalid database search.";
 
       auto configuration_name_array = element_values->get_array();
-
-      std::stringstream ss;
-      ss << "{";
-      // ss << "\"collection\" : \"" << collection_name << "\",";
-      ss << "\"dbprovider\" : \"mongo\",";
-      ss << "\"dataformat\" : \"gui\",";
-      ss << "\"operation\" : \"buildfilter\",";
-      ss << "\"filter\" : {";
-
       for (auto const& configuration_name : configuration_name_array.value) {
+        std::stringstream ss;
+        ss << "{";
+        // ss << "\"collection\" : \"" << collection_name << "\",";
+        ss << "\"dbprovider\" : \"mongo\",";
+        ss << "\"dataformat\" : \"gui\",";
+        ss << "\"operation\" : \"buildfilter\",";
+        ss << "\"filter\" : {";
         auto name_json = bsoncxx::to_json(configuration_name.get_value());
         ss << "\"configurations.name\" : " << name_json;
+        ss << "}";
+        ss << "}";
+        TRACE_(4, "StorageProvider::MongoDB::findGlobalConfigs() found document=<" << ss.str() << ">");
+
+        returnCollection.emplace_back(ss.str());
       }
-
-      ss << "}";
-      ss << "}";
-      TRACE_(4, "StorageProvider::MongoDB::findGlobalConfigs() found document=<" << ss.str() << ">");
-
-      returnCollection.emplace_back(ss.str());
     }
   }
 

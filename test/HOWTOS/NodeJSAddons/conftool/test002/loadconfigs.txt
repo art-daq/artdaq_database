@@ -3,10 +3,21 @@ setup artdaq_database v1_00_00 -q debug:e9:s21
 
 cd ~/artdaq-demo-base/artdaq-utilities-database/test/HOWTOS/NodeJSAddons/conftool/test002/
 
-conftool2 -o load -c BoardReader_TOY1_topol.flt.json -j BoardReader_TOY1_topol.fnal.gov_5205.db.json
-conftool2 -o load -c BoardReader_TOY2_topol.flt.json -j BoardReader_TOY2_topol.fnal.gov_5206.db.json
-conftool2 -o load -c EventBuilder_topol.flt.json -j EventBuilder_topol.fnal.gov_5235.db.json
-conftool2 -o load -c Aggregator_topol.flt.json -j Aggregator_topol.fnal.gov_5266.db.json
+conftool2 -o load -c BoardReader_DAQ_HOST_001.flt.mongo.json -j BoardReader_DAQ_HOST_001.db.mongo.json
+conftool2 -o load -c BoardReader_DAQ_HOST_002.flt.mongo.json -j BoardReader_DAQ_HOST_002.db.mongo.json
+
+conftool2 -o load -c EventBuilder_DAQ_HOST_001.flt.mongo.json -j EventBuilder_DAQ_HOST_001.db.mongo.json
+conftool2 -o load -c EventBuilder_DAQ_HOST_002.flt.mongo.json -j EventBuilder_DAQ_HOST_002.db.mongo.json
+
+conftool2 -o load -c Aggregator_DAQ_HOST_001.flt.mongo.json -j Aggregator_DAQ_HOST_001.db.mongo.json
+conftool2 -o load -c Aggregator_DAQ_HOST_002.flt.mongo.json -j Aggregator_DAQ_HOST_002.db.mongo.json
 
 
+conftool2 -o load -c BoardReader_DAQ_HOST_001.flt.filesystem.json -j BoardReader_DAQ_HOST_001.db.filesystem.json
+conftool2 -o load -c BoardReader_DAQ_HOST_002.flt.filesystem.json -j BoardReader_DAQ_HOST_002.db.filesystem.json
 
+conftool2 -o load -c EventBuilder_DAQ_HOST_001.flt.filesystem.json -j EventBuilder_DAQ_HOST_001.db.filesystem.json
+conftool2 -o load -c EventBuilder_DAQ_HOST_002.flt.filesystem.json -j EventBuilder_DAQ_HOST_002.db.filesystem.json
+
+conftool2 -o load -c Aggregator_DAQ_HOST_001.flt.filesystem.json -j Aggregator_DAQ_HOST_001.db.filesystem.json
+conftool2 -o load -c Aggregator_DAQ_HOST_002.flt.filesystem.json -j Aggregator_DAQ_HOST_002.db.filesystem.json

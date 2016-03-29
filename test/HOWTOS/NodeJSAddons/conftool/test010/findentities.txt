@@ -3,7 +3,8 @@ setup artdaq_database v1_00_00 -q debug:e9:s21
 
 cd ~/artdaq-demo-base/artdaq-utilities-database/test/HOWTOS/NodeJSAddons/conftool/test005/
 
-conftool2 -o entities -c test010.flt.json -j test010.gui.json
+conftool2 -o findentities -c test0101.flt.json -j test0101.gui.json
+conftool2 -o findentities -c test0102.flt.json -j test0102.gui.json
 
-#test010.gui.json should be identical with test010.cmp.json
+#test010{1,2}.gui.json should be identical with test010{1,2}.cmp.json
 

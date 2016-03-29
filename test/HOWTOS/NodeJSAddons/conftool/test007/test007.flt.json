@@ -1,7 +1,0 @@
-{
-  "filter":{"configurable_entity.name":"Aggregator_topol"},
-  "collection":"artdaq_Aggregator",
-  "dbprovider":"filesystem",
-  "operation":"findversions",
-  "dataformat":"gui"
-}

@@ -120,7 +120,8 @@ JsonData cfd::findGlobalConfigs(cfo::FindConfigsOperation const& options, JsonDa
   std::stringstream ss;
 
   auto seenValues = std::list<std::string>{};
-
+  seenValues.push_back(cfo::literal::notprovided);
+  
   auto isNew = [& v = seenValues](auto const& name) {
     assert(!name.empty());
     if (std::find(v.begin(), v.end(), name) != v.end()) return false;

@@ -1,0 +1,6 @@
+  {
+    "filter":{},
+    "dbprovider":"mongo",
+    "operation":"findentities",
+    "dataformat":"gui"
+  }

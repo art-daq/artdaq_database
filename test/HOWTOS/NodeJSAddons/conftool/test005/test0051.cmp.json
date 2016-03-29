@@ -1,0 +1,15 @@
+{
+   "search":[
+      {
+         "name":"configA001",
+         "query":{
+            "dbprovider":"mongo",
+            "dataformat":"gui",
+            "operation":"buildfilter",
+            "filter":{
+               "configurations.name":"configA001"
+            }
+         }
+      }
+   ]
+}

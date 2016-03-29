@@ -1,0 +1,1 @@
+{ "search": [ {"name" :"version002","query" :{"collection" : "artdaq_BoardReader","dbprovider" : "filesystem","dataformat" : "gui","operation" : "load","filter" : {"version" : "version002", "configurable_entity.name" : "DAQ_HOST_002"}}}] }
