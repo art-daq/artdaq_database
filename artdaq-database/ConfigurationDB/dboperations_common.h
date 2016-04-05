@@ -48,7 +48,7 @@ constexpr auto operations = "operations";
 
 constexpr auto default_filter = "{\"configurable_entity\":\"any\"}";
 
-constexpr auto empty_search_result = "{\"search\":[ ]\"}";
+constexpr auto empty_search_result = "{\"search\":[ ]}";
 
 constexpr auto colon = ":";
 }
