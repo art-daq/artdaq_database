@@ -104,7 +104,8 @@ JsonData prov::findGlobalConfigs(ManageConfigsOperation const& options, JsonData
   auto global_configs = provider->findGlobalConfigs(search_payload);
 
   if (global_configs.empty()) {
-    throw cet::exception("operation_findconfigs") << "No global configurations were found.";
+    return {literal::empty_search_result};        
+    //throw cet::exception("operation_findconfigs") << "No global configurations were found.";
   }
 
   auto needComma = bool{false};
@@ -239,7 +240,8 @@ JsonData prov::findConfigVersions(LoadStoreOperation const& options, JsonData co
   auto config_versions = provider->findConfigVersions(search_filter);
 
   if (config_versions.empty()) {
-    throw cet::exception("operation_findversions") << "No configuration versions were found.";
+     return {literal::empty_search_result};    
+    //throw cet::exception("operation_findversions") << "No configuration versions were found.";
   }
 
   auto ex = std::regex(
@@ -309,7 +311,8 @@ JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData co
   auto config_entities = provider->findConfigEntities(search_filter);
 
   if (config_entities.empty()) {
-    throw cet::exception("operation_findentities") << "No configuration entities were found.";
+    return {literal::empty_search_result};        
+   // throw cet::exception("operation_findentities") << "No configuration entities were found.";
   }
 
   auto ex = std::regex("\\s\"(configurable_entity\\.name)\"\\s:\\s\"((\\\\\"|[^\"])*)\"");

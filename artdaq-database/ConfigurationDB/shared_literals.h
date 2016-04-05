@@ -77,6 +77,7 @@ constexpr auto database_provider_mongo = "mongo";
 constexpr auto database_provider_filesystem = "filesystem";
 constexpr auto colon = ":";
 constexpr auto empty_json = "{ }";
+constexpr auto empty_search_result = "{\"search\":[ ]}";
 }
 }  // namespace configuration
 }  // namespace database
