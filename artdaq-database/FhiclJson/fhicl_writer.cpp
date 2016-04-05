@@ -20,10 +20,13 @@
 
 namespace fcl = artdaq::database::fhicl;
 namespace jsn = artdaq::database::json;
+namespace literal = artdaq::database::fhicljson::literal;
 
 using artdaq::database::fhicl::FhiclWriter;
 using artdaq::database::fhicljson::json2fclgui;
 using artdaq::database::fhicljson::json2fcldb;
+
+
 
 bool FhiclWriter::write_data_db(jsn::object_t const& json_object, std::string& out) {
   assert(out.empty());

@@ -15,8 +15,9 @@ art_make(
   artdaq-database_StorageProviders_FileSystemDB  
  # ${BSONCXXLIB}
  # ${MONGOCXXLIB}  
-  ${FHICLCPP}
+  ${FHICLCPP}  
   ${CETLIB}
+  ${Boost_PROGRAM_OPTIONS_LIBRARY}    
   )
 
 install_headers()

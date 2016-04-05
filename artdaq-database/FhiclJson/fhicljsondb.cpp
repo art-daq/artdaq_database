@@ -18,6 +18,8 @@ namespace artdaq {
 namespace database {
 namespace fhicljsondb {
 
+namespace literal = artdaq::database::fhicljson::literal;
+
 namespace fcl = artdaq::database::fhicl;
 namespace jsn = artdaq::database::json;
 

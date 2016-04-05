@@ -11,7 +11,7 @@ namespace fhicljson {
 std::string filter_quotes(std::string const& str) { return std::regex_replace(str, std::regex("\""), "|"); }
 
 bool isDouble(std::string const& str) {
-  std::regex ex({regex::parse_double});
+  std::regex ex({literal::regex::parse_double});
   return std::regex_match(str, ex);
 }
 

@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) try {
   }
 
   if (vm.count("globalid")) {
-    options.globalConfigurationId(vm["globalid"].as<std::string>());
+    options.globalConfiguration(vm["globalid"].as<std::string>());
   }
 
   if (!vm.count("database")) {

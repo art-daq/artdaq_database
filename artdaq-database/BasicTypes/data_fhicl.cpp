@@ -41,6 +41,8 @@ bool JsonData::convert_from(FhiclData const& fhicl) {
 FhiclData::FhiclData(std::string const& buffer) : fhicl_buffer{buffer} {}
 
 FhiclData::FhiclData(JsonData const& document) {
+  namespace literal = artdaq::database::fhicljson::literal;
+  
   assert(!document.json_buffer.empty());
 
   TRACE_(1, "FHICL document=" << document.json_buffer);
@@ -69,6 +71,8 @@ FhiclData::FhiclData(JsonData const& document) {
 }
 
 FhiclData::operator JsonData() const {
+  namespace literal = artdaq::database::fhicljson::literal;
+  
   TRACE_(5, "FHICL fhicl=" << fhicl_buffer);
 
   auto json = JsonData("");

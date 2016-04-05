@@ -21,6 +21,8 @@
 
 namespace jsn = artdaq::database::json;
 
+namespace literal = artdaq::database::fhicljson::literal;
+
 using artdaq::database::fhicl::FhiclReader;
 
 bool FhiclReader::read_data_db(std::string const& in, jsn::object_t& json_object) {
@@ -49,7 +51,7 @@ bool FhiclReader::read_data_db(std::string const& in, jsn::object_t& json_object
     object[literal::data_node] = jsn::object_t();
     object[literal::metadata_node] = jsn::object_t();
 
-    std::string masked_includes = std::regex_replace(in, std::regex(regex::parse_include), "//$1");
+    std::string masked_includes = std::regex_replace(in, std::regex(literal::regex::parse_include), "//$1");
 
     ::fhicl::intermediate_table fhicl_table;
     ::fhicl::parse_document(masked_includes, fhicl_table);
@@ -97,7 +99,7 @@ bool FhiclReader::read_data_gui(std::string const& in, jsn::array_t& json_array)
 
     auto array = jsn::array_t();
 
-    std::string masked_includes = std::regex_replace(in, std::regex(regex::parse_include), "//$1");
+    std::string masked_includes = std::regex_replace(in, std::regex(literal::regex::parse_include), "//$1");
 
     ::fhicl::intermediate_table fhicl_table;
     ::fhicl::parse_document(masked_includes, fhicl_table);

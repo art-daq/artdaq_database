@@ -1,6 +1,9 @@
 #ifndef _ARTDAQ_DATABASE_SHAREDLITERALS_H_
 #define _ARTDAQ_DATABASE_SHAREDLITERALS_H_
 
+namespace artdaq {
+namespace database {
+namespace fhicljson {
 namespace literal {
 constexpr auto document_node = "document";
 constexpr auto data_node = "data";
@@ -23,7 +26,7 @@ constexpr auto unknown = "unknown";
 constexpr auto include = "#include";
 constexpr auto linenum = "linenum";
 constexpr auto metadata_node = "metadata";
-constexpr auto changelog="changelog";
+constexpr auto changelog = "changelog";
 constexpr auto object = "object";
 constexpr auto table = "table";
 constexpr auto array = "array";
@@ -31,11 +34,16 @@ constexpr auto sequence = "sequence";
 
 constexpr auto gui_data_node = "guidata";
 constexpr auto converted = "converted";
-}
 
 namespace regex {
 constexpr auto parse_double = "-?\\d*\\.?\\d+e[+-]?\\d+";
 constexpr auto parse_include = "(#include)";
 }
+  
+}
+
+}  // namespace fhicljson
+}  // namespace database
+}  // namespace artdaq
 
 #endif /* _ARTDAQ_DATABASE_SHAREDLITERALS_H_ */

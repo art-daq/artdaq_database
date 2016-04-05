@@ -1,5 +1,5 @@
-#ifndef _ARTDAQ_DATABASE_SEARCH_FILTER_H_
-#define _ARTDAQ_DATABASE_SEARCH_FILTER_H_
+#ifndef _ARTDAQ_DATABASE_CONFIGURATIONDB_SEARCH_FILTER_H_
+#define _ARTDAQ_DATABASE_CONFIGURATIONDB_SEARCH_FILTER_H_
 
 #include "artdaq-database/ConfigurationDB/common.h"
 
@@ -20,4 +20,4 @@ class filters {
 }  // namespace database
 }  // namespace artdaq
 
-#endif /* _ARTDAQ_DATABASE_SEARCH_FILTER_H_ */
+#endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_SEARCH_FILTER_H_ */

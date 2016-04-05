@@ -113,7 +113,7 @@ int main(int argc, char* argv[]) try {
               << "'.\n";
     return process_exit_code::INVALID_ARGUMENT | 4;
   } else {
-    options.globalConfigurationId(vm["globalid"].as<std::string>());
+    options.globalConfiguration(vm["globalid"].as<std::string>());
   }
 
   if (!vm.count("database")) {
