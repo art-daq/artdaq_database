@@ -17,6 +17,7 @@ namespace bpo = boost::program_options;
 namespace db = artdaq::database;
 
 void test_001 ();
+void test_002 ();
 
 int main(int argc, char* argv[]) try {
   debug::registerUngracefullExitHandlers();
@@ -44,6 +45,8 @@ int main(int argc, char* argv[]) try {
   }
 
   test_001();
+
+  test_002();
   
   return process_exit_code::SUCCESS;
 
@@ -53,14 +56,14 @@ int main(int argc, char* argv[]) try {
 }
 
 void test_001 (){
-  auto row_count=int{3};
-  auto col_count=int{3};
+  std::size_t row_count =3;
+  std::size_t col_count=3;
 
   auto data = std::vector<std::vector<std::string>>();
  
-  for (int i =0; i<row_count; ++i){
+  for (std::size_t i =0; i<row_count; ++i){
     auto subarray=std::vector<std::string>();
-    for (int j =0; j<col_count; ++j){
+    for (std::size_t j =0; j<col_count; ++j){
       subarray.push_back(std::to_string(i+j));
     }
     data.push_back(subarray);
@@ -68,24 +71,83 @@ void test_001 (){
   
   using namespace artdaq::database::json;
   
-  auto name=std::string{"data"};
-  auto docAST= object_t{};
-  docAST[name]=array_t{};
+  auto doc_name=std::string{"document"};
+  auto data_name=std::string{"data"};
+  auto dataset_name=std::string{"dataset"};
   
-  auto & dataArray=boost::get<array_t>(docAST.at(name));
+  auto docAST= object_t{};
+  
+  docAST[doc_name]=object_t{};
+  auto & documentAST=boost::get<object_t>(docAST.at(doc_name));
+
+  documentAST[data_name]=object_t{};
+  auto & dataAST=boost::get<object_t>(documentAST.at(data_name));
+  
+  dataAST[dataset_name]=array_t{};
+  auto & dataSetArray=boost::get<array_t>(dataAST.at(dataset_name));
   
   for (auto& subarray: data){
     auto subarrayAST = array_t{};
     for (auto& element: subarray){
       subarrayAST.push_back(element);
     }
-    dataArray.push_back(subarrayAST);
+    dataSetArray.push_back(subarrayAST);
   }
   
   auto json = std::string{};
   
   JsonWriter{}.write(docAST,json);
   
-  std::cout << json;
+  std::cout << "test001\n"<< json << "\n";
+  
 }
+
+
+void test_002 (){
+  std::size_t row_count=7;
+
+  auto table = std::vector<std::vector<std::string>>();
+  auto cols = std::vector<std::string>{"name", "type", "status"};
+ 
+  for (std::size_t i =0; i<row_count; ++i){
+    auto subarray=std::vector<std::string>();
+    for (std::size_t j =0; j<cols.size(); ++j){
+      subarray.push_back(std::to_string(i+j));
+    }
+    table.push_back(subarray);
+  }
+  
+  using namespace artdaq::database::json;
+  
+  auto doc_name=std::string{"document"};
+  auto data_name=std::string{"data"};
+  auto dataset_name=std::string{"dataset"};
+  
+  auto docAST= object_t{};
+  
+  docAST[doc_name]=object_t{};
+  auto & documentAST=boost::get<object_t>(docAST.at(doc_name));
+
+  documentAST[data_name]=object_t{};
+  auto & dataAST=boost::get<object_t>(documentAST.at(data_name));
+  
+  dataAST[dataset_name]=array_t{};
+  auto & dataSetArray=boost::get<array_t>(dataAST.at(dataset_name));
+
+  
+  for (auto& subarray: table){
+    auto subarrayAST = object_t{};
+    for (std::size_t j =0; j < cols.size(); ++j){
+      subarrayAST[cols.at(j)]=subarray.at(j);
+    }
+    dataSetArray.push_back(subarrayAST);
+  }
+  
+  auto json = std::string{};
+  
+  JsonWriter{}.write(docAST,json);
+  
+  std::cout << "test002\n"<< json << "\n";
+}
+
 
