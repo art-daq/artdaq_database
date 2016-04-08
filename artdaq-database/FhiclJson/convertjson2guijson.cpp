@@ -186,7 +186,7 @@ void db2gui::operator()(json_node_t& gui_node) const {
         auto array_node = json_node_t{object};
         db2gui{{value}, {false}}(array_node);
       } else {
-        type_name = {literal::value};
+        type_name = {literal::string};
         object[literal::value] = value;
         object[literal::annotation] = (hasMetadata ? metadata_node.annotation() : std::string{" "});
       }

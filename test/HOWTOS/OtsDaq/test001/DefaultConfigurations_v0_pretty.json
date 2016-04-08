@@ -1,0 +1,173 @@
+{
+    "ROOT": {
+        "@xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        "@xsi:noNamespaceSchemaLocation": "../../ConfigurationBase.xsd",
+        "DATA_SET": {
+            "COMMENT_DESCRIPTION": "null",
+            "CREATED_BY_USER": "null",
+            "DATA": [
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Physics",
+                    "KEY_ALIAS": "DefaultPhysics",
+                    "KOC": "DAC",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Physics",
+                    "KEY_ALIAS": "DefaultPhysics",
+                    "KOC": "Detector",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Physics",
+                    "KEY_ALIAS": "DefaultPhysics",
+                    "KOC": "FEW",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Physics",
+                    "KEY_ALIAS": "DefaultPhysics",
+                    "KOC": "FER",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Physics",
+                    "KEY_ALIAS": "DefaultPhysics",
+                    "KOC": "Mask",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Physics",
+                    "KEY_ALIAS": "DefaultPhysics",
+                    "KOC": "ROCToFE",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Physics",
+                    "KEY_ALIAS": "SCurveDefault",
+                    "KOC": "DAC",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Physics",
+                    "KEY_ALIAS": "SCurveDefault",
+                    "KOC": "Detector",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Physics",
+                    "KEY_ALIAS": "SCurveDefault",
+                    "KOC": "FEW",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Physics",
+                    "KEY_ALIAS": "SCurveDefault",
+                    "KOC": "FER",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Physics",
+                    "KEY_ALIAS": "SCurveDefault",
+                    "KOC": "Mask",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Physics",
+                    "KEY_ALIAS": "SCurveDefault",
+                    "KOC": "ModuleToFE",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Physics",
+                    "KEY_ALIAS": "SCurveLatest",
+                    "KOC": "DAC",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10",
+                    "VERSION_ALIAS": "Latest"
+                },
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Physics",
+                    "KEY_ALIAS": "SCurveLatest",
+                    "KOC": "Detector",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Physics",
+                    "KEY_ALIAS": "SCurveLatest",
+                    "KOC": "FEW",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Physics",
+                    "KEY_ALIAS": "SCurveLatest",
+                    "KOC": "FER",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Physics",
+                    "KEY_ALIAS": "SCurveLatest",
+                    "KOC": "Mask",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Physics",
+                    "KEY_ALIAS": "SCurveLatest",
+                    "KOC": "ModuleToFE",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10",
+                    "VERSION_ALIAS": "Default"
+                }
+            ],
+            "PART": {
+                "KIND_OF_PART": "Detector ROOT",
+                "NAME_LABEL": "CMS--ROOT"
+            },
+            "VERSION": "0"
+        },
+        "HEADER": {
+            "RUN": {
+                "LOCATION": "CERN P5",
+                "RUN_BEGIN_TIMESTAMP": "2013-01-29 17:22:10",
+                "RUN_NUMBER": "1",
+                "RUN_TYPE": "DefaultConfigurations"
+            },
+            "TYPE": {
+                "EXTENSION_TABLE_NAME": "DEFAULT_CONFIGURATIONS",
+                "NAME": "DefaultConfigurations"
+            }
+        }
+    }
+}
