@@ -13,6 +13,7 @@
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
+#include "artdaq-database/FhiclJson/convertjson2guijson.h"
 
 #include <boost/exception/diagnostic_information.hpp>
 
@@ -49,7 +50,7 @@ int main(int argc, char* argv[]) try {
   cf::trace_enable_FindConfigsOperation();
   cf::trace_enable_FindConfigsOperationDetail();
 
-  /*
+  
   cf::trace_enable_DBOperationMongo();
   cf::trace_enable_DBOperationFileSystem();
   
@@ -63,7 +64,7 @@ int main(int argc, char* argv[]) try {
   db::fhicljsondb::trace_enable_fhicljsondb();
 
   db::jsonutils::trace_enable_JSONDocumentBuilder();
-  */
+  db::fhicljson::trace_enable_convertjson2guijson();
   
   // Get the input parameters via the boost::program_options library,
   // designed to make it relatively simple to define arguments and

@@ -1,0 +1,179 @@
+{
+    "ROOT": {
+        "@xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        "@xsi:noNamespaceSchemaLocation": "../../ConfigurationBase.xsd",
+        "DATA_SET": {
+            "COMMENT_DESCRIPTION": "null",
+            "CREATED_BY_USER": "Uplegger",
+            "DATA": [
+                {
+                    "CONDITION_VERSION": "0",
+                    "CONFIGURATION_KEY": "0",
+                    "KOC": "FEConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "0",
+                    "CONFIGURATION_KEY": "0",
+                    "KOC": "FEWROtsUDPFSSRInterfaceConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "0",
+                    "CONFIGURATION_KEY": "0",
+                    "KOC": "FEWROtsUDPHCALInterfaceConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "0",
+                    "CONFIGURATION_KEY": "0",
+                    "KOC": "FEWRPurdueFSSRInterfaceConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "0",
+                    "CONFIGURATION_KEY": "0",
+                    "KOC": "DataManagerConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "0",
+                    "CONFIGURATION_KEY": "0",
+                    "KOC": "ROCToFEConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "0",
+                    "CONFIGURATION_KEY": "0",
+                    "KOC": "DetectorConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "0",
+                    "CONFIGURATION_KEY": "0",
+                    "KOC": "MaskConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "0",
+                    "CONFIGURATION_KEY": "0",
+                    "KOC": "FSSRDACsConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "1",
+                    "CONFIGURATION_KEY": "1",
+                    "KOC": "FEConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "1",
+                    "CONFIGURATION_KEY": "1",
+                    "KOC": "FEWROtsUDPFSSRInterfaceConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "1",
+                    "CONFIGURATION_KEY": "1",
+                    "KOC": "DataManagerConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "1",
+                    "CONFIGURATION_KEY": "1",
+                    "KOC": "ROCToFEConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "1",
+                    "CONFIGURATION_KEY": "1",
+                    "KOC": "DetectorConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "1",
+                    "CONFIGURATION_KEY": "1",
+                    "KOC": "MaskConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "1",
+                    "CONFIGURATION_KEY": "1",
+                    "KOC": "FSSRDACsConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "2",
+                    "CONFIGURATION_KEY": "2",
+                    "KOC": "FEConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "2",
+                    "CONFIGURATION_KEY": "2",
+                    "KOC": "FEWROtsUDPFSSRInterfaceConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "2",
+                    "CONFIGURATION_KEY": "2",
+                    "KOC": "DataManagerConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "2",
+                    "CONFIGURATION_KEY": "2",
+                    "KOC": "ROCToFEConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "2",
+                    "CONFIGURATION_KEY": "2",
+                    "KOC": "DetectorConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "2",
+                    "CONFIGURATION_KEY": "2",
+                    "KOC": "MaskConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "2",
+                    "CONFIGURATION_KEY": "2",
+                    "KOC": "FSSRDACsConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "3",
+                    "CONFIGURATION_KEY": "3",
+                    "KOC": "FEConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "3",
+                    "CONFIGURATION_KEY": "3",
+                    "KOC": "FEWROtsUDPFSSRInterfaceConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "3",
+                    "CONFIGURATION_KEY": "3",
+                    "KOC": "DataManagerConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "3",
+                    "CONFIGURATION_KEY": "3",
+                    "KOC": "ROCToFEConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "3",
+                    "CONFIGURATION_KEY": "3",
+                    "KOC": "DetectorConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "3",
+                    "CONFIGURATION_KEY": "3",
+                    "KOC": "MaskConfiguration"
+                },
+                {
+                    "CONDITION_VERSION": "3",
+                    "CONFIGURATION_KEY": "3",
+                    "KOC": "FSSRDACsConfiguration"
+                }
+            ],
+            "PART": {
+                "KIND_OF_PART": "Detector ROOT",
+                "NAME_LABEL": "CMS--ROOT"
+            },
+            "VERSION": "0"
+        },
+        "HEADER": {
+            "RUN": {
+                "LOCATION": "CERN P5",
+                "RUN_BEGIN_TIMESTAMP": "2013-01-29 17:22:10",
+                "RUN_NUMBER": "1",
+                "RUN_TYPE": "Configurations"
+            },
+            "TYPE": {
+                "EXTENSION_TABLE_NAME": "CONFIGURATIONS",
+                "NAME": "Configurations"
+            }
+        }
+    }
+}

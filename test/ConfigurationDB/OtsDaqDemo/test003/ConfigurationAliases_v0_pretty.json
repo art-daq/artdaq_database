@@ -1,0 +1,59 @@
+{
+    "ROOT": {
+        "@xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        "@xsi:noNamespaceSchemaLocation": "../../ConfigurationBase.xsd",
+        "DATA_SET": {
+            "COMMENT_DESCRIPTION": null,
+            "CREATED_BY_USER": null,
+            "DATA": [
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Physics",
+                    "CONFIGURATION_ALIAS": "Physics",
+                    "CONFIGURATION_KEY": "0",
+                    "CONFIGURATION_KEY_ID": "0",
+                    "CONFIGURATION_KEY_TYPE": "ConfigurationAliases",
+                    "KEY_ALIAS_ID": "Physics",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10"
+                },
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Scurve calibration injecting only 1 pixel per ROC",
+                    "CONFIGURATION_ALIAS": "SCurve",
+                    "CONFIGURATION_KEY": "5",
+                    "CONFIGURATION_KEY_ID": "5",
+                    "CONFIGURATION_KEY_TYPE": "ConfigurationAliases",
+                    "KEY_ALIAS_ID": "SCurve",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10"
+                },
+                {
+                    "AUTHOR": "Uplegger",
+                    "COMMENT_DESCRIPTION": "Default Scurve calibration injecting only 1 pixel per ROC",
+                    "CONFIGURATION_ALIAS": "SCurve_Default_1x1",
+                    "CONFIGURATION_KEY": "6",
+                    "CONFIGURATION_KEY_ID": "6",
+                    "CONFIGURATION_KEY_TYPE": "ConfigurationAliases",
+                    "KEY_ALIAS_ID": "SCurve_Default_1x1",
+                    "RECORD_INSERTION_TIME": "2013-01-29 17:22:10"
+                }
+            ],
+            "PART": {
+                "KIND_OF_PART": "Detector ROOT",
+                "NAME_LABEL": "CMS--ROOT"
+            },
+            "VERSION": "0"
+        },
+        "HEADER": {
+            "RUN": {
+                "LOCATION": "CERN P5",
+                "RUN_BEGIN_TIMESTAMP": "2013-01-29 17:22:10",
+                "RUN_NUMBER": "1",
+                "RUN_TYPE": "ConfigurationAliases"
+            },
+            "TYPE": {
+                "EXTENSION_TABLE_NAME": "CONFIGURATION_ALIASES",
+                "NAME": "ConfigurationAliases"
+            }
+        }
+    }
+}

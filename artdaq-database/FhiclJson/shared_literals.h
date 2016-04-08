@@ -11,6 +11,7 @@ constexpr auto timestamp = "timestamp";
 constexpr auto source = "source";
 constexpr auto file = "file";
 constexpr auto value = "value";
+constexpr auto string = "string"; 
 constexpr auto type = "type";
 constexpr auto whitespace = " ";
 constexpr auto empty = "";

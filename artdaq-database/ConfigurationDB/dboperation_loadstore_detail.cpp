@@ -87,9 +87,12 @@ void store_configuration(Options const& options, std::string& conf) {
       break;
     }
     case data_format_t::gui: {
-      if (!db::json_gui_to_db(conf, returnValue)) {
-        throw cet::exception("load_configuration") << "GUI to DB data convertion failed";
+      if (!db::json_gui_to_db(conf, returnValue)) {	
+        throw cet::exception("store_configuration") << "GUI to DB data convertion failed";
       }
+    
+      data = JsonData{returnValue};
+
       returnValueChanged = true;
 
       break;
@@ -119,7 +122,8 @@ void store_configuration(Options const& options, std::string& conf) {
 
   // create a json document to be inserted into the database
   auto builder = JSONDocumentBuilder{};
-  builder.createFromData(data.json_buffer);
+  
+  builder.createFromData(data.json_buffer);  
   builder.addToGlobalConfig(options.globalConfigurationId_jsndoc());
   builder.setVersion(options.version_jsndoc());
   builder.setConfigurableEntity(options.configurableEntity_jsndoc());

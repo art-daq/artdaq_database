@@ -1,0 +1,74 @@
+{
+    "ROOT": {
+        "@xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        "@xsi:noNamespaceSchemaLocation": "../../ConfigurationBase.xsd",
+        "DATA_SET": {
+            "COMMENT_DESCRIPTION": "null",
+            "CREATED_BY_USER": "null",
+            "DATA": [
+                {
+                    "KOC": "DAC",
+                    "VERSION": "0",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "KOC": "DAC",
+                    "VERSION": "0",
+                    "VERSION_ALIAS": "Latest"
+                },
+                {
+                    "KOC": "Detector",
+                    "VERSION": "0",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "KOC": "Detector",
+                    "VERSION": "1",
+                    "VERSION_ALIAS": "BPix"
+                },
+                {
+                    "KOC": "Detector",
+                    "VERSION": "2",
+                    "VERSION_ALIAS": "FPix"
+                },
+                {
+                    "KOC": "FEW",
+                    "VERSION": "0",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "KOC": "FER",
+                    "VERSION": "0",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "KOC": "Mask",
+                    "VERSION": "0",
+                    "VERSION_ALIAS": "Default"
+                },
+                {
+                    "KOC": "ModuleToFE",
+                    "VERSION": "0",
+                    "VERSION_ALIAS": "Default"
+                }
+            ],
+            "PART": {
+                "KIND_OF_PART": "Detector ROOT",
+                "NAME_LABEL": "CMS--ROOT"
+            },
+            "VERSION": "0"
+        },
+        "HEADER": {
+            "RUN": {
+                "LOCATION": "CERN P5",
+                "RUN_BEGIN_TIMESTAMP": "2013-01-29 17:22:10",
+                "RUN_NUMBER": "1",
+                "RUN_TYPE": "VersionAliases"
+            },
+            "TYPE": {
+                "EXTENSION_TABLE_NAME": "VERSION_ALIASES",
+                "NAME": "VersionAliases"
+            }
+        }
+    }
+}

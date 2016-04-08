@@ -12,6 +12,9 @@ constexpr auto search = "document.search";
 constexpr auto metadata = "document.metadata";
 constexpr auto comments = "document.metadata.comments";
 
+constexpr auto changelog = "changelog";
+
+
 constexpr auto source = "document.source";
 constexpr auto source_rawdata = "document.source.rawdata";
 
@@ -85,13 +88,14 @@ constexpr auto template__default_document =
     "        \"history\": [\n"
     "        ]\n"
     "    },\n"
+    "    \"changelog\":\"empty\",\n"
     "    \"bookkeeping\": {\n"
     "        \"isdeleted\": false,\n"
     "        \"isreadonly\": true,\n"
     "        \"created\": \"Tue Dec 29 18:19:25 2015\",\n"
     "        \"updates\": [\n"
     "        ]\n"
-    "    }\n"
+    "    }\n"    
     "}";
 
 }  // namespace jsonutils

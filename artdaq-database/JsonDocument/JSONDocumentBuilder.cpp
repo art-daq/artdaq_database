@@ -176,10 +176,22 @@ JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& doc
 
   // replace data if any
   try {
+    auto data = document.findChild(literal::changelog);
+
+    TRACE_(2, "createFrom() Found converted.changelog=<" << data << ">");
+
+    _document.replaceChild(data, literal::changelog);
+
+  } catch (notfound_exception const&) {
+    TRACE_(2, "createFrom() No converted.changelog");
+  }
+  
+  // replace data if any
+  try {
     auto data = document.findChild(literal::data);
 
     TRACE_(2, "createFrom() Found document.data=<" << data << ">");
-
+    
     _document.replaceChild(data, literal::data);
 
     return self();
