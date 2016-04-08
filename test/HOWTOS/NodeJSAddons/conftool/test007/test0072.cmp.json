@@ -1,0 +1,30 @@
+{
+   "search":[
+      {
+         "name":"version001",
+         "query":{
+            "collection":"artdaq_BoardReader",
+            "dbprovider":"filesystem",
+            "dataformat":"gui",
+            "operation":"load",
+            "filter":{
+               "version":"version001",
+               "configurable_entity.name":"DAQ_HOST_002"
+            }
+         }
+      },
+      {
+         "name":"version002",
+         "query":{
+            "collection":"artdaq_BoardReader",
+            "dbprovider":"filesystem",
+            "dataformat":"gui",
+            "operation":"load",
+            "filter":{
+               "version":"version002",
+               "configurable_entity.name":"DAQ_HOST_002"
+            }
+         }
+      }
+   ]
+}

@@ -1,0 +1,27 @@
+source  /products/setup
+setup artdaq_database v1_00_00 -q debug:e9:s21
+
+cd ~/artdaq-demo-base/artdaq-utilities-database/test/HOWTOS/NodeJSAddons/conftool/test004/
+
+conftool2 -o store -c BoardReader_DAQ_HOST_001.flt.mongo.json -j BoardReader_DAQ_HOST_001.gui.mongo.json
+conftool2 -o store -c BoardReader_DAQ_HOST_002.flt.mongo.json -j BoardReader_DAQ_HOST_002.gui.mongo.json
+
+conftool2 -o store -c EventBuilder_DAQ_HOST_001.flt.mongo.json -j EventBuilder_DAQ_HOST_001.gui.mongo.json
+conftool2 -o store -c EventBuilder_DAQ_HOST_002.flt.mongo.json -j EventBuilder_DAQ_HOST_002.gui.mongo.json
+
+conftool2 -o store -c Aggregator_DAQ_HOST_001.flt.mongo.json -j Aggregator_DAQ_HOST_001.gui.mongo.json
+conftool2 -o store -c Aggregator_DAQ_HOST_002.flt.mongo.json -j Aggregator_DAQ_HOST_002.gui.mongo.json
+
+
+conftool2 -o store -c BoardReader_DAQ_HOST_001.flt.filesystem.json -j BoardReader_DAQ_HOST_001.gui.filesystem.json
+conftool2 -o store -c BoardReader_DAQ_HOST_002.flt.filesystem.json -j BoardReader_DAQ_HOST_002.gui.filesystem.json
+
+conftool2 -o store -c EventBuilder_DAQ_HOST_001.flt.filesystem.json -j EventBuilder_DAQ_HOST_001.gui.filesystem.json
+conftool2 -o store -c EventBuilder_DAQ_HOST_002.flt.filesystem.json -j EventBuilder_DAQ_HOST_002.gui.filesystem.json
+
+conftool2 -o store -c Aggregator_DAQ_HOST_001.flt.filesystem.json -j Aggregator_DAQ_HOST_001.gui.filesystem.json
+conftool2 -o store -c Aggregator_DAQ_HOST_002.flt.filesystem.json -j Aggregator_DAQ_HOST_002.gui.filesystem.json
+
+
+
+

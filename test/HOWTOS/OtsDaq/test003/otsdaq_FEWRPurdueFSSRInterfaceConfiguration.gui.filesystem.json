@@ -1,0 +1,359 @@
+{
+"document" : {
+"data" : {
+"@xmlns:xsi" : "http://www.w3.org/2001/XMLSchema-instance",
+"@xsi:noNamespaceSchemaLocation" : "../../ConfigurationBase.xsd",
+"DATA_SET" : {
+"COMMENT_DESCRIPTION" : "null",
+"CREATED_BY_USER" : "null",
+"DATA" : {
+"CHANNEL0_STATUS" : "on",
+"CHANNEL1_STATUS" : "on",
+"CHANNEL2_STATUS" : "on",
+"CHANNEL3_STATUS" : "on",
+"CHANNEL4_STATUS" : "off",
+"CHANNEL5_STATUS" : "off",
+"CLOCK_SELECT" : "External",
+"CLOCK_SPEED_MHZ" : "13.5",
+"FIRMWARE_VERSION" : "1",
+"INTERFACE_IP_ADDRESS" : "192.168.133.1",
+"INTERFACE_PORT" : "10024",
+"IP_ADDRESS" : "192.168.133.20",
+"NAME" : "0",
+"PORT" : "47000",
+"STATUS" : "on",
+"STREAMING_IP_ADDRESS" : "192.168.133.1",
+"STREAMING_PORT" : "47000"
+},
+"PART" : {
+"KIND_OF_PART" : "Detector ROOT",
+"NAME_LABEL" : "CMS--ROOT"
+},
+"VERSION" : "0"
+},
+"HEADER" : {
+"RUN" : {
+"LOCATION" : "CERN P5",
+"RUN_BEGIN_TIMESTAMP" : "2013-01-29 17:22:10",
+"RUN_NUMBER" : "1",
+"RUN_TYPE" : "FEWRPurdueFSSRInterfaceConfiguration"
+},
+"TYPE" : {
+"EXTENSION_TABLE_NAME" : "FEWR_PURDUE_FSSR_INTERFACE_CONFIGURATION",
+"NAME" : "FEWRPurdueFSSRInterfaceConfiguration"
+}
+}
+},
+"metadata" : {
+"comments" : {
+"empty" : "empty"
+}
+},
+"search" : [
+{
+"name" : "find any",
+"query" : "not defined"
+}
+],
+"converted" : {
+"guidata" : [
+{
+"type" : "value",
+"name" : "@xmlns:xsi",
+"comment" : " ",
+"value" : "http://www.w3.org/2001/XMLSchema-instance",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "@xsi:noNamespaceSchemaLocation",
+"comment" : " ",
+"value" : "../../ConfigurationBase.xsd",
+"annotation" : " "
+},
+{
+"type" : "table",
+"name" : "DATA_SET",
+"comment" : " ",
+"children" : [
+{
+"type" : "value",
+"name" : "COMMENT_DESCRIPTION",
+"comment" : " ",
+"value" : "null",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "CREATED_BY_USER",
+"comment" : " ",
+"value" : "null",
+"annotation" : " "
+},
+{
+"type" : "table",
+"name" : "DATA",
+"comment" : " ",
+"children" : [
+{
+"type" : "value",
+"name" : "CHANNEL0_STATUS",
+"comment" : " ",
+"value" : "on",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "CHANNEL1_STATUS",
+"comment" : " ",
+"value" : "on",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "CHANNEL2_STATUS",
+"comment" : " ",
+"value" : "on",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "CHANNEL3_STATUS",
+"comment" : " ",
+"value" : "on",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "CHANNEL4_STATUS",
+"comment" : " ",
+"value" : "off",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "CHANNEL5_STATUS",
+"comment" : " ",
+"value" : "off",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "CLOCK_SELECT",
+"comment" : " ",
+"value" : "External",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "CLOCK_SPEED_MHZ",
+"comment" : " ",
+"value" : "13.5",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "FIRMWARE_VERSION",
+"comment" : " ",
+"value" : "1",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "INTERFACE_IP_ADDRESS",
+"comment" : " ",
+"value" : "192.168.133.1",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "INTERFACE_PORT",
+"comment" : " ",
+"value" : "10024",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "IP_ADDRESS",
+"comment" : " ",
+"value" : "192.168.133.20",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "NAME",
+"comment" : " ",
+"value" : "0",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "PORT",
+"comment" : " ",
+"value" : "47000",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "STATUS",
+"comment" : " ",
+"value" : "on",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "STREAMING_IP_ADDRESS",
+"comment" : " ",
+"value" : "192.168.133.1",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "STREAMING_PORT",
+"comment" : " ",
+"value" : "47000",
+"annotation" : " "
+}
+]
+},
+{
+"type" : "table",
+"name" : "PART",
+"comment" : " ",
+"children" : [
+{
+"type" : "value",
+"name" : "KIND_OF_PART",
+"comment" : " ",
+"value" : "Detector ROOT",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "NAME_LABEL",
+"comment" : " ",
+"value" : "CMS--ROOT",
+"annotation" : " "
+}
+]
+},
+{
+"type" : "value",
+"name" : "VERSION",
+"comment" : " ",
+"value" : "0",
+"annotation" : " "
+}
+]
+},
+{
+"type" : "table",
+"name" : "HEADER",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "RUN",
+"comment" : " ",
+"children" : [
+{
+"type" : "value",
+"name" : "LOCATION",
+"comment" : " ",
+"value" : "CERN P5",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "RUN_BEGIN_TIMESTAMP",
+"comment" : " ",
+"value" : "2013-01-29 17:22:10",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "RUN_NUMBER",
+"comment" : " ",
+"value" : "1",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "RUN_TYPE",
+"comment" : " ",
+"value" : "FEWRPurdueFSSRInterfaceConfiguration",
+"annotation" : " "
+}
+]
+},
+{
+"type" : "table",
+"name" : "TYPE",
+"comment" : " ",
+"children" : [
+{
+"type" : "value",
+"name" : "EXTENSION_TABLE_NAME",
+"comment" : " ",
+"value" : "FEWR_PURDUE_FSSR_INTERFACE_CONFIGURATION",
+"annotation" : " "
+},
+{
+"type" : "value",
+"name" : "NAME",
+"comment" : " ",
+"value" : "FEWRPurdueFSSRInterfaceConfiguration",
+"annotation" : " "
+}
+]
+}
+]
+}
+],
+"changelog" : "empty"
+}
+},
+"source" : {
+"encoding" : "base64",
+"format" : "json",
+"rawdata" : "as"
+},
+"version" : "version001",
+"configurations" : [
+{
+"name" : "otsdaqC001",
+"assigned" : "Fri Apr  8 15:27:46 2016"
+}
+],
+"aliases" : {
+"active" : [
+
+],
+"history" : [
+
+]
+},
+"changelog" : "empty",
+"bookkeeping" : {
+"isdeleted" : false,
+"isreadonly" : true,
+"created" : "Tue Dec 29 18:19:25 2015",
+"updates" : [
+{
+"addToGlobalConfig" : "Fri Apr  8 15:27:46 2016"
+},
+{
+"setVersion" : "Fri Apr  8 15:27:46 2016"
+},
+{
+"setConfigurableEntity" : "Fri Apr  8 15:27:46 2016"
+}
+]
+},
+"configurable_entity" : {
+"name" : "CMSROOT"
+},
+"_id" : {
+"_oid" : "85459766b11a4439b0d0085c"
+}
+}

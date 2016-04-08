@@ -1,0 +1,11 @@
+{"filter":{
+ "configurable_entity.name":"CMSROOT",
+ "configurations.name":"otsdaqC001"
+}, 
+"collection":"otsdaq_FSSRDACsConfiguration",
+"configurable_entity":"CMSROOT",
+"configuration":"otsdaqC001",
+"dbprovider":"filesystem",
+"operation":"load",
+"dataformat":"gui"
+}

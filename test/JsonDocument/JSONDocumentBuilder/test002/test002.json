@@ -1,0 +1,6 @@
+{ 
+  "operation":"buildDocument",
+  "begin-state":"begin-state.json", 
+  "end-state":"end-state.json",
+  "must-succeed":1
+}

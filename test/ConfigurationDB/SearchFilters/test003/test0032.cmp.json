@@ -1,0 +1,15 @@
+{
+"search" : [
+{
+  "name" : "@TEST_CONFIG_NAME@",
+  "query" : 
+  {
+    "filter":{ "testConfigurations.name":"@TEST_CONFIG_NAME@"}, 
+    "dbprovider":"filesystem",
+    "operation":"buildfilter",
+    "dataformat":"gui"
+  }
+}
+]
+}
+

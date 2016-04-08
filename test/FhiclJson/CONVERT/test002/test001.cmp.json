@@ -1,0 +1,388 @@
+{
+"document" : {
+"data" : {
+"daq" : {
+"aggregator" : {
+"event_builder_count" : 2,
+"event_queue_depth" : 2,
+"event_queue_wait_time" : 1,
+"expected_events_per_bunch" : 1,
+"file_duration" : 0,
+"file_event_count" : 0,
+"file_size_MB" : 8000,
+"first_event_builder_rank" : 2,
+"mpi_buffer_count" : 8,
+"onmon_event_prescale" : 1,
+"print_event_store_stats" : true,
+"xmlrpc_client_list" : ";http://topol.fnal.gov:5205/RPC2,3;http://topol.fnal.gov:5206/RPC2,3;http://topol.fnal.gov:5235/RPC2,4;http://topol.fnal.gov:5236/RPC2,4;http://topol.fnal.gov:5265/RPC2,5;http://topol.fnal.gov:5266/RPC2,5"
+},
+"max_fragment_size_words" : 2097152,
+"metrics" : {
+"aggFile" : {
+"fileName" : "/tmp/aggregator/agg_%UID%_metrics.log",
+"level" : 3,
+"metricPluginType" : "file",
+"uniquify" : true
+}
+}
+},
+"outputs" : {
+
+},
+"physics" : {
+"analyzers" : {
+
+},
+"filters" : {
+"prescaleMod2" : {
+"module_type" : "NthEvent",
+"nth" : 2
+},
+"prescaleMod3" : {
+"module_type" : "NthEvent",
+"nth" : 3
+}
+},
+"p1" : [
+
+],
+"p2" : [
+"BuildInfo"
+],
+"pmod2" : [
+"prescaleMod2"
+],
+"pmod3" : [
+"prescaleMod3"
+],
+"producers" : {
+"BuildInfo" : {
+"instance_name" : "ArtdaqDemo",
+"module_type" : "ArtdaqDemoBuildInfo"
+}
+}
+},
+"process_name" : "DAQAG",
+"services" : {
+"NetMonTransportServiceInterface" : {
+"max_fragment_size_words" : 2097152,
+"service_provider" : "NetMonTransportService"
+},
+"scheduler" : {
+"fileMode" : "NOMERGE"
+}
+},
+"source" : {
+"module_type" : "NetMonInput"
+}
+},
+"metadata" : {
+"daq" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"aggregator" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"event_builder_count" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"event_queue_depth" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"event_queue_wait_time" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"expected_events_per_bunch" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"file_duration" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"file_event_count" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"file_size_MB" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"first_event_builder_rank" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"mpi_buffer_count" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"onmon_event_prescale" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"print_event_store_stats" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : " "
+},
+"xmlrpc_client_list" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+},
+"max_fragment_size_words" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"metrics" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"aggFile" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"fileName" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"level" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"metricPluginType" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"uniquify" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+}
+}
+}
+},
+"outputs" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+
+}
+},
+"physics" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"analyzers" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+
+}
+},
+"filters" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"prescaleMod2" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"module_type" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"nth" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+}
+}
+},
+"prescaleMod3" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"module_type" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"nth" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+}
+},
+"p1" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " "
+},
+"p2" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " "
+},
+"pmod2" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " "
+},
+"pmod3" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " "
+},
+"producers" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"BuildInfo" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"instance_name" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"module_type" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+}
+}
+}
+},
+"process_name" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"services" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"NetMonTransportServiceInterface" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"max_fragment_size_words" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"service_provider" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+},
+"scheduler" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"fileMode" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+}
+},
+"source" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"module_type" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+},
+"search" : [
+{
+"name" : "find any",
+"query" : "not defined"
+}
+],
+"converted" : {
+
+}
+},
+"source" : {
+"encoding" : "base64",
+"format" : "json",
+"rawdata" : "as"
+},
+"version" : "version001",
+"configurations" : [
+{
+"name" : "configA001",
+"assigned" : "Thu Mar 10 16:50:25 2016"
+}
+],
+"aliases" : {
+"active" : [
+
+],
+"history" : [
+
+]
+},
+"bookkeeping" : {
+"isdeleted" : false,
+"isreadonly" : true,
+"created" : "Tue Dec 29 18:19:25 2015",
+"updates" : [
+{
+"addToGlobalConfig" : "Thu Mar 10 16:50:25 2016"
+},
+{
+"setVersion" : "Thu Mar 10 16:50:25 2016"
+},
+{
+"setConfigurableEntity" : "Thu Mar 10 16:50:25 2016"
+}
+]
+},
+"configurable_entity" : {
+"name" : "Aggregator_topol"
+}
+}

@@ -1,0 +1,105 @@
+{
+"document" : {
+"data" : {
+"tt" : [
+"mm",
+1,
+[
+"aa",
+"zz"
+],
+{
+"xx" : true
+}
+]
+},
+"metadata" : {
+"source" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"module_type" : {
+"type" : "string",
+"comment" : "#Success 1  above satom",
+"annotation" : " "
+},
+"resume_after_timeout" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : "#Success 3 right of satom"
+},
+"waiting_time" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "//Success 2 right of satom"
+}
+}
+}
+},
+"search" : [
+{
+"name" : "find any",
+"query" : "not defined"
+}
+],
+"converted" : {
+"guidata" : [
+{
+"type" : "sequence",
+"name" : "tt",
+"comment" : " ",
+"children" : [
+"mm",
+1,
+[
+"aa",
+"zz"
+],
+{
+"xx" : true
+}
+]
+}
+]
+}
+},
+"source" : {
+"encoding" : "base64",
+"format" : "json",
+"rawdata" : "as"
+},
+"version" : "version",
+"configurations" : [
+{
+"name" : "config-003",
+"assigned" : "Tue Mar  8 21:34:36 2016"
+}
+],
+"aliases" : {
+"active" : [
+
+],
+"history" : [
+
+]
+},
+"bookkeeping" : {
+"isdeleted" : false,
+"isreadonly" : true,
+"created" : "Tue Dec 29 18:19:25 2015",
+"updates" : [
+{
+"addToGlobalConfig" : "Tue Mar  8 21:34:36 2016"
+},
+{
+"setVersion" : "Tue Mar  8 21:34:36 2016"
+},
+{
+"setConfigurableEntity" : "Tue Mar  8 21:34:36 2016"
+}
+]
+},
+"configurable_entity" : {
+"name" : "any"
+}
+}

@@ -1,0 +1,9 @@
+{ 
+  "operation":"insertChild",
+  "path":"document.data",
+  "begin-state"   :"begin-state.json",
+  "delta":"operation-delta.json",
+  "end-state":"end-state.json",
+  "returned-value":"returned-value.json",
+  "must-succeed":1
+}

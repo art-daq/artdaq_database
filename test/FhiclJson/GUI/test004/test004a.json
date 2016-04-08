@@ -1,0 +1,415 @@
+{
+"data" : [
+{
+"type" : "table",
+"name" : "daq",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "event_builder",
+"comment" : " ",
+"children" : [
+{
+"type" : "number",
+"name" : "expected_fragments_per_event",
+"comment" : " ",
+"annotation" : " ",
+"value" : 2
+},
+{
+"type" : "number",
+"name" : "first_fragment_receiver_rank",
+"comment" : " ",
+"annotation" : " ",
+"value" : 0
+},
+{
+"type" : "number",
+"name" : "fragment_receiver_count",
+"comment" : " ",
+"annotation" : " ",
+"value" : 2
+},
+{
+"type" : "number",
+"name" : "mpi_buffer_count",
+"comment" : " ",
+"annotation" : " ",
+"value" : 16
+},
+{
+"type" : "bool",
+"name" : "print_event_store_stats",
+"comment" : " ",
+"annotation" : " ",
+"value" : true
+},
+{
+"type" : "bool",
+"name" : "use_art",
+"comment" : " ",
+"annotation" : " ",
+"value" : true
+},
+{
+"type" : "bool",
+"name" : "verbose",
+"comment" : " ",
+"annotation" : " ",
+"value" : false
+}
+]
+},
+{
+"type" : "number",
+"name" : "max_fragment_size_words",
+"comment" : " ",
+"annotation" : " ",
+"value" : 2097152
+},
+{
+"type" : "table",
+"name" : "metrics",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "evbFile",
+"comment" : " ",
+"children" : [
+{
+"type" : "string",
+"name" : "fileName",
+"comment" : " ",
+"annotation" : "//demoe",
+"value" : "/tmp/eventbuilder/evb_%UID%_met // rics.log"
+},
+{
+"type" : "number",
+"name" : "level",
+"comment" : " ",
+"annotation" : " ",
+"value" : 3
+},
+{
+"type" : "string",
+"name" : "metricPluginType",
+"comment" : " ",
+"annotation" : " ",
+"value" : "file"
+},
+{
+"type" : "bool",
+"name" : "uniquify",
+"comment" : " ",
+"annotation" : " ",
+"value" : true
+}
+]
+}
+]
+}
+]
+},
+{
+"type" : "table",
+"name" : "outputs",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "netMonOutput",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "SelectEvents",
+"comment" : "#Failure 5 not a satom ",
+"children" : [
+{
+"type" : "sequence",
+"name" : "SelectEvents",
+"comment" : "#Failure 5 not a satom ",
+"annotation" : " ",
+"values" : [
+"pmod2",
+"pmod3"
+]
+}
+]
+},
+{
+"type" : "string",
+"name" : "module_type",
+"comment" : " ",
+"annotation" : " ",
+"value" : "NetMonOutput"
+}
+]
+}
+]
+},
+{
+"type" : "table",
+"name" : "physics",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "analyzers",
+"comment" : " ",
+"children" : [
+
+]
+},
+{
+"type" : "table",
+"name" : "filters",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "prescaleMod2",
+"comment" : "#Failure 4 not a satom ",
+"children" : [
+{
+"type" : "string",
+"name" : "module_type",
+"comment" : " ",
+"annotation" : "#//Success 5 right of satom",
+"value" : "NthEvent"
+},
+{
+"type" : "number",
+"name" : "nth",
+"comment" : "#//Success 5 right of satom",
+"annotation" : " ",
+"value" : 2
+}
+]
+},
+{
+"type" : "table",
+"name" : "prescaleMod3",
+"comment" : " ",
+"children" : [
+{
+"type" : "string",
+"name" : "module_type",
+"comment" : " ",
+"annotation" : " ",
+"value" : "NthEvent"
+},
+{
+"type" : "number",
+"name" : "nth",
+"comment" : " ",
+"annotation" : "//#Success 4 right of satom",
+"value" : 3
+}
+]
+}
+]
+},
+{
+"type" : "sequence",
+"name" : "my_output_modules",
+"comment" : " ",
+"annotation" : " ",
+"values" : [
+"netMonOutput"
+]
+},
+{
+"type" : "sequence",
+"name" : "pmod2",
+"comment" : " ",
+"annotation" : " ",
+"values" : [
+"prescaleMod2"
+]
+},
+{
+"type" : "sequence",
+"name" : "pmod3",
+"comment" : "#Failure 2 not a satom ",
+"annotation" : " ",
+"values" : [
+"prescaleMod3"
+]
+},
+{
+"type" : "table",
+"name" : "producers",
+"comment" : " ",
+"children" : [
+
+]
+}
+]
+},
+{
+"type" : "string",
+"name" : "process_name",
+"comment" : " ",
+"annotation" : " ",
+"value" : "DAQ"
+},
+{
+"type" : "table",
+"name" : "services",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "scheduler",
+"comment" : " ",
+"children" : [
+{
+"type" : "string",
+"name" : "fileMode",
+"comment" : " ",
+"annotation" : " ",
+"value" : "NOMERGE"
+}
+]
+},
+{
+"type" : "table",
+"name" : "user",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "NetMonTransportServiceInterface",
+"comment" : " ",
+"children" : [
+{
+"type" : "number",
+"name" : "data_receiver_count",
+"comment" : " ",
+"annotation" : "# 2",
+"value" : 1
+},
+{
+"type" : "number",
+"name" : "first_data_receiver_rank",
+"comment" : " ",
+"annotation" : " ",
+"value" : 6
+},
+{
+"type" : "number",
+"name" : "max_fragment_size_words",
+"comment" : " ",
+"annotation" : " ",
+"value" : 2097152
+},
+{
+"type" : "number",
+"name" : "mpi_buffer_count",
+"comment" : " ",
+"annotation" : " ",
+"value" : 8
+},
+{
+"type" : "string",
+"name" : "service_provider",
+"comment" : " ",
+"annotation" : " ",
+"value" : "NetMonTransportService"
+}
+]
+}
+]
+}
+]
+},
+{
+"type" : "table",
+"name" : "source",
+"comment" : " ",
+"children" : [
+{
+"type" : "string",
+"name" : "module_type",
+"comment" : "#Success 1  above satom",
+"annotation" : " ",
+"value" : "RawInput"
+},
+{
+"type" : "bool",
+"name" : "resume_after_timeout",
+"comment" : " ",
+"annotation" : "#Success 3 right of satom",
+"value" : true
+},
+{
+"type" : "number",
+"name" : "waiting_time",
+"comment" : " ",
+"annotation" : "//Success 2 right of satom",
+"value" : 900
+}
+]
+}
+],
+"comments" : [
+{
+"linenum" : 29,
+"value" : "//demoe"
+},
+{
+"linenum" : 43,
+"value" : "#Failure 5 not a satom "
+},
+{
+"linenum" : 45,
+"value" : "#Failure 5 not a satom "
+},
+{
+"linenum" : 59,
+"value" : "#Failure 4 not a satom "
+},
+{
+"linenum" : 62,
+"value" : "#//Success 5 right of satom"
+},
+{
+"linenum" : 63,
+"value" : "#//Success 5 right of satom"
+},
+{
+"linenum" : 71,
+"value" : "//#Success 4 right of satom"
+},
+{
+"linenum" : 78,
+"value" : "#Failure 2 not a satom "
+},
+{
+"linenum" : 98,
+"value" : "# 2"
+},
+{
+"linenum" : 112,
+"value" : "#Success 1  above satom"
+},
+{
+"linenum" : 115,
+"value" : "#Success 3 right of satom"
+},
+{
+"linenum" : 117,
+"value" : "//Success 2 right of satom"
+}
+],
+"origin" : {
+"source" : "fhicl_to_json",
+"timestamp" : "Mon Feb  8 14:00:30 2016"
+},
+"includes" : [
+
+]
+}

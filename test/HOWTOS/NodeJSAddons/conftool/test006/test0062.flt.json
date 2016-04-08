@@ -1,0 +1,8 @@
+{
+            "dbprovider":"filesystem",
+            "dataformat":"gui",
+            "operation":"buildfilter",
+            "filter":{
+               "configurations.name":"configA001"
+            }
+         }

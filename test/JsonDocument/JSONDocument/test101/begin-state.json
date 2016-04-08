@@ -1,0 +1,77 @@
+{
+    "_id": "5683230d1a72ba4f5176f731",
+    "document": {          
+	"metadata": {
+	    "comments": {
+		"a": {
+		    "comment": "//comment 1",
+		    "annotation": "#annotation 1"
+		},
+		"b": {
+		    "comment": "//comment 2",
+		    "children": {
+			"c": {
+			    "annotation": "#annotation 2"
+			},
+			"d": {
+			    "comment": "//comment 3",
+			    "annotation": "#annotation 3"
+			}
+		    }
+		}
+	    },
+	    "search": [
+		{
+		    "name": "find docs where b.c=2",
+		    "query": "find docs where b.c=2"
+		},
+		{
+		    "name": "find docs where b.c=4",
+		    "query": "find docs where b.c=4"
+		}
+	    ]
+	},
+	"source": {
+	    "encoding": "base64",
+	    "format": "fhicl",
+	    "rawdata": "Ly9jb21tZW50IDENCmE6MSAjYW5ub3RhdGlvbiAxDQovL2NvbW1lbnQgMg0KYjp7DQogIGM6IjIiICNhbm5vdGF0aW9uIDINCiAgLy9jb21tZW50IDMNCiAgZDpbMiw1LDZdICNhbm5vdGF0aW9uIDMNCn0="
+	}        
+    },
+    "version": "version1",
+    "configurations": [
+        "config1",
+        "config2"
+    ],
+    "aliases": {
+        "active": [
+            {
+                "name": "version alias 1",
+                "assigned": "Tue Dec 29 18:19:25 2015"
+            },
+            {
+                "name": "version alias 2",
+                "assigned": "Tue Dec 29 18:19:25 2015"
+            }
+        ],
+        "history": [
+            {
+                "name": "version alias 3",
+                "assigned": "Tue Dec 29 18:19:25 2015",
+                "removed": "Tue Dec 29 18:19:25 2015"
+            },
+            {
+                "name": "version alias 4",
+                "assigned": "Tue Dec 30 18:19:25 2015",
+                "removed": "Tue Dec 30 18:19:25 2015"
+            }
+        ]
+    },
+    "bookkeeping": {
+        "isdeleted": false,
+        "isreadonly": true,
+        "created": "Tue Dec 29 18:19:25 2015",
+        "updates": [
+            "Tue Dec 29 18:19:25 2015"
+        ]
+    }
+}

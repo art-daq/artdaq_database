@@ -1,0 +1,129 @@
+{
+    "ROOT": {
+        "@xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        "@xsi:noNamespaceSchemaLocation": "../../ConfigurationBase.xsd",
+        "DATA_SET": {
+            "COMMENT_DESCRIPTION": null,
+            "CREATED_BY_USER": null,
+            "DATA": [
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ1_ROC0",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                },
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ1_ROC1",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                },
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ1_ROC2",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                },
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ1_ROC3",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                },
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ1_ROC4",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                },
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ2_ROC0",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                },
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ2_ROC1",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                },
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ2_ROC2",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                },
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ2_ROC3",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                },
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ2_ROC4",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                },
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ3_ROC0",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                },
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ3_ROC1",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                },
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ3_ROC2",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                },
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ3_ROC3",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                },
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ3_ROC4",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                },
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ4_ROC0",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                },
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ4_ROC1",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                },
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ4_ROC2",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                },
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ4_ROC3",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                },
+                {
+                    "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ4_ROC4",
+                    "COMPONENT_STATUS": "off",
+                    "COMPONENT_TYPE": "FSSR"
+                }
+            ],
+            "PART": {
+                "KIND_OF_PART": "Detector ROOT",
+                "NAME_LABEL": "CMS--ROOT"
+            },
+            "VERSION": "0"
+        },
+        "HEADER": {
+            "RUN": {
+                "LOCATION": "CERN P5",
+                "RUN_BEGIN_TIMESTAMP": "2013-01-29 17:22:10",
+                "RUN_NUMBER": "1",
+                "RUN_TYPE": "DetectorConfiguration"
+            },
+            "TYPE": {
+                "EXTENSION_TABLE_NAME": "DETECTOR_CONFIGURATION",
+                "NAME": "DetectorConfiguration"
+            }
+        }
+    }
+}

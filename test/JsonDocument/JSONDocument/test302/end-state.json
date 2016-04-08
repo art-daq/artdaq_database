@@ -1,0 +1,33 @@
+{ 
+    "aliases": {
+        "active": [
+            {
+                "name": "version alias 11",
+                "assigned": "Tue Dec 29 18:19:25 2015"
+            },
+            {
+                "name": "version alias 44",
+                "assigned": "Tue Dec 29 18:19:25 2015"
+            }
+        ],
+        "history": [
+            {
+                "name": "version alias 3",
+                "assigned": "Tue Dec 29 18:19:25 2015",
+                "removed": "Tue Dec 29 18:19:25 2015"
+            },
+            {
+                "name": "version alias 4",
+                "assigned": "Tue Dec 30 18:19:25 2015",
+                "removed": "Tue Dec 30 18:19:25 2015"
+            }
+        ]
+    },
+    "bookkeeping": {
+        "isdeleted": false,
+        "isreadonly": true,
+        "created": "Tue Dec 29 18:19:25 2015",
+        "updates": [
+        ]
+    }
+}

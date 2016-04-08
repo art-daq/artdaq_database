@@ -1,0 +1,7 @@
+{ 
+  "operation":"removeAlias",
+  "begin-state":"begin-state.json", 
+  "end-state":"end-state.json",
+  "delta":"alias.json",
+  "must-succeed":1
+}

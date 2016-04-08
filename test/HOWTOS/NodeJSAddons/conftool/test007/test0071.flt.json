@@ -1,0 +1,9 @@
+{
+            "collection":"artdaq_Aggregator",
+            "dbprovider":"mongo",
+            "dataformat":"gui",
+            "operation":"findversions",
+            "filter":{
+               "configurable_entity.name":"DAQ_HOST_001"
+            }
+         }

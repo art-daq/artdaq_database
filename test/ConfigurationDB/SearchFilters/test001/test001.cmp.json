@@ -1,0 +1,15 @@
+{
+    "search" : [
+        {
+            "name" : "@TEST_CONFIG_NAME@", 
+            "query" : {
+                "dbprovider" : "mongo", 
+                "dataformat" : "gui", 
+                "operation" : "buildfilter", 
+                "filter" : {
+                    "configurations.name" : "@TEST_CONFIG_NAME@"
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,43 @@
+find_ups_product( mongodb ${mongodb_product_version} )
+
+include_directories($ENV{MONGODB_FQ_DIR}/include/bsoncxx/v0.3)
+include_directories($ENV{MONGODB_FQ_DIR}/include/mongocxx/v0.3)
+
+find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_FQ_DIR}/lib )
+find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_FQ_DIR}/lib )
+
+ art_make_exec(GlobalConfigBuilder_t
+  LIBRARIES
+  artdaq-database_StackTrace  
+  artdaq-database_BasicTypes
+  artdaq-database_FhiclJson
+  artdaq-database_JsonDocument
+  artdaq-database_ConfigurationDB
+  artdaq-database_StorageProviders_MongoDB
+  artdaq-database_StorageProviders_FileSystemDB
+  ${FHICLCPP}
+  ${CETLIB}
+  ${Boost_PROGRAM_OPTIONS_LIBRARY}  
+) 
+
+execute_process( COMMAND "date" "-u" "+%m%d%Y-%H%M%S" OUTPUT_VARIABLE CONFIG_NUMBER )
+string( STRIP ${CONFIG_NUMBER} CONFIG_NUMBER )
+
+string(RANDOM LENGTH 3 ALPHABET 0123456789 RAND_NAME)
+message(STATUS "RAND_NAME=${RAND_NAME}")
+
+string(RANDOM LENGTH 3 ALPHABET 0123456789 VERSION_NUMBER)
+message(STATUS "VERSION_NUMBER=${VERSION_NUMBER}")
+
+set (CONFIG_NUMBER "03252016-222027")
+
+set (TEST_CONFIG_NAME "testConfigA${CONFIG_NUMBER}")
+
+set (TEST_ENTITY_NAME "Aggregator_topol${CONFIG_NUMBER}")
+
+add_subdirectory(test000)
+add_subdirectory(test001)
+add_subdirectory(test002)
+add_subdirectory(test003)
+
+install_source()

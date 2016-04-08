@@ -1,0 +1,73 @@
+{
+        "document" : {
+            "data" : {
+                "source" : {
+                    "module_type" : "RawInput", 
+                    "resume_after_timeout" : true, 
+                    "waiting_time" : 900
+                }
+            }, 
+            "metadata" : {
+                "source" : {
+                    "type" : "table", 
+                    "comment" : " ", 
+                    "children" : {
+                        "module_type" : {
+                            "type" : "string", 
+                            "comment" : "#Success 1  above satom", 
+                            "annotation" : " "
+                        }, 
+                        "resume_after_timeout" : {
+                            "type" : "bool", 
+                            "comment" : " ", 
+                            "annotation" : "#Success 3 right of satom"
+                        }, 
+                        "waiting_time" : {
+                            "type" : "number", 
+                            "comment" : " ", 
+                            "annotation" : "//Success 2 right of satom"
+                        }
+                    }
+                }
+            }, 
+            "search" : [
+                {
+                    "name" : "find any", 
+                    "query" : "not defined"
+                }
+            ]
+        }, 
+        "source" : {
+            "encoding" : "base64", 
+            "format" : "json", 
+            "rawdata" : "as"
+        }, 
+        "version" : "version", 
+        "configurations" : [
+            {
+                "name" : "config-005", 
+                "assigned" : "Mon Feb 29 21:57:32 2016"
+            }
+        ], 
+        "aliases" : {
+            "active" : [
+
+            ], 
+            "history" : [
+
+            ]
+        }, 
+        "bookkeeping" : {
+            "isdeleted" : false, 
+            "isreadonly" : true, 
+            "created" : "Tue Dec 29 18:19:25 2015", 
+            "updates" : [
+                {
+                    "addToGlobalConfig" : "Mon Feb 29 21:57:32 2016"
+                }, 
+                {
+                    "setVersion" : "Mon Feb 29 21:57:32 2016"
+                }
+            ]
+        }
+    }

@@ -1,0 +1,10 @@
+SET ( TEST_NUMBER "002" )
+
+SET ( TEST_NAME "search1" )
+
+cet_test(MongoJson_${TEST_NAME}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC MongoJson_t 
+  DATAFILES 
+    ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.src.json 
+    ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.cmp.json
+    ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.opts.json 
+  TEST_ARGS -s test${TEST_NUMBER}.src.json -c test${TEST_NUMBER}.cmp.json -t ${TEST_NAME} -o test${TEST_NUMBER}.opts.json)
