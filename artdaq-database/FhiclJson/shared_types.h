@@ -125,7 +125,8 @@ struct table_of : vector_of<KVP> {
   using value_type = KVP;
   using key_type = typename value_type::key_type;
   using mapped_type = typename value_type::value_type;
-
+  using size_type = typename vector_of<KVP>::size_type;
+  
   mapped_type& operator[](key_type const& key) {
     auto& pairs = vector_of<value_type>::values;
 
@@ -150,6 +151,18 @@ struct table_of : vector_of<KVP> {
     }
 
     throw std::out_of_range("Key not found; key=" + key);
+  }
+
+  size_type count(key_type const& key) const {
+    auto retValue = size_type{0};
+
+    auto& pairs = vector_of<value_type>::values;
+
+    for (auto& pair : pairs) {
+      if (key == pair.key) ++retValue;
+    }
+
+    return retValue;
   }
 
   mapped_type const& at(key_type const& key) const {
