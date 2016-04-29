@@ -9,7 +9,9 @@
 #include "artdaq-database/ConfigurationDB/dispatch_mongodb.h"
 
 #include "artdaq-database/BasicTypes/basictypes.h"
+#include "artdaq-database/FhiclJson/json_common.h"
 #include "artdaq-database/FhiclJson/shared_literals.h"
+
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/JsonDocument/JSONDocument_template.h"
 
@@ -17,7 +19,6 @@
 
 #include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
-
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -30,6 +31,7 @@ namespace cf = db::configuration;
 namespace cfl = cf::literal;
 namespace cflo = cfl::operation;
 namespace cflp = cfl::provider;
+namespace cftd = cf::debug::detail;
 
 using cf::ManageConfigsOperation;
 using cf::options::data_format_t;
@@ -56,7 +58,7 @@ namespace detail {
 typedef JsonData (*provider_findglobalconfigs_t)(Options const& /*options*/, JsonData const& /*search_filter*/);
 typedef JsonData (*provider_buildconfigsearchfilter_t)(Options const& /*options*/, JsonData const& /*search_filter*/);
 
-void find_global_configurations(FindConfigsOperation const& options, std::string& configs) {
+void find_global_configurations(Options const& options, std::string& configs) {
   assert(configs.empty());
   assert(options.operation().compare(cflo::findconfigs) == 0);
 
@@ -107,7 +109,7 @@ void find_global_configurations(FindConfigsOperation const& options, std::string
 
   TRACE_(11, "find_global_configurations: end");
 }
-void build_global_configuration_search_filter(FindConfigsOperation const& options, std::string& filters) {
+void build_global_configuration_search_filter(Options const& options, std::string& filters) {
   assert(filters.empty());
   assert(options.operation().compare(cflo::buildfilter) == 0);
 
@@ -163,13 +165,12 @@ void build_global_configuration_search_filter(FindConfigsOperation const& option
 }  // namespace database
 }  // namespace artdaq
 
-void cf::trace_enable_FindConfigsOperationDetail() {
+void cftd::enableFindConfigsOperation() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::FindConfigsOperationDetail"
-                << "trace_enable");
+  TRACE_(0, "artdaq::database::configuration::FindConfigsDetail trace_enable");
 }

@@ -260,8 +260,9 @@ jcunwrapper<A> jcunwrap(A& any) {
   return jcunwrapper<A>(any);
 }
 
-void trace_enable_convertjson2guijson();
-
+namespace debug {
+void enableJSON2GUIJSON();
+}
 }  // namespace fhicljson
 bool json_db_to_gui(std::string const&, std::string&);
 bool json_gui_to_db(std::string const&, std::string&);

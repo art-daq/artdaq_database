@@ -9,7 +9,9 @@
 #include "artdaq-database/ConfigurationDB/dispatch_mongodb.h"
 
 #include "artdaq-database/BasicTypes/basictypes.h"
+#include "artdaq-database/FhiclJson/json_common.h"
 #include "artdaq-database/FhiclJson/shared_literals.h"
+
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/JsonDocument/JSONDocument_template.h"
 
@@ -17,7 +19,6 @@
 
 #include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
-
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -30,6 +31,7 @@ namespace cf = db::configuration;
 namespace cfl = cf::literal;
 namespace cflo = cfl::operation;
 namespace cflp = cfl::provider;
+namespace cftd = cf::debug::detail;
 
 using cf::LoadStoreOperation;
 using cf::options::data_format_t;
@@ -128,13 +130,18 @@ void store_configuration(Options const& options, std::string& conf) {
   // create a json document to be inserted into the database
   auto builder = JSONDocumentBuilder{};
   builder.createFromData(data.json_buffer);
-  builder.addToGlobalConfig(options.globalConfiguration_jsndoc());
-  builder.setVersion(options.version_jsndoc());
-  builder.setConfigurableEntity(options.configurableEntity_jsndoc());
+
+  auto globalConfiguration = JSONDocument{options.globalConfiguration_to_JsonData().json_buffer};
+  auto version = JSONDocument{options.version_to_JsonData().json_buffer};
+  auto configurableEntity = JSONDocument{options.configurableEntity_to_JsonData().json_buffer};
+
+  builder.addToGlobalConfig(globalConfiguration);
+  builder.setVersion(version);
+  builder.setConfigurableEntity(configurableEntity);
 
   auto document = std::move(builder.extract());
   auto insert_payload =
-      JsonData{"{\"document\":" + document.to_string() + ", \"collection\":\"" + options.type() + "\"}"};
+      JsonData{"{\"document\":" + document.to_string() + ", \"collection\":\"" + options.collectionName() + "\"}"};
 
   TRACE_(15, "store_configuration: insert_payload=<" << insert_payload.json_buffer << ">");
 
@@ -172,8 +179,8 @@ void load_configuration(Options const& options, std::string& conf) {
                                                << ".";
   }
 
-  auto search_payload = JsonData{"{\"filter\":" + options.search_filter_to_JsonData().json_buffer + +", \"collection\":\"" +
-                                 options.type() + "\"}"};
+  auto search_payload = JsonData{"{\"filter\":" + options.search_filter_to_JsonData().json_buffer +
+                                 +", \"collection\":\"" + options.collectionName() + "\"}"};
 
   TRACE_(16, "load_configuration: search_payload=<" << search_payload.json_buffer << ">");
 
@@ -245,13 +252,12 @@ void load_configuration(Options const& options, std::string& conf) {
 }  // namespace database
 }  // namespace artdaq
 
-void cf::trace_enable_LoadStoreOperationDetail() {
+void cftd::enableLoadStoreOperation() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::LoadStoreOperationDetail"
-                << "trace_enable");
+  TRACE_(0, "artdaq::database::configuration::LoadStoreOperationDetail trace_enable");
 }

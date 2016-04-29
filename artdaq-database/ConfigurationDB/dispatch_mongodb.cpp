@@ -16,15 +16,15 @@
 #define TRACE_NAME "COMG:DpMon_C"
 
 using namespace artdaq::database::configuration;
-using namespace artdaq::database::configuration::mongo;
 
 namespace DBI = artdaq::database::mongo;
+namespace prov = artdaq::database::configuration::mongo;
 
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::jsonutils::JSONDocumentBuilder;
 using artdaq::database::jsonutils::JSONDocument;
 
-void store(LoadStoreOperation const& options, JsonData const& insert_payload) {
+void prov::store(LoadStoreOperation const& options, JsonData const& insert_payload) {
   assert(options.provider().compare(literal::provider::mongo) == 0);
   assert(options.operation().compare(literal::operation::store) == 0);
 
@@ -48,7 +48,7 @@ void store(LoadStoreOperation const& options, JsonData const& insert_payload) {
   TRACE_(15, "store: end");
 }
 
-JsonData load(LoadStoreOperation const& options, JsonData const& search_payload) {
+JsonData prov::load(LoadStoreOperation const& options, JsonData const& search_payload) {
   assert(options.provider().compare(literal::provider::mongo) == 0);
   assert(options.operation().compare(literal::operation::load) == 0);
 
@@ -82,7 +82,7 @@ JsonData load(LoadStoreOperation const& options, JsonData const& search_payload)
   return data;
 }
 
-JsonData findGlobalConfigs(ManageConfigsOperation const& options, JsonData const& search_payload) {
+JsonData prov::findGlobalConfigs(ManageConfigsOperation const& options, JsonData const& search_payload) {
   assert(options.provider().compare(literal::provider::mongo) == 0);
   assert(options.operation().compare(literal::operation::findconfigs) == 0);
 
@@ -147,7 +147,7 @@ JsonData findGlobalConfigs(ManageConfigsOperation const& options, JsonData const
   return {ss.str()};
 }
 
-JsonData buildConfigSearchFilter(ManageConfigsOperation const& options, JsonData const& search_payload) {
+JsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, JsonData const& search_payload) {
   assert(options.provider().compare(literal::provider::mongo) == 0);
   assert(options.operation().compare(literal::operation::buildfilter) == 0);
 
@@ -216,7 +216,7 @@ JsonData buildConfigSearchFilter(ManageConfigsOperation const& options, JsonData
   return {ss.str()};
 }
 
-JsonData findConfigVersions(LoadStoreOperation const& options, JsonData const&) {
+JsonData prov::findConfigVersions(LoadStoreOperation const& options, JsonData const&) {
   assert(options.provider().compare(literal::provider::mongo) == 0);
   assert(options.operation().compare(literal::operation::findversions) == 0);
 
@@ -286,7 +286,7 @@ JsonData findConfigVersions(LoadStoreOperation const& options, JsonData const&) 
   return {ss.str()};
 }
 
-JsonData findConfigEntities(LoadStoreOperation const& options, JsonData const&) {
+JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData const&) {
   assert(options.provider().compare(literal::provider::mongo) == 0);
   assert(options.operation().compare(literal::operation::findentities) == 0);
 
@@ -357,7 +357,7 @@ JsonData findConfigEntities(LoadStoreOperation const& options, JsonData const&) 
   return {ss.str()};
 }
 
-JsonData addConfigToGlobalConfig(LoadStoreOperation const& options, JsonData const& search_payload) {
+JsonData prov::addConfigToGlobalConfig(LoadStoreOperation const& options, JsonData const& search_payload) {
   assert(options.provider().compare(literal::provider::mongo) == 0);
   assert(options.operation().compare(literal::operation::addconfig) == 0);
 
@@ -374,13 +374,16 @@ JsonData addConfigToGlobalConfig(LoadStoreOperation const& options, JsonData con
   auto new_options = options;
   new_options.operation(literal::operation::load);
 
-  auto search = JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collectionName() + "\"}"};
+  auto search =
+      JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collectionName() + "\"}"};
   TRACE_(20, "operation_addconfig: args search_payload=<" << search.json_buffer << ">");
 
-  auto document = load(new_options, search);
+  auto document = mongo::load(new_options, search);
   auto json_document = JSONDocument{document.json_buffer};
   auto builder = JSONDocumentBuilder{json_document};
-  builder.addToGlobalConfig(new_options.globalConfiguration_jsndoc());
+  auto globalConfiguration = JSONDocument{new_options.globalConfiguration_to_JsonData().json_buffer};
+
+  builder.addToGlobalConfig(globalConfiguration);
 
   new_options.operation(literal::operation::store);
 
@@ -388,27 +391,26 @@ JsonData addConfigToGlobalConfig(LoadStoreOperation const& options, JsonData con
       JsonData{"{\"filter\":{\"$oid\":\"" + builder.extract().deleteChild("_id").value() + "\"},  \"document\":" +
                builder.extract().to_string() + ", \"collection\":\"" + options.collectionName() + "\"}"};
 
-  store(new_options, update.json_buffer);
+  mongo::store(new_options, update.json_buffer);
 
   new_options.operation(literal::operation::buildfilter);
 
   auto find_options = ManageConfigsOperation{literal::operation::addconfig};
 
   find_options.operation(literal::operation::buildfilter);
-  find_options.dataFormat(cfo::data_format_t::gui);
+  find_options.dataFormat(options::data_format_t::gui);
   find_options.provider(literal::provider::mongo);
   find_options.globalConfiguration(new_options.globalConfiguration());
 
-  return buildConfigSearchFilter(find_options, options.find_search_filter_to_JsonData().json_buffer);
+  return mongo::buildConfigSearchFilter(find_options, options.search_filter_to_JsonData().json_buffer);
 }
 
-void trace_enable_DBOperationMongo() {
+void debug::enableDBOperationMongo() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::Mongo"
-                << "trace_enable");
+  TRACE_(0, "artdaq::database::configuration::Mongo trace_enable");
 }

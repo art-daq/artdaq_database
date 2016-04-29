@@ -4,8 +4,6 @@
 #include <string>
 #include <utility>
 
-//#include "artdaq-database/ConfigurationDB/options_operation_managealiases.h"
-
 namespace artdaq {
 namespace database {
 namespace configuration {
@@ -25,7 +23,13 @@ result_pair_t add_version_alias(std::string const& /*search_filter*/) noexcept;
 result_pair_t remove_version_alias(std::string const& /*search_filter*/) noexcept;
 result_pair_t find_version_aliases(std::string const& /*search_filter*/) noexcept;
 }
-void trace_enable_ManageAliasesOperation();
+
+namespace debug {
+void enableVersionAliasOperation();
+namespace detail {
+void enableVersionAliasOperation();
+}
+}
 
 }  // namespace configuration
 }  // namespace database

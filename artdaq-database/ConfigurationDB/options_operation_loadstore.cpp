@@ -207,6 +207,50 @@ JsonData LoadStoreOperation::search_filter_to_JsonData() const {
   return {json_buffer};
 }
 
+JsonData LoadStoreOperation::globalConfiguration_to_JsonData() const {
+  using namespace artdaq::database::json;
+  auto docAST = object_t{};
+
+  docAST[cfl::filter::configuration] = globalConfiguration();
+
+  auto json_buffer = std::string{};
+
+  if (!JsonWriter{}.write(docAST, json_buffer)) {
+    throw db::invalid_option_exception("Options") << "Unable to write JSON buffer.";
+  }
+
+  return {json_buffer};
+}
+
+JsonData LoadStoreOperation::version_to_JsonData() const {
+  using namespace artdaq::database::json;
+  auto docAST = object_t{};
+
+  docAST[cfl::filter::version] = version();
+
+  auto json_buffer = std::string{};
+
+  if (!JsonWriter{}.write(docAST, json_buffer)) {
+    throw db::invalid_option_exception("Options") << "Unable to write JSON buffer.";
+  }
+
+  return {json_buffer};
+}
+JsonData LoadStoreOperation::configurableEntity_to_JsonData() const {
+  using namespace artdaq::database::json;
+  auto docAST = object_t{};
+
+  docAST[cfl::filter::entity] = configurableEntity();
+
+  auto json_buffer = std::string{};
+
+  if (!JsonWriter{}.write(docAST, json_buffer)) {
+    throw db::invalid_option_exception("Options") << "Unable to write JSON buffer.";
+  }
+
+  return {json_buffer};
+}
+
 //
 void cf::trace_enable_OperationLoadStore() {
   TRACE_CNTL("name", TRACE_NAME);

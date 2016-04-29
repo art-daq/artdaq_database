@@ -9,7 +9,9 @@
 #include "artdaq-database/ConfigurationDB/dispatch_mongodb.h"
 
 #include "artdaq-database/BasicTypes/basictypes.h"
+#include "artdaq-database/FhiclJson/json_common.h"
 #include "artdaq-database/FhiclJson/shared_literals.h"
+
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/JsonDocument/JSONDocument_template.h"
 
@@ -29,6 +31,7 @@ namespace cf = db::configuration;
 namespace cfl = cf::literal;
 namespace cflo = cfl::operation;
 namespace cflp = cfl::provider;
+namespace cftd = cf::debug::detail;
 
 using cf::LoadStoreOperation;
 using cf::options::data_format_t;
@@ -56,11 +59,12 @@ typedef JsonData (*provider_findversions_t)(Options const& /*options*/, JsonData
 typedef JsonData (*provider_findentities_t)(Options const& /*options*/, JsonData const& /*search_filter*/);
 typedef JsonData (*provider_addtoglobalconfig_t)(Options const& /*options*/, JsonData const& /*search_filter*/);
 
-void add_configuration_to_global_configuration(LoadStoreOperation const& options, std::string& configs) {
+void add_configuration_to_global_configuration(Options const& options, std::string& configs) {
   assert(configs.empty());
   assert(options.operation().compare(cflo::addconfig) == 0);
 
-  TRACE_(11, "add_configuration_to_global_configuration: begin");
+  TRACE_(11, "add_configuration_to_global_configuration: begin"
+                 << "aq");
   TRACE_(11, "add_configuration_to_global_configuration args options=<" << options.to_string() << ">");
 
   if (cf::not_equal(options.provider(), cflp::filesystem) && cf::not_equal(options.provider(), cflp::mongo)) {
@@ -124,7 +128,7 @@ void create_new_global_configuration(std::string const& operations, std::string&
     throw cet::exception("create_new_global_configuration") << "Failed to create an AST from operations JSON.";
   }
 
-  auto const& operations_list = boost::get<array_t>(operations_ast.at(cfo::literal::operations));
+  auto const& operations_list = boost::get<array_t>(operations_ast.at(cfl::gui::operations));
 
   TRACE_(11, "create_new_global_configuration: found " << operations_list.size() << " operations.");
 
@@ -134,8 +138,8 @@ void create_new_global_configuration(std::string const& operations, std::string&
 
     TRACE_(11, "create_new_global_configuration() Found operation=<" << buff << ">.");
 
-    auto addconfig = LoadStoreOperation{};
-    addconfig.read(buff);
+    auto addconfig = Options{cfl::gui::operations};
+    addconfig.readJsonData(buff);
 
     configs.clear();
 
@@ -145,7 +149,7 @@ void create_new_global_configuration(std::string const& operations, std::string&
   TRACE_(11, "create_new_global_configuration: end");
 }
 
-void find_configuration_versions(LoadStoreOperation const& options, std::string& versions) {
+void find_configuration_versions(Options const& options, std::string& versions) {
   assert(versions.empty());
   assert(options.operation().compare(cflo::findversions) == 0);
 
@@ -195,7 +199,7 @@ void find_configuration_versions(LoadStoreOperation const& options, std::string&
   TRACE_(11, "find_configuration_versions: end");
 }
 
-void find_configuration_entities(LoadStoreOperation const& options, std::string& entities) {
+void find_configuration_entities(Options const& options, std::string& entities) {
   assert(entities.empty());
   assert(options.operation().compare(cflo::findentities) == 0);
 
@@ -250,13 +254,12 @@ void find_configuration_entities(LoadStoreOperation const& options, std::string&
 }  // namespace database
 }  // namespace artdaq
 
-void cf::trace_enable_CreateConfigsOperationDetail() {
+void cftd::enableCreateConfigsOperation() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::CreateConfigsOperationDetail"
-                << "trace_enable");
+  TRACE_(0, "artdaq::database::configuration::CreateConfigsOperationDetail trace_enable");
 }

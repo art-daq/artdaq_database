@@ -298,7 +298,7 @@ bool artdaq::database::json_gui_to_db(std::string const& gui_json, std::string& 
     try {
       auto changelog_node = unwrap(converted.at(literal::changelog)).value_as<std::string>();
       TRACE_(14, "json_gui_to_db() Found changelog in guiAST <" << changelog_node << ">");
-      guiAST[literal::changelog]= value_t{changelog_node};
+      guiAST[literal::changelog] = value_t{changelog_node};
     } catch (...) {
       TRACE_(14, "json_gui_to_db() No changelog in guiAST");
     }
@@ -414,12 +414,11 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
   }
 }
 
-void artdaq::database::fhicljson::trace_enable_convertjson2guijson() {
+void artdaq::database::fhicljson::debug::enableJSON2GUIJSON() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", 1LL);
   TRACE_CNTL("modeS", 1LL);
 
-  TRACE_(0, "artdaq::database::convertjson::"
-                << "trace_enable");
+  TRACE_(0, "artdaq::database::convertjson::JSON2GUIJSON trace_enable");
 }

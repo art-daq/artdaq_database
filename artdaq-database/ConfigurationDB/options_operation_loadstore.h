@@ -36,6 +36,10 @@ class LoadStoreOperation final : public OperationBase {
 
   JsonData search_filter_to_JsonData() const override;
 
+  JsonData globalConfiguration_to_JsonData() const;
+  JsonData version_to_JsonData() const;
+  JsonData configurableEntity_to_JsonData() const;
+
   bpo::options_description makeProgramOptions() const override;
 
   int readProgramOptions(bpo::variables_map const&) override;

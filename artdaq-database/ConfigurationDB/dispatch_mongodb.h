@@ -9,32 +9,30 @@ namespace basictypes {
 class JsonData;
 }  // namespace basictypes
 namespace configuration {
-namespace options {
 class LoadStoreOperation;
 class ManageConfigsOperation;
 class ManageAliasesOperation;
-}  // namespace options
 
 namespace mongo {
 using artdaq::database::basictypes::JsonData;
 
-namespace cfo = artdaq::database::configuration::options;
+namespace cf = artdaq::database::configuration;
 
-void store(cfo::LoadStoreOperation const& /*options*/, JsonData const& /*insert_payload*/);
-JsonData load(cfo::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
+void store(cf::LoadStoreOperation const& /*options*/, JsonData const& /*insert_payload*/);
+JsonData load(cf::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
 
-JsonData findGlobalConfigs(cfo::ManageConfigsOperation const& /*options*/, JsonData const& /*search_payload*/);
-JsonData buildConfigSearchFilter(cfo::ManageConfigsOperation const& /*options*/, JsonData const& /*search_payload*/);
+JsonData findGlobalConfigs(cf::ManageConfigsOperation const& /*options*/, JsonData const& /*search_payload*/);
+JsonData buildConfigSearchFilter(cf::ManageConfigsOperation const& /*options*/, JsonData const& /*search_payload*/);
 
-JsonData findConfigVersions(cfo::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
-JsonData addConfigToGlobalConfig(cfo::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
+JsonData findConfigVersions(cf::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
+JsonData addConfigToGlobalConfig(cf::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
 
-JsonData findConfigEntities(cfo::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
+JsonData findConfigEntities(cf::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
 
 }  // namespace mongo
-
-void trace_enable_DBOperationMongo();
-
+namespace debug {
+void enableDBOperationMongo();
+}
 }  // namespace configuration
 }  // namespace database
 }  // namespace artdaq

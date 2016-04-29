@@ -39,7 +39,6 @@ namespace regex {
 constexpr auto parse_double = "-?\\d*\\.?\\d+e[+-]?\\d+";
 constexpr auto parse_include = "(#include)";
 }
-  
 }
 
 }  // namespace fhicljson

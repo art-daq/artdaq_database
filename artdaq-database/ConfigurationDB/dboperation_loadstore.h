@@ -4,8 +4,6 @@
 #include <string>
 #include <utility>
 
-//#include "artdaq-database/ConfigurationDB/options_operation_loadstore.h"
-
 namespace artdaq {
 namespace database {
 namespace configuration {
@@ -24,7 +22,12 @@ result_pair_t store_configuration(std::string const& /*search_filter*/, std::str
 result_pair_t load_configuration(std::string const& /*search_filter*/, std::string& /*conf*/) noexcept;
 }
 
-void trace_enable_LoadStoreOperation();
+namespace debug {
+void enableLoadStoreOperation();
+namespace detail {
+void enableLoadStoreOperation();
+}
+}
 
 }  // namespace configuration
 }  // namespace database

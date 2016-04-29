@@ -20,7 +20,7 @@ constexpr auto newconfig = "newconfig";
 
 constexpr auto addalias = "addalias";
 constexpr auto rmalias = "rmalias";
-constexpr auto findalias = "findalias";  
+constexpr auto findalias = "findalias";
 }
 
 namespace provider {
@@ -62,8 +62,8 @@ constexpr auto operations = "operations";
 }
 
 namespace msg {
-  constexpr auto empty_filter = "Search filter is empty";
-  constexpr auto empty_document = "Json document is empty";
+constexpr auto empty_filter = "Search filter is empty";
+constexpr auto empty_document = "Json document is empty";
 }
 
 namespace search {
@@ -77,7 +77,6 @@ constexpr auto database_provider_mongo = "mongo";
 constexpr auto database_provider_filesystem = "filesystem";
 constexpr auto colon = ":";
 constexpr auto empty_json = "{ }";
-
 }
 }  // namespace configuration
 }  // namespace database

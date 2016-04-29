@@ -396,12 +396,11 @@ T& unwrapper<fcl::value_t>::value_as() {
   return boost::get<T>(any.value);
 }
 
-void artdaq::database::fhicljson::trace_enable_fcl2jsondb() {
+void artdaq::database::fhicljson::debug::enableFCL2JSON() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", 1LL);
   TRACE_CNTL("modeS", 1LL);
 
-  TRACE_(0, "artdaq::database::fcl2jsondb"
-                << "trace_enable");
+  TRACE_(0, "artdaq::database::convertjson::FCL2JSON trace_enable");
 }

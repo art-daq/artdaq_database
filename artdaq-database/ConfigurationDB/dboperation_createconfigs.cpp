@@ -1,13 +1,12 @@
 #include "artdaq-database/ConfigurationDB/common.h"
 
 #include <boost/exception/diagnostic_information.hpp>
+#include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/ConfigurationDB/dboperation_manageconfigs.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
 #include "artdaq-database/ConfigurationDB/shared_literals.h"
-#include "artdaq-database/BasicTypes/basictypes.h"
-
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -144,13 +143,12 @@ result_pair_t json::find_configuration_entities(std::string const& search_filter
   }
 }
 
-void trace_enable_CreateConfigsOperation() {
+void debug::enableCreateConfigsOperation() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::CreateConfigsOperation"
-                << "trace_enable");
+  TRACE_(0, "artdaq::database::configuration::CreateConfigsOperation trace_enable");
 }

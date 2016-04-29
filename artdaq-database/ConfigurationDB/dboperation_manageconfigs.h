@@ -4,8 +4,6 @@
 #include <string>
 #include <utility>
 
-//#include "artdaq-database/ConfigurationDB/options_operation_manageconfigs.h"
-
 namespace artdaq {
 namespace database {
 namespace configuration {
@@ -34,7 +32,15 @@ result_pair_t find_configuration_versions(std::string const& /*search_filter*/) 
 result_pair_t find_configuration_entities(std::string const& /*search_filter*/) noexcept;
 }
 
-void trace_enable_ManageConfigsOperation();
+namespace debug {
+void enableCreateConfigsOperation();
+void enableFindConfigsOperation();
+namespace detail {
+void enableCreateConfigsOperation();
+void enableFindConfigsOperation();
+}
+}
+
 }  // namespace configuration
 }  // namespace database
 }  // namespace artdaq

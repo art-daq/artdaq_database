@@ -61,7 +61,9 @@ struct json2fcldb final {
   valuetuple_t const& parent;
 };
 
-void trace_enable_fcl2jsondb();
+namespace debug {
+void enableFCL2JSON();
+}
 
 }  // namespace fhicljson
 }  // namespace database
