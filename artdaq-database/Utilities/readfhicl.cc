@@ -1,11 +1,23 @@
+#include <fstream>
 #include <iostream>
-#include "fhiclcpp/ParameterSet.h"
-#include "fhiclcpp/make_ParameterSet.h"
 
+#include <cstddef>
+#include <iterator>
+#include <regex>
 #include "boost/program_options.hpp"
+#include "cetlib/includer.h"
+#include "fhiclcpp/extended_value.h"
+#include "fhiclcpp/intermediate_table.h"
+#include "fhiclcpp/parse.h"
+#include "fhiclcpp/parse_shims.h"
 
 using namespace fhicl;
 namespace bpo = boost::program_options;
+
+std::ostream& operator<<(std::ostream& out, fhicl::extended_value const& value) {
+  out << value.to_string();
+  return out;
+}
 
 int main(int argc, char* argv[]) try {
   // Get the input parameters via the boost::program_options library,
@@ -44,20 +56,35 @@ int main(int argc, char* argv[]) try {
   // environmental variable for the *.fcl file whose name was passed to
   // the command line. If not defined, look in the current directory.
 
-  ParameterSet complete_pset;
-
   if (getenv("FHICL_FILE_PATH") == nullptr) {
     std::cerr << "INFO: environment variable FHICL_FILE_PATH was not set. Using \".\"\n";
     setenv("FHICL_FILE_PATH", ".", 0);
   }
 
   auto file_name = vm["config"].as<std::string>();
-  auto filepath_maker = cet::filepath_lookup("FHICL_FILE_PATH");
 
-  make_ParameterSet(file_name, filepath_maker, complete_pset);
+  std::ifstream is(file_name);
+  std::string conf((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+  is.close();
 
-  std::cout << complete_pset.to_indented_string(0, false) << "\n";
+  auto idx = std::size_t{0};
 
+  conf.reserve(conf.size()+512);
+
+  std::for_each(std::sregex_iterator(conf.begin(), conf.end(), std::regex{"(#include\\s)([^'\"]*)"}),
+                std::sregex_iterator(), [&conf, &idx](auto& m) {
+                  conf.replace(m.position(), m.length(), "fhicl_pound_include_" + std::to_string(idx++) + ":");
+                });
+
+  ::fhicl::intermediate_table fhicl_table;
+  
+  ::shims::isSnippetMode(true);
+  
+  parse_document(conf, fhicl_table);
+
+  for (auto const& atom : fhicl_table) std::cout << "\n" << atom.first << ":" << atom.second;
+
+  std::cout << "\n";
   return 0;
 }
 

@@ -2,8 +2,7 @@
 
 #include "artdaq-database/FhiclJson/fhicl_writer.h"
 
-#include "artdaq-database/FhiclJson/convertfhicljsondb.h"
-#include "artdaq-database/FhiclJson/convertfhicljsongui.h"
+#include "artdaq-database/FhiclJson/convertfhicl2jsondb.h"
 #include "artdaq-database/FhiclJson/fhicl_types.h"
 #include "artdaq-database/FhiclJson/healper_functions.h"
 #include "artdaq-database/FhiclJson/json_types.h"
@@ -23,97 +22,80 @@ namespace jsn = artdaq::database::json;
 namespace literal = artdaq::database::fhicljson::literal;
 
 using artdaq::database::fhicl::FhiclWriter;
-using artdaq::database::fhicljson::json2fclgui;
 using artdaq::database::fhicljson::json2fcldb;
+using artdaq::database::fhicljson::extra_opts;
 
-bool FhiclWriter::write_data_db(jsn::object_t const& json_object, std::string& out) {
+bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out) {
   assert(out.empty());
   assert(!json_object.empty());
 
-  TRACE_(2, "write_data_db() begin");
+  TRACE_(2, "write_data() begin");
 
   using artdaq::database::fhicl::fhicl_generator_grammar;
   using artdaq::database::fhicljson::valuetuple_t;
 
-  auto const& data_node = boost::get<jsn::object_t>(json_object.at(literal::data_node));
-  auto const& metadata_node = boost::get<jsn::object_t>(json_object.at(literal::metadata_node));
+  auto get_SubNode = [](auto& parent, auto const& child_name) -> auto const& {
+    return boost::get<jsn::object_t>(parent.at(child_name));
+  };
 
-  auto result = bool(false);
+  auto const& data_node = get_SubNode(json_object, literal::data_node);
+  auto const& metadata_node = get_SubNode(json_object, literal::metadata_node);
+
   auto buffer = std::string();
 
-  auto fhicl_table = fcl::table_t();
+  auto sink = std::back_insert_iterator<std::string>(buffer);
 
-  TRACE_(2, "write_data_db() create fcl table begin");
+  {  // convert prolog section
+    auto fhicl_table = fcl::table_t();
 
-  for (auto const& data : data_node) {
-    valuetuple_t value_tuple = std::forward_as_tuple(data.key, data.value, metadata_node.at(data.key));
-    fhicl_table.push_back(json2fcldb(value_tuple, value_tuple));
+    auto opts = extra_opts{};
+    opts.enablePrologMode();
+
+    auto& data = get_SubNode(data_node, literal::prolog_node);
+    auto& metadata = get_SubNode(metadata_node, literal::prolog_node);
+
+    for (auto const& element : data) {
+      valuetuple_t value_tuple = std::forward_as_tuple(element.key, element.value, metadata.at(element.key));
+      fhicl_table.push_back(json2fcldb(std::make_tuple(value_tuple, value_tuple, opts)));
+    }
+
+    fhicl_generator_grammar<decltype(sink)> grammar;
+
+    if (!karma::generate(sink, grammar, fhicl_table)) return false;
   }
 
-  TRACE_(2, "write_data_db() create fcl table end");
+  {  // convert main section
+    auto fhicl_table = fcl::table_t();
 
-  auto sink = std::back_insert_iterator<std::string>(buffer);
+    auto opts = extra_opts{};
+    opts.enableDefaultMode();
 
-  fhicl_generator_grammar<decltype(sink)> grammar;
+    auto& data = get_SubNode(data_node, literal::main_node);
+    auto& metadata = get_SubNode(metadata_node, literal::main_node);
 
-  result = karma::generate(sink, grammar, fhicl_table);
+    for (auto const& element : data) {
+      valuetuple_t value_tuple = std::forward_as_tuple(element.key, element.value, metadata.at(element.key));
+      fhicl_table.push_back(json2fcldb(std::make_tuple(value_tuple, value_tuple, opts)));
+    }
 
-  if (result) out.swap(buffer);
+    fhicl_generator_grammar<decltype(sink)> grammar;
 
-  TRACE_(2, "write_data_db() end");
+    if (!karma::generate(sink, grammar, fhicl_table)) return false;
+  }
 
-  return result;
-}
+  buffer.reserve(buffer.size()+512);
 
-bool FhiclWriter::write_data_gui(jsn::array_t const& json_array, std::string& out) {
-  assert(out.empty());
-  assert(!json_array.empty());
+  std::for_each(std::sregex_iterator(buffer.begin(), buffer.end(), std::regex{"(#include\\s*:)([^\"]*)"}),
+                std::sregex_iterator(), [&buffer](auto& m) {
+                  buffer.replace(m.position(), m.length(), "#include ");
+                });
 
-  using artdaq::database::fhicl::fhicl_generator_grammar;
 
-  auto result = bool(false);
-  auto buffer = std::string();
+  out.swap(buffer);
 
-  auto fhicl_table = fcl::table_t();
+  TRACE_(2, "write_data() end");
 
-  for (auto const& json_value : json_array) fhicl_table.push_back(json2fclgui(json_value, json_value));
-
-  auto sink = std::back_insert_iterator<std::string>(buffer);
-
-  fhicl_generator_grammar<decltype(sink)> grammar;
-
-  result = karma::generate(sink, grammar, fhicl_table);
-
-  if (result) out.swap(buffer);
-
-  return result;
-}
-
-bool FhiclWriter::write_includes(jsn::array_t const& json_array, std::string& out) {
-  assert(out.empty());
-  assert(!json_array.empty());
-
-  using artdaq::database::fhicl::fhicl_include_generator_grammar;
-
-  auto result = bool(false);
-  auto buffer = std::string();
-
-  auto includes = includes_t();
-
-  includes.reserve(json_array.size());
-
-  for (auto const& json_value : json_array)
-    includes.push_back(artdaq::database::fhicljson::unescape(boost::get<std::string>(json_value)));
-
-  auto sink = std::back_insert_iterator<std::string>(buffer);
-
-  fhicl_include_generator_grammar<decltype(sink)> grammar;
-
-  result = karma::generate(sink, grammar, includes);
-
-  if (result) out.swap(buffer);
-
-  return result;
+  return true;
 }
 
 void artdaq::database::fhicl::trace_enable_FhiclWriter() {

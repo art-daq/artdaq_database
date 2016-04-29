@@ -350,7 +350,7 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
 	  
 	  if(child.count(literal::type)==0) {	     
              data_node.value_as<array_t>().push_back(value);
-	     break;
+	     continue;
 	  }
 	    
           auto const& type_name = unwrap(child).value_as<const std::string>(literal::type);

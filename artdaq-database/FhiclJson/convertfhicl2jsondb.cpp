@@ -1,7 +1,7 @@
 #include "artdaq-database/FhiclJson/common.h"
 #include "artdaq-database/FhiclJson/healper_functions.h"
 
-#include "artdaq-database/FhiclJson/convertfhicljsondb.h"
+#include "artdaq-database/FhiclJson/convertfhicl2jsondb.h"
 #include "artdaq-database/FhiclJson/shared_literals.h"
 
 #include "fhiclcpp/extended_value.h"
@@ -25,9 +25,12 @@ using comments_t = artdaq::database::fhicljson::comments_t;
 using artdaq::database::fhicljson::fcl2jsondb;
 using artdaq::database::fhicljson::json2fcldb;
 
-fcl2jsondb::fcl2jsondb(fhicl_key_value_pair_t const& self_, fhicl_key_value_pair_t const& parent_,
-                       comments_t const& comments_)
-    : self{self_}, parent{parent_}, comments{comments_} {}
+std::string include("fhicl_pound_include");
+std::string quoted_(std::string const& text) { return "\"" + text + "\""; }
+bool need_quotes(std::string const& text){ return text.find_first_of(" .%()/")!=std::string::npos;  }
+
+fcl2jsondb::fcl2jsondb(args_tuple_t args)
+    : self{std::get<0>(args)}, parent{std::get<1>(args)}, comments{std::get<2>(args)}, opts{std::get<3>(args)} {}
 
 fcl2jsondb::operator datapair_t() try {
   auto const& key = self.first;
@@ -202,9 +205,11 @@ fcl2jsondb::operator datapair_t() try {
       auto& tmpMetadataObject = boost::get<jsn::object_t>(pair.metadata_<jsn::object_t>()[literal::children]);
 
       for (auto const& kvp : fcl_value::table_t(value)) {
-        datapair_t pair = std::move(fcl2jsondb(kvp, self, comments));
+	if((kvp.second.in_prolog && opts.readProlog) ||(!kvp.second.in_prolog && opts.readMain) ) {
+        datapair_t pair = std::move(fcl2jsondb(std::make_tuple(kvp, self, comments,opts)));
         tmpDataObject.push_back(std::move(pair.first));
         tmpMetadataObject.push_back(std::move(pair.second));
+	}
       }
 
       break;
@@ -228,7 +233,8 @@ fcl2jsondb::operator datapair_t() try {
   throw ::fhicl::exception(::fhicl::cant_insert, self.first) << e.what();
 }
 
-json2fcldb::json2fcldb(valuetuple_t const& self_, valuetuple_t const& parent_) : self{self_}, parent{parent_} {}
+json2fcldb::json2fcldb(args_tuple_t args)
+    : self{std::get<0>(args)}, parent{std::get<1>(args)}, opts{std::get<2>(args)} {}
 
 json2fcldb::operator fcl::value_t() try {
   auto const& self_value = std::get<1>(self);
@@ -253,19 +259,34 @@ json2fcldb::operator fcl::atom_t() try {
   auto const& self_data = std::get<1>(self);
   auto const& self_metadata = std::get<2>(self);
 
-  TRACE_(2, "json2fcldb() key=<" << self_key << ">");
-
-  // if (self_data.type() != typeid(jsn::object_t))
-  //    throw ::fhicl::exception(::fhicl::parse_error, literal::data_node) << ("JSON element is not a object_t type.");
-
-  // if (self_metadata.type() != typeid(jsn::object_t))
-  //    throw ::fhicl::exception(::fhicl::parse_error, literal::metadata_node) << ("JSON element is not a object_t
-  //    type.");
-
-  // auto const& data_object = unwrap(self_data).value_as<const jsn::object_t>();
   auto const& metadata_object = unwrap(self_metadata).value_as<const jsn::object_t>();
 
-  auto type = string_as_tag(boost::get<std::string>(metadata_object.at(literal::type)));
+  auto type_name= boost::get<std::string>(metadata_object.at(literal::type));
+  
+  TRACE_(2, "json2fcldb() key=<" << self_key << ">" << " type=<" << type_name << ">");
+  
+  auto override_comment = false;
+  
+  if(type_name=="table" &&  self_data.type() == typeid(std::string)){
+    TRACE_(2, "json2fcldb() type override to string");
+      type_name  ="string";
+      override_comment=true;
+  }
+
+
+  
+  if(self_key.compare(0, include.length(),include)==0){
+    TRACE_(2, "json2fcldb() name override to #include");
+    
+    auto fcl_key = fcl::key_t("#include", " ");
+    auto fcl_value = fcl::value_t();
+
+    fcl_value.value = quoted_(boost::get<std::string>(self_data));
+
+    return {fcl_key, fcl_value};
+  }
+    
+  auto type = string_as_tag(type_name);
 
   auto fcl_value = fcl::value_t();
 
@@ -273,7 +294,8 @@ json2fcldb::operator fcl::atom_t() try {
     case ::fhicl::UNKNOWN:
     case ::fhicl::NIL:
     case ::fhicl::STRING: {
-      fcl_value.value = boost::get<std::string>(self_data);
+      auto value =boost::get<std::string>(self_data);
+      fcl_value.value = need_quotes(value)?quoted_(value):value ;
 
       break;
     }
@@ -326,7 +348,7 @@ json2fcldb::operator fcl::atom_t() try {
             }
           } else {
             valuetuple_t value_tuple = std::forward_as_tuple(self_key, tmpVal, self_metadata);
-            sequence.push_back(json2fcldb(value_tuple, self));
+            sequence.push_back(json2fcldb(std::make_tuple(value_tuple, self,opts)));
           }
         }
       } catch (std::out_of_range const&) {
@@ -344,7 +366,7 @@ json2fcldb::operator fcl::atom_t() try {
         for (auto const& data : object) {
           valuetuple_t value_tuple = std::forward_as_tuple(data.key, data.value, children.at(data.key));
 
-          table.push_back(json2fcldb(value_tuple, self));
+          table.push_back(json2fcldb( std::make_tuple(value_tuple, self,opts)));
         }
 
       } catch (std::out_of_range const&) {
@@ -362,9 +384,10 @@ json2fcldb::operator fcl::atom_t() try {
 
   auto const& name = self_key;
   auto const& comment = boost::get<std::string>(metadata_object.at(literal::comment));
+  
   auto fcl_key = fcl::key_t(name, comment);
 
-  if (type != ::fhicl::TABLE)  // table does not have annotation
+  if (type != ::fhicl::TABLE && !override_comment)  // table does not have annotation
     fcl_value.annotation = boost::get<std::string>(metadata_object.at(literal::annotation));
 
   return {fcl_key, fcl_value};

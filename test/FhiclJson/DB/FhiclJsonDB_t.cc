@@ -22,7 +22,7 @@ bool test_convert2json(std::string const&, std::string const&);
 bool test_roundconvertfcl(std::string const&, std::string const&);
 bool test_roundconvertjson(std::string const&, std::string const&);
 
-int main(int argc, char* argv[]) try
+int main(int argc, char* argv[]) //try
 {
     artdaq::database::fhicl::trace_enable_FhiclReader();
     artdaq::database::fhicl::trace_enable_FhiclWriter();
@@ -127,11 +127,12 @@ int main(int argc, char* argv[]) try
 
     return process_exit_code::FAILURE;
 }
-catch(...)
-{
-    std::cerr << "Process exited with error: " << boost::current_exception_diagnostic_information();
-    return process_exit_code::UNCAUGHT_EXCEPTION;
-}
+//catch(...)
+//{
+//    using namespace debug;    
+//   std::cerr << current_exception_diagnostic_information();    
+//    return process_exit_code::UNCAUGHT_EXCEPTION;
+//}
 
 bool test_convert2fcl(std::string const& input, std::string const& compare)
 {

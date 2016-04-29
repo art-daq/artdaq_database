@@ -38,27 +38,51 @@ struct return_pair {
   jsn::data_t& metadata;
 };
 
+struct extra_opts {
+  bool readProlog = false;
+  bool readMain = true;
+
+  inline void enablePrologMode() {
+    readProlog = true;
+    readMain = false;
+  }
+  inline void enableDefaultMode() {
+    readProlog = false;
+    readMain = true;
+  }
+  inline void enableCombinedMode() {
+    readProlog = true;
+    readMain = true;
+  }
+};
+
 struct fcl2jsondb final {
   using fcl_value = ::fhicl::extended_value;
   using fhicl_key_value_pair_t = std::pair<std::string, fcl_value> const;
+  using args_tuple_t =
+      std::tuple<fhicl_key_value_pair_t const&, fhicl_key_value_pair_t const&, comments_t const&, extra_opts const&>;
 
-  explicit fcl2jsondb(fhicl_key_value_pair_t const&, fhicl_key_value_pair_t const&, comments_t const&);
+  explicit fcl2jsondb(args_tuple_t);
 
   operator datapair_t();
 
   fhicl_key_value_pair_t const& self;
   fhicl_key_value_pair_t const& parent;
   comments_t const& comments;
+  extra_opts const& opts;
 };
 
 struct json2fcldb final {
-  explicit json2fcldb(valuetuple_t const&, valuetuple_t const&);
+  using args_tuple_t = std::tuple<valuetuple_t const&, valuetuple_t const&, extra_opts const&>;
+
+  explicit json2fcldb(args_tuple_t);
 
   operator fcl::value_t();
   operator fcl::atom_t();
 
   valuetuple_t const& self;
   valuetuple_t const& parent;
+  extra_opts const& opts;
 };
 
 namespace debug {

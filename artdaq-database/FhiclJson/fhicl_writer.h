@@ -19,13 +19,11 @@ using namespace boost::spirit;
 template <typename Iter>
 struct fhicl_generator_grammar : karma::grammar<Iter, table_t()> {
   fhicl_generator_grammar() : fhicl_generator_grammar::base_type(start) {
-    variant_value_rule = table_rule | sequence_rule | quoted_string | karma::int_ | karma::double_ | karma::bool_;
+    variant_value_rule = table_rule | sequence_rule | string | karma::int_ | karma::double_ | karma::bool_;
 
     annotated_value_rule = variant_value_rule << -annotation;
 
     string = karma::string;
-
-    quoted_string = '"' << string << '"';
 
     comment = -(string << karma::eol);
 
@@ -44,7 +42,7 @@ struct fhicl_generator_grammar : karma::grammar<Iter, table_t()> {
     start = toplevel_table;
   }
 
-  karma::rule<Iter, std::string()> string, quoted_string, comment, annotation;
+  karma::rule<Iter, std::string()> string, comment, annotation;
   karma::rule<Iter, variant_value_t()> variant_value_rule;
   karma::rule<Iter, value_t()> annotated_value_rule;
   karma::rule<Iter, key_t()> commented_key_rule;
@@ -68,10 +66,7 @@ struct fhicl_include_generator_grammar : karma::grammar<Iter, includes_t()> {
 };
 
 struct FhiclWriter final {
-  bool write_data_gui(jsn::array_t const&, std::string&);
-  bool write_data_db(jsn::object_t const&, std::string&);
-
-  bool write_includes(jsn::array_t const&, std::string&);
+  bool write_data(jsn::object_t const&, std::string&);
 };
 
 void trace_enable_FhiclWriter();

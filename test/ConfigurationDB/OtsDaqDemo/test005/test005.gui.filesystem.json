@@ -1,0 +1,511 @@
+{
+   "document":{
+      "data":{
+         "@xmlns:xsi":"http://www.w3.org/2001/XMLSchema-instance",
+         "@xsi:noNamespaceSchemaLocation":"../../ConfigurationBase.xsd",
+         "DATA_SET":{
+            "COMMENT_DESCRIPTION":"null",
+            "CREATED_BY_USER":"null",
+            "DATA":[
+               {
+                  "AUTHOR":"Uplegger",
+                  "COMMENT_DESCRIPTION":"Default Physics",
+                  "KEY_ALIAS":"DefaultPhysics",
+                  "KOC":"DAC",
+                  "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                  "VERSION_ALIAS":"Default"
+               },
+               {
+                  "AUTHOR":"Uplegger",
+                  "COMMENT_DESCRIPTION":"Default Physics",
+                  "KEY_ALIAS":"DefaultPhysics",
+                  "KOC":"Detector",
+                  "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                  "VERSION_ALIAS":"Default"
+               },
+               {
+                  "AUTHOR":"Uplegger",
+                  "COMMENT_DESCRIPTION":"Default Physics",
+                  "KEY_ALIAS":"DefaultPhysics",
+                  "KOC":"FEW",
+                  "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                  "VERSION_ALIAS":"Default"
+               },
+               {
+                  "AUTHOR":"Uplegger",
+                  "COMMENT_DESCRIPTION":"Default Physics",
+                  "KEY_ALIAS":"DefaultPhysics",
+                  "KOC":"FER",
+                  "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                  "VERSION_ALIAS":"Default"
+               },
+               {
+                  "AUTHOR":"Uplegger",
+                  "COMMENT_DESCRIPTION":"Default Physics",
+                  "KEY_ALIAS":"DefaultPhysics",
+                  "KOC":"Mask",
+                  "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                  "VERSION_ALIAS":"Default"
+               },
+               {
+                  "AUTHOR":"Uplegger",
+                  "COMMENT_DESCRIPTION":"Default Physics",
+                  "KEY_ALIAS":"DefaultPhysics",
+                  "KOC":"ROCToFE",
+                  "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                  "VERSION_ALIAS":"Default"
+               },
+               {
+                  "AUTHOR":"Uplegger",
+                  "COMMENT_DESCRIPTION":"Default Physics",
+                  "KEY_ALIAS":"SCurveDefault",
+                  "KOC":"DAC",
+                  "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                  "VERSION_ALIAS":"Default"
+               },
+               {
+                  "AUTHOR":"Uplegger",
+                  "COMMENT_DESCRIPTION":"Default Physics",
+                  "KEY_ALIAS":"SCurveDefault",
+                  "KOC":"Detector",
+                  "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                  "VERSION_ALIAS":"Default"
+               },
+               {
+                  "AUTHOR":"Uplegger",
+                  "COMMENT_DESCRIPTION":"Default Physics",
+                  "KEY_ALIAS":"SCurveDefault",
+                  "KOC":"FEW",
+                  "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                  "VERSION_ALIAS":"Default"
+               },
+               {
+                  "AUTHOR":"Uplegger",
+                  "COMMENT_DESCRIPTION":"Default Physics",
+                  "KEY_ALIAS":"SCurveDefault",
+                  "KOC":"FER",
+                  "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                  "VERSION_ALIAS":"Default"
+               },
+               {
+                  "AUTHOR":"Uplegger",
+                  "COMMENT_DESCRIPTION":"Default Physics",
+                  "KEY_ALIAS":"SCurveDefault",
+                  "KOC":"Mask",
+                  "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                  "VERSION_ALIAS":"Default"
+               },
+               {
+                  "AUTHOR":"Uplegger",
+                  "COMMENT_DESCRIPTION":"Default Physics",
+                  "KEY_ALIAS":"SCurveDefault",
+                  "KOC":"ModuleToFE",
+                  "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                  "VERSION_ALIAS":"Default"
+               },
+               {
+                  "AUTHOR":"Uplegger",
+                  "COMMENT_DESCRIPTION":"Default Physics",
+                  "KEY_ALIAS":"SCurveLatest",
+                  "KOC":"DAC",
+                  "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                  "VERSION_ALIAS":"Latest"
+               },
+               {
+                  "AUTHOR":"Uplegger",
+                  "COMMENT_DESCRIPTION":"Default Physics",
+                  "KEY_ALIAS":"SCurveLatest",
+                  "KOC":"Detector",
+                  "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                  "VERSION_ALIAS":"Default"
+               },
+               {
+                  "AUTHOR":"Uplegger",
+                  "COMMENT_DESCRIPTION":"Default Physics",
+                  "KEY_ALIAS":"SCurveLatest",
+                  "KOC":"FEW",
+                  "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                  "VERSION_ALIAS":"Default"
+               },
+               {
+                  "AUTHOR":"Uplegger",
+                  "COMMENT_DESCRIPTION":"Default Physics",
+                  "KEY_ALIAS":"SCurveLatest",
+                  "KOC":"FER",
+                  "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                  "VERSION_ALIAS":"Default"
+               },
+               {
+                  "AUTHOR":"Uplegger",
+                  "COMMENT_DESCRIPTION":"Default Physics",
+                  "KEY_ALIAS":"SCurveLatest",
+                  "KOC":"Mask",
+                  "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                  "VERSION_ALIAS":"Default"
+               },
+               {
+                  "AUTHOR":"Uplegger",
+                  "COMMENT_DESCRIPTION":"Default Physics",
+                  "KEY_ALIAS":"SCurveLatest",
+                  "KOC":"ModuleToFE",
+                  "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                  "VERSION_ALIAS":"Default"
+               }
+            ],
+            "PART":{
+               "KIND_OF_PART":"Detector ROOT",
+               "NAME_LABEL":"CMS--ROOT"
+            },
+            "VERSION":"0"
+         },
+         "HEADER":{
+            "RUN":{
+               "LOCATION":"CERN P5",
+               "RUN_BEGIN_TIMESTAMP":"2013-01-29 17:22:10",
+               "RUN_NUMBER":"1",
+               "RUN_TYPE":"DefaultConfigurations"
+            },
+            "TYPE":{
+               "EXTENSION_TABLE_NAME":"DEFAULT_CONFIGURATIONS",
+               "NAME":"DefaultConfigurations"
+            }
+         }
+      },
+      "metadata":{
+         "comments":{
+            "empty":"empty"
+         }
+      },
+      "search":[
+         {
+            "name":"find any",
+            "query":"not defined"
+         }
+      ],
+      "converted":{
+         "guidata":[
+            {
+               "type":"string",
+               "name":"@xmlns:xsi",
+               "comment":" ",
+               "value":"http://www.w3.org/2001/XMLSchema-instance",
+               "annotation":" "
+            },
+            {
+               "type":"string",
+               "name":"@xsi:noNamespaceSchemaLocation",
+               "comment":" ",
+               "value":"../../ConfigurationBase.xsd",
+               "annotation":" "
+            },
+            {
+               "type":"table",
+               "name":"DATA_SET",
+               "comment":" ",
+               "children":[
+                  {
+                     "type":"string",
+                     "name":"COMMENT_DESCRIPTION",
+                     "comment":" ",
+                     "value":"null",
+                     "annotation":" "
+                  },
+                  {
+                     "type":"string",
+                     "name":"CREATED_BY_USER",
+                     "comment":" ",
+                     "value":"null",
+                     "annotation":" "
+                  },
+                  {
+                     "type":"sequence",
+                     "name":"DATA",
+                     "comment":" ",
+                     "children":[
+                        {
+                           "AUTHOR":"Uplegger",
+                           "COMMENT_DESCRIPTION":"Default Physics",
+                           "KEY_ALIAS":"DefaultPhysics",
+                           "KOC":"DAC",
+                           "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                           "VERSION_ALIAS":"Default"
+                        },
+                        {
+                           "AUTHOR":"Uplegger",
+                           "COMMENT_DESCRIPTION":"Default Physics",
+                           "KEY_ALIAS":"DefaultPhysics",
+                           "KOC":"Detector",
+                           "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                           "VERSION_ALIAS":"Default"
+                        },
+                        {
+                           "AUTHOR":"Uplegger",
+                           "COMMENT_DESCRIPTION":"Default Physics",
+                           "KEY_ALIAS":"DefaultPhysics",
+                           "KOC":"FEW",
+                           "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                           "VERSION_ALIAS":"Default"
+                        },
+                        {
+                           "AUTHOR":"Uplegger",
+                           "COMMENT_DESCRIPTION":"Default Physics",
+                           "KEY_ALIAS":"DefaultPhysics",
+                           "KOC":"FER",
+                           "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                           "VERSION_ALIAS":"Default"
+                        },
+                        {
+                           "AUTHOR":"Uplegger",
+                           "COMMENT_DESCRIPTION":"Default Physics",
+                           "KEY_ALIAS":"DefaultPhysics",
+                           "KOC":"Mask",
+                           "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                           "VERSION_ALIAS":"Default"
+                        },
+                        {
+                           "AUTHOR":"Uplegger",
+                           "COMMENT_DESCRIPTION":"Default Physics",
+                           "KEY_ALIAS":"DefaultPhysics",
+                           "KOC":"ROCToFE",
+                           "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                           "VERSION_ALIAS":"Default"
+                        },
+                        {
+                           "AUTHOR":"Uplegger",
+                           "COMMENT_DESCRIPTION":"Default Physics",
+                           "KEY_ALIAS":"SCurveDefault",
+                           "KOC":"DAC",
+                           "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                           "VERSION_ALIAS":"Default"
+                        },
+                        {
+                           "AUTHOR":"Uplegger",
+                           "COMMENT_DESCRIPTION":"Default Physics",
+                           "KEY_ALIAS":"SCurveDefault",
+                           "KOC":"Detector",
+                           "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                           "VERSION_ALIAS":"Default"
+                        },
+                        {
+                           "AUTHOR":"Uplegger",
+                           "COMMENT_DESCRIPTION":"Default Physics",
+                           "KEY_ALIAS":"SCurveDefault",
+                           "KOC":"FEW",
+                           "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                           "VERSION_ALIAS":"Default"
+                        },
+                        {
+                           "AUTHOR":"Uplegger",
+                           "COMMENT_DESCRIPTION":"Default Physics",
+                           "KEY_ALIAS":"SCurveDefault",
+                           "KOC":"FER",
+                           "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                           "VERSION_ALIAS":"Default"
+                        },
+                        {
+                           "AUTHOR":"Uplegger",
+                           "COMMENT_DESCRIPTION":"Default Physics",
+                           "KEY_ALIAS":"SCurveDefault",
+                           "KOC":"Mask",
+                           "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                           "VERSION_ALIAS":"Default"
+                        },
+                        {
+                           "AUTHOR":"Uplegger",
+                           "COMMENT_DESCRIPTION":"Default Physics",
+                           "KEY_ALIAS":"SCurveDefault",
+                           "KOC":"ModuleToFE",
+                           "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                           "VERSION_ALIAS":"Default"
+                        },
+                        {
+                           "AUTHOR":"Uplegger",
+                           "COMMENT_DESCRIPTION":"Default Physics",
+                           "KEY_ALIAS":"SCurveLatest",
+                           "KOC":"DAC",
+                           "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                           "VERSION_ALIAS":"Latest"
+                        },
+                        {
+                           "AUTHOR":"Uplegger",
+                           "COMMENT_DESCRIPTION":"Default Physics",
+                           "KEY_ALIAS":"SCurveLatest",
+                           "KOC":"Detector",
+                           "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                           "VERSION_ALIAS":"Default"
+                        },
+                        {
+                           "AUTHOR":"Uplegger",
+                           "COMMENT_DESCRIPTION":"Default Physics",
+                           "KEY_ALIAS":"SCurveLatest",
+                           "KOC":"FEW",
+                           "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                           "VERSION_ALIAS":"Default"
+                        },
+                        {
+                           "AUTHOR":"Uplegger",
+                           "COMMENT_DESCRIPTION":"Default Physics",
+                           "KEY_ALIAS":"SCurveLatest",
+                           "KOC":"FER",
+                           "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                           "VERSION_ALIAS":"Default"
+                        },
+                        {
+                           "AUTHOR":"Uplegger",
+                           "COMMENT_DESCRIPTION":"Default Physics",
+                           "KEY_ALIAS":"SCurveLatest",
+                           "KOC":"Mask",
+                           "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                           "VERSION_ALIAS":"Default"
+                        },
+                        {
+                           "AUTHOR":"Uplegger",
+                           "COMMENT_DESCRIPTION":"Default Physics",
+                           "KEY_ALIAS":"SCurveLatest",
+                           "KOC":"ModuleToFE",
+                           "RECORD_INSERTION_TIME":"2013-01-29 17:22:10",
+                           "VERSION_ALIAS":"Default"
+                        }
+                     ]
+                  },
+                  {
+                     "type":"table",
+                     "name":"PART",
+                     "comment":" ",
+                     "children":[
+                        {
+                           "type":"string",
+                           "name":"KIND_OF_PART",
+                           "comment":" ",
+                           "value":"Detector ROOT",
+                           "annotation":" "
+                        },
+                        {
+                           "type":"string",
+                           "name":"NAME_LABEL",
+                           "comment":" ",
+                           "value":"CMS--ROOT",
+                           "annotation":" "
+                        }
+                     ]
+                  },
+                  {
+                     "type":"string",
+                     "name":"VERSION",
+                     "comment":" ",
+                     "value":"0",
+                     "annotation":" "
+                  }
+               ]
+            },
+            {
+               "type":"table",
+               "name":"HEADER",
+               "comment":" ",
+               "children":[
+                  {
+                     "type":"table",
+                     "name":"RUN",
+                     "comment":" ",
+                     "children":[
+                        {
+                           "type":"string",
+                           "name":"LOCATION",
+                           "comment":" ",
+                           "value":"CERN P5",
+                           "annotation":" "
+                        },
+                        {
+                           "type":"string",
+                           "name":"RUN_BEGIN_TIMESTAMP",
+                           "comment":" ",
+                           "value":"2013-01-29 17:22:10",
+                           "annotation":" "
+                        },
+                        {
+                           "type":"string",
+                           "name":"RUN_NUMBER",
+                           "comment":" ",
+                           "value":"1",
+                           "annotation":" "
+                        },
+                        {
+                           "type":"string",
+                           "name":"RUN_TYPE",
+                           "comment":" ",
+                           "value":"DefaultConfigurations",
+                           "annotation":" "
+                        }
+                     ]
+                  },
+                  {
+                     "type":"table",
+                     "name":"TYPE",
+                     "comment":" ",
+                     "children":[
+                        {
+                           "type":"string",
+                           "name":"EXTENSION_TABLE_NAME",
+                           "comment":" ",
+                           "value":"DEFAULT_CONFIGURATIONS",
+                           "annotation":" "
+                        },
+                        {
+                           "type":"string",
+                           "name":"NAME",
+                           "comment":" ",
+                           "value":"DefaultConfigurations",
+                           "annotation":" "
+                        }
+                     ]
+                  }
+               ]
+            }
+         ],
+         "changelog":"empty"
+      }
+   },
+   "source":{
+      "encoding":"base64",
+      "format":"json",
+      "rawdata":"as"
+   },
+   "version":"version001",
+   "configurations":[
+      {
+         "name":"otsdaqC001",
+         "assigned":"Mon Apr 25 11:38:41 2016"
+      }
+   ],
+   "aliases":{
+      "active":[
+
+      ],
+      "history":[
+
+      ]
+   },
+   "changelog":"empty",
+   "bookkeeping":{
+      "isdeleted":false,
+      "isreadonly":true,
+      "created":"Tue Dec 29 18:19:25 2015",
+      "updates":[
+         {
+            "addToGlobalConfig":"Mon Apr 25 11:38:41 2016"
+         },
+         {
+            "setVersion":"Mon Apr 25 11:38:41 2016"
+         },
+         {
+            "setConfigurableEntity":"Mon Apr 25 11:38:41 2016"
+         }
+      ]
+   },
+   "configurable_entity":{
+      "name":"CMSROOT"
+   },
+   "_id":{
+      "_oid":"9748bc11b9894c5f98e116cd"
+   }
+}

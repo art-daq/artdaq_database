@@ -7,6 +7,8 @@ namespace fhicljson {
 namespace literal {
 constexpr auto document_node = "document";
 constexpr auto data_node = "data";
+constexpr auto prolog_node = "prolog";
+constexpr auto main_node = "main";
 constexpr auto comments_node = "comments";
 constexpr auto origin_node = "origin";
 constexpr auto includes_node = "includes";
