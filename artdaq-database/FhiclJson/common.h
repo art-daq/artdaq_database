@@ -21,7 +21,7 @@
 #include <cstddef>
 #include <iterator>
 
-
+#define BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT 1
 #include <boost/core/demangle.hpp>
 #include <boost/exception/diagnostic_information.hpp>
 #include <boost/lexical_cast.hpp>

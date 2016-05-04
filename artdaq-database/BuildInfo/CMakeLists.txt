@@ -9,10 +9,10 @@ string( STRIP ${rawUTCDate} utcDateTime )
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/GetPackageBuildInfo.cc.in
   ${CMAKE_CURRENT_BINARY_DIR}/GetPackageBuildInfo.cc @ONLY )
 
-art_make_library( LIBRARY_NAME artdaq-database_BuildInfo
-		  SOURCE
-		  ${CMAKE_CURRENT_BINARY_DIR}/GetPackageBuildInfo.cc
-                 )
+#art_make_library( LIBRARY_NAME artdaq-database_BuildInfo
+#		  SOURCE
+#		  ${CMAKE_CURRENT_BINARY_DIR}/GetPackageBuildInfo.cc
+#                 )
 
 art_make_library( LIBRARY_NAME artdaq-database_StackTrace
 		  SOURCE

@@ -76,6 +76,8 @@ int main(int argc, char* argv[]) try {
                   conf.replace(m.position(), m.length(), "fhicl_pound_include_" + std::to_string(idx++) + ":");
                 });
 
+  std::cout << "input\n" << conf <<  "\n";
+  
   ::fhicl::intermediate_table fhicl_table;
   
   ::shims::isSnippetMode(true);
