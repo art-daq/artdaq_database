@@ -5,6 +5,9 @@
 #include "boost/program_options.hpp"
 #include "artdaq-database/FhiclJson/fhicljsondb.h"
 #include "artdaq-database/FhiclJson/healper_functions.h"
+#include <artdaq-database/FhiclJson/convertjson2guijson.h>
+#include <artdaq-database/FhiclJson/convertfhicl2jsondb.h>
+
 #include "cetlib/coded_exception.h"
 #include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/BuildInfo/printStackTrace.h"
@@ -26,8 +29,8 @@ int main(int argc, char* argv[]) //try
 {
     artdaq::database::fhicl::trace_enable_FhiclReader();
     artdaq::database::fhicl::trace_enable_FhiclWriter();
-    artdaq::database::fhicljson::trace_enable_fcl2jsondb();
-    artdaq::database::fhicljsondb::trace_enable_fhicljsondb();
+    artdaq::database::fhicljson::debug::enableJSON2GUIJSON();
+    artdaq::database::fhicljson::debug::enableFCL2JSON();
     
     debug::registerUngracefullExitHandlers();
     artdaq::database::fhicljson::useFakeTime(true);
