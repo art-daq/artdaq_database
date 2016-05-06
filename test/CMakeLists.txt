@@ -9,6 +9,7 @@ cet_test_env("FHICL_FILE_PATH=.")
 #test order is important
 #add_subdirectory(JsonDocument)
 add_subdirectory(FhiclJson)
+#add_subdirectory(XmlJson)
 #add_subdirectory(ConfigurationDB)
 #add_subdirectory(StorageProviders)
 #add_subdirectory(JSONConvert)
