@@ -4,7 +4,7 @@
 #include "artdaq-database/ConfigurationDB/options_operations.h"
 
 #include "artdaq-database/BasicTypes/basictypes.h"
-#include "artdaq-database/FhiclJson/shared_literals.h"
+#include "artdaq-database/DataFormats/common/shared_literals.h"
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"

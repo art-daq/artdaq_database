@@ -1,7 +1,7 @@
 #ifndef _ARTDAQ_DATABASE_PROVIDER_FILESYSTEM_INDEX_H_
 #define _ARTDAQ_DATABASE_PROVIDER_FILESYSTEM_INDEX_H_
 
-#include "artdaq-database/FhiclJson/json_common.h"
+#include "artdaq-database/DataFormats/Json/json_common.h"
 #include "artdaq-database/StorageProviders/common.h"
 #include "artdaq-database/StorageProviders/storage_providers.h"
 

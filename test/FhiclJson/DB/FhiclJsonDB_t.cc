@@ -4,7 +4,7 @@
 #include <streambuf>
 #include "boost/program_options.hpp"
 #include "artdaq-database/FhiclJson/fhicljsondb.h"
-#include "artdaq-database/FhiclJson/healper_functions.h"
+#include "artdaq-database/FhiclJson/helper_functions.h"
 #include <artdaq-database/FhiclJson/convertjson2guijson.h>
 #include <artdaq-database/FhiclJson/convertfhicl2jsondb.h>
 

@@ -4,12 +4,12 @@
 #include "artdaq-database/ConfigurationDB/options_operation_base.h"
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
 
-#include "artdaq-database/FhiclJson/shared_literals.h"
+#include "artdaq-database/DataFormats/common/shared_literals.h"
 
 #include "artdaq-database/BasicTypes/basictypes.h"
 
-#include "artdaq-database/FhiclJson/json_reader.h"
-#include "artdaq-database/FhiclJson/json_writer.h"
+#include "artdaq-database/DataFormats/Json/json_reader.h"
+#include "artdaq-database/DataFormats/Json/json_writer.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME

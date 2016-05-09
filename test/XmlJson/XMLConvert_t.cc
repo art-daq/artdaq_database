@@ -13,7 +13,7 @@
 #include "artdaq-database/XmlJson/xml_common.h"
 #include "artdaq-database/XmlJson/xmljsondb.h"
 #include "artdaq-database/XmlJson/convertxml2json.h"
-#include "artdaq-database/FhiclJson/healper_functions.h"
+#include "artdaq-database/FhiclJson/helper_functions.h"
 
 namespace  bpo = boost::program_options;
 using namespace artdaq::database;

@@ -4,11 +4,10 @@
 #include "artdaq-database/BasicTypes/data_fhicl.h"
 #include "artdaq-database/BasicTypes/data_fhicl_fusion.h"
 
-#include "artdaq-database/FhiclJson/fhicljsondb.h"
-#include "artdaq-database/FhiclJson/shared_literals.h"
+#include "artdaq-database/DataFormats/Fhicldb.h"
+#include "artdaq-database/DataFormats/common/shared_literals.h"
 
 #include "artdaq-database/BasicTypes/base64.h"
-#include "fhiclcpp/exception.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -41,7 +40,7 @@ bool JsonData::convert_from(FhiclData const& fhicl) {
 FhiclData::FhiclData(std::string const& buffer) : fhicl_buffer{buffer} {}
 
 FhiclData::FhiclData(JsonData const& document) {
-  namespace literal = artdaq::database::fhicljson::literal;
+  namespace literal = artdaq::database::dataformats::literal;
   
   assert(!document.json_buffer.empty());
 
@@ -71,7 +70,7 @@ FhiclData::FhiclData(JsonData const& document) {
 }
 
 FhiclData::operator JsonData() const {
-  namespace literal = artdaq::database::fhicljson::literal;
+  namespace literal = artdaq::database::dataformats::literal;
   
   TRACE_(5, "FHICL fhicl=" << fhicl_buffer);
 

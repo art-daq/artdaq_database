@@ -4,7 +4,7 @@
 #include <streambuf>
 #include "boost/program_options.hpp"
 #include "artdaq-database/FhiclJson/fhicljsongui.h"
-#include "artdaq-database/FhiclJson/healper_functions.h"
+#include "artdaq-database/FhiclJson/helper_functions.h"
 #include "cetlib/coded_exception.h"
 #include "artdaq-database/BuildInfo/printStackTrace.h"
 

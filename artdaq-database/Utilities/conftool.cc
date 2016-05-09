@@ -9,7 +9,7 @@
 #include "boost/program_options.hpp"
 #include "cetlib/coded_exception.h"
 
-#include "artdaq-database/FhiclJson/fhicljsondb.h"
+#include "artdaq-database/DataFormats/Fhicldb.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
 

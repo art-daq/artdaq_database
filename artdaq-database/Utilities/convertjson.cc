@@ -4,7 +4,7 @@
 #include <string>
 #include "boost/program_options.hpp"
 
-#include "artdaq-database/FhiclJson/convertjson2guijson.h"
+#include "artdaq-database/DataFormats/convertjson2guijson.h"
 
 #include <boost/exception/diagnostic_information.hpp>
 #include "artdaq-database/BuildInfo/process_exit_codes.h"

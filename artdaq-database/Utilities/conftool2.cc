@@ -9,11 +9,11 @@
 #include "boost/program_options.hpp"
 #include "cetlib/coded_exception.h"
 
-#include "artdaq-database/FhiclJson/fhicljsondb.h"
+#include "artdaq-database/DataFormats/Fhicldb.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
-#include "artdaq-database/FhiclJson/convertjson2guijson.h"
+#include "artdaq-database/DataFormats/convertjson2guijson.h"
 
 #include <boost/exception/diagnostic_information.hpp>
 

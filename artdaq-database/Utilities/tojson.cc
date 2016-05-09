@@ -2,8 +2,8 @@
 #include <iostream>
 #include <streambuf>
 #include <string>
-#include "artdaq-database/FhiclJson/fhicljsondb.h"
-//#include "artdaq-database/FhiclJson/fhicljsongui.h"
+#include "artdaq-database/DataFormats/Fhicldb.h"
+//#include "artdaq-database/DataFormats/Fhiclgui.h"
 #include "boost/program_options.hpp"
 
 #include <boost/exception/diagnostic_information.hpp>

@@ -3,7 +3,7 @@
 #include <streambuf>
 
 #include <boost/exception/diagnostic_information.hpp>
-#include "artdaq-database/FhiclJson/fhicljsondb.h"
+#include "artdaq-database/DataFormats/Fhicldb.h"
 #include "fhicljson.h"
 
 using namespace artdaq::database::fhicljson;
