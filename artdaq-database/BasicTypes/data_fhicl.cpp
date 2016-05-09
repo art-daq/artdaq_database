@@ -4,7 +4,11 @@
 #include "artdaq-database/BasicTypes/data_fhicl.h"
 #include "artdaq-database/BasicTypes/data_fhicl_fusion.h"
 
-#include "artdaq-database/DataFormats/Fhicldb.h"
+#include "artdaq-database/DataFormats/Fhicl/fhicl_common.h"
+#include "artdaq-database/DataFormats/Fhicl/fhicljsondb.h"
+
+#include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
+
 #include "artdaq-database/DataFormats/common/shared_literals.h"
 
 #include "artdaq-database/BasicTypes/base64.h"

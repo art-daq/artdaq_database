@@ -1,6 +1,8 @@
 art_make(
   LIB_LIBRARIES
-  artdaq-database_FhiclJson
+  artdaq-database_DataFormats_common
+  artdaq-database_DataFormats_Fhicl
+  artdaq-database_DataFormats_Json
   ${FHICLCPP}
   ${CETLIB}  
   )

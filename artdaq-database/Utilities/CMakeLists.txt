@@ -1,7 +1,8 @@
 
 art_make_exec(readfhicl
   LIBRARIES
-  artdaq-database_FhiclJson
+  artdaq-database_DataFormats_common
+  artdaq-database_DataFormats_Fhicl
   ${FHICLCPP}  
   ${CETLIB}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
