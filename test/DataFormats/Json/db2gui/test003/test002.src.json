@@ -1,0 +1,334 @@
+{
+"document" : {
+"data" : {
+"daq" : {
+"event_builder" : {
+"expected_fragments_per_event" : 2,
+"first_fragment_receiver_rank" : 0,
+"fragment_receiver_count" : 2,
+"mpi_buffer_count" : 16,
+"print_event_store_stats" : true,
+"use_art" : true,
+"verbose" : false
+},
+"max_fragment_size_words" : 2097152,
+"metrics" : {
+"evbFile" : {
+"fileName" : "/tmp/eventbuilder/evb_%UID%_metrics.log",
+"level" : 3,
+"metricPluginType" : "file",
+"uniquify" : true
+}
+}
+},
+"outputs" : {
+"netMonOutput" : {
+"SelectEvents" : {
+"SelectEvents" : [
+"pmod2",
+"pmod3"
+]
+},
+"module_type" : "NetMonOutput"
+}
+},
+"physics" : {
+"filters" : {
+"prescaleMod2" : {
+"module_type" : "NthEvent",
+"nth" : 2
+},
+"prescaleMod3" : {
+"module_type" : "NthEvent",
+"nth" : 3
+}
+},
+"my_output_modules" : [
+"netMonOutput"
+],
+"pmod2" : [
+"prescaleMod2"
+],
+"pmod3" : [
+"prescaleMod3"
+]
+},
+"process_name" : "DAQ",
+"services" : {
+"scheduler" : {
+"fileMode" : "NOMERGE"
+},
+"user" : {
+"NetMonTransportServiceInterface" : {
+"data_receiver_count" : 1,
+"first_data_receiver_rank" : 6,
+"max_fragment_size_words" : 2097152,
+"mpi_buffer_count" : 8,
+"service_provider" : "NetMonTransportService"
+}
+}
+},
+"source" : {
+"module_type" : "RawInput",
+"resume_after_timeout" : true,
+"waiting_time" : 900
+}
+},
+"metadata" : {
+"daq" : {
+"type" : "table",
+"comment" : "zxcv ",
+"children" : {
+"event_builder" : {
+"type" : "table",
+"comment" : "xzcv ",
+"children" : {
+"expected_fragments_per_event" : {
+"type" : "number",
+"comment" : "zxcv ",
+"annotation" : "zxcv "
+},
+"first_fragment_receiver_rank" : {
+"type" : "number",
+"comment" : "zxcv ",
+"annotation" : "zxcv "
+},
+"fragment_receiver_count" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"mpi_buffer_count" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"print_event_store_stats" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : " "
+},
+"use_art" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : " "
+},
+"verbose" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : " "
+}
+}
+},
+"max_fragment_size_words" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"metrics" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"evbFile" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"fileName" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : "//demoe"
+},
+"level" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"metricPluginType" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"uniquify" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+}
+}
+}
+},
+"outputs" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"netMonOutput" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"SelectEvents" : {
+"type" : "table",
+"comment" : "#Failure 5 not a satom ",
+"children" : {
+"SelectEvents" : {
+"type" : "sequence",
+"comment" : "#Failure 5 not a satom ",
+"annotation" : " "
+}
+}
+},
+"module_type" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+}
+},
+"physics" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"filters" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"prescaleMod2" : {
+"type" : "table",
+"comment" : "#Failure 4 not a satom ",
+"children" : {
+"module_type" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : "#//Success 5 right of satom"
+},
+"nth" : {
+"type" : "number",
+"comment" : "#//Success 5 right of satom",
+"annotation" : " "
+}
+}
+},
+"prescaleMod3" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"module_type" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"nth" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "//#Success 4 right of satom"
+}
+}
+}
+}
+},
+"my_output_modules" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " "
+},
+"pmod2" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " "
+},
+"pmod3" : {
+"type" : "sequence",
+"comment" : "#Failure 2 not a satom ",
+"annotation" : " "
+}
+}
+},
+"process_name" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"services" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"scheduler" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"fileMode" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+},
+"user" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"NetMonTransportServiceInterface" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"data_receiver_count" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "# 2"
+},
+"first_data_receiver_rank" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"max_fragment_size_words" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"mpi_buffer_count" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"service_provider" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+}
+}
+}
+},
+"source" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"module_type" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"resume_after_timeout" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"waiting_time" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+},
+"converted" : {
+
+}
+}
+}

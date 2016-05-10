@@ -7,5 +7,6 @@
 #include "fhiclcpp/intermediate_table.h"
 #include "fhiclcpp/make_ParameterSet.h"
 #include "fhiclcpp/parse.h"
+#include "fhiclcpp/parse_shims_opts.h"
 
 #endif /* _ARTDAQ_DATABASE_DATAFORMATS_FHICL_LIB_INCLUDES_H_ */

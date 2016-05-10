@@ -7,14 +7,14 @@
 
 namespace artdaq {
 namespace database {
-namespace fhicljson {
+namespace fhicl {
 bool isDouble(std::string const& str);
 std::string unescape(std::string const& str);
 
 std::string tag_as_string(::fhicl::value_tag);
 ::fhicl::value_tag string_as_tag(std::string);
 
-}  // namespace fhicljson
+}  // namespace fhicl
 }  // namespace database
 }  // artdaq
 

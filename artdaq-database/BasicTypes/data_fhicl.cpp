@@ -29,14 +29,14 @@ namespace basictypes {
 
 template <>
 bool JsonData::convert_to(FhiclData& fhicl) const {
-  using artdaq::database::fhicljsondb::json_to_fhicl;
+  using artdaq::database::fhicljson::json_to_fhicl;
 
   return json_to_fhicl(json_buffer, fhicl.fhicl_buffer);
 }
 
 template <>
 bool JsonData::convert_from(FhiclData const& fhicl) {
-  using artdaq::database::fhicljsondb::fhicl_to_json;
+  using artdaq::database::fhicljson::fhicl_to_json;
 
   return fhicl_to_json(fhicl.fhicl_buffer, json_buffer);
 }

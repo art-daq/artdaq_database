@@ -9,13 +9,16 @@ namespace database {
 namespace xmljson {
 bool xml_to_json(std::string const&, std::string&);
 bool json_to_xml(std::string const&, std::string&);
-void trace_enable_xmljsondb();
-
+namespace debug {
+void enableXmlJson();
+}
 }  // namespace xmljson
 
 namespace xml {
-void trace_enable_XmlReader();
-void trace_enable_XmlWriter();
+namespace debug {
+void enableXmlReader();
+void enableXmlWriter();
+}
 }  // namespace xml
 
 }  // namespace database

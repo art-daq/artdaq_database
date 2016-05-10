@@ -5,21 +5,20 @@
 
 namespace artdaq {
 namespace database {
-
-namespace fhicljsondb {
+namespace fhicljson {
 bool fhicl_to_json(std::string const&, std::string&);
 bool json_to_fhicl(std::string const&, std::string&);
-void trace_enable_fhicljsondb();
-
-}  // namespace fhicljson
-
-namespace fhicljson {
-void trace_enable_fcl2jsondb();
+namespace debug {
+void enableFhiclJson();
+void enableFCL2JSONDB();
+}
 }  // namespace fhicljson
 
 namespace fhicl {
-void trace_enable_FhiclReader();
-void trace_enable_FhiclWriter();
+namespace debug {
+void enableFhiclReader();
+void enableFhiclWriter();
+}
 }  // namespace fhicl
 
 }  // namespace database

@@ -25,3 +25,18 @@ bool JsonReader::read(std::string const& in, object_t& ast) {
 
   return result;
 }
+
+std::pair<bool, std::string> artdaq::database::json::compare_json_objects(std::string const& first,
+                                                                          std::string const& second) {
+  assert(!first.empty());
+  assert(!second.empty());
+
+  auto firstAST = object_t{};
+  auto secondAST = object_t{};
+
+  if (!JsonReader{}.read(first, firstAST)) return std::make_pair(false, "Unable to read first Json buffer");
+
+  if (!JsonReader{}.read(second, secondAST)) return std::make_pair(false, "Unable to read second Json buffer");
+
+  return firstAST == secondAST;
+}

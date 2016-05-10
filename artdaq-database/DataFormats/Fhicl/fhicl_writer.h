@@ -69,8 +69,9 @@ struct FhiclWriter final {
   bool write_data(jsn::object_t const&, std::string&);
 };
 
-void trace_enable_FhiclWriter();
-
+namespace debug {
+void enableFhiclWriter();
+}
 }  // namespace fhicl
 }  // namespace database
 }  // namespace artdaq

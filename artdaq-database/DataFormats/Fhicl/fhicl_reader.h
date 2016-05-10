@@ -103,8 +103,9 @@ struct FhiclReader final {
   bool read_comments(std::string const&, jsn::array_t&);
 };
 
-void trace_enable_FhiclReader();
-
+namespace debug {
+void enableFhiclReader();
+}
 }  // namespace fhicl
 }  // namespace database
 }  // namespace artdaq

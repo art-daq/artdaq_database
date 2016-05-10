@@ -1,0 +1,110 @@
+ 
+services: {
+ 
+scheduler: {
+ 
+fileMode: NOMERGE  
+
+} 
+user: {
+ 
+NetMonTransportServiceInterface: {
+ 
+service_provider: NetMonTransportService  
+ 
+first_data_receiver_rank: 6  
+ 
+mpi_buffer_count: 8  
+ 
+max_fragment_size_words: 2097152  
+ 
+data_receiver_count: 1 # 2
+
+}
+}
+} 
+daq: {
+ 
+max_fragment_size_words: 2097152  
+ 
+event_builder: {
+ 
+mpi_buffer_count: 16  
+ 
+first_fragment_receiver_rank: 0  
+ 
+fragment_receiver_count: 2  
+ 
+expected_fragments_per_event: 2  
+ 
+use_art: true  
+ 
+print_event_store_stats: true  
+ 
+verbose: false  
+
+} 
+metrics: {
+ 
+evbFile: {
+ 
+metricPluginType: file  
+ 
+level: 3  
+ 
+fileName: "/tmp/eventbuilder/evb_%UID%_metrics.log" //demoe
+ 
+uniquify: true  
+
+}
+}
+} 
+outputs: {
+ 
+netMonOutput: {
+ 
+module_type: NetMonOutput  
+#Failure 5 not a satom 
+SelectEvents: {
+#Failure 5 not a satom 
+SelectEvents: [pmod2, pmod3]  
+
+}
+}
+} 
+physics: {
+ 
+filters: {
+#Failure 4 not a satom 
+prescaleMod2: {
+ 
+module_type: NthEvent #//Success 5 right of satom
+#//Success 5 right of satom
+nth: 2  
+
+} 
+prescaleMod3: {
+ 
+module_type: NthEvent  
+ 
+nth: 3 //#Success 4 right of satom
+
+}
+} 
+pmod2: [prescaleMod2]  
+#Failure 2 not a satom 
+pmod3: [prescaleMod3]  
+ 
+my_output_modules: [netMonOutput]  
+
+} 
+source: {
+#Success 1  above satom
+module_type: RawInput  
+ 
+waiting_time: 900 //Success 2 right of satom
+ 
+resume_after_timeout: true #Success 3 right of satom
+
+} 
+process_name: DAQ  

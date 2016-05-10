@@ -13,13 +13,12 @@
 #endif
 
 #define TRACE_NAME "FHJS:json2gui_C"
+
 using namespace artdaq::database::sharedtypes;
-
 using namespace artdaq::database::json;
-using namespace artdaq::database::fhicljson;
 
-using artdaq::database::fhicljson::db2gui;
-using artdaq::database::fhicljson::gui2db;
+using artdaq::database::json::db2gui;
+using artdaq::database::json::gui2db;
 
 template <>
 template <typename T>
@@ -420,11 +419,11 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
   }
 }
 
-void artdaq::database::fhicljson::debug::enableJSON2GUIJSON() {
+void artdaq::database::json::debug::enableJSON2GUIJSON() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", 1LL);
   TRACE_CNTL("modeS", 1LL);
 
-  TRACE_(0, "artdaq::database::convertjson::JSON2GUIJSON trace_enable");
+  TRACE_(0, "artdaq::database::JSON2GUIJSON trace_enable");
 }

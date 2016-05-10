@@ -3,7 +3,7 @@
 
 namespace artdaq {
 namespace database {
-namespace fhicljson {
+namespace fhicl {
 
 namespace literal = artdaq::database::dataformats::literal;
 
@@ -14,7 +14,7 @@ bool isDouble(std::string const& str) {
 
 std::string unescape(std::string const& str) { return std::regex_replace(str, std::regex("\\\""), "\""); }
 
-std::string tag_as_string(fhicl::value_tag tag) {
+std::string tag_as_string(::fhicl::value_tag tag) {
   switch (tag) {
     default:
       return "undefined";
@@ -61,6 +61,6 @@ std::string tag_as_string(fhicl::value_tag tag) {
   throw ::fhicl::exception(::fhicl::parse_error, literal::data_node)
       << ("FHiCL atom type \"" + str + "\" is not implemented.");
 }
-}  // namespace fhicljson
+}  // namespace fhicl
 }  // namespace database
 }  // artdaq

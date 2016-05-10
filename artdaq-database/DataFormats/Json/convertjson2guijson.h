@@ -1,5 +1,5 @@
-#ifndef _ARTDAQ_DATABASE_DATAFORMATS_FHICL_CONVERTJSON2JSONGUI_H_
-#define _ARTDAQ_DATABASE_DATAFORMATS_FHICL_CONVERTJSON2JSONGUI_H_
+#ifndef _ARTDAQ_DATABASE_DATAFORMATS_JSON_CONVERTJSON2JSONGUI_H_
+#define _ARTDAQ_DATABASE_DATAFORMATS_JSON_CONVERTJSON2JSONGUI_H_
 
 #include "artdaq-database/DataFormats/common.h"
 #include "artdaq-database/DataFormats/common/shared_literals.h"
@@ -8,9 +8,8 @@
 
 namespace artdaq {
 namespace database {
-namespace fhicljson {
+namespace json {
 
-using namespace artdaq::database::json;
 namespace literal = artdaq::database::dataformats::literal;
 
 struct value_crt {
@@ -269,4 +268,4 @@ bool json_gui_to_db(std::string const&, std::string&);
 }  // namespace database
 }  // namespace artdaq
 
-#endif /* _ARTDAQ_DATABASE_DATAFORMATS_FHICL_CONVERTJSON2JSONGUI_H_ */
+#endif /* _ARTDAQ_DATABASE_DATAFORMATS_JSON_CONVERTJSON2JSONGUI_H_ */

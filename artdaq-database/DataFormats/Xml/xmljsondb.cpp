@@ -108,7 +108,7 @@ void trace_enable_xmljsondb() {
   TRACE_CNTL("modeM", 1LL);
   TRACE_CNTL("modeS", 1LL);
 
-  TRACE_(0, "artdaq::database::fhicljsondb trace_enable");
+  TRACE_(0, "artdaq::database::fhicljson trace_enable");
 }
 }  // namespace fhicljson
 }  // namespace database

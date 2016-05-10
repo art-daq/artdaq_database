@@ -16,6 +16,7 @@
 #define TRACE_NAME "FHJS:fcl2jsondb_C"
 
 namespace jsn = artdaq::database::json;
+namespace fcl = artdaq::database::fhicl;
 
 using comments_t = artdaq::database::fhicljson::comments_t;
 
@@ -52,7 +53,7 @@ fcl2jsondb::operator datapair_t() try {
 
   auto& object = pair.metadata_<jsn::object_t>();
 
-  object[literal::type] = tag_as_string(value.tag);
+  object[literal::type] = fcl::tag_as_string(value.tag);
 
   auto parse_linenum = [](std::string const& str) -> int {
     if (str.empty()) return -1;
@@ -102,7 +103,7 @@ fcl2jsondb::operator datapair_t() try {
 
   if (value.tag != ::fhicl::TABLE) add_comment(annotation_at, literal::annotation, linenum);
 
-  TRACE_(2, "fcl2jsondb() value type=<" << tag_as_string(value.tag) << ">");
+  TRACE_(2, "fcl2jsondb() value type=<" << fcl::tag_as_string(value.tag) << ">");
 
   switch (value.tag) {
     default:
@@ -123,7 +124,7 @@ fcl2jsondb::operator datapair_t() try {
     case ::fhicl::NUMBER: {
       std::string str = fcl_value::atom_t(value);
 
-      if (isDouble(str)) {
+      if (fcl::isDouble(str)) {
         auto dbl = boost::lexical_cast<double>(str);
 
         if (std::fmod(dbl, static_cast<decltype(dbl)>(1.0)) == 0.0)
@@ -165,7 +166,7 @@ fcl2jsondb::operator datapair_t() try {
               case ::fhicl::NUMBER: {
                 std::string str = fcl_value::atom_t(subTmpVal);
 
-                if (isDouble(str)) {
+                if (fcl::isDouble(str)) {
                   auto dbl = boost::lexical_cast<double>(str);
 
                   if (std::fmod(dbl, static_cast<decltype(dbl)>(1.0)) == 0.0)
@@ -284,7 +285,7 @@ json2fcldb::operator fcl::atom_t() try {
     return {fcl_key, fcl_value};
   }
 
-  auto type = string_as_tag(type_name);
+  auto type = fcl::string_as_tag(type_name);
 
   auto fcl_value = fcl::value_t();
 

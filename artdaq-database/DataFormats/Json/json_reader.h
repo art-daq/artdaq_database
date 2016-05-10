@@ -50,6 +50,7 @@ struct JsonReader final {
   bool read(std::string const&, object_t&);
 };
 
+std::pair<bool, std::string> compare_json_objects(std::string const&, std::string const&);
 }  // namespace json
 }  // namespace database
 }  // namespace artdaq

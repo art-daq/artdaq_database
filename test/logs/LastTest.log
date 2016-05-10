@@ -1,3 +1,1036 @@
-Start testing: May 09 17:10 CDT
+Start testing: May 10 18:18 CDT
 ----------------------------------------------------------
-End testing: May 09 17:10 CDT
+1/4 Testing: Convert_Fhicl2DBJson_001_t
+1/4 Test: Convert_Fhicl2DBJson_001_t
+Command: "/home/lukhanin/scratch/current/artdaq-demo-base/products/cetbuildtools/v4_18_02/bin/cet_exec_test" "--wd" "/home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/test/DataFormats/Fhicl/fcl2dbjson/test001/Convert_Fhicl2DBJson_001_t.d" "--required-files" "" "--datafiles" "/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/test/DataFormats/Fhicl/fcl2dbjson/test001/test001.fcl;/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/test/DataFormats/Fhicl/fcl2dbjson/test001/test001.json" "--skip-return-code" "247" "ConvertFhicl_t" "-s" "test001.fcl" "-c" "test001.json" "-t" "Convert_Fhicl2DBJson"
+Directory: /home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/test/DataFormats/Fhicl/fcl2dbjson/test001/Convert_Fhicl2DBJson_001_t.d
+"Convert_Fhicl2DBJson_001_t" start time: May 10 18:18 CDT
+Output:
+----------------------------------------------------------
+05-10 18:18:44.740429  1  0 artdaq::database::fhicl::FhiclReader trace_enable
+05-10 18:18:44.741514  1  0 artdaq::database::fhicl::FhiclWrite trace_enable
+05-10 18:18:44.741584  1  0 artdaq::database::fhicljson trace_enable
+05-10 18:18:44.741633  1  0 artdaq::database::convertjson::FCL2JSON trace_enable
+05-10 18:18:44.746481  1  2 fhicl_to_json: begin
+05-10 18:18:44.746973  1  2 fhicl_to_json: Created root nodes
+05-10 18:18:44.747180  1  2 read_comments begin
+05-10 18:18:44.756217  1  2 read_comments end result=1
+05-10 18:18:44.756248  1  2 read_data begin
+05-10 18:18:44.756272  1  2 read_data() begin
+05-10 18:18:44.809849  1  2 parse_document() returned 6 entries.
+05-10 18:18:44.810098  1  2 fcl2jsondb() key=<services>
+05-10 18:18:44.810389  1  2 fcl2jsondb() value=<{scheduler:{fileMode:"NOMERGE"} user:{NetMonTransportServiceInterface:{service_provider:"NetMonTransportService" first_data_receiver_rank:6 mpi_buffer_count:8 max_fragment_size_words:2.097152e6 data_receiver_count:1}}}>
+05-10 18:18:44.810549  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:44.810658  1  2 fcl2jsondb() key=<scheduler>
+05-10 18:18:44.810692  1  2 fcl2jsondb() value=<{fileMode:"NOMERGE"}>
+05-10 18:18:44.810732  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:44.810798  1  2 fcl2jsondb() key=<fileMode>
+05-10 18:18:44.810813  1  2 fcl2jsondb() value=<"NOMERGE">
+05-10 18:18:44.810857  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:44.811035  1  2 fcl2jsondb() key=<user>
+05-10 18:18:44.811099  1  2 fcl2jsondb() value=<{NetMonTransportServiceInterface:{service_provider:"NetMonTransportService" first_data_receiver_rank:6 mpi_buffer_count:8 max_fragment_size_words:2.097152e6 data_receiver_count:1}}>
+05-10 18:18:44.811136  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:44.811199  1  2 fcl2jsondb() key=<NetMonTransportServiceInterface>
+05-10 18:18:44.811385  1  2 fcl2jsondb() value=<{service_provider:"NetMonTransportService" first_data_receiver_rank:6 mpi_buffer_count:8 max_fragment_size_words:2.097152e6 data_receiver_count:1}>
+05-10 18:18:44.811421  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:44.811490  1  2 fcl2jsondb() key=<service_provider>
+05-10 18:18:44.811503  1  2 fcl2jsondb() value=<"NetMonTransportService">
+05-10 18:18:44.811540  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:44.811624  1  2 fcl2jsondb() key=<first_data_receiver_rank>
+05-10 18:18:44.811636  1  2 fcl2jsondb() value=<6>
+05-10 18:18:44.811668  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:44.816298  1  2 fcl2jsondb() key=<mpi_buffer_count>
+05-10 18:18:44.816314  1  2 fcl2jsondb() value=<8>
+05-10 18:18:44.816354  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:44.820479  1  2 fcl2jsondb() key=<max_fragment_size_words>
+05-10 18:18:44.820494  1  2 fcl2jsondb() value=<2.097152e6>
+05-10 18:18:44.820527  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:44.825065  1  2 fcl2jsondb() key=<data_receiver_count>
+05-10 18:18:44.825080  1  2 fcl2jsondb() value=<1>
+05-10 18:18:44.825199  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:44.829446  1  2 fcl2jsondb() key=<daq>
+05-10 18:18:44.829563  1  2 fcl2jsondb() value=<{max_fragment_size_words:2.097152e6 event_builder:{mpi_buffer_count:16 first_fragment_receiver_rank:0 fragment_receiver_count:2 expected_fragments_per_event:2 use_art:true print_event_store_stats:true verbose:false} metrics:{evbFile:{metricPluginType:"file" level:3 fileName:"/tmp/eventbuilder/evb_%UID%_metrics.log" uniquify:true}}}>
+05-10 18:18:44.829598  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:44.829666  1  2 fcl2jsondb() key=<max_fragment_size_words>
+05-10 18:18:44.829677  1  2 fcl2jsondb() value=<2.097152e6>
+05-10 18:18:44.829711  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:44.833743  1  2 fcl2jsondb() key=<event_builder>
+05-10 18:18:44.833780  1  2 fcl2jsondb() value=<{mpi_buffer_count:16 first_fragment_receiver_rank:0 fragment_receiver_count:2 expected_fragments_per_event:2 use_art:true print_event_store_stats:true verbose:false}>
+05-10 18:18:44.833810  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:44.833864  1  2 fcl2jsondb() key=<mpi_buffer_count>
+05-10 18:18:44.833875  1  2 fcl2jsondb() value=<16>
+05-10 18:18:44.833904  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:44.837786  1  2 fcl2jsondb() key=<first_fragment_receiver_rank>
+05-10 18:18:44.837802  1  2 fcl2jsondb() value=<0>
+05-10 18:18:44.837833  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:44.841652  1  2 fcl2jsondb() key=<fragment_receiver_count>
+05-10 18:18:44.841665  1  2 fcl2jsondb() value=<2>
+05-10 18:18:44.841696  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:44.845417  1  2 fcl2jsondb() key=<expected_fragments_per_event>
+05-10 18:18:44.845430  1  2 fcl2jsondb() value=<2>
+05-10 18:18:44.845459  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:44.849157  1  2 fcl2jsondb() key=<use_art>
+05-10 18:18:44.849172  1  2 fcl2jsondb() value=<true>
+05-10 18:18:44.849202  1  2 fcl2jsondb() value type=<bool>
+05-10 18:18:44.849310  1  2 fcl2jsondb() key=<print_event_store_stats>
+05-10 18:18:44.849321  1  2 fcl2jsondb() value=<true>
+05-10 18:18:44.849348  1  2 fcl2jsondb() value type=<bool>
+05-10 18:18:44.849418  1  2 fcl2jsondb() key=<verbose>
+05-10 18:18:44.849429  1  2 fcl2jsondb() value=<false>
+05-10 18:18:44.849457  1  2 fcl2jsondb() value type=<bool>
+05-10 18:18:44.849594  1  2 fcl2jsondb() key=<metrics>
+05-10 18:18:44.849639  1  2 fcl2jsondb() value=<{evbFile:{metricPluginType:"file" level:3 fileName:"/tmp/eventbuilder/evb_%UID%_metrics.log" uniquify:true}}>
+05-10 18:18:44.849667  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:44.849715  1  2 fcl2jsondb() key=<evbFile>
+05-10 18:18:44.849742  1  2 fcl2jsondb() value=<{metricPluginType:"file" level:3 fileName:"/tmp/eventbuilder/evb_%UID%_metrics.log" uniquify:true}>
+05-10 18:18:44.849771  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:44.849815  1  2 fcl2jsondb() key=<metricPluginType>
+05-10 18:18:44.849825  1  2 fcl2jsondb() value=<"file">
+05-10 18:18:44.849851  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:44.849904  1  2 fcl2jsondb() key=<level>
+05-10 18:18:44.849913  1  2 fcl2jsondb() value=<3>
+05-10 18:18:44.849943  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:44.853611  1  2 fcl2jsondb() key=<fileName>
+05-10 18:18:44.853624  1  2 fcl2jsondb() value=<"/tmp/eventbuilder/evb_%UID%_metrics.log">
+05-10 18:18:44.853705  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:44.853765  1  2 fcl2jsondb() key=<uniquify>
+05-10 18:18:44.853779  1  2 fcl2jsondb() value=<true>
+05-10 18:18:44.853875  1  2 fcl2jsondb() value type=<bool>
+05-10 18:18:44.854143  1  2 fcl2jsondb() key=<outputs>
+05-10 18:18:44.854246  1  2 fcl2jsondb() value=<{netMonOutput:{module_type:"NetMonOutput" SelectEvents:{SelectEvents:["pmod2","pmod3"]}}}>
+05-10 18:18:44.854276  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:44.854333  1  2 fcl2jsondb() key=<netMonOutput>
+05-10 18:18:44.854386  1  2 fcl2jsondb() value=<{module_type:"NetMonOutput" SelectEvents:{SelectEvents:["pmod2","pmod3"]}}>
+05-10 18:18:44.854414  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:44.854463  1  2 fcl2jsondb() key=<module_type>
+05-10 18:18:44.854474  1  2 fcl2jsondb() value=<"NetMonOutput">
+05-10 18:18:44.854500  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:44.854557  1  2 fcl2jsondb() key=<SelectEvents>
+05-10 18:18:44.854589  1  2 fcl2jsondb() value=<{SelectEvents:["pmod2","pmod3"]}>
+05-10 18:18:44.854690  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:44.854742  1  2 fcl2jsondb() key=<SelectEvents>
+05-10 18:18:44.854763  1  2 fcl2jsondb() value=<["pmod2","pmod3"]>
+05-10 18:18:44.854846  1  2 fcl2jsondb() value type=<sequence>
+05-10 18:18:44.855154  1  2 fcl2jsondb() key=<physics>
+05-10 18:18:44.855248  1  2 fcl2jsondb() value=<{filters:{prescaleMod2:{module_type:"NthEvent" nth:2} prescaleMod3:{module_type:"NthEvent" nth:3}} pmod2:["prescaleMod2"] pmod3:["prescaleMod3"] my_output_modules:["netMonOutput"]}>
+05-10 18:18:44.855277  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:44.855344  1  2 fcl2jsondb() key=<filters>
+05-10 18:18:44.855388  1  2 fcl2jsondb() value=<{prescaleMod2:{module_type:"NthEvent" nth:2} prescaleMod3:{module_type:"NthEvent" nth:3}}>
+05-10 18:18:44.855420  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:44.855465  1  2 fcl2jsondb() key=<prescaleMod2>
+05-10 18:18:44.855484  1  2 fcl2jsondb() value=<{module_type:"NthEvent" nth:2}>
+05-10 18:18:44.855568  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:44.855614  1  2 fcl2jsondb() key=<module_type>
+05-10 18:18:44.855626  1  2 fcl2jsondb() value=<"NthEvent">
+05-10 18:18:44.855711  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:44.855766  1  2 fcl2jsondb() key=<nth>
+05-10 18:18:44.855776  1  2 fcl2jsondb() value=<2>
+05-10 18:18:44.855869  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:44.859476  1  2 fcl2jsondb() key=<prescaleMod3>
+05-10 18:18:44.859501  1  2 fcl2jsondb() value=<{module_type:"NthEvent" nth:3}>
+05-10 18:18:44.859535  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:44.859576  1  2 fcl2jsondb() key=<module_type>
+05-10 18:18:44.859586  1  2 fcl2jsondb() value=<"NthEvent">
+05-10 18:18:44.859611  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:44.859656  1  2 fcl2jsondb() key=<nth>
+05-10 18:18:44.859665  1  2 fcl2jsondb() value=<3>
+05-10 18:18:44.859757  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:44.863431  1  2 fcl2jsondb() key=<pmod2>
+05-10 18:18:44.863451  1  2 fcl2jsondb() value=<["prescaleMod2"]>
+05-10 18:18:44.863559  1  2 fcl2jsondb() value type=<sequence>
+05-10 18:18:44.863648  1  2 fcl2jsondb() key=<pmod3>
+05-10 18:18:44.863665  1  2 fcl2jsondb() value=<["prescaleMod3"]>
+05-10 18:18:44.863759  1  2 fcl2jsondb() value type=<sequence>
+05-10 18:18:44.863839  1  2 fcl2jsondb() key=<my_output_modules>
+05-10 18:18:44.863855  1  2 fcl2jsondb() value=<["netMonOutput"]>
+05-10 18:18:44.863883  1  2 fcl2jsondb() value type=<sequence>
+05-10 18:18:44.864043  1  2 fcl2jsondb() key=<source>
+05-10 18:18:44.864067  1  2 fcl2jsondb() value=<{module_type:"RawInput" waiting_time:900 resume_after_timeout:true}>
+05-10 18:18:44.864099  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:44.864325  1  2 fcl2jsondb() key=<module_type>
+05-10 18:18:44.864335  1  2 fcl2jsondb() value=<"RawInput">
+05-10 18:18:44.864423  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:44.864482  1  2 fcl2jsondb() key=<waiting_time>
+05-10 18:18:44.864491  1  2 fcl2jsondb() value=<900>
+05-10 18:18:44.864587  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:44.868019  1  2 fcl2jsondb() key=<resume_after_timeout>
+05-10 18:18:44.868031  1  2 fcl2jsondb() value=<true>
+05-10 18:18:44.868161  1  2 fcl2jsondb() value type=<bool>
+05-10 18:18:44.868248  1  2 fcl2jsondb() key=<process_name>
+05-10 18:18:44.868258  1  2 fcl2jsondb() value=<"DAQ">
+05-10 18:18:44.868285  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:44.868318  1  2 read_data() end
+05-10 18:18:44.868417  1  2 read_data end result=1
+05-10 18:18:44.868430  1  2 fhicl_to_json: write() begin
+05-10 18:18:44.887752  1  2 fhicl_to_json: write() end
+05-10 18:18:44.887793  1  2 fhicl_to_json: end
+Running test:<Convert_Fhicl2DBJson>
+Convertion started. 
+<end of output>
+Test time =   0.22 sec
+----------------------------------------------------------
+Test Passed.
+"Convert_Fhicl2DBJson_001_t" end time: May 10 18:18 CDT
+"Convert_Fhicl2DBJson_001_t" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/4 Testing: Convert_DBJson2Fhicl_001_t
+2/4 Test: Convert_DBJson2Fhicl_001_t
+Command: "/home/lukhanin/scratch/current/artdaq-demo-base/products/cetbuildtools/v4_18_02/bin/cet_exec_test" "--wd" "/home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/test/DataFormats/Fhicl/fcl2dbjson/test002/Convert_DBJson2Fhicl_001_t.d" "--required-files" "" "--datafiles" "/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/test/DataFormats/Fhicl/fcl2dbjson/test002/test001.fcl;/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/test/DataFormats/Fhicl/fcl2dbjson/test002/test001.json" "--skip-return-code" "247" "ConvertFhicl_t" "-s" "test001.json" "-c" "test001.fcl" "-t" "Convert_DBJson2Fhicl"
+Directory: /home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/test/DataFormats/Fhicl/fcl2dbjson/test002/Convert_DBJson2Fhicl_001_t.d
+"Convert_DBJson2Fhicl_001_t" start time: May 10 18:18 CDT
+Output:
+----------------------------------------------------------
+05-10 18:18:44.950237  1  0 artdaq::database::fhicl::FhiclReader trace_enable
+05-10 18:18:44.951216  1  0 artdaq::database::fhicl::FhiclWrite trace_enable
+05-10 18:18:44.951249  1  0 artdaq::database::fhicljson trace_enable
+05-10 18:18:44.951280  1  0 artdaq::database::convertjson::FCL2JSON trace_enable
+05-10 18:18:44.954638  1  3 json_to_fhicl: begin
+05-10 18:18:44.954679  1  3 json_to_fhicl: Reading json root nodes
+05-10 18:18:44.969520  1  2 write_data() begin
+05-10 18:18:44.970857  1  2 json2fcldb() key=<services> type=<table>
+05-10 18:18:44.970967  1  2 json2fcldb() key=<scheduler> type=<table>
+05-10 18:18:44.970992  1  2 json2fcldb() key=<fileMode> type=<string>
+05-10 18:18:44.971142  1  2 json2fcldb() key=<user> type=<table>
+05-10 18:18:44.971163  1  2 json2fcldb() key=<NetMonTransportServiceInterface> type=<table>
+05-10 18:18:44.971180  1  2 json2fcldb() key=<service_provider> type=<string>
+05-10 18:18:44.971201  1  2 json2fcldb() key=<first_data_receiver_rank> type=<number>
+05-10 18:18:44.971269  1  2 json2fcldb() key=<mpi_buffer_count> type=<number>
+05-10 18:18:44.971292  1  2 json2fcldb() key=<max_fragment_size_words> type=<number>
+05-10 18:18:44.971312  1  2 json2fcldb() key=<data_receiver_count> type=<number>
+05-10 18:18:44.971401  1  2 json2fcldb() key=<daq> type=<table>
+05-10 18:18:44.971419  1  2 json2fcldb() key=<max_fragment_size_words> type=<number>
+05-10 18:18:44.971439  1  2 json2fcldb() key=<event_builder> type=<table>
+05-10 18:18:44.971456  1  2 json2fcldb() key=<mpi_buffer_count> type=<number>
+05-10 18:18:44.971483  1  2 json2fcldb() key=<first_fragment_receiver_rank> type=<number>
+05-10 18:18:44.971502  1  2 json2fcldb() key=<fragment_receiver_count> type=<number>
+05-10 18:18:44.971522  1  2 json2fcldb() key=<expected_fragments_per_event> type=<number>
+05-10 18:18:44.971540  1  2 json2fcldb() key=<use_art> type=<bool>
+05-10 18:18:44.971603  1  2 json2fcldb() key=<print_event_store_stats> type=<bool>
+05-10 18:18:44.971624  1  2 json2fcldb() key=<verbose> type=<bool>
+05-10 18:18:44.971660  1  2 json2fcldb() key=<metrics> type=<table>
+05-10 18:18:44.971677  1  2 json2fcldb() key=<evbFile> type=<table>
+05-10 18:18:44.971691  1  2 json2fcldb() key=<metricPluginType> type=<string>
+05-10 18:18:44.971710  1  2 json2fcldb() key=<level> type=<number>
+05-10 18:18:44.971732  1  2 json2fcldb() key=<fileName> type=<string>
+05-10 18:18:44.971770  1  2 json2fcldb() key=<uniquify> type=<bool>
+05-10 18:18:44.971851  1  2 json2fcldb() key=<outputs> type=<table>
+05-10 18:18:44.971868  1  2 json2fcldb() key=<netMonOutput> type=<table>
+05-10 18:18:44.971883  1  2 json2fcldb() key=<module_type> type=<string>
+05-10 18:18:44.971908  1  2 json2fcldb() key=<SelectEvents> type=<table>
+05-10 18:18:44.971925  1  2 json2fcldb() key=<SelectEvents> type=<sequence>
+05-10 18:18:44.972156  1  2 json2fcldb() key=<physics> type=<table>
+05-10 18:18:44.972174  1  2 json2fcldb() key=<filters> type=<table>
+05-10 18:18:44.972189  1  2 json2fcldb() key=<prescaleMod2> type=<table>
+05-10 18:18:44.972206  1  2 json2fcldb() key=<module_type> type=<string>
+05-10 18:18:44.972226  1  2 json2fcldb() key=<nth> type=<number>
+05-10 18:18:44.972255  1  2 json2fcldb() key=<prescaleMod3> type=<table>
+05-10 18:18:44.972271  1  2 json2fcldb() key=<module_type> type=<string>
+05-10 18:18:44.972292  1  2 json2fcldb() key=<nth> type=<number>
+05-10 18:18:44.972339  1  2 json2fcldb() key=<pmod2> type=<sequence>
+05-10 18:18:44.972386  1  2 json2fcldb() key=<pmod3> type=<sequence>
+05-10 18:18:44.972427  1  2 json2fcldb() key=<my_output_modules> type=<sequence>
+05-10 18:18:44.972492  1  2 json2fcldb() key=<source> type=<table>
+05-10 18:18:44.972513  1  2 json2fcldb() key=<module_type> type=<string>
+05-10 18:18:44.972533  1  2 json2fcldb() key=<waiting_time> type=<number>
+05-10 18:18:44.972555  1  2 json2fcldb() key=<resume_after_timeout> type=<bool>
+05-10 18:18:44.972584  1  2 json2fcldb() key=<process_name> type=<string>
+05-10 18:18:44.982098  1  2 write_data() end
+05-10 18:18:44.982260  1  3 json_to_fhicl: fcl=< 
+services: {
+ 
+scheduler: {
+ 
+fileMode: NOMERGE  
+
+} 
+user: {
+ 
+NetMonTransportServiceInterface: {
+ 
+service_provider: NetMonTransportService  
+ 
+first_data_receiver_rank: 6  
+ 
+mpi_buffer_count: 8  
+ 
+max_fragment_size_words: 2097152  
+ 
+data_receiver_count: 1 # 2
+
+}
+}
+} 
+daq: {
+ 
+max_fragment_size_words: 2097152  
+ 
+event_builder: {
+ 
+mpi_buffer_count: 16  
+ 
+first_fragment_receiver_rank: 0  
+ 
+fragment_receiver_count: 2  
+ 
+expected_fragments_per_event: 2  
+ 
+use_art: true  
+ 
+print_event_store_stats: true  
+ 
+verbose: false  
+
+} 
+metrics: {
+ 
+evbFile: {
+ 
+metricPluginType: file  
+ 
+level: 3  
+ 
+fileName: "/tmp/eventbuilder/evb_%UID%_metrics.log" //demoe
+ 
+uniquify: true  
+
+}
+}
+} 
+outputs: {
+ 
+netMonOutput: {
+ 
+module_type: NetMonOutput  
+#Failure 5 not a satom 
+SelectEvents: {
+#Failure 5 not a satom 
+SelectEvents: [pmod2, pmod3]  
+
+}
+}
+} 
+physics: {
+ 
+filters: {
+#Failure 4 not a satom 
+prescaleMod2: {
+ 
+module_type: NthEvent #//Success 5 right of satom
+#//Success 5 right of satom
+nth: 2  
+
+} 
+prescaleMod3: {
+ 
+module_type: NthEvent  
+ 
+nth: 3 //#Success 4 right of satom
+
+}
+} 
+pmod2: [prescaleMod2]  
+#Failure 2 not a satom 
+pmod3: [prescaleMod3]  
+ 
+my_output_modules: [netMonOutput]  
+
+} 
+source: {
+#Success 1  above satom
+module_type: RawInput  
+ 
+waiting_time: 900 //Success 2 right of satom
+ 
+resume_after_timeout: true #Success 3 right of satom
+
+} 
+process_name: DAQ  
+>
+05-10 18:18:44.982276  1  3 json_to_fhicl: end
+Running test:<Convert_DBJson2Fhicl>
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"Convert_DBJson2Fhicl_001_t" end time: May 10 18:18 CDT
+"Convert_DBJson2Fhicl_001_t" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/4 Testing: RoundConvert_Fhicl2DBJson_001_t
+3/4 Test: RoundConvert_Fhicl2DBJson_001_t
+Command: "/home/lukhanin/scratch/current/artdaq-demo-base/products/cetbuildtools/v4_18_02/bin/cet_exec_test" "--wd" "/home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/test/DataFormats/Fhicl/fcl2dbjson/test003/RoundConvert_Fhicl2DBJson_001_t.d" "--required-files" "" "--datafiles" "/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/test/DataFormats/Fhicl/fcl2dbjson/test003/test001.fcl" "--skip-return-code" "247" "ConvertFhicl_t" "-s" "test001.fcl" "-c" "test001.fcl" "-t" "RoundConvert_Fhicl2DBJson"
+Directory: /home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/test/DataFormats/Fhicl/fcl2dbjson/test003/RoundConvert_Fhicl2DBJson_001_t.d
+"RoundConvert_Fhicl2DBJson_001_t" start time: May 10 18:18 CDT
+Output:
+----------------------------------------------------------
+05-10 18:18:45.013007  1  0 artdaq::database::fhicl::FhiclReader trace_enable
+05-10 18:18:45.013961  1  0 artdaq::database::fhicl::FhiclWrite trace_enable
+05-10 18:18:45.013992  1  0 artdaq::database::fhicljson trace_enable
+05-10 18:18:45.014021  1  0 artdaq::database::convertjson::FCL2JSON trace_enable
+05-10 18:18:45.016894  1  2 fhicl_to_json: begin
+05-10 18:18:45.017212  1  2 fhicl_to_json: Created root nodes
+05-10 18:18:45.017343  1  2 read_comments begin
+05-10 18:18:45.021048  1  2 read_comments end result=1
+05-10 18:18:45.021062  1  2 read_data begin
+05-10 18:18:45.021075  1  2 read_data() begin
+05-10 18:18:45.055902  1  2 parse_document() returned 6 entries.
+05-10 18:18:45.056085  1  2 fcl2jsondb() key=<services>
+05-10 18:18:45.056285  1  2 fcl2jsondb() value=<{scheduler:{fileMode:"NOMERGE"} user:{NetMonTransportServiceInterface:{service_provider:"NetMonTransportService" first_data_receiver_rank:6 mpi_buffer_count:8 max_fragment_size_words:2.097152e6 data_receiver_count:1}}}>
+05-10 18:18:45.056407  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.056476  1  2 fcl2jsondb() key=<scheduler>
+05-10 18:18:45.056496  1  2 fcl2jsondb() value=<{fileMode:"NOMERGE"}>
+05-10 18:18:45.056522  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.056553  1  2 fcl2jsondb() key=<fileMode>
+05-10 18:18:45.056560  1  2 fcl2jsondb() value=<"NOMERGE">
+05-10 18:18:45.056583  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:45.056698  1  2 fcl2jsondb() key=<user>
+05-10 18:18:45.056736  1  2 fcl2jsondb() value=<{NetMonTransportServiceInterface:{service_provider:"NetMonTransportService" first_data_receiver_rank:6 mpi_buffer_count:8 max_fragment_size_words:2.097152e6 data_receiver_count:1}}>
+05-10 18:18:45.056759  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.056797  1  2 fcl2jsondb() key=<NetMonTransportServiceInterface>
+05-10 18:18:45.056913  1  2 fcl2jsondb() value=<{service_provider:"NetMonTransportService" first_data_receiver_rank:6 mpi_buffer_count:8 max_fragment_size_words:2.097152e6 data_receiver_count:1}>
+05-10 18:18:45.056940  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.056974  1  2 fcl2jsondb() key=<service_provider>
+05-10 18:18:45.056985  1  2 fcl2jsondb() value=<"NetMonTransportService">
+05-10 18:18:45.057010  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:45.057049  1  2 fcl2jsondb() key=<first_data_receiver_rank>
+05-10 18:18:45.057057  1  2 fcl2jsondb() value=<6>
+05-10 18:18:45.057081  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.060253  1  2 fcl2jsondb() key=<mpi_buffer_count>
+05-10 18:18:45.060263  1  2 fcl2jsondb() value=<8>
+05-10 18:18:45.060287  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.063098  1  2 fcl2jsondb() key=<max_fragment_size_words>
+05-10 18:18:45.063107  1  2 fcl2jsondb() value=<2.097152e6>
+05-10 18:18:45.063131  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.066407  1  2 fcl2jsondb() key=<data_receiver_count>
+05-10 18:18:45.066418  1  2 fcl2jsondb() value=<1>
+05-10 18:18:45.066502  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.069466  1  2 fcl2jsondb() key=<daq>
+05-10 18:18:45.069547  1  2 fcl2jsondb() value=<{max_fragment_size_words:2.097152e6 event_builder:{mpi_buffer_count:16 first_fragment_receiver_rank:0 fragment_receiver_count:2 expected_fragments_per_event:2 use_art:true print_event_store_stats:true verbose:false} metrics:{evbFile:{metricPluginType:"file" level:3 fileName:"/tmp/eventbuilder/evb_%UID%_metrics.log" uniquify:true}}}>
+05-10 18:18:45.069574  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.069621  1  2 fcl2jsondb() key=<max_fragment_size_words>
+05-10 18:18:45.069629  1  2 fcl2jsondb() value=<2.097152e6>
+05-10 18:18:45.069650  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.072503  1  2 fcl2jsondb() key=<event_builder>
+05-10 18:18:45.072529  1  2 fcl2jsondb() value=<{mpi_buffer_count:16 first_fragment_receiver_rank:0 fragment_receiver_count:2 expected_fragments_per_event:2 use_art:true print_event_store_stats:true verbose:false}>
+05-10 18:18:45.072551  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.072599  1  2 fcl2jsondb() key=<mpi_buffer_count>
+05-10 18:18:45.072608  1  2 fcl2jsondb() value=<16>
+05-10 18:18:45.072641  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.075516  1  2 fcl2jsondb() key=<first_fragment_receiver_rank>
+05-10 18:18:45.075526  1  2 fcl2jsondb() value=<0>
+05-10 18:18:45.075549  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.078338  1  2 fcl2jsondb() key=<fragment_receiver_count>
+05-10 18:18:45.078350  1  2 fcl2jsondb() value=<2>
+05-10 18:18:45.078373  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.081153  1  2 fcl2jsondb() key=<expected_fragments_per_event>
+05-10 18:18:45.081163  1  2 fcl2jsondb() value=<2>
+05-10 18:18:45.081186  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.083937  1  2 fcl2jsondb() key=<use_art>
+05-10 18:18:45.083946  1  2 fcl2jsondb() value=<true>
+05-10 18:18:45.083977  1  2 fcl2jsondb() value type=<bool>
+05-10 18:18:45.084065  1  2 fcl2jsondb() key=<print_event_store_stats>
+05-10 18:18:45.084074  1  2 fcl2jsondb() value=<true>
+05-10 18:18:45.084106  1  2 fcl2jsondb() value type=<bool>
+05-10 18:18:45.084145  1  2 fcl2jsondb() key=<verbose>
+05-10 18:18:45.084152  1  2 fcl2jsondb() value=<false>
+05-10 18:18:45.084173  1  2 fcl2jsondb() value type=<bool>
+05-10 18:18:45.084263  1  2 fcl2jsondb() key=<metrics>
+05-10 18:18:45.084293  1  2 fcl2jsondb() value=<{evbFile:{metricPluginType:"file" level:3 fileName:"/tmp/eventbuilder/evb_%UID%_metrics.log" uniquify:true}}>
+05-10 18:18:45.084316  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.084348  1  2 fcl2jsondb() key=<evbFile>
+05-10 18:18:45.084374  1  2 fcl2jsondb() value=<{metricPluginType:"file" level:3 fileName:"/tmp/eventbuilder/evb_%UID%_metrics.log" uniquify:true}>
+05-10 18:18:45.084399  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.084429  1  2 fcl2jsondb() key=<metricPluginType>
+05-10 18:18:45.084441  1  2 fcl2jsondb() value=<"file">
+05-10 18:18:45.084464  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:45.084498  1  2 fcl2jsondb() key=<level>
+05-10 18:18:45.084506  1  2 fcl2jsondb() value=<3>
+05-10 18:18:45.084526  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.087317  1  2 fcl2jsondb() key=<fileName>
+05-10 18:18:45.087327  1  2 fcl2jsondb() value=<"/tmp/eventbuilder/evb_%UID%_metrics.log">
+05-10 18:18:45.087392  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:45.087435  1  2 fcl2jsondb() key=<uniquify>
+05-10 18:18:45.087445  1  2 fcl2jsondb() value=<true>
+05-10 18:18:45.087467  1  2 fcl2jsondb() value type=<bool>
+05-10 18:18:45.087663  1  2 fcl2jsondb() key=<outputs>
+05-10 18:18:45.087745  1  2 fcl2jsondb() value=<{netMonOutput:{module_type:"NetMonOutput" SelectEvents:{SelectEvents:["pmod2","pmod3"]}}}>
+05-10 18:18:45.087768  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.087806  1  2 fcl2jsondb() key=<netMonOutput>
+05-10 18:18:45.087840  1  2 fcl2jsondb() value=<{module_type:"NetMonOutput" SelectEvents:{SelectEvents:["pmod2","pmod3"]}}>
+05-10 18:18:45.087860  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.087893  1  2 fcl2jsondb() key=<module_type>
+05-10 18:18:45.087899  1  2 fcl2jsondb() value=<"NetMonOutput">
+05-10 18:18:45.087922  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:45.087965  1  2 fcl2jsondb() key=<SelectEvents>
+05-10 18:18:45.087989  1  2 fcl2jsondb() value=<{SelectEvents:["pmod2","pmod3"]}>
+05-10 18:18:45.088067  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.088104  1  2 fcl2jsondb() key=<SelectEvents>
+05-10 18:18:45.088124  1  2 fcl2jsondb() value=<["pmod2","pmod3"]>
+05-10 18:18:45.088202  1  2 fcl2jsondb() value type=<sequence>
+05-10 18:18:45.088424  1  2 fcl2jsondb() key=<physics>
+05-10 18:18:45.088500  1  2 fcl2jsondb() value=<{filters:{prescaleMod2:{module_type:"NthEvent" nth:2} prescaleMod3:{module_type:"NthEvent" nth:3}} pmod2:["prescaleMod2"] pmod3:["prescaleMod3"] my_output_modules:["netMonOutput"]}>
+05-10 18:18:45.088526  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.088570  1  2 fcl2jsondb() key=<filters>
+05-10 18:18:45.088604  1  2 fcl2jsondb() value=<{prescaleMod2:{module_type:"NthEvent" nth:2} prescaleMod3:{module_type:"NthEvent" nth:3}}>
+05-10 18:18:45.088624  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.088657  1  2 fcl2jsondb() key=<prescaleMod2>
+05-10 18:18:45.088672  1  2 fcl2jsondb() value=<{module_type:"NthEvent" nth:2}>
+05-10 18:18:45.088739  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.088769  1  2 fcl2jsondb() key=<module_type>
+05-10 18:18:45.088777  1  2 fcl2jsondb() value=<"NthEvent">
+05-10 18:18:45.088847  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:45.088882  1  2 fcl2jsondb() key=<nth>
+05-10 18:18:45.088889  1  2 fcl2jsondb() value=<2>
+05-10 18:18:45.088957  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.091791  1  2 fcl2jsondb() key=<prescaleMod3>
+05-10 18:18:45.091810  1  2 fcl2jsondb() value=<{module_type:"NthEvent" nth:3}>
+05-10 18:18:45.091832  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.091857  1  2 fcl2jsondb() key=<module_type>
+05-10 18:18:45.091864  1  2 fcl2jsondb() value=<"NthEvent">
+05-10 18:18:45.091887  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:45.091917  1  2 fcl2jsondb() key=<nth>
+05-10 18:18:45.091926  1  2 fcl2jsondb() value=<3>
+05-10 18:18:45.091994  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.094857  1  2 fcl2jsondb() key=<pmod2>
+05-10 18:18:45.094875  1  2 fcl2jsondb() value=<["prescaleMod2"]>
+05-10 18:18:45.094900  1  2 fcl2jsondb() value type=<sequence>
+05-10 18:18:45.094956  1  2 fcl2jsondb() key=<pmod3>
+05-10 18:18:45.094972  1  2 fcl2jsondb() value=<["prescaleMod3"]>
+05-10 18:18:45.095047  1  2 fcl2jsondb() value type=<sequence>
+05-10 18:18:45.095112  1  2 fcl2jsondb() key=<my_output_modules>
+05-10 18:18:45.095125  1  2 fcl2jsondb() value=<["netMonOutput"]>
+05-10 18:18:45.095148  1  2 fcl2jsondb() value type=<sequence>
+05-10 18:18:45.095273  1  2 fcl2jsondb() key=<source>
+05-10 18:18:45.095479  1  2 fcl2jsondb() value=<{module_type:"RawInput" waiting_time:900 resume_after_timeout:true}>
+05-10 18:18:45.095503  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.095530  1  2 fcl2jsondb() key=<module_type>
+05-10 18:18:45.095540  1  2 fcl2jsondb() value=<"RawInput">
+05-10 18:18:45.095607  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:45.095649  1  2 fcl2jsondb() key=<waiting_time>
+05-10 18:18:45.095657  1  2 fcl2jsondb() value=<900>
+05-10 18:18:45.095734  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.098490  1  2 fcl2jsondb() key=<resume_after_timeout>
+05-10 18:18:45.098500  1  2 fcl2jsondb() value=<true>
+05-10 18:18:45.098568  1  2 fcl2jsondb() value type=<bool>
+05-10 18:18:45.098634  1  2 fcl2jsondb() key=<process_name>
+05-10 18:18:45.098643  1  2 fcl2jsondb() value=<"DAQ">
+05-10 18:18:45.098667  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:45.098691  1  2 read_data() end
+05-10 18:18:45.098764  1  2 read_data end result=1
+05-10 18:18:45.098772  1  2 fhicl_to_json: write() begin
+05-10 18:18:45.114343  1  2 fhicl_to_json: write() end
+05-10 18:18:45.114369  1  2 fhicl_to_json: end
+05-10 18:18:45.114557  1  3 json_to_fhicl: begin
+05-10 18:18:45.114566  1  3 json_to_fhicl: Reading json root nodes
+05-10 18:18:45.126976  1  2 write_data() begin
+05-10 18:18:45.128042  1  2 json2fcldb() key=<services> type=<table>
+05-10 18:18:45.128137  1  2 json2fcldb() key=<scheduler> type=<table>
+05-10 18:18:45.128156  1  2 json2fcldb() key=<fileMode> type=<string>
+05-10 18:18:45.128293  1  2 json2fcldb() key=<user> type=<table>
+05-10 18:18:45.128311  1  2 json2fcldb() key=<NetMonTransportServiceInterface> type=<table>
+05-10 18:18:45.128325  1  2 json2fcldb() key=<service_provider> type=<string>
+05-10 18:18:45.128344  1  2 json2fcldb() key=<first_data_receiver_rank> type=<number>
+05-10 18:18:45.128397  1  2 json2fcldb() key=<mpi_buffer_count> type=<number>
+05-10 18:18:45.128420  1  2 json2fcldb() key=<max_fragment_size_words> type=<number>
+05-10 18:18:45.128441  1  2 json2fcldb() key=<data_receiver_count> type=<number>
+05-10 18:18:45.128515  1  2 json2fcldb() key=<daq> type=<table>
+05-10 18:18:45.128531  1  2 json2fcldb() key=<max_fragment_size_words> type=<number>
+05-10 18:18:45.128552  1  2 json2fcldb() key=<event_builder> type=<table>
+05-10 18:18:45.128574  1  2 json2fcldb() key=<mpi_buffer_count> type=<number>
+05-10 18:18:45.128594  1  2 json2fcldb() key=<first_fragment_receiver_rank> type=<number>
+05-10 18:18:45.128612  1  2 json2fcldb() key=<fragment_receiver_count> type=<number>
+05-10 18:18:45.128629  1  2 json2fcldb() key=<expected_fragments_per_event> type=<number>
+05-10 18:18:45.128647  1  2 json2fcldb() key=<use_art> type=<bool>
+05-10 18:18:45.128689  1  2 json2fcldb() key=<print_event_store_stats> type=<bool>
+05-10 18:18:45.128710  1  2 json2fcldb() key=<verbose> type=<bool>
+05-10 18:18:45.128742  1  2 json2fcldb() key=<metrics> type=<table>
+05-10 18:18:45.128757  1  2 json2fcldb() key=<evbFile> type=<table>
+05-10 18:18:45.128771  1  2 json2fcldb() key=<metricPluginType> type=<string>
+05-10 18:18:45.128788  1  2 json2fcldb() key=<level> type=<number>
+05-10 18:18:45.128810  1  2 json2fcldb() key=<fileName> type=<string>
+05-10 18:18:45.128843  1  2 json2fcldb() key=<uniquify> type=<bool>
+05-10 18:18:45.128927  1  2 json2fcldb() key=<outputs> type=<table>
+05-10 18:18:45.128945  1  2 json2fcldb() key=<netMonOutput> type=<table>
+05-10 18:18:45.128959  1  2 json2fcldb() key=<module_type> type=<string>
+05-10 18:18:45.128979  1  2 json2fcldb() key=<SelectEvents> type=<table>
+05-10 18:18:45.128994  1  2 json2fcldb() key=<SelectEvents> type=<sequence>
+05-10 18:18:45.129191  1  2 json2fcldb() key=<physics> type=<table>
+05-10 18:18:45.129208  1  2 json2fcldb() key=<filters> type=<table>
+05-10 18:18:45.129222  1  2 json2fcldb() key=<prescaleMod2> type=<table>
+05-10 18:18:45.129238  1  2 json2fcldb() key=<module_type> type=<string>
+05-10 18:18:45.129256  1  2 json2fcldb() key=<nth> type=<number>
+05-10 18:18:45.129284  1  2 json2fcldb() key=<prescaleMod3> type=<table>
+05-10 18:18:45.129299  1  2 json2fcldb() key=<module_type> type=<string>
+05-10 18:18:45.129316  1  2 json2fcldb() key=<nth> type=<number>
+05-10 18:18:45.129362  1  2 json2fcldb() key=<pmod2> type=<sequence>
+05-10 18:18:45.129401  1  2 json2fcldb() key=<pmod3> type=<sequence>
+05-10 18:18:45.129440  1  2 json2fcldb() key=<my_output_modules> type=<sequence>
+05-10 18:18:45.129506  1  2 json2fcldb() key=<source> type=<table>
+05-10 18:18:45.129523  1  2 json2fcldb() key=<module_type> type=<string>
+05-10 18:18:45.129550  1  2 json2fcldb() key=<waiting_time> type=<number>
+05-10 18:18:45.129572  1  2 json2fcldb() key=<resume_after_timeout> type=<bool>
+05-10 18:18:45.129601  1  2 json2fcldb() key=<process_name> type=<string>
+05-10 18:18:45.137830  1  2 write_data() end
+05-10 18:18:45.137850  1  3 json_to_fhicl: fcl=< 
+services: {
+ 
+scheduler: {
+ 
+fileMode: NOMERGE  
+
+} 
+user: {
+ 
+NetMonTransportServiceInterface: {
+ 
+service_provider: NetMonTransportService  
+ 
+first_data_receiver_rank: 6  
+ 
+mpi_buffer_count: 8  
+ 
+max_fragment_size_words: 2097152  
+ 
+data_receiver_count: 1 # 2
+
+}
+}
+} 
+daq: {
+ 
+max_fragment_size_words: 2097152  
+ 
+event_builder: {
+ 
+mpi_buffer_count: 16  
+ 
+first_fragment_receiver_rank: 0  
+ 
+fragment_receiver_count: 2  
+ 
+expected_fragments_per_event: 2  
+ 
+use_art: true  
+ 
+print_event_store_stats: true  
+ 
+verbose: false  
+
+} 
+metrics: {
+ 
+evbFile: {
+ 
+metricPluginType: file  
+ 
+level: 3  
+ 
+fileName: "/tmp/eventbuilder/evb_%UID%_metrics.log" //demoe
+ 
+uniquify: true  
+
+}
+}
+} 
+outputs: {
+ 
+netMonOutput: {
+ 
+module_type: NetMonOutput  
+#Failure 5 not a satom 
+SelectEvents: {
+#Failure 5 not a satom 
+SelectEvents: [pmod2, pmod3]  
+
+}
+}
+} 
+physics: {
+ 
+filters: {
+#Failure 4 not a satom 
+prescaleMod2: {
+ 
+module_type: NthEvent #//Success 5 right of satom
+#//Success 5 right of satom
+nth: 2  
+
+} 
+prescaleMod3: {
+ 
+module_type: NthEvent  
+ 
+nth: 3 //#Success 4 right of satom
+
+}
+} 
+pmod2: [prescaleMod2]  
+#Failure 2 not a satom 
+pmod3: [prescaleMod3]  
+ 
+my_output_modules: [netMonOutput]  
+
+} 
+source: {
+#Success 1  above satom
+module_type: RawInput  
+ 
+waiting_time: 900 //Success 2 right of satom
+ 
+resume_after_timeout: true #Success 3 right of satom
+
+} 
+process_name: DAQ  
+>
+05-10 18:18:45.137861  1  3 json_to_fhicl: end
+Running test:<RoundConvert_Fhicl2DBJson>
+fhicl_to_json succeeded.
+json_to_fhicl succeeded.
+<end of output>
+Test time =   0.16 sec
+----------------------------------------------------------
+Test Passed.
+"RoundConvert_Fhicl2DBJson_001_t" end time: May 10 18:18 CDT
+"RoundConvert_Fhicl2DBJson_001_t" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/4 Testing: RoundConvert_DBJson2Fhicl_001_t
+4/4 Test: RoundConvert_DBJson2Fhicl_001_t
+Command: "/home/lukhanin/scratch/current/artdaq-demo-base/products/cetbuildtools/v4_18_02/bin/cet_exec_test" "--wd" "/home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/test/DataFormats/Fhicl/fcl2dbjson/test004/RoundConvert_DBJson2Fhicl_001_t.d" "--required-files" "" "--datafiles" "/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/test/DataFormats/Fhicl/fcl2dbjson/test004/test001.json" "--skip-return-code" "247" "ConvertFhicl_t" "-s" "test001.json" "-c" "test001.json" "-t" "RoundConvert_DBJson2Fhicl"
+Directory: /home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/test/DataFormats/Fhicl/fcl2dbjson/test004/RoundConvert_DBJson2Fhicl_001_t.d
+"RoundConvert_DBJson2Fhicl_001_t" start time: May 10 18:18 CDT
+Output:
+----------------------------------------------------------
+05-10 18:18:45.166489  1  0 artdaq::database::fhicl::FhiclReader trace_enable
+05-10 18:18:45.167250  1  0 artdaq::database::fhicl::FhiclWrite trace_enable
+05-10 18:18:45.167282  1  0 artdaq::database::fhicljson trace_enable
+05-10 18:18:45.167312  1  0 artdaq::database::convertjson::FCL2JSON trace_enable
+05-10 18:18:45.170840  1  3 json_to_fhicl: begin
+05-10 18:18:45.170882  1  3 json_to_fhicl: Reading json root nodes
+05-10 18:18:45.184025  1  2 write_data() begin
+05-10 18:18:45.185233  1  2 json2fcldb() key=<services> type=<table>
+05-10 18:18:45.185335  1  2 json2fcldb() key=<scheduler> type=<table>
+05-10 18:18:45.185366  1  2 json2fcldb() key=<fileMode> type=<string>
+05-10 18:18:45.185518  1  2 json2fcldb() key=<user> type=<table>
+05-10 18:18:45.185537  1  2 json2fcldb() key=<NetMonTransportServiceInterface> type=<table>
+05-10 18:18:45.185554  1  2 json2fcldb() key=<service_provider> type=<string>
+05-10 18:18:45.185576  1  2 json2fcldb() key=<first_data_receiver_rank> type=<number>
+05-10 18:18:45.185638  1  2 json2fcldb() key=<mpi_buffer_count> type=<number>
+05-10 18:18:45.185661  1  2 json2fcldb() key=<max_fragment_size_words> type=<number>
+05-10 18:18:45.185679  1  2 json2fcldb() key=<data_receiver_count> type=<number>
+05-10 18:18:45.185765  1  2 json2fcldb() key=<daq> type=<table>
+05-10 18:18:45.185782  1  2 json2fcldb() key=<max_fragment_size_words> type=<number>
+05-10 18:18:45.185802  1  2 json2fcldb() key=<event_builder> type=<table>
+05-10 18:18:45.185821  1  2 json2fcldb() key=<mpi_buffer_count> type=<number>
+05-10 18:18:45.185846  1  2 json2fcldb() key=<first_fragment_receiver_rank> type=<number>
+05-10 18:18:45.185864  1  2 json2fcldb() key=<fragment_receiver_count> type=<number>
+05-10 18:18:45.185882  1  2 json2fcldb() key=<expected_fragments_per_event> type=<number>
+05-10 18:18:45.185900  1  2 json2fcldb() key=<use_art> type=<bool>
+05-10 18:18:45.185959  1  2 json2fcldb() key=<print_event_store_stats> type=<bool>
+05-10 18:18:45.185979  1  2 json2fcldb() key=<verbose> type=<bool>
+05-10 18:18:45.186013  1  2 json2fcldb() key=<metrics> type=<table>
+05-10 18:18:45.186029  1  2 json2fcldb() key=<evbFile> type=<table>
+05-10 18:18:45.186045  1  2 json2fcldb() key=<metricPluginType> type=<string>
+05-10 18:18:45.186063  1  2 json2fcldb() key=<level> type=<number>
+05-10 18:18:45.186085  1  2 json2fcldb() key=<fileName> type=<string>
+05-10 18:18:45.186120  1  2 json2fcldb() key=<uniquify> type=<bool>
+05-10 18:18:45.186195  1  2 json2fcldb() key=<outputs> type=<table>
+05-10 18:18:45.186211  1  2 json2fcldb() key=<netMonOutput> type=<table>
+05-10 18:18:45.186225  1  2 json2fcldb() key=<module_type> type=<string>
+05-10 18:18:45.186246  1  2 json2fcldb() key=<SelectEvents> type=<table>
+05-10 18:18:45.186262  1  2 json2fcldb() key=<SelectEvents> type=<sequence>
+05-10 18:18:45.186486  1  2 json2fcldb() key=<physics> type=<table>
+05-10 18:18:45.186504  1  2 json2fcldb() key=<filters> type=<table>
+05-10 18:18:45.186518  1  2 json2fcldb() key=<prescaleMod2> type=<table>
+05-10 18:18:45.186533  1  2 json2fcldb() key=<module_type> type=<string>
+05-10 18:18:45.186552  1  2 json2fcldb() key=<nth> type=<number>
+05-10 18:18:45.186580  1  2 json2fcldb() key=<prescaleMod3> type=<table>
+05-10 18:18:45.186595  1  2 json2fcldb() key=<module_type> type=<string>
+05-10 18:18:45.186614  1  2 json2fcldb() key=<nth> type=<number>
+05-10 18:18:45.186659  1  2 json2fcldb() key=<pmod2> type=<sequence>
+05-10 18:18:45.186706  1  2 json2fcldb() key=<pmod3> type=<sequence>
+05-10 18:18:45.186737  1  2 json2fcldb() key=<my_output_modules> type=<sequence>
+05-10 18:18:45.186803  1  2 json2fcldb() key=<source> type=<table>
+05-10 18:18:45.186821  1  2 json2fcldb() key=<module_type> type=<string>
+05-10 18:18:45.186842  1  2 json2fcldb() key=<waiting_time> type=<number>
+05-10 18:18:45.186863  1  2 json2fcldb() key=<resume_after_timeout> type=<bool>
+05-10 18:18:45.186892  1  2 json2fcldb() key=<process_name> type=<string>
+05-10 18:18:45.196389  1  2 write_data() end
+05-10 18:18:45.196806  1  3 json_to_fhicl: fcl=< 
+services: {
+ 
+scheduler: {
+ 
+fileMode: NOMERGE  
+
+} 
+user: {
+ 
+NetMonTransportServiceInterface: {
+ 
+service_provider: NetMonTransportService  
+ 
+first_data_receiver_rank: 6  
+ 
+mpi_buffer_count: 8  
+ 
+max_fragment_size_words: 2097152  
+ 
+data_receiver_count: 1 # 2
+
+}
+}
+} 
+daq: {
+ 
+max_fragment_size_words: 2097152  
+ 
+event_builder: {
+ 
+mpi_buffer_count: 16  
+ 
+first_fragment_receiver_rank: 0  
+ 
+fragment_receiver_count: 2  
+ 
+expected_fragments_per_event: 2  
+ 
+use_art: true  
+ 
+print_event_store_stats: true  
+ 
+verbose: false  
+
+} 
+metrics: {
+ 
+evbFile: {
+ 
+metricPluginType: file  
+ 
+level: 3  
+ 
+fileName: "/tmp/eventbuilder/evb_%UID%_metrics.log" //demoe
+ 
+uniquify: true  
+
+}
+}
+} 
+outputs: {
+ 
+netMonOutput: {
+ 
+module_type: NetMonOutput  
+#Failure 5 not a satom 
+SelectEvents: {
+#Failure 5 not a satom 
+SelectEvents: [pmod2, pmod3]  
+
+}
+}
+} 
+physics: {
+ 
+filters: {
+#Failure 4 not a satom 
+prescaleMod2: {
+ 
+module_type: NthEvent #//Success 5 right of satom
+#//Success 5 right of satom
+nth: 2  
+
+} 
+prescaleMod3: {
+ 
+module_type: NthEvent  
+ 
+nth: 3 //#Success 4 right of satom
+
+}
+} 
+pmod2: [prescaleMod2]  
+#Failure 2 not a satom 
+pmod3: [prescaleMod3]  
+ 
+my_output_modules: [netMonOutput]  
+
+} 
+source: {
+#Success 1  above satom
+module_type: RawInput  
+ 
+waiting_time: 900 //Success 2 right of satom
+ 
+resume_after_timeout: true #Success 3 right of satom
+
+} 
+process_name: DAQ  
+>
+05-10 18:18:45.196830  1  3 json_to_fhicl: end
+05-10 18:18:45.197090  1  2 fhicl_to_json: begin
+05-10 18:18:45.197249  1  2 fhicl_to_json: Created root nodes
+05-10 18:18:45.197386  1  2 read_comments begin
+05-10 18:18:45.200473  1  2 read_comments end result=1
+05-10 18:18:45.200486  1  2 read_data begin
+05-10 18:18:45.200497  1  2 read_data() begin
+05-10 18:18:45.233542  1  2 parse_document() returned 6 entries.
+05-10 18:18:45.233725  1  2 fcl2jsondb() key=<services>
+05-10 18:18:45.233935  1  2 fcl2jsondb() value=<{scheduler:{fileMode:"NOMERGE"} user:{NetMonTransportServiceInterface:{service_provider:"NetMonTransportService" first_data_receiver_rank:6 mpi_buffer_count:8 max_fragment_size_words:2.097152e6 data_receiver_count:1}}}>
+05-10 18:18:45.234040  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.234116  1  2 fcl2jsondb() key=<scheduler>
+05-10 18:18:45.234133  1  2 fcl2jsondb() value=<{fileMode:"NOMERGE"}>
+05-10 18:18:45.234157  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.234196  1  2 fcl2jsondb() key=<fileMode>
+05-10 18:18:45.234205  1  2 fcl2jsondb() value=<"NOMERGE">
+05-10 18:18:45.234237  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:45.234345  1  2 fcl2jsondb() key=<user>
+05-10 18:18:45.234388  1  2 fcl2jsondb() value=<{NetMonTransportServiceInterface:{service_provider:"NetMonTransportService" first_data_receiver_rank:6 mpi_buffer_count:8 max_fragment_size_words:2.097152e6 data_receiver_count:1}}>
+05-10 18:18:45.234412  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.234447  1  2 fcl2jsondb() key=<NetMonTransportServiceInterface>
+05-10 18:18:45.234573  1  2 fcl2jsondb() value=<{service_provider:"NetMonTransportService" first_data_receiver_rank:6 mpi_buffer_count:8 max_fragment_size_words:2.097152e6 data_receiver_count:1}>
+05-10 18:18:45.234604  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.234646  1  2 fcl2jsondb() key=<service_provider>
+05-10 18:18:45.234654  1  2 fcl2jsondb() value=<"NetMonTransportService">
+05-10 18:18:45.234690  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:45.234734  1  2 fcl2jsondb() key=<first_data_receiver_rank>
+05-10 18:18:45.234743  1  2 fcl2jsondb() value=<6>
+05-10 18:18:45.234768  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.237862  1  2 fcl2jsondb() key=<mpi_buffer_count>
+05-10 18:18:45.237873  1  2 fcl2jsondb() value=<8>
+05-10 18:18:45.237901  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.240710  1  2 fcl2jsondb() key=<max_fragment_size_words>
+05-10 18:18:45.240720  1  2 fcl2jsondb() value=<2.097152e6>
+05-10 18:18:45.240743  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.243689  1  2 fcl2jsondb() key=<data_receiver_count>
+05-10 18:18:45.243699  1  2 fcl2jsondb() value=<1>
+05-10 18:18:45.243783  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.246751  1  2 fcl2jsondb() key=<daq>
+05-10 18:18:45.246822  1  2 fcl2jsondb() value=<{max_fragment_size_words:2.097152e6 event_builder:{mpi_buffer_count:16 first_fragment_receiver_rank:0 fragment_receiver_count:2 expected_fragments_per_event:2 use_art:true print_event_store_stats:true verbose:false} metrics:{evbFile:{metricPluginType:"file" level:3 fileName:"/tmp/eventbuilder/evb_%UID%_metrics.log" uniquify:true}}}>
+05-10 18:18:45.246846  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.246899  1  2 fcl2jsondb() key=<max_fragment_size_words>
+05-10 18:18:45.246907  1  2 fcl2jsondb() value=<2.097152e6>
+05-10 18:18:45.246931  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.249830  1  2 fcl2jsondb() key=<event_builder>
+05-10 18:18:45.249863  1  2 fcl2jsondb() value=<{mpi_buffer_count:16 first_fragment_receiver_rank:0 fragment_receiver_count:2 expected_fragments_per_event:2 use_art:true print_event_store_stats:true verbose:false}>
+05-10 18:18:45.249885  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.249916  1  2 fcl2jsondb() key=<mpi_buffer_count>
+05-10 18:18:45.249935  1  2 fcl2jsondb() value=<16>
+05-10 18:18:45.249958  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.252812  1  2 fcl2jsondb() key=<first_fragment_receiver_rank>
+05-10 18:18:45.252821  1  2 fcl2jsondb() value=<0>
+05-10 18:18:45.252846  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.255637  1  2 fcl2jsondb() key=<fragment_receiver_count>
+05-10 18:18:45.255647  1  2 fcl2jsondb() value=<2>
+05-10 18:18:45.255670  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.258484  1  2 fcl2jsondb() key=<expected_fragments_per_event>
+05-10 18:18:45.258494  1  2 fcl2jsondb() value=<2>
+05-10 18:18:45.258517  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.261308  1  2 fcl2jsondb() key=<use_art>
+05-10 18:18:45.261320  1  2 fcl2jsondb() value=<true>
+05-10 18:18:45.261343  1  2 fcl2jsondb() value type=<bool>
+05-10 18:18:45.261413  1  2 fcl2jsondb() key=<print_event_store_stats>
+05-10 18:18:45.261421  1  2 fcl2jsondb() value=<true>
+05-10 18:18:45.261442  1  2 fcl2jsondb() value type=<bool>
+05-10 18:18:45.261481  1  2 fcl2jsondb() key=<verbose>
+05-10 18:18:45.261488  1  2 fcl2jsondb() value=<false>
+05-10 18:18:45.261510  1  2 fcl2jsondb() value type=<bool>
+05-10 18:18:45.261600  1  2 fcl2jsondb() key=<metrics>
+05-10 18:18:45.261631  1  2 fcl2jsondb() value=<{evbFile:{metricPluginType:"file" level:3 fileName:"/tmp/eventbuilder/evb_%UID%_metrics.log" uniquify:true}}>
+05-10 18:18:45.261653  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.261688  1  2 fcl2jsondb() key=<evbFile>
+05-10 18:18:45.261708  1  2 fcl2jsondb() value=<{metricPluginType:"file" level:3 fileName:"/tmp/eventbuilder/evb_%UID%_metrics.log" uniquify:true}>
+05-10 18:18:45.261730  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.261757  1  2 fcl2jsondb() key=<metricPluginType>
+05-10 18:18:45.261764  1  2 fcl2jsondb() value=<"file">
+05-10 18:18:45.261784  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:45.261992  1  2 fcl2jsondb() key=<level>
+05-10 18:18:45.262000  1  2 fcl2jsondb() value=<3>
+05-10 18:18:45.262022  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.264828  1  2 fcl2jsondb() key=<fileName>
+05-10 18:18:45.264838  1  2 fcl2jsondb() value=<"/tmp/eventbuilder/evb_%UID%_metrics.log">
+05-10 18:18:45.264905  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:45.264942  1  2 fcl2jsondb() key=<uniquify>
+05-10 18:18:45.264953  1  2 fcl2jsondb() value=<true>
+05-10 18:18:45.264975  1  2 fcl2jsondb() value type=<bool>
+05-10 18:18:45.265183  1  2 fcl2jsondb() key=<outputs>
+05-10 18:18:45.265264  1  2 fcl2jsondb() value=<{netMonOutput:{module_type:"NetMonOutput" SelectEvents:{SelectEvents:["pmod2","pmod3"]}}}>
+05-10 18:18:45.265287  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.265326  1  2 fcl2jsondb() key=<netMonOutput>
+05-10 18:18:45.265364  1  2 fcl2jsondb() value=<{module_type:"NetMonOutput" SelectEvents:{SelectEvents:["pmod2","pmod3"]}}>
+05-10 18:18:45.265389  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.265419  1  2 fcl2jsondb() key=<module_type>
+05-10 18:18:45.265430  1  2 fcl2jsondb() value=<"NetMonOutput">
+05-10 18:18:45.265453  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:45.265495  1  2 fcl2jsondb() key=<SelectEvents>
+05-10 18:18:45.265518  1  2 fcl2jsondb() value=<{SelectEvents:["pmod2","pmod3"]}>
+05-10 18:18:45.265600  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.265639  1  2 fcl2jsondb() key=<SelectEvents>
+05-10 18:18:45.265656  1  2 fcl2jsondb() value=<["pmod2","pmod3"]>
+05-10 18:18:45.265739  1  2 fcl2jsondb() value type=<sequence>
+05-10 18:18:45.265944  1  2 fcl2jsondb() key=<physics>
+05-10 18:18:45.266016  1  2 fcl2jsondb() value=<{filters:{prescaleMod2:{module_type:"NthEvent" nth:2} prescaleMod3:{module_type:"NthEvent" nth:3}} pmod2:["prescaleMod2"] pmod3:["prescaleMod3"] my_output_modules:["netMonOutput"]}>
+05-10 18:18:45.266041  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.266091  1  2 fcl2jsondb() key=<filters>
+05-10 18:18:45.266127  1  2 fcl2jsondb() value=<{prescaleMod2:{module_type:"NthEvent" nth:2} prescaleMod3:{module_type:"NthEvent" nth:3}}>
+05-10 18:18:45.266147  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.266178  1  2 fcl2jsondb() key=<prescaleMod2>
+05-10 18:18:45.266195  1  2 fcl2jsondb() value=<{module_type:"NthEvent" nth:2}>
+05-10 18:18:45.266260  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.266290  1  2 fcl2jsondb() key=<module_type>
+05-10 18:18:45.266298  1  2 fcl2jsondb() value=<"NthEvent">
+05-10 18:18:45.266369  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:45.266410  1  2 fcl2jsondb() key=<nth>
+05-10 18:18:45.266418  1  2 fcl2jsondb() value=<2>
+05-10 18:18:45.266486  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.269325  1  2 fcl2jsondb() key=<prescaleMod3>
+05-10 18:18:45.269346  1  2 fcl2jsondb() value=<{module_type:"NthEvent" nth:3}>
+05-10 18:18:45.269370  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.269403  1  2 fcl2jsondb() key=<module_type>
+05-10 18:18:45.269412  1  2 fcl2jsondb() value=<"NthEvent">
+05-10 18:18:45.269438  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:45.269469  1  2 fcl2jsondb() key=<nth>
+05-10 18:18:45.269476  1  2 fcl2jsondb() value=<3>
+05-10 18:18:45.269547  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.272424  1  2 fcl2jsondb() key=<pmod2>
+05-10 18:18:45.272441  1  2 fcl2jsondb() value=<["prescaleMod2"]>
+05-10 18:18:45.272470  1  2 fcl2jsondb() value type=<sequence>
+05-10 18:18:45.272536  1  2 fcl2jsondb() key=<pmod3>
+05-10 18:18:45.272551  1  2 fcl2jsondb() value=<["prescaleMod3"]>
+05-10 18:18:45.272632  1  2 fcl2jsondb() value type=<sequence>
+05-10 18:18:45.272692  1  2 fcl2jsondb() key=<my_output_modules>
+05-10 18:18:45.272705  1  2 fcl2jsondb() value=<["netMonOutput"]>
+05-10 18:18:45.272731  1  2 fcl2jsondb() value type=<sequence>
+05-10 18:18:45.272860  1  2 fcl2jsondb() key=<source>
+05-10 18:18:45.272882  1  2 fcl2jsondb() value=<{module_type:"RawInput" waiting_time:900 resume_after_timeout:true}>
+05-10 18:18:45.272903  1  2 fcl2jsondb() value type=<table>
+05-10 18:18:45.272930  1  2 fcl2jsondb() key=<module_type>
+05-10 18:18:45.272937  1  2 fcl2jsondb() value=<"RawInput">
+05-10 18:18:45.273005  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:45.273043  1  2 fcl2jsondb() key=<waiting_time>
+05-10 18:18:45.273050  1  2 fcl2jsondb() value=<900>
+05-10 18:18:45.273128  1  2 fcl2jsondb() value type=<number>
+05-10 18:18:45.275901  1  2 fcl2jsondb() key=<resume_after_timeout>
+05-10 18:18:45.275911  1  2 fcl2jsondb() value=<true>
+05-10 18:18:45.275982  1  2 fcl2jsondb() value type=<bool>
+05-10 18:18:45.276042  1  2 fcl2jsondb() key=<process_name>
+05-10 18:18:45.276056  1  2 fcl2jsondb() value=<"DAQ">
+05-10 18:18:45.276079  1  2 fcl2jsondb() value type=<string>
+05-10 18:18:45.276103  1  2 read_data() end
+05-10 18:18:45.276178  1  2 read_data end result=1
+05-10 18:18:45.276186  1  2 fhicl_to_json: write() begin
+05-10 18:18:45.291145  1  2 fhicl_to_json: write() end
+05-10 18:18:45.291173  1  2 fhicl_to_json: end
+Running test:<RoundConvert_DBJson2Fhicl>
+json_to_fhicl succeeded.
+fhicl_to_json succeeded.
+<end of output>
+Test time =   0.17 sec
+----------------------------------------------------------
+Test Passed.
+"RoundConvert_DBJson2Fhicl_001_t" end time: May 10 18:18 CDT
+"RoundConvert_DBJson2Fhicl_001_t" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: May 10 18:18 CDT

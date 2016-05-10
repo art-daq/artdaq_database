@@ -15,7 +15,7 @@
 
 namespace artdaq {
 namespace database {
-namespace fhicljsondb {
+namespace fhicljson {
 
 namespace literal = artdaq::database::dataformats::literal;
 
@@ -33,6 +33,8 @@ bool fhicl_to_json(std::string const& fcl, std::string& json) {
   assert(json.empty());
 
   TRACE_(2, "fhicl_to_json: begin");
+
+  shims::isSnippetMode(true);
 
   auto result = bool(false);
 
@@ -119,14 +121,15 @@ bool json_to_fhicl(std::string const& json, std::string& fcl) {
   return result;
 }
 
-void trace_enable_fhicljsondb() {
+namespace debug {
+void enableFhiclJson() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", 1LL);
   TRACE_CNTL("modeS", 1LL);
 
-  TRACE_(0, "artdaq::database::fhicljsondb"
-                << "trace_enable");
+  TRACE_(0, "artdaq::database::fhicljson trace_enable");
+}
 }
 }  // namespace fhicljson
 }  // namespace database
