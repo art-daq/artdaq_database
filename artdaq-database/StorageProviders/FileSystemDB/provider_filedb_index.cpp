@@ -739,7 +739,7 @@ std::vector<std::string> SearchIndex::_filtered_attribute_list(std::string const
 
   TRACE_(5, "StorageProvider::FileSystemDB::index::_filtered_attribute_list()"
                 << " filtered_attribute_list has " << returnCollection.size() << " entries.");
-  
+
   return returnCollection;
 }
 
@@ -811,14 +811,13 @@ file_paths_t list_files_in_directory(boost::filesystem::path const& path, std::s
   return result;
 }
 
-void dbfsi::trace_enable() {
+void dbfsi::debug::enable() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", 1LL);
   TRACE_CNTL("modeS", 1LL);
 
-  TRACE_(0, "artdaq::database::filesystem::index"
-                << "trace_enable");
+  TRACE_(0, "artdaq::database::filesystem::index trace_enable");
 }
 
 using artdaq::database::sharedtypes::unwrap;

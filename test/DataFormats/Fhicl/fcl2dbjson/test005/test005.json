@@ -1,39 +1,59 @@
 {
 "document" : {
 "data" : {
+"prolog" : {
+
+},
+"main" : {
+"services" : {
+"scheduler" : {
+"fileMode" : "NOMERGE",
+"errorOnFailureToPut" : false
+},
+"NetMonTransportServiceInterface" : {
+"service_provider" : "NetMonTransportService",
+"first_data_receiver_rank" : 4,
+"mpi_buffer_count" : 8,
+"max_fragment_size_words" : 2097152,
+"data_receiver_count" : 1
+}
+},
 "daq" : {
+"max_fragment_size_words" : 2097152,
 "event_builder" : {
-"expected_fragments_per_event" : 2,
+"mpi_buffer_count" : 16,
 "first_fragment_receiver_rank" : 0,
 "fragment_receiver_count" : 2,
-"mpi_buffer_count" : 16,
-"print_event_store_stats" : true,
+"expected_fragments_per_event" : 2,
 "use_art" : true,
+"print_event_store_stats" : true,
 "verbose" : false
 },
-"max_fragment_size_words" : 2097152,
 "metrics" : {
 "evbFile" : {
-"fileName" : "/tmp/eventbuilder/evb_%UID%_metrics.log",
-"level" : 3,
 "metricPluginType" : "file",
+"level" : 3,
+"fileName" : "/tmp/eventbuilder/evb_%UID%_metrics.log",
 "uniquify" : true
 }
 }
 },
 "outputs" : {
 "rootMPIOutput" : {
+"module_type" : "RootMPIOutput",
 "SelectEvents" : {
 "SelectEvents" : [
 "pmod2",
 "pmod3"
 ]
-},
-"module_type" : "RootMPIOutput"
+}
 }
 },
 "physics" : {
 "analyzers" : {
+
+},
+"producers" : {
 
 },
 "filters" : {
@@ -46,9 +66,6 @@
 "nth" : 3
 }
 },
-"my_output_modules" : [
-"rootMPIOutput"
-],
 "p1" : [
 
 ],
@@ -58,25 +75,14 @@
 "pmod3" : [
 "prescaleMod3"
 ],
-"producers" : {
-
-}
-},
-"process_name" : "DAQ",
-"services" : {
-"NetMonTransportServiceInterface" : {
-"data_receiver_count" : 1,
-"first_data_receiver_rank" : 4,
-"max_fragment_size_words" : 2097152,
-"mpi_buffer_count" : 8,
-"service_provider" : "NetMonTransportService"
-},
-"scheduler" : {
-"errorOnFailureToPut" : false,
-"fileMode" : "NOMERGE"
-}
+"my_output_modules" : [
+"rootMPIOutput"
+]
 },
 "source" : {
+"module_type" : "RawInput",
+"waiting_time" : 2500000,
+"resume_after_timeout" : true,
 "fragment_type_map" : [
 [
 1,
@@ -102,22 +108,83 @@
 8,
 "ASCII"
 ]
-],
-"module_type" : "RawInput",
-"resume_after_timeout" : true,
-"waiting_time" : 2500000
+]
+},
+"process_name" : "DAQ"
 }
 },
 "metadata" : {
+"prolog" : {
+
+},
+"main" : {
+"services" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"scheduler" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"fileMode" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"errorOnFailureToPut" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : " "
+}
+}
+},
+"NetMonTransportServiceInterface" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"service_provider" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"first_data_receiver_rank" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"mpi_buffer_count" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"max_fragment_size_words" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"data_receiver_count" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "# 2"
+}
+}
+}
+}
+},
 "daq" : {
 "type" : "table",
 "comment" : " ",
 "children" : {
+"max_fragment_size_words" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
 "event_builder" : {
 "type" : "table",
 "comment" : " ",
 "children" : {
-"expected_fragments_per_event" : {
+"mpi_buffer_count" : {
 "type" : "number",
 "comment" : " ",
 "annotation" : " "
@@ -132,17 +199,17 @@
 "comment" : " ",
 "annotation" : " "
 },
-"mpi_buffer_count" : {
+"expected_fragments_per_event" : {
 "type" : "number",
 "comment" : " ",
 "annotation" : " "
 },
-"print_event_store_stats" : {
+"use_art" : {
 "type" : "bool",
 "comment" : " ",
 "annotation" : " "
 },
-"use_art" : {
+"print_event_store_stats" : {
 "type" : "bool",
 "comment" : " ",
 "annotation" : " "
@@ -154,11 +221,6 @@
 }
 }
 },
-"max_fragment_size_words" : {
-"type" : "number",
-"comment" : " ",
-"annotation" : " "
-},
 "metrics" : {
 "type" : "table",
 "comment" : " ",
@@ -167,7 +229,7 @@
 "type" : "table",
 "comment" : " ",
 "children" : {
-"fileName" : {
+"metricPluginType" : {
 "type" : "string",
 "comment" : " ",
 "annotation" : " "
@@ -177,7 +239,7 @@
 "comment" : " ",
 "annotation" : " "
 },
-"metricPluginType" : {
+"fileName" : {
 "type" : "string",
 "comment" : " ",
 "annotation" : " "
@@ -201,6 +263,11 @@
 "type" : "table",
 "comment" : " ",
 "children" : {
+"module_type" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
 "SelectEvents" : {
 "type" : "table",
 "comment" : " ",
@@ -211,11 +278,6 @@
 "annotation" : " "
 }
 }
-},
-"module_type" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
 }
 }
 }
@@ -226,6 +288,13 @@
 "comment" : " ",
 "children" : {
 "analyzers" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+
+}
+},
+"producers" : {
 "type" : "table",
 "comment" : " ",
 "children" : {
@@ -270,11 +339,6 @@
 }
 }
 },
-"my_output_modules" : {
-"type" : "sequence",
-"comment" : " ",
-"annotation" : " "
-},
 "p1" : {
 "type" : "sequence",
 "comment" : " ",
@@ -290,70 +354,10 @@
 "comment" : " ",
 "annotation" : " "
 },
-"producers" : {
-"type" : "table",
-"comment" : " ",
-"children" : {
-
-}
-}
-}
-},
-"process_name" : {
-"type" : "string",
+"my_output_modules" : {
+"type" : "sequence",
 "comment" : " ",
 "annotation" : " "
-},
-"services" : {
-"type" : "table",
-"comment" : " ",
-"children" : {
-"NetMonTransportServiceInterface" : {
-"type" : "table",
-"comment" : " ",
-"children" : {
-"data_receiver_count" : {
-"type" : "number",
-"comment" : " ",
-"annotation" : "# 2"
-},
-"first_data_receiver_rank" : {
-"type" : "number",
-"comment" : " ",
-"annotation" : " "
-},
-"max_fragment_size_words" : {
-"type" : "number",
-"comment" : " ",
-"annotation" : " "
-},
-"mpi_buffer_count" : {
-"type" : "number",
-"comment" : " ",
-"annotation" : " "
-},
-"service_provider" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
-}
-}
-},
-"scheduler" : {
-"type" : "table",
-"comment" : " ",
-"children" : {
-"errorOnFailureToPut" : {
-"type" : "bool",
-"comment" : " ",
-"annotation" : " "
-},
-"fileMode" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
-}
-}
 }
 }
 },
@@ -361,13 +365,13 @@
 "type" : "table",
 "comment" : " ",
 "children" : {
-"fragment_type_map" : {
-"type" : "sequence",
+"module_type" : {
+"type" : "string",
 "comment" : " ",
 "annotation" : " "
 },
-"module_type" : {
-"type" : "string",
+"waiting_time" : {
+"type" : "number",
 "comment" : " ",
 "annotation" : " "
 },
@@ -376,11 +380,17 @@
 "comment" : " ",
 "annotation" : " "
 },
-"waiting_time" : {
-"type" : "number",
+"fragment_type_map" : {
+"type" : "sequence",
 "comment" : " ",
 "annotation" : " "
 }
+}
+},
+"process_name" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
 }
 }
 }
@@ -442,8 +452,5 @@
 "origin" : {
 "source" : "fhicl_to_json",
 "timestamp" : "Mon Feb  8 14:00:30 2016"
-},
-"includes" : [
-
-]
+}
 }

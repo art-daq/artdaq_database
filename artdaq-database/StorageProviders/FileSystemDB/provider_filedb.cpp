@@ -530,16 +530,17 @@ object_id_t extract_oid(std::string const& filter) {
 }
 
 namespace filesystem {
-void trace_enable() {
+namespace debug {
+void enable() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", 1LL);
   TRACE_CNTL("modeS", 1LL);
 
-  TRACE_(0, "artdaq::database::filesystem::"
-                << "trace_enable");
+  TRACE_(0, "artdaq::database::filesystem trace_enable");
 
-  index::trace_enable();
+  artdaq::database::filesystem::index::debug::enable();
+}
 }
 }  // namespace filesystem
 }  // namespace database

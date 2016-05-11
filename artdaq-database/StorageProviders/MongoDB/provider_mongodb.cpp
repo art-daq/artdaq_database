@@ -579,14 +579,15 @@ std::string dequote(std::string s) {
 }
 
 namespace mongo {
-void trace_enable() {
+namespace debug {
+void enable() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", 1LL);
   TRACE_CNTL("modeS", 1LL);
 
-  TRACE_(0, "artdaq::database::mongo::"
-                << "trace_enable");
+  TRACE_(0, "artdaq::database::mongo trace_enable");
+}
 }
 }  // namespace mongo
 }  // namespace database

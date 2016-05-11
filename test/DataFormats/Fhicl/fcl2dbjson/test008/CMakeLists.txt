@@ -1,6 +1,6 @@
-SET ( TEST_NUMBER "008" )
+SET ( TEST_NAME "Convert_DBJson2Fhicl" )
 
-SET ( TEST_NAME "convert2fcl" )
+SET ( TEST_NUMBER "008" )
 
 cet_test(${TEST_NAME}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC ConvertFhicl_t 
   DATAFILES 

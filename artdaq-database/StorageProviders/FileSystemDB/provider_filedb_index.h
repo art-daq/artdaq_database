@@ -92,8 +92,9 @@ void SearchIndex::_make_unique_sorted(jsn::array_t& ouids) {
   std::for_each(tmp.begin(), tmp.end(), [&ouids](TYPE& value) { ouids.push_back(value); });
 }
 
-void trace_enable();
-
+namespace debug {
+void enable();
+}
 }  // namespace index
 }  // namespace filesystem
 }  // namespace database

@@ -1,7 +1,6 @@
-SET ( TEST_NUMBER "006" )
+SET ( TEST_NAME "Convert_Fhicl2DBJson" )
 
-SET ( TEST_NAME "convert2json" )
-  
+SET ( TEST_NUMBER "006" )  
 cet_test(${TEST_NAME}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC ConvertFhicl_t 
   DATAFILES 
     ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.fcl 
