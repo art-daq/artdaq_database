@@ -134,6 +134,8 @@ JsonData OperationBase::search_filter_to_JsonData() const {
 bpo::options_description OperationBase::makeProgramOptions() const {
   std::ostringstream descstr;
   descstr << _process_name;
+  descstr << " <" << cfl::option::searchquery << ">";
+
   descstr << "  <-d <" << cfl::option::provider << ">>";
   descstr << "  <-o <" << cfl::option::operation << ">>";
   descstr << "  <-f <" << cfl::option::format << ">>";
@@ -160,6 +162,8 @@ bpo::options_description OperationBase::makeProgramOptions() const {
 
   opts.add_options()(cfl::option::searchfilter, bpo::value<std::string>(), "Search filter");
 
+  opts.add_options()(cfl::option::searchquery, bpo::value<std::string>(), "Search query");
+
   opts.add_options()(make_opt_name(cfl::option::result, "r").c_str(), bpo::value<std::string>(),
                      "Expected result file name");
 
@@ -170,6 +174,20 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
   if (vm.count("help")) {
     std::cout << makeProgramOptions() << "\n";
     return process_exit_code::HELP;
+  }
+
+  if (vm.count(cfl::option::searchquery)) {
+    auto json = vm[cfl::option::searchquery].as<std::string>();    
+    std::ifstream is(json.c_str());    
+    if (is.good()) {
+      json = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+      is.close();      
+    }
+
+    TRACE_(14, "Options: json query= <" << json << ">");
+
+    readJsonData(json);
+    return process_exit_code::SUCCESS;
   }
 
   if (!vm.count(cfl::option::provider)) {

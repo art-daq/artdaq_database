@@ -44,6 +44,8 @@ constexpr auto source = "source";
 constexpr auto version = "version";
 constexpr auto version_alias = "alias";
 constexpr auto searchfilter = "filter";
+constexpr auto searchquery = "searchquery";
+
 constexpr auto collection = "collection";
 constexpr auto entity = "entity";
 constexpr auto configuration = "configuration";
@@ -77,6 +79,8 @@ constexpr auto document = "document";
 constexpr auto data = "data";
 constexpr auto metadata = "metadata";
 }
+
+constexpr auto name = "name";
 
 constexpr auto notprovided = "notprovided";
 constexpr auto unknown = "unknown";

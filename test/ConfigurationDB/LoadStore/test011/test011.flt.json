@@ -1,0 +1,7 @@
+{
+    "filter":{"version":"@TEST_VERSION_NAME@", "configurable_entity.name":"ENTITY-@TEST_COLLECTION_NAME@"},
+    "collection":"@TEST_COLLECTION_NAME@",
+    "dbprovider":"@TEST_DBPROVIDER@",
+    "operation":"store",
+    "dataformat":"json"
+}

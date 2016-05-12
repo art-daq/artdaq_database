@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cassert>
 #include <ctime>
+#include <fstream> 
 #include <iostream>
 #include <iterator>
 #include <map>

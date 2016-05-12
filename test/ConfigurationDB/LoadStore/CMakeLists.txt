@@ -22,23 +22,36 @@ find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_FQ_DIR}/lib )
   ${Boost_PROGRAM_OPTIONS_LIBRARY}  
 ) 
 
+SET (TEST_COLLECTION_NAME "testLoadStore" )
+
+
 execute_process( COMMAND "date" "-u" "+%m%d%Y-%H%M%S" OUTPUT_VARIABLE CONFIG_NUMBER )
 string( STRIP ${CONFIG_NUMBER} CONFIG_NUMBER )
 
 string(RANDOM LENGTH 3 ALPHABET 0123456789 RAND_NAME)
 message(STATUS "RAND_NAME=${RAND_NAME}")
 
-string(RANDOM LENGTH 3 ALPHABET 0123456789 VERSION_NUMBER)
+string(RANDOM LENGTH 5 ALPHABET 0123456789 VERSION_NUMBER)
 message(STATUS "VERSION_NUMBER=${VERSION_NUMBER}")
 
 set (CONFIG_NUMBER "03172016-174859")
-
 set (TEST_CONFIG_NAME "testConfigA${CONFIG_NUMBER}")
 
-SET ( TEST_COLLECTION_NAME "testLoadStore" )
 
+SET (TEST_VERSION_NAME    versionA${VERSION_NUMBER} )
 add_subdirectory(test001)
-#add_subdirectory(test002)
-
 add_subdirectory(test003)
-#add_subdirectory(test004)
+
+SET (TEST_VERSION_NAME    versionB${VERSION_NUMBER} )
+add_subdirectory(test002)
+add_subdirectory(test004)
+
+SET (TEST_VERSION_NAME    versionC${VERSION_NUMBER} )
+add_subdirectory(test011)
+add_subdirectory(test013)
+
+SET (TEST_VERSION_NAME    versionD${VERSION_NUMBER} )
+add_subdirectory(test012)
+add_subdirectory(test014)
+
+

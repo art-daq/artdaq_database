@@ -32,8 +32,8 @@ bool test_buildfilter(Options const&, std::string const&);
 int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
-  artdaq::database::jsonutils::debug::enableJSONDocument();
-  artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
+  //artdaq::database::jsonutils::debug::enableJSONDocument();
+  //artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
 
   artdaq::database::configuration::debug::enableLoadStoreOperation();
   artdaq::database::configuration::debug::options::enableOperationBase();
@@ -147,7 +147,7 @@ int main(int argc, char* argv[]) try {
                            .append("-")
                            .append(basename((char*)file_src_name.c_str()))
                            .append(".txt");
-			   
+
   std::ofstream os(file_out_name.c_str());
   std::copy(result.second.begin(), result.second.end(), std::ostream_iterator<char>(os));
   os.close();
