@@ -32,6 +32,26 @@ using cf::options::data_format_t;
 
 ManageConfigsOperation::ManageConfigsOperation(std::string const& process_name) : OperationBase{process_name} {}
 
+std::string const& ManageConfigsOperation::version() const noexcept {
+  assert(!_version.empty());
+
+  return _version;
+}
+
+std::string const& ManageConfigsOperation::version(std::string const& version) {
+  assert(!version.empty());
+
+  if (version.empty()) {
+    throw cet::exception("Options") << "Invalid version; version is empty.";
+  }
+
+  TRACE_(10, "Options: Updating version from " << _version << " to " << version << ".");
+
+  _version = version;
+
+  return _version;
+}
+
 std::string const& ManageConfigsOperation::configurableEntity() const noexcept {
   assert(!_configurable_entity.empty());
 
@@ -91,12 +111,17 @@ void ManageConfigsOperation::readJsonData(JsonData const& data) {
     if (!filterAST.empty()) searchFilter(cfl::notprovided);
 
     try {
-      configurableEntity(boost::get<std::string>(filterAST.at(cfl::option::entity)));
+      configurableEntity(boost::get<std::string>(filterAST.at(cfl::filter::version)));
+    } catch (...) {
+    }
+    
+    try {
+      configurableEntity(boost::get<std::string>(filterAST.at(cfl::filter::entity)));
     } catch (...) {
     }
 
     try {
-      globalConfiguration(boost::get<std::string>(filterAST.at(cfl::option::configuration)));
+      globalConfiguration(boost::get<std::string>(filterAST.at(cfl::filter::configuration)));
     } catch (...) {
     }
 
@@ -109,6 +134,10 @@ int ManageConfigsOperation::readProgramOptions(bpo::variables_map const& vm) {
   auto result = OperationBase::readProgramOptions(vm);
 
   if (result != process_exit_code::SUCCESS) return result;
+
+  if (vm.count(cfl::option::version)) {
+    version(vm[cfl::option::version].as<std::string>());
+  }
 
   if (vm.count(cfl::option::entity)) {
     configurableEntity(vm[cfl::option::entity].as<std::string>());
@@ -128,6 +157,8 @@ bpo::options_description ManageConfigsOperation::makeProgramOptions() const {
     return std::string{long_name}.append(",").append(short_name);
   };
 
+  opts.add_options()(make_opt_name(cfl::option::version, "v").c_str(), bpo::value<std::string>(),
+                     "Configuration version");
   opts.add_options()(make_opt_name(cfl::option::entity, "e").c_str(), bpo::value<std::string>(),
                      "Configurable-entity name");
   opts.add_options()(make_opt_name(cfl::option::configuration, "g").c_str(), bpo::value<std::string>(),
@@ -168,6 +199,8 @@ JsonData ManageConfigsOperation::search_filter_to_JsonData() const {
     throw db::invalid_option_exception("Options") << "Unable to search_filter_to_JsonData().";
   }
 
+  if (version() != cfl::notprovided) docAST[cfl::filter::version] = version();
+
   if (configurableEntity() != cfl::notprovided) docAST[cfl::filter::entity] = configurableEntity();
 
   if (globalConfiguration() != cfl::notprovided && operation() != cfl::operation::addconfig)
@@ -185,6 +218,51 @@ JsonData ManageConfigsOperation::search_filter_to_JsonData() const {
   return {json_buffer};
 }
 
+
+JsonData ManageConfigsOperation::globalConfiguration_to_JsonData() const {
+  using namespace artdaq::database::json;
+  auto docAST = object_t{};
+
+  docAST[cfl::name] = globalConfiguration();
+
+  auto json_buffer = std::string{};
+
+  if (!JsonWriter{}.write(docAST, json_buffer)) {
+    throw db::invalid_option_exception("Options") << "Unable to write JSON buffer.";
+  }
+
+  return {json_buffer};
+}
+
+JsonData ManageConfigsOperation::version_to_JsonData() const {
+  using namespace artdaq::database::json;
+  auto docAST = object_t{};
+
+  docAST[cfl::filter::version] = version();
+
+  auto json_buffer = std::string{};
+
+  if (!JsonWriter{}.write(docAST, json_buffer)) {
+    throw db::invalid_option_exception("Options") << "Unable to write JSON buffer.";
+  }
+
+  return {json_buffer};
+}
+
+JsonData ManageConfigsOperation::configurableEntity_to_JsonData() const {
+  using namespace artdaq::database::json;
+  auto docAST = object_t{};
+
+  docAST[cfl::name] = configurableEntity();
+
+  auto json_buffer = std::string{};
+
+  if (!JsonWriter{}.write(docAST, json_buffer)) {
+    throw db::invalid_option_exception("Options") << "Unable to write JSON buffer.";
+  }
+
+  return {json_buffer};
+}
 //
 void cf::debug::options::enableOperationManageConfigs() {
   TRACE_CNTL("name", TRACE_NAME);

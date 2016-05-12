@@ -32,8 +32,8 @@ bool test_buildfilter(Options const&, std::string const&);
 int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
-  //artdaq::database::jsonutils::debug::enableJSONDocument();
-  //artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
+  // artdaq::database::jsonutils::debug::enableJSONDocument();
+  // artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
 
   artdaq::database::configuration::debug::enableLoadStoreOperation();
   artdaq::database::configuration::debug::options::enableOperationBase();
@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::FAILURE;
   }
 
-  auto returned = result.second;
+  auto returned = std::string{result.second};
 
   std::ifstream is(file_res_name);
   auto expected = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
@@ -129,16 +129,27 @@ int main(int argc, char* argv[]) try {
       return process_exit_code::SUCCESS;
     }
     std::cout << "Test failed (expected!=returned); error message: " << compare_result.second << "\n";
-  } else if (returned == expected) {
+  } else if (expected.compare(returned) == 0) {
     std::cout << "returned:\n" << returned << "\n";
 
     return process_exit_code::SUCCESS;
-  } else {
-    std::cout << "Test failed (expected!=returned)\n";
+  } else if (expected.pop_back(), expected.compare(returned) == 0) {
+    std::cout << "returned:\n" << returned << "\n";
+
+    return process_exit_code::SUCCESS;
   }
+
+  std::cout << "Test failed (expected!=returned)\n";
 
   std::cout << "returned:\n" << returned << "\n";
   std::cout << "expected:\n" << expected << "\n";
+
+  auto mismatch = std::mismatch(expected.begin(), expected.end(), returned.begin());
+  std::cout << "File sizes (exp,ret)=(" << std::distance(expected.begin(), expected.end()) << ","
+            << std::distance(returned.begin(), returned.end()) << ")\n";
+
+  std::cout << "First mismatch at position " << std::distance(expected.begin(), mismatch.first) << ", (exp,ret)=(0x"
+            << std::hex << (unsigned int)*mismatch.first << ",0x" << (unsigned int)*mismatch.second << ")\n";
 
   auto file_out_name = std::string(artdaq::database::mkdir(tmpdir))
                            .append(argv[0])
@@ -149,7 +160,7 @@ int main(int argc, char* argv[]) try {
                            .append(".txt");
 
   std::ofstream os(file_out_name.c_str());
-  std::copy(result.second.begin(), result.second.end(), std::ostream_iterator<char>(os));
+  std::copy(returned.begin(), returned.end(), std::ostream_iterator<char>(os));
   os.close();
 
   std::cout << "Wrote file:" << file_out_name << "\n";

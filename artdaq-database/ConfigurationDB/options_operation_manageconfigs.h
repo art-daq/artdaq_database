@@ -24,6 +24,8 @@ using artdaq::database::configuration::options::data_format_t;
 class ManageConfigsOperation final : public OperationBase {
  public:
   ManageConfigsOperation(std::string const&);
+  std::string const& version() const noexcept;
+  std::string const& version(std::string const&);
 
   std::string const& configurableEntity() const noexcept;
   std::string const& configurableEntity(std::string const&);
@@ -33,6 +35,10 @@ class ManageConfigsOperation final : public OperationBase {
 
   JsonData search_filter_to_JsonData() const override;
 
+  JsonData globalConfiguration_to_JsonData() const;
+  JsonData version_to_JsonData() const;
+  JsonData configurableEntity_to_JsonData() const;
+
   bpo::options_description makeProgramOptions() const override;
 
   int readProgramOptions(bpo::variables_map const&) override;
@@ -41,6 +47,7 @@ class ManageConfigsOperation final : public OperationBase {
   JsonData writeJsonData() const override;
 
  private:
+  std::string _version = {literal::notprovided};   
   std::string _configurable_entity = {literal::notprovided};
   std::string _global_configuration = {literal::notprovided};
 };

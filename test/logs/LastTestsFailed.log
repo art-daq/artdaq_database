@@ -1,6 +1,2 @@
-3:LoadStore_load_filesystem_003_t
-4:LoadStore_load_mongo_003_t
-7:LoadStore_load_filesystem_004_t
-8:LoadStore_load_mongo_004_t
-11:LoadStore_load_filesystem_013_t
-12:LoadStore_load_mongo_013_t
+1:ManageConfigs_seeddata_filesystem_000_t
+2:ManageConfigs_seeddata_mongo_000_t
