@@ -1,16 +1,10 @@
-#include <boost/exception/diagnostic_information.hpp>
-#include <fstream>
-#include <iostream>
-#include <streambuf>
-#include <string>
-#include "artdaq-database/BuildInfo/printStackTrace.h"
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
-#include "artdaq-database/ConfigurationDB/configurationdb.h"
-#include "boost/program_options.hpp"
-#include "cetlib/coded_exception.h"
-
+#include "test/common.h"
 #include "artdaq-database/BasicTypes/basictypes.h"
-#include "artdaq-database/FhiclJson/fhicljsondb.h"
+
+
+#include "artdaq-database/DataFormats/Fhicl/fhicljsondb.h"
+#include "artdaq-database/DataFormats/Json/json_common.h"
+
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
@@ -53,9 +47,6 @@ int main(int argc, char* argv[]) try {
   db::jsonutils::trace_enable_JSONDocumentBuilder();
   db::jsonutils::trace_enable_JSONDocument();
 
-  // Get the input parameters via the boost::program_options library,
-  // designed to make it relatively simple to define arguments and
-  // issue errors if argument list is supplied incorrectly
 
   namespace db = artdaq::database;
   namespace cfol = artdaq::database::configuration::options::literal;

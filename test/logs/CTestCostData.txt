@@ -76,4 +76,27 @@ FileSystemJson_search2_004_t 4 2.30295
 FileSystemFhicl_insert_001_t 4 0.039108
 FileSystemFhicl_update_003_t 4 0.0611942
 FileSystemFhicl_search2_004_t 4 0.492273
+conftool_mongo_store_000_01_t 0 0
+conftool_mongo_store_000_02_t 0 0
+conftool_mongo_store_000_03_t 0 0
+conftool_mongo_store_000_04_t 0 0
+conftool_filesystem_store_000_01_t 0 0
+conftool_filesystem_store_000_02_t 0 0
+conftool_filesystem_store_000_03_t 0 0
+conftool_filesystem_store_000_04_t 0 0
+SearchFilters_mongo_findconfigs_001_01_t 0 0
+SearchFilters_filesystem_findconfigs_001_01_t 0 0
+SearchFilters_mongo_buildfilter_002_01_t 0 0
+SearchFilters_filesystem_buildfilter_002_01_t 0 0
+conftool2_mongo_findconfigs_003_01_t 0 0
+conftool2_filesystem_findconfigs_003_01_t 0 0
+conftool2_mongo_buildfilter_004_01_t 0 0
+conftool2_filesystem_buildfilter_004_01_t 0 0
+LoadStore_store_configuration_filesystem_001_t 0 0
+LoadStore_store_filesystem_001_t 34 0.00349509
+LoadStore_store_mongo_001_t 28 0.00397354
+LoadStore_store_filesystem_002_t 5 0.075655
+LoadStore_store_mongo_002_t 4 0.0787555
+LoadStore_load_filesystem_001_t 2 0.0381365
+LoadStore_load_mongo_001_t 1 0.094538
 ---

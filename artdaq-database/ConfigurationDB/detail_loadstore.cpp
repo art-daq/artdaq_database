@@ -31,6 +31,8 @@ namespace cf = db::configuration;
 namespace cfl = cf::literal;
 namespace cflo = cfl::operation;
 namespace cflp = cfl::provider;
+namespace cfld = cfl::document;
+
 namespace cftd = cf::debug::detail;
 
 using cf::LoadStoreOperation;
@@ -88,7 +90,7 @@ void store_configuration(Options const& options, std::string& conf) {
   switch (options.dataFormat()) {
     default:
     case data_format_t::json:
-      // do nothing
+       data = JsonData{std::string("{\"data\":").append(conf).append("}")};  
       break;
 
     case data_format_t::unknown: {
@@ -121,7 +123,8 @@ void store_configuration(Options const& options, std::string& conf) {
         TRACE_(17, "store_configuration: Converted json data to fcl; json=<" << data.json_buffer << ">");
         TRACE_(17, "store_configuration: Converted json data to fcl; fcl=<" << fhicl.fhicl_buffer << ">");
       }
-
+      
+      returnValue= fhicl.fhicl_buffer;
       returnValueChanged = true;
 
       break;
@@ -218,9 +221,17 @@ void load_configuration(Options const& options, std::string& conf) {
     }
 
     case data_format_t::json: {
-      auto document = JSONDocument{search_result.json_buffer};
-      returnValue = document.findChild(db::jsonutils::literal::document).to_string();
+      auto resultAst = jsn::object_t{};
+      
+      if(!jsn::JsonReader{}.read(search_result.json_buffer,resultAst))
+	throw cet::exception("load_configuration")<< "Invalid json data";
 
+      auto const& docAst = boost::get<jsn::object_t>(resultAst.at(cfld::document));
+      auto const& dataAst = boost::get<jsn::object_t>(docAst.at(cfld::data));
+
+      if(!jsn::JsonWriter{}.write(dataAst,returnValue))
+	throw cet::exception("load_configuration")<< "Invalid json data";
+      
       returnValueChanged = true;
       break;
     }

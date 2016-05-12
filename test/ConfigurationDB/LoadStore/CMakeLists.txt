@@ -6,11 +6,13 @@ include_directories($ENV{MONGODB_FQ_DIR}/include/mongocxx/v0.3)
 find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_FQ_DIR}/lib )
 find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_FQ_DIR}/lib )
 
- art_make_exec(SearchFilters_t
+ art_make_exec(LoadStore_t
   LIBRARIES
   artdaq-database_StackTrace  
   artdaq-database_BasicTypes
-  artdaq-database_FhiclJson
+  artdaq-database_DataFormats_common
+  artdaq-database_DataFormats_Fhicl
+  artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
   artdaq-database_ConfigurationDB
   artdaq-database_StorageProviders_MongoDB
@@ -33,9 +35,10 @@ set (CONFIG_NUMBER "03172016-174859")
 
 set (TEST_CONFIG_NAME "testConfigA${CONFIG_NUMBER}")
 
-add_subdirectory(test000)
+SET ( TEST_COLLECTION_NAME "testLoadStore" )
+
 add_subdirectory(test001)
-add_subdirectory(test002)
+#add_subdirectory(test002)
+
 add_subdirectory(test003)
-add_subdirectory(test004)
-install_source()
+#add_subdirectory(test004)

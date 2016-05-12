@@ -37,7 +37,9 @@ namespace option {
 constexpr auto operation = "operation";
 constexpr auto format = "dataformat";
 constexpr auto provider = "dbprovider";
+
 constexpr auto result = "result";
+constexpr auto source = "source";
 
 constexpr auto version = "version";
 constexpr auto version_alias = "alias";
@@ -68,6 +70,12 @@ constexpr auto empty_document = "Json document is empty";
 
 namespace search {
 constexpr auto default_filter = "{\"configurable_entity\":\"any\"}";
+}
+
+namespace document {
+constexpr auto document = "document";
+constexpr auto data = "data";
+constexpr auto metadata = "metadata";
 }
 
 constexpr auto notprovided = "notprovided";

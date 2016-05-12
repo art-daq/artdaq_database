@@ -15,11 +15,13 @@ namespace configuration {
 using artdaq::configuration::dispatch::Functor;
 using artdaq::configuration::dispatch::RA1Functor;
 using artdaq::configuration::dispatch::RA1A2Functor;
+using artdaq::configuration::dispatch::RA1R2Functor;
 
 using result_pair_t = std::pair<bool, std::string>;
 
 using opsig_str_t = RA1Functor<result_pair_t, std::string>;
 using opsig_strstr_t = RA1A2Functor<result_pair_t, std::string, std::string>;
+using opsig_str_rstr_t = RA1R2Functor<result_pair_t, std::string, std::string>;
 
 using operations_map_t = std::map<std::string, std::unique_ptr<Functor<result_pair_t>>>;
 

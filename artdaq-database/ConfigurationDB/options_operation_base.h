@@ -61,7 +61,11 @@ class OperationBase {
   std::string _search_filter = {literal::notprovided};
 };
 
-void trace_enable_OperationBase();
+namespace debug {
+namespace options {
+void enableOperationBase();
+}
+}
 
 }  // namespace configuration
 }  // namespace database

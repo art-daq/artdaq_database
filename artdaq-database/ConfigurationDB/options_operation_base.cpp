@@ -214,8 +214,6 @@ void OperationBase::readJsonData(JsonData const& data) {
     throw db::invalid_option_exception("Options") << "Unable to read JSON buffer.";
   }
 
-  TRACE_(1, "Options() read filterAST");
-
   try {
     provider(boost::get<std::string>(filterAST.at(cfl::option::provider)));
   } catch (...) {
@@ -237,7 +235,9 @@ void OperationBase::readJsonData(JsonData const& data) {
   }
 
   try {
-    searchFilter(boost::get<std::string>(filterAST.at(cfl::option::searchfilter)));
+    auto const& filter_object = boost::get<jsn::object_t>(filterAST.at(cfl::option::searchfilter));
+    auto filter_string = std::string{};
+    if (!filter_object.empty() && JsonWriter{}.write(filter_object, filter_string)) searchFilter(filter_string);
   } catch (...) {
   }
 }
@@ -272,13 +272,12 @@ JsonData OperationBase::to_JsonData() const { return {writeJsonData()}; }
 std::string OperationBase::to_string() const { return to_JsonData().json_buffer; }
 
 //
-void cf::trace_enable_OperationBase() {
+void cf::debug::options::enableOperationBase() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::OperationBase"
-                << "trace_enable");
+  TRACE_(0, "artdaq::database::configuration::options::OperationBase trace_enable");
 }

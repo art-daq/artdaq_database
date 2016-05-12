@@ -79,22 +79,29 @@ void ManageConfigsOperation::readJsonData(JsonData const& data) {
   OperationBase::readJsonData(data);
 
   using namespace artdaq::database::json;
-  auto filterAST = object_t{};
+  auto dataAST = object_t{};
 
-  if (!JsonReader{}.read(data.json_buffer, filterAST)) {
+  if (!JsonReader{}.read(data.json_buffer, dataAST)) {
     throw db::invalid_option_exception("Options") << "Unable to read JSON buffer.";
   }
 
-  TRACE_(1, "Options() read filterAST");
-
   try {
-    configurableEntity(boost::get<std::string>(filterAST.at(cfl::option::entity)));
-  } catch (...) {
-  }
+    auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(cfl::option::searchfilter));
 
-  try {
-    globalConfiguration(boost::get<std::string>(filterAST.at(cfl::option::configuration)));
+    if (!filterAST.empty()) searchFilter(cfl::notprovided);
+
+    try {
+      configurableEntity(boost::get<std::string>(filterAST.at(cfl::option::entity)));
+    } catch (...) {
+    }
+
+    try {
+      globalConfiguration(boost::get<std::string>(filterAST.at(cfl::option::configuration)));
+    } catch (...) {
+    }
+
   } catch (...) {
+    TRACE_(1, "Options() no filter provided <" << data << ">");
   }
 }
 
@@ -166,6 +173,10 @@ JsonData ManageConfigsOperation::search_filter_to_JsonData() const {
   if (globalConfiguration() != cfl::notprovided && operation() != cfl::operation::addconfig)
     docAST[cfl::filter::configuration] = globalConfiguration();
 
+  if (docAST.empty()) {
+    return {cfl::empty_json};
+  }
+
   auto json_buffer = std::string{};
 
   if (!JsonWriter{}.write(docAST, json_buffer)) {
@@ -175,13 +186,12 @@ JsonData ManageConfigsOperation::search_filter_to_JsonData() const {
 }
 
 //
-void cf::trace_enable_OperationManageConfigs() {
+void cf::debug::options::enableOperationManageConfigs() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::OperationFindConfigs"
-                << "trace_enable");
+  TRACE_(0, "artdaq::database::configuration::options::OperationFindConfigs trace_enable");
 }

@@ -45,7 +45,11 @@ class ManageConfigsOperation final : public OperationBase {
   std::string _global_configuration = {literal::notprovided};
 };
 
-void trace_enable_OperationManageConfigs();
+namespace debug {
+namespace options {
+void enableOperationManageConfigs();
+}
+}
 
 }  // namespace configuration
 }  // namespace database

@@ -53,8 +53,11 @@ class LoadStoreOperation final : public OperationBase {
   std::string _global_configuration = {literal::notprovided};
 };
 
-void trace_enable_OperationLoadStore();
-
+namespace debug {
+namespace options {
+void enableLoadStoreOperation();
+}
+}
 }  // namespace configuration
 }  // namespace database
 }  // namespace artdaq

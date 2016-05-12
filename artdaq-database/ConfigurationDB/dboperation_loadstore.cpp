@@ -41,7 +41,7 @@ auto make_error_msg = [](auto msg) { return std::string("{error:\"").append(msg)
 result_pair_t opts::store_configuration(LoadStoreOperation const& options, std::string& conf) noexcept {
   try {
     detail::store_configuration(options, conf);
-    return result_pair_t{true, literal::result::SUCCESS};
+    return result_pair_t{true, conf};
   } catch (...) {
     return result_pair_t{false, boost::current_exception_diagnostic_information()};
   }
@@ -50,7 +50,7 @@ result_pair_t opts::store_configuration(LoadStoreOperation const& options, std::
 result_pair_t opts::load_configuration(LoadStoreOperation const& options, std::string& conf) noexcept {
   try {
     detail::load_configuration(options, conf);
-    return result_pair_t{true, literal::result::SUCCESS};
+    return result_pair_t{true, conf};
   } catch (...) {
     return result_pair_t{false, boost::current_exception_diagnostic_information()};
   }
@@ -81,14 +81,14 @@ result_pair_t json::load_configuration(std::string const& search_filter, std::st
     auto options = LoadStoreOperation{literal::operation::load};
     options.readJsonData({search_filter});
 
-    auto database_format = std::string(conf);
+    auto database_format = std::string{};
 
     detail::load_configuration(options, database_format);
 
     // convert to gui
     conf = database_format;
 
-    return result_pair_t{true, literal::result::SUCCESS};
+    return result_pair_t{true, conf};
   } catch (...) {
     return result_pair_t{false, boost::current_exception_diagnostic_information()};
   }

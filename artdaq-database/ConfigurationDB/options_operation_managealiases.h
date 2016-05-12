@@ -59,7 +59,11 @@ class ManageAliasesOperation final : public OperationBase {
   std::string _global_configuration_alias = {literal::notprovided};
 };
 
-void trace_enable_OperationManageAliases();
+namespace debug {
+namespace options {
+void enableOperationManageAliases();
+}
+}
 
 }  // namespace configuration
 }  // namespace database

@@ -52,6 +52,21 @@ class RA1A2Functor : public Functor<R> {
   A2 const& _a2;
 };
 
+template <typename R, typename A1, typename R2>
+class RA1R2Functor : public Functor<R> {
+ public:
+  typedef R (*FP)(A1 const&, R2&);
+
+  RA1R2Functor(FP fp, A1 const& a1, R2& r2) : _fp{fp}, _a1{a1}, _r2{r2} {}
+
+  R invoke() override final { return _fp(_a1, _r2); }
+
+ private:
+  FP _fp;
+  A1 const& _a1;
+  R2& _r2;
+};
+
 template <typename A1, typename R2>
 class VA1R2Functor : public Functor<void> {
  public:
