@@ -256,14 +256,20 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findGlobalConfigs(JsonDa
     configuration_filter.concatenate(bson_document->view());
 
     auto cursor = collection.distinct("configurations.name", configuration_filter.view_document());
-
+    
     for (auto const& view : cursor) {
+          TRACE_(4, "StorageProvider::MongoDB::findGlobalConfigs() looping over cursor =<" << bsoncxx::to_json(view) << ">");
+
       auto element_values = view.find("values");
 
       if (element_values == collectionDescriptor.end())
         throw cet::exception("MongoDB") << "MongoDB returned invalid database search.";
-
+      
       auto configuration_name_array = element_values->get_array();
+
+      if(configuration_name_array.value.empty())
+	break;
+      
       for (auto const& configuration_name : configuration_name_array.value) {
         std::stringstream ss;
         ss << "{";

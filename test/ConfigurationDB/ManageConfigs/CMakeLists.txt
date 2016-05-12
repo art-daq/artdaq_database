@@ -39,7 +39,9 @@ set (TEST_CONFIGURATION_NAME "testConfigA${CONFIG_NUMBER}")
 
 
 SET (TEST_VERSION_NAME    versionA${VERSION_NUMBER} )
-add_subdirectory(test000)
+#add_subdirectory(test000)
+add_subdirectory(test001)
+add_subdirectory(test011)
 
 
 

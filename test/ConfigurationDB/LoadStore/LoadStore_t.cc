@@ -109,6 +109,7 @@ int main(int argc, char* argv[]) try {
 
   if (!result.first) {
     std::cout << "Test failed; error message: " << result.second << "\n";
+    std::cout << debug::current_exception_diagnostic_information();
     return process_exit_code::FAILURE;
   }
 

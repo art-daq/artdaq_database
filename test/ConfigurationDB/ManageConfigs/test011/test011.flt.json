@@ -1,0 +1,6 @@
+{
+"filter":{"configurations.name":{"$regex":"^@TEST_CONFIGURATION_NAME@"}}, 
+"dbprovider":"@TEST_DBPROVIDER@",
+"operation":"findconfigs",
+"dataformat":"gui"
+}

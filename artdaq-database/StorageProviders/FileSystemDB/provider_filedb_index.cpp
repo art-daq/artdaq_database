@@ -748,6 +748,8 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::_indexed_filtered_
   auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
 
   auto acceptValue = [&right_begins_with](auto const& value) {
+    if (value.size() < right_begins_with.size() || value == "notprovided") return false;
+
     if (std::equal(right_begins_with.begin(), right_begins_with.end(), value.begin())) return true;
     return false;
   };
