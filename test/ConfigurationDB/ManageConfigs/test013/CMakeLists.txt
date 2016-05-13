@@ -1,6 +1,8 @@
-SET ( TEST_NAME "ManageConfigs_buildfilter" )
+SET ( TEST_NAME "ManageConfigs_findversions" )
 
-SET ( TEST_NUMBER "012" )
+SET ( TEST_COLLECTION_NAME_QUAL "findversions" )
+
+SET ( TEST_NUMBER "013" )
 
 SET ( TEST_FILE_NUMBER "011" )
 SET ( TEST_DBPROVIDER "filesystem" )
@@ -13,7 +15,7 @@ cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC M
     ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_FILE_NUMBER}.flt.${RAND_NAME}.json
   TEST_ARGS  --searchquery=test${TEST_FILE_NUMBER}.flt.${RAND_NAME}.json -r test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json )
 
-SET ( TEST_FILE_NUMBER "011" )  
+SET ( TEST_FILE_NUMBER "012" )  
 SET ( TEST_DBPROVIDER "mongo" )
 string(RANDOM LENGTH 3 ALPHABET 0123456789 RAND_NAME)
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_FILE_NUMBER}.cmp.json ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json @ONLY )
@@ -23,3 +25,4 @@ cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC M
     ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json
     ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_FILE_NUMBER}.flt.${RAND_NAME}.json
   TEST_ARGS  --searchquery=test${TEST_FILE_NUMBER}.flt.${RAND_NAME}.json -r test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json )
+

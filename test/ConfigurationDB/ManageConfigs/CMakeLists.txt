@@ -34,16 +34,24 @@ message(STATUS "RAND_NAME=${RAND_NAME}")
 string(RANDOM LENGTH 5 ALPHABET 0123456789 VERSION_NUMBER)
 message(STATUS "VERSION_NUMBER=${VERSION_NUMBER}")
 
-set (CONFIG_NUMBER "05132016-160218")
+### uncomment to debug tests
+#set (CONFIG_NUMBER "05132016-170247")
+#set (VERSION_NUMBER "77611")
+
 set (TEST_CONFIGURATION_NAME "testConfigA${CONFIG_NUMBER}")
-
-
 SET (TEST_VERSION_NAME    versionA${VERSION_NUMBER} )
-#add_subdirectory(test000)
+
+add_subdirectory(test000)
 add_subdirectory(test001)
 add_subdirectory(test011)
 
 add_subdirectory(test002)
 add_subdirectory(test012)
+
+add_subdirectory(test003)
+add_subdirectory(test013)
+
+#add_subdirectory(test004)
+#add_subdirectory(test014)
 
 
