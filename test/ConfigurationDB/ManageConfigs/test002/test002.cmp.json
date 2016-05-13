@@ -1,56 +1,82 @@
 {
-    "search" : [
-        {
-            "name" : "@TEST_CONFIG_NAME@:Aggregator_topol", 
-            "query" : {
-                "collection" : "artdaq_Aggregator", 
-                "dbprovider" : "filesystem", 
-                "dataformat" : "gui", 
-                "operation" : "load", 
-                "filter" : {
-                    "configurations.name" : "@TEST_CONFIG_NAME@", 
-                    "configurable_entity.name" : "Aggregator_topol"
-                }
+   "search":[
+      {
+         "name":"@TEST_CONFIGURATION_NAME@:test001",
+         "query":{
+            "collection":"testManageConfigs_aggregator",
+            "dbprovider":"@TEST_DBPROVIDER@",
+            "dataformat":"gui",
+            "operation":"load",
+            "filter":{
+               "configurations.name":"@TEST_CONFIGURATION_NAME@",
+               "configurable_entity.name":"test001"
             }
-        },
-        {
-            "name" : "@TEST_CONFIG_NAME@:EventBuilder_topol", 
-            "query" : {
-                "collection" : "artdaq_EventBuilder", 
-                "dbprovider" : "filesystem", 
-                "dataformat" : "gui", 
-                "operation" : "load", 
-                "filter" : {
-                    "configurations.name" : "@TEST_CONFIG_NAME@", 
-                    "configurable_entity.name" : "EventBuilder_topol"
-                }
+         }
+      },
+      {
+         "name":"@TEST_CONFIGURATION_NAME@:test002",
+         "query":{
+            "collection":"testManageConfigs_aggregator",
+            "dbprovider":"@TEST_DBPROVIDER@",
+            "dataformat":"gui",
+            "operation":"load",
+            "filter":{
+               "configurations.name":"@TEST_CONFIGURATION_NAME@",
+               "configurable_entity.name":"test002"
             }
-        },
-        {
-            "name" : "@TEST_CONFIG_NAME@:BoardReader_TOY1_topol", 
-            "query" : {
-                "collection" : "artdaq_BoardReader", 
-                "dbprovider" : "filesystem", 
-                "dataformat" : "gui", 
-                "operation" : "load", 
-                "filter" : {
-                    "configurations.name" : "@TEST_CONFIG_NAME@", 
-                    "configurable_entity.name" : "BoardReader_TOY1_topol"
-                }
+         }
+      },
+      {
+         "name":"@TEST_CONFIGURATION_NAME@:test003",
+         "query":{
+            "collection":"testManageConfigs_boardreader",
+            "dbprovider":"@TEST_DBPROVIDER@",
+            "dataformat":"gui",
+            "operation":"load",
+            "filter":{
+               "configurations.name":"@TEST_CONFIGURATION_NAME@",
+               "configurable_entity.name":"test003"
             }
-        }, 
-        {
-            "name" : "@TEST_CONFIG_NAME@:BoardReader_TOY2_topol", 
-            "query" : {
-                "collection" : "artdaq_BoardReader", 
-                "dbprovider" : "filesystem", 
-                "dataformat" : "gui", 
-                "operation" : "load", 
-                "filter" : {
-                    "configurations.name" : "@TEST_CONFIG_NAME@", 
-                    "configurable_entity.name" : "BoardReader_TOY2_topol"
-                }
+         }
+      },
+      {
+         "name":"@TEST_CONFIGURATION_NAME@:test004",
+         "query":{
+            "collection":"testManageConfigs_boardreader",
+            "dbprovider":"@TEST_DBPROVIDER@",
+            "dataformat":"gui",
+            "operation":"load",
+            "filter":{
+               "configurations.name":"@TEST_CONFIGURATION_NAME@",
+               "configurable_entity.name":"test004"
             }
-        }
-    ]
+         }
+      },
+      {
+         "name":"@TEST_CONFIGURATION_NAME@:test005",
+         "query":{
+            "collection":"testManageConfigs_eventbuilder",
+            "dbprovider":"@TEST_DBPROVIDER@",
+            "dataformat":"gui",
+            "operation":"load",
+            "filter":{
+               "configurations.name":"@TEST_CONFIGURATION_NAME@",
+               "configurable_entity.name":"test005"
+            }
+         }
+      },
+      {
+         "name":"@TEST_CONFIGURATION_NAME@:test006",
+         "query":{
+            "collection":"testManageConfigs_eventbuilder",
+            "dbprovider":"@TEST_DBPROVIDER@",
+            "dataformat":"gui",
+            "operation":"load",
+            "filter":{
+               "configurations.name":"@TEST_CONFIGURATION_NAME@",
+               "configurable_entity.name":"test006"
+            }
+         }
+      }
+   ]
 }

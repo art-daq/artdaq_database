@@ -34,7 +34,7 @@ message(STATUS "RAND_NAME=${RAND_NAME}")
 string(RANDOM LENGTH 5 ALPHABET 0123456789 VERSION_NUMBER)
 message(STATUS "VERSION_NUMBER=${VERSION_NUMBER}")
 
-set (CONFIG_NUMBER "03172016-174859")
+set (CONFIG_NUMBER "05132016-160218")
 set (TEST_CONFIGURATION_NAME "testConfigA${CONFIG_NUMBER}")
 
 
@@ -43,5 +43,7 @@ SET (TEST_VERSION_NAME    versionA${VERSION_NUMBER} )
 add_subdirectory(test001)
 add_subdirectory(test011)
 
+add_subdirectory(test002)
+add_subdirectory(test012)
 
 
