@@ -16,8 +16,9 @@ struct xml2json final {};
 
 struct json2xml final {};
 
-void trace_enable_xml2json();
-
+namespace debug {
+void enableXml2Json();
+}
 }  // namespace xmljson
 }  // namespace database
 }  // namespace artdaq

@@ -17,8 +17,9 @@ struct XmlReader final {
   bool read(std::string const&, jsn::object_t&);
 };
 
-void trace_enable_XmlReader();
-
+namespace debug {
+void enableXmlReader();
+}
 }  // namespace xml
 }  // namespace database
 }  // namespace artdaq

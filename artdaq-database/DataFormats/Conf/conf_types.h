@@ -1,0 +1,6 @@
+#ifndef _ARTDAQ_DATABASE_DATAFORMATS_XMLTYPES_H_
+#define _ARTDAQ_DATABASE_DATAFORMATS_XMLTYPES_H_
+
+#include "artdaq-database/DataFormats/common.h"
+
+#endif /* _ARTDAQ_DATABASE_DATAFORMATS_XMLTYPES_H_ */

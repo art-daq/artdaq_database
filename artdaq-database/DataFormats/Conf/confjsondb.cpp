@@ -2,34 +2,34 @@
 #include "artdaq-database/DataFormats/common/shared_literals.h"
 
 #include "artdaq-database/DataFormats/Json/json_common.h"
-#include "artdaq-database/DataFormats/Xml/xml_common.h"
+#include "artdaq-database/DataFormats/Conf/conf_common.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "XML:xmljsondb_C"
+#define TRACE_NAME "CNF:confjsondb_C"
 
 namespace artdaq {
 namespace database {
-namespace xmljson {
+namespace confjson {
 
-namespace fcl = artdaq::database::xml;
+namespace fcl = artdaq::database::conf;
 namespace jsn = artdaq::database::json;
 
 using artdaq::database::json::JsonReader;
 using artdaq::database::json::JsonWriter;
 
-using artdaq::database::xml::XmlReader;
-using artdaq::database::xml::XmlWriter;
+using artdaq::database::conf::ConfReader;
+using artdaq::database::conf::ConfWriter;
 
 namespace literal = artdaq::database::dataformats::literal;
 
-bool xml_to_json(std::string const& xml, std::string& json) {
-  assert(!xml.empty());
+bool conf_to_json(std::string const& conf, std::string& json) {
+  assert(!conf.empty());
   assert(json.empty());
 
-  TRACE_(2, "xml_to_json: begin");
+  TRACE_(2, "conf_to_json: begin");
 
   auto result = bool{false};
 
@@ -41,13 +41,13 @@ bool xml_to_json(std::string const& xml, std::string& json) {
     return boost::get<jsn::object_t>(json_root[name]);
   };
 
-  get_object(literal::origin_node)[literal::source] = std::string("xml_to_json");
+  get_object(literal::origin_node)[literal::source] = std::string("conf_to_json");
   get_object(literal::origin_node)[literal::timestamp] = artdaq::database::dataformats::timestamp();
 
   auto& json_node = get_object(literal::document_node);
 
-  auto reader = xml::XmlReader{};
-  result = reader.read(xml, json_node);
+  auto reader = conf::ConfReader{};
+  result = reader.read(conf, json_node);
 
   if (!result) return result;
 
@@ -59,27 +59,27 @@ bool xml_to_json(std::string const& xml, std::string& json) {
 
   if (result) json.swap(json1);
 
-  TRACE_(2, "xml_to_json: end");
+  TRACE_(2, "conf_to_json: end");
 
   return result;
 }
 
-bool json_to_xml(std::string const& json, std::string& xml) {
+bool json_to_conf(std::string const& json, std::string& conf) {
   assert(!json.empty());
-  assert(xml.empty());
+  assert(conf.empty());
 
-  TRACE_(3, "json_to_xml: begin");
+  TRACE_(3, "json_to_conf: begin");
 
   auto result = bool{false};
 
-  TRACE_(3, "json_to_xml: Reading JSON buffer..");
+  TRACE_(3, "json_to_conf: Reading JSON buffer..");
 
   auto json_root = jsn::object_t{};
   auto reader = JsonReader{};
   result = reader.read(json, json_root);
 
   if (!result) {
-    TRACE_(3, "json_to_xml: Unable to read JSON buffer");
+    TRACE_(3, "json_to_conf: Unable to read JSON buffer");
     return result;
   }
 
@@ -89,29 +89,29 @@ bool json_to_xml(std::string const& json, std::string& xml) {
 
   auto& json_node = get_object(literal::document_node);
 
-  auto xml1 = std::string{};
+  auto conf1 = std::string{};
 
-  auto writer = XmlWriter{};
+  auto writer = ConfWriter{};
 
-  result = writer.write(json_node, xml1);
+  result = writer.write(json_node, conf1);
 
-  if (result) xml.swap(xml1);
+  if (result) conf.swap(conf1);
 
-  TRACE_(3, "json_to_xml: end");
+  TRACE_(3, "json_to_conf: end");
 
   return result;
 }
 
 namespace debug {
-void enableXmlJson() {
+  void enableConfJson() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", 1LL);
   TRACE_CNTL("modeS", 1LL);
 
-  TRACE_(0, "artdaq::database::xmljson trace_enable");
+  TRACE_(0, "artdaq::database::confjson trace_enable");
 }
 }
-}  // namespace fhicljson
+}  // namespace confjson
 }  // namespace database
 }  // namespace artdaq

@@ -3,9 +3,9 @@
 
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
-#include "artdaq-database/DataFormats/Xml/convertxml2json.h"
-#include "artdaq-database/DataFormats/Xml/xml_common.h"
-#include "artdaq-database/DataFormats/Xml/xmljsondb.h"
+#include "artdaq-database/DataFormats/Conf/convertconf2json.h"
+#include "artdaq-database/DataFormats/Conf/conf_common.h"
+#include "artdaq-database/DataFormats/Conf/confjsondb.h"
 #include "artdaq-database/DataFormats/common/helper_functions.h"
 
 namespace bpo = boost::program_options;
@@ -13,17 +13,21 @@ using namespace artdaq::database;
 
 typedef bool (*test_case)(std::string const& /*input*/, std::string const& /*compare*/);
 
-bool test_convertxml2json(std::string const&, std::string const&);
-bool test_convertjson2xml(std::string const&, std::string const&);
+bool test_convertconf2json(std::string const&, std::string const&);
+bool test_convertjson2conf(std::string const&, std::string const&);
 
 int main(int argc, char* argv[]) {
-  artdaq::database::xml::debug::enableXmlReader();
-  artdaq::database::xml::debug::enableXmlWriter();
-  artdaq::database::xmljson::debug::enableXml2Json();
-  artdaq::database::xmljson::debug::enableXmlJson();
+  artdaq::database::conf::debug::enableConfReader();
+  artdaq::database::conf::debug::enableConfWriter();
+  artdaq::database::confjson::debug::enableConf2Json();
+  artdaq::database::confjson::debug::enableConfJson();
 
   debug::registerUngracefullExitHandlers();
   artdaq::database::dataformats::useFakeTime(true);
+
+  // Get the input parameters via the boost::program_options library,
+  // designed to make it relatively simple to define arguments and
+  // issue errors if argument list is supplied incorrectly
 
   std::ostringstream descstr;
   descstr << argv[0]
@@ -85,7 +89,7 @@ int main(int argc, char* argv[]) {
 
   auto runTest = [](std::string const& name) {
     auto tests =
-        std::map<std::string, test_case>{{"xml2json", test_convertxml2json}, {"json2xml", test_convertjson2xml}};
+        std::map<std::string, test_case>{{"conf2json", test_convertconf2json}, {"json2conf", test_convertjson2conf}};
 
     std::cout << "Running test:<" << name << ">\n";
 
@@ -97,13 +101,13 @@ int main(int argc, char* argv[]) {
   return !testResult;
 }
 
-bool test_convertxml2json(std::string const& input, std::string const& compare) {
+bool test_convertconf2json(std::string const& input, std::string const& compare) {
   assert(!input.empty());
   assert(!compare.empty());
 
   auto output = std::string();
 
-  if (!artdaq::database::xmljson::xml_to_json(input, output)) return false;
+  if (!artdaq::database::confjson::conf_to_json(input, output)) return false;
 
   auto compare_result = artdaq::database::json::compare_json_objects(output, compare);
   if (compare_result.first)
@@ -117,13 +121,13 @@ bool test_convertxml2json(std::string const& input, std::string const& compare) 
   return false;
 }
 
-bool test_convertjson2xml(std::string const& input, std::string const& compare) {
+bool test_convertjson2conf(std::string const& input, std::string const& compare) {
   assert(!input.empty());
   assert(!compare.empty());
 
   auto output = std::string();
 
-  if (!artdaq::database::xmljson::json_to_xml(input, output)) return false;
+  if (!artdaq::database::confjson::json_to_conf(input, output)) return false;
 
   if (output == compare)
     return true;

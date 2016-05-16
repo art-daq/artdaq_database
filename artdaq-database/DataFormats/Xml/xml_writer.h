@@ -17,8 +17,9 @@ struct XmlWriter final {
   bool write(jsn::object_t const&, std::string&);
 };
 
-void trace_enable_XmlWriter();
-
+namespace debug {
+void enableXmlWriter();
+}
 }  // namespace xml
 }  // namespace database
 }  // namespace artdaq

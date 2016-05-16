@@ -1,23 +1,23 @@
 #include "artdaq-database/DataFormats/common.h"
 
-#include "artdaq-database/DataFormats/Xml/convertxml2json.h"
-#include "artdaq-database/DataFormats/Xml/xml_reader.h"
+#include "artdaq-database/DataFormats/Conf/convertconf2json.h"
+#include "artdaq-database/DataFormats/Conf/conf_reader.h"
 #include "artdaq-database/DataFormats/common/shared_literals.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "XML:XmlReader_C"
+#define TRACE_NAME "CNF:ConfReader_C"
 
-namespace fcl = artdaq::database::xml;
+namespace fcl = artdaq::database::conf;
 namespace jsn = artdaq::database::json;
 
-using artdaq::database::xml::XmlReader;
+using artdaq::database::conf::ConfReader;
 
 namespace literal = artdaq::database::dataformats::literal;
 
-bool XmlReader::read(std::string const& in, jsn::object_t& json_object) {
+bool ConfReader::read(std::string const& in, jsn::object_t& json_object) {
   assert(!in.empty());
   assert(json_object.empty());
 
@@ -27,7 +27,7 @@ bool XmlReader::read(std::string const& in, jsn::object_t& json_object) {
     auto object = jsn::object_t();
     object[literal::data_node] = jsn::object_t();
 
-    // TODO: convert XML into Json AST
+    // TODO: convert CONF into Json AST
 
     json_object.swap(object);
 
@@ -43,11 +43,11 @@ bool XmlReader::read(std::string const& in, jsn::object_t& json_object) {
   }
 }
 
-void artdaq::database::xml::debug::enableXmlReader() {
+void artdaq::database::conf::debug::enableConfReader() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", 1LL);
   TRACE_CNTL("modeS", 1LL);
 
-  TRACE_(0, "artdaq::database::xml::XmlReader trace_enable");
+  TRACE_(0, "artdaq::database::conf::ConfReader trace_enable");
 }
