@@ -71,7 +71,7 @@ std::string const& OperationBase::provider(std::string const& provider) {
 
   if (cf::not_equal(provider, cfl::database_provider_filesystem) &&
       cf::not_equal(provider, cfl::database_provider_mongo)) {
-    throw db::invalid_option_exception("Options") << "Invalid database provider; database provider=" << provider << ".";
+    throw db::invalid_option_exception("OperationBase") << "Invalid database provider; database provider=" << provider << ".";
   }
 
   TRACE_(12, "Options: Updating provider from " << _provider << " to " << provider << ".");
@@ -116,9 +116,10 @@ std::string const& OperationBase::searchFilter() const noexcept {
 std::string const& OperationBase::searchFilter(std::string const& search_filter) {
   assert(!search_filter.empty());
 
-  TRACE_(15, "Options: searchFilter args search_filter=<" << search_filter << ">.");
+  auto tmp =cf::dequote(search_filter);
+  TRACE_(15, "Options: searchFilter args search_filter=<" << tmp << ">.");
 
-  _search_filter = search_filter;
+  _search_filter = tmp;
 
   return _search_filter;
 }
@@ -228,8 +229,9 @@ void OperationBase::readJsonData(JsonData const& data) {
   using namespace artdaq::database::json;
   auto filterAST = object_t{};
 
+  
   if (!JsonReader{}.read(data.json_buffer, filterAST)) {
-    throw db::invalid_option_exception("Options") << "Unable to read JSON buffer.";
+    throw db::invalid_option_exception("OperationBase") << "Unable to read JSON buffer.";
   }
 
   try {
@@ -266,7 +268,7 @@ JsonData OperationBase::writeJsonData() const {
   auto searchFilterAST = object_t{};
 
   if (!JsonReader{}.read(search_filter_to_JsonData().json_buffer, searchFilterAST)) {
-    throw db::invalid_option_exception("Options") << "Unable to readsearch_filter_to_JsonData().";
+    throw db::invalid_option_exception("OperationBase") << "Unable to readsearch_filter_to_JsonData().";
   }
 
   auto docAST = object_t{};
@@ -280,7 +282,7 @@ JsonData OperationBase::writeJsonData() const {
   auto json_buffer = std::string{};
 
   if (!JsonWriter{}.write(docAST, json_buffer)) {
-    throw db::invalid_option_exception("Options") << "Unable to write JSON buffer.";
+    throw db::invalid_option_exception("OperationBase") << "Unable to write JSON buffer.";
   }
   return {json_buffer};
 }

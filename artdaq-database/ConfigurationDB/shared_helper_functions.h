@@ -15,6 +15,7 @@ bool not_equal(std::string const&, std::string const&);
 std::string quoted_(std::string const&);
 std::string to_string(options::data_format_t const&);
 options::data_format_t to_data_format(std::string const&);
+std::string dequote(std::string s);
 
 }  // namespace configuration
 }  // namespace database

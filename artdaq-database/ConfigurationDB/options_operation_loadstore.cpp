@@ -102,13 +102,13 @@ void LoadStoreOperation::readJsonData(JsonData const& data) {
   auto dataAST = object_t{};
 
   if (!JsonReader{}.read(data.json_buffer, dataAST)) {
-    throw db::invalid_option_exception("Options") << "Unable to read JSON buffer.";
+    throw db::invalid_option_exception("LoadStoreOperation") << "Unable to read JSON buffer.";
   }
 
   try {
     auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(cfl::option::searchfilter));
 
-    if (!filterAST.empty()) searchFilter(cfl::notprovided);
+    if (filterAST.empty()) searchFilter(cfl::notprovided);
 
     try {
       version(boost::get<std::string>(filterAST.at(cfl::filter::version)));
@@ -176,7 +176,7 @@ JsonData LoadStoreOperation::writeJsonData() const {
   auto docAST = object_t{};
 
   if (!JsonReader{}.read(OperationBase::writeJsonData().json_buffer, docAST)) {
-    throw db::invalid_option_exception("Options") << "Unable to readsearch_filter_to_JsonData().";
+    throw db::invalid_option_exception("LoadStoreOperation") << "Unable to readsearch_filter_to_JsonData().";
   }
 
   if (globalConfiguration() != cfl::notprovided) docAST[cfl::option::configuration] = globalConfiguration();
@@ -184,7 +184,7 @@ JsonData LoadStoreOperation::writeJsonData() const {
   auto json_buffer = std::string{};
 
   if (!JsonWriter{}.write(docAST, json_buffer)) {
-    throw db::invalid_option_exception("Options") << "Unable to write JSON buffer.";
+    throw db::invalid_option_exception("LoadStoreOperation") << "Unable to write JSON buffer.";
   }
   return {json_buffer};
 }
@@ -199,7 +199,7 @@ JsonData LoadStoreOperation::search_filter_to_JsonData() const {
   auto docAST = object_t{};
 
   if (!JsonReader{}.read(OperationBase::search_filter_to_JsonData().json_buffer, docAST)) {
-    throw db::invalid_option_exception("Options") << "Unable to search_filter_to_JsonData().";
+    throw db::invalid_option_exception("LoadStoreOperation") << "Unable to search_filter_to_JsonData().";
   }
 
   if (version() != cfl::notprovided) docAST[cfl::filter::version] = version();
@@ -216,7 +216,7 @@ JsonData LoadStoreOperation::search_filter_to_JsonData() const {
   auto json_buffer = std::string{};
 
   if (!JsonWriter{}.write(docAST, json_buffer)) {
-    throw db::invalid_option_exception("Options") << "Unable to write JSON buffer.";
+    throw db::invalid_option_exception("LoadStoreOperation") << "Unable to write JSON buffer.";
   }
   return {json_buffer};
 }
@@ -230,7 +230,7 @@ JsonData LoadStoreOperation::globalConfiguration_to_JsonData() const {
   auto json_buffer = std::string{};
 
   if (!JsonWriter{}.write(docAST, json_buffer)) {
-    throw db::invalid_option_exception("Options") << "Unable to write JSON buffer.";
+    throw db::invalid_option_exception("LoadStoreOperation") << "Unable to write JSON buffer.";
   }
 
   return {json_buffer};
@@ -245,7 +245,7 @@ JsonData LoadStoreOperation::version_to_JsonData() const {
   auto json_buffer = std::string{};
 
   if (!JsonWriter{}.write(docAST, json_buffer)) {
-    throw db::invalid_option_exception("Options") << "Unable to write JSON buffer.";
+    throw db::invalid_option_exception("LoadStoreOperation") << "Unable to write JSON buffer.";
   }
 
   return {json_buffer};
@@ -259,7 +259,7 @@ JsonData LoadStoreOperation::configurableEntity_to_JsonData() const {
   auto json_buffer = std::string{};
 
   if (!JsonWriter{}.write(docAST, json_buffer)) {
-    throw db::invalid_option_exception("Options") << "Unable to write JSON buffer.";
+    throw db::invalid_option_exception("LoadStoreOperation") << "Unable to write JSON buffer.";
   }
 
   return {json_buffer};

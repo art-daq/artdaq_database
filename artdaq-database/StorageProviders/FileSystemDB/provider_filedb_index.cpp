@@ -167,9 +167,7 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findConfigVersions
   auto entityNameFilter = std::string{};
 
   try {
-    auto const& filterAST= boost::get<object_t>(search_ast.at("filter"));
-    
-    entityNameFilter = boost::get<std::string>(filterAST.at("configurable_entity.name"));
+    entityNameFilter = boost::get<std::string>(search_ast.at("configurable_entity.name"));
 
     TRACE_(5, "StorageProvider::FileSystemDB::index::findConfigVersions()"
                   << " Found filter=<" << entityNameFilter << ">.");
@@ -199,9 +197,7 @@ std::vector<std::string> SearchIndex::findConfigEntities(JsonData const& search)
   auto entityNameFilter = std::string{};
 
   try {
-    auto const& filterAST= boost::get<object_t>(search_ast.at("filter"));
-    
-    entityNameFilter = boost::get<std::string>(filterAST.at("configurable_entity.name"));
+    entityNameFilter = boost::get<std::string>(search_ast.at("configurable_entity.name"));
 
     TRACE_(5, "StorageProvider::FileSystemDB::index::findConfigEntities()"
                   << " Found filter=<" << entityNameFilter << ">.");
@@ -232,10 +228,7 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findAllGlobalConfi
   auto configFilter = std::string{};
 
   try {
-    auto const& filterAST= boost::get<object_t>(search_ast.at("filter"));
-    
-    configFilter = boost::get<std::string>(filterAST.at("configurations.name"));
-
+    configFilter = boost::get<std::string>(search_ast.at("configurations.name"));
     TRACE_(5, "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations()"
                   << " Found filter=<" << configFilter << ">.");
   } catch (...) {
@@ -743,11 +736,11 @@ std::vector<std::string> SearchIndex::_filtered_attribute_list(std::string const
     if (std::equal(attribute_begins_with.begin(), attribute_begins_with.end(), value.begin())) return true;
     return false;
   };
-  
+
   auto& lookup_table = boost::get<jsn::object_t>(_index.at(attribute));
 
   for (auto& ouid_array_element : lookup_table) {
-       if (!acceptValue(ouid_array_element.key)) continue;
+    if (!acceptValue(ouid_array_element.key)) continue;
 
     returnCollection.push_back(ouid_array_element.key);
   }
@@ -777,6 +770,9 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::_indexed_filtered_
 
   for (auto& right_element : right_table) {
     if (!acceptValue(right_element.key)) continue;
+
+    TRACE_(5, "StorageProvider::FileSystemDB::index::_indexed_filtered_innerjoin_over_ouid()"
+                  << " accepted value  " << right_element.key << " begin with" << right_begins_with);
 
     auto& right_ouid_list = boost::get<jsn::array_t>(right_element.value);
 

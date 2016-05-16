@@ -143,13 +143,13 @@ void ManageAliasesOperation::readJsonData(JsonData const& data) {
   auto dataAST = object_t{};
 
   if (!JsonReader{}.read(data.json_buffer, dataAST)) {
-    throw db::invalid_option_exception("Options") << "Unable to read JSON buffer.";
+    throw db::invalid_option_exception("ManageAliasesOperation") << "Unable to read JSON buffer.";
   }
 
   try {
     auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(cfl::option::searchfilter));
 
-    if (!filterAST.empty()) searchFilter(cfl::notprovided);
+    if (filterAST.empty()) searchFilter(cfl::notprovided);
 
     try {
       configurableEntity(boost::get<std::string>(filterAST.at(cfl::option::entity)));
@@ -239,7 +239,7 @@ JsonData ManageAliasesOperation::writeJsonData() const {
   auto docAST = object_t{};
 
   if (!JsonReader{}.read(OperationBase::writeJsonData().json_buffer, docAST)) {
-    throw db::invalid_option_exception("Options") << "Unable to readsearch_filter_to_JsonData().";
+    throw db::invalid_option_exception("ManageAliasesOperation") << "Unable to readsearch_filter_to_JsonData().";
   }
 
   if (globalConfiguration() != cfl::notprovided) docAST[cfl::option::configuration] = globalConfiguration();
@@ -251,7 +251,7 @@ JsonData ManageAliasesOperation::writeJsonData() const {
   auto json_buffer = std::string{};
 
   if (!JsonWriter{}.write(docAST, json_buffer)) {
-    throw db::invalid_option_exception("Options") << "Unable to write JSON buffer.";
+    throw db::invalid_option_exception("ManageAliasesOperation") << "Unable to write JSON buffer.";
   }
   return {json_buffer};
 }
@@ -266,7 +266,7 @@ JsonData ManageAliasesOperation::search_filter_to_JsonData() const {
   auto docAST = object_t{};
 
   if (!JsonReader{}.read(OperationBase::search_filter_to_JsonData().json_buffer, docAST)) {
-    throw db::invalid_option_exception("Options") << "Unable to search_filter_to_JsonData().";
+    throw db::invalid_option_exception("ManageAliasesOperation") << "Unable to search_filter_to_JsonData().";
   }
 
   if (configurableEntity() != cfl::notprovided) docAST[cfl::filter::entity] = configurableEntity();
@@ -281,7 +281,7 @@ JsonData ManageAliasesOperation::search_filter_to_JsonData() const {
   auto json_buffer = std::string{};
 
   if (!JsonWriter{}.write(docAST, json_buffer)) {
-    throw db::invalid_option_exception("Options") << "Unable to write JSON buffer.";
+    throw db::invalid_option_exception("ManageAliasesOperation") << "Unable to write JSON buffer.";
   }
   return {json_buffer};
 }

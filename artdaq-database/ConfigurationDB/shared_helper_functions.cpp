@@ -51,3 +51,10 @@ data_format_t cf::to_data_format(std::string const& f) {
     return data_format_t::unknown;
   }
 }
+
+std::string cf::dequote(std::string s) {
+  if (s[0] == '"' && s[s.length() - 1] == '"')
+    return s.substr(1, s.length() - 2);
+  else
+    return s;
+}

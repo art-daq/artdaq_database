@@ -292,13 +292,16 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigVersions(
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigEntities(JsonData const& search_filter) {
-  assert(!search_filter.json_buffer.empty());
+std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigEntities(JsonData const& filter) {
+  assert(!filter.json_buffer.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(9, "StorageProvider::FileSystemDB::findConfigEntities() begin");
-  TRACE_(9, "StorageProvider::FileSystemDB::findConfigEntities() args data=<" << search_filter.json_buffer << ">");
+  TRACE_(9, "StorageProvider::FileSystemDB::findConfigEntities() args data=<" << filter.json_buffer << ">");
 
+  auto search_filter_document = JSONDocument{filter.json_buffer};
+  auto search_filter = search_filter_document.findChild("filter").value();
+  
   auto collection = _provider->connection();
   collection = expand_environment_variables(collection);
 

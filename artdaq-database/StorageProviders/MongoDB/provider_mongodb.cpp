@@ -508,7 +508,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigEntities(JsonD
 
     if (collection_name == "system.indexes") continue;
 
-    TRACE_(9, "StorageProvider::MongoDB::findGlobalConfigs() querying collection_name=<" << collection_name << ">");
+    TRACE_(9, "StorageProvider::MongoDB::findConfigEntities() querying collection_name=<" << collection_name << ">");
 
     auto collection = _provider->connection().collection(collection_name);
     auto bson_document = bsoncxx::from_json(search.json_buffer);
