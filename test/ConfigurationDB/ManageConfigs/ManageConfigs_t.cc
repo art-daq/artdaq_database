@@ -35,11 +35,14 @@ int main(int argc, char* argv[]) try {
   // artdaq::database::jsonutils::debug::enableJSONDocument();
   // artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
 
-  artdaq::database::configuration::debug::enableLoadStoreOperation();
+  artdaq::database::configuration::debug::enableFindConfigsOperation();
+  artdaq::database::configuration::debug::enableCreateConfigsOperation();
+  
   artdaq::database::configuration::debug::options::enableOperationBase();
-  artdaq::database::configuration::debug::options::enableLoadStoreOperation();
-  artdaq::database::configuration::debug::detail::enableLoadStoreOperation();
-
+  artdaq::database::configuration::debug::options::enableOperationManageConfigs();
+  artdaq::database::configuration::debug::detail::enableCreateConfigsOperation();
+  artdaq::database::configuration::debug::detail::enableFindConfigsOperation();
+  
   debug::registerUngracefullExitHandlers();
   artdaq::database::dataformats::useFakeTime(true);
 

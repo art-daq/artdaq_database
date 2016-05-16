@@ -43,13 +43,13 @@ SET (TEST_VERSION_NAME    versionA${VERSION_NUMBER} )
 
 add_subdirectory(test000)
 add_subdirectory(test001)
-add_subdirectory(test011)
+#add_subdirectory(test011)
 
-add_subdirectory(test002)
-add_subdirectory(test012)
+#add_subdirectory(test002)
+#add_subdirectory(test012)
 
-add_subdirectory(test003)
-add_subdirectory(test013)
+#add_subdirectory(test003)
+#add_subdirectory(test013)
 
 #add_subdirectory(test004)
 #add_subdirectory(test014)

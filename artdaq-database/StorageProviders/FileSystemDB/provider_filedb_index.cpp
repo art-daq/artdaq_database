@@ -167,7 +167,9 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findConfigVersions
   auto entityNameFilter = std::string{};
 
   try {
-    entityNameFilter = boost::get<std::string>(search_ast.at("configurable_entity.name"));
+    auto const& filterAST= boost::get<object_t>(search_ast.at("filter"));
+    
+    entityNameFilter = boost::get<std::string>(filterAST.at("configurable_entity.name"));
 
     TRACE_(5, "StorageProvider::FileSystemDB::index::findConfigVersions()"
                   << " Found filter=<" << entityNameFilter << ">.");
@@ -197,7 +199,9 @@ std::vector<std::string> SearchIndex::findConfigEntities(JsonData const& search)
   auto entityNameFilter = std::string{};
 
   try {
-    entityNameFilter = boost::get<std::string>(search_ast.at("configurable_entity.name"));
+    auto const& filterAST= boost::get<object_t>(search_ast.at("filter"));
+    
+    entityNameFilter = boost::get<std::string>(filterAST.at("configurable_entity.name"));
 
     TRACE_(5, "StorageProvider::FileSystemDB::index::findConfigEntities()"
                   << " Found filter=<" << entityNameFilter << ">.");
@@ -228,7 +232,9 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findAllGlobalConfi
   auto configFilter = std::string{};
 
   try {
-    configFilter = boost::get<std::string>(search_ast.at("configurations.name"));
+    auto const& filterAST= boost::get<object_t>(search_ast.at("filter"));
+    
+    configFilter = boost::get<std::string>(filterAST.at("configurations.name"));
 
     TRACE_(5, "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations()"
                   << " Found filter=<" << configFilter << ">.");
@@ -726,14 +732,23 @@ void SearchIndex::_build_ouid_map(std::map<std::string, std::string>& map, std::
 }
 
 std::vector<std::string> SearchIndex::_filtered_attribute_list(std::string const& attribute,
-                                                               std::string const& attribute_with[[gnu::unused]]) {
+                                                               std::string const& attribute_begins_with) {
   assert(!attribute.empty());
 
   auto returnCollection = std::vector<std::string>{};
 
+  auto acceptValue = [&attribute_begins_with](auto const& value) {
+    if (value.size() < attribute_begins_with.size() || value == "notprovided") return false;
+
+    if (std::equal(attribute_begins_with.begin(), attribute_begins_with.end(), value.begin())) return true;
+    return false;
+  };
+  
   auto& lookup_table = boost::get<jsn::object_t>(_index.at(attribute));
 
   for (auto& ouid_array_element : lookup_table) {
+       if (!acceptValue(ouid_array_element.key)) continue;
+
     returnCollection.push_back(ouid_array_element.key);
   }
 
