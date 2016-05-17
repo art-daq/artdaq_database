@@ -278,7 +278,7 @@ JsonData OperationBase::writeJsonData() const {
   docAST[cfl::option::operation] = operation();
   docAST[cfl::option::collection] = collectionName();
   docAST[cfl::option::format] = cf::to_string(dataFormat());
-
+  
   auto json_buffer = std::string{};
 
   if (!JsonWriter{}.write(docAST, json_buffer)) {

@@ -2,6 +2,7 @@
 
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/ConfigurationDB/configuration_common.h"
+#include "artdaq-database/ConfigurationDB/dispatch_common.h"
 
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
@@ -33,7 +34,7 @@ int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
   // artdaq::database::jsonutils::debug::enableJSONDocument();
-  // artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
+  artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
 
   artdaq::database::configuration::debug::enableFindConfigsOperation();
   artdaq::database::configuration::debug::enableCreateConfigsOperation();
@@ -43,6 +44,9 @@ int main(int argc, char* argv[]) try {
   artdaq::database::configuration::debug::detail::enableCreateConfigsOperation();
   artdaq::database::configuration::debug::detail::enableFindConfigsOperation();
   
+  artdaq::database::configuration::debug::enableDBOperationMongo();
+  artdaq::database::configuration::debug::enableDBOperationFileSystem();
+
   debug::registerUngracefullExitHandlers();
   artdaq::database::dataformats::useFakeTime(true);
 

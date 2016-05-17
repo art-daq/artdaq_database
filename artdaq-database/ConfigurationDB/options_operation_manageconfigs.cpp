@@ -106,6 +106,11 @@ void ManageConfigsOperation::readJsonData(JsonData const& data) {
   }
 
   try {
+      globalConfiguration(boost::get<std::string>(dataAST.at(cfl::option::configuration)));
+    } catch (...) {
+  }
+  
+  try {
     auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(cfl::option::searchfilter));
 
     if (filterAST.empty()) searchFilter(cfl::notprovided);
@@ -223,7 +228,7 @@ JsonData ManageConfigsOperation::globalConfiguration_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[cfl::name] = globalConfiguration();
+  docAST[cfl::filter::configuration] = globalConfiguration();
 
   auto json_buffer = std::string{};
 

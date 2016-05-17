@@ -106,16 +106,17 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::load(JsonData const& sea
         break;
       }
     }
-    TRACE_(2, "search filter=<" << bsoncxx::to_json(filter.view_document()) << ">");
+    TRACE_(2, "collection_name=\"" << collection_name << "\", search filter=<" << bsoncxx::to_json(filter.view_document())
+                                 << ">");
+
   } catch (cet::exception const&) {
     TRACE_(2, "search filter is missing");
   }
 
   auto size = collection.count(filter.view_document());
+  TRACE_(3, "found_count=" << size);
 
   auto cursor = collection.find(filter.view_document());
-
-  TRACE_(3, "found_count=" << size);
 
   for (auto& doc : cursor) returnCollection.emplace_back(bsoncxx::to_json(doc));
 
@@ -179,7 +180,9 @@ object_id_t StorageProvider<JsonData, MongoDB>::store(JsonData const& data) {
         break;
       }
     }
-    TRACE_(2, "search filter=<" << bsoncxx::to_json(filter.view_document()) << ">");
+    TRACE_(2, "collection_name=\"" << collection_name << "\", search filter=<" << bsoncxx::to_json(filter.view_document())
+                                 << ">");
+
     isNew = false;
   } catch (cet::exception const&) {
     TRACE_(4, "Search filter is missing, proceeding with insert.");
@@ -256,20 +259,20 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findGlobalConfigs(JsonDa
     configuration_filter.concatenate(bson_document->view());
 
     auto cursor = collection.distinct("configurations.name", configuration_filter.view_document());
-    
+
     for (auto const& view : cursor) {
-          TRACE_(4, "StorageProvider::MongoDB::findGlobalConfigs() looping over cursor =<" << bsoncxx::to_json(view) << ">");
+      TRACE_(4, "StorageProvider::MongoDB::findGlobalConfigs() looping over cursor =<" << bsoncxx::to_json(view)
+                                                                                       << ">");
 
       auto element_values = view.find("values");
 
       if (element_values == collectionDescriptor.end())
         throw cet::exception("MongoDB") << "MongoDB returned invalid database search.";
-      
+
       auto configuration_name_array = element_values->get_array();
 
-      if(configuration_name_array.value.empty())
-	break;
-      
+      if (configuration_name_array.value.empty()) break;
+
       for (auto const& configuration_name : configuration_name_array.value) {
         std::stringstream ss;
         ss << "{";

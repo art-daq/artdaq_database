@@ -384,7 +384,7 @@ JsonData prov::addConfigToGlobalConfig(LoadStoreOperation const& options, JsonDa
   auto document = filesystem::load(new_options, search);
   auto json_document = JSONDocument{document.json_buffer};
   auto builder = JSONDocumentBuilder{json_document};
-  auto globalConfiguration = JSONDocument{new_options.globalConfiguration_to_JsonData().json_buffer};
+  auto globalConfiguration = JSONDocument{new_options.globalConfiguration_to_JsonData().json_buffer};  
   builder.addToGlobalConfig(globalConfiguration);
 
   new_options.operation(literal::operation::store);
@@ -413,7 +413,7 @@ JsonData prov::addConfigToGlobalConfig(LoadStoreOperation const& options, JsonDa
   find_options.provider(literal::provider::filesystem);
   find_options.globalConfiguration(new_options.globalConfiguration());
 
-  return filesystem::buildConfigSearchFilter(find_options, find_options.search_filter_to_JsonData().json_buffer);
+  return filesystem::buildConfigSearchFilter(find_options, find_options.globalConfiguration_to_JsonData().json_buffer);
 }
 
 void debug::enableDBOperationFileSystem() {

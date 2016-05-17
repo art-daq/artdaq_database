@@ -63,8 +63,7 @@ void add_configuration_to_global_configuration(Options const& options, std::stri
   assert(configs.empty());
   assert(options.operation().compare(cflo::addconfig) == 0);
 
-  TRACE_(11, "add_configuration_to_global_configuration: begin"
-                 << "aq");
+  TRACE_(11, "add_configuration_to_global_configuration: begin");
   TRACE_(11, "add_configuration_to_global_configuration args options=<" << options.to_string() << ">");
 
   if (cf::not_equal(options.provider(), cflp::filesystem) && cf::not_equal(options.provider(), cflp::mongo)) {

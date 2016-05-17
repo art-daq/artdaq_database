@@ -405,7 +405,7 @@ JsonData prov::addConfigToGlobalConfig(LoadStoreOperation const& options, JsonDa
   find_options.provider(literal::provider::mongo);
   find_options.globalConfiguration(new_options.globalConfiguration());
 
-  return mongo::buildConfigSearchFilter(find_options, options.search_filter_to_JsonData().json_buffer);
+  return mongo::buildConfigSearchFilter(find_options, options.globalConfiguration_to_JsonData().json_buffer);
 }
 
 void debug::enableDBOperationMongo() {
