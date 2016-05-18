@@ -1,0 +1,36 @@
+
+daq.fragment_receiver.DAQConfig.EmptyWriteDelay : 10000000
+
+#### Uncomment these to use the external clock rather than the NOvA clock & sync pulse
+#daq.fragment_receiver.DAQConfig.UseExternalTimeStamp:      0          #0=Use internal timestamp to split events into millislices, 1=Use NOvA timestamp
+#daq.fragment_receiver.DAQConfig.StartOnNOvASync:           0          #Tell SSP to wait for sync pulse from NOvA timing unit before taking data.
+#                                      #In this case then DAQ will start 1st millislice exactly at NOvA sync timestamp
+#daq.fragment_receiver.DAQConfig.HardwareClockRate:         150        #in MHz. Must be 64 for NOvA timestamping, 150 for internal.
+#                                      #NB This doesn't set the hardware clock, just tells the DAQ what it is!
+#daq.fragment_receiver.HardwareConfig.dsp_clock_control:         0x00000000 #Use internal clock
+
+
+#### Set the external trigger delay
+#### REMOVE THIS if you want to set the trigger delays for each SSP to be different
+#daq.fragment_receiver.HardwareConfig.trigger_input_delay:       0x00000037    #Delay to apply to front panel trigger.
+#                                         #Dont set less than 0x20.
+
+
+####bias_config register sets channel bias voltages - bit 0x40000 enables biasing,
+####bits 0xFFF set value on linear scale 0-30V.
+####Comment out these lines AND the individual files lines to disable biasing.
+####REMOVE THIS if you want to set the different SSPs to have different bias voltages
+#daq.fragment_receiver.HardwareConfig.ALL_bias_config:           0x00040FFF # 30V
+daq.fragment_receiver.HardwareConfig.ALL_bias_config:           0x00040E21 # 26.5V
+#daq.fragment_receiver.HardwareConfig.ALL_bias_config:            0x00000000 # Bias disabled
+
+#################################
+#Trigger/channel enable settings#
+#################################
+
+ALL_channel_control:      0x80F00401    #rising edge trigger
+#ALL_channel_control:      0x00006001     #front panel trigger
+#ALL_channel_control:      0x00F0E051    #timestamp trigger 2.3kHz
+#ALL_channel_control:      0x00F0E071    #timestamp 143Hz
+#ALL_channel_control:      0x00F0E091    #timestamp 35.8Hz
+#ALL_channel_control:      0x00F0E0C1    #timestamp 1.12Hz

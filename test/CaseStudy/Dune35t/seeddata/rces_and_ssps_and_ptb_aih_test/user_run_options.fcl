@@ -1,0 +1,29 @@
+daq.fragment_receiver.HardwareConfig.ALL_readout_window                : 700
+daq.fragment_receiver.DAQConfig.MillisliceLength                       : 640000
+daq.fragment_receiver.DAQConfig.MillisliceOverlap                      : 0
+daq.fragment_receiver.rce_daq_mode                                     : Trigger
+daq.fragment_receiver.HardwareConfig.ALL_readout_pretrigger            : 50
+daq.fragment_receiver.number_of_microslices_per_millislice             : 20
+#daq.fragment_receiver.HardwareConfig.ALL_channel_control               : 0x00006001 # External trigger
+#daq.fragment_receiver.HardwareConfig.ALL_channel_control               : 0x00F00401 # Discriminator trigger
+#daq.fragment_receiver.HardwareConfig.ALL_channel_control               : 0x00000001 # Just turn the channel on
+daq.fragment_receiver.muon_triggers.trigger_0.prescale     	       : 50
+daq.fragment_receiver.muon_triggers.trigger_1.prescale      	       : 0
+daq.fragment_receiver.muon_triggers.trigger_2.prescale     	       : 0
+daq.fragment_receiver.muon_triggers.trigger_3.prescale       	       : 0
+daq.fragment_receiver.millislice_size			               : 640000
+#daq.fragment_receiver.HardwareConfig.ALL_led_threshold                 : 45 # Set channel-by-channel
+
+#daq.fragment_receiver.HardwareConfig.ChannelControl.ExtTriggerMode     : 0  #0=no external trigger
+#daq.fragment_receiver.HardwareConfig.ChannelControl.ExtTriggerMode     : 1  #0=front panel triggers
+daq.fragment_receiver.HardwareConfig.ChannelControl.ExtTriggerMode     : 3  #0=timestamp trigger
+
+#daq.fragment_receiver.HardwareConfig.ChannelControl.LEDTrigger         : 0  #0=no trigger
+daq.fragment_receiver.HardwareConfig.ChannelControl.LEDTrigger         : 0  #2=positive polarity trigger
+
+daq.fragment_receiver.HardwareConfig.ChannelControl.TimestampRate      : 6  #6=1.1 Hz
+
+daq.fragment_receiver.HardwareConfig.ALL_bias_config                   : 0x00040D10 # 24.5V
+#daq.fragment_receiver.HardwareConfig.ALL_bias_config                   : 0x00040D55 # 25.0V
+#daq.fragment_receiver.HardwareConfig.ALL_bias_config                   : 0x00040D99 # 25.5V
+

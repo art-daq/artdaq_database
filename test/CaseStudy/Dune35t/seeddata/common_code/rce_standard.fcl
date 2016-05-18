@@ -1,0 +1,163 @@
+BEGIN_PROLOG
+#include "metrics.fcl"
+
+rce_standard: {
+
+  metrics: @local::metrics
+
+  max_fragment_size_words: 1048576
+
+  fragment_receiver: {
+
+    mpi_buffer_count: 16
+    mpi_sync_interval: 24000
+
+    # These two variables will be calculated by DAQInterface...
+    first_event_builder_rank: -1  
+    event_builder_count: -1
+
+    generator: TpcRceReceiver
+    fragment_type: TPC
+
+    #    fragment_id: -1
+    #    board_id: -1
+    sleep_on_stop_us: 0
+    
+    number_of_microslices_per_millislice: 10
+
+    # rce_client_host_addr: "0.0.0.0"
+
+    rce_client_host_port: 8090
+     rce_client_timeout_usecs: 500000
+
+     rce_xml_config_file: 'config/defaults.xml'  # Configuration file
+     rce_daq_mode: 'Trigger' # Can be one of Burst, Scope, Trigger
+     rce_feb_emulation_mode: false
+
+    # receive_port: -1
+
+     receiver_debug_level: 0
+     receiver_tick_period_usecs: 10000
+
+     reporting_interval_fragments: 100
+     reporting_interval_time: 10
+
+     raw_buffer_size: 16000000
+     raw_buffer_precommit: 100
+     use_fragments_as_raw_buffer: true
+
+     data_timeout_usecs: 30000000
+    }
+}
+
+# JCF, Dec-2-2015
+
+# Since users will typically expect the block to be called "daq"
+# rather than "rce_standard", we need to alias daq to rce_standard,
+# put the user's changes in, and then alias rce_standard back to daq
+
+daq: @local::rce_standard
+
+#include "rce_expert_run_options.fcl"
+#include "user_run_options.fcl"
+
+rce_standard: @local::daq
+
+
+rce00_standard: @local::rce_standard
+rce00_standard.fragment_receiver.fragment_id: 100
+rce00_standard.fragment_receiver.board_id: 0
+rce00_standard.fragment_receiver.rce_client_host_addr: "10.0.1.191"
+rce00_standard.fragment_receiver.receive_port: 7991
+
+rce01_standard: @local::rce_standard
+rce01_standard.fragment_receiver.fragment_id: 101
+rce01_standard.fragment_receiver.board_id: 1
+rce01_standard.fragment_receiver.rce_client_host_addr: "10.0.1.192"
+rce01_standard.fragment_receiver.receive_port: 7992
+
+rce02_standard: @local::rce_standard
+rce02_standard.fragment_receiver.fragment_id: 102
+rce02_standard.fragment_receiver.board_id: 2
+rce02_standard.fragment_receiver.rce_client_host_addr: "10.0.1.193"
+rce02_standard.fragment_receiver.receive_port: 7993
+
+rce03_standard: @local::rce_standard
+rce03_standard.fragment_receiver.fragment_id: 103
+rce03_standard.fragment_receiver.board_id: 3
+rce03_standard.fragment_receiver.rce_client_host_addr: "10.0.1.194"
+rce03_standard.fragment_receiver.receive_port: 7994
+
+rce04_standard: @local::rce_standard
+rce04_standard.fragment_receiver.fragment_id: 104
+rce04_standard.fragment_receiver.board_id: 4
+rce04_standard.fragment_receiver.rce_client_host_addr: "10.0.1.195"
+rce04_standard.fragment_receiver.receive_port: 7995
+
+rce05_standard: @local::rce_standard
+rce05_standard.fragment_receiver.fragment_id: 105
+rce05_standard.fragment_receiver.board_id: 5
+rce05_standard.fragment_receiver.rce_client_host_addr: "10.0.1.196"
+rce05_standard.fragment_receiver.receive_port: 7996
+
+rce06_standard: @local::rce_standard
+rce06_standard.fragment_receiver.fragment_id: 106
+rce06_standard.fragment_receiver.board_id: 6
+rce06_standard.fragment_receiver.rce_client_host_addr: "10.0.1.197"
+rce06_standard.fragment_receiver.receive_port: 7997
+
+rce07_standard: @local::rce_standard
+rce07_standard.fragment_receiver.fragment_id: 107
+rce07_standard.fragment_receiver.board_id: 7
+rce07_standard.fragment_receiver.rce_client_host_addr: "10.0.1.198"
+rce07_standard.fragment_receiver.receive_port: 7998
+
+rce08_standard: @local::rce_standard
+rce08_standard.fragment_receiver.fragment_id: 108
+rce08_standard.fragment_receiver.board_id: 8
+rce08_standard.fragment_receiver.rce_client_host_addr: "10.0.1.181"
+rce08_standard.fragment_receiver.receive_port: 8991
+
+rce09_standard: @local::rce_standard
+rce09_standard.fragment_receiver.fragment_id: 109
+rce09_standard.fragment_receiver.board_id: 9
+rce09_standard.fragment_receiver.rce_client_host_addr: "10.0.1.182"
+rce09_standard.fragment_receiver.receive_port: 8992
+
+rce10_standard: @local::rce_standard
+rce10_standard.fragment_receiver.fragment_id: 110
+rce10_standard.fragment_receiver.board_id: 10
+rce10_standard.fragment_receiver.rce_client_host_addr: "10.0.1.183"
+rce10_standard.fragment_receiver.receive_port: 8993
+
+rce11_standard: @local::rce_standard
+rce11_standard.fragment_receiver.fragment_id: 111
+rce11_standard.fragment_receiver.board_id: 11
+rce11_standard.fragment_receiver.rce_client_host_addr: "10.0.1.184"
+rce11_standard.fragment_receiver.receive_port: 8994
+
+rce12_standard: @local::rce_standard
+rce12_standard.fragment_receiver.fragment_id: 112
+rce12_standard.fragment_receiver.board_id: 12
+rce12_standard.fragment_receiver.rce_client_host_addr: "10.0.1.185"
+rce12_standard.fragment_receiver.receive_port: 8995
+
+rce13_standard: @local::rce_standard
+rce13_standard.fragment_receiver.fragment_id: 113
+rce13_standard.fragment_receiver.board_id: 13
+rce13_standard.fragment_receiver.rce_client_host_addr: "10.0.1.186"
+rce13_standard.fragment_receiver.receive_port: 8996
+
+rce14_standard: @local::rce_standard
+rce14_standard.fragment_receiver.fragment_id: 114
+rce14_standard.fragment_receiver.board_id: 14
+rce14_standard.fragment_receiver.rce_client_host_addr: "10.0.1.187"
+rce14_standard.fragment_receiver.receive_port: 8997
+
+rce15_standard: @local::rce_standard
+rce15_standard.fragment_receiver.fragment_id: 115
+rce15_standard.fragment_receiver.board_id: 15
+rce15_standard.fragment_receiver.rce_client_host_addr: "10.0.1.188"
+rce15_standard.fragment_receiver.receive_port: 8998
+
+END_PROLOG
