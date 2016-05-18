@@ -102,7 +102,7 @@ void ManageConfigsOperation::readJsonData(JsonData const& data) {
   auto dataAST = object_t{};
 
   if (!JsonReader{}.read(data.json_buffer, dataAST)) {
-    throw db::invalid_option_exception("ManageConfigsOperation") << "Unable to read JSON buffer.";
+    throw db::invalid_option_exception("ManageConfigsOperation") << "ManageConfigsOperation: Unable to read JSON buffer.";
   }
 
   try {
@@ -116,7 +116,7 @@ void ManageConfigsOperation::readJsonData(JsonData const& data) {
     if (filterAST.empty()) searchFilter(cfl::notprovided);
 
     try {
-      configurableEntity(boost::get<std::string>(filterAST.at(cfl::filter::version)));
+      version(boost::get<std::string>(filterAST.at(cfl::filter::version)));
     } catch (...) {
     }
     

@@ -2,6 +2,7 @@
 
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/ConfigurationDB/configuration_common.h"
+#include "artdaq-database/ConfigurationDB/options_operations.h"
 #include "artdaq-database/ConfigurationDB/dispatch_common.h"
 
 #include "artdaq-database/JsonDocument/JSONDocument.h"
@@ -20,7 +21,7 @@ namespace cfo = cf::options;
 namespace literal = artdaq::database::configuration::literal;
 namespace bpo = boost::program_options;
 
-using Options = cf::ManageConfigsOperation;
+using Options = cf::BulkOperations;
 
 using artdaq::database::jsonutils::JSONDocument;
 using artdaq::database::basictypes::JsonData;
@@ -29,12 +30,13 @@ int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
   // artdaq::database::jsonutils::debug::enableJSONDocument();
-  //artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
+  artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
 
   artdaq::database::configuration::debug::enableFindConfigsOperation();
   artdaq::database::configuration::debug::enableCreateConfigsOperation();
   
   artdaq::database::configuration::debug::options::enableOperationBase();
+  artdaq::database::configuration::debug::options::enableBulkOperations();
   artdaq::database::configuration::debug::options::enableOperationManageConfigs();
   artdaq::database::configuration::debug::detail::enableCreateConfigsOperation();
   artdaq::database::configuration::debug::detail::enableFindConfigsOperation();
@@ -79,38 +81,19 @@ int main(int argc, char* argv[]) try {
 
   auto file_res_name = vm[literal::option::result].as<std::string>();
 
-  auto file_src_name = file_res_name;
-
-  if (vm.count(literal::option::source)) {
-    file_src_name = vm[literal::option::source].as<std::string>();
-  }
-
   auto options_string = options.to_string();
-
+  auto operation_name = std::string{"newconfig"};
+  
   std::cout << "Parsed options:\n" << options_string << "\n";
 
   using namespace artdaq::database::configuration::json;
 
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      "findconfigs", find_global_configurations, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      "buildfilter", build_global_configuration_search_filter, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      "addconfig", add_configuration_to_global_configuration, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      "findversions", find_configuration_versions, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      "findentities", find_configuration_entities, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>("addalias", add_version_alias,
-                                                                                  options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>("removealias", remove_version_alias,
-                                                                                  options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>("findaliases", find_version_aliases,
-                                                                                  options_string);
+      operation_name, create_new_global_configuration, options_string);
 
-  std::cout << "Running test:<" << options.operation() << ">\n";
+  std::cout << "Running test:<" << operation_name << ">\n";
 
-  auto result = cf::getOperations().at(options.operation())->invoke();
+  auto result = cf::getOperations().at(operation_name)->invoke();
 
   if (!result.first) {
     std::cout << "Test failed; error message: " << result.second << "\n";
@@ -160,9 +143,9 @@ int main(int argc, char* argv[]) try {
   auto file_out_name = std::string(artdaq::database::mkdir(tmpdir))
                            .append(argv[0])
                            .append("-")
-                           .append(options.operation())
+                           .append(operation_name)
                            .append("-")
-                           .append(basename((char*)file_src_name.c_str()))
+                           .append(basename((char*)file_res_name.c_str()))
                            .append(".txt");
 
   std::ofstream os(file_out_name.c_str());

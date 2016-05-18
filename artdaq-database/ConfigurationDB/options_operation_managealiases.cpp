@@ -143,7 +143,7 @@ void ManageAliasesOperation::readJsonData(JsonData const& data) {
   auto dataAST = object_t{};
 
   if (!JsonReader{}.read(data.json_buffer, dataAST)) {
-    throw db::invalid_option_exception("ManageAliasesOperation") << "Unable to read JSON buffer.";
+    throw db::invalid_option_exception("ManageAliasesOperation") << "ManageAliasesOperation: Unable to read JSON buffer.";
   }
 
   try {

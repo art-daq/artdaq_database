@@ -21,6 +21,8 @@ constexpr auto newconfig = "newconfig";
 constexpr auto addalias = "addalias";
 constexpr auto rmalias = "rmalias";
 constexpr auto findalias = "findalias";
+constexpr auto operations = "operations";
+
 }
 
 namespace provider {
@@ -45,6 +47,7 @@ constexpr auto version = "version";
 constexpr auto version_alias = "alias";
 constexpr auto searchfilter = "filter";
 constexpr auto searchquery = "searchquery";
+constexpr auto bulkoperations = "bulkoperations";
 
 constexpr auto collection = "collection";
 constexpr auto entity = "entity";

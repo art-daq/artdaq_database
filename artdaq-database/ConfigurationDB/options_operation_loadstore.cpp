@@ -102,7 +102,7 @@ void LoadStoreOperation::readJsonData(JsonData const& data) {
   auto dataAST = object_t{};
 
   if (!JsonReader{}.read(data.json_buffer, dataAST)) {
-    throw db::invalid_option_exception("LoadStoreOperation") << "Unable to read JSON buffer.";
+    throw db::invalid_option_exception("LoadStoreOperation") << "LoadStoreOperation: Unable to read JSON buffer.";
   }
 
   try {

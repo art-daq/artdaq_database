@@ -225,13 +225,15 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
 
 void OperationBase::readJsonData(JsonData const& data) {
   assert(!data.json_buffer.empty());
-
+  assert(data.json_buffer!=cfl::notprovided);
+  
   using namespace artdaq::database::json;
   auto filterAST = object_t{};
 
   
   if (!JsonReader{}.read(data.json_buffer, filterAST)) {
-    throw db::invalid_option_exception("OperationBase") << "Unable to read JSON buffer.";
+    TRACE_(14, "OperationBase: JSON buffer= <" << data.json_buffer << ">");
+    throw db::invalid_option_exception("OperationBase") << "OperationBase: Unable to read JSON buffer.";
   }
 
   try {

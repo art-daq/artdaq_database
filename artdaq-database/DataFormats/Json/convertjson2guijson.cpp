@@ -94,7 +94,7 @@ bool artdaq::database::json_db_to_gui(std::string const& db_json, std::string& g
   auto dbAST = object_t{};
 
   if (!JsonReader{}.read(db_json, dbAST)) {
-    throw cet::exception("json_db_to_gui") << "Unable to read JSON buffer.";
+    throw cet::exception("json_db_to_gui") << "json_db_to_gui: Unable to read JSON buffer.";
   }
 
   TRACE_(10, "json_db_to_gui() read dbAST");
@@ -266,7 +266,7 @@ bool artdaq::database::json_gui_to_db(std::string const& gui_json, std::string& 
   auto guiAST = object_t{};
 
   if (!JsonReader{}.read(gui_json, guiAST)) {
-    throw cet::exception("json_gui_to_db") << "Unable to read JSON buffer.";
+    throw cet::exception("json_gui_to_db") << "json_db_to_gui: Unable to read JSON buffer.";
   }
 
   auto& gui_document = unwrap(guiAST).value_as<object_t>(literal::document_node);
