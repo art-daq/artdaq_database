@@ -1,15 +1,24 @@
 SET ( TEST_NUMBER "002" )
-SET ( TEST_NAME "store" )
 
+SET ( TEST_NAME "ArtdaqDemo_store" )
 
-cet_test(ArtdaqDemo_mongo_${TEST_NAME}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC ArtdaqDemo_t 
+SET ( TEST_DBPROVIDER "filesystem" )
+string(RANDOM LENGTH 3 ALPHABET 0123456789 RAND_NAME)
+configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test001.src.json ${CMAKE_CURRENT_BINARY_DIR}/test001.src.${RAND_NAME}.json @ONLY )
+configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test001.cmp.json ${CMAKE_CURRENT_BINARY_DIR}/test001.cmp.${RAND_NAME}.json @ONLY )
+cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC ArtdaqDemo_t 
   DATAFILES 
-    ${CMAKE_CURRENT_SOURCE_DIR}/test002.src.json 
-  TEST_ARGS -d mongo -o store -t test_${TEST_NAME}_${TEST_NUMBER} -c test002.src.json -f json -v version -g config )
+    ${CMAKE_CURRENT_BINARY_DIR}/test001.src.${RAND_NAME}.json 
+    ${CMAKE_CURRENT_BINARY_DIR}/test001.cmp.${RAND_NAME}.json 
+  TEST_ARGS -o store -d ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f json -v ${TEST_VERSION_NAME}-${TEST_NUMBER}  -s test001.src.${RAND_NAME}.json -r test001.cmp.${RAND_NAME}.json )
 
-  
-cet_test(ArtdaqDemo_filesystem_${TEST_NAME}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC ArtdaqDemo_t 
+SET ( TEST_DBPROVIDER "mongo" )
+string(RANDOM LENGTH 3 ALPHABET 0123456789 RAND_NAME)
+configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test001.src.json ${CMAKE_CURRENT_BINARY_DIR}/test001.src.${RAND_NAME}.json @ONLY )
+configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test001.cmp.json ${CMAKE_CURRENT_BINARY_DIR}/test001.cmp.${RAND_NAME}.json @ONLY )
+cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC ArtdaqDemo_t 
   DATAFILES 
-    ${CMAKE_CURRENT_SOURCE_DIR}/test002.src.json 
-  TEST_ARGS -d filesystem -o store -t test_${TEST_NAME}_${TEST_NUMBER} -c test002.src.json -f json -v version -g config )
-  
+    ${CMAKE_CURRENT_BINARY_DIR}/test001.src.${RAND_NAME}.json 
+    ${CMAKE_CURRENT_BINARY_DIR}/test001.cmp.${RAND_NAME}.json 
+  TEST_ARGS -o store -d ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f json -v ${TEST_VERSION_NAME}${TEST_NUMBER} -s test001.src.${RAND_NAME}.json -r test001.cmp.${RAND_NAME}.json )
+

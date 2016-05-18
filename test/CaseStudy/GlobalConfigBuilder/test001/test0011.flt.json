@@ -1,7 +1,0 @@
-{
-  "filter":{"configurable_entity.name":"@TEST_ENTITY_NAME@"},
-  "collection":"artdaq_Aggregator",
-  "dbprovider":"mongo",
-  "operation":"findversions",
-  "dataformat":"gui"
-}

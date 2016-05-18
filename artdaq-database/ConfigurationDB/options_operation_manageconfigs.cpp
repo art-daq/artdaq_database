@@ -169,6 +169,9 @@ bpo::options_description ManageConfigsOperation::makeProgramOptions() const {
   opts.add_options()(make_opt_name(cfl::option::configuration, "g").c_str(), bpo::value<std::string>(),
                      "Global configuration name");
 
+  opts.add_options()(make_opt_name(cfl::option::source, "s").c_str(), bpo::value<std::string>(),
+                     "Configuration source file name");
+  
   return opts;
 }
 

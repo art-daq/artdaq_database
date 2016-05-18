@@ -1,6 +1,0 @@
-  {
-    "filter":{},
-    "dbprovider":"filesystem",
-    "operation":"findentities",
-    "dataformat":"gui"
-  }
