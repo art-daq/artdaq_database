@@ -9,11 +9,15 @@
 #include "boost/program_options.hpp"
 #include "cetlib/coded_exception.h"
 
-#include "artdaq-database/FhiclJson/fhicljsondb.h"
+#include "artdaq-database/DataFormats/Fhicldb.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
+<<<<<<< HEAD
 #include "artdaq-database/FhiclJson/convertjson2guijson.h"
+=======
+#include "artdaq-database/DataFormats/convertjson2guijson.h"
+>>>>>>> lukhanin-wip
 
 #include <boost/exception/diagnostic_information.hpp>
 
@@ -25,22 +29,12 @@ namespace cfo = cf::options;
 namespace gui = cf::guiexports;
 namespace cfol = cfo::literal;
 
-typedef bool (*test_case)(std::string const& /*filter*/, std::string const& /*json*/);
-
-bool test_storeconfig(std::string const&, std::string const&);
-bool test_loadconfig(std::string const&, std::string const&);
-bool test_findconfigs(std::string const&, std::string const&);
-bool test_buildfilter(std::string const&, std::string const&);
-bool test_findversions(std::string const&, std::string const&);
-bool test_addconfig(std::string const&, std::string const&);
-bool test_newconfig(std::string const&, std::string const&);
-bool test_findentities(std::string const&, std::string const&);
+// std::string operator"" _s(const char* text, std::size_t) { return std::string(text) ; }
 
 int main(int argc, char* argv[]) try {
   debug::registerUngracefullExitHandlers();
   //    artdaq::database::fhicljson::useFakeTime(true);
-  
-  
+
   cf::trace_enable_CreateConfigsOperation();
   cf::trace_enable_CreateConfigsOperationDetail();
 
@@ -53,7 +47,7 @@ int main(int argc, char* argv[]) try {
   
   cf::trace_enable_DBOperationMongo();
   cf::trace_enable_DBOperationFileSystem();
-  
+
 
   db::filesystem::trace_enable();
   db::mongo::trace_enable();
@@ -121,228 +115,61 @@ int main(int argc, char* argv[]) try {
   }
   auto json_file = vm["json"].as<std::string>();
 
+  assert(!config_file.empty());
+  assert(!json_file.empty());
+
   std::cout << "Running :<" << operation << ">\n";
 
-  auto runTest = [](std::string const& name) {
-    auto tests = std::map<std::string, test_case>{{"store", test_storeconfig},        {"load", test_loadconfig},
-                                                  {"findconfigs", test_findconfigs},  {"buildfilter", test_buildfilter},
-                                                  {"addconfig", test_addconfig},      {"newconfig", test_newconfig},
-                                                  {"findversions", test_findversions}, {"findentities", test_findentities}};
+  std::ifstream is(config_file);
+  std::string search_filter((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+  is.close();
 
-    return tests.at(name);
-  };
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>("load", load_configuration,
+                                                                                  search_filter);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
+      "findconfigs", find_global_configurations, search_filter);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
+      "buildfilter", build_global_configuration_search_filter, search_filter);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
+      "addconfig", add_configuration_to_global_configuration, search_filter);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
+      "newconfig", create_new_global_configuration, search_filter);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
+      "findversions", find_configuration_versions, search_filter);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
+      "findentities", find_configuration_entities, search_filter);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>("addalias", add_version_alias,
+                                                                                  search_filter);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>("removealias", remove_version_alias,
+                                                                                  search_filter);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>("findaliases", find_version_aliases,
+                                                                                  search_filter);
 
-  auto testResult = runTest(operation)(config_file, json_file);
+  auto json_document = std::string{"{}"};
 
-  if (testResult) return process_exit_code::SUCCESS;
+  try {
+    std::ifstream is1(json_file);
+    json_document = std::string((std::istreambuf_iterator<char>(is1)), std::istreambuf_iterator<char>());
+    is1.close();
+    cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
+        "store", store_configuration, search_filter, json_document);
+  } catch (...) {
+  }
 
-  return process_exit_code::FAILURE;
+  auto result = cf::getOperations().at(operation)->invoke();
+
+  if (!result.first) {
+    std::cerr << "Error message: " << result.second << "\n";
+    return process_exit_code::FAILURE;
+  }
+
+  std::ofstream os(json_file + ".out");
+  std::copy(result.second.begin(), result.second.end(), std::ostream_iterator<char>(os));
+  os.close();
+
+  return process_exit_code::SUCCESS;
+
 } catch (...) {
   std::cerr << "Process exited with error: " << boost::current_exception_diagnostic_information();
   return process_exit_code::UNCAUGHT_EXCEPTION;
-}
-
-bool test_storeconfig(std::string const& config_name, std::string const& json_name) {
-  assert(!config_name.empty());
-  assert(!json_name.empty());
-
-  std::ifstream is(config_name);
-
-  std::string search_filter((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-
-  is.close();
-
-  std::ifstream is1(json_name);
-
-  std::string json_document((std::istreambuf_iterator<char>(is1)), std::istreambuf_iterator<char>());
-
-  is1.close();
-
-  auto result = store_configuration(search_filter, json_document);
-
-  if (!result.first) {
-    std::cerr << "Error message: " << result.second << "\n";
-    return false;
-  }
-
-  std::ofstream os(json_name + ".out");
-  std::copy(result.second.begin(), result.second.end(), std::ostream_iterator<char>(os));
-
-  os.close();
-
-  return true;
-}
-
-bool test_loadconfig(std::string const& config_name, std::string const& json_name) {
-  assert(!config_name.empty());
-  assert(!json_name.empty());
-
-  std::ifstream is(config_name);
-
-  std::string search_filter((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-
-  is.close();
-
-  auto result = load_configuration(search_filter);
-
-  if (!result.first) {
-    return false;
-  }
-
-  std::ofstream os(json_name);
-  std::copy(result.second.begin(), result.second.end(), std::ostream_iterator<char>(os));
-
-  os.close();
-
-  return true;
-}
-
-bool test_findconfigs(std::string const& config_name, std::string const& json_name) {
-  assert(!config_name.empty());
-  assert(!json_name.empty());
-
-  std::ifstream is(config_name);
-
-  std::string search_filter((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-
-  is.close();
-
-  auto result = find_global_configurations(search_filter);
-
-  if (!result.first) {
-    return false;
-  }
-
-  std::ofstream os(json_name);
-  std::copy(result.second.begin(), result.second.end(), std::ostream_iterator<char>(os));
-
-  os.close();
-
-  return true;
-}
-
-bool test_buildfilter(std::string const& config_name, std::string const& json_name) {
-  assert(!config_name.empty());
-  assert(!json_name.empty());
-
-  std::ifstream is(config_name);
-
-  std::string search_filter((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-
-  is.close();
-
-  auto result = build_global_configuration_search_filter(search_filter);
-
-  if (!result.first) {
-    std::cerr << "Error message: " << result.second << "\n";
-    return false;
-  }
-
-  std::ofstream os(json_name);
-  std::copy(result.second.begin(), result.second.end(), std::ostream_iterator<char>(os));
-
-  os.close();
-
-  return true;
-}
-
-bool test_findversions(std::string const& config_name, std::string const& json_name) {
-  assert(!config_name.empty());
-  assert(!json_name.empty());
-
-  std::ifstream is(config_name);
-
-  std::string search_filter((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-
-  is.close();
-
-  auto result = find_configuration_versions(search_filter);
-
-  if (!result.first) {
-    std::cerr << "Error message: " << result.second << "\n";
-    return false;
-  }
-
-  std::ofstream os(json_name);
-  std::copy(result.second.begin(), result.second.end(), std::ostream_iterator<char>(os));
-
-  os.close();
-
-  return true;
-}
-
-bool test_findentities(std::string const& config_name, std::string const& json_name) {
-  assert(!config_name.empty());
-  assert(!json_name.empty());
-
-  std::ifstream is(config_name);
-
-  std::string search_filter((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-
-  is.close();
-
-  auto result = find_configuration_entities(search_filter);
-
-  if (!result.first) {
-    std::cerr << "Error message: " << result.second << "\n";
-    return false;
-  }
-
-  std::ofstream os(json_name);
-  std::copy(result.second.begin(), result.second.end(), std::ostream_iterator<char>(os));
-
-  os.close();
-
-  return true;
-}
-
-
-bool test_addconfig(std::string const& config_name, std::string const& json_name) {
-  assert(!config_name.empty());
-  assert(!json_name.empty());
-
-  std::ifstream is(config_name);
-
-  std::string search_filter((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-
-  is.close();
-
-  auto result = add_configuration_to_global_configuration(search_filter);
-
-  if (!result.first) {
-    std::cerr << "Error message: " << result.second << "\n";
-    return false;
-  }
-
-  std::ofstream os(json_name);
-  std::copy(result.second.begin(), result.second.end(), std::ostream_iterator<char>(os));
-
-  os.close();
-
-  return true;
-}
-
-bool test_newconfig(std::string const& config_name, std::string const& json_name) {
-  assert(!config_name.empty());
-  assert(!json_name.empty());
-
-  std::ifstream is(config_name);
-
-  std::string search_filter((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-
-  is.close();
-
-  auto result = create_new_global_configuration(search_filter);
-
-  if (!result.first) {
-    std::cerr << "Error message: " << result.second << "\n";
-    return false;
-  }
-
-  std::ofstream os(json_name);
-  std::copy(result.second.begin(), result.second.end(), std::ostream_iterator<char>(os));
-
-  os.close();
-
-  return true;
 }

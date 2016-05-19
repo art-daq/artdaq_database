@@ -10,8 +10,9 @@
 namespace artdaq {
 namespace database {
 namespace mongo {
-
-void trace_enable();
+namespace debug {
+void enable();
+}
 
 struct DBConfig final {
   std::string hostname = "127.0.0.1";

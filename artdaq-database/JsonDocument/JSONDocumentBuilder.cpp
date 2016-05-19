@@ -348,16 +348,16 @@ void JSONDocumentBuilder::enforce() const {
   throw notfound_exception("JSONDocumentBuilder") << "Document is readonly.";
 }
 
-void trace_enable_JSONDocumentBuilder() {
+namespace debug {
+void enableJSONDocumentBuilder() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", 1LL);
   TRACE_CNTL("modeS", 1LL);
 
-  TRACE_(0, "artdaq::database::JSONDocumentBuilder::"
-                << "trace_enable");
+  TRACE_(0, "artdaq::database::JSONDocumentBuilder trace_enable");
 }
-
+}
 }  // namespace jsonutils
 }  // namespace database
 }  // namespace artdaq

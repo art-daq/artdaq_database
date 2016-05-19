@@ -1,0 +1,249 @@
+{
+   "document":{
+      "data":{
+         "sequenceSequence":{
+            "seq":[
+               [
+                  "value1a-old",
+                  "value1b-old"
+               ],
+               [
+                  "value2a-old",
+                  "value2b"
+               ],
+               [
+                  "value3a-old",
+                  "value3b"
+               ]
+            ]
+         },
+         "sequenceValueSequence":{
+            "seq":[
+               "value1",
+               [
+                  "value2a-old",
+                  "value2b"
+               ],
+               "value3-old"
+            ]
+         },
+         "valueSequence":{
+            "seq":[
+               "value1",
+               "value2-old",
+               "value3"
+            ]
+         },
+         "objectSequence":{
+            "seq":[
+               {
+                  "name":"name1",
+                  "bork":"value1"
+               },
+               {
+                  "name":"name2",
+                  "bork":"value2-old"
+               },
+               {
+                  "name":"name3",
+                  "bork":"value3-old"
+               }
+            ]
+         }
+      },
+      "metadata":{
+         "sequenceSequence":{
+            "type":"table",
+            "comment":" ",
+            "children":{
+               "seq":{
+                  "type":"sequence",
+                  "comment":" ",
+                  "annotation":" "
+               }
+            }
+         },
+         "sequenceValueSequence":{
+            "type":"table",
+            "comment":" ",
+            "children":{
+               "seq":{
+                  "type":"sequence",
+                  "comment":" ",
+                  "annotation":" "
+               }
+            }
+         },
+         "valueSequence":{
+            "type":"table",
+            "comment":" ",
+            "children":{
+               "seq":{
+                  "type":"sequence",
+                  "comment":" ",
+                  "annotation":" "
+               }
+            }
+         },
+         "objectSequence":{
+            "type":"table",
+            "comment":" ",
+            "children":{
+               "seq":{
+                  "type":"sequence",
+                  "comment":" ",
+                  "annotation":" "
+               }
+            }
+         }
+      },
+      "search":[
+         {
+            "name":"find any",
+            "query":"not defined"
+         }
+      ],
+      "converted":{
+         "guidata":[
+            {
+               "type":"table",
+               "name":"sequenceSequence",
+               "comment":" ",
+               "children":[
+                  {
+                     "type":"sequence",
+                     "name":"seq",
+                     "comment":" ",
+                     "children":[
+                        [
+                           "value1a",
+                           "value1b-new"
+                        ],
+                        [
+                           "value2a",
+                           "value2b"
+                        ],
+                        [
+                           "value3a",
+                           "value3b-new"
+                        ]
+                     ]
+                  }
+               ]
+            },
+            {
+               "type":"table",
+               "name":"sequenceValueSequence",
+               "comment":" ",
+               "children":[
+                  {
+                     "type":"sequence",
+                     "name":"seq",
+                     "comment":" ",
+                     "children":[
+                        "value1",
+                        [
+                           "value2a",
+                           "value2b-new"
+                        ],
+                        "value3"
+                     ]
+                  }
+               ]
+            },
+            {
+               "type":"table",
+               "name":"valueSequence",
+               "comment":" ",
+               "children":[
+                  {
+                     "type":"sequence",
+                     "name":"seq",
+                     "comment":" ",
+                     "children":[
+                        "value1",
+                        "value2",
+                        "value3-new"
+                     ]
+                  }
+               ]
+            },
+            {
+               "type":"table",
+               "name":"objectSequence",
+               "comment":" ",
+               "children":[
+                  {
+                     "type":"sequence",
+                     "name":"seq",
+                     "comment":" ",
+                     "children":[
+                        {
+                           "name":"name1",
+                           "bork":"value1"
+                        },
+                        {
+                           "name":"name2",
+                           "bork":"value23-new"
+                        },
+                        {
+                           "name":"name3",
+                           "bork":"value3"
+                        }
+                     ]
+                  }
+               ]
+            }
+         ]
+      }
+   },
+   "source":{
+      "encoding":"base64",
+      "format":"json",
+      "rawdata":"as"
+   },
+   "version":"version002",
+   "configurations":[
+      {
+         "name":"configB001",
+         "assigned":"Wed Apr 13 15:40:14 2016"
+      },
+      {
+         "name":"configB0015",
+         "assigned":"Thu Apr 14 11:07:24 2016"
+      }
+   ],
+   "aliases":{
+      "active":[
+
+      ],
+      "history":[
+
+      ]
+   },
+   "bookkeeping":{
+      "isdeleted":false,
+      "isreadonly":true,
+      "created":"Tue Dec 29 18:19:25 2015",
+      "updates":[
+         {
+            "addToGlobalConfig":"Wed Apr 13 15:40:14 2016"
+         },
+         {
+            "setVersion":"Wed Apr 13 15:40:14 2016"
+         },
+         {
+            "setConfigurableEntity":"Wed Apr 13 15:40:14 2016"
+         },
+         {
+            "addToGlobalConfig":"Thu Apr 14 11:07:24 2016"
+         }
+      ]
+   },
+   "configurable_entity":{
+      "name":"TestEntity"
+   },
+   "_id":{
+      "_oid":"9f242f3401674466a37bc5de"
+   }
+}

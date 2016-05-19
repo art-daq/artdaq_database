@@ -1,12 +1,23 @@
+#include <cxxabi.h>
+#include <dlfcn.h>
+#include <errno.h>
+#include <execinfo.h>
+#include <libgen.h>
 #include <signal.h>
 #include <stdio.h>
 #include <cstdlib>
+#include <iostream>
+#include <memory>
+#include <ostream>
+#include <regex>
+#include <string>
+#include <typeinfo>
 
-#include <cxxabi.h>
-#include <errno.h>
-#include <execinfo.h>
+#include "artdaq-database/BuildInfo/printStackTrace.h"
 
-#include "trace.h"
+#include <boost/exception/diagnostic_information.hpp>
+
+#include <trace.h>
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -14,82 +25,80 @@
 
 #define TRACE_NAME "StackTrace_C"
 
-void printStackTrace(FILE* out[[gnu::unused]] = stderr) {
-  size_t trace_buffersize = 4096;
-  char trace_buffer[trace_buffersize];
+extern "C" {
+void __cxa_throw(void* ex, void* info, void (*dest)(void*)) {
+  using namespace debug::stack;
+  last_size = backtrace(last_frames, sizeof last_frames / sizeof(void*));
 
-  TRACE(1, "Stack trace:");
+  static void (*const rethrow)(void*, void*, void (*)(void*)) __attribute__((noreturn)) =
+      (void (*)(void*, void*, void (*)(void*)))dlsym(RTLD_NEXT, "__cxa_throw");
 
-  // storage array for stack trace address data
-  void* addrlist[64];
+  rethrow(ex, info, dest);
+}
+}
 
-  // retrieve current stack addresses
-  unsigned int addrlen = backtrace(addrlist, sizeof(addrlist) / sizeof(void*));
+namespace debug {
 
-  if (addrlen == 0) {
-    TRACE(1, " ");
-    return;
-  }
+std::string getStackTrace() {
+  using namespace debug::stack;
 
-  // resolve addresses into strings containing "filename(function+address)",
-  // Actually it will be ## program address function + offset
-  // this array must be free()-ed
-  char** symbollist = backtrace_symbols(addrlist, addrlen);
+  last_size = backtrace(last_frames, sizeof last_frames / sizeof(void*));
 
-  size_t funcnamesize = 1024;
-  char funcname[1024];
+  std::ostringstream os;
+  os << "Stack trace [" << last_size << " frames]:\n";
+  if (last_size != 0) os << demangleStackTrace(last_frames, last_size);
 
-  // iterate over the returned symbol lines. skip the first, it is the
-  // address of this function.
-  for (unsigned int i = 4; i < addrlen; i++) {
-    char* begin_name = NULL;
-    char* begin_offset = NULL;
-    char* end_offset = NULL;
+  return os.str();
+}
 
-    // find parentheses and +address offset surrounding the mangled name
+std::string getCxaThrowStack() {
+  using namespace debug::stack;
 
-    // ./module(function+0x15c) [0x8048a6d]
-    for (char* p = symbollist[i]; *p; ++p) {
-      if (*p == '(')
-        begin_name = p;
-      else if (*p == '+')
-        begin_offset = p;
-      else if (*p == ')' && (begin_offset || begin_name))
-        end_offset = p;
+  if (last_size == 0) return "None";
+
+  std::ostringstream os;
+  os << "Stack trace [" << last_size << " frames] @ __cxa_throw():\n";
+  os << demangleStackTrace(last_frames, last_size) << "\n";
+
+  return os.str();
+}
+
+std::string demangle(std::string const& name) { return debug::demangle(name.c_str()); }
+
+std::string demangle(const char* name) {
+  int status;
+  std::unique_ptr<char, void (*)(void*)> realname(abi::__cxa_demangle(name, 0, 0, &status), &std::free);
+  return status ? name : &*realname;
+}
+
+std::string demangleStackTrace(void* const* trace, int size) {
+  using namespace debug::stack;
+
+  char** symbols = backtrace_symbols(trace, size);
+  std::ostringstream os;
+
+  auto ex = std::regex{"[(](.*)[+]"};
+
+  auto make_readable = [&ex](char* sym) {
+    auto val = std::string{basename(sym)};
+    auto m = std::smatch();
+
+    if (std::regex_search(val, m, ex)) {
+      if (m.size() > 1) val.replace(m.position(1), m.length(1), demangle(m[1]));
     }
 
-    if (begin_name && end_offset && (begin_name < end_offset)) {
-      *begin_name++ = '\0';
-      *end_offset++ = '\0';
-      if (begin_offset) *begin_offset++ = '\0';
+    return val;
+  };
 
-      // mangled name is now in [begin_name, begin_offset) and caller
-      // offset in [begin_offset, end_offset). now apply
-      // __cxa_demangle():
+  for (int i = size; i > 0; i--) os << std::setw(3) << i << " " << make_readable(symbols[i - 1]) << "\n";
 
-      int status = 0;
-      char* ret = abi::__cxa_demangle(begin_name, funcname, &funcnamesize, &status);
-      char* fname = begin_name;
-      if (status == 0) fname = ret;
+  free(symbols);
 
-      if (begin_offset) {
-        snprintf(trace_buffer, trace_buffersize, "  %-30s ( %-40s  + %-6s) %s\n", symbollist[i], fname, begin_offset,
-                 end_offset);
-      } else {
-        snprintf(trace_buffer, trace_buffersize, "  %-30s ( %-40s    %-6s) %s\n", symbollist[i], fname, "", end_offset);
-      }
-    } else {
-      // couldn't parse the line? print the whole line.
-      snprintf(trace_buffer, trace_buffersize, "  %-40s\n", symbollist[i]);
-    }
-    TRACE(1, trace_buffer);
-  }
-
-  free(symbollist);
+  return os.str();
 }
 
 void signalHandler(int signum) {
-  // associate each signal with a signal name string.
+  // aosociate each signal with a signal name string.
   const char* name = NULL;
   switch (signum) {
     case SIGABRT:
@@ -118,27 +127,21 @@ void signalHandler(int signum) {
       break;
   }
 
-  // notify the user which signal was caught. We use printf, because this is the most
-  // basic output function. Once you get a crash, it is possible that more complex output
-  // systems like streams and the like may be corrupted. So we make the most basic call
-  // possible to the lowest level, most standard print function.
   if (name) {
     TRACE_(1, "Caught signal " << signum << " (" << name << ")");
   } else {
     TRACE_(1, "Caught signal " << signum);
   }
-  // Dump a stack trace.
-  // This is the function we will be implementing next.
-  printStackTrace();
 
-  // If you caught one of the above signals, it is likely you just
-  // want to quit your program right now.
+  TRACE_(1, "" << getStackTrace());
+
   exit(signum);
 }
 
 void terminateHandler() {
   std::exception_ptr exptr = std::current_exception();
   if (exptr != 0) {
+    auto pending = getCxaThrowStack();
     try {
       std::rethrow_exception(exptr);
     } catch (std::exception const& ex) {
@@ -149,7 +152,10 @@ void terminateHandler() {
       TRACE_(1, "Terminate called after throwing an instance of \'"
                     << abi::__cxa_demangle(typeid(ex).name(), funcname, &funcnamesize, &status) << "\'");
 
-      TRACE_(1, " what():" << ex.what());
+      TRACE_(1, " what(): " << ex.what());
+
+      TRACE_(1, " details: " << pending);
+
     } catch (...) {
       TRACE_(1, "Terminate called after throwing an instance of unknown exception");
     }
@@ -157,12 +163,16 @@ void terminateHandler() {
     TRACE_(1, "Terminate called");
   }
 
-  printStackTrace();
+  TRACE_(1, getStackTrace());
 
   exit(SIGTERM);
 }
 
-void uncaughtExceptionHandler() { terminateHandler(); }
+void uncaughtExceptionHandler() {
+  TRACE_(1, "Unexpected handler function called.");
+  TRACE_(1, getCxaThrowStack());
+  terminateHandler();
+}
 
 void registerAbortHandler() {
   signal(SIGABRT, signalHandler);
@@ -176,7 +186,6 @@ void registerAbortHandler() {
   std::set_terminate(terminateHandler);
 }
 
-namespace debug {
 void registerTerminateHandler() { std::set_terminate(terminateHandler); }
 
 void registerUncaughtExceptionHandler() { std::set_unexpected(uncaughtExceptionHandler); }
@@ -193,5 +202,17 @@ void registerUngracefullExitHandlers() {
   registerAbortHandler();
   registerTerminateHandler();
   registerUncaughtExceptionHandler();
+}
+
+std::string current_exception_diagnostic_information() {
+  std::ostringstream os;
+
+  os << "Process exited";
+
+  os << getCxaThrowStack();
+
+  os << "Error: " << boost::current_exception_diagnostic_information();
+
+  return os.str();
 }
 }

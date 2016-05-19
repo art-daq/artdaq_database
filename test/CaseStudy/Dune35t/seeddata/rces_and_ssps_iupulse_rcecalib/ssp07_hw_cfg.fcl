@@ -1,0 +1,3 @@
+#include "ssp_standard.fcl"
+
+daq: @local::ssp07_standard

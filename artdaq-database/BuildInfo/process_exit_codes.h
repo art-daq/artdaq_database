@@ -9,4 +9,9 @@ constexpr int FAILURE = 1;
 constexpr int HELP = 1;
 }
 
+namespace trace_mode {
+constexpr auto modeM = 1LL;
+constexpr auto modeS = 1LL;
+}
+
 #endif  // _PROCESS_EXIT_CODES_H_

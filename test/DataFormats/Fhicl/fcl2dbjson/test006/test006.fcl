@@ -1,0 +1,46 @@
+# Standard online monitoring configurations
+
+BEGIN_PROLOG
+
+OnlineMonitoring_standard:
+{
+  module_type:             "OnlineMonitoring"
+  
+  DataDirPath:             "/storage/data/"                   # Where the data is written by the aggregator
+  
+  MonitorSavePath:         "/data2/lbnedaq/monitoring/"       # Directory in which to save the monitoring data (looked at by cron job)
+  
+  EVDSavePath:             "/data2/lbnedaq/eventDisplay/"     # Directory in which to save online event display (looked at by cron job)
+  
+  ChannelMapFile:          "/data/lbnedaq/lbne-artdaq-standard/lbne-artdaq/lbne-artdaq/OnlineMonitoring/detailedMap.txt" # The channel map file location
+  
+  ImageType:               ".png"                             # Format to save the images in
+  
+  InitialMonitoringUpdate: 30                                 # Time (in s) after the start of a run to save the first set of monitoring plots
+  
+  MonitoringRefreshRate:   500                                # Time (in s) between each refresh of the monitoring plots
+  
+  EventDisplayRefreshRate: 30                                 # Time (in s) between each refresh of the online event display
+  
+  DetailedMonitoring:      false                              # Switch to turn on and off 'detailed monitoring', which saves much more information (but is much slower)
+  
+  ScopeMonitoring:         false                              # Switch to set whether or not the DAQ is being run in 'scope mode'
+  
+  DriftVelocity:           0.9 #mm/us                         # The electron drift velocity (used for scaling EVD axes)
+  
+  CollectionPedestal:      550 #ADC                           # The average pedestal of the collection wires (used for subtraction when making online EVDs)
+  
+  MicroslicePreBuffer:     5                                  # The number of microslices buffer and saved before a trigger
+  
+  MicrosliceTriggerLength: 5                                  # The number of microslices saved after a trigger has occurred
+}
+
+OnlineMonitoring_detailed: @local::OnlineMonitoring_standard
+OnlineMonitoring_detailed.DetailedMonitoring: true
+
+OnlineMonitoring_scope: @local::OnlineMonitoring_standard
+OnlineMonitoring_scope.ScopeMonitoring: true
+
+END_PROLOG
+
+process_name: DAQ

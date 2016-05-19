@@ -8,15 +8,18 @@ include_directories($ENV{MONGODB_FQ_DIR}/include/mongocxx/v0.3)
 
 art_make(
   LIB_LIBRARIES
-  artdaq-database_FhiclJson
+  artdaq-database_DataFormats_common  
+  artdaq-database_DataFormats_Json
+  artdaq-database_DataFormats_Fhicl  
   artdaq-database_JsonDocument
   artdaq-database_BasicTypes
   artdaq-database_StorageProviders_MongoDB  
   artdaq-database_StorageProviders_FileSystemDB  
  # ${BSONCXXLIB}
  # ${MONGOCXXLIB}  
-  ${FHICLCPP}
+  ${FHICLCPP}  
   ${CETLIB}
+  ${Boost_PROGRAM_OPTIONS_LIBRARY}    
   )
 
 install_headers()

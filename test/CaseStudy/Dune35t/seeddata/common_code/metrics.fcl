@@ -1,0 +1,16 @@
+metrics: {
+
+    rcreporter: {
+      metricPluginType: "RCReporter"
+      level: 1
+      fileName: "/data/lbnedaq/daqlogs/boardreader/boardreader_%UID%_metrics.log"
+      uniquify: true
+    }
+
+  ganglia: {
+    metricPluginType: ganglia
+    level: 5
+    configFile: "/etc/ganglia/gmond.conf"
+    group: BoardReader
+  }
+}

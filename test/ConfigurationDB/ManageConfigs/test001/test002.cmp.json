@@ -1,0 +1,15 @@
+{
+    "search" : [
+        {
+            "name" : "@TEST_CONFIGURATION_NAME@", 
+            "query" : {
+                "dbprovider" : "@TEST_DBPROVIDER@", 
+                "dataformat" : "gui", 
+                "operation" : "buildfilter", 
+                "filter" : {
+                    "configurations.name" : "@TEST_CONFIGURATION_NAME@"
+                }
+            }
+        }
+    ]
+}

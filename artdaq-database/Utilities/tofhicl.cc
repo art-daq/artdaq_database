@@ -2,8 +2,8 @@
 #include <iostream>
 #include <streambuf>
 #include <string>
-#include "artdaq-database/FhiclJson/fhicljsondb.h"
-#include "artdaq-database/FhiclJson/fhicljsongui.h"
+#include "artdaq-database/DataFormats/Fhicldb.h"
+//#include "artdaq-database/DataFormats/Fhiclgui.h"
 #include "boost/program_options.hpp"
 
 #include <boost/exception/diagnostic_information.hpp>
@@ -59,11 +59,7 @@ int main(int argc, char* argv[]) try {
   auto json = json_buffer.str();
   auto fhicl = std::string();
 
-  if (format.compare("db") == 0 || format.compare("database") == 0) {
-    fhicljsondb::json_to_fhicl(json, fhicl);
-  } else {
-    fhicljsongui::json_to_fhicl(json, fhicl);
-  }
+  fhicljsondb::json_to_fhicl(json, fhicl);
 
   std::ofstream os(file_name + ".fcl");
   os << fhicl;

@@ -1,0 +1,210 @@
+{
+"document" : {
+"data" : {
+"prolog" : {
+"OnlineMonitoring_standard" : {
+"module_type" : "OnlineMonitoring",
+"DataDirPath" : "/storage/data/",
+"MonitorSavePath" : "/data2/lbnedaq/monitoring/",
+"EVDSavePath" : "/data2/lbnedaq/eventDisplay/",
+"ChannelMapFile" : "/data/lbnedaq/lbne-artdaq-standard/lbne-artdaq/lbne-artdaq/OnlineMonitoring/detailedMap.txt",
+"ImageType" : ".png",
+"InitialMonitoringUpdate" : 30,
+"MonitoringRefreshRate" : 500,
+"EventDisplayRefreshRate" : 30,
+"DetailedMonitoring" : false,
+"ScopeMonitoring" : false,
+"DriftVelocity" : 0.9,
+"CollectionPedestal" : 550,
+"MicroslicePreBuffer" : 5,
+"MicrosliceTriggerLength" : 5
+},
+"OnlineMonitoring_detailed" : "@local::OnlineMonitoring_standard",
+"OnlineMonitoring_detailed.DetailedMonitoring" : true,
+"OnlineMonitoring_scope" : "@local::OnlineMonitoring_standard",
+"OnlineMonitoring_scope.ScopeMonitoring" : true
+},
+"main" : {
+"process_name" : "DAQ"
+}
+},
+"metadata" : {
+"prolog" : {
+"OnlineMonitoring_standard" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"module_type" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"DataDirPath" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : "# Where the data is written by the aggregator"
+},
+"MonitorSavePath" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : "# Directory in which to save the monitoring data (looked at by cron job)"
+},
+"EVDSavePath" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : "# Directory in which to save online event display (looked at by cron job)"
+},
+"ChannelMapFile" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : "# The channel map file location"
+},
+"ImageType" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : "# Format to save the images in"
+},
+"InitialMonitoringUpdate" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "# Time (in s) after the start of a run to save the first set of monitoring plots"
+},
+"MonitoringRefreshRate" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "# Time (in s) between each refresh of the monitoring plots"
+},
+"EventDisplayRefreshRate" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "# Time (in s) between each refresh of the online event display"
+},
+"DetailedMonitoring" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : "# Switch to turn on and off 'detailed monitoring', which saves much more information (but is much slower)"
+},
+"ScopeMonitoring" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : "# Switch to set whether or not the DAQ is being run in 'scope mode'"
+},
+"DriftVelocity" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#mm/us                         # The electron drift velocity (used for scaling EVD axes)"
+},
+"CollectionPedestal" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#ADC                           # The average pedestal of the collection wires (used for subtraction when making online EVDs)"
+},
+"MicroslicePreBuffer" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "# The number of microslices buffer and saved before a trigger"
+},
+"MicrosliceTriggerLength" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "# The number of microslices saved after a trigger has occurred"
+}
+}
+},
+"OnlineMonitoring_detailed" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"OnlineMonitoring_detailed.DetailedMonitoring" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : " "
+},
+"OnlineMonitoring_scope" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"OnlineMonitoring_scope.ScopeMonitoring" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : " "
+}
+},
+"main" : {
+"process_name" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+},
+"comments" : [
+{
+"linenum" : 1,
+"value" : "# Standard online monitoring configurations"
+},
+{
+"linenum" : 9,
+"value" : "# Where the data is written by the aggregator"
+},
+{
+"linenum" : 11,
+"value" : "# Directory in which to save the monitoring data (looked at by cron job)"
+},
+{
+"linenum" : 13,
+"value" : "# Directory in which to save online event display (looked at by cron job)"
+},
+{
+"linenum" : 15,
+"value" : "# The channel map file location"
+},
+{
+"linenum" : 17,
+"value" : "# Format to save the images in"
+},
+{
+"linenum" : 19,
+"value" : "# Time (in s) after the start of a run to save the first set of monitoring plots"
+},
+{
+"linenum" : 21,
+"value" : "# Time (in s) between each refresh of the monitoring plots"
+},
+{
+"linenum" : 23,
+"value" : "# Time (in s) between each refresh of the online event display"
+},
+{
+"linenum" : 25,
+"value" : "# Switch to turn on and off 'detailed monitoring', which saves much more information (but is much slower)"
+},
+{
+"linenum" : 27,
+"value" : "# Switch to set whether or not the DAQ is being run in 'scope mode'"
+},
+{
+"linenum" : 29,
+"value" : "#mm/us                         # The electron drift velocity (used for scaling EVD axes)"
+},
+{
+"linenum" : 31,
+"value" : "#ADC                           # The average pedestal of the collection wires (used for subtraction when making online EVDs)"
+},
+{
+"linenum" : 33,
+"value" : "# The number of microslices buffer and saved before a trigger"
+},
+{
+"linenum" : 35,
+"value" : "# The number of microslices saved after a trigger has occurred"
+}
+],
+"origin" : {
+"source" : "fhicl_to_json",
+"timestamp" : "Mon Feb  8 14:00:30 2016"
+}
+}

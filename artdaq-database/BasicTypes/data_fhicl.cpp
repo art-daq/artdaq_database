@@ -4,11 +4,14 @@
 #include "artdaq-database/BasicTypes/data_fhicl.h"
 #include "artdaq-database/BasicTypes/data_fhicl_fusion.h"
 
-#include "artdaq-database/FhiclJson/fhicljsondb.h"
-#include "artdaq-database/FhiclJson/shared_literals.h"
+#include "artdaq-database/DataFormats/Fhicl/fhicl_common.h"
+#include "artdaq-database/DataFormats/Fhicl/fhicljsondb.h"
+
+#include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
+
+#include "artdaq-database/DataFormats/common/shared_literals.h"
 
 #include "artdaq-database/BasicTypes/base64.h"
-#include "fhiclcpp/exception.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -26,14 +29,14 @@ namespace basictypes {
 
 template <>
 bool JsonData::convert_to(FhiclData& fhicl) const {
-  using artdaq::database::fhicljsondb::json_to_fhicl;
+  using artdaq::database::fhicljson::json_to_fhicl;
 
   return json_to_fhicl(json_buffer, fhicl.fhicl_buffer);
 }
 
 template <>
 bool JsonData::convert_from(FhiclData const& fhicl) {
-  using artdaq::database::fhicljsondb::fhicl_to_json;
+  using artdaq::database::fhicljson::fhicl_to_json;
 
   return fhicl_to_json(fhicl.fhicl_buffer, json_buffer);
 }
@@ -41,6 +44,8 @@ bool JsonData::convert_from(FhiclData const& fhicl) {
 FhiclData::FhiclData(std::string const& buffer) : fhicl_buffer{buffer} {}
 
 FhiclData::FhiclData(JsonData const& document) {
+  namespace literal = artdaq::database::dataformats::literal;
+  
   assert(!document.json_buffer.empty());
 
   TRACE_(1, "FHICL document=" << document.json_buffer);
@@ -69,6 +74,8 @@ FhiclData::FhiclData(JsonData const& document) {
 }
 
 FhiclData::operator JsonData() const {
+  namespace literal = artdaq::database::dataformats::literal;
+  
   TRACE_(5, "FHICL fhicl=" << fhicl_buffer);
 
   auto json = JsonData("");

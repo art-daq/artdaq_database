@@ -7,8 +7,9 @@
 namespace artdaq {
 namespace database {
 namespace filesystem {
-
-void trace_enable();
+namespace debug {
+void enable();
+}
 
 namespace literal {
 constexpr auto FILEURI = "file://";

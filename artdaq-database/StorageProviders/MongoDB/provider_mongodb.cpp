@@ -106,16 +106,17 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::load(JsonData const& sea
         break;
       }
     }
-    TRACE_(2, "search filter=<" << bsoncxx::to_json(filter.view_document()) << ">");
+    TRACE_(2, "collection_name=\"" << collection_name << "\", search filter=<" << bsoncxx::to_json(filter.view_document())
+                                 << ">");
+
   } catch (cet::exception const&) {
     TRACE_(2, "search filter is missing");
   }
 
   auto size = collection.count(filter.view_document());
+  TRACE_(3, "found_count=" << size);
 
   auto cursor = collection.find(filter.view_document());
-
-  TRACE_(3, "found_count=" << size);
 
   for (auto& doc : cursor) returnCollection.emplace_back(bsoncxx::to_json(doc));
 
@@ -179,7 +180,9 @@ object_id_t StorageProvider<JsonData, MongoDB>::store(JsonData const& data) {
         break;
       }
     }
-    TRACE_(2, "search filter=<" << bsoncxx::to_json(filter.view_document()) << ">");
+    TRACE_(2, "collection_name=\"" << collection_name << "\", search filter=<" << bsoncxx::to_json(filter.view_document())
+                                 << ">");
+
     isNew = false;
   } catch (cet::exception const&) {
     TRACE_(4, "Search filter is missing, proceeding with insert.");
@@ -258,12 +261,18 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findGlobalConfigs(JsonDa
     auto cursor = collection.distinct("configurations.name", configuration_filter.view_document());
 
     for (auto const& view : cursor) {
+      TRACE_(4, "StorageProvider::MongoDB::findGlobalConfigs() looping over cursor =<" << bsoncxx::to_json(view)
+                                                                                       << ">");
+
       auto element_values = view.find("values");
 
       if (element_values == collectionDescriptor.end())
         throw cet::exception("MongoDB") << "MongoDB returned invalid database search.";
 
       auto configuration_name_array = element_values->get_array();
+
+      if (configuration_name_array.value.empty()) break;
+
       for (auto const& configuration_name : configuration_name_array.value) {
         std::stringstream ss;
         ss << "{";
@@ -502,7 +511,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigEntities(JsonD
 
     if (collection_name == "system.indexes") continue;
 
-    TRACE_(9, "StorageProvider::MongoDB::findGlobalConfigs() querying collection_name=<" << collection_name << ">");
+    TRACE_(9, "StorageProvider::MongoDB::findConfigEntities() querying collection_name=<" << collection_name << ">");
 
     auto collection = _provider->connection().collection(collection_name);
     auto bson_document = bsoncxx::from_json(search.json_buffer);
@@ -579,14 +588,15 @@ std::string dequote(std::string s) {
 }
 
 namespace mongo {
-void trace_enable() {
+namespace debug {
+void enable() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", 1LL);
   TRACE_CNTL("modeS", 1LL);
 
-  TRACE_(0, "artdaq::database::mongo::"
-                << "trace_enable");
+  TRACE_(0, "artdaq::database::mongo trace_enable");
+}
 }
 }  // namespace mongo
 }  // namespace database

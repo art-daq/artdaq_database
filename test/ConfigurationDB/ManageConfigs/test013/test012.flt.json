@@ -1,0 +1,7 @@
+{
+  "filter":{"configurable_entity.name":"test@CONFIG_NUMBER@"},
+  "collection":"@TEST_COLLECTION_NAME@_@TEST_COLLECTION_NAME_QUAL@",
+  "dbprovider":"@TEST_DBPROVIDER@",
+  "operation":"findversions",
+  "dataformat":"gui"
+}

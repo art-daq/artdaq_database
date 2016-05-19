@@ -78,8 +78,9 @@ class JSONDocument final {
   std::string _json_buffer;
 };
 
-void trace_enable_JSONDocument();
-
+namespace debug {
+void enableJSONDocument();
+}
 std::ostream& operator<<(std::ostream&, JSONDocument const&);
 
 }  // namespace jsonutils

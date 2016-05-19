@@ -1,0 +1,41 @@
+{
+    "ROOT": {
+        "@xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        "@xsi:noNamespaceSchemaLocation": "../../ConfigurationBase.xsd",
+        "DATA_SET": {
+            "COMMENT_DESCRIPTION": null,
+            "CREATED_BY_USER": null,
+            "DATA": [
+                {
+                    "FRONT_END_ID": "0",
+                    "FRONT_END_INTERFACE_NAME": "FEWRPurdueFSSRInterface",
+                    "FRONT_END_TYPE": "FEW",
+                    "SUPERVISOR_INSTANCE": "1"
+                },
+                {
+                    "FRONT_END_ID": "0",
+                    "FRONT_END_INTERFACE_NAME": "ARTDAQ",
+                    "FRONT_END_TYPE": "FER",
+                    "SUPERVISOR_INSTANCE": "1"
+                }
+            ],
+            "PART": {
+                "KIND_OF_PART": "Detector ROOT",
+                "NAME_LABEL": "CMS--ROOT"
+            },
+            "VERSION": "0"
+        },
+        "HEADER": {
+            "RUN": {
+                "LOCATION": "CERN P5",
+                "RUN_BEGIN_TIMESTAMP": "2013-01-29 17:22:10",
+                "RUN_NUMBER": "1",
+                "RUN_TYPE": "FEConfiguration"
+            },
+            "TYPE": {
+                "EXTENSION_TABLE_NAME": "FE_CONFIGURATION",
+                "NAME": "FEConfiguration"
+            }
+        }
+    }
+}

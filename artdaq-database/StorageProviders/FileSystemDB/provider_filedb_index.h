@@ -1,7 +1,7 @@
 #ifndef _ARTDAQ_DATABASE_PROVIDER_FILESYSTEM_INDEX_H_
 #define _ARTDAQ_DATABASE_PROVIDER_FILESYSTEM_INDEX_H_
 
-#include "artdaq-database/FhiclJson/json_common.h"
+#include "artdaq-database/DataFormats/Json/json_common.h"
 #include "artdaq-database/StorageProviders/common.h"
 #include "artdaq-database/StorageProviders/storage_providers.h"
 
@@ -92,8 +92,9 @@ void SearchIndex::_make_unique_sorted(jsn::array_t& ouids) {
   std::for_each(tmp.begin(), tmp.end(), [&ouids](TYPE& value) { ouids.push_back(value); });
 }
 
-void trace_enable();
-
+namespace debug {
+void enable();
+}
 }  // namespace index
 }  // namespace filesystem
 }  // namespace database

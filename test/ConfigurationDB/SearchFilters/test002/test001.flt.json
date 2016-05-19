@@ -1,6 +1,0 @@
-{
-"filter":{"configurations.name":"@TEST_CONFIG_NAME@"},  
-"dbprovider":"mongo",
-"operation":"buildfilter",
-"dataformat":"gui"
-}

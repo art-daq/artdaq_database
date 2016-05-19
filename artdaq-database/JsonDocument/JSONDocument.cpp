@@ -890,14 +890,15 @@ JSONDocument JSONDocument::removeChild(JSONDocument const& child, path_t const& 
 
 bool JSONDocument::isReadonly() const { return false; }
 
-void trace_enable_JSONDocument() {
+namespace debug {
+void enableJSONDocument() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", 1LL);
   TRACE_CNTL("modeS", 1LL);
 
-  TRACE_(0, "artdaq::database::JSONDocument::"
-                << "trace_enable");
+  TRACE_(0, "artdaq::database::JSONDocument trace_enable");
+}
 }
 
 std::ostream& operator<<(std::ostream& os, JSONDocument const& document) {
