@@ -135,13 +135,6 @@ void store_configuration(Options const& options, std::string& conf) {
 
   // create a json document to be inserted into the database
   auto builder = JSONDocumentBuilder{};
-<<<<<<< HEAD:artdaq-database/ConfigurationDB/dboperation_loadstore_detail.cpp
-  
-  builder.createFromData(data.json_buffer);  
-  builder.addToGlobalConfig(options.globalConfigurationId_jsndoc());
-  builder.setVersion(options.version_jsndoc());
-  builder.setConfigurableEntity(options.configurableEntity_jsndoc());
-=======
 
   builder.createFromData(data.json_buffer);
 
@@ -152,7 +145,6 @@ void store_configuration(Options const& options, std::string& conf) {
   builder.addToGlobalConfig(globalConfiguration);
   builder.setVersion(version);
   builder.setConfigurableEntity(configurableEntity);
->>>>>>> lukhanin-wip:artdaq-database/ConfigurationDB/detail_loadstore.cpp
 
   auto document = std::move(builder.extract());
   auto insert_payload =

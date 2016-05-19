@@ -5,8 +5,5 @@ cd ~/artdaq-demo-base/artdaq-utilities-database/test/HOWTOS/NodeJSAddons/conftoo
 
 conftool2 -o load -c otsdaq_FEWRPurdueFSSRInterfaceConfiguration.flt.filesystem.json -j otsdaq_FEWRPurdueFSSRInterfaceConfiguration.gui.filesystem.json
 conftool2 -o load -c otsdaq_FSSRDACsConfiguration.flt.filesystem.json -j otsdaq_FSSRDACsConfiguration.gui.filesystem.json
-<<<<<<< HEAD
-=======
 
 conftool2 -o load -c otsdaq_DefaultConfigurations.flt.filesystem.json -j otsdaq_DefaultConfigurations.gui.filesystem.json
->>>>>>> lukhanin-wip

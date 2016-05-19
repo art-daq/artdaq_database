@@ -346,21 +346,12 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
 
         if (value.type() == typeid(object_t)) {
           object_t const& child = jcunwrap(value);
-<<<<<<< HEAD:artdaq-database/FhiclJson/convertjson2guijson.cpp
-	  
-	  if(child.count(literal::type)==0) {	     
-             data_node.value_as<array_t>().push_back(value);
-	     continue;
-	  }
-	    
-=======
 
           if (child.count(literal::type) == 0) {
             data_node.value_as<array_t>().push_back(value);
             continue;
           }
 
->>>>>>> lukhanin-wip:artdaq-database/DataFormats/Json/convertjson2guijson.cpp
           auto const& type_name = unwrap(child).value_as<const std::string>(literal::type);
           // auto const& node_name = unwrap( child ).value_as<const std::string>( literal::name );
 

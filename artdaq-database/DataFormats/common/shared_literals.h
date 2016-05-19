@@ -16,11 +16,7 @@ constexpr auto timestamp = "timestamp";
 constexpr auto source = "source";
 constexpr auto file = "file";
 constexpr auto value = "value";
-<<<<<<< HEAD:artdaq-database/FhiclJson/shared_literals.h
-constexpr auto string = "string"; 
-=======
 constexpr auto string = "string";
->>>>>>> lukhanin-wip:artdaq-database/DataFormats/common/shared_literals.h
 constexpr auto type = "type";
 constexpr auto whitespace = " ";
 constexpr auto empty = "";

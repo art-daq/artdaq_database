@@ -13,11 +13,7 @@
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
-<<<<<<< HEAD
-#include "artdaq-database/FhiclJson/convertjson2guijson.h"
-=======
 #include "artdaq-database/DataFormats/convertjson2guijson.h"
->>>>>>> lukhanin-wip
 
 #include <boost/exception/diagnostic_information.hpp>
 

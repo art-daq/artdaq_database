@@ -125,11 +125,7 @@ struct table_of : vector_of<KVP> {
   using key_type = typename value_type::key_type;
   using mapped_type = typename value_type::value_type;
   using size_type = typename vector_of<KVP>::size_type;
-<<<<<<< HEAD:artdaq-database/FhiclJson/shared_types.h
-  
-=======
 
->>>>>>> lukhanin-wip:artdaq-database/DataFormats/common/shared_types.h
   mapped_type& operator[](key_type const& key) {
     auto& pairs = vector_of<value_type>::values;
 

@@ -104,11 +104,7 @@ JsonData prov::findGlobalConfigs(ManageConfigsOperation const& options, JsonData
   auto global_configs = provider->findGlobalConfigs(search_payload);
 
   if (global_configs.empty()) {
-<<<<<<< HEAD:artdaq-database/ConfigurationDB/dboperation_mongodb.cpp
-    return {cfo::literal::empty_search_result};        
-=======
     return {literal::empty_search_result};        
->>>>>>> lukhanin-wip:artdaq-database/ConfigurationDB/dispatch_mongodb.cpp
     //throw cet::exception("operation_findconfigs") << "No global configurations were found.";
   }
 
@@ -244,11 +240,7 @@ JsonData prov::findConfigVersions(LoadStoreOperation const& options, JsonData co
   auto config_versions = provider->findConfigVersions(search_filter);
 
   if (config_versions.empty()) {
-<<<<<<< HEAD:artdaq-database/ConfigurationDB/dboperation_mongodb.cpp
-     return {cfo::literal::empty_search_result};    
-=======
      return {literal::empty_search_result};    
->>>>>>> lukhanin-wip:artdaq-database/ConfigurationDB/dispatch_mongodb.cpp
     //throw cet::exception("operation_findversions") << "No configuration versions were found.";
   }
 
@@ -319,11 +311,7 @@ JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData co
   auto config_entities = provider->findConfigEntities(search_filter);
 
   if (config_entities.empty()) {
-<<<<<<< HEAD:artdaq-database/ConfigurationDB/dboperation_mongodb.cpp
-    return {cfo::literal::empty_search_result};        
-=======
     return {literal::empty_search_result};        
->>>>>>> lukhanin-wip:artdaq-database/ConfigurationDB/dispatch_mongodb.cpp
    // throw cet::exception("operation_findentities") << "No configuration entities were found.";
   }
 

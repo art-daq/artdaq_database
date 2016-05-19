@@ -39,13 +39,10 @@ cet_set_compiler_flags(DIAGS VIGILANT
 
 string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC )
 if( ${BTYPE_UC} MATCHES "DEBUG" )
-<<<<<<< HEAD
-=======
 
 cet_add_compiler_flags( -rdynamic -ldl -fsanitize=address) 
 
 
->>>>>>> lukhanin-wip
 #  cet_add_compiler_flags(-fsanitize=address)
 endif()
 
@@ -82,7 +79,7 @@ include(ArtMake)
 #include(BuildPlugins)
 
 # testing
-#add_subdirectory(test)
+add_subdirectory(test)
 
 # source
 add_subdirectory(artdaq-database)
