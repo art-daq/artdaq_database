@@ -7,7 +7,7 @@ namespace artdaq {
 namespace database {
 namespace dataformats {
 
-std::string filter_quotes(std::string const& str);
+std::string filter_jsonstring(std::string const& str);
 std::string timestamp();
 bool useFakeTime(bool);
 

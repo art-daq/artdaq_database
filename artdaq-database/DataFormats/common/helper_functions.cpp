@@ -8,7 +8,15 @@ namespace artdaq {
 namespace database {
 namespace dataformats {
 
-std::string filter_quotes(std::string const& str) { return std::regex_replace(str, std::regex("\""), "|"); }
+std::string filter_jsonstring(std::string const& str) {
+  auto retValue= std::string{str.c_str()};
+  
+  retValue = std::regex_replace(retValue, std::regex("\""), "|");
+  retValue = std::regex_replace(retValue, std::regex("\'"), "^");
+  retValue = std::regex_replace(retValue, std::regex("\t"), "    ");
+  
+  return retValue;
+}
 
 bool useFakeTime(bool useFakeTime = false) {
   static bool _useFakeTime = useFakeTime;

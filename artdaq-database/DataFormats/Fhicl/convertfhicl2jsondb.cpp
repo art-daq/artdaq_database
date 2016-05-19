@@ -70,7 +70,7 @@ fcl2jsondb::operator datapair_t() try {
     auto search = comments.find(linenum);
     if (comments.end() == search) return literal::whitespace;
 
-    return artdaq::database::dataformats::filter_quotes(search->second);
+    return artdaq::database::dataformats::filter_jsonstring(search->second);
   };
 
   auto comment_at = [&annotation_at](int linenum) -> std::string {
