@@ -43,7 +43,7 @@ set (TEST_CONFIGURATION_NAME "testConfigA${CONFIG_NUMBER}")
 SET (TEST_VERSION_NAME    versionA${VERSION_NUMBER} )
 
 SET ( TEST_NUMBER "001" )
-SET ( TEST_NAME "ArtdaqDemo_store" )
+SET ( TEST_NAME "Dune35t_bulkimport" )
 
 SET ( TEST_DBPROVIDER "filesystem" )
 cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC ImportDune35tData_t 

@@ -1,4 +1,4 @@
-SET ( TEST_NAME "Dune35tDemo_findconfigs" )
+SET ( TEST_NAME "Dune35tDemo_buildfilter" )
 
 SET ( TEST_NUMBER "002" )
 

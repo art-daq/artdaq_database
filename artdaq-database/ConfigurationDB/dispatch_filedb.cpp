@@ -327,7 +327,7 @@ JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData co
 
   std::stringstream ss;
 
-  ss << "{ \"search\": [";
+  ss << "{ \"search\": [\n";
 
   for (auto const& config_entity : config_entities) {
     auto filter_json = JSONDocument{config_entity.json_buffer}.findChild("filter").value();
@@ -352,7 +352,7 @@ JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData co
     ss << printComma() << "{";
     ss << "\"name\" :\"" << results[2].str() /*<< ":" << results[3].str()*/ << "\",";
     ss << "\"query\" :" << config_entity.json_buffer;
-    ss << "}";
+    ss << "}\n";
   }
 
   ss << "] }";

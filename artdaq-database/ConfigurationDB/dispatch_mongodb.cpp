@@ -186,7 +186,7 @@ JsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, Js
 
   std::stringstream ss;
 
-  ss << "{ \"search\": [";
+  ss << "{ \"search\": [\n";
 
   for (auto const& search_filter : search_filters) {
     auto filter_json = JSONDocument{search_filter.json_buffer}.findChild("filter").value();
@@ -209,7 +209,7 @@ JsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, Js
     ss << printComma() << "{";
     ss << "\"name\" :\"" << results[1].str() << ":" << results[3].str() << "\",";
     ss << "\"query\" :" << search_filter.json_buffer;
-    ss << "}";
+    ss << "}\n";
   }
 
   ss << "] }";
