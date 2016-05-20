@@ -19,12 +19,12 @@ perllib  product_dir
 
 #
 product		version		optional
-#artdaq_core 	v1_04_23
+#artdaq_core 	v1_04_30
 fhiclcpp        v3_12_06
 mongodb 	v3_0_7
 swig            v3_0_7		
 TRACE           v3_06_06	
-cetbuildtools	v4_18_02	-	only_for_build
+cetbuildtools	v5_01_03	-	only_for_build
 end_product_list
 
 # e7  - with gcc 4.9.2 and -std=c++1y
