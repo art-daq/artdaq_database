@@ -85,6 +85,9 @@ namespace document {
 constexpr auto document = "document";
 constexpr auto data = "data";
 constexpr auto metadata = "metadata";
+constexpr auto search = "search";
+constexpr auto query = "query";
+
 }
 
 constexpr auto name = "name";

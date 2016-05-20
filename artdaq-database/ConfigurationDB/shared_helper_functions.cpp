@@ -1,10 +1,12 @@
+#include <algorithm>
 #include <cassert>
 #include <sstream>
 
-#include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
+#include <cstdlib>
 #include <libgen.h>
 #include <boost/filesystem.hpp>
 #include <boost/range/iterator_range.hpp>
+#include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
 
 namespace cf = artdaq::database::configuration;
 
@@ -78,22 +80,49 @@ std::vector<std::string> cf::list_files(std::string const& path) {
   return files;
 }
 
+std::string cf::collection_name_from_relative_path(std::string const& file_path_str) {
+  auto file_path_copy = std::string{file_path_str.c_str()};
+  char* file_path = (char*)(file_path_copy.c_str());
+  auto names = std::list<std::string>{};
+  names.push_front(basename(file_path));
+  char* parent = dirname(file_path);
+  names.push_front(basename(parent));
 
-std::string cf::collection_name_from_relative_path(std::string const& file_path_str){
-    auto  file_path_copy= std::string{file_path_str.c_str()};
-    char* file_path = (char*)(file_path_copy.c_str());
-    auto names = std::list<std::string>{};
-    names.push_front(basename(file_path));
-    char* parent = dirname(file_path);
-    names.push_front(basename(parent));
+  //  parent = dirname(parent);
+  //  names.push_front(basename(parent));
 
-//  parent = dirname(parent);
-//  names.push_front(basename(parent));
+  std::stringstream ss;
+  for (auto const& name : names) ss << name << ".";
+  auto collName = ss.str();
+  collName.pop_back();
 
-    std::stringstream ss;
-    for (auto const& name : names) ss << name << ".";
-    auto collName = ss.str();
-    collName.pop_back();
+  return collName;
+}
 
-    return collName;
+std::string cf::relative_path_from_collection_name(std::string const& collection_name) {
+  assert(!collection_name.empty());
+  auto retValue = std::string{collection_name};
+  auto begin = retValue.begin();
+  auto end = retValue.begin();
+  std::advance(end, retValue.rfind('.') - 1);
+  std::replace(begin, end, '.', '/');
+
+  return retValue;
+}
+
+bool cf::mkdir(std::string const& path) {
+  assert(!path.empty());
+
+  auto cmd = std::string{"mkdir -p "};
+  cmd.append(path.c_str());
+  
+  return 0 == system(cmd.c_str());
+}
+
+bool cf::mkdirfile(std::string const& file) {
+  assert(!file.empty());
+
+  auto tmp = std::string{file.c_str()};
+  
+  return mkdir(dirname((char*)tmp.c_str()));
 }

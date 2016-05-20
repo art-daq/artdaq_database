@@ -96,6 +96,9 @@ int main(int argc, char* argv[]) try {
   cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP, std::string const&, std::string&>(
       literal::operation::load, load_configuration, options_string, test_document);
 
+  cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP, std::string const&, std::string&>(
+      literal::operation::globalconfload, load_globalconfiguration, options_string, test_document);
+  
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
       "findconfigs", find_global_configurations, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
@@ -143,6 +146,11 @@ int main(int argc, char* argv[]) try {
 
   using cfo::data_format_t;
 
+  if(options.operation().compare(literal::operation::globalconfload) || options.operation().compare(literal::operation::globalconfstore)){
+    //TODO: compare the contents of tar.bz2.base64
+    return process_exit_code::SUCCESS;
+  }
+    
   if (options.dataFormat() == data_format_t::gui || options.dataFormat() == data_format_t::db ||
       options.dataFormat() == data_format_t::json) {
     auto compare_result = artdaq::database::json::compare_json_objects(returned, expected);
