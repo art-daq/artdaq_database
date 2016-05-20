@@ -7,6 +7,9 @@ namespace configuration {
 namespace literal {
 
 namespace operation {
+constexpr auto globalconfstore = "globalconfstore";
+constexpr auto globalconfload = "globalconfload";
+
 constexpr auto store = "store";
 constexpr auto load = "load";
 
@@ -71,6 +74,7 @@ constexpr auto operations = "operations";
 namespace msg {
 constexpr auto empty_filter = "Search filter is empty";
 constexpr auto empty_document = "Json document is empty";
+constexpr auto cant_call_system= "Unable to call system() from this API; check if either set-user-ID or set-group-ID are used in the program execution context.";
 }
 
 namespace search {

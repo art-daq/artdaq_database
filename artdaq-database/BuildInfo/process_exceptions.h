@@ -28,6 +28,15 @@ class invalid_option_exception : public exception {
   invalid_option_exception(Category const& category, std::string const& message) : exception{category, message} {}
 };
 
+class runtime_exception : public exception {
+ public:
+  using exception::Category;
+
+  explicit runtime_exception(Category const& category) : exception{category} {}
+
+  runtime_exception(Category const& category, std::string const& message) : exception{category, message} {}
+};
+
 }
 }
 #endif  // _PROCESS_EXCEPTIONS_H_

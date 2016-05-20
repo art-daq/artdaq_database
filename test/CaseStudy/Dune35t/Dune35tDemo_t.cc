@@ -29,16 +29,17 @@ int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
   // artdaq::database::jsonutils::debug::enableJSONDocument();
-  //artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
+  // artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
 
   artdaq::database::configuration::debug::enableFindConfigsOperation();
   artdaq::database::configuration::debug::enableCreateConfigsOperation();
-  
+  artdaq::database::configuration::debug::enableGlobalConfLoadStoreOperation();
+
   artdaq::database::configuration::debug::options::enableOperationBase();
   artdaq::database::configuration::debug::options::enableOperationManageConfigs();
   artdaq::database::configuration::debug::detail::enableCreateConfigsOperation();
   artdaq::database::configuration::debug::detail::enableFindConfigsOperation();
-  
+
   artdaq::database::configuration::debug::enableDBOperationMongo();
   artdaq::database::configuration::debug::enableDBOperationFileSystem();
 
@@ -94,7 +95,7 @@ int main(int argc, char* argv[]) try {
 
   cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP, std::string const&, std::string&>(
       literal::operation::load, load_configuration, options_string, test_document);
-  
+
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
       "findconfigs", find_global_configurations, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
@@ -117,6 +118,10 @@ int main(int argc, char* argv[]) try {
     is.close();
     cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
         literal::operation::store, store_configuration, options_string, test_document);
+
+    cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
+        literal::operation::globalconfstore, store_globalconfiguration, options_string, test_document);
+
   } catch (...) {
   }
 
