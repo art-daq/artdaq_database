@@ -50,16 +50,24 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
     opts.enablePrologMode();
 
     auto& data = get_SubNode(data_node, literal::prolog_node);
-    auto& metadata = get_SubNode(metadata_node, literal::prolog_node);
+
+    auto& prolog = get_SubNode(metadata_node, literal::prolog_node);
+    auto& metadata = get_SubNode(prolog, literal::children);
 
     for (auto const& element : data) {
       valuetuple_t value_tuple = std::forward_as_tuple(element.key, element.value, metadata.at(element.key));
       fhicl_table.push_back(json2fcldb(std::make_tuple(value_tuple, value_tuple, opts)));
     }
 
-    fhicl_generator_grammar<decltype(sink)> grammar;
+    if (data.size()) {
+      buffer.append("BEGIN_PROLOG\n");
+      sink = std::back_insert_iterator<std::string>(buffer);
 
-    if (!karma::generate(sink, grammar, fhicl_table)) return false;
+      fhicl_generator_grammar<decltype(sink)> grammar;
+
+      if (!karma::generate(sink, grammar, fhicl_table)) return false;
+      buffer.append("\nEND_PROLOG\n");
+    }
   }
 
   {  // convert main section
@@ -69,7 +77,9 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
     opts.enableDefaultMode();
 
     auto& data = get_SubNode(data_node, literal::main_node);
-    auto& metadata = get_SubNode(metadata_node, literal::main_node);
+
+    auto& main = get_SubNode(metadata_node, literal::main_node);
+    auto& metadata = get_SubNode(main, literal::children);
 
     for (auto const& element : data) {
       valuetuple_t value_tuple = std::forward_as_tuple(element.key, element.value, metadata.at(element.key));

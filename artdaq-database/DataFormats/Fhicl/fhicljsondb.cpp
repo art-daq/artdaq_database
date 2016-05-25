@@ -50,6 +50,7 @@ bool fhicl_to_json(std::string const& fcl, std::string& json) {
 
   TRACE_(2, "fhicl_to_json: Created root nodes");
 
+  get_object(literal::origin_node)[literal::format] = std::string("fhicl");
   get_object(literal::origin_node)[literal::source] = std::string("fhicl_to_json");
   get_object(literal::origin_node)[literal::timestamp] = artdaq::database::dataformats::timestamp();
 

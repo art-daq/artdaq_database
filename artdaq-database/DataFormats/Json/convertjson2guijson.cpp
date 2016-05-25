@@ -20,6 +20,11 @@ using namespace artdaq::database::json;
 using artdaq::database::json::db2gui;
 using artdaq::database::json::gui2db;
 
+/*
+ * http://stackoverflow.com/questions/21832701/does-json-syntax-allow-duplicate-keys-in-an-object
+ * For now, to have a "better" compartibilty with FHICL I'll allow duplicate key names in JSON.
+*/
+
 template <>
 template <typename T>
 T const& unwrapper<const object_t>::value_as(std::string const& name) {
@@ -187,7 +192,12 @@ void db2gui::operator()(json_node_t& gui_node) const {
       } else {
         type_name = {literal::string};
         object[literal::value] = value;
-        object[literal::annotation] = (hasMetadata ? metadata_node.annotation() : std::string{" "});
+        try {
+          object[literal::annotation] = (hasMetadata ? metadata_node.annotation() : std::string{" "});
+        } catch (std::out_of_range const& ex) {
+          TRACE_(11, "json_db_to_gui() missing annotation for string data; key" << data_node.value<data_t>().key);
+          object[literal::annotation] = std::string{literal::whitespace};
+        }
       }
 
       object[literal::type] = (hasMetadata ? metadata_node.typeName() : type_name);
@@ -352,7 +362,12 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
             continue;
           }
 
-          auto const& type_name = unwrap(child).value_as<const std::string>(literal::type);
+          std::string type_name = unwrap(child).value_as<const std::string>(literal::type);
+
+          if (type_name.compare(literal::table) == 0 && child.count(literal::value) == 1 &&
+              child.count(literal::children) == 0)
+            type_name = std::string{literal::string};
+
           // auto const& node_name = unwrap( child ).value_as<const std::string>( literal::name );
 
           TRACE_(15, "json_gui_to_db() operator() switch ARRAY child type=" << type_name);

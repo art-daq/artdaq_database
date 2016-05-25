@@ -30,6 +30,10 @@
 },
 "metadata" : {
 "prolog" : {
+"comment" : "#prolog",
+"type" : "table",
+"annotation" : "//Auto generated prolog",
+"children" : {
 "OnlineMonitoring_standard" : {
 "type" : "table",
 "comment" : " ",
@@ -82,12 +86,12 @@
 "DetailedMonitoring" : {
 "type" : "bool",
 "comment" : " ",
-"annotation" : "# Switch to turn on and off 'detailed monitoring', which saves much more information (but is much slower)"
+"annotation" : "# Switch to turn on and off ^detailed monitoring^, which saves much more information (but is much slower)"
 },
 "ScopeMonitoring" : {
 "type" : "bool",
 "comment" : " ",
-"annotation" : "# Switch to set whether or not the DAQ is being run in 'scope mode'"
+"annotation" : "# Switch to set whether or not the DAQ is being run in ^scope mode^"
 },
 "DriftVelocity" : {
 "type" : "number",
@@ -131,12 +135,18 @@
 "comment" : " ",
 "annotation" : " "
 }
+}
 },
 "main" : {
+"comment" : "#main",
+"type" : "table",
+"annotation" : "//Auto generated main",
+"children" : {
 "process_name" : {
 "type" : "string",
 "comment" : " ",
 "annotation" : " "
+}
 }
 }
 }
@@ -180,11 +190,11 @@
 },
 {
 "linenum" : 25,
-"value" : "# Switch to turn on and off 'detailed monitoring', which saves much more information (but is much slower)"
+"value" : "# Switch to turn on and off ^detailed monitoring^, which saves much more information (but is much slower)"
 },
 {
 "linenum" : 27,
-"value" : "# Switch to set whether or not the DAQ is being run in 'scope mode'"
+"value" : "# Switch to set whether or not the DAQ is being run in ^scope mode^"
 },
 {
 "linenum" : 29,
@@ -204,6 +214,7 @@
 }
 ],
 "origin" : {
+"format" : "fhicl",
 "source" : "fhicl_to_json",
 "timestamp" : "Mon Feb  8 14:00:30 2016"
 }
