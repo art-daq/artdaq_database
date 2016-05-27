@@ -31,6 +31,7 @@ int main(int argc, char* argv[]) try {
   // artdaq::database::jsonutils::debug::enableJSONDocument();
   // artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
 
+
   artdaq::database::configuration::debug::enableFindConfigsOperation();
   artdaq::database::configuration::debug::enableCreateConfigsOperation();
   artdaq::database::configuration::debug::enableGlobalConfLoadStoreOperation();

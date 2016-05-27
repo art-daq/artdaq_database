@@ -85,11 +85,6 @@ result_pair_t json::store_globalconfiguration(std::string const& search_filter,
       throw artdaq::database::runtime_exception("store_globalconfiguration")
           << "store_globalconfiguration: Unable to delete a temp file ; system_cmd=" << system_cmd;
 
-    system_cmd = "rm -rf " + tmp_dir_name;
-
-    if (0 != system(system_cmd.c_str()))
-      throw artdaq::database::runtime_exception("store_globalconfiguration")
-          << "store_globalconfiguration: Unable to delete a temp directory; system_cmd=" << system_cmd;
 
     std::ostringstream oss;
 
@@ -101,6 +96,12 @@ result_pair_t json::store_globalconfiguration(std::string const& search_filter,
       }
     }
 
+    system_cmd = "rm -rf " + tmp_dir_name;
+
+    if (0 != system(system_cmd.c_str()))
+      throw artdaq::database::runtime_exception("store_globalconfiguration")
+          << "store_globalconfiguration: Unable to delete a temp directory; system_cmd=" << system_cmd;
+    
     auto error_message = std::string{oss.str()};
 
     if (!error_message.empty()) return result_pair_t{false, make_error_msg(error_message)};
