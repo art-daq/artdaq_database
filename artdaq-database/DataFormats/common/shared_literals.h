@@ -14,6 +14,7 @@ constexpr auto origin_node = "origin";
 constexpr auto includes_node = "includes";
 constexpr auto timestamp = "timestamp";
 constexpr auto source = "source";
+constexpr auto format = "format";
 constexpr auto file = "file";
 constexpr auto value = "value";
 constexpr auto string = "string";

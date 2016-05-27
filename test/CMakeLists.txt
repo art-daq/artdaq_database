@@ -12,7 +12,6 @@ add_subdirectory(JsonDocument)
 add_subdirectory(DataFormats)
 add_subdirectory(StorageProviders)
 add_subdirectory(ConfigurationDB)
-
 add_subdirectory(CaseStudy)
 
 #add_subdirectory(JSONConvert)

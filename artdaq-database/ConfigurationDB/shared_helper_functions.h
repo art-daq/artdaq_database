@@ -2,6 +2,7 @@
 #define _ARTDAQ_DATABASE_CONFIGURATIONDB_SHARED_HELPER_FUNCTIONS_H_
 
 #include <string>
+#include <vector>
 
 namespace artdaq {
 namespace database {
@@ -15,8 +16,12 @@ bool not_equal(std::string const&, std::string const&);
 std::string quoted_(std::string const&);
 std::string to_string(options::data_format_t const&);
 options::data_format_t to_data_format(std::string const&);
-std::string dequote(std::string s);
-
+std::string dequote(std::string);
+std::vector<std::string> list_files(std::string const&);
+std::string collection_name_from_relative_path(std::string const&);
+std::string relative_path_from_collection_name(std::string const&);
+bool mkdir(std::string const&);
+bool mkdirfile(std::string const&);
 }  // namespace configuration
 }  // namespace database
 }  // namespace artdaq

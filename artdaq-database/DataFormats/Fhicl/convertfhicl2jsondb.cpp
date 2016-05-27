@@ -99,9 +99,14 @@ fcl2jsondb::operator datapair_t() try {
 
   auto linenum = parse_linenum(value.src_info);
 
-  add_comment(comment_at, literal::comment, linenum - 1);
+  if (key.find("fhicl_pound_include_") != std::string::npos) {
+    object[literal::comment] = std::string{literal::whitespace};
+    object[literal::annotation] = std::string{literal::whitespace};
+  } else {
+    add_comment(comment_at, literal::comment, linenum - 1);
 
-  if (value.tag != ::fhicl::TABLE) add_comment(annotation_at, literal::annotation, linenum);
+    if (value.tag != ::fhicl::TABLE) add_comment(annotation_at, literal::annotation, linenum);
+  }
 
   TRACE_(2, "fcl2jsondb() value type=<" << fcl::tag_as_string(value.tag) << ">");
 

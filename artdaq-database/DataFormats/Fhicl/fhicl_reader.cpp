@@ -77,7 +77,13 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
       opts.enablePrologMode();
 
       auto& data = make_SubNode(data_node, literal::prolog_node);
-      auto& metadata = make_SubNode(metadata_node, literal::prolog_node);
+
+      auto& prolog = make_SubNode(metadata_node, literal::prolog_node);
+      prolog[literal::comment] = std::string{"#"}.append(literal::prolog_node);
+      prolog[literal::type] = std::string{literal::table};
+      prolog[literal::annotation] = std::string{"//Auto generated "}.append(literal::prolog_node);
+
+      auto& metadata = make_SubNode(prolog, literal::children);
 
       for (auto const& fhicl_element : fhicl_table) {
         if (fhicl_element.second.in_prolog && opts.readProlog) {
@@ -93,7 +99,13 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
       opts.enableDefaultMode();
 
       auto& data = make_SubNode(data_node, literal::main_node);
-      auto& metadata = make_SubNode(metadata_node, literal::main_node);
+
+      auto& main = make_SubNode(metadata_node, literal::main_node);
+      main[literal::comment] = std::string{"#"}.append(literal::main_node);
+      main[literal::type] = std::string{literal::table};
+      main[literal::annotation] = std::string{"//Auto generated "}.append(literal::main_node);
+
+      auto& metadata = make_SubNode(main, literal::children);
 
       for (auto const& fhicl_element : fhicl_table) {
         if (!fhicl_element.second.in_prolog && opts.readMain) {
@@ -149,7 +161,8 @@ bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
       array.push_back(jsn::object_t());
       auto& object = boost::get<jsn::object_t>(array.back());
       object.push_back(jsn::data_t::make(literal::linenum, comment.first));
-      object.push_back(jsn::data_t::make(literal::value, artdaq::database::dataformats::filter_jsonstring(comment.second)));
+      object.push_back(
+          jsn::data_t::make(literal::value, artdaq::database::dataformats::filter_jsonstring(comment.second)));
     }
 
     json_array.swap(array);

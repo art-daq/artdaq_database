@@ -120,10 +120,14 @@
 },
 "metadata" : {
 "prolog" : {
+"comment" : "#prolog",
+"type" : "table",
+"annotation" : "//Auto generated prolog",
+"children" : {
 "fhicl_pound_include_0" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : "#include |metrics.fcl|"
+"annotation" : " "
 },
 "rce_standard" : {
 "type" : "table",
@@ -260,12 +264,12 @@
 "fhicl_pound_include_1" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : "#include |rce_expert_run_options.fcl|"
+"annotation" : " "
 },
 "fhicl_pound_include_2" : {
 "type" : "string",
-"comment" : "#include |rce_expert_run_options.fcl|",
-"annotation" : "#include |user_run_options.fcl|"
+"comment" : " ",
+"annotation" : " "
 },
 "rce_standard" : {
 "type" : "string",
@@ -397,8 +401,13 @@
 "comment" : " ",
 "annotation" : " "
 }
+}
 },
 "main" : {
+"comment" : "#main",
+"type" : "table",
+"annotation" : "//Auto generated main",
+"children" : {
 "rce05_standard" : {
 "type" : "string",
 "comment" : " ",
@@ -676,6 +685,7 @@
 }
 }
 }
+}
 },
 "comments" : [
 {
@@ -724,7 +734,7 @@
 },
 {
 "linenum" : 57,
-"value" : "# put the user's changes in, and then alias rce_standard back to daq"
+"value" : "# put the user^s changes in, and then alias rce_standard back to daq"
 },
 {
 "linenum" : 61,
@@ -736,6 +746,7 @@
 }
 ],
 "origin" : {
+"format" : "fhicl",
 "source" : "fhicl_to_json",
 "timestamp" : "Mon Feb  8 14:00:30 2016"
 }

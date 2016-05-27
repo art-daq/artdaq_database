@@ -115,9 +115,18 @@
 },
 "metadata" : {
 "prolog" : {
+"comment" : "#prolog",
+"type" : "table",
+"annotation" : "//Auto generated prolog",
+"children" : {
 
+}
 },
 "main" : {
+"comment" : "#main",
+"type" : "table",
+"annotation" : "//Auto generated main",
+"children" : {
 "services" : {
 "type" : "table",
 "comment" : " ",
@@ -394,6 +403,7 @@
 }
 }
 }
+}
 },
 "comments" : [
 {
@@ -450,6 +460,7 @@
 }
 ],
 "origin" : {
+"format" : "fhicl",
 "source" : "fhicl_to_json",
 "timestamp" : "Mon Feb  8 14:00:30 2016"
 }

@@ -41,6 +41,7 @@ bool xml_to_json(std::string const& xml, std::string& json) {
     return boost::get<jsn::object_t>(json_root[name]);
   };
 
+  get_object(literal::origin_node)[literal::format] = std::string("xml");
   get_object(literal::origin_node)[literal::source] = std::string("xml_to_json");
   get_object(literal::origin_node)[literal::timestamp] = artdaq::database::dataformats::timestamp();
 

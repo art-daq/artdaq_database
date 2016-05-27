@@ -6,7 +6,7 @@ include_directories($ENV{MONGODB_FQ_DIR}/include/mongocxx/v0.3)
 find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_FQ_DIR}/lib )
 find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_FQ_DIR}/lib )
 
- art_make_exec(Dune35tDemo_t
+ art_make_exec(ExportDune35tData_t
   LIBRARIES
   artdaq-database_StackTrace  
   artdaq-database_BasicTypes
@@ -36,27 +36,23 @@ string(RANDOM LENGTH 5 ALPHABET 0123456789 VERSION_NUMBER)
 message(STATUS "VERSION_NUMBER=${VERSION_NUMBER}")
 
 ### uncomment to debug tests
-#set (CONFIG_NUMBER "05202016-201808")
-#set (VERSION_NUMBER "56774")
+#set (CONFIG_NUMBER "05172016-193725")
+#set (VERSION_NUMBER "16185")
 
 set (TEST_CONFIGURATION_NAME "testConfigA${CONFIG_NUMBER}")
 SET (TEST_VERSION_NAME    versionA${VERSION_NUMBER} )
 
-message(STATUS "TEST_CONFIGURATION_NAME=${TEST_CONFIGURATION_NAME}")
-message(STATUS "TEST_VERSION_NAME=${TEST_VERSION_NAME}")
-message(STATUS "CONFIG_NUMBER=${CONFIG_NUMBER}")
-message(STATUS "VERSION_NUMBER=${VERSION_NUMBER}")
+SET ( TEST_NUMBER "001" )
+SET ( TEST_NAME "Dune35t_bulkexport" )
 
+SET ( TEST_DBPROVIDER "filesystem" )
+cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC ExportDune35tData_t 
+  DATAFILES 
+  TEST_ARGS -o store -d ${TEST_DBPROVIDER} -f fhicl -v ${TEST_VERSION_NAME}-${TEST_NUMBER} -g ${TEST_CONFIGURATION_NAME}-${TEST_NUMBER} -s "${CMAKE_CURRENT_SOURCE_DIR}/../seeddata" )
 
-add_subdirectory(test001)
-add_subdirectory(test002)
-add_subdirectory(test003)
-add_subdirectory(test004)
-
-#add_subdirectory(test005)
-#add_subdirectory(test006)
-
-#add_subdirectory(test007)
-#add_subdirectory(test008)
-
+SET ( TEST_DBPROVIDER "mongo" )
+cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC ExportDune35tData_t 
+  DATAFILES 
+  TEST_ARGS -o store -d ${TEST_DBPROVIDER} -f fhicl -v ${TEST_VERSION_NAME}-${TEST_NUMBER} -g ${TEST_CONFIGURATION_NAME}-${TEST_NUMBER} -s "${CMAKE_CURRENT_SOURCE_DIR}/../seeddata" )
+  
 install_source()
