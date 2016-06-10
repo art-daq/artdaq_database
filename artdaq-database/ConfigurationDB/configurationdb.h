@@ -6,4 +6,11 @@
 #include "artdaq-database/ConfigurationDB/dboperation_manageconfigs.h"
 #include "artdaq-database/ConfigurationDB/dboperation_globalconf_loadstore.h"
 
+namespace artdaq {
+namespace database {
+namespace jsonutils {
+bool isValidJson(std::string const&);
+}
+}
+}
 #endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_H_ */

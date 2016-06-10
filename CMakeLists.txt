@@ -38,13 +38,12 @@ cet_set_compiler_flags(DIAGS VIGILANT
 )
 
 string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC )
+
 if( ${BTYPE_UC} MATCHES "DEBUG" )
-
-cet_add_compiler_flags( -rdynamic -ldl -fsanitize=address) 
-
-
-#  cet_add_compiler_flags(-fsanitize=address)
+  cet_add_compiler_flags( -fsanitize=address) 
 endif()
+
+cet_add_compiler_flags( -rdynamic -ldl)
 
 cet_report_compiler_flags()
 

@@ -1,69 +1,52 @@
-#include <boost/exception/diagnostic_information.hpp>
-#include <fstream>
-#include <iostream>
-#include <streambuf>
-#include <string>
-#include "artdaq-database/BuildInfo/printStackTrace.h"
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
-#include "artdaq-database/ConfigurationDB/configurationdb.h"
-#include "boost/program_options.hpp"
-#include "cetlib/coded_exception.h"
+#include "test/common.h"
 
-#include "artdaq-database/FhiclJson/fhicljsondb.h"
+#include "artdaq-database/BasicTypes/basictypes.h"
+#include "artdaq-database/ConfigurationDB/configuration_common.h"
+#include "artdaq-database/ConfigurationDB/dispatch_common.h"
+
+#include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 
-namespace bpo = boost::program_options;
+#include "artdaq-database/DataFormats/Json/json_reader.h"
+#include "artdaq-database/DataFormats/common/helper_functions.h"
+#include "artdaq-database/DataFormats/common/shared_literals.h"
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
 namespace cfo = cf::options;
-namespace cfol = cfo::literal;
 
-using Options = cfo::LoadStoreOperation;
+namespace literal = artdaq::database::configuration::literal;
+namespace bpo = boost::program_options;
 
-typedef bool (*test_case)(Options const& /*options*/, std::string const& /*filename*/);
+using Options = cf::ManageConfigsOperation;
 
-bool test_storeconfig(Options const&, std::string const&);
-bool test_loadconfig(Options const&, std::string const&);
+using artdaq::database::jsonutils::JSONDocument;
+using artdaq::database::basictypes::JsonData;
 
 int main(int argc, char* argv[]) try {
+  artdaq::database::filesystem::debug::enable();
+  artdaq::database::mongo::debug::enable();
+  // artdaq::database::jsonutils::debug::enableJSONDocument();
+  //artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
+
+  artdaq::database::configuration::debug::enableFindConfigsOperation();
+  artdaq::database::configuration::debug::enableCreateConfigsOperation();
+  
+  artdaq::database::configuration::debug::options::enableOperationBase();
+  artdaq::database::configuration::debug::options::enableOperationManageConfigs();
+  artdaq::database::configuration::debug::detail::enableCreateConfigsOperation();
+  artdaq::database::configuration::debug::detail::enableFindConfigsOperation();
+  
+  artdaq::database::configuration::debug::enableDBOperationMongo();
+  artdaq::database::configuration::debug::enableDBOperationFileSystem();
+
   debug::registerUngracefullExitHandlers();
-  //    artdaq::database::fhicljson::useFakeTime(true);
+  artdaq::database::dataformats::useFakeTime(true);
 
-  cf::trace_enable_FindConfigsOperation();
-  cf::trace_enable_FindConfigsOperationDetail();
-  cf::trace_enable_DBOperationMongo();
-  cf::trace_enable_DBOperationFileSystem();
-
-  db::filesystem::trace_enable();
-  db::mongo::trace_enable();
-
-  db::fhicljson::trace_enable_fcl2jsondb();
-  db::fhicl::trace_enable_FhiclReader();
-  db::fhicl::trace_enable_FhiclWriter();
-  db::fhicljsondb::trace_enable_fhicljsondb();
-
-  // Get the input parameters via the boost::program_options library,
-  // designed to make it relatively simple to define arguments and
-  // issue errors if argument list is supplied incorrectly
-
-  namespace db = artdaq::database;
-  namespace cfol = artdaq::database::configuration::options::literal;
-  std::ostringstream descstr;
-  descstr << argv[0] << " <-o <operation>>  <-c <config-file>>  <-f <file-format>>";
-  descstr << "  <-t <type>> <-v <version>>  <-g <globalid>>  <-d <database>>";
-
-  bpo::options_description desc = descstr.str();
-
-  desc.add_options()("operation,o", bpo::value<std::string>(), "Operation [load/store].")(
-      "configuration,c", bpo::value<std::string>(), "Configuration file name.")(
-      "format,f", bpo::value<std::string>(), "Configuration file format [fhicl/json/gui].")(
-      "type,t", bpo::value<std::string>(), "Configuration collection type name.")(
-      "version,v", bpo::value<std::string>(), "Configuration version.")("globalid,g", bpo::value<std::string>(),
-                                                                        "Gloval config id.")(
-      "database,d", bpo::value<std::string>(), "Database provider name.")("help,h", "produce help message");
+  auto options = Options{argv[0]};
+  auto desc = options.makeProgramOptions();
 
   bpo::variables_map vm;
 
@@ -76,130 +59,132 @@ int main(int argc, char* argv[]) try {
   }
 
   if (vm.count("help")) {
-    std::cout << desc << std::endl;
+    std::cerr << desc << std::endl;
     return process_exit_code::HELP;
   }
-  auto options = Options{};
 
-  if (!vm.count("operation")) {
-    std::cerr << "Exception from command line processing in " << argv[0] << ": no database operation given.\n"
+  auto exit_code = options.readProgramOptions(vm);
+  if (exit_code != process_exit_code::SUCCESS) {
+    std::cerr << desc << std::endl;
+    return exit_code;
+  }
+
+  if (!vm.count(literal::option::result)) {
+    std::cerr << "Exception from command line processing in " << argv[0] << ": no result file name given.\n"
               << "For usage and an options list, please do '" << argv[0] << " --help"
               << "'.\n";
+
     return process_exit_code::INVALID_ARGUMENT | 1;
-  } else {
-    options.operation(vm["operation"].as<std::string>());
   }
 
-  if (!vm.count("configuration")) {
-    std::cerr << "Exception from command line processing in " << argv[0] << ": no file name given.\n"
-              << "For usage and an options list, please do '" << argv[0] << " --help"
-              << "'.\n";
-    return process_exit_code::INVALID_ARGUMENT | 2;
-  }
-  auto file_name = vm["configuration"].as<std::string>();
+  auto file_res_name = vm[literal::option::result].as<std::string>();
 
-  if (!vm.count("type")) {
-    std::cerr << "Exception from command line processing in " << argv[0] << ": no configuration type given.\n"
-              << "For usage and an options list, please do '" << argv[0] << " --help"
-              << "'.\n";
-    return process_exit_code::INVALID_ARGUMENT | 3;
-  } else {
-    options.type(vm["type"].as<std::string>());
+  auto file_src_name = file_res_name;
+
+  if (vm.count(literal::option::source)) {
+    file_src_name = vm[literal::option::source].as<std::string>();
   }
 
-  if (!vm.count("globalid")) {
-    std::cerr << "Exception from command line processing in " << argv[0] << ": no globalid file given.\n"
-              << "For usage and an options list, please do '" << argv[0] << " --help"
-              << "'.\n";
-    return process_exit_code::INVALID_ARGUMENT | 4;
-  } else {
-    options.globalConfiguration(vm["globalid"].as<std::string>());
-  }
+  auto options_string = options.to_string();
+  auto test_document = std::string{};
 
-  if (!vm.count("database")) {
-    std::cerr << "Exception from command line processing in " << argv[0] << ": no database provider given.\n"
-              << "For usage and an options list, please do '" << argv[0] << " --help"
-              << "'.\n";
-    return process_exit_code::INVALID_ARGUMENT | 5;
+  std::cout << "Parsed options:\n" << options_string << "\n";
 
-  } else {
-    options.provider(vm["database"].as<std::string>());
-  }
+  using namespace artdaq::database::configuration::json;
 
-  if (!vm.count("format")) {
-    std::cerr << "Exception from command line processing in " << argv[0] << ": no configuration format given.\n"
-              << "For usage and an options list, please do '" << argv[0] << " --help"
-              << "'.\n";
-    return process_exit_code::INVALID_ARGUMENT | 6;
-
-  } else {
-    options.dataFormat(vm["format"].as<std::string>());
-  }
-
-  if (options.operation().compare(cfol::operation_store) == 0) {
-    if (!vm.count("version")) {
-      std::cerr << "Exception from command line processing in " << argv[0] << ": no configuration version given.\n"
-                << "For usage and an options list, please do '" << argv[0] << " --help"
-                << "'.\n";
-      return process_exit_code::INVALID_ARGUMENT | 7;
-    } else {
-      options.version(vm["version"].as<std::string>());
-    }
+  cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP, std::string const&, std::string&>(
+      literal::operation::load, load_configuration, options_string, test_document);
+  
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
+      "findconfigs", find_global_configurations, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
+      "buildfilter", build_global_configuration_search_filter, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
+      "addconfig", add_configuration_to_global_configuration, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
+      "findversions", find_configuration_versions, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
+      "findentities", find_configuration_entities, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>("addalias", add_version_alias,
+                                                                                  options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>("removealias", remove_version_alias,
+                                                                                  options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>("findaliases", find_version_aliases,
+                                                                                  options_string);
+  try {
+    std::ifstream is(file_src_name);
+    test_document = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+    is.close();
+    cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
+        literal::operation::store, store_configuration, options_string, test_document);
+  } catch (...) {
   }
 
   std::cout << "Running test:<" << options.operation() << ">\n";
 
-  auto runTest = [](std::string const& name) {
-    auto tests = std::map<std::string, test_case>{{"store", test_storeconfig}, {"load", test_loadconfig}};
+  auto result = cf::getOperations().at(options.operation())->invoke();
 
-    return tests.at(name);
-  };
+  if (!result.first) {
+    std::cout << "Test failed; error message: " << result.second << "\n";
+    std::cout << debug::current_exception_diagnostic_information();
+    return process_exit_code::FAILURE;
+  }
 
-  auto testResult = runTest(options.operation())(options, file_name);
+  auto returned = std::string{result.second};
 
-  if (testResult) return process_exit_code::SUCCESS;
+  std::ifstream is(file_res_name);
+  auto expected = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+  is.close();
+
+  using cfo::data_format_t;
+
+  if (options.dataFormat() == data_format_t::gui || options.dataFormat() == data_format_t::db ||
+      options.dataFormat() == data_format_t::json) {
+    auto compare_result = artdaq::database::json::compare_json_objects(returned, expected);
+    if (compare_result.first) {
+      std::cout << "returned:\n" << returned << "\n";
+
+      return process_exit_code::SUCCESS;
+    }
+    std::cout << "Test failed (expected!=returned); error message: " << compare_result.second << "\n";
+  } else if (expected.compare(returned) == 0) {
+    std::cout << "returned:\n" << returned << "\n";
+
+    return process_exit_code::SUCCESS;
+  } else if (expected.pop_back(), expected.compare(returned) == 0) {
+    std::cout << "returned:\n" << returned << "\n";
+
+    return process_exit_code::SUCCESS;
+  }
+
+  std::cout << "Test failed (expected!=returned)\n";
+
+  std::cout << "returned:\n" << returned << "\n";
+  std::cout << "expected:\n" << expected << "\n";
+
+  auto mismatch = std::mismatch(expected.begin(), expected.end(), returned.begin());
+  std::cout << "File sizes (exp,ret)=(" << std::distance(expected.begin(), expected.end()) << ","
+            << std::distance(returned.begin(), returned.end()) << ")\n";
+
+  std::cout << "First mismatch at position " << std::distance(expected.begin(), mismatch.first) << ", (exp,ret)=(0x"
+            << std::hex << (unsigned int)*mismatch.first << ",0x" << (unsigned int)*mismatch.second << ")\n";
+
+  auto file_out_name = std::string(artdaq::database::mkdir(tmpdir))
+                           .append(argv[0])
+                           .append("-")
+                           .append(options.operation())
+                           .append("-")
+                           .append(basename((char*)file_src_name.c_str()))
+                           .append(".txt");
+
+  std::ofstream os(file_out_name.c_str());
+  std::copy(returned.begin(), returned.end(), std::ostream_iterator<char>(os));
+  os.close();
+
+  std::cout << "Wrote file:" << file_out_name << "\n";
 
   return process_exit_code::FAILURE;
 } catch (...) {
-  std::cerr << "Process exited with error: " << boost::current_exception_diagnostic_information();
+  std::cout << "Process exited with error: " << boost::current_exception_diagnostic_information();
   return process_exit_code::UNCAUGHT_EXCEPTION;
-}
-
-bool test_storeconfig(Options const& options, std::string const& file_name) {
-  assert(!file_name.empty());
-
-  std::ifstream is(file_name);
-
-  std::string configuration((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-
-  is.close();
-
-  auto result = cf::store_configuration(options, configuration);
-
-  if (!result.first) {
-    std::cerr << "Error message: " << result.second << "\n";
-    return false;
-  }
-
-  return true;
-}
-
-bool test_loadconfig(Options const& options, std::string const& file_name) {
-  assert(!file_name.empty());
-
-  auto configuration = std::string();
-
-  auto result = cf::load_configuration(options, configuration);
-
-  if (!result.first) {
-    std::cerr << "Error message: " << result.second << "\n";
-    return false;
-  }
-
-  std::ofstream os(file_name);
-  std::copy(configuration.begin(), configuration.end(), std::ostream_iterator<char>(os));
-
-  os.close();
-
-  return true;
 }

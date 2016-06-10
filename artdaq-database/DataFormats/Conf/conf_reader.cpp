@@ -17,7 +17,7 @@ using artdaq::database::conf::ConfReader;
 
 namespace literal = artdaq::database::dataformats::literal;
 
-bool ConfReader::read(std::string const& in, jsn::object_t& json_object) {
+bool ConfReader::read(std::string const& in [[gnu::unused]], jsn::object_t& json_object) {
   assert(!in.empty());
   assert(json_object.empty());
 

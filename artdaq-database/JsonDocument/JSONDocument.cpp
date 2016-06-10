@@ -31,6 +31,14 @@ constexpr std::uint8_t static_cast_as_uint8_t(T const& t) {
   return static_cast<std::uint8_t>(t);
 }
 
+bool isValidJson(std::string const& json_buffer) {
+  auto document = bsoncxx::from_json(json_buffer);
+
+  if (!document) return false;
+
+  return true;
+}
+
 std::string JSONDocument::validate(std::string const& json) {
   assert(!json.empty());
 

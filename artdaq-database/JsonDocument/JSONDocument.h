@@ -7,6 +7,8 @@ namespace artdaq {
 namespace database {
 namespace jsonutils {
 
+bool isValidJson(std::string const&);
+
 using path_t = std::string;
 
 class notfound_exception : public cet::exception {
@@ -54,7 +56,7 @@ class JSONDocument final {
   static std::string validate(std::string const&);
   static std::string value(JSONDocument const&);
   static std::string value_at(JSONDocument const&, std::size_t);
-  
+
   static JSONDocument loadFromFile(std::string const&);
 
   // defaults
