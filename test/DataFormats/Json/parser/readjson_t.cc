@@ -51,9 +51,11 @@ int main(int argc, char* argv[]) try {
 
   auto reader = jsn::JsonReader{};
 
-  jsn::object_t doc_ast;
+  jsn::object_t doc_ast1;
 
-  if (!reader.read(json, doc_ast)) {
+  if (!reader.read(json, doc_ast1)) {
+      std::cout << "Failed reading JSON buffer: << " << json_buffer.str() << ">>\n";
+
     return process_exit_code::FAILURE;
   }
 
@@ -61,13 +63,33 @@ int main(int argc, char* argv[]) try {
 
   auto jsonout = std::string();
 
-  if (!writer.write(doc_ast, jsonout)) {
+  if (!writer.write(doc_ast1, jsonout)) {
     return process_exit_code::FAILURE;
   }
+    std::cout << "Initial:" << json << "\n";
+    std::cout << "Converted:" << jsonout << "\n";
+  
+  jsn::object_t doc_ast2;
 
-  std::cout << "Source:" << json << "\n";
-  std::cout << "Result:" << jsonout << "\n";
-  return process_exit_code::SUCCESS;
+  if (!reader.read(jsonout, doc_ast2)) {
+      std::cout << "Failed reading JSON buffer: << " << jsonout << ">>\n";
+
+    return process_exit_code::FAILURE;
+  }
+  
+  auto compare_result= doc_ast1==doc_ast2;
+
+  if(compare_result.first){
+      std::cout << "Returned:" << jsonout << "\n";
+      return process_exit_code::SUCCESS;
+  }else{
+    std::cout << "Test failed (expected!=returned); error message: " << compare_result.second << "\n";
+
+    std::cout << "Expected:" << json << "\n";
+    std::cout << "Returned:" << jsonout << "\n";
+    
+    return process_exit_code::FAILURE;
+  }
 } catch (...) {
   std::cerr << "Process exited with error: " << boost::current_exception_diagnostic_information();
   return process_exit_code::UNCAUGHT_EXCEPTION;
