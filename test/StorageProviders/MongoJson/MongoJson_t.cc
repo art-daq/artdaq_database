@@ -7,8 +7,6 @@
 #include "artdaq-database/DataFormats/common/shared_literals.h"
 #include "artdaq-database/DataFormats/common/helper_functions.h"
 
-#include <bsoncxx/json.hpp>
-
 namespace  bpo = boost::program_options;
 using namespace artdaq::database;
 
