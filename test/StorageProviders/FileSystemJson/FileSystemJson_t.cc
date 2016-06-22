@@ -269,7 +269,7 @@ bool test_search2(std::string const& source, std::string const& compare,std::str
   
   auto json = JsonData{"{\"document\":" + source + ", \"collection\":\"" +colle11ctionName +"\"}"};
 
-  auto repeatCount = std::size_t{100};
+  auto repeatCount = std::size_t{10};
   
   auto object_ids = std::vector<std::string>();
   

@@ -10,9 +10,18 @@
 
 #define TRACE_NAME "JSNU:Document_C"
 
+namespace artdaq {
+namespace database {
+namespace mongo {
+std::string to_json(bsoncxx::document::view view);
+}  // namespace mongo
+}  // namespace database
+}  // namespace artdaq
+
+
 namespace adj= artdaq::database::jsonutils;
   
-bool adj::isValidJson(std::string const& json_buffer) {
+bool adj::isValidJson(std::string const& json_buffer [[gnu::unused]]) {
   auto document = bsoncxx::from_json(json_buffer);
 
   if (!document) return false;
@@ -34,5 +43,5 @@ std::string adj::filterJson(std::string const& json) {
     throw cet::exception("JSONDocument_utils") << "Invalid JSON document; json=" << json;
   }
 
-  return bsoncxx::to_json(document->view());
+  return  artdaq::database::mongo::to_json(document->view());
 }

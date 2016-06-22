@@ -498,7 +498,7 @@ object_id_t extract_oid(std::string const& filter) {
   auto results = std::smatch();
 
   if (!std::regex_search(filter, results, ex))
-    throw cet::exception("JSONDocument") << ("Regex search failed; JSON buffer:" + filter);
+    throw cet::exception("JSONDocument") << ("Regex ouid search failed; JSON buffer:" + filter);
 
   if (results.size() != 2) {
     // we are interested in a second match

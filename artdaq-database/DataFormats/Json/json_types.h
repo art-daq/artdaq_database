@@ -30,7 +30,7 @@ enum struct type_t { NOTSET = 0, VALUE, DATA, OBJECT, ARRAY };
 struct print_visitor : public boost::static_visitor<std::string> {
   std::string operator()(object_t const&) const { return "object(...)"; }
   std::string operator()(array_t const&) const { return "array(...)"; }
-  std::string operator()(std::string const& val) const { return "std::string(" + val + ")"; }
+  std::string operator()(std::string const& val) const { std::stringstream ss; ss << "std::string(" << val << ")";  return ss.str();}
   std::string operator()(double const& val) const { return "double(" + std::to_string(val) + ")"; }
   std::string operator()(int const& val) const { return "int(" + std::to_string(val) + ")"; }
   std::string operator()(bool const& val) const { return val ? "bool(true)" : "bool(false)"; }

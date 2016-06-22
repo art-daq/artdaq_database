@@ -17,7 +17,7 @@ template <typename Iter>
 struct json_parser_grammar : qi::grammar<Iter, object_t(), ascii::space_type> {
   json_parser_grammar() : json_parser_grammar::base_type(start) {
     
-    escape_rule = ascii::char_('\\') >> ascii::char_("\\\"\b\f\n\r\t");
+    escape_rule = ascii::char_('\\') >> ascii::char_("\\\"bfnrt");
     
     text_string = +(escape_rule | ~ascii::char_('"'));
     

@@ -8,7 +8,7 @@
 #define TRACE_NAME "JSNU:Document_C"
 
 namespace regex {
-constexpr auto parse_value = "^\\{[^:]+:\\s+([\\s\\S]+)\\}$";
+constexpr auto parse_value = "[^:]+:\\s*([\\s\\S]+)[\\s*\\S*^}]";
 }
 
 namespace artdaq {
@@ -23,7 +23,7 @@ std::string JSONDocument::value(JSONDocument const& document) {
   auto results = std::smatch();
 
   if (!std::regex_search(document._json_buffer, results, ex))
-    throw cet::exception("JSONDocument") << ("Regex search failed; JSON buffer:" + document._json_buffer);
+    throw cet::exception("JSONDocument") << ("Regex value search failed; JSON buffer:" + document._json_buffer);
 
   if (results.size() != 2) {
     // we are interested in a second match

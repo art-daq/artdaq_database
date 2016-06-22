@@ -104,7 +104,7 @@ JSONDocument JSONDocument::findChild(path_t const& path) const {
       TRACE_(5, "findChild() recurse() jsn::value_t is not jsn::object_t;  value=" << boost::apply_visitor(
                     jsn::print_visitor(), childValue));
 
-      throw notfound_exception("JSONDocument") << "Search failed for" << path_tokens.at(currentDepth)
+      throw notfound_exception("JSONDocument") << "Search failed for json element name=" << path_tokens.at(currentDepth)
                                                << ", findChild() recurse() jsn::value_t is not jsn::object_t;  value="
                                                << boost::apply_visitor(jsn::print_visitor(), childValue);
     }
@@ -116,10 +116,10 @@ JSONDocument JSONDocument::findChild(path_t const& path) const {
                                                          << ">");
 
     if (childDocument.count(path_tokens.at(currentDepth)) == 0) {
-      TRACE_(5, "findChild() recurse() Error: Search failed for" << path_tokens.at(currentDepth) << ", search path =<"
+      TRACE_(5, "findChild() recurse() Error: Search failed for json element name=" << path_tokens.at(currentDepth) << ", search path =<"
                                                                  << path << ">.");
 
-      throw notfound_exception("JSONDocument") << "Search failed for" << path_tokens.at(currentDepth)
+      throw notfound_exception("JSONDocument") << "Search failed for json element name=" << path_tokens.at(currentDepth)
                                                << ", search path =<" << path << ">.";
     }
 

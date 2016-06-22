@@ -1,5 +1,6 @@
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
+#include "artdaq-database/StorageProviders/MongoDB/mongo_json.h"
 #include "artdaq-database/StorageProviders/common.h"
 
 #include <bsoncxx/builder/basic/helpers.hpp>
@@ -118,8 +119,11 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::load(JsonData const& sea
 
   auto cursor = collection.find(filter.view_document());
 
-  for (auto& doc : cursor) returnCollection.emplace_back(bsoncxx::to_json(doc));
+  for (auto& doc : cursor) {
+    TRACE_(3, "found_document=<" << artdaq::database::mongo::to_json(doc) << ">");
 
+    returnCollection.emplace_back(artdaq::database::mongo::to_json(doc));
+  }
   return returnCollection;
 }
 
