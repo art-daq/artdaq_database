@@ -1,14 +1,7 @@
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/JsonDocument/common.h"
 
-#include <bsoncxx/builder/basic/helpers.hpp>
-#include <bsoncxx/builder/stream/array.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
-#include <bsoncxx/document/value.hpp>
-#include <bsoncxx/document/view.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/types.hpp>
-#include <bsoncxx/types/value.hpp>
+#include "artdaq-database/DataFormats/Json/json_common.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -16,290 +9,144 @@
 
 #define TRACE_NAME "JSNU:Document_C"
 
-namespace regex {
-constexpr auto parse_value = "^\\{[^:]+:\\s+([\\s\\S]+)\\}$";
-}
-
 namespace artdaq {
 namespace database {
 namespace jsonutils {
 
-using value_type_t = bsoncxx::type;
+bool matches(jsn::value_t const& left, jsn::value_t const& right) {
+  if (left.type() != right.type()) return false;
 
-template <typename T>
-constexpr std::uint8_t static_cast_as_uint8_t(T const& t) {
-  return static_cast<std::uint8_t>(t);
-}
+  if (left.type() == typeid(const jsn::object_t)) {
+    auto const& leftObj = boost::get<jsn::object_t>(left);
+    auto const& rightObj = boost::get<jsn::object_t>(right);
 
-bool isValidJson(std::string const& json_buffer) {
-  auto document = bsoncxx::from_json(json_buffer);
+    // partial elements match
+    // if (leftObj.size()!=rightObj.size()) return false;
 
-  if (!document) return false;
+    if (leftObj.empty() || rightObj.empty()) return false;
 
-  return true;
-}
+    auto const& tempateObj = leftObj.size() >= rightObj.size() ? leftObj : rightObj;
+    auto const& candidateObj = leftObj.size() >= rightObj.size() ? rightObj : leftObj;
 
-std::string JSONDocument::validate(std::string const& json) {
-  assert(!json.empty());
+    for (auto const& templateKVP : tempateObj) {
+      if (candidateObj.count(templateKVP.key) != 1) continue;
 
-  TRACE_(10, "validate() json=<" << json << ">");
+      auto const& candidateVal = candidateObj.at(templateKVP.key);
+      auto const& templateVal = templateKVP.value;
 
-  auto document = bsoncxx::from_json(json);
+      if (!matches(templateVal, candidateVal)) {
+        TRACE_(26, "artdaq::database::jsonutils::matches() objects are different at key=<" << templateKVP.key << ">");
 
-  if (!document) {
-    TRACE_(10, "validate()"
-                   << "Invalid JSON document.");
-
-    throw cet::exception("JSONDocument") << "Invalid JSON document; json=" << json;
-  }
-
-  return bsoncxx::to_json(document->view());
-}
-
-std::string JSONDocument::value(JSONDocument const& document) {
-  auto ex = std::regex({regex::parse_value});
-
-  auto results = std::smatch();
-
-  if (!std::regex_search(document._json_buffer, results, ex))
-    throw cet::exception("JSONDocument") << ("Regex search failed; JSON buffer:" + document._json_buffer);
-
-  if (results.size() != 2) {
-    // we are interested in a second match
-    TRACE_(12, "value()"
-                   << "JSON regex_search() result count=" << results.size());
-    for (auto const& result : results) {
-      TRACE_(12, "value()"
-                     << "JSON regex_search() result=" << result);
+        return false;
+      }
     }
 
-    throw cet::exception("JSONDocument") << ("Regex search failed, regex_search().size()!=1; JSON buffer: " +
-                                             document._json_buffer);
-  }
+    return true;
 
-  auto match = std::string(results[1]);
+  } else if (left.type() == typeid(const jsn::array_t)) {
+    auto const& leftObj = boost::get<jsn::array_t>(left);
+    auto const& rightObj = boost::get<jsn::array_t>(right);
 
-  match.erase(match.find_last_not_of(" \n\r\t") + 1);
+    if (leftObj.size() != rightObj.size()) return false;
 
-  auto dequote = [](auto s) {
+    if (leftObj.empty() || rightObj.empty()) return false;
 
-    if (s[0] == '"' && s[s.length() - 1] == '"')
-      return s.substr(1, s.length() - 2);
-    else
-      return s;
-  };
+    auto elementCount = leftObj.size();
 
-  match = dequote(match);
+    auto leftObjIter = leftObj.begin();
+    auto rightObjIter = rightObj.begin();
 
-  TRACE_(12, "value()"
-                 << "JSON regex_search() result=" << match);
+    while (elementCount--) {
+      if (!matches(*leftObjIter, *rightObjIter)) return false;
 
-  return match;
-}
+      std::advance(leftObjIter, 1);
+      std::advance(rightObjIter, 1);
+    }
+    return true;
 
-std::string JSONDocument::value_at(JSONDocument const& document, std::size_t index) {
-  auto values = bsoncxx::from_json(JSONDocument::value(document));
-
-  auto arrayView = values->view();
-
-  if (arrayView.empty()) {
-    TRACE_(14, "value_at() Failed to call value_at(); arrayView is empty, document=<" << document._json_buffer << ">");
-    throw cet::exception("JSONDocument") << "Failed to call value_at(); arrayView is empty, document=<"
-                                         << document._json_buffer << ">";
-  }
-
-  if (std::distance(arrayView.cbegin(), arrayView.cend()) < int(index)) {
-    TRACE_(14, "value_at() Failed to call value_at(); not enough elements, document=<" << document._json_buffer << ">");
-    throw cet::exception("JSONDocument") << "Failed to call value_at(); not enough elements, document=<"
-                                         << document._json_buffer << ">";
-  }
-
-  auto pos = arrayView.begin();
-  std::advance(pos, index);
-
-  return bsoncxx::to_json(pos->get_value());
-}
-
-JSONDocument JSONDocument::loadFromFile(std::string const& fileName) {
-  assert(!fileName.empty());
-
-  std::ifstream is;
-  is.open(fileName.c_str());
-
-  if (!is.good()) {
-    is.close();
-    TRACE_(11, "loadFromFile()"
-                   << "Failed opening a JSON file=" << fileName);
-
-    throw cet::exception("JSONDocument") << "Failed opening a JSON file=" << fileName;
-  }
-
-  std::string json_buffer((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-
-  is.close();
-
-  return {json_buffer};
-}
-
-std::vector<std::string> JSONDocument::_split_path(std::string const& path) const {
-  auto tmp = std::string{path};
-
-  TRACE_(1, "split_path() args path=<" << path << ">");
-
-  std::replace(tmp.begin(), tmp.end(), '.', ' ');
-
-  std::istringstream iss(tmp);
-
-  std::vector<std::string> tokens{std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>{}};
-
-  if (!tokens.empty()) {
-    std::stringstream ss;
-    for (auto const& token : tokens) ss << "\"" << token << "\",";
-    TRACE_(1, "split_path() loop token=<" << ss.str() << ">");
   } else {
-    TRACE_(1, "split_path() token=<empty> ");
-  }
+    auto leftObj = boost::apply_visitor(jsn::tostring_visitor(), left);
+    auto rightObj = boost::apply_visitor(jsn::tostring_visitor(), right);
 
-  return tokens;
+    return leftObj == rightObj;
+  }
 }
 
-// returns inserted child
-JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t const& path) {
+// returns found child
+JSONDocument JSONDocument::findChild(path_t const& path) const {
   assert(!path.empty());
-  assert(!newChild._json_buffer.empty());
 
-  TRACE_(2, "insertChild() begin _json_buffer=<" << _json_buffer << ">");
-  TRACE_(2, "insertChild() args  newChild=<" << newChild._json_buffer << ">");
-  TRACE_(2, "insertChild() args  path=<" << path << ">");
+  TRACE_(5, "findChild() begin _json_buffer=<" << _json_buffer << ">");
+  TRACE_(5, "findChild() args  path=<" << path << ">");
 
   auto path_tokens = _split_path(path);
 
-  if (path_tokens.empty()) throw cet::exception("JSONDocument") << "Invalid path; path=" << path;
+  if (path_tokens.empty()) throw cet::exception("JSONDocument") << "Invalid paht; path=" << path;
 
   std::reverse(path_tokens.begin(), path_tokens.end());
 
-  auto newChildDocument = bsoncxx::from_json(newChild._json_buffer);
-  auto newChildValue = newChildDocument->view().begin()->get_value();
-  auto hasPayload = newChildDocument->view().begin()->key().to_string().compare("payload");
+  auto document = jsn::value_t{jsn::object_t{}};
 
-  if (!newChildDocument) {
-    TRACE_(2, "insertChild()"
-                  << "Invalid newChild");
-
-    throw cet::exception("JSONDocument") << "Invalid newChild; json_buffer=" << newChild._json_buffer;
-  }
-
-  auto initialDocument = bsoncxx::from_json(_json_buffer);
-
-  if (!initialDocument) {
-    TRACE_(2, "insertChild()"
+  if (!jsn::JsonReader().read(_json_buffer, boost::get<jsn::object_t>(document))) {
+    TRACE_(5, "findChild()"
                   << " Invalid initialDocument");
 
     throw cet::exception("JSONDocument") << " Invalid initialDocument; json_buffer=" << _json_buffer;
   }
 
-  using bsoncxx::builder::stream::document;
-  using bsoncxx::document::view;
-  using bsoncxx::document::value;
+  auto tmpJson = std::string{};
 
-  auto wasUpdated = bool{false};
+  std::function<jsn::value_t const(jsn::value_t const&, std::size_t)> recurse = [&](jsn::value_t const& childValue,
+                                                                                    std::size_t currentDepth) {
+    TRACE_(5, "findChild() recurse() args currentDepth=" << currentDepth);
 
-  std::function<document(view const&, std::size_t)> recurse = [&](view const& currentView, std::size_t currentDepth) {
-    using namespace bsoncxx::builder::stream;
+    if (childValue.type() != typeid(const jsn::object_t)) {
+      TRACE_(5, "findChild() recurse() jsn::value_t is not jsn::object_t;  value=" << boost::apply_visitor(
+                    jsn::print_visitor(), childValue));
 
-    auto resultDocument = document{};
-
-    TRACE_(2, "insertChild() recurse() args currentDepth=" << currentDepth);
-    TRACE_(2, "insertChild() recurse() args currentView=<" << bsoncxx::to_json(currentView) << ">");
-
-    if (currentDepth == 0) {
-      if (!currentView.empty() && path_tokens.at(currentDepth) != "root") {
-        for (auto const& childElement : currentView) {
-          TRACE_(2, "insertChild() recurse() insert() path,key=<" << path_tokens.at(currentDepth) << ","
-                                                                  << childElement.key().to_string() << ">");
-          TRACE_(2, "insertChild() recurse() insert() childDocument=<" << bsoncxx::to_json(childElement.get_value())
-                                                                       << ">");
-
-          if (path_tokens.at(currentDepth) == childElement.key().to_string()) {
-            TRACE_(2, "insertChild() Insert failed path =<" << path << ">, call replaceChild() instead.");
-            throw cet::exception("JSONDocument") << "Insert failed path =<" << path
-                                                 << ">, call replaceChild() instead.";
-          } else {
-            resultDocument << childElement.key().to_string() << childElement.get_value();
-          }
-        }
-      }
-
-      resultDocument << path_tokens.at(currentDepth) << newChildValue;
-
-      TRACE_(2, "insertChild() recurse() insert() newChildDocument=<"
-                    << bsoncxx::to_json(bsoncxx::types::b_document{newChildDocument->view()}) << ">");
-
-      wasUpdated = true;
-
-      TRACE_(2, "insertChild() recurse() resultDocument=<" << bsoncxx::to_json(resultDocument) << ">");
-      TRACE_(2, "insertChild() recurse() Insert succeeded.");
-
-      return resultDocument;
+      throw notfound_exception("JSONDocument") << "Search failed for" << path_tokens.at(currentDepth)
+                                               << ", findChild() recurse() jsn::value_t is not jsn::object_t;  value="
+                                               << boost::apply_visitor(jsn::print_visitor(), childValue);
     }
 
-    auto matchedPath = bool{false};
+    auto const& childDocument = boost::get<jsn::object_t>(childValue);
 
-    for (auto const& childElement : currentView) {
-      TRACE_(2, "insertChild() recurse() copy() childElement=<" << bsoncxx::to_json(childElement) << ">");
+    tmpJson.clear();
+    TRACE_(5, "findChild() recurse() args currentView=<" << (jsn::JsonWriter().write(childDocument, tmpJson), tmpJson)
+                                                         << ">");
 
-      auto childType = static_cast_as_uint8_t(childElement.type());
+    if (childDocument.count(path_tokens.at(currentDepth)) == 0) {
+      TRACE_(5, "findChild() recurse() Error: Search failed for" << path_tokens.at(currentDepth) << ", search path =<"
+                                                                 << path << ">.");
 
-      TRACE_(2, "insertChild() recurse() copy() path,key=<" << path_tokens.at(currentDepth) << ","
-                                                            << childElement.key().to_string() << ">");
-
-      switch (childType) {
-        default: {
-          resultDocument << childElement.key().to_string() << childElement.get_value();
-          break;
-        }
-
-        case static_cast_as_uint8_t(value_type_t::k_document): {
-          auto childView = childElement.get_value().get_document();
-
-          TRACE_(2, "insertChild() recurse() copy() childView=<" << bsoncxx::to_json(childView) << ">");
-
-          if (path_tokens.at(currentDepth) == childElement.key().to_string()) {
-            resultDocument << childElement.key().to_string() << open_document
-                           << concatenate{recurse(childView, currentDepth - 1)} << close_document;
-            matchedPath = true;
-          } else {
-            resultDocument << childElement.key().to_string() << open_document << concatenate{childView}
-                           << close_document;
-            TRACE_(2, "insertChild() recurse() copy() resultDocument=<" << bsoncxx::to_json(resultDocument) << ">");
-          }
-          break;
-        }
-      }
+      throw notfound_exception("JSONDocument") << "Search failed for" << path_tokens.at(currentDepth)
+                                               << ", search path =<" << path << ">.";
     }
 
-    if (!matchedPath) {
-      TRACE_(2, "insertChild() recurse() Error: Invalid JSON insert path =<" << path << ">");
+    auto const& matchedValue = childDocument.at(path_tokens.at(currentDepth));
 
-      throw cet::exception("JSONDocument") << "Invalid JSON insert path =<" << path << ">";
-    }
+    if (currentDepth == 0) return matchedValue;
 
-    return resultDocument;
+    return recurse(matchedValue, currentDepth - 1);
   };
 
-  auto updatedDocument = recurse(initialDocument->view(), path_tokens.size() - 1);
+  auto found_value = recurse(document, path_tokens.size() - 1);
 
-  if (!wasUpdated) {
-    TRACE_(2, "insertChild() Error: Insert failed path =<" << path << ">, call replaceChild() instead.");
+  TRACE_(5, "findChild() found child value=" << boost::apply_visitor(jsn::print_visitor(), found_value));
 
-    throw cet::exception("JSONDocument") << "Inset failed path =<" << path << ">, call replaceChild() instead.";
-  }
+  auto result = jsn::object_t{};
 
-  _json_buffer = bsoncxx::to_json(updatedDocument);
+  result[path] = jsn::value_t(found_value);
 
-  TRACE_(2, "insertChild() end  _json_buffer=<" << _json_buffer << ">");
+  tmpJson.clear();
 
-  return (hasPayload == 0) ? bsoncxx::to_json(newChildValue) : newChild;
+  jsn::JsonWriter().write(result, tmpJson);
+
+  TRACE_(5, "findChild() resultDocument=<" << tmpJson << ">");
+
+  TRACE_(5, "findChild() Find succeeded.");
+
+  return {tmpJson};
 }
 
 // returns old child
@@ -317,137 +164,231 @@ JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t con
 
   std::reverse(path_tokens.begin(), path_tokens.end());
 
-  auto newChildDocument = bsoncxx::from_json(newChild._json_buffer);
+  auto document = jsn::value_t{jsn::object_t{}};
 
-  if (!newChildDocument) {
-    TRACE_(4, "replaceChild()"
-                  << "Invalid newChild");
-
-    throw cet::exception("JSONDocument") << "Invalid newChild; json_buffer=" << newChild._json_buffer;
-  }
-
-  auto newChildView = newChildDocument->view();
-
-  auto newChildKey = newChildView.begin()->key().to_string();
-
-  if (newChildKey.compare("payload") == 0) {
-    newChildView = newChildView.begin()->get_value().get_document().value;
-    newChildKey = newChildView.begin()->key().to_string();
-  }
-
-  auto initialDocument = bsoncxx::from_json(_json_buffer);
-
-  if (!initialDocument) {
+  if (!jsn::JsonReader().read(_json_buffer, boost::get<jsn::object_t>(document))) {
     TRACE_(4, "replaceChild()"
                   << " Invalid initialDocument");
 
     throw cet::exception("JSONDocument") << " Invalid initialDocument; json_buffer=" << _json_buffer;
   }
 
-  using bsoncxx::builder::stream::document;
-  using bsoncxx::document::view;
-  using bsoncxx::document::value;
+  auto tmpValue = jsn::value_t{jsn::object_t{}};
 
-  auto wasUpdated = bool{false};
+  if (!jsn::JsonReader().read(newChild._json_buffer, boost::get<jsn::object_t>(tmpValue))) {
+    TRACE_(4, "replaceChild()"
+                  << " Invalid newChild document");
 
-  auto replaced_json_buffer = std::string{};
-
-  std::function<document(view const&, std::size_t)> recurse = [&](view const& currentView, std::size_t currentDepth) {
-    using namespace bsoncxx::builder::stream;
-
-    auto resultDocument = document{};
-
-    TRACE_(4, "replaceChild() recurse() args currentDepth=" << currentDepth);
-    TRACE_(4, "replaceChild() recurse() args currentView=<" << bsoncxx::to_json(currentView) << ">");
-
-    if (currentDepth == 0) {
-      for (auto const& childElement : currentView) {
-        TRACE_(4, "replaceChild() recurse() replace() path,key=<" << path_tokens.at(currentDepth) << ","
-                                                                  << childElement.key().to_string() << ">");
-        TRACE_(4, "replaceChild() recurse() replace() childDocument=<" << bsoncxx::to_json(childElement.get_value())
-                                                                       << ">");
-
-        if (path_tokens.at(currentDepth) == childElement.key().to_string()) {
-          if (childElement.key().to_string() != newChildKey) {
-            resultDocument << path_tokens.at(currentDepth) << newChildDocument->view().begin()->get_value();
-            replaced_json_buffer = bsoncxx::to_json(childElement.get_value());
-          } else {
-            resultDocument << path_tokens.at(currentDepth) << newChildView.begin()->get_value();
-            replaced_json_buffer = std::string("{").append(bsoncxx::to_json(childElement)).append(" }");
-          }
-
-          TRACE_(4, "replaceChild() recurse() replace() newChildDocument=<"
-                        << bsoncxx::to_json(bsoncxx::types::b_document{newChildView}) << ">");
-
-          wasUpdated = true;
-        } else {
-          resultDocument << childElement.key().to_string() << childElement.get_value();
-        }
-      }
-
-      TRACE_(4, "replaceChild() recurse() resultDocument=<" << bsoncxx::to_json(resultDocument) << ">");
-      TRACE_(4, "replaceChild() recurse() Replace succeeded.");
-
-      return resultDocument;
-    }
-
-    auto matchedPath = bool{false};
-
-    for (auto const& childElement : currentView) {
-      TRACE_(4, "replaceChild() recurse() copy() childElement=<" << bsoncxx::to_json(childElement) << ">");
-
-      auto childType = static_cast_as_uint8_t(childElement.type());
-
-      TRACE_(4, "replaceChild() recurse() copy() path,key=<" << path_tokens.at(currentDepth) << ","
-                                                             << childElement.key().to_string() << ">");
-
-      switch (childType) {
-        default: {
-          resultDocument << childElement.key().to_string() << childElement.get_value();
-          break;
-        }
-
-        case static_cast_as_uint8_t(value_type_t::k_document): {
-          auto childView = childElement.get_value().get_document();
-
-          TRACE_(4, "replaceChild() recurse() copy() childView=<" << bsoncxx::to_json(childView) << ">");
-
-          if (path_tokens.at(currentDepth) == childElement.key().to_string()) {
-            resultDocument << childElement.key().to_string() << open_document
-                           << concatenate{recurse(childView, currentDepth - 1)} << close_document;
-            matchedPath = true;
-          } else {
-            resultDocument << childElement.key().to_string() << open_document << concatenate{childView}
-                           << close_document;
-            TRACE_(4, "replaceChild() recurse() copy() resultDocument=<" << bsoncxx::to_json(resultDocument) << ">");
-          }
-          break;
-        }
-      }
-    }
-
-    if (!matchedPath) {
-      TRACE_(4, "replaceChild() recurse() Error: Invalid JSON insert path =<" << path << ">");
-
-      throw cet::exception("JSONDocument") << "Invalid JSON insert path =<" << path << ">";
-    }
-
-    return resultDocument;
-  };
-
-  auto updatedDocument = recurse(initialDocument->view(), path_tokens.size() - 1);
-
-  if (!wasUpdated) {
-    TRACE_(4, "replaceChild() Error: Replace failed path =<" << path << ">, call insertChild() instead.");
-
-    throw cet::exception("JSONDocument") << "Replace failed path =<" << path << ">, call insertChild() instead.";
+    throw cet::exception("JSONDocument") << " Invalid newChild document; json_buffer=" << newChild._json_buffer;
   }
 
-  _json_buffer = bsoncxx::to_json(updatedDocument);
+  auto newValue = jsn::value_t{};
 
-  TRACE_(4, "replaceChild() end  _json_buffer=<" << _json_buffer << ">");
+  if (boost::get<jsn::object_t>(tmpValue).count("payload") == 1) {
+    newValue = boost::get<jsn::object_t>(tmpValue).at("payload");
+    if (newValue.type() == typeid(jsn::object_t) && boost::get<jsn::object_t>(newValue).count(path_tokens.at(0)) == 1)
+      newValue = jsn::value_t{boost::get<jsn::object_t>(newValue).at(path_tokens.at(0))};
+  } else if (boost::get<jsn::object_t>(tmpValue).size() == 1) {
+    newValue = boost::get<jsn::object_t>(tmpValue).begin()->value;
+  } else {
+    newValue = tmpValue;
+    TRACE_(4, "replaceChild()"
+                  << " Replacement payload <" << newChild._json_buffer << ">");
+  }
 
-  return {replaced_json_buffer};
+  TRACE_(4, "replaceChild() new child value=" << boost::apply_visitor(jsn::print_visitor(), newValue));
+
+  auto tmpJson = std::string{};
+
+  std::function<jsn::value_t(jsn::value_t&, std::size_t)> recurse = [&](jsn::value_t& childValue,
+                                                                        std::size_t currentDepth) {
+    TRACE_(4, "replaceChild() recurse() args currentDepth=" << currentDepth);
+
+    if (currentDepth == 0 && childValue.type() != typeid(jsn::object_t)) {
+      TRACE_(4, "replaceChild() recurse() jsn::value_t is not jsn::object_t;  value=" << boost::apply_visitor(
+                    jsn::print_visitor(), childValue));
+
+      throw notfound_exception("JSONDocument")
+          << "Replace failed for" << path_tokens.at(currentDepth)
+          << ", replaceChild() recurse() jsn::value_t is not jsn::object_t;  value="
+          << boost::apply_visitor(jsn::print_visitor(), childValue);
+    }
+
+    auto& childDocument = boost::get<jsn::object_t>(childValue);
+
+    tmpJson.clear();
+    TRACE_(4, "replaceChild() recurse() args childValue=<" << (jsn::JsonWriter().write(childDocument, tmpJson), tmpJson)
+                                                           << ">");
+
+    if (childDocument.count(path_tokens.at(currentDepth)) == 0) {
+      TRACE_(4, "replaceChild() recurse() Error: Replace failed for" << path_tokens.at(currentDepth)
+                                                                     << ", search path =<" << path << ">.");
+
+      throw notfound_exception("JSONDocument") << "Replace failed for" << path_tokens.at(currentDepth)
+                                               << ", search path =<" << path << ">.";
+    }
+
+    auto& matchedValue = childDocument.at(path_tokens.at(currentDepth));
+
+    if (currentDepth == 0) {
+      matchedValue.swap(newValue);
+      return newValue;
+    }
+
+    return recurse(matchedValue, currentDepth - 1);
+  };
+
+  auto replaced_value = recurse(document, path_tokens.size() - 1);
+
+  TRACE_(4, "replaceChild() found child value=" << boost::apply_visitor(jsn::print_visitor(), replaced_value));
+
+  tmpJson.clear();
+  jsn::JsonWriter().write(boost::get<jsn::object_t>(document), tmpJson);
+  TRACE_(4, "replaceChild() resultDocument=<" << tmpJson << ">");
+
+  auto return_json = std::string{};
+  if (replaced_value.type() == typeid(jsn::object_t)) {
+    auto const& replaced_object = boost::get<jsn::object_t>(replaced_value);
+    if (!replaced_object.empty())
+      jsn::JsonWriter().write(replaced_object, return_json);
+    else
+      return_json = "{}";
+  } else {
+    auto replaced_object = jsn::object_t{};
+    replaced_object["replaced"] = replaced_value;
+    jsn::JsonWriter().write(replaced_object, return_json);
+  }
+
+  TRACE_(4, "replaceChild() replacedChild=<" << tmpJson << ">");
+
+  _json_buffer.swap(tmpJson);
+
+  TRACE_(4, "replaceChild() Replace succeeded.");
+  return {return_json};
+}
+
+// returns inserted child
+JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t const& path) {
+  assert(!path.empty());
+  assert(!newChild._json_buffer.empty());
+
+  TRACE_(2, "insertChild() begin _json_buffer=<" << _json_buffer << ">");
+  TRACE_(2, "insertChild() args  newChild=<" << newChild._json_buffer << ">");
+  TRACE_(2, "insertChild() args  path=<" << path << ">");
+
+  auto path_tokens = _split_path(path);
+
+  if (path_tokens.empty()) throw cet::exception("JSONDocument") << "Invalid path; path=" << path;
+
+  std::reverse(path_tokens.begin(), path_tokens.end());
+
+  auto document = jsn::value_t{jsn::object_t{}};
+
+  if (!jsn::JsonReader().read(_json_buffer, boost::get<jsn::object_t>(document))) {
+    TRACE_(4, "insertChild()"
+                  << " Invalid initialDocument");
+
+    throw cet::exception("JSONDocument") << " Invalid initialDocument; json_buffer=" << _json_buffer;
+  }
+
+  auto tmpValue = jsn::value_t{jsn::object_t{}};
+
+  if (!jsn::JsonReader().read(newChild._json_buffer, boost::get<jsn::object_t>(tmpValue))) {
+    TRACE_(4, "insertChild()"
+                  << " Invalid newChild document");
+
+    throw cet::exception("JSONDocument") << " Invalid newChild document; json_buffer=" << newChild._json_buffer;
+  }
+
+  auto newValue = jsn::value_t{};
+
+  if (boost::get<jsn::object_t>(tmpValue).count("payload") == 1) {
+    newValue = boost::get<jsn::object_t>(tmpValue).at("payload");
+    if (newValue.type() == typeid(jsn::object_t) && boost::get<jsn::object_t>(newValue).count(path_tokens.at(0)) == 1)
+      newValue = jsn::value_t{boost::get<jsn::object_t>(newValue).at(path_tokens.at(0))};
+  } else if (boost::get<jsn::object_t>(tmpValue).size() == 1) {
+    newValue = boost::get<jsn::object_t>(tmpValue).begin()->value;
+  } else {
+    newValue = tmpValue;
+    TRACE_(4, "insertChild()"
+                  << " Insert payload <" << newChild._json_buffer << ">");
+  }
+
+  TRACE_(4, "insertChild() new child value=" << boost::apply_visitor(jsn::print_visitor(), newValue));
+
+  auto tmpJson = std::string{};
+
+  std::function<jsn::value_t(jsn::value_t&, std::size_t)> recurse = [&](jsn::value_t& childValue,
+                                                                        std::size_t currentDepth) {
+    TRACE_(4, "insertChild() recurse() args currentDepth=" << currentDepth);
+
+    if (currentDepth == 0 && childValue.type() != typeid(jsn::object_t)) {
+      TRACE_(4, "insertChild() recurse() jsn::value_t is not jsn::object_t;  value=" << boost::apply_visitor(
+                    jsn::print_visitor(), childValue));
+
+      throw notfound_exception("JSONDocument") << "Insert failed for" << path_tokens.at(currentDepth)
+                                               << ", insertChild() recurse() jsn::value_t is not jsn::object_t;  value="
+                                               << boost::apply_visitor(jsn::print_visitor(), childValue);
+    }
+
+    auto& childDocument = boost::get<jsn::object_t>(childValue);
+
+    tmpJson.clear();
+    TRACE_(4, "insertChild() recurse() args childValue=<" << (jsn::JsonWriter().write(childDocument, tmpJson), tmpJson)
+                                                          << ">");
+
+    auto numberOfChildren = childDocument.count(path_tokens.at(currentDepth));
+
+    if (currentDepth == 0 && numberOfChildren != 0) {
+      TRACE_(4, "insertChild() recurse() Error: Insert failed for" << path_tokens.at(currentDepth) << ", search path =<"
+                                                                   << path << ">; Child exists, call replace instead.");
+
+      throw notfound_exception("JSONDocument") << "Insert failed for" << path_tokens.at(currentDepth)
+                                               << ", search path =<" << path << ">; Child exists, call replace instead";
+
+    } else if (currentDepth != 0 && numberOfChildren == 0) {
+      TRACE_(4, "insertChild() recurse() Error: Insert failed for" << path_tokens.at(currentDepth) << ", search path =<"
+                                                                   << path << ">.");
+
+      throw notfound_exception("JSONDocument") << "Insert failed for" << path_tokens.at(currentDepth)
+                                               << ", search path =<" << path << ">.";
+    } else if (currentDepth == 0 && numberOfChildren == 0) {
+      childDocument[path_tokens.at(currentDepth)] = newValue;
+      return newValue;
+    }
+
+    auto& matchedValue = childDocument.at(path_tokens.at(currentDepth));
+
+    return recurse(matchedValue, currentDepth - 1);
+  };
+
+  auto inserted_value = recurse(document, path_tokens.size() - 1);
+
+  TRACE_(4, "insertChild() found child value=" << boost::apply_visitor(jsn::print_visitor(), inserted_value));
+
+  tmpJson.clear();
+  jsn::JsonWriter().write(boost::get<jsn::object_t>(document), tmpJson);
+  TRACE_(4, "insertChild() resultDocument=<" << tmpJson << ">");
+
+  auto return_json = std::string{};
+  if (inserted_value.type() == typeid(jsn::object_t)) {
+    auto const& replaced_object = boost::get<jsn::object_t>(inserted_value);
+    if (!replaced_object.empty())
+      jsn::JsonWriter().write(replaced_object, return_json);
+    else
+      return_json = "{}";
+  } else {
+    auto replaced_object = jsn::object_t{};
+    replaced_object["replaced"] = inserted_value;
+    jsn::JsonWriter().write(replaced_object, return_json);
+  }
+
+  TRACE_(4, "insertChild() insertChild=<" << tmpJson << ">");
+
+  _json_buffer.swap(tmpJson);
+
+  TRACE_(4, "insertChild() Insert succeeded.");
+  return {return_json};
 }
 
 // returns old child
@@ -459,444 +400,352 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) {
 
   auto path_tokens = _split_path(path);
 
-  if (path_tokens.empty()) throw cet::exception("JSONDocument") << "Invalid paht; path=" << path;
+  if (path_tokens.empty()) throw cet::exception("JSONDocument") << "Invalid path; path=" << path;
 
   std::reverse(path_tokens.begin(), path_tokens.end());
 
-  auto initialDocument = bsoncxx::from_json(_json_buffer);
+  auto document = jsn::value_t{jsn::object_t{}};
 
-  if (!initialDocument) {
+  if (!jsn::JsonReader().read(_json_buffer, boost::get<jsn::object_t>(document))) {
     TRACE_(3, "deleteChild()"
                   << " Invalid initialDocument");
 
     throw cet::exception("JSONDocument") << " Invalid initialDocument; json_buffer=" << _json_buffer;
   }
 
-  using bsoncxx::builder::stream::document;
-  using bsoncxx::document::view;
-  using bsoncxx::document::value;
+  auto tmpJson = std::string{};
 
-  auto wasUpdated = bool{false};
-
-  auto deleted_json_buffer = std::string{};
-
-  std::function<document(view const&, std::size_t)> recurse = [&](view const& currentView, std::size_t currentDepth) {
-    using namespace bsoncxx::builder::stream;
-
-    auto resultDocument = document{};
-
+  std::function<jsn::value_t(jsn::value_t&, std::size_t)> recurse = [&](jsn::value_t& childValue,
+                                                                        std::size_t currentDepth) {
     TRACE_(3, "deleteChild() recurse() args currentDepth=" << currentDepth);
-    TRACE_(3, "deleteChild() recurse() args currentView=<" << bsoncxx::to_json(currentView) << ">");
+
+    if (currentDepth == 0 && childValue.type() != typeid(jsn::object_t)) {
+      TRACE_(3, "deleteChild() recurse() jsn::value_t is not jsn::object_t;  value=" << boost::apply_visitor(
+                    jsn::print_visitor(), childValue));
+
+      throw notfound_exception("JSONDocument") << "Replace failed for" << path_tokens.at(currentDepth)
+                                               << ", deleteChild() recurse() jsn::value_t is not jsn::object_t;  value="
+                                               << boost::apply_visitor(jsn::print_visitor(), childValue);
+    }
+
+    auto& childDocument = boost::get<jsn::object_t>(childValue);
+
+    tmpJson.clear();
+    TRACE_(3, "deleteChild() recurse() args childValue=<" << (jsn::JsonWriter().write(childDocument, tmpJson), tmpJson)
+                                                          << ">");
+
+    if (childDocument.count(path_tokens.at(currentDepth)) == 0) {
+      TRACE_(3, "deleteChild() recurse() Error: Replace failed for" << path_tokens.at(currentDepth)
+                                                                    << ", search path =<" << path << ">.");
+
+      throw notfound_exception("JSONDocument") << "Replace failed for" << path_tokens.at(currentDepth)
+                                               << ", search path =<" << path << ">.";
+    }
+
+    auto& matchedValue = childDocument.at(path_tokens.at(currentDepth));
 
     if (currentDepth == 0) {
-      for (auto const& childElement : currentView) {
-        TRACE_(3, "deleteChild() recurse() path,key=<" << path_tokens.at(currentDepth) << ","
-                                                       << childElement.key().to_string() << ">");
-        TRACE_(3, "deleteChild() recurse() childElement=<" << bsoncxx::to_json(childElement) << ">");
-
-        if (path_tokens.at(currentDepth) == childElement.key().to_string()) {
-          deleted_json_buffer = bsoncxx::to_json(childElement.get_value());
-
-          if (path == "_id") {
-            std::replace(deleted_json_buffer.begin(), deleted_json_buffer.end(), '$', '_');
-          }
-
-          TRACE_(3, "deleteChild() recurse() Delete succeeded.");
-          wasUpdated = true;
-          continue;
-        }
-
-        resultDocument << childElement.key().to_string() << childElement.get_value();
-      }
-
-      return resultDocument;
+      return childDocument.delete_at(path_tokens.at(currentDepth));
     }
 
-    auto matchedPath = bool{false};
-
-    for (auto const& childElement : currentView) {
-      TRACE_(3, "deleteChild() recurse() childElement=<" << bsoncxx::to_json(childElement) << ">");
-
-      auto childView = childElement.get_value().get_document();
-
-      TRACE_(3, "deleteChild() recurse() childView=<" << bsoncxx::to_json(childView) << ">");
-      TRACE_(3, "deleteChild() recurse() path,key=<" << path_tokens.at(currentDepth) << ","
-                                                     << childElement.key().to_string() << ">");
-
-      if (path_tokens.at(currentDepth) == childElement.key().to_string()) {
-        resultDocument << childElement.key().to_string() << open_document
-                       << concatenate{recurse(childView, currentDepth - 1)} << close_document;
-        matchedPath = true;
-      } else {
-        resultDocument << childElement.key().to_string() << open_document << concatenate{childView} << close_document;
-        TRACE_(3, "deleteChild() recurse() resultDocument=<" << bsoncxx::to_json(resultDocument) << ">");
-      }
-    }
-
-    if (!matchedPath) {
-      TRACE_(3, "deleteChild() recurse() Error: Invalid JSON delete path =<" << path << ">");
-
-      throw cet::exception("JSONDocument") << "Invalid JSON delete path =<" << path << ">";
-    }
-
-    return resultDocument;
+    return recurse(matchedValue, currentDepth - 1);
   };
 
-  auto updatedDocument = recurse(initialDocument->view(), path_tokens.size() - 1);
+  auto deleted_value = recurse(document, path_tokens.size() - 1);
 
-  if (!wasUpdated) {
-    TRACE_(3, "deleteChild() recurse() Error: Delete failed path =<" << path << ">, call findChild() instead.");
+  TRACE_(3, "deleteChild() deleted child value=" << boost::apply_visitor(jsn::print_visitor(), deleted_value));
 
-    throw cet::exception("JSONDocument") << "Delete failed path =<" << path << ">, call findChild() instead.";
+  tmpJson.clear();
+  jsn::JsonWriter().write(boost::get<jsn::object_t>(document), tmpJson);
+  TRACE_(3, "deleteChild() resultDocument=<" << tmpJson << ">");
+
+  
+  auto return_json = std::string{};
+  if (deleted_value.type() == typeid(jsn::object_t)) {
+    auto const& deleted_object = boost::get<jsn::object_t>(deleted_value);
+    if (!deleted_object.empty())
+      jsn::JsonWriter().write(deleted_object, return_json);
+    else
+      return_json = "{}";
+  } else {
+    auto deleted_object = jsn::object_t{};
+    deleted_object["deleted"] = deleted_value;
+    jsn::JsonWriter().write(deleted_object, return_json);
   }
+  
+  if (path == "_id") std::replace(return_json.begin(), return_json.end(), '$', '_');
 
-  _json_buffer = bsoncxx::to_json(updatedDocument);
+  TRACE_(3, "deleteChild() deletedChild=<" << return_json << ">");
 
-  TRACE_(3, "deleteChild() end  _json_buffer=<" << _json_buffer << ">");
+  _json_buffer.swap(tmpJson);
 
-  return {deleted_json_buffer};
+  TRACE_(3, "deleteChild() Delete succeeded.");
+  return {return_json};
 }
 
-// returns found child
-JSONDocument JSONDocument::findChild(path_t const& path) const {
+// returns added child
+JSONDocument JSONDocument::appendChild(JSONDocument const& newChild, path_t const& path) {
   assert(!path.empty());
 
-  TRACE_(5, "findChild() begin _json_buffer=<" << _json_buffer << ">");
-  TRACE_(5, "findChild() args  path=<" << path << ">");
+  TRACE_(13, "appendChild() begin _json_buffer=<" << _json_buffer << ">");
+  TRACE_(13, "appendChild() args  child=<" << newChild._json_buffer << ">");
+  TRACE_(13, "appendChild() args  path=<" << path << ">");
 
-  auto path_tokens = _split_path(path);
+  auto tmpValue = jsn::value_t{jsn::object_t{}};
 
-  if (path_tokens.empty()) throw cet::exception("JSONDocument") << "Invalid paht; path=" << path;
+  if (!jsn::JsonReader().read(newChild._json_buffer, boost::get<jsn::object_t>(tmpValue))) {
+    TRACE_(4, "appendChild()"
+                  << " Invalid newChild document");
 
-  std::reverse(path_tokens.begin(), path_tokens.end());
-
-  auto initialDocument = bsoncxx::from_json(_json_buffer);
-
-  if (!initialDocument) {
-    TRACE_(5, "findChild()"
-                  << " Invalid initialDocument");
-
-    throw cet::exception("JSONDocument") << " Invalid initialDocument; json_buffer=" << _json_buffer;
+    throw cet::exception("JSONDocument") << " Invalid newChild document; json_buffer=" << newChild._json_buffer;
   }
 
-  using bsoncxx::builder::stream::document;
-  using bsoncxx::document::view;
-  using bsoncxx::document::value;
+  auto newValue = jsn::value_t{};
 
-  auto foundChild = bool{false};
+  if (boost::get<jsn::object_t>(tmpValue).count("payload") == 1) {
+    newValue = boost::get<jsn::object_t>(tmpValue).at("payload");
+  } else {
+    newValue = tmpValue;
+    TRACE_(4, "appendChild()"
+                  << " Invalid newChild document, found invalid insert payload.");
 
-  std::function<document(view const&, std::size_t)> recurse = [&](view const& currentView, std::size_t currentDepth) {
-    using namespace bsoncxx::builder::stream;
-
-    auto resultDocument = document{};
-
-    TRACE_(5, "findChild() recurse() args currentDepth=" << currentDepth);
-    TRACE_(5, "findChild() recurse() args currentView=<" << bsoncxx::to_json(currentView) << ">");
-
-    if (currentDepth == 0) {
-      for (auto const& childElement : currentView) {
-        TRACE_(5, "findChild() recurse() path,key=<" << path_tokens.at(currentDepth) << ","
-                                                     << childElement.key().to_string() << ">");
-        TRACE_(5, "findChild() recurse() childElement=<" << bsoncxx::to_json(childElement) << ">");
-
-        if (path_tokens.at(currentDepth) == childElement.key().to_string()) {
-          TRACE_(5, "findChild() recurse() Search succeeded.");
-          resultDocument << childElement.key().to_string() << childElement.get_value();
-          foundChild = true;
-          break;
-        }
-      }
-
-      return resultDocument;
-    }
-
-    auto matchedPath = bool{false};
-
-    for (auto const& childElement : currentView) {
-      TRACE_(5, "findChild() recurse() childElement=<" << bsoncxx::to_json(childElement) << ">");
-
-      if (path_tokens.at(currentDepth) != childElement.key().to_string()) continue;
-
-      assert(childElement.type() == value_type_t::k_document);
-
-      if (childElement.type() != value_type_t::k_document) {
-        TRACE_(5, "findChild() recurse() Error: Coding error, JSON search path =<" << path << ">");
-        throw cet::exception("JSONDocument") << "Coding error, JSON search path =<" << path << ">";
-      }
-
-      auto childView = childElement.get_value().get_document();
-
-      TRACE_(5, "findChild() recurse() childView=<" << bsoncxx::to_json(childView) << ">");
-      TRACE_(5, "findChild() recurse() path,key=<" << path_tokens.at(currentDepth) << ","
-                                                   << childElement.key().to_string() << ">");
-
-      resultDocument = recurse(childView, currentDepth - 1);
-
-      matchedPath = true;
-      break;
-    }
-
-    if (!matchedPath) {
-      TRACE_(5, "findChild() recurse() Error: Invalid JSON search path =<" << path << ">");
-
-      throw notfound_exception("JSONDocument") << "Invalid JSON search path =<" << path << ">";
-    }
-
-    return resultDocument;
-  };
-
-  auto childDocument = recurse(initialDocument->view(), path_tokens.size() - 1);
-
-  if (!foundChild) {
-    TRACE_(5, "findChild() recurse() Error: Search failed path =<" << path << ">, call findChild() instead.");
-
-    throw notfound_exception("JSONDocument") << "Search failed path =<" << path << ">, call findChild() instead.";
+    throw cet::exception("JSONDocument") << " Invalid newChild document, found invalid insert payload; json_buffer="
+                                         << newChild._json_buffer;
   }
 
-  auto json_buffer = bsoncxx::to_json(childDocument);
+  TRACE_(4, "appendChild() new child value=" << boost::apply_visitor(jsn::print_visitor(), newValue));
 
-  TRACE_(5, "findChild() end  json_buffer=<" << json_buffer << ">");
-  TRACE_(5, "findChild() end  _json_buffer=<" << _json_buffer << ">");
+  auto searchResults = findChild(path);
 
-  return {json_buffer};
+  auto documentAST = jsn::object_t{};
+
+  if (!jsn::JsonReader().read(searchResults._json_buffer, documentAST)) {
+    TRACE_(13, "appendChild()"
+                   << " Invalid initialDocument");
+
+    throw cet::exception("JSONDocument") << " Invalid initialDocument; json_buffer=" << searchResults._json_buffer;
+  }
+
+  if (documentAST.size() != 1) {
+    TRACE_(13, "appendChild() Too many elements in the results view, path=<" << path << ">");
+    throw cet::exception("JSONDocument") << "Too many elements in the results view, path=<" << path << ">";
+  }
+
+  auto firstResultIt = documentAST.begin();
+
+  if (firstResultIt->value.type() != typeid(jsn::array_t)) {
+    TRACE_(13, "appendChild() Not an array element, path=<" << path << ">");
+    throw cet::exception("JSONDocument") << "Failed to appendChild(); target path is not an array_t element, path=<"
+                                         << path << ">";
+  }
+
+  auto updatedDocument = jsn::object_t{};
+  updatedDocument["payload"] = boost::get<jsn::array_t>(firstResultIt->value);
+  boost::get<jsn::array_t>(updatedDocument.at("payload")).push_back(newValue);
+
+  auto updatedDocument_json = std::string{};
+  jsn::JsonWriter().write(updatedDocument, updatedDocument_json);
+  TRACE_(3, "appendChild() updatedChild=<" << updatedDocument_json << ">");
+
+  auto return_value = std::string{};
+
+  jsn::JsonWriter().write(boost::get<jsn::object_t>(newValue), return_value);
+
+  TRACE_(3, "appendChild() newChild=<" << return_value << ">");
+
+  auto updatedChild = JSONDocument{updatedDocument_json};
+
+  TRACE_(13, "appendChild() updatedChild=<" << updatedChild._json_buffer << ">");
+
+  replaceChild(updatedChild, path);
+
+  return {return_value};
 }
 
-bool JSONDocument::matches(JSONDocument const& other, bool matchSize) const {
+// returns removed child
+JSONDocument JSONDocument::removeChild(JSONDocument const& delChild, path_t const& path) {
+  assert(!path.empty());
+
+  TRACE_(13, "removeChild() begin _json_buffer=<" << _json_buffer << ">");
+  TRACE_(13, "removeChild() args  child=<" << delChild._json_buffer << ">");
+  TRACE_(13, "removeChild() args  path=<" << path << ">");
+
+  auto tmpValue = jsn::value_t{jsn::object_t{}};
+
+  if (!jsn::JsonReader().read(delChild._json_buffer, boost::get<jsn::object_t>(tmpValue))) {
+    TRACE_(4, "removeChild()"
+                  << " Invalid delChild document");
+
+    throw cet::exception("JSONDocument") << " Invalid delChild document; json_buffer=" << delChild._json_buffer;
+  }
+
+  auto delValue = jsn::value_t{};
+
+  if (boost::get<jsn::object_t>(tmpValue).count("payload") == 1) {
+    delValue = boost::get<jsn::object_t>(tmpValue).at("payload");
+  } else {
+    delValue = tmpValue;
+    TRACE_(4, "removeChild()"
+                  << " Invalid delChild document, found invalid delete payload.");
+
+    throw cet::exception("JSONDocument") << " Invalid delChild document, found invalid delete payload; json_buffer="
+                                         << delChild._json_buffer;
+  }
+
+  TRACE_(4, "removeChild() new delete value=" << boost::apply_visitor(jsn::print_visitor(), delValue));
+
+  auto searchResults = findChild(path);
+
+  auto documentAST = jsn::object_t{};
+
+  if (!jsn::JsonReader().read(searchResults._json_buffer, documentAST)) {
+    TRACE_(13, "removeChild()"
+                   << " Invalid initialDocument");
+
+    throw cet::exception("JSONDocument") << " Invalid initialDocument; json_buffer=" << searchResults._json_buffer;
+  }
+
+  if (documentAST.size() != 1) {
+    TRACE_(13, "appendChild() Too many elements in the results view, path=<" << path << ">");
+    throw cet::exception("JSONDocument") << "Too many elements in the results view, path=<" << path << ">";
+  }
+
+  auto firstResultIt = documentAST.begin();
+
+  if (firstResultIt->value.type() != typeid(jsn::array_t)) {
+    TRACE_(13, "appendChild() Not an array element, path=<" << path << ">");
+    throw cet::exception("JSONDocument") << "Failed to appendChild(); target path is not an array_t element, path=<"
+                                         << path << ">";
+  }
+
+  auto updatedDocument = jsn::object_t{};
+
+  auto arrayAST = boost::get<jsn::array_t>(firstResultIt->value);
+
+  updatedDocument["payload"] = jsn::array_t{};
+
+  auto returnAST = jsn::object_t{};
+  returnAST["0"] = jsn::array_t{};
+
+  std::for_each(arrayAST.begin(), arrayAST.end(), [&](auto const& element) {
+    if (matches(delValue, element)) {
+      boost::get<jsn::array_t>(returnAST.at("0")).push_back(element);
+    } else {
+      boost::get<jsn::array_t>(updatedDocument.at("payload")).push_back(element);
+    }
+  });
+
+  auto updatedDocument_json = std::string{};
+  jsn::JsonWriter().write(updatedDocument, updatedDocument_json);
+  TRACE_(3, "removeChild() updatedChild=<" << updatedDocument_json << ">");
+
+  auto return_value = std::string{};
+
+  jsn::JsonWriter().write(returnAST, return_value);
+
+  TRACE_(3, "removeChild() delChild=<" << return_value << ">");
+
+  auto updatedChild = JSONDocument{updatedDocument_json};
+
+  TRACE_(13, "removeChild() updatedChild=<" << updatedChild._json_buffer << ">");
+
+  replaceChild(updatedChild, path);
+
+  return {return_value};
+}
+
+bool JSONDocument::equals(JSONDocument const& other) const {
   TRACE_(10, "operator==() begin _json_buffer=<" << _json_buffer << ">");
   TRACE_(10, "operator==() args  other.__json_buffer=<" << other._json_buffer << ">");
 
   if (other._json_buffer == _json_buffer) return true;
 
-  auto thisDocument = bsoncxx::from_json(_json_buffer);
-  auto otherDocument = bsoncxx::from_json(other._json_buffer);
+  auto selfAST = jsn::object_t{};
+  if (!jsn::JsonReader().read(_json_buffer, selfAST)) {
+    TRACE_(10, "matches()"
+                   << " Invalid initialDocument");
 
-  using bsoncxx::builder::stream::document;
-  using bsoncxx::document::view;
-  using bsoncxx::document::value;
-  using bsoncxx::document::element;
+    throw cet::exception("JSONDocument") << " Invalid initialDocument; json_buffer=" << _json_buffer;
+  }
 
-  std::function<bool(view, view, path_t)> areEqual = [&areEqual, &matchSize](view thisView, view otherView,
-                                                                             path_t path) {
-    TRACE_(10, "operator==() areEqual this=<" << bsoncxx::to_json(thisView) << ">");
-    TRACE_(10, "operator==() areEqual other=<" << bsoncxx::to_json(otherView) << ">");
-    TRACE_(10, "operator==() areEqual path=<" << path << ">");
+  auto otherAST = jsn::object_t{};
 
-    // both are empty
-    if (thisView.empty() && otherView.empty()) {
-      return true;
-    }
+  if (!jsn::JsonReader().read(other._json_buffer, otherAST)) {
+    TRACE_(10, "matches()"
+                   << " Invalid other initialDocument");
 
-    // different sizes
-    if (matchSize) {
-      if (thisView.empty() || otherView.empty()) {
-        return false;
-      } else if (std::distance(thisView.cbegin(), thisView.cend()) !=
-                 std::distance(otherView.cbegin(), otherView.cend())) {
-        return false;
-      }
-    }
+    throw cet::exception("JSONDocument") << " Invalid other initialDocument; json_buffer=" << other._json_buffer;
+  }
 
-    for (auto thisChild : thisView) {
-      auto key_name = thisChild.key().to_string();
+  auto result = jsn::operator==(selfAST, otherAST);
 
-      auto otherViewChildIter = otherView.find(key_name);
+  TRACE_(10, "matches() JSON buffers are " << (result.first ? "equal." : "not equal."));
 
-      if (otherViewChildIter == otherView.end()) {
-        // skip missing elements
-        if (matchSize) {
-          TRACE_(10, "operator==() Other is missing an element, path=<" << path << "." << key_name << ">");
-          return false;
-        } else {
-          continue;
-        }
-      }
+  if (result.first) return true;
 
-      auto otherChild = *otherViewChildIter;
+  TRACE_(10, "matches() Error message=<" << result.second << ">");
 
-      if (thisChild.type() != otherChild.type()) {
-        TRACE_(10, "operator==() Elements have different types, path=<" << path << "." << key_name << ">");
-        return false;
-      }
-
-      auto tmpThis = thisChild.get_value();
-      auto tmpOther = otherChild.get_value();
-
-      switch (static_cast_as_uint8_t(thisChild.type())) {
-        default: {
-          TRACE_(10, "operator==() checking value, path=<" << path << "." << key_name << ">");
-
-          if (tmpThis != tmpOther) {
-            TRACE_(10, "operator==() Elements have different values, path=<" << path << "." << key_name << ">");
-            return false;
-          }
-
-          break;
-        }
-
-        case static_cast_as_uint8_t(value_type_t::k_array): {
-          TRACE_(10, "operator==() checking k_array, path=<" << path << "." << key_name << ">");
-
-          if (tmpThis.get_array().value.empty() && tmpThis.get_array().value.empty()) {
-            break;
-          } else if (tmpThis.get_array().value.empty() || tmpThis.get_array().value.empty()) {
-            return false;
-          }
-
-          if (!areEqual(tmpThis.get_array().value, tmpOther.get_array().value, path.append(".").append(key_name)))
-            return false;
-
-          break;
-        }
-
-        case static_cast_as_uint8_t(value_type_t::k_document): {
-          TRACE_(10, "operator==() checking k_document, path=<" << path << "." << key_name << ">");
-
-          if (!areEqual(tmpThis.get_document().value, tmpOther.get_document().value, path.append(".").append(key_name)))
-            return false;
-
-          break;
-        }
-      }
-    }
-
-    // no discrepancies were found
-    return true;
-  };
-
-  auto result = areEqual(thisDocument->view(), otherDocument->view(), "");
-
-  TRACE_(10, "operator==() end, JSON buffers are " << (result ? "equal." : "not equal."));
-
-  return result;
+  return false;
 }
 
-// returns added child
-JSONDocument JSONDocument::appendChild(JSONDocument const& child, path_t const& path) {
-  assert(!path.empty());
+std::string JSONDocument::value_at(JSONDocument const& document, std::size_t index) {
+  TRACE_(14, "value_at() begin _json_buffer=<" << document._json_buffer << ">");
+  TRACE_(14, "value_at() begin index=<" << index << ">");
 
-  TRACE_(13, "appendChild() begin _json_buffer=<" << _json_buffer << ">");
-  TRACE_(13, "appendChild() args  child=<" << child._json_buffer << ">");
-  TRACE_(13, "appendChild() args  path=<" << path << ">");
+  auto json_buffer = document._json_buffer;
 
-  using bsoncxx::builder::stream::array;
-  using bsoncxx::builder::stream::open_array;
-  using bsoncxx::builder::stream::close_array;
-  using bsoncxx::builder::stream::array_context;
+  // needed for compatibility with mongodb
+  if (json_buffer.find("\"0\"") != std::string::npos) json_buffer.replace(json_buffer.find("\"0\""), 3, "\"payload\"");
 
-  auto searchResults = findChild(path);
+  if (json_buffer.find("\"payload\"") == std::string::npos)
+    json_buffer = "{ \"payload\":" + document._json_buffer + "}";
 
-  auto searchResultsDocument = bsoncxx::from_json(searchResults._json_buffer);
-  auto searchResultsView = searchResultsDocument->view();
+  TRACE_(14, "value_at() json_buffer=<" << json_buffer << ">");
 
-  if (std::distance(searchResultsView.begin(), searchResultsView.end()) != 1) {
-    TRACE_(13, "appendChild() Too many elements in the results view, path=<" << path << ">");
-    throw cet::exception("JSONDocument") << "Too many elements in the results view, path=<" << path << ">";
+  auto tmpObject = jsn::object_t{};
+
+  if (!jsn::JsonReader().read(json_buffer, tmpObject)) {
+    TRACE_(14, "value_at()"
+                   << " Invalid document");
+
+    throw cet::exception("JSONDocument") << " Invalid document; json_buffer=" << document._json_buffer;
   }
 
-  auto firstResultIt = searchResultsView.begin();
+  if (tmpObject.count("payload") != 1) {
+    TRACE_(14, "value_at()"
+                   << " Invalid document.");
 
-  if (firstResultIt->get_value().type() != value_type_t::k_array) {
-    TRACE_(13, "appendChild() Not an array element, path=<" << path << ">");
-    throw cet::exception("JSONDocument") << "Failed to appendChild(); target path is not an array element, path=<"
-                                         << path << ">";
+    throw cet::exception("JSONDocument") << " Invalid document; json_buffer=" << document._json_buffer;
   }
 
-  auto newChildDocument = bsoncxx::from_json(child._json_buffer);
-  auto newChildValue = newChildDocument->view().begin()->get_value();
+  auto const& valueArray = boost::get<jsn::array_t>(tmpObject.at("payload"));
 
-  auto newArray = array{};
+  TRACE_(14, "value_at() new child value=" << boost::apply_visitor(jsn::print_visitor(), tmpObject.at("payload")));
 
-  newArray << open_array << [&](array_context<> tmp_array_context) {
-    if (!firstResultIt->get_value().get_array().value.empty()) {
-      for (auto const& childElement : firstResultIt->get_value().get_array().value)
-        tmp_array_context << childElement.get_value();
-    }
-    TRACE_(13, "appendChild() appending _json_buffer =<" << bsoncxx::to_json(newChildValue) << ">");
-    tmp_array_context << newChildValue;
-  } << close_array;
+  if (valueArray.empty()) {
+    TRACE_(14, "value_at() Failed to call value_at(); valueArray is empty, document=<" << document._json_buffer << ">");
+    throw cet::exception("JSONDocument") << "Failed to call value_at(); valueArray is empty, document=<"
+                                         << document._json_buffer << ">";
+  }
 
-  auto updatedDocument = JSONDocument({bsoncxx::to_json(newArray.view())});
+  if (valueArray.size() < index) {
+    TRACE_(14, "value_at() Failed to call value_at(); not enough elements, document=<" << document._json_buffer << ">");
+    throw cet::exception("JSONDocument") << "Failed to call value_at(); not enough elements, document=<"
+                                         << document._json_buffer << ">";
+  }
 
-  TRACE_(13, "appendChild() updatedDocument._json_buffer =<" << updatedDocument._json_buffer << ">");
+  auto pos = valueArray.begin();
+  std::advance(pos, index);
 
-  replaceChild(updatedDocument, path);
+  auto return_value = std::string{};
 
-  return {bsoncxx::to_json(newChildValue)};
+  if (pos->type() == typeid(jsn::object_t))
+    jsn::JsonWriter().write(boost::get<jsn::object_t>(*pos), return_value);
+  else
+    return_value = boost::apply_visitor(jsn::tostring_visitor(), *pos);
+
+  return return_value;
 }
-
-// returns removed child
-JSONDocument JSONDocument::removeChild(JSONDocument const& child, path_t const& path) {
-  assert(!path.empty());
-
-  TRACE_(13, "removeChild() begin _json_buffer=<" << _json_buffer << ">");
-  TRACE_(13, "removeChild() args  child=<" << child._json_buffer << ">");
-  TRACE_(13, "removeChild() args  path=<" << path << ">");
-
-  using bsoncxx::builder::stream::array;
-  using bsoncxx::builder::stream::open_array;
-  using bsoncxx::builder::stream::close_array;
-  using bsoncxx::builder::stream::array_context;
-
-  auto matchFilter = JSONDocument{JSONDocument::value(child)};
-
-  auto searchResults = findChild(path);
-  auto searchResultsDocument = bsoncxx::from_json(searchResults._json_buffer);
-  auto searchResultsView = searchResultsDocument->view();
-
-  if (std::distance(searchResultsView.begin(), searchResultsView.end()) != 1) {
-    TRACE_(13, "removeChild() Too many elements in the results view, path=<" << path << ">");
-    throw cet::exception("JSONDocument") << "Too many elements in the results view, path=<" << path << ">";
-  }
-
-  auto firstResultIt = searchResultsView.begin();
-
-  if (firstResultIt->get_value().type() != value_type_t::k_array) {
-    TRACE_(13, "removeChild() Not an array element, path=<" << path << ">");
-    throw cet::exception("JSONDocument") << "Failed to removeChild(); target path is not an array element, path=<"
-                                         << path << ">";
-  }
-
-  auto deleted_json_buffer = std::string();
-  auto newArray = array{};
-
-  newArray << open_array << [&](array_context<> tmp_array_context) {
-
-    if (firstResultIt->get_value().get_array().value.empty()) {
-      TRACE_(13, "removeChild() Failed to removeChild(); element array is empty, path=<" << path << ">");
-      throw cet::exception("JSONDocument") << "Failed to removeChild(); element array is empty, path=<" << path << ">";
-    }
-
-    auto addComma = bool{false};
-    std::stringstream ss;
-    ss << "{\"0\": [";
-
-    for (auto const& childElement : firstResultIt->get_value().get_array().value) {
-      auto json_buffer = bsoncxx::to_json(childElement.get_value());
-      if (!matchFilter.matches({json_buffer}, false)) {
-        tmp_array_context << childElement.get_value();
-        TRACE_(13, "removeChild() copied element, json_buffer =<" << bsoncxx::to_json(childElement.get_value()) << ">");
-      } else {
-        ss << (addComma ? ',' : ' ') << std::move(json_buffer);
-        addComma = true;
-        TRACE_(13, "removeChild() filtered element, json_buffer =<" << deleted_json_buffer << ">");
-      }
-    }
-
-    ss << "]}";
-
-    deleted_json_buffer = ss.str();
-  } << close_array;
-
-  auto updatedDocument = JSONDocument({bsoncxx::to_json(newArray.view())});
-
-  TRACE_(13, "removeChild() updatedDocument._json_buffer =<" << updatedDocument._json_buffer << ">");
-
-  replaceChild(updatedDocument, path);
-
-  return {deleted_json_buffer};
-}
-
-bool JSONDocument::isReadonly() const { return false; }
 
 namespace debug {
 void enableJSONDocument() {
@@ -907,12 +756,6 @@ void enableJSONDocument() {
 
   TRACE_(0, "artdaq::database::JSONDocument trace_enable");
 }
-}
-
-std::ostream& operator<<(std::ostream& os, JSONDocument const& document) {
-  os << document.to_string();
-
-  return os;
 }
 
 }  // namespace jsonutils

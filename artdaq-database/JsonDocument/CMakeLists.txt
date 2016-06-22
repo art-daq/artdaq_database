@@ -6,6 +6,8 @@ find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_FQ_DIR}/lib )
 
 art_make(
   LIB_LIBRARIES
+  artdaq-database_DataFormats_common
+  artdaq-database_DataFormats_Json
   ${BSONCXXLIB}
   ${CETLIB}  
   )

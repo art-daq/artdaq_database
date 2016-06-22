@@ -8,6 +8,7 @@ namespace database {
 namespace jsonutils {
 
 bool isValidJson(std::string const&);
+std::string filterJson(std::string const&);
 
 using path_t = std::string;
 
@@ -43,9 +44,9 @@ class JSONDocument final {
   std::string value() { return JSONDocument::value(self()); };
   bool isReadonly() const;
 
-  bool matches(JSONDocument const&, bool) const;
+  bool equals(JSONDocument const&) const;
 
-  bool operator==(JSONDocument const& other) const { return matches(other, true); }
+  bool operator==(JSONDocument const& other) const { return equals(other); }
   bool operator!=(JSONDocument const& other) const { return !(*this == other); }
 
   template <typename T>

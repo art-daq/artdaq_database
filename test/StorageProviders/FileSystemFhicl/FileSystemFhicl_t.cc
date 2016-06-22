@@ -363,7 +363,8 @@ bool test_update(std::string const& source_fcl, std::string const& compare_fcl,s
 
     auto result = JSONDocument(collection.begin()->json_buffer);
     result.deleteChild("_id");
-    result.replaceChild(changes,"document");
+    auto payload = changes.findChild("document");
+    result.replaceChild(payload,"document");
 
     json = JsonData {"{\"document\":" + result.to_string() + ", \"filter\":" + object_id +  ",\"collection\":\"" +colle11ctionName +"\"}"};
 

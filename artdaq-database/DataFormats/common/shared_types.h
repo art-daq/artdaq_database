@@ -125,6 +125,8 @@ struct table_of : vector_of<KVP> {
   using key_type = typename value_type::key_type;
   using mapped_type = typename value_type::value_type;
   using size_type = typename vector_of<KVP>::size_type;
+  using const_iterator = typename vector_of<KVP>::const_iterator;
+  using iterator = typename vector_of<KVP>::iterator;
 
   mapped_type& operator[](key_type const& key) {
     auto& pairs = vector_of<value_type>::values;
@@ -174,6 +176,31 @@ struct table_of : vector_of<KVP> {
     }
 
     throw std::out_of_range("Key not found; key=" + key);
+  }
+
+  iterator find(key_type const& key) {
+    auto& pairs = vector_of<value_type>::values;
+
+    return std::find_if(pairs.begin(), pairs.end(), [&key](auto const& pair) { return key == pair.key; });
+  }
+
+  const_iterator find(key_type const& key) const {
+    auto const& pairs = vector_of<value_type>::values;
+    return std::find_if(pairs.begin(), pairs.end(), [&key](auto const& pair) { return key == pair.key; });
+  }
+
+  mapped_type delete_at(key_type const& key) {
+    auto& pairs = vector_of<value_type>::values;
+
+    auto pair = find(key);
+
+    if (pair == pairs.end()) throw std::out_of_range("Key not found; key=" + key);
+
+    auto deleted = pair->value;
+    
+    pairs.erase(pair);
+    
+    return deleted;
   }
 };
 

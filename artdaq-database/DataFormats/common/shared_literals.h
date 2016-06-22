@@ -9,6 +9,11 @@ constexpr auto document_node = "document";
 constexpr auto data_node = "data";
 constexpr auto prolog_node = "prolog";
 constexpr auto main_node = "main";
+
+constexpr auto version_node = "version";
+constexpr auto configurable_entity_node = "configurable_entity";
+constexpr auto configurations_node = "configurations";
+
 constexpr auto comments_node = "comments";
 constexpr auto origin_node = "origin";
 constexpr auto includes_node = "includes";
@@ -38,6 +43,7 @@ constexpr auto sequence = "sequence";
 
 constexpr auto gui_data_node = "guidata";
 constexpr auto converted = "converted";
+constexpr auto notprovided = "notprovided";
 
 namespace regex {
 constexpr auto parse_double = "-?\\d*\\.?\\d+e[+-]?\\d+";

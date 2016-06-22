@@ -36,6 +36,15 @@ struct print_visitor : public boost::static_visitor<std::string> {
   std::string operator()(bool const& val) const { return val ? "bool(true)" : "bool(false)"; }
 };
 
+struct tostring_visitor : public boost::static_visitor<std::string> {
+  std::string operator()(object_t const&) const { return "object(...)"; }
+  std::string operator()(array_t const&) const { return "array(...)"; }
+  std::string operator()(std::string const& val) const { return val; }
+  std::string operator()(double const& val) const { return std::to_string(val);}
+  std::string operator()(int const& val) const { return std::to_string(val);}
+  std::string operator()(bool const& val) const { return val ? "true" : "false"; }
+};
+
 std::pair<bool, std::string> operator==(value_t const&, value_t const&);
 std::pair<bool, std::string> operator==(data_t const&, data_t const&);
 std::pair<bool, std::string> operator==(array_t const&, array_t const&);

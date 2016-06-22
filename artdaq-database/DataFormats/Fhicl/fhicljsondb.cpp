@@ -47,13 +47,19 @@ bool fhicl_to_json(std::string const& fcl, std::string& json) {
   json_root[literal::document_node] = jsn::object_t();
   json_root[literal::comments_node] = jsn::array_t();
   json_root[literal::origin_node] = jsn::object_t();
-
+  
+  json_root[literal::version_node] = std::string{literal::notprovided};
+  json_root[literal::configurable_entity_node] =  jsn::object_t();
+  json_root[literal::configurations_node] =  jsn::array_t();
+  
   TRACE_(2, "fhicl_to_json: Created root nodes");
 
   get_object(literal::origin_node)[literal::format] = std::string("fhicl");
   get_object(literal::origin_node)[literal::source] = std::string("fhicl_to_json");
   get_object(literal::origin_node)[literal::timestamp] = artdaq::database::dataformats::timestamp();
 
+  get_object(literal::configurable_entity_node)[literal::name]=std::string{literal::notprovided};
+  
   auto reader = FhiclReader();
 
   TRACE_(2, "read_comments begin");
