@@ -1,8 +1,7 @@
 find_ups_product( mongodb ${mongodb_product_version} )
 
-include_directories($ENV{MONGODB_FQ_DIR}/include/bsoncxx/v0.3)
-
-find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_FQ_DIR}/lib )
+include_directories($ENV{MONGODB_INC}/bsoncxx)
+find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_LIB} )
 
 art_make(
   LIB_LIBRARIES
