@@ -38,6 +38,13 @@ e10:s35:prof    e10:s35:prof	e10:prof	e10:prof	e10:prof	-std=c++14
 
 end_qualifier_list
 
+
+table_fragment_begin
+
+envSet( ARTDAQ_DATABASE_DATADIR, ${HOME}/databases )
+
+table_fragment_end
+
 # Preserve tabs and formatting in emacs and vi / vim:
 
 ### Local Variables:
