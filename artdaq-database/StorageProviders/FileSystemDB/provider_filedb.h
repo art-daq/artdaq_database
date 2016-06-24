@@ -17,7 +17,7 @@ constexpr auto search_index = "index.json";
 }
 
 struct DBConfig final {
-  std::string path = "${ARTDAQ_DATABASE_DATADIR}/databases/filesystemdb";
+  std::string path = "${ARTDAQ_DATABASE_DATADIR}/filesystemdb";
   std::string db_name = "test_configuration_db";
   const std::string connectionURI() const { return std::string{literal::FILEURI} + path; };
 };
