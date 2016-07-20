@@ -47,7 +47,7 @@ cet_add_compiler_flags( -rdynamic -ldl)
 
 cet_report_compiler_flags()
 
-set(mongodb_product_version v3_0_7)
+set(mongodb_product_version v3_2_7)
 
 # these are minimum required versions, not the actual product versions
 find_ups_boost(v1_61_0)
