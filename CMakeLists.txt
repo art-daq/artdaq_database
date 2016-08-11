@@ -73,7 +73,7 @@ include(ArtMake)
 #include(BuildPlugins)
 
 # testing
-add_subdirectory(test)
+#add_subdirectory(test)
 
 # source
 add_subdirectory(artdaq-database)

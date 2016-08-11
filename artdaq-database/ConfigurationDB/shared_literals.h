@@ -87,11 +87,11 @@ constexpr auto data = "data";
 constexpr auto metadata = "metadata";
 constexpr auto search = "search";
 constexpr auto query = "query";
-
 }
 
 constexpr auto name = "name";
 
+constexpr auto filterx = "filter";
 constexpr auto notprovided = "notprovided";
 constexpr auto unknown = "unknown";
 constexpr auto collection_default = "test_Data_Type001";

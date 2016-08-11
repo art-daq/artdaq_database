@@ -107,6 +107,11 @@ std::istream& operator>>(std::istream& is, FhiclData& data) {
   return is;
 }
 
+std::ostream& operator<<(std::ostream& os, FhiclData const& data) {
+    os << data.fhicl_buffer;
+    return os;
+}
+
 }  // namespace basictypes
 }  // namespace database
 }  // namespace artdaq
