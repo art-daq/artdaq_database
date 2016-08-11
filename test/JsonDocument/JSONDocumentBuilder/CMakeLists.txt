@@ -10,6 +10,8 @@ art_make_exec(JSONDocumentBuilder_t
   artdaq-database_JsonDocument
   ${BSONCXXLIB}
   ${CETLIB}
+  ${FHICLCPP} 
+  ${SQLITE3}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 ) 
 

@@ -5,6 +5,8 @@ art_make_exec(ConvertFhicl_t
   artdaq-database_DataFormats_Json
   artdaq-database_DataFormats_Fhicl
   ${CETLIB}
+  ${FHICLCPP}
+  ${SQLITE3}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 ) 
 

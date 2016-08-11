@@ -18,6 +18,7 @@ art_make(
  # ${BSONCXXLIB}
  # ${MONGOCXXLIB}  
   ${FHICLCPP}  
+  ${SQLITE3}
   ${CETLIB}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}    
   )

@@ -19,6 +19,7 @@ find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_FQ_DIR}/lib )
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   ${FHICLCPP}
+  ${SQLITE3}
   ${CETLIB}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}  
 ) 
@@ -28,7 +29,8 @@ art_make_exec(readfhicl
   LIBRARIES
   artdaq-database_DataFormats_common
   artdaq-database_DataFormats_Fhicl
-  ${FHICLCPP}  
+  ${FHICLCPP}
+  ${SQLITE3}  
   ${CETLIB}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
@@ -36,3 +38,4 @@ art_make_exec(readfhicl
 
 install_headers()
 install_source()
+

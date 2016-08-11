@@ -16,6 +16,7 @@ find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_FQ_DIR}/lib )
   artdaq-database_JsonDocument
   artdaq-database_StorageProviders_FileSystemDB
   ${FHICLCPP}
+  ${SQLITE3}
   ${CETLIB}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}    
 ) 
