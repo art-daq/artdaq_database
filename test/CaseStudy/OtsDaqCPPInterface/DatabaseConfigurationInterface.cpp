@@ -5,10 +5,8 @@
 
 #include "artdaq-database/ConfigurationDB/configurationdbifc.h"
 
-
 using artdaq::database::basictypes::FhiclData;
 using artdaq::database::basictypes::JsonData;
-
 
 namespace artdaq {
 namespace database {
@@ -44,10 +42,10 @@ std::string MakeSerializable<ConfigurationBase*>::configurationNameImpl() const 
 }  // namespace artdaq
 
 using ots::DatabaseConfigurationInterface;
-using config_version_map_t= ots::DatabaseConfigurationInterface::config_version_map_t;
+using config_version_map_t = ots::DatabaseConfigurationInterface::config_version_map_t;
 
 namespace db = artdaq::database::configuration;
-using VersionInfoList_t=db::ConfigurationInterface::VersionInfoList_t;
+using VersionInfoList_t = db::ConfigurationInterface::VersionInfoList_t;
 
 constexpr auto default_dbprovider = "filesystem";
 constexpr auto default_entity = "OTSDAQROOT";
@@ -108,7 +106,7 @@ std::set<int> DatabaseConfigurationInterface::getVersions(const ConfigurationBas
   auto to_set = [](auto const& inputList) {
     auto resultSet = std::set<int>{};
     std::for_each(inputList.begin(), inputList.end(),
-                   [&resultSet](std::string const& version) { resultSet.insert(std::stol(version, 0, 10)); });
+                  [&resultSet](std::string const& version) { resultSet.insert(std::stol(version, 0, 10)); });
     return resultSet;
   };
 
@@ -152,11 +150,9 @@ config_version_map_t DatabaseConfigurationInterface::loadGlobalConfiguration(
 
   auto to_map = [](auto const& inputList) {
     auto resultMap = config_version_map_t{};
-    
+
     std::for_each(inputList.begin(), inputList.end(),
-		  [&resultMap](auto const& info) {     
-		  resultMap[info.configuration]=std::stol(info.version, 0, 10);
-		  });  
+                  [&resultMap](auto const& info) { resultMap[info.configuration] = std::stol(info.version, 0, 10); });
     return resultMap;
   };
 

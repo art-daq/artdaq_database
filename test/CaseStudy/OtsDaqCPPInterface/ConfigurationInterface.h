@@ -9,7 +9,10 @@ struct ConfigurationInterface {};
 
 struct ConfigurationView {
   void printJSON(std::stringstream& ss) { ss << _json; }
-  int fillFromJSON(std::string const& newjson) { _json = newjson; return 0; }
+  int fillFromJSON(std::string const& newjson) {
+    _json = newjson;
+    return 0;
+  }
   std::string _json = "{}";
   int version = 0;
 };
@@ -17,7 +20,7 @@ struct ConfigurationView {
 struct ConfigurationBase {
   virtual std::string getConfigurationName() const { return "ConfigurationBase"; }
   virtual ConfigurationView& getView() = 0;
-  virtual ConfigurationView* getViewP() =0;
+  virtual ConfigurationView* getViewP() = 0;
   virtual int getViewVersion() const = 0;
 };
 
