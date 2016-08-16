@@ -21,6 +21,7 @@ result_pair_t add_configuration_to_global_configuration(LoadStoreOperation const
 result_pair_t create_new_global_configuration(LoadStoreOperation const& /*options*/) noexcept;
 result_pair_t find_configuration_versions(LoadStoreOperation const& /*options*/) noexcept;
 result_pair_t find_configuration_entities(LoadStoreOperation const& /*options*/) noexcept;
+result_pair_t list_collection_names(LoadStoreOperation const& /*options*/) noexcept;
 }
 
 namespace json {
@@ -30,6 +31,7 @@ result_pair_t add_configuration_to_global_configuration(std::string const& /*sea
 result_pair_t create_new_global_configuration(std::string const& /*search_filter*/) noexcept;
 result_pair_t find_configuration_versions(std::string const& /*search_filter*/) noexcept;
 result_pair_t find_configuration_entities(std::string const& /*search_filter*/) noexcept;
+result_pair_t list_collection_names(std::string const& /*search_filter*/) noexcept;
 }
 
 namespace debug {

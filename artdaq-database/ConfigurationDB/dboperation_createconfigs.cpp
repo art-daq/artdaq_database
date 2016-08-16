@@ -33,6 +33,9 @@ void add_configuration_to_global_configuration(LoadStoreOperation const&, std::s
 void create_new_global_configuration(std::string const&, std::string&);
 void find_configuration_versions(LoadStoreOperation const&, std::string&);
 void find_configuration_entities(LoadStoreOperation const&, std::string&);
+void list_collection_names(LoadStoreOperation const&, std::string&);
+
+
 }  // namespace detail
 }  // namespace configuration
 }  // namespace database
@@ -53,6 +56,18 @@ result_pair_t opts::add_configuration_to_global_configuration(LoadStoreOperation
 
 result_pair_t opts::create_new_global_configuration(LoadStoreOperation const& /*options*/) noexcept {
   return result_pair_t{false, "Not Implemented"};
+}
+
+result_pair_t opts::list_collection_names(LoadStoreOperation const& options) noexcept{
+  try {
+    auto returnValue = std::string{};
+
+    detail::list_collection_names(options, returnValue);
+
+    return result_pair_t{true, returnValue};
+  } catch (...) {
+    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+  }
 }
 
 result_pair_t opts::find_configuration_versions(LoadStoreOperation const& options) noexcept {
@@ -108,6 +123,23 @@ result_pair_t json::create_new_global_configuration(std::string const& operation
     return result_pair_t{false, boost::current_exception_diagnostic_information()};
   }
 }
+
+result_pair_t json::list_collection_names(std::string const& search_filter) noexcept{
+  try {
+    if (search_filter.empty()) return std::make_pair(false, make_error_msg(literal::msg::empty_filter));
+
+    auto options = LoadStoreOperation{literal::operation::addconfig};
+    options.readJsonData({search_filter});
+
+    auto returnValue = std::string{};
+
+    detail::list_collection_names(options, returnValue);
+    return result_pair_t{true, returnValue};
+  } catch (...) {
+    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+  }
+}
+
 
 result_pair_t json::find_configuration_versions(std::string const& search_filter) noexcept {
   try {

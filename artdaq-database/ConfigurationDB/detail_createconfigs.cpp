@@ -152,11 +152,11 @@ void find_configuration_versions(Options const& options, std::string& versions) 
   assert(versions.empty());
   assert(options.operation().compare(cflo::findversions) == 0);
 
-  TRACE_(11, "find_configuration_versions: begin");
-  TRACE_(11, "find_configuration_versions args options=<" << options.to_string() << ">");
+  TRACE_(12, "find_configuration_versions: begin");
+  TRACE_(12, "find_configuration_versions args options=<" << options.to_string() << ">");
 
   if (cf::not_equal(options.provider(), cflp::filesystem) && cf::not_equal(options.provider(), cflp::mongo)) {
-    TRACE_(11, "Error in find_configuration_versions:"
+    TRACE_(12, "Error in find_configuration_versions:"
                    << " Invalid database provider; database provider=" << options.provider() << ".");
 
     throw cet::exception("find_configuration_versions")
@@ -195,18 +195,18 @@ void find_configuration_versions(Options const& options, std::string& versions) 
 
   if (returnValueChanged) versions.swap(returnValue);
 
-  TRACE_(11, "find_configuration_versions: end");
+  TRACE_(12, "find_configuration_versions: end");
 }
 
 void find_configuration_entities(Options const& options, std::string& entities) {
   assert(entities.empty());
   assert(options.operation().compare(cflo::findentities) == 0);
 
-  TRACE_(11, "find_configuration_entities: begin");
-  TRACE_(11, "find_configuration_entities args options=<" << options.to_string() << ">");
+  TRACE_(13, "find_configuration_entities: begin");
+  TRACE_(13, "find_configuration_entities args options=<" << options.to_string() << ">");
 
   if (cf::not_equal(options.provider(), cflp::filesystem) && cf::not_equal(options.provider(), cflp::mongo)) {
-    TRACE_(11, "Error in find_configuration_entities:"
+    TRACE_(13, "Error in find_configuration_entities:"
                    << " Invalid database provider; database provider=" << options.provider() << ".");
 
     throw cet::exception("find_configuration_entities")
@@ -245,9 +245,60 @@ void find_configuration_entities(Options const& options, std::string& entities) 
 
   if (returnValueChanged) entities.swap(returnValue);
 
-  TRACE_(11, "find_configuration_entities: end");
-  TRACE_(11, "find_configuration_entities: end entities=" << entities);
+  TRACE_(13, "find_configuration_entities: end");
+  TRACE_(13, "find_configuration_entities: end entities=" << entities);
 }
+
+void list_collection_names(Options const& options, std::string& collections){
+  assert(collections.empty());
+  assert(options.operation().compare(cflo::listcollections) == 0);
+
+  TRACE_(13, "list_collection_names: begin");
+  TRACE_(13, "list_collection_names args search_filter=<" << options.to_string() << ">");
+
+  if (cf::not_equal(options.provider(), cflp::filesystem) && cf::not_equal(options.provider(), cflp::mongo)) {
+    TRACE_(13, "Error in list_collection_names:"
+                   << " Invalid database provider; database provider=" << options.provider() << ".");
+
+    throw cet::exception("list_collection_names")
+        << "Invalid database provider; database provider=" << options.provider() << ".";
+  }
+
+  auto dispatch_persistence_provider = [](std::string const& name) {
+    auto providers = std::map<std::string, provider_findversions_t>{
+        {cflp::mongo, cf::mongo::findConfigVersions}, {cflp::filesystem, cf::filesystem::listCollectionNames}};
+
+    return providers.at(name);
+  };
+
+  auto search_result =
+      dispatch_persistence_provider(options.provider())(options, options.collectionName_to_JsonData().json_buffer);
+
+  auto returnValue = std::string{};
+  auto returnValueChanged = bool{false};
+
+  switch (options.dataFormat()) {
+    default:
+    case data_format_t::db:
+    case data_format_t::json:
+    case data_format_t::unknown:
+    case data_format_t::fhicl: {
+      throw cet::exception("list_collection_names") << "Unsupported data format.";
+      break;
+    }
+
+    case data_format_t::gui: {
+      returnValue = search_result.json_buffer;
+      returnValueChanged = true;
+      break;
+    }
+  }
+
+  if (returnValueChanged) collections.swap(returnValue);
+
+  TRACE_(13, "list_collection_names: end");
+}
+
 }  // namespace detail
 }  // namespace configuration
 }  // namespace database

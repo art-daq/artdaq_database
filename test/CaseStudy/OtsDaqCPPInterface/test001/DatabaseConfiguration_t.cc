@@ -26,7 +26,7 @@
 
 struct TestData {
   TestData() {
-    /*
+    
     artdaq::database::filesystem::debug::enable();
     artdaq::database::mongo::debug::enable();
     // artdaq::database::jsonutils::debug::enableJSONDocument();
@@ -45,13 +45,11 @@ struct TestData {
 
 //    debug::registerUngracefullExitHandlers();
     artdaq::database::dataformats::useFakeTime(true);
-    */
-    BOOST_TEST_MESSAGE("setup fixture");
+    
     std::cout << "setup fixture\n";
   }
 
   ~TestData() {
-    BOOST_TEST_MESSAGE("teardown fixture");
     std::cout << "setup fixture\n";
   }
 
@@ -61,14 +59,13 @@ struct TestData {
   int oldConfigCount() { return _oldConfigCount; }
 
   const int _version = (srand(time(NULL)), rand() % 99999 + 100000);
-  
+
   int _oldConfigCount = 0;
 };
 
 using namespace ots;
 
 TestData fixture;
-
 
 BOOST_AUTO_TEST_SUITE(databaseconfiguration_test)
 
@@ -133,7 +130,7 @@ BOOST_AUTO_TEST_CASE(load_global_configuration) {
   auto ifc = DatabaseConfigurationInterface();
 
   auto configName = std::string{"config"} + std::to_string(fixture.version());
-  
+
   auto map = ifc.loadGlobalConfiguration(configName);
 
   BOOST_CHECK_EQUAL(map.size(), 2);
@@ -152,7 +149,7 @@ BOOST_AUTO_TEST_CASE(find_all_global_configurations) {
 
   auto list = ifc.findAllGlobalConfigurations();
 
-  BOOST_CHECK_EQUAL(list.size(), fixture.oldConfigCount()+1);
+  BOOST_CHECK_EQUAL(list.size(), fixture.oldConfigCount() + 1);
 
   auto configName = std::string{"config"} + std::to_string(fixture.version());
 
@@ -163,5 +160,25 @@ BOOST_AUTO_TEST_CASE(find_all_global_configurations) {
   return;
 }
 
+BOOST_AUTO_TEST_CASE(list_configuration_types) {
+  auto ifc = DatabaseConfigurationInterface();
+
+  auto list = ifc.listConfigurationsTypes();
+
+  BOOST_CHECK_EQUAL(list.size(), 2);
+
+  std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();
+  std::shared_ptr<ConfigurationBase> cfg2 = std::make_shared<TestConfiguration002>();
+
+  auto found1 = (std::find(list.begin(), list.end(), cfg1->getConfigurationName()) != list.end());
+
+  BOOST_CHECK_EQUAL(found1, true);
+
+  auto found2 = (std::find(list.begin(), list.end(), cfg2->getConfigurationName()) != list.end());
+
+  BOOST_CHECK_EQUAL(found2, true);
+
+  return;
+}
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -36,6 +36,7 @@ class LoadStoreOperation final : public OperationBase {
   JsonData globalConfiguration_to_JsonData() const;
   JsonData version_to_JsonData() const;
   JsonData configurableEntity_to_JsonData() const;
+  JsonData collectionName_to_JsonData() const;
 
   bpo::options_description makeProgramOptions() const override;
 

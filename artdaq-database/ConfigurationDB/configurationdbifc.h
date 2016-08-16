@@ -370,10 +370,35 @@ struct ConfigurationInterface final {
   }
 
   // returns a list of configuration collection names
-  std::list<std::string> listConfigurationCollections() const {
+  std::list<std::string> listCollectionNames(std::string const& name_prefix) const {
     auto returnList = std::list<std::string>{};  // RVO
 
-    // constexpr auto apifunctname = "ConfigurationInterface::findConfigurationCollections";
+    constexpr auto apifunctname = "ConfigurationInterface::listCollectionNames";
+
+    auto opts = LoadStoreOperation{apiname};
+
+    opts.operation(cfl::operation::listcollections);
+    opts.dataFormat(data_format_t::gui);
+    opts.provider(_database_provider);
+
+    if (!name_prefix.empty()) opts.collectionName(name_prefix);
+
+    auto apiCallResult = cf::impl::list_collection_names(opts);
+
+    if (!apiCallResult.first) throw artdaq::database::runtime_exception(apifunctname) << apiCallResult.second;
+
+    auto payloadAST = jsn::object_t{};
+
+    if (!jsn::JsonReader().read(apiCallResult.second, payloadAST))
+      throw artdaq::database::runtime_exception(apifunctname) << "JsonWriter failed, invalid payloadAST.";
+
+    jsn::array_t const& searchResults = boost::get<jsn::array_t>(payloadAST.at(cfl::document::search));
+
+    for (auto const& searchResult : searchResults) {
+      auto const& query = boost::get<jsn::object_t>(searchResult).at(cfl::document::query);
+      auto const& collectionName = boost::get<jsn::object_t>(query).at(cfl::option::collection);
+      returnList.push_back(boost::get<std::string>(collectionName));
+    }
 
     return returnList;
   }

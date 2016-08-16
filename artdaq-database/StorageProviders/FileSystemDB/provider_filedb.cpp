@@ -395,6 +395,41 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigEntities(
   return returnCollection;
 }
 
+
+template <>
+template <>
+std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listCollectionNames(JsonData const& search_filter) {
+  assert(!search_filter.json_buffer.empty());
+  auto returnCollection = std::list<JsonData>();
+  TRACE_(12, "StorageProvider::FileSystemDB::listCollectionNames() begin");
+  TRACE_(12, "StorageProvider::FileSystemDB::listCollectionNames() args data=<" << search_filter.json_buffer << ">");
+  
+  auto collection = _provider->connection();
+  collection = expand_environment_variables(collection);
+
+  auto dir_name = mkdir(collection);
+  auto collection_names = find_subdirs(dir_name);
+
+  for (auto const& collection_name : collection_names) {
+    TRACE_(12, "StorageProvider::FileSystemDB::listCollectionNames() found collection_name=<" << collection_name << ">");
+
+      std::stringstream ss;
+
+      ss << "{";
+      ss << "\"collection\" : \"" << collection_name << "\",";
+      ss << "\"dbprovider\" : \"filesystem\",";
+      ss << "\"dataformat\" : \"gui\",";
+      ss << "\"operation\" : \"findversions\",";
+      ss << "\"filter\" : { }";
+      ss << "}";
+
+      TRACE_(12, "StorageProvider::FileSystemDB::listCollectionNames() found document=<" << ss.str() << ">");
+
+      returnCollection.emplace_back(ss.str());
+  }  
+  return returnCollection;
+}
+
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::addConfigToGlobalConfig(JsonData const& search_filter) {
@@ -575,6 +610,8 @@ object_id_t extract_oid(std::string const& filter) {
 
   return match;
 }
+
+
 
 namespace filesystem {
 namespace debug {

@@ -581,6 +581,55 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::addConfigToGlobalConfig(
   return returnCollection;
 }
 
+template <>
+template <>
+std::list<JsonData> StorageProvider<JsonData, MongoDB>::listCollectionNames(JsonData const& search_filter) {
+  assert(!search_filter.json_buffer.empty());
+  auto returnCollection = std::list<JsonData>();
+
+  TRACE_(9, "StorageProvider::MongoDB::listCollectionNames() begin");
+  TRACE_(9, "StorageProvider::MongoDB::listCollectionNames() args data=<" << search_filter.json_buffer << ">");
+
+  auto filter = bsoncxx::builder::core(false);
+  auto search_filter_doc = bbs::document{};
+  filter.concatenate(search_filter_doc);
+
+  auto collectionDescriptors = _provider->connection().list_collections(filter.view_document());
+
+  for (auto const& collectionDescriptor : collectionDescriptors) {
+    TRACE_(9, "StorageProvider::MongoDB::listCollectionNames() found collection=<"
+                  << bsoncxx::to_json(collectionDescriptor) << ">");
+
+    auto element_name = collectionDescriptor.find("name");
+
+    if (element_name == collectionDescriptor.end())
+      throw cet::exception("MongoDB") << "MongoDB returned invalid database collection descriptor.";
+
+    auto string_value = element_name->get_value();
+
+    auto collection_name = dequote(bsoncxx::to_json(string_value));
+
+    if (collection_name == "system.indexes") continue;
+
+    TRACE_(9, "StorageProvider::MongoDB::listCollectionNames() found collection_name=<" << collection_name << ">");
+
+      std::stringstream ss;
+      ss << "{";
+      ss << "\"collection\" : \"" << collection_name << "\",";
+      ss << "\"dbprovider\" : \"mongo\",";
+      ss << "\"dataformat\" : \"gui\",";
+      ss << "\"operation\" : \"findversions\",";
+      ss << "\"filter\" : {}";
+      ss << "}";
+
+      TRACE_(9, "StorageProvider::MongoDB::listCollectionNames() found document=<" << ss.str() << ">");
+
+      returnCollection.emplace_back(ss.str());
+  }
+  return returnCollection;
+}
+
+
 std::string dequote(std::string s) {
   if (s[0] == '"' && s[s.length() - 1] == '"')
     return s.substr(1, s.length() - 2);

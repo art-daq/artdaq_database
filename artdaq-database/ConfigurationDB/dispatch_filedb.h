@@ -29,6 +29,7 @@ JsonData addConfigToGlobalConfig(cf::LoadStoreOperation const& /*options*/, Json
 
 JsonData findConfigEntities(cf::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
 
+JsonData listCollectionNames(cf::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
 }  // namespace filesystem
 
 namespace debug {

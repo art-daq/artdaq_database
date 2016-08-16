@@ -13,6 +13,9 @@ constexpr auto globalconfload = "globalconfload";
 constexpr auto store = "store";
 constexpr auto load = "load";
 
+
+constexpr auto listcollections = "listcollections";
+
 constexpr auto findconfigs = "findconfigs";
 constexpr auto findversions = "findversions";
 constexpr auto findentities = "findentities";

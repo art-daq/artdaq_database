@@ -47,6 +47,9 @@ class StorageProvider final {
   template <typename FILTER>
   std::list<FILTER> buildConfigSearchFilter(FILTER const&);
 
+  template <typename FILTER>
+  std::list<FILTER> listCollectionNames(FILTER const&);
+  
  private:
   std::shared_ptr<IMPL> _provider;
 };

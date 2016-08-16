@@ -241,6 +241,22 @@ JsonData LoadStoreOperation::globalConfiguration_to_JsonData() const {
   return {json_buffer};
 }
 
+
+JsonData LoadStoreOperation::collectionName_to_JsonData() const {
+  using namespace artdaq::database::json;
+  auto docAST = object_t{};
+
+  docAST[cfl::option::collection] = collectionName();
+
+  auto json_buffer = std::string{};
+
+  if (!JsonWriter{}.write(docAST, json_buffer)) {
+    throw db::invalid_option_exception("LoadStoreOperation") << "Unable to write JSON buffer.";
+  }
+
+  return {json_buffer};
+}
+
 JsonData LoadStoreOperation::version_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};

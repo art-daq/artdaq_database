@@ -408,6 +408,57 @@ JsonData prov::addConfigToGlobalConfig(LoadStoreOperation const& options, JsonDa
   return mongo::buildConfigSearchFilter(find_options, options.globalConfiguration_to_JsonData().json_buffer);
 }
 
+JsonData prov::listCollectionNames(LoadStoreOperation const& options, JsonData const& search_payload) {
+  assert(options.provider().compare(literal::provider::mongo) == 0);
+  assert(options.operation().compare(literal::operation::listcollections) == 0);
+
+  if (options.operation().compare(literal::operation::listcollections) != 0) {
+    throw cet::exception("operation_listcollections") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  }
+
+  if (options.provider().compare(literal::provider::mongo) != 0) {
+    throw cet::exception("operation_listcollections") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  }
+
+  TRACE_(20, "operation_listcollections: begin");
+
+  auto config = DBI::DBConfig{};
+  auto database = DBI::DB::create(config);
+  auto provider = DBI::DBProvider<JsonData>::create(database);
+
+  auto collection_names = provider->listCollectionNames(search_payload);
+  
+  if (collection_names.empty()) {
+    return {literal::empty_search_result};
+    //throw cet::exception("operation_listcollections") << "No configuration entities were found.";
+  }
+
+  auto needComma = bool{false};
+  auto printComma = [&needComma]() {
+    if (needComma) return ", ";
+    needComma = true;
+    return " ";
+  };
+
+  std::stringstream ss;
+
+  ss << "{ \"search\": [\n";
+
+  for (auto const& collection_name : collection_names) {
+    auto name = JSONDocument{collection_name.json_buffer}.findChild("collection").value();
+    TRACE_(18, "operation_listcollections: collection=<" << name << '>');
+
+    ss << printComma() << "{";
+    ss << "\"name\" :\"" << name << "\",";
+    ss << "\"query\" :" << collection_name.json_buffer;
+    ss << "}\n";
+  }
+
+  ss << "] }";
+
+  return {ss.str()};
+}
+
 void debug::enableDBOperationMongo() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);

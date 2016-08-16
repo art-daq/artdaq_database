@@ -89,7 +89,9 @@ std::list<std::string /*name*/> DatabaseConfigurationInterface::listConfiguratio
     throw(std::runtime_error) try {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
 
-  return ifc.listConfigurationCollections();
+  auto collection_name_prefix=std::string{};
+  
+  return ifc.listCollectionNames(collection_name_prefix);
 } catch (std::exception const& e) {
   std::cout << "DBI Exception:" << e.what() << "\n";
   throw std::runtime_error(e.what());
@@ -163,3 +165,4 @@ void DatabaseConfigurationInterface::storeGlobalConfiguration(config_version_map
   std::cout << "DBI Unknown exception.\n";
   throw std::runtime_error("DBI Unknown exception.");
 }
+
