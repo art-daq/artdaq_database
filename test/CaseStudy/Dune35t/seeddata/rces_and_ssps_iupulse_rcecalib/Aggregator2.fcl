@@ -1,0 +1,86 @@
+#include "/data/lbnedaq/config/common_code/monitoring_standard.fcl"
+
+services: {
+  scheduler: {
+    fileMode: NOMERGE
+  }
+  user: {
+    NetMonTransportServiceInterface: {
+      service_provider: NetMonTransportService
+      max_fragment_size_words: 20971520
+    }
+  }
+
+}
+
+daq: {
+  max_fragment_size_words: 20971520
+  aggregator: {
+    mpi_buffer_count: 32
+    first_event_builder_rank: PLACEHOLDER
+    event_builder_count: PLACEHOLDER
+    expected_events_per_bunch: 1
+    print_event_store_stats: true
+    event_queue_depth: 2
+    event_queue_wait_time: 1
+    onmon_event_prescale: 1
+    xmlrpc_client_list: PLACEHOLDER
+    file_size_MB: 1000000.0
+    file_duration: 0
+    file_event_count: 0
+  }
+  metrics: {
+
+    rcreporter: {
+      metricPluginType: "RCReporter"
+      level: 1
+      fileName: "/data/lbnedaq/daqlogs/aggregator/aggregator_%UID%_metrics.log"
+      uniquify: true
+  }
+
+    ganglia: {
+      metricPluginType: ganglia
+      level: 5
+      configFile: "/etc/ganglia/gmond.conf"
+      group: Aggregator
+    }
+  }
+}
+
+source: {
+  module_type: NetMonInput
+}
+
+outputs: {
+
+}
+
+physics: {
+  analyzers: {
+    
+    app: {
+      module_type: RootApplication
+      force_new: true
+    }
+    
+    wf: {
+      module_type: WFViewer
+      fragment_ids: []
+      fragment_type_labels: [] 
+
+      prescale: 200
+      digital_sum_only: false
+    }
+
+    monitoring: @local::OnlineMonitoring_standard
+
+  }
+
+  producers: {
+  }
+
+  a1: [ monitoring ]
+#  #a1: [ app, wf ]
+#  #a1: [ app ]
+}
+process_name: DAQAG

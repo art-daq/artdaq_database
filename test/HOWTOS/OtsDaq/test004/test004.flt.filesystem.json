@@ -1,0 +1,7 @@
+{"version":"version002",
+"collection":"test_fhicl",
+"configurable_entity":"TestEntity",
+"dbprovider":"filesystem",
+"operation":"store",
+"dataformat":"gui",
+"configuration":"configB002"}

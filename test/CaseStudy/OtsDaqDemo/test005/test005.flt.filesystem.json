@@ -1,0 +1,7 @@
+{"version":"version002",
+"collection":"otsdaq_DefaultConfigurations",
+"configurable_entity":"CMSROOT",
+"dbprovider":"filesystem",
+"operation":"store",
+"dataformat":"gui",
+"configuration":"configB002"}

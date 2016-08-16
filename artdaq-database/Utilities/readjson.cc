@@ -2,7 +2,7 @@
 #include <iostream>
 #include <streambuf>
 #include <string>
-#include "artdaq-database/FhiclJson/json_common.h"
+#include "artdaq-database/DataFormats/Json/json_common.h"
 #include "boost/program_options.hpp"
 
 #include <boost/exception/diagnostic_information.hpp>

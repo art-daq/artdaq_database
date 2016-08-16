@@ -1,7 +1,7 @@
 #ifndef _ARTDAQ_DATABASE_PROVIDER_FILESYSTEM_INDEX_H_
 #define _ARTDAQ_DATABASE_PROVIDER_FILESYSTEM_INDEX_H_
 
-#include "artdaq-database/FhiclJson/json_common.h"
+#include "artdaq-database/DataFormats/Json/json_common.h"
 #include "artdaq-database/StorageProviders/common.h"
 #include "artdaq-database/StorageProviders/storage_providers.h"
 
@@ -27,7 +27,9 @@ class SearchIndex final {
 
   std::vector<object_id_t> findDocumentIDs(JsonData const&);
   std::vector<std::pair<std::string, std::string>> findAllGlobalConfigurations(JsonData const&);
-  std::vector<std::pair<std::string, std::string>> findConfigVersions(JsonData const&);
+  std::vector<std::pair<std::string, std::string>> findVersionsByGlobalConfigName(JsonData const&);
+  std::vector<std::pair<std::string, std::string>> findVersionsByEntityName(JsonData const&);
+  
   std::vector<std::string> findConfigEntities(JsonData const&);
 
   bool addDocument(JsonData const&, object_id_t const&);
@@ -92,8 +94,9 @@ void SearchIndex::_make_unique_sorted(jsn::array_t& ouids) {
   std::for_each(tmp.begin(), tmp.end(), [&ouids](TYPE& value) { ouids.push_back(value); });
 }
 
-void trace_enable();
-
+namespace debug {
+void enable();
+}
 }  // namespace index
 }  // namespace filesystem
 }  // namespace database

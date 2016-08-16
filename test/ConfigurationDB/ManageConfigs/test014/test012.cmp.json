@@ -1,0 +1,28 @@
+{
+   "search":[
+      {
+         "name":"findentities-@CONFIG_NUMBER@-A",
+         "query":{
+            "collection":"@TEST_COLLECTION_NAME@_@TEST_COLLECTION_NAME_QUAL@",
+            "dbprovider":"@TEST_DBPROVIDER@",
+            "dataformat":"gui",
+            "operation":"findversions",
+            "filter":{
+               "configurable_entity.name":"findentities-@CONFIG_NUMBER@-A"
+            }
+         }
+      },
+      {
+         "name":"findentities-@CONFIG_NUMBER@-B",
+         "query":{
+            "collection":"@TEST_COLLECTION_NAME@_@TEST_COLLECTION_NAME_QUAL@",
+            "dbprovider":"@TEST_DBPROVIDER@",
+            "dataformat":"gui",
+            "operation":"findversions",
+            "filter":{
+               "configurable_entity.name":"findentities-@CONFIG_NUMBER@-B"
+            }
+         }
+      }
+   ]
+}

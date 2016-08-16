@@ -4,11 +4,11 @@
 #include <cassert>
 #include <ctime>
 #include <iostream>
+#include <list>
 #include <memory>
 #include <tuple>
 #include <type_traits>
 #include <vector>
-#include <list>
 #include "trace.h"
 
 #include <boost/core/demangle.hpp>

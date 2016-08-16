@@ -263,41 +263,88 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigVersions(
 
   SearchIndex search_index(index_path);
 
-  auto versionentityname_pairs = search_index.findConfigVersions(search_filter);
+  jsn::object_t search_ast;
 
-  TRACE_(7, "StorageProvider::FileSystemDB::findConfigVersions() search returned " << versionentityname_pairs.size()
-                                                                                   << " configurations.");
-
-  for (auto const& versionentityname_pair : versionentityname_pairs) {
-    std::stringstream ss;
-
-    ss << "{";
-    ss << "\"collection\" : \"" << collection_name << "\",";
-    ss << "\"dbprovider\" : \"filesystem\",";
-    ss << "\"dataformat\" : \"gui\",";
-    ss << "\"operation\" : \"load\",";
-    ss << "\"filter\" : {";
-    ss << "\"version\" : \"" << versionentityname_pair.second << "\"";
-    ss << ", \"configurable_entity.name\" : \"" << versionentityname_pair.first << "\"";
-    ss << "}";
-    ss << "}";
-
-    TRACE_(7, "StorageProvider::FileSystemDB::findConfigVersions() found document=<" << ss.str() << ">");
-
-    returnCollection.emplace_back(ss.str());
+  if (!jsn::JsonReader{}.read(search_filter, search_ast)) {
+    TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByEntityName()"
+                  << " Failed to create an AST from search.");
+    return returnCollection;
   }
 
+  if (search_ast.count("configurations.name") == 0) {
+    auto versionentityname_pairs = search_index.findVersionsByEntityName(search_filter);
+
+    TRACE_(7, "StorageProvider::FileSystemDB::findVersionsByEntityName() search returned "
+                  << versionentityname_pairs.size() << " configurations.");
+
+    for (auto const& versionentityname_pair : versionentityname_pairs) {
+      std::stringstream ss;
+
+      ss << "{";
+      ss << "\"collection\" : \"" << collection_name << "\",";
+      ss << "\"dbprovider\" : \"filesystem\",";
+      ss << "\"dataformat\" : \"gui\",";
+      ss << "\"operation\" : \"load\",";
+      ss << "\"filter\" : {";
+      ss << "\"version\" : \"" << versionentityname_pair.second << "\"";
+      ss << ", \"configurable_entity.name\" : \"" << versionentityname_pair.first << "\"";
+      ss << "}";
+      ss << "}";
+
+      TRACE_(7, "StorageProvider::FileSystemDB::findConfigVersions() found document=<" << ss.str() << ">");
+
+      returnCollection.emplace_back(ss.str());
+    }
+  } else {
+    auto entityName = std::string{"notprovided"};
+
+    try {
+      entityName = boost::get<std::string>(search_ast.at("configurable_entity.name"));
+
+      TRACE_(7, "StorageProvider::FileSystemDB::findVersionsByGlobalConfigName"
+                    << " Found entity filter=<" << entityName << ">.");
+
+    } catch (...) {
+    }
+    
+    auto versionentityname_pairs = search_index.findVersionsByGlobalConfigName(search_filter);
+
+    TRACE_(7, "StorageProvider::FileSystemDB::findVersionsByGlobalConfigName() search returned "
+                  << versionentityname_pairs.size() << " configurations.");
+
+    for (auto const& versionentityname_pair : versionentityname_pairs) {
+      std::stringstream ss;
+
+      ss << "{";
+      ss << "\"collection\" : \"" << collection_name << "\",";
+      ss << "\"dbprovider\" : \"filesystem\",";
+      ss << "\"dataformat\" : \"gui\",";
+      ss << "\"operation\" : \"load\",";
+      ss << "\"filter\" : {";
+      ss << "\"version\" : \"" << versionentityname_pair.second << "\"";
+      ss << ", \"configurable_entity.name\" : \"" << entityName << "\"";
+      ss << "}";
+      ss << "}";
+
+      TRACE_(7, "StorageProvider::FileSystemDB::findConfigVersions() found document=<" << ss.str() << ">");
+
+      returnCollection.emplace_back(ss.str());
+    }
+  }
   return returnCollection;
 }
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigEntities(JsonData const& search_filter) {
-  assert(!search_filter.json_buffer.empty());
+std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigEntities(JsonData const& filter) {
+  assert(!filter.json_buffer.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(9, "StorageProvider::FileSystemDB::findConfigEntities() begin");
-  TRACE_(9, "StorageProvider::FileSystemDB::findConfigEntities() args data=<" << search_filter.json_buffer << ">");
+  TRACE_(9, "StorageProvider::FileSystemDB::findConfigEntities() args data=<" << filter.json_buffer << ">");
+
+  auto search_filter_document = JSONDocument{filter.json_buffer};
+  auto search_filter = search_filter_document.findChild("filter").value();
 
   auto collection = _provider->connection();
   collection = expand_environment_variables(collection);
@@ -345,6 +392,41 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigEntities(
     }
   }
 
+  return returnCollection;
+}
+
+
+template <>
+template <>
+std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listCollectionNames(JsonData const& search_filter) {
+  assert(!search_filter.json_buffer.empty());
+  auto returnCollection = std::list<JsonData>();
+  TRACE_(12, "StorageProvider::FileSystemDB::listCollectionNames() begin");
+  TRACE_(12, "StorageProvider::FileSystemDB::listCollectionNames() args data=<" << search_filter.json_buffer << ">");
+  
+  auto collection = _provider->connection();
+  collection = expand_environment_variables(collection);
+
+  auto dir_name = mkdir(collection);
+  auto collection_names = find_subdirs(dir_name);
+
+  for (auto const& collection_name : collection_names) {
+    TRACE_(12, "StorageProvider::FileSystemDB::listCollectionNames() found collection_name=<" << collection_name << ">");
+
+      std::stringstream ss;
+
+      ss << "{";
+      ss << "\"collection\" : \"" << collection_name << "\",";
+      ss << "\"dbprovider\" : \"filesystem\",";
+      ss << "\"dataformat\" : \"gui\",";
+      ss << "\"operation\" : \"findversions\",";
+      ss << "\"filter\" : { }";
+      ss << "}";
+
+      TRACE_(12, "StorageProvider::FileSystemDB::listCollectionNames() found document=<" << ss.str() << ">");
+
+      returnCollection.emplace_back(ss.str());
+  }  
   return returnCollection;
 }
 
@@ -495,7 +577,7 @@ object_id_t extract_oid(std::string const& filter) {
   auto results = std::smatch();
 
   if (!std::regex_search(filter, results, ex))
-    throw cet::exception("JSONDocument") << ("Regex search failed; JSON buffer:" + filter);
+    throw cet::exception("JSONDocument") << ("Regex ouid search failed; JSON buffer:" + filter);
 
   if (results.size() != 2) {
     // we are interested in a second match
@@ -529,17 +611,20 @@ object_id_t extract_oid(std::string const& filter) {
   return match;
 }
 
+
+
 namespace filesystem {
-void trace_enable() {
+namespace debug {
+void enable() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", 1LL);
   TRACE_CNTL("modeS", 1LL);
 
-  TRACE_(0, "artdaq::database::filesystem::"
-                << "trace_enable");
+  TRACE_(0, "artdaq::database::filesystem trace_enable");
 
-  index::trace_enable();
+  artdaq::database::filesystem::index::debug::enable();
+}
 }
 }  // namespace filesystem
 }  // namespace database

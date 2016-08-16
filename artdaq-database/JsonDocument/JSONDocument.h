@@ -7,6 +7,9 @@ namespace artdaq {
 namespace database {
 namespace jsonutils {
 
+bool isValidJson(std::string const&);
+std::string filterJson(std::string const&);
+
 using path_t = std::string;
 
 class notfound_exception : public cet::exception {
@@ -41,9 +44,9 @@ class JSONDocument final {
   std::string value() { return JSONDocument::value(self()); };
   bool isReadonly() const;
 
-  bool matches(JSONDocument const&, bool) const;
+  bool equals(JSONDocument const&) const;
 
-  bool operator==(JSONDocument const& other) const { return matches(other, true); }
+  bool operator==(JSONDocument const& other) const { return equals(other); }
   bool operator!=(JSONDocument const& other) const { return !(*this == other); }
 
   template <typename T>
@@ -54,7 +57,7 @@ class JSONDocument final {
   static std::string validate(std::string const&);
   static std::string value(JSONDocument const&);
   static std::string value_at(JSONDocument const&, std::size_t);
-  
+
   static JSONDocument loadFromFile(std::string const&);
 
   // defaults
@@ -78,8 +81,9 @@ class JSONDocument final {
   std::string _json_buffer;
 };
 
-void trace_enable_JSONDocument();
-
+namespace debug {
+void enableJSONDocument();
+}
 std::ostream& operator<<(std::ostream&, JSONDocument const&);
 
 }  // namespace jsonutils

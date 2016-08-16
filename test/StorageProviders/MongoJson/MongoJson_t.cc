@@ -1,27 +1,18 @@
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <streambuf>
-#include <sstream> 
-
-
-#include "boost/program_options.hpp"
-#include "artdaq-database/StorageProviders/common.h"
+#include "test/common.h"
 #include "artdaq-database/BasicTypes/basictypes.h"
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
-#include "artdaq-database/BuildInfo/printStackTrace.h"
-#include <boost/exception/diagnostic_information.hpp>
 
 #include "artdaq-database/StorageProviders/storage_providers.h"
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 #include "artdaq-database/JsonDocument/JSONDocument.h"
-#include <bsoncxx/json.hpp>
+#include "artdaq-database/DataFormats/common/shared_literals.h"
+#include "artdaq-database/DataFormats/common/helper_functions.h"
 
 namespace  bpo = boost::program_options;
 using namespace artdaq::database;
 
 using artdaq::database::jsonutils::JSONDocument;
 
+namespace literal = artdaq::database::dataformats::literal;
 
 typedef bool (*test_case)(std::string const&, std::string const&,std::string const&);
 
@@ -32,15 +23,11 @@ bool test_update(std::string const&, std::string const&,std::string const&);
 
 int main(int argc, char* argv[])try
 {
-    artdaq::database::mongo::trace_enable();
-    //artdaq::database::jsonutils::trace_enable_JSONDocument();
+    artdaq::database::mongo::debug::enable();
+    artdaq::database::jsonutils::debug::enableJSONDocument();
 
     debug::registerUngracefullExitHandlers();
-    //artdaq::database::fhicljson::useFakeTime(true);
-
-    // Get the input parameters via the boost::program_options library,
-    // designed to make it relatively simple to define arguments and
-    // issue errors if argument list is supplied incorrectly
+    artdaq::database::dataformats::useFakeTime(true);
 
     std::ostringstream descstr;
     descstr << argv[0] << " <-s <source-file>> <-c <compare-with-file>> <-t <test-name>> [<-o <options file>>] (available test names: insert,search1,search1,update)";
@@ -279,7 +266,7 @@ bool test_search2(std::string const& source, std::string const& compare,std::str
   
   auto json = JsonData{"{\"document\":" + source + ", \"collection\":\"" +colle11ctionName +"\"}"};
 
-  auto repeatCount = std::size_t{100};
+  auto repeatCount = std::size_t{10};
   
   auto object_ids = std::vector<std::string>();
   

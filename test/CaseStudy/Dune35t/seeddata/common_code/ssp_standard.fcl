@@ -1,0 +1,269 @@
+BEGIN_PROLOG
+#include "metrics.fcl"
+
+ssp_standard: {
+
+  metrics: @local::metrics
+  max_fragment_size_words: 262144
+  fragment_receiver: {
+    mpi_buffer_count: 16
+    mpi_sync_interval: 24000
+
+    # These two variables will be calculated by DAQInterface...
+    first_event_builder_rank: -1  
+    event_builder_count: -1
+
+    generator: SSP                        ###Don't edit these lines
+    fragment_type: SSP                    ###
+
+    #fragment_id: 0                        ### Increment these lines for each SSP
+    #board_id: 0                           ###
+
+    interface_type: 1                     ### 0=USB, 1=Ethernet, 2=Emulated
+
+    #board_ip: "0.0.0.0"           #Need to set for each board. Normally 192.168.1.1xx
+                                          #where xx is device serial number (with leading 0 if appropriate)
+
+    verbosity: 3                          #0=silent, no errors or warnings.
+                                          #1=Errors only, important warnings not printed.
+                                          #2=Warnings and errors only.
+                                          #3=Normal (info on device initialization, run start and stop, periodic performance readout).
+                                          #4=*Very* verbose, ~1 line per hardware event, affects performance.
+                                          #5=Currently same as 4.
+      #####################
+      #Set up DAQ software#
+      #####################
+
+      DAQConfig:{
+        
+      #**Important note**
+      #NOvA clock is multiplied up so that ADC samples will be generated at 128MHz, but NOvA ticks used for timestamp
+      #generation (and thus affecting physical millislice length) are at 64Hz.
+      #Internal clock runs at 150MHz for both timestamping and ADC sampling.
+
+        MillisliceLength:          1E7       #Amount of time to assign to a single fragment in clock ticks
+        MillisliceOverlap:         1E6       #Amount at start of next fragment to also put into current fragment
+
+        UseExternalTimestamp:      1         #0=Use internal timestamp to split events into millislices, 1=Use NOvA timestamp.
+
+        StartOnNOvASync:           1         #Tell SSP to wait for sync pulse from NOvA timing unit before taking data.
+                                             #In this case then DAQ will start 1st millislice exactly at NOvA sync timestamp
+
+        EmptyWriteDelay:           1000000   #Time in us that DAQ will wait for SSP events, before starting to build and send
+                                             #empty millislices. Limits the number of empty slices that will be generated simultaneously
+                                             #if delay between events is large.
+
+        HardwareClockRate:         64        #in MHz. Must be 64 for NOvA timestamping, 150 for internal.
+                                             #NB This doesn't set the hardware clock, just tells the DAQ what it is!
+      }
+
+    ############################
+    #Set named registers in SSP#
+    ############################
+                                         
+    HardwareConfig:{                      #Won't affect behaviour of emulated devices
+
+        ####################
+        #Interface type, ID#
+        ####################
+
+        eventDataInterfaceSelect: 0x00000001     #0=USB, 1=Ethernet
+	#module_id:                0x00000001     #Set as desired to identify module; goes into event header.
+
+        #################################
+        #Trigger/channel enable settings#
+        #################################
+
+        ChannelControl: {
+            ExtTriggerMode: 1 #0=no external trigger
+                              #1=edge trigger on front panel
+                              #2=front panel is gate
+                              #3=timestamp
+
+            LEDTrigger:     0 #0=no leading edge trigger
+                              #1=negative polarity trigger
+                              #2=positive polarity trigger
+
+            TimestampRate:  7 #0=292.969kHz
+                              #1=73.242kHz
+                              #2=2.289kHz
+                              #3=143.051Hz
+                              #4=35.763Hz
+                              #5=8.941Hz
+                              #6=1.118Hz
+                              #7=Disabled
+ 
+        }
+
+         
+
+        #ALL_channel_control:      0x80F00401    #rising edge trigger
+        #ALL_channel_control:      0x00006001     #front panel trigger
+        #ALL_channel_control:      0x00F0E051    #timestamp trigger 2.3kHz
+        #ALL_channel_control:      0x00F0E071    #timestamp 143Hz
+        #ALL_channel_control:      0x00F0E091    #timestamp 35.8Hz
+        #ALL_channel_control:      0x00F0E0C1    #timestamp 1.12Hz
+
+        #Alternative to setting ALL_channel_control - set channels up separately.
+        #0x0 means channel disabled.
+	# ARR_channel_control:    [0x00F0E0C1,
+        #                         0x00000000,
+        #                         0x00000000,
+        #                         0x00000000,
+        #                         0x00000000,
+        #                         0x00000000,
+        #                         0x00000000,
+        #                         0x00000000,
+        #                         0x00000000,
+        #                         0x00000000,
+        #                         0x00000000,
+        #                         0x00000000]
+
+        ALL_led_threshold:        100            #Leading edge trigger threshold in ADC
+
+        trigger_input_delay:       0x00000037    #Delay to apply to front panel trigger.
+                                                 #Dont set less than 0x20.
+        ################
+        #Clock settings#
+        ################
+
+        #Use NOvA TDU
+        dsp_clock_control:         0x00000013 # Bit |  Meaning 
+                                               # 0x1 |  1: use ext clock to drive DSP (i.e. sampling rate), 0: use internal clock
+                                               # 0x2 |  1: External clock is NOvA TDU, 0: External clock is front panel input
+                                               # 0x10|  1: Enable clock jitter correction
+
+        #Use internal clock
+        #dsp_clock_control:         0x00000000 
+
+        ############################
+        #Data readout configuration#
+        ############################
+
+        ALL_readout_window:        700           #Number of ADC samples to read out
+	ALL_readout_pretrigger:    50            #Of which before trigger time
+
+        #Parameters used for calculation of metadata
+        #i.e. peak shape, baseline etc as reported in event header.
+        #Leave alone unless you know what you're doing!
+	ALL_cfd_parameters:        0x1800
+	ALL_p_window:              0x20
+	ALL_i2_window:             500
+	ALL_m1_window:             10
+	ALL_m2_window:             10
+	ALL_d_window:              20
+	ALL_i1_window:             500
+	ALL_disc_width:            10
+	ALL_baseline_start:        0x0000
+
+        ############################
+        #Bias voltage configuration#
+        ############################
+
+        #bias_config register sets channel bias voltages - bit 0x40000 enables biasing,
+        #bits 0xFFF set value on linear scale 0-30V.
+        #Comment out all lines to disable biasing.
+        #Can use ARR_bias_config (as above for ARR_channel_config) to set
+        #bias voltages per channel.
+
+        #ALL_bias_config:           0x00040FFF # 30V
+        #ALL_bias_config:           0x00040E21 # 26.5V
+        ALL_bias_config:           0x00040D10 # 24.5V
+
+        ###########################
+        #Leave these alone please!#
+        ###########################
+
+      	c2c_control:             0x00000007
+	c2c_master_intr_control: 0x00000000
+	comm_clock_control:      0x00000001
+	comm_led_config:         0x00000000
+	comm_led_input:          0x00000000
+	qi_dac_config:           0x00000000
+	qi_dac_control:          0x00000001
+
+	mon_config:              0x0012F000
+	mon_select:              0x00FFFF00
+	mon_gpio:                0x00000000
+	mon_control:             0x00010001
+
+	c2c_slave_intr_control:  0x00000000
+           
+        gpio_output_width:         0x00001000
+        front_panel_config:        0x00001111 # standard config?
+        dsp_led_config:            0x00000000
+        dsp_led_input:             0x00000000
+        baseline_delay:            5
+        diag_channel_input:        0x00000000
+        qi_config:                 0x0FFF1F00
+        qi_delay:                  0x00000000
+        qi_pulse_width:            0x00000000
+        external_gate_width:       0x00008000
+
+      }
+   }
+}
+
+# JCF, Dec-2-2015
+
+# Since users will typically expect the block to be called "daq"
+# rather than "ssp_standard", we need to alias daq to ssp_standard,
+# put the user's changes in, and then alias ssp_standard back to daq
+
+daq: @local::ssp_standard
+
+#include "ssp_expert_run_options.fcl"
+#include "user_run_options.fcl"
+
+ssp_standard: @local::daq
+
+ssp01_standard: @local::ssp_standard
+ssp01_standard.fragment_receiver.fragment_id: 0
+ssp01_standard.fragment_receiver.board_id: 0
+ssp01_standard.fragment_receiver.board_ip: "192.168.1.109"
+ssp01_standard.fragment_receiver.HardwareConfig.module_id: 0x00000001
+
+ssp02_standard: @local::ssp_standard
+ssp02_standard.fragment_receiver.fragment_id: 1
+ssp02_standard.fragment_receiver.board_id: 1
+ssp02_standard.fragment_receiver.board_ip: "192.168.1.117"
+ssp02_standard.fragment_receiver.HardwareConfig.module_id: 0x00000002
+
+ssp03_standard: @local::ssp_standard
+ssp03_standard.fragment_receiver.fragment_id: 2
+ssp03_standard.fragment_receiver.board_id: 2
+ssp03_standard.fragment_receiver.board_ip: "192.168.1.113"
+ssp03_standard.fragment_receiver.HardwareConfig.module_id: 0x00000003
+
+ssp04_standard: @local::ssp_standard
+ssp04_standard.fragment_receiver.fragment_id: 3
+ssp04_standard.fragment_receiver.board_id: 3
+ssp04_standard.fragment_receiver.board_ip: "192.168.1.110"
+ssp04_standard.fragment_receiver.HardwareConfig.module_id: 0x00000004
+
+ssp05_standard: @local::ssp_standard
+ssp05_standard.fragment_receiver.fragment_id: 4
+ssp05_standard.fragment_receiver.board_id: 4
+ssp05_standard.fragment_receiver.board_ip: "192.168.1.114"
+ssp05_standard.fragment_receiver.HardwareConfig.module_id: 0x00000005
+
+ssp06_standard: @local::ssp_standard
+ssp06_standard.fragment_receiver.fragment_id: 5
+ssp06_standard.fragment_receiver.board_id: 5
+ssp06_standard.fragment_receiver.board_ip: "192.168.1.106"
+ssp06_standard.fragment_receiver.HardwareConfig.module_id: 0x00000006
+
+ssp07_standard: @local::ssp_standard
+ssp07_standard.fragment_receiver.fragment_id: 6
+ssp07_standard.fragment_receiver.board_id: 6
+ssp07_standard.fragment_receiver.board_ip: "192.168.1.105"
+ssp07_standard.fragment_receiver.HardwareConfig.module_id: 0x00000007
+
+ssp08_standard: @local::ssp_standard
+ssp08_standard.fragment_receiver.fragment_id: 7
+ssp08_standard.fragment_receiver.board_id: 7
+ssp08_standard.fragment_receiver.board_ip: "192.168.1.105"
+ssp08_standard.fragment_receiver.HardwareConfig.module_id: 0x00000008
+
+END_PROLOG
+ssp07_standard:@erase

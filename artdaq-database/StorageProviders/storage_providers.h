@@ -37,16 +37,19 @@ class StorageProvider final {
 
   template <typename FILTER>
   std::list<FILTER> addConfigToGlobalConfig(FILTER const&);
-  
+
   template <typename FILTER>
   std::list<FILTER> findConfigVersions(FILTER const&);
 
   template <typename FILTER>
   std::list<FILTER> findConfigEntities(FILTER const&);
-  
+
   template <typename FILTER>
   std::list<FILTER> buildConfigSearchFilter(FILTER const&);
 
+  template <typename FILTER>
+  std::list<FILTER> listCollectionNames(FILTER const&);
+  
  private:
   std::shared_ptr<IMPL> _provider;
 };

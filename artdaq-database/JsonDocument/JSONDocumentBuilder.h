@@ -64,7 +64,9 @@ std::string timestamp();
 template <typename T>
 JSONDocument toJSONDocument(T const& t);
 
-void trace_enable_JSONDocumentBuilder();
+namespace debug {
+void enableJSONDocumentBuilder();
+}
 }  // namespace jsonutils
 }  // namespace database
 }  // namespace artdaq

@@ -1,1 +1,1 @@
-add_subdirectory(conftool)
+add_subdirectory(test004)

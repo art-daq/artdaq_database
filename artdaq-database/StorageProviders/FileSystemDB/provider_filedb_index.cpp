@@ -3,7 +3,7 @@
 
 #include <fstream>
 #include "artdaq-database/BasicTypes/data_json.h"
-#include "artdaq-database/FhiclJson/json_common.h"
+#include "artdaq-database/DataFormats/Json/json_common.h"
 
 #include <boost/exception/diagnostic_information.hpp>
 #include <boost/filesystem.hpp>
@@ -148,18 +148,48 @@ std::vector<object_id_t> SearchIndex::findDocumentIDs(JsonData const& search) {
   return ouids;
 }
 
-std::vector<std::pair<std::string, std::string>> SearchIndex::findConfigVersions(JsonData const& search) {
+std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByGlobalConfigName(JsonData const& search) {
   assert(!search.json_buffer.empty());
   auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
-  TRACE_(5, "StorageProvider::FileSystemDB::index::findConfigVersions() begin");
-  TRACE_(5, "StorageProvider::FileSystemDB::index::findConfigVersions() args search=<" << search.json_buffer << ">.");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByGlobalConfigName() begin");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByGlobalConfigName() args search=<" << search.json_buffer << ">.");
 
   auto reader = JsonReader{};
 
   object_t search_ast;
 
   if (!reader.read(search.json_buffer, search_ast)) {
-    TRACE_(5, "StorageProvider::FileSystemDB::index::findConfigVersions()"
+    TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByGlobalConfigName()"
+                  << " Failed to create an AST from search.");
+    return returnCollection;
+  }
+
+  auto configNameFilter = std::string{};
+
+  try {
+    configNameFilter = boost::get<std::string>(search_ast.at("configurations.name"));
+
+    TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByGlobalConfigName()"
+                  << " Found global configuration filter=<" << configNameFilter << ">.");
+
+  } catch (...) {
+  }
+  
+  return _indexed_filtered_innerjoin_over_ouid("version", "configurations.name", configNameFilter);
+}
+
+std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByEntityName(JsonData const& search) {
+  assert(!search.json_buffer.empty());
+  auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByEntityName() begin");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByEntityName() args search=<" << search.json_buffer << ">.");
+
+  auto reader = JsonReader{};
+
+  object_t search_ast;
+
+  if (!reader.read(search.json_buffer, search_ast)) {
+    TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByEntityName()"
                   << " Failed to create an AST from search.");
     return returnCollection;
   }
@@ -169,12 +199,12 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findConfigVersions
   try {
     entityNameFilter = boost::get<std::string>(search_ast.at("configurable_entity.name"));
 
-    TRACE_(5, "StorageProvider::FileSystemDB::index::findConfigVersions()"
-                  << " Found filter=<" << entityNameFilter << ">.");
+    TRACE_(5, "StorageProvider::FileSystemDB::index::findConfigVersionsByEntityName()"
+                  << " Found entity filter=<" << entityNameFilter << ">.");
 
   } catch (...) {
   }
-
+  
   return _indexed_filtered_innerjoin_over_ouid("version", "configurable_entity.name", entityNameFilter);
 }
 
@@ -229,7 +259,6 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findAllGlobalConfi
 
   try {
     configFilter = boost::get<std::string>(search_ast.at("configurations.name"));
-
     TRACE_(5, "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations()"
                   << " Found filter=<" << configFilter << ">.");
   } catch (...) {
@@ -726,20 +755,29 @@ void SearchIndex::_build_ouid_map(std::map<std::string, std::string>& map, std::
 }
 
 std::vector<std::string> SearchIndex::_filtered_attribute_list(std::string const& attribute,
-                                                               std::string const& attribute_with[[gnu::unused]]) {
+                                                               std::string const& attribute_begins_with) {
   assert(!attribute.empty());
 
   auto returnCollection = std::vector<std::string>{};
 
+  auto acceptValue = [&attribute_begins_with](auto const& value) {
+    if (value.size() < attribute_begins_with.size() || value == "notprovided") return false;
+
+    if (std::equal(attribute_begins_with.begin(), attribute_begins_with.end(), value.begin())) return true;
+    return false;
+  };
+
   auto& lookup_table = boost::get<jsn::object_t>(_index.at(attribute));
 
   for (auto& ouid_array_element : lookup_table) {
+    if (!acceptValue(ouid_array_element.key)) continue;
+
     returnCollection.push_back(ouid_array_element.key);
   }
 
   TRACE_(5, "StorageProvider::FileSystemDB::index::_filtered_attribute_list()"
                 << " filtered_attribute_list has " << returnCollection.size() << " entries.");
-  
+
   return returnCollection;
 }
 
@@ -748,6 +786,8 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::_indexed_filtered_
   auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
 
   auto acceptValue = [&right_begins_with](auto const& value) {
+    if (value.size() < right_begins_with.size() || value == "notprovided") return false;
+
     if (std::equal(right_begins_with.begin(), right_begins_with.end(), value.begin())) return true;
     return false;
   };
@@ -760,6 +800,9 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::_indexed_filtered_
 
   for (auto& right_element : right_table) {
     if (!acceptValue(right_element.key)) continue;
+
+    TRACE_(5, "StorageProvider::FileSystemDB::index::_indexed_filtered_innerjoin_over_ouid()"
+                  << " accepted value  " << right_element.key << " begin with " << right_begins_with);
 
     auto& right_ouid_list = boost::get<jsn::array_t>(right_element.value);
 
@@ -811,14 +854,13 @@ file_paths_t list_files_in_directory(boost::filesystem::path const& path, std::s
   return result;
 }
 
-void dbfsi::trace_enable() {
+void dbfsi::debug::enable() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", 1LL);
   TRACE_CNTL("modeS", 1LL);
 
-  TRACE_(0, "artdaq::database::filesystem::index"
-                << "trace_enable");
+  TRACE_(0, "artdaq::database::filesystem::index trace_enable");
 }
 
 using artdaq::database::sharedtypes::unwrap;

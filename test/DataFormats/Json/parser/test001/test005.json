@@ -1,0 +1,98 @@
+{
+        "document" : {
+            "data" : {
+                "NAME" : "CONFIGURATION_ALIASES", 
+                "COMMENT" : "", 
+                "AUTHOR" : "", 
+                "CREATION_TIME" : 1465601490, 
+                "NUM_OF_COLS" : 8, 
+                "NUM_OF_ROWS" : 3, 
+                "DATA_SET" : [
+                    {
+                        "CONFIGURATION_KEY_ID" : 3, 
+                        "CONFIGURATION_KEY" : "3", 
+                        "KEY_ALIAS_ID" : 0, 
+                        "CONFIGURATION_ALIAS" : "Physics", 
+                        "CONFIGURATION_KEY_TYPE" : "ConfigurationAliases", 
+                        "RECORD_INSERTION_TIME" : "2013-01-29 17:22:10", 
+                        "COMMENT_DESCRIPTION" : "Default Physics", 
+                        "AUTHOR" : "Uplegger"
+                    }, 
+                    {
+                        "CONFIGURATION_KEY_ID" : 5, 
+                        "CONFIGURATION_KEY" : "5", 
+                        "KEY_ALIAS_ID" : 0, 
+                        "CONFIGURATION_ALIAS" : "SCurve", 
+                        "CONFIGURATION_KEY_TYPE" : "ConfigurationAliases", 
+                        "RECORD_INSERTION_TIME" : "2013-01-29 17:22:10", 
+                        "COMMENT_DESCRIPTION" : "Default Scurve calibration injecting only 1 pixel per ROC", 
+                        "AUTHOR" : "Uplegger"
+                    }, 
+                    {
+                        "CONFIGURATION_KEY_ID" : 6, 
+                        "CONFIGURATION_KEY" : "6", 
+                        "KEY_ALIAS_ID" : 0, 
+                        "CONFIGURATION_ALIAS" : "SCurve_Default_1x1", 
+                        "CONFIGURATION_KEY_TYPE" : "ConfigurationAliases", 
+                        "RECORD_INSERTION_TIME" : "2013-01-29 17:22:10", 
+                        "COMMENT_DESCRIPTION" : "Default Scurve calibration injecting only 1 pixel per ROC", 
+                        "AUTHOR" : "Uplegger"
+                    }
+                ]
+            }, 
+            "metadata" : {
+                "comments" : {
+                    "empty" : "empty"
+                }
+            }, 
+            "search" : [
+                {
+                    "name" : "find any", 
+                    "query" : "not defined"
+                }
+            ]
+        }, 
+        "source" : {
+            "encoding" : "base64", 
+            "format" : "json", 
+            "rawdata" : "as"
+        }, 
+        "version" : "0", 
+        "configurations" : [
+            {
+                "name" : "notprovided", 
+                "assigned" : "Fri Jun 10 18:31:30 2016"
+            }
+        ], 
+        "aliases" : {
+            "active" : [
+
+            ], 
+            "history" : [
+
+            ]
+        }, 
+        "changelog" : "empty", 
+        "bookkeeping" : {
+            "isdeleted" : false, 
+            "isreadonly" : true, 
+            "created" : "Tue Dec 29 18:19:25 2015", 
+            "updates" : [
+                {
+                    "addToGlobalConfig" : "Fri Jun 10 18:31:30 2016"
+                }, 
+                {
+                    "setVersion" : "Fri Jun 10 18:31:30 2016"
+                }, 
+                {
+                    "setConfigurableEntity" : "Fri Jun 10 18:31:30 2016"
+                }
+            ]
+        }, 
+        "configurable_entity" : {
+            "name" : "CMSROOT"
+        }, 
+        "_id" : {
+            "_oid" : "130869f2a1aa48b0acb3ac80"
+        }
+    }

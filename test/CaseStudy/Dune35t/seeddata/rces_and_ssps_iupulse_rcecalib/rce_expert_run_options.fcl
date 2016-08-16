@@ -1,0 +1,10 @@
+
+#### The number of RCE millislices to receive before printing to log
+daq.fragment_receiver.reporting_interval_fragments                     : 1000
+
+#### The debug printout level for the RCE receiver thread (low is quiet)
+daq.fragment_receiver.receiver_debug_level                             : 0
+
+daq.fragment_receiver.max_rce_events                             : 5
+
+

@@ -1,0 +1,8 @@
+{
+    "filter":{"version":"version002", "configurable_entity.name":"DAQ_HOST_001"},
+    "configuration":"configA006",      
+    "collection":"artdaq_Aggregator",
+    "dbprovider":"filesystem",
+    "operation":"addconfig",
+    "dataformat":"gui"
+}

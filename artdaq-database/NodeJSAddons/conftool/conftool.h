@@ -11,3 +11,5 @@ result_pair_t add_configuration_to_global_configuration_ui(std::string const& se
 result_pair_t create_new_global_configuration_ui(std::string const& search_filter);
 result_pair_t find_configuration_versions_ui(std::string const& search_filter);
 result_pair_t find_configuration_entities_ui(std::string const& search_filter);
+result_pair_t load_globalconfiguration_ui(std::string const& search_filter);
+result_pair_t store_globalconfiguration_ui(std::string const& search_filter, std::string const& tarbz2base64);

@@ -5,6 +5,6 @@ module_type: "RawInput"
  
 resume_after_timeout: true #Success 3 right of satom
  
-waiting_time: 901 //Success 2 right of satom
+waiting_time: 1@RAND_NAME@ //Success 2 right of satom
 
 }

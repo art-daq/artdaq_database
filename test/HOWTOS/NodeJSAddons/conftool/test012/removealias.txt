@@ -1,0 +1,10 @@
+source  /products/setup
+setup artdaq_database v1_00_00 -q debug:e9:s21
+
+cd ~/artdaq-demo-base/artdaq-utilities-database/test/HOWTOS/NodeJSAddons/conftool/test005/
+
+conftool2 -o addconfig -c test0121.flt.json -j test0121.gui.json
+conftool2 -o addconfig -c test0122.flt.json -j test0122.gui.json
+
+#test012{1,2}.gui.json should be identical with test012{1,2}.cmp.json
+
