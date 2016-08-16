@@ -11,7 +11,9 @@ find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_LIB} )
   LIBRARIES
   artdaq-database_StackTrace  
   artdaq-database_BasicTypes
-  artdaq-database_FhiclJson
+  artdaq-database_DataFormats_common
+  artdaq-database_DataFormats_Fhicl
+  artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
   artdaq-database_ConfigurationDB
   artdaq-database_StorageProviders_MongoDB
@@ -23,8 +25,8 @@ find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_LIB} )
 ) 
 
 
-#add_subdirectory(test001)
-#add_subdirectory(test002)
-#add_subdirectory(test004)
+add_subdirectory(test001)
+add_subdirectory(test002)
+add_subdirectory(test004)
 add_subdirectory(test005)
 install_source()

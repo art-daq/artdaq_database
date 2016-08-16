@@ -1,0 +1,574 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"fi",
+				"firstAST"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "/home/lukhanin/.config/sublime-text-3/Packages/EasyClangComplete/EasyClangComplete.sublime-settings",
+			"settings":
+			{
+				"buffer_size": 1399,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "artdaq-database/ConfigurationDB/configurationdb.h",
+			"settings":
+			{
+				"buffer_size": 532,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "#include \"artdaq-database/ConfigurationDB/common.h\"\n\n#include <boost/exception/diagnostic_information.hpp>\n#include \"artdaq-database/BasicTypes/basictypes.h\"\n#include \"artdaq-database/BuildInfo/process_exit_codes.h\"\n#include \"artdaq-database/ConfigurationDB/dboperation_loadstore.h\"\n#include \"artdaq-database/ConfigurationDB/options_operations.h\"\n#include \"artdaq-database/ConfigurationDB/shared_helper_functions.h\"\n#include \"artdaq-database/ConfigurationDB/shared_literals.h\"\n\n#ifdef TRACE_NAME\n#undef TRACE_NAME\n#endif\n\n#define TRACE_NAME \"CONF:OpldStr_C\"\n\nusing namespace artdaq::database::configuration;\n\nusing artdaq::database::configuration::options::data_format_t;\n\nnamespace artdaq {\nnamespace database {\nbool json_db_to_gui(std::string const&, std::string&);\nbool json_gui_to_db(std::string const&, std::string&);\n}\n}\n\nnamespace artdaq {\nnamespace database {\nnamespace configuration {\nnamespace detail {\nvoid store_configuration(LoadStoreOperation const&, std::string&);\nvoid load_configuration(LoadStoreOperation const&, std::string&);\n}  // namespace detail\n}  // namespace configuration\n}  // namespace database\n}  // namespace artdaq\n\nauto make_error_msg = [](auto msg) { return std::string(\"{error:\\\"\").append(msg).append(\".\\\"}\"); };\n\nresult_pair_t opts::store_configuration(LoadStoreOperation const& options, std::string& conf) noexcept {\n  try {\n    detail::store_configuration(options, conf);\n    return result_pair_t{true, conf};\n  } catch (...) {\n    return result_pair_t{false, boost::current_exception_diagnostic_information()};\n  }\n}\n\nresult_pair_t opts::load_configuration(LoadStoreOperation const& options, std::string& conf) noexcept {\n  try {\n    detail::load_configuration(options, conf);\n    result_pair_t{true, conf};\n  } catch (...) {\n    return result_pair_t{false, boost::current_exception_diagnostic_information()};\n  }\n}\n\nresult_pair_t json::store_configuration(std::string const& search_filter, std::string const& conf) noexcept {\n  try {\n    if (search_filter.empty()) return std::make_pair(false, make_error_msg(literal::msg::empty_filter));\n    if (conf.empty()) return std::make_pair(false, make_error_msg(literal::msg::empty_document));\n\n    auto options = LoadStoreOperation{literal::operation::store};\n    options.readJsonData({search_filter});\n    \n    // convert to database_format\n    auto database_format = std::string(conf);\n\n    detail::store_configuration(options, database_format);\n    return result_pair_t{true, database_format};\n  } catch (...) {\n    return result_pair_t{false, boost::current_exception_diagnostic_information()};\n  }\n}\n\nresult_pair_t json::load_configuration(std::string const& search_filter, std::string& conf) noexcept {\n  try {\n    if (search_filter.empty()) return std::make_pair(false, make_error_msg(literal::msg::empty_filter));\n\n    auto options = LoadStoreOperation{literal::operation::load};\n    options.readJsonData({search_filter});\n\n    auto database_format = std::string{};\n\n    detail::load_configuration(options, database_format);\n\n    // convert to gui\n    conf = database_format;\n\n    return result_pair_t{true, conf};\n  } catch (...) {\n    return result_pair_t{false, boost::current_exception_diagnostic_information()};\n  }\n}\n\nvoid debug::enableLoadStoreOperation() {\n  TRACE_CNTL(\"name\", TRACE_NAME);\n  TRACE_CNTL(\"lvlset\", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);\n\n  TRACE_CNTL(\"modeM\", trace_mode::modeM);\n  TRACE_CNTL(\"modeS\", trace_mode::modeS);\n\n  TRACE_(0, \"artdaq::database::configuration::LoadStoreOperation trace_enable\");\n}",
+			"file": "artdaq-database/ConfigurationDB/dboperation_loadstore.cpp",
+			"file_size": 3528,
+			"file_write_time": 131146491526508315,
+			"settings":
+			{
+				"buffer_size": 3532,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "artdaq-database/ConfigurationDB/dboperation_loadstore.h",
+			"settings":
+			{
+				"buffer_size": 1063,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "artdaq-database/ConfigurationDB/detail_findconfigs.cpp",
+			"settings":
+			{
+				"buffer_size": 6135,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "#include \"artdaq-database/ConfigurationDB/common.h\"\n\n#include \"artdaq-database/ConfigurationDB/dispatch_filedb.h\"\n#include \"artdaq-database/ConfigurationDB/options_operations.h\"\n\n#include \"artdaq-database/BasicTypes/basictypes.h\"\n#include \"artdaq-database/DataFormats/common/shared_literals.h\"\n#include \"artdaq-database/JsonDocument/JSONDocumentBuilder.h\"\n#include \"artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h\"\n\n#ifdef TRACE_NAME\n#undef TRACE_NAME\n#endif\n\n#define TRACE_NAME \"COFS:DpFle_C\"\n\nusing namespace artdaq::database::configuration;\n\nnamespace DBI = artdaq::database::filesystem;\nnamespace prov = artdaq::database::configuration::filesystem;\n\nusing artdaq::database::basictypes::JsonData;\nusing artdaq::database::jsonutils::JSONDocumentBuilder;\nusing artdaq::database::jsonutils::JSONDocument;\n\nvoid prov::store(LoadStoreOperation const& options, JsonData const& insert_payload) {\n  assert(options.provider().compare(literal::provider::filesystem) == 0);\n  assert(options.operation().compare(literal::operation::store) == 0);\n\n  if (options.operation().compare(literal::operation::store) != 0) {\n    throw cet::exception(\"store_configuration\") << \"Wrong operation option; operation=<\" << options.operation() << \">.\";\n  }\n\n  if (options.provider().compare(literal::provider::filesystem) != 0) {\n    throw cet::exception(\"store_configuration\") << \"Wrong provider option; provider=<\" << options.provider() << \">.\";\n  }\n\n  TRACE_(15, \"store: begin\");\n\n  auto config = DBI::DBConfig{};\n  auto database = DBI::DB::create(config);\n  auto provider = DBI::DBProvider<JsonData>::create(database);\n  auto object_id = provider->store(insert_payload);\n\n  TRACE_(15, \"store: object_id=<\" << object_id << \">\");\n\n  TRACE_(15, \"store: end\");\n}\n\nJsonData prov::load(LoadStoreOperation const& options, JsonData const& search_payload) {\n  assert(options.provider().compare(literal::provider::filesystem) == 0);\n  assert(options.operation().compare(literal::operation::load) == 0);\n\n  if (options.operation().compare(literal::operation::load) != 0) {\n    throw cet::exception(\"load_configuration\") << \"Wrong operation option; operation=<\" << options.operation() << \">.\";\n  }\n\n  if (options.provider().compare(literal::provider::filesystem) != 0) {\n    throw cet::exception(\"load_configuration\") << \"Wrong provider option; provider=<\" << options.provider() << \">.\";\n  }\n\n  TRACE_(16, \"load: begin\");\n\n  auto config = DBI::DBConfig{};\n  auto database = DBI::DB::create(config);\n  auto provider = DBI::DBProvider<JsonData>::create(database);\n\n  auto collection = provider->load(search_payload);\n\n  TRACE_(16, \"load_configuration: \"\n                 << \"Search returned \" << collection.size() << \" results.\");\n\n  if (collection.size() != 1) {\n    throw cet::exception(\"load_configuration\") << \"Search returned \" << collection.size() << \" results.\";\n  }\n\n  auto data = JsonData(collection.begin()->json_buffer);\n\n  TRACE_(16, \"load: end\");\n\n  return data;\n}\n\nJsonData prov::findGlobalConfigs(ManageConfigsOperation const& options, JsonData const& search_payload) {\n  assert(options.provider().compare(literal::provider::filesystem) == 0);\n  assert(options.operation().compare(literal::operation::findconfigs) == 0);\n\n  if (options.operation().compare(literal::operation::findconfigs) != 0) {\n    throw cet::exception(\"operation_findconfigs\") << \"Wrong operation option; operation=<\" << options.operation()\n                                                  << \">.\";\n  }\n\n  if (options.provider().compare(literal::provider::filesystem) != 0) {\n    throw cet::exception(\"operation_findconfigs\") << \"Wrong provider option; provider=<\" << options.provider() << \">.\";\n  }\n\n  TRACE_(17, \"operation_findconfigs: begin\");\n  TRACE_(18, \"operation_findconfigs args data=<\" << search_payload.json_buffer << \">\");\n\n  auto config = DBI::DBConfig{};\n  auto database = DBI::DB::create(config);\n  auto provider = DBI::DBProvider<JsonData>::create(database);\n\n  auto global_configs = provider->findGlobalConfigs(search_payload);\n\n  if (global_configs.empty()) {\n    return {literal::empty_search_result};    \n   // throw cet::exception(\"operation_findconfigs\") << \"No global configurations were found.\";\n  }\n\n  auto needComma = bool{false};\n  auto printComma = [&needComma]() {\n    if (needComma) return \", \";\n    needComma = true;\n    return \" \";\n  };\n\n  std::stringstream ss;\n\n  auto seenValues = std::list<std::string>{};\n  seenValues.push_back(literal::notprovided);\n\n  auto isNew = [& v = seenValues](auto const& name) {\n    assert(!name.empty());\n    if (std::find(v.begin(), v.end(), name) != v.end()) return false;\n\n    v.emplace_back(name);\n    return true;\n  };\n\n  ss << \"{ \\\"search\\\": [\";\n\n  for (auto const& global_config : global_configs) {\n    auto doc = JSONDocument{global_config.json_buffer};\n\n    auto global_config_name = JSONDocument::value(doc.findChild(\"filter\").value());\n\n    if (!isNew(global_config_name)) continue;\n\n    ss << printComma() << \"{\";\n    ss << \"\\\"name\\\" :\\\"\" << global_config_name << \"\\\",\";\n    ss << \"\\\"query\\\" :\" << global_config.json_buffer;\n    ss << \"}\";\n  }\n\n  ss << \"] }\";\n\n  return {ss.str()};\n}\n\nJsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, JsonData const& search_payload) {\n  assert(options.provider().compare(literal::provider::filesystem) == 0);\n  assert(options.operation().compare(literal::operation::buildfilter) == 0);\n\n  if (options.operation().compare(literal::operation::buildfilter) != 0) {\n    throw cet::exception(\"operation_buildfilter\") << \"Wrong operation option; operation=<\" << options.operation()\n                                                  << \">.\";\n  }\n\n  if (options.provider().compare(literal::provider::filesystem) != 0) {\n    throw cet::exception(\"operation_buildfilter\") << \"Wrong provider option; provider=<\" << options.provider() << \">.\";\n  }\n\n  TRACE_(18, \"operation_buildfilter: begin\");\n  TRACE_(18, \"operation_buildfilter args data=<\" << search_payload.json_buffer << \">\");\n\n  auto config = DBI::DBConfig{};\n  auto database = DBI::DB::create(config);\n  auto provider = DBI::DBProvider<JsonData>::create(database);\n\n  auto search_filters = provider->buildConfigSearchFilter(search_payload);\n\n  if (search_filters.empty()) {\n    throw cet::exception(\"operation_buildfilter\") << \"No search filters were found.\";\n  }\n\n  auto ex = std::regex(\n      \"\\\"configurations\\\\.name\\\"\\\\s*:\\\\s*\\\"((\\\\\\\\\\\"|[^\\\"])*)\\\"\\\\,\\\\s*\\\"configurable_entity\\\\.name\\\"\\\\s*:\\\\s*\\\"((\\\\\\\\\\\"|\"\n      \"[^\\\"])*)\\\"\");\n\n  auto needComma = bool{false};\n  auto printComma = [&needComma]() {\n    if (needComma) return \", \";\n    needComma = true;\n    return \" \";\n  };\n\n  std::stringstream ss;\n\n  ss << \"{ \\\"search\\\": [\";\n\n  for (auto const& search_filter : search_filters) {\n    auto filter_json = JSONDocument{search_filter.json_buffer}.findChild(\"filter\").value();\n\n    auto results = std::smatch();\n\n    if (!std::regex_search(filter_json, results, ex))\n      throw cet::exception(\"operation_buildfilter\") << \"Unsupported filter string, no match\";\n\n    /*\n        for (size_t i = 0; i < results.size(); ++i) {\n          std::ssub_match sub_match = results[i];\n          std::string piece = sub_match.str();\n                     TRACE_(18, \"operation_buildfilter: submatch*** \" << i << \": \" << piece << '\\n';\n        }\n    */\n    if (results.size() != 5)\n      throw cet::exception(\"operation_buildfilter\") << \"Unsupported filter string, wrong result count\";\n\n    ss << printComma() << \"{\";\n    ss << \"\\\"name\\\" :\\\"\" << results[1].str() << \":\" << results[3].str() << \"\\\",\";\n    ss << \"\\\"query\\\" :\" << search_filter.json_buffer;\n    ss << \"}\";\n  }\n\n  ss << \"] }\";\n\n  return {ss.str()};\n}\n\nJsonData prov::findConfigVersions(LoadStoreOperation const& options, JsonData const& /*not used*/) {\n  assert(options.provider().compare(literal::provider::filesystem) == 0);\n  assert(options.operation().compare(literal::operation::findversions) == 0);\n\n  if (options.operation().compare(literal::operation::findversions) != 0) {\n    throw cet::exception(\"operation_findversions\") << \"Wrong operation option; operation=<\" << options.operation()\n                                                   << \">.\";\n  }\n\n  if (options.provider().compare(literal::provider::filesystem) != 0) {\n    throw cet::exception(\"operation_findversions\") << \"Wrong provider option; provider=<\" << options.provider() << \">.\";\n  }\n\n  TRACE_(19, \"operation_findversions: begin\");\n\n  auto config = DBI::DBConfig{};\n  auto database = DBI::DB::create(config);\n  auto provider = DBI::DBProvider<JsonData>::create(database);\n\n  auto search_filter = options.to_JsonData();\n  auto config_versions = provider->findConfigVersions(search_filter);\n\n  if (config_versions.empty()) {\n    return {literal::empty_search_result};\n//    throw cet::exception(\"operation_findversions\") << \"No configuration versions were found.\";\n  }\n\n  auto ex = std::regex(\n      \"\\\"version\\\"\\\\s*:\\\\s*\\\"((\\\\\\\\\\\"|[^\\\"])*)\\\"\\\\,\\\\s*\\\"configurable_entity\\\\.name\\\"\\\\s*:\\\\s*\\\"((\\\\\\\\\\\"|\"\n      \"[^\\\"])*)\\\"\");\n\n  auto needComma = bool{false};\n  auto printComma = [&needComma]() {\n    if (needComma) return \", \";\n    needComma = true;\n    return \" \";\n  };\n\n  std::stringstream ss;\n\n  ss << \"{ \\\"search\\\": [\";\n\n  for (auto const& config_version : config_versions) {\n    auto filter_json = JSONDocument{config_version.json_buffer}.findChild(\"filter\").value();\n\n    auto results = std::smatch();\n\n    if (!std::regex_search(filter_json, results, ex))\n      throw cet::exception(\"operation_findversions\") << \"Unsupported filter string, no match\";\n\n    /*\n            for (size_t i = 0; i < results.size(); ++i) {\n              std::ssub_match sub_match = results[i];\n              std::string piece = sub_match.str();\n                         TRACE_(18, \"operation_findversions: submatch*** \" << i << \": \" << piece << '\\n');\n            }\n    */\n    if (results.size() != 5)\n      throw cet::exception(\"operation_findversions\") << \"Unsupported filter string, wrong result count\";\n\n    ss << printComma() << \"{\";\n    ss << \"\\\"name\\\" :\\\"\" << results[1].str() /*<< \":\" << results[3].str()*/ << \"\\\",\";\n    ss << \"\\\"query\\\" :\" << config_version.json_buffer;\n    ss << \"}\";\n  }\n\n  ss << \"] }\";\n\n  return {ss.str()};\n}\n\nJsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData const& /*not used*/) {\n  assert(options.provider().compare(literal::provider::filesystem) == 0);\n  assert(options.operation().compare(literal::operation::findentities) == 0);\n\n  if (options.operation().compare(literal::operation::findentities) != 0) {\n    throw cet::exception(\"operation_findentities\") << \"Wrong operation option; operation=<\" << options.operation()\n                                                   << \">.\";\n  }\n\n  if (options.provider().compare(literal::provider::filesystem) != 0) {\n    throw cet::exception(\"operation_findentities\") << \"Wrong provider option; provider=<\" << options.provider() << \">.\";\n  }\n\n  TRACE_(19, \"operation_findentities: begin\");\n\n  auto config = DBI::DBConfig{};\n  auto database = DBI::DB::create(config);\n  auto provider = DBI::DBProvider<JsonData>::create(database);\n\n  auto search_filter = options.to_JsonData();\n  auto config_entities = provider->findConfigEntities(search_filter);\n\n  if (config_entities.empty()) {\n    return {literal::empty_search_result};\n    //throw cet::exception(\"operation_findentities\") << \"No configuration entities were found.\";\n  }\n\n  auto ex = std::regex(\"\\\\s\\\"(configurable_entity\\\\.name)\\\"\\\\s:\\\\s\\\"((\\\\\\\\\\\"|[^\\\"])*)\\\"\");\n\n  auto needComma = bool{false};\n  auto printComma = [&needComma]() {\n    if (needComma) return \", \";\n    needComma = true;\n    return \" \";\n  };\n\n  std::stringstream ss;\n\n  ss << \"{ \\\"search\\\": [\\n\";\n\n  for (auto const& config_entity : config_entities) {\n    auto filter_json = JSONDocument{config_entity.json_buffer}.findChild(\"filter\").value();\n    TRACE_(18, \"operation_findentities: filter_json=<\" << filter_json << '>');\n\n    auto results = std::smatch();\n\n    if (!std::regex_search(filter_json, results, ex))\n      throw cet::exception(\"operation_findentities\") << \"Unsupported filter string, no match\";\n\n    /*\n            for (size_t i = 0; i < results.size(); ++i) {\n              std::ssub_match sub_match = results[i];\n              std::string piece = sub_match.str();\n                         TRACE_(18, \"operation_findentities: submatch*** \" << i << \": \" << piece << '\\n');\n            }\n    */\n\n    if (results.size() != 4)\n      throw cet::exception(\"operation_findentities\") << \"Unsupported filter string, wrong result count\";\n\n    ss << printComma() << \"{\";\n    ss << \"\\\"name\\\" :\\\"\" << results[2].str() /*<< \":\" << results[3].str()*/ << \"\\\",\";\n    ss << \"\\\"query\\\" :\" << config_entity.json_buffer;\n    ss << \"}\\n\";\n  }\n\n  ss << \"] }\";\n\n  return {ss.str()};\n}\n\nJsonData prov::addConfigToGlobalConfig(LoadStoreOperation const& options, JsonData const& search_payload) {\n  assert(options.provider().compare(literal::provider::filesystem) == 0);\n  assert(options.operation().compare(literal::operation::addconfig) == 0);\n\n  if (options.operation().compare(literal::operation::addconfig) != 0) {\n    throw cet::exception(\"operation_addconfig\") << \"Wrong operation option; operation=<\" << options.operation() << \">.\";\n  }\n\n  if (options.provider().compare(literal::provider::filesystem) != 0) {\n    throw cet::exception(\"operation_addconfig\") << \"Wrong provider option; provider=<\" << options.provider() << \">.\";\n  }\n\n  TRACE_(20, \"operation_addconfig: begin\");\n\n  auto new_options = options;\n  new_options.operation(literal::operation::load);\n\n  auto search =\n      JsonData{\"{\\\"filter\\\":\" + search_payload.json_buffer + \", \\\"collection\\\":\\\"\" + options.collectionName() + \"\\\"}\"};\n  TRACE_(20, \"operation_addconfig: args search_payload=<\" << search.json_buffer << \">\");\n\n  auto document = filesystem::load(new_options, search);\n  auto json_document = JSONDocument{document.json_buffer};\n  auto builder = JSONDocumentBuilder{json_document};\n  auto globalConfiguration = JSONDocument{new_options.globalConfiguration_to_JsonData().json_buffer};  \n  builder.addToGlobalConfig(globalConfiguration);\n\n  new_options.operation(literal::operation::store);\n\n  TRACE_(20, \"operation_addconfig: store()\");\n\n  // std::cout<< \"operation_addconfig:: builder=<\" << builder.extract().to_string() << \">builder\\n\";\n\n  auto update =\n      JsonData{\"{\\\"filter\\\":{\\\"$oid\\\":\\\"\" + builder.extract().deleteChild(\"_id\").value() + \"\\\"},  \\\"document\\\":\" +\n               builder.extract().to_string() + \", \\\"collection\\\":\\\"\" + options.collectionName() + \"\\\"}\"};\n\n  // std::cout << \"operation_addconfig:: update=<\" << update.json_buffer << \">update\\n\";\n\n  TRACE_(20, \"operation_addconfig: store() begin\");\n  filesystem::store(new_options, update.json_buffer);\n\n  TRACE_(20, \"operation_addconfig: store() done\");\n\n  new_options.operation(literal::operation::buildfilter);\n\n  auto find_options = ManageConfigsOperation{literal::operation::addconfig};\n\n  find_options.operation(literal::operation::buildfilter);\n  find_options.dataFormat(options::data_format_t::gui);\n  find_options.provider(literal::provider::filesystem);\n  find_options.globalConfiguration(new_options.globalConfiguration());\n\n  return filesystem::buildConfigSearchFilter(find_options, find_options.globalConfiguration_to_JsonData().json_buffer);\n}\n\nvoid debug::enableDBOperationFileSystem() {\n  TRACE_CNTL(\"name\", TRACE_NAME);\n  TRACE_CNTL(\"lvlset\", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);\n\n  TRACE_CNTL(\"modeM\", trace_mode::modeM);\n  TRACE_CNTL(\"modeS\", trace_mode::modeS);\n\n  TRACE_(0, \"artdaq::database::configuration::FileSystem trace_enable\");\n}\n",
+			"file": "artdaq-database/ConfigurationDB/dispatch_filedb.cpp",
+			"file_size": 15583,
+			"file_write_time": 131088599060693739,
+			"settings":
+			{
+				"buffer_size": 15583,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "artdaq-database.sublime-project",
+			"settings":
+			{
+				"buffer_size": 298,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": ".clang_complete",
+			"settings":
+			{
+				"buffer_size": 354,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "artdaq-database/DataFormats/Json/json_types.cpp",
+			"settings":
+			{
+				"buffer_size": 4154,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "Packages/C++/C++ Single File.sublime-build",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					""
+				],
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					"Run"
+				]
+			],
+			[
+				"Packages/C++/C++ Single File.sublime-build",
+				""
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 372.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"Package Control: ",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: cl",
+				"Package Control: List Packages"
+			]
+		],
+		"width": 476.0
+	},
+	"console":
+	{
+		"height": 332.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/artdaq-database",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/artdaq-database/ConfigurationDB",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/artdaq-database/StorageProviders",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/artdaq-database/StorageProviders/MongoDB",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/test",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/test/DataFormats",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/test/DataFormats/Conf",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/test/StorageProviders",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/test/StorageProviders/MongoFhicl",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/test/StorageProviders/MongoFhicl/test001"
+	],
+	"file_history":
+	[
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/artdaq-database/StorageProviders/MongoDB/mongo_json.cpp",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/artdaq-database/DataFormats/Json/json_writer.cpp",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/artdaq-database/DataFormats/Json/json_common.h",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/artdaq-database/Utilities/conftool.cc",
+		"/home/lukhanin/.config/sublime-text-3/Packages/EasyClangComplete/EasyClangComplete.sublime-settings",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/artdaq-database/DataFormats/Json/json_types.cpp",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/artdaq-database/DataFormats/Json/json_reader.cpp",
+		"/home/lukhanin/.config/sublime-text-3/Packages/Clang Format/clang_format.sublime-settings",
+		"/home/lukhanin/.config/sublime-text-3/Packages/Clang Format/clang_format_custom.sublime-settings",
+		"/home/lukhanin/.config/sublime-text-3/Packages/User/clang_format.sublime-settings",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/artdaq-database/DataFormats/Json/json_reader.h",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/artdaq-database.sublime-project",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/artdaq-database/Utilities/readjson.cc",
+		"/home/lukhanin/.local/share/applications/sublime.desktop",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/artdaq-database/Utilities/CMakeLists.txt.mrb",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/artdaq-database/DemoTypes/BasicSample.cpp",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/artdaq-database/DataFormats/Json/convertjson2guijson.cpp",
+		"/home/lukhanin/.config/sublime-text-3/Packages/User/EasyClangComplete.sublime-settings",
+		"/home/lukhanin/scratch/current/artdaq-demo-base/artdaq-utilities-database/test/StorageProviders/MongoJson/MongoJson_t.cc",
+		"/home/lukhanin/.config/sublime-text-3/Packages/User/CTags.sublime-settings",
+		"/home/lukhanin/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 5,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "/home/lukhanin/.config/sublime-text-3/Packages/EasyClangComplete/EasyClangComplete.sublime-settings",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1399,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1218,
+								1218
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 585.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "artdaq-database/ConfigurationDB/configurationdb.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 532,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "artdaq-database/ConfigurationDB/dboperation_loadstore.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3532,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2291,
+								2291
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 585.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "artdaq-database/ConfigurationDB/dboperation_loadstore.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1063,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "artdaq-database/ConfigurationDB/detail_findconfigs.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6135,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2385.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "artdaq-database/ConfigurationDB/dispatch_filedb.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 15583,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2744,
+								2744
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1530.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "artdaq-database.sublime-project",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 298,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": ".clang_complete",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 354,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								353,
+								353
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "artdaq-database/DataFormats/Json/json_types.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4154,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 45.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 100.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "Packages/C++/C++ Single File.sublime-build",
+	"project": "artdaq-database.sublime-project",
+	"replace":
+	{
+		"height": 42.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 284.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

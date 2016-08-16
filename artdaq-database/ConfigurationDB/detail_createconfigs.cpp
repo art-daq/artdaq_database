@@ -266,7 +266,7 @@ void list_collection_names(Options const& options, std::string& collections){
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers = std::map<std::string, provider_findversions_t>{
-        {cflp::mongo, cf::mongo::findConfigVersions}, {cflp::filesystem, cf::filesystem::listCollectionNames}};
+        {cflp::mongo, cf::mongo::listCollectionNames}, {cflp::filesystem, cf::filesystem::listCollectionNames}};
 
     return providers.at(name);
   };

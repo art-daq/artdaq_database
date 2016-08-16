@@ -128,7 +128,7 @@ result_pair_t json::list_collection_names(std::string const& search_filter) noex
   try {
     if (search_filter.empty()) return std::make_pair(false, make_error_msg(literal::msg::empty_filter));
 
-    auto options = LoadStoreOperation{literal::operation::addconfig};
+    auto options = LoadStoreOperation{literal::operation::listcollections};
     options.readJsonData({search_filter});
 
     auto returnValue = std::string{};
@@ -162,7 +162,7 @@ result_pair_t json::find_configuration_entities(std::string const& search_filter
   try {
     if (search_filter.empty()) return std::make_pair(false, make_error_msg(literal::msg::empty_filter));
 
-    auto options = LoadStoreOperation{literal::operation::findversions};
+    auto options = LoadStoreOperation{literal::operation::findentities};
     options.readJsonData({search_filter});
 
     auto returnValue = std::string{};
