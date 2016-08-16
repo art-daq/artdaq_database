@@ -5,41 +5,9 @@
 
 #include "artdaq-database/ConfigurationDB/configurationdbifc.h"
 
+#include "artdaq-database/BasicTypes/basictypes.h"
 using artdaq::database::basictypes::FhiclData;
 using artdaq::database::basictypes::JsonData;
-
-namespace artdaq {
-namespace database {
-namespace configuration {
-
-using ots::ConfigurationBase;
-template <>
-template <>
-bool MakeSerializable<ConfigurationBase*>::writeConfigurationImpl<JsonData>(JsonData& data) const {
-  std::stringstream ss;
-
-  _conf->getView().printJSON(ss);
-
-  data.json_buffer = ss.str();
-
-  return true;
-}
-
-template <>
-template <>
-bool MakeSerializable<ConfigurationBase*>::readConfigurationImpl<JsonData>(JsonData const& data) {
-  int retVal = _conf->getViewP()->fillFromJSON(data.json_buffer);
-
-  return (retVal >= 0);
-}
-
-template <>
-std::string MakeSerializable<ConfigurationBase*>::configurationNameImpl() const {
-  return _conf->getConfigurationName();
-}
-}  // namespace configuration
-}  // namespace database
-}  // namespace artdaq
 
 using ots::DatabaseConfigurationInterface;
 using config_version_map_t = ots::DatabaseConfigurationInterface::config_version_map_t;
@@ -120,6 +88,7 @@ std::set<int> DatabaseConfigurationInterface::getVersions(const ConfigurationBas
 std::list<std::string /*name*/> DatabaseConfigurationInterface::listConfigurationsTypes() const
     throw(std::runtime_error) try {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
+
   return ifc.listConfigurationCollections();
 } catch (std::exception const& e) {
   std::cout << "DBI Exception:" << e.what() << "\n";
@@ -133,6 +102,7 @@ std::list<std::string /*name*/> DatabaseConfigurationInterface::listConfiguratio
 std::list<std::string /*name*/> DatabaseConfigurationInterface::findAllGlobalConfigurations() const
     throw(std::runtime_error) try {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
+
   return ifc.findGlobalConfigurations("");
 } catch (std::exception const& e) {
   std::cout << "DBI Exception:" << e.what() << "\n";
@@ -153,6 +123,7 @@ config_version_map_t DatabaseConfigurationInterface::loadGlobalConfiguration(
 
     std::for_each(inputList.begin(), inputList.end(),
                   [&resultMap](auto const& info) { resultMap[info.configuration] = std::stol(info.version, 0, 10); });
+
     return resultMap;
   };
 
@@ -176,6 +147,7 @@ void DatabaseConfigurationInterface::storeGlobalConfiguration(config_version_map
     std::transform(inputMap.begin(), inputMap.end(), std::back_inserter(resultList), [](auto const& mapEntry) {
       return VersionInfoList_t::value_type{mapEntry.first, std::to_string(mapEntry.second), default_entity};
     });
+
     return resultList;
   };
 
@@ -184,7 +156,6 @@ void DatabaseConfigurationInterface::storeGlobalConfiguration(config_version_map
   if (result.first) return;
 
   throw std::runtime_error(result.second);
-
 } catch (std::exception const& e) {
   std::cout << "DBI Exception:" << e.what() << "\n";
   throw std::runtime_error(e.what());

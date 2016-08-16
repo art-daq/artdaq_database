@@ -9,6 +9,7 @@ include_directories($ENV{MONGODB_INC})
 
 art_make(
   LIB_LIBRARIES
+  artdaq-database_StackTrace
   artdaq-database_DataFormats_common  
   artdaq-database_DataFormats_Json
   artdaq-database_DataFormats_Fhicl  

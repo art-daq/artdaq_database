@@ -148,18 +148,48 @@ std::vector<object_id_t> SearchIndex::findDocumentIDs(JsonData const& search) {
   return ouids;
 }
 
-std::vector<std::pair<std::string, std::string>> SearchIndex::findConfigVersions(JsonData const& search) {
+std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByGlobalConfigName(JsonData const& search) {
   assert(!search.json_buffer.empty());
   auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
-  TRACE_(5, "StorageProvider::FileSystemDB::index::findConfigVersions() begin");
-  TRACE_(5, "StorageProvider::FileSystemDB::index::findConfigVersions() args search=<" << search.json_buffer << ">.");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByGlobalConfigName() begin");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByGlobalConfigName() args search=<" << search.json_buffer << ">.");
 
   auto reader = JsonReader{};
 
   object_t search_ast;
 
   if (!reader.read(search.json_buffer, search_ast)) {
-    TRACE_(5, "StorageProvider::FileSystemDB::index::findConfigVersions()"
+    TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByGlobalConfigName()"
+                  << " Failed to create an AST from search.");
+    return returnCollection;
+  }
+
+  auto configNameFilter = std::string{};
+
+  try {
+    configNameFilter = boost::get<std::string>(search_ast.at("configurations.name"));
+
+    TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByGlobalConfigName()"
+                  << " Found global configuration filter=<" << configNameFilter << ">.");
+
+  } catch (...) {
+  }
+  
+  return _indexed_filtered_innerjoin_over_ouid("version", "configurations.name", configNameFilter);
+}
+
+std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByEntityName(JsonData const& search) {
+  assert(!search.json_buffer.empty());
+  auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByEntityName() begin");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByEntityName() args search=<" << search.json_buffer << ">.");
+
+  auto reader = JsonReader{};
+
+  object_t search_ast;
+
+  if (!reader.read(search.json_buffer, search_ast)) {
+    TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByEntityName()"
                   << " Failed to create an AST from search.");
     return returnCollection;
   }
@@ -169,12 +199,12 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findConfigVersions
   try {
     entityNameFilter = boost::get<std::string>(search_ast.at("configurable_entity.name"));
 
-    TRACE_(5, "StorageProvider::FileSystemDB::index::findConfigVersions()"
-                  << " Found filter=<" << entityNameFilter << ">.");
+    TRACE_(5, "StorageProvider::FileSystemDB::index::findConfigVersionsByEntityName()"
+                  << " Found entity filter=<" << entityNameFilter << ">.");
 
   } catch (...) {
   }
-
+  
   return _indexed_filtered_innerjoin_over_ouid("version", "configurable_entity.name", entityNameFilter);
 }
 
@@ -772,7 +802,7 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::_indexed_filtered_
     if (!acceptValue(right_element.key)) continue;
 
     TRACE_(5, "StorageProvider::FileSystemDB::index::_indexed_filtered_innerjoin_over_ouid()"
-                  << " accepted value  " << right_element.key << " begin with" << right_begins_with);
+                  << " accepted value  " << right_element.key << " begin with " << right_begins_with);
 
     auto& right_ouid_list = boost::get<jsn::array_t>(right_element.value);
 

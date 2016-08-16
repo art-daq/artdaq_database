@@ -226,7 +226,9 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
 void OperationBase::readJsonData(JsonData const& data) {
   assert(!data.json_buffer.empty());
   assert(data.json_buffer!=cfl::notprovided);
-  
+
+  TRACE_(14, "OperationBase::readJsonData() data=<" << data.json_buffer << ">");
+
   using namespace artdaq::database::json;
   auto filterAST = object_t{};
 

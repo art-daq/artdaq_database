@@ -4,6 +4,8 @@
 #include "artdaq-database/ConfigurationDB/configurationdbifc_base.h"
 #include "options_operation_manageconfigs.h"
 
+using debug::demangle;
+
 namespace artdaq {
 namespace database {
 namespace configuration {
@@ -21,8 +23,8 @@ constexpr auto apiname = "ConfigurationInterface";
 
 struct ConfigurationInterface final {
   std::string _database_provider;
-  using VersionInfoList_t= std::list<VersionInfo>;
-  
+  using VersionInfoList_t = std::list<VersionInfo>;
+
   ConfigurationInterface(std::string const& database_provider) : _database_provider(database_provider){};
 
   //==============================================================================
@@ -50,7 +52,7 @@ struct ConfigurationInterface final {
       opts.dataFormat(data_format_t::fhicl);
     } else {
       throw artdaq::database::invalid_option_exception(apifunctname)
-          << "Unsupported storage format " << typeid(TYPE).name() << ",  use either JsonData or FhiclData.";
+          << "Unsupported storage format " << demangle(typeid(TYPE).name()) << ",  use either JsonData or FhiclData.";
     }
 
     if (!entity.empty()) opts.configurableEntity(entity);
@@ -102,7 +104,7 @@ struct ConfigurationInterface final {
       opts.dataFormat(data_format_t::fhicl);
     } else {
       throw artdaq::database::invalid_option_exception(apifunctname)
-          << "Unsupported storage format " << typeid(TYPE).name() << ",  use either JsonData or FhiclData.";
+          << "Unsupported storage format " << demangle(typeid(TYPE).name()) << ",  use either JsonData or FhiclData.";
     }
 
     if (!entity.empty()) opts.configurableEntity(entity);
@@ -239,6 +241,14 @@ struct ConfigurationInterface final {
 
     auto returnList = VersionInfoList_t{};  // RVO
 
+    auto to_VersionInfo = [](auto const& query) {
+      auto const& configuration = boost::get<std::string>(boost::get<jsn::object_t>(query).at(cfl::option::collection));
+      auto const& filter = boost::get<jsn::object_t>(query).at(cfl::filterx);
+      auto const& version = boost::get<std::string>(boost::get<jsn::object_t>(filter).at(cfl::filter::version));
+      auto const& entity = boost::get<std::string>(boost::get<jsn::object_t>(filter).at(cfl::filter::entity));
+      return VersionInfo{configuration, version, entity};
+    };
+
     try {
       auto opts = ManageConfigsOperation{apiname};
       opts.operation(cfl::operation::buildfilter);
@@ -247,7 +257,7 @@ struct ConfigurationInterface final {
 
       if (!configuration.empty()) opts.globalConfiguration(configuration);
 
-      auto apiCallResult = impl::find_global_configurations(opts);
+      auto apiCallResult = impl::build_global_configuration_search_filter(opts);
 
       if (!apiCallResult.first) throw artdaq::database::runtime_exception(apifunctname) << apiCallResult.second;
 
@@ -257,17 +267,36 @@ struct ConfigurationInterface final {
         throw artdaq::database::runtime_exception(apifunctname) << "Invalid JSON:" << apiCallResult.second;
 
       try {
-        auto const& searches = boost::get<jsn::array_t>(resultAST.at(cfl::document::search));
+        for (auto const search : boost::get<jsn::array_t>(resultAST.at(cfl::document::search))) {
+          auto buffer = std::string{};
 
-        for (auto const search : searches) {
-          auto const& query = boost::get<jsn::object_t>(search).at(cfl::document::query);
-          auto const& filter = boost::get<jsn::object_t>(query).at(cfl::filterx);
-          auto const& version = boost::get<std::string>(boost::get<jsn::object_t>(filter).at(cfl::filter::version));
-          auto const& entity = boost::get<std::string>(boost::get<jsn::object_t>(filter).at(cfl::filter::entity));
-          auto const& configuration =
-              boost::get<std::string>(boost::get<jsn::object_t>(filter).at(cfl::filter::configuration));
+          {
+            auto query = boost::get<jsn::object_t>(search).at(cfl::document::query);
 
-          returnList.emplace_back(VersionInfo{configuration, version, entity});
+            boost::get<jsn::object_t>(query).at("operation") = std::string{cfl::operation::findversions};
+
+            if (!jsn::JsonWriter().write(boost::get<jsn::object_t>(query), buffer))
+              throw artdaq::database::runtime_exception(apifunctname) << "Invalid JSON:" << apiCallResult.second;
+          }
+
+          auto apiCall2Result = cf::json::find_configuration_versions(buffer);
+
+          if (!apiCall2Result.first) throw artdaq::database::runtime_exception(apifunctname) << apiCall2Result.second;
+
+          auto result2AST = jsn::object_t{};
+
+          if (!jsn::JsonReader().read(apiCall2Result.second, result2AST))
+            throw artdaq::database::runtime_exception(apifunctname) << "Invalid JSON:" << apiCall2Result.second;
+
+          auto const& searches2 = boost::get<jsn::array_t>(result2AST.at(cfl::document::search));
+
+          if (searches2.size() != 1)
+            throw artdaq::database::runtime_exception(apifunctname) << "Invalid JSON:" << apiCall2Result.second
+                                                                    << "Too many results found, expected one.";
+
+          auto const& version_query = boost::get<jsn::object_t>(*searches2.begin()).at(cfl::document::query);
+
+          returnList.emplace_back(to_VersionInfo(version_query));
         }
       } catch (std::exception const& e) {
         throw artdaq::database::runtime_exception(apifunctname)
@@ -313,7 +342,7 @@ struct ConfigurationInterface final {
       op[cfl::option::collection] = versionInfo.configuration;
       op[cfl::option::provider] = _database_provider;
       op[cfl::option::format] = to_string(data_format_t::gui);
-      op[cfl::option::operation] = cfl::operation::addconfig;
+      op[cfl::option::operation] = std::string{cfl::operation::addconfig};
       op[cfl::filterx] = jsn::object_t{};
 
       auto& filter = boost::get<jsn::object_t>(op[cfl::filterx]);
@@ -344,11 +373,11 @@ struct ConfigurationInterface final {
   std::list<std::string> listConfigurationCollections() const {
     auto returnList = std::list<std::string>{};  // RVO
 
-    //constexpr auto apifunctname = "ConfigurationInterface::findConfigurationCollections";
-  
+    // constexpr auto apifunctname = "ConfigurationInterface::findConfigurationCollections";
+
     return returnList;
   }
-  
+
   // defaults
   ~ConfigurationInterface() = default;
   ConfigurationInterface(ConfigurationInterface&&) = default;

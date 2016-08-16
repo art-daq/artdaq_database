@@ -263,30 +263,74 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigVersions(
 
   SearchIndex search_index(index_path);
 
-  auto versionentityname_pairs = search_index.findConfigVersions(search_filter);
+  jsn::object_t search_ast;
 
-  TRACE_(7, "StorageProvider::FileSystemDB::findConfigVersions() search returned " << versionentityname_pairs.size()
-                                                                                   << " configurations.");
-
-  for (auto const& versionentityname_pair : versionentityname_pairs) {
-    std::stringstream ss;
-
-    ss << "{";
-    ss << "\"collection\" : \"" << collection_name << "\",";
-    ss << "\"dbprovider\" : \"filesystem\",";
-    ss << "\"dataformat\" : \"gui\",";
-    ss << "\"operation\" : \"load\",";
-    ss << "\"filter\" : {";
-    ss << "\"version\" : \"" << versionentityname_pair.second << "\"";
-    ss << ", \"configurable_entity.name\" : \"" << versionentityname_pair.first << "\"";
-    ss << "}";
-    ss << "}";
-
-    TRACE_(7, "StorageProvider::FileSystemDB::findConfigVersions() found document=<" << ss.str() << ">");
-
-    returnCollection.emplace_back(ss.str());
+  if (!jsn::JsonReader{}.read(search_filter, search_ast)) {
+    TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByEntityName()"
+                  << " Failed to create an AST from search.");
+    return returnCollection;
   }
 
+  if (search_ast.count("configurations.name") == 0) {
+    auto versionentityname_pairs = search_index.findVersionsByEntityName(search_filter);
+
+    TRACE_(7, "StorageProvider::FileSystemDB::findVersionsByEntityName() search returned "
+                  << versionentityname_pairs.size() << " configurations.");
+
+    for (auto const& versionentityname_pair : versionentityname_pairs) {
+      std::stringstream ss;
+
+      ss << "{";
+      ss << "\"collection\" : \"" << collection_name << "\",";
+      ss << "\"dbprovider\" : \"filesystem\",";
+      ss << "\"dataformat\" : \"gui\",";
+      ss << "\"operation\" : \"load\",";
+      ss << "\"filter\" : {";
+      ss << "\"version\" : \"" << versionentityname_pair.second << "\"";
+      ss << ", \"configurable_entity.name\" : \"" << versionentityname_pair.first << "\"";
+      ss << "}";
+      ss << "}";
+
+      TRACE_(7, "StorageProvider::FileSystemDB::findConfigVersions() found document=<" << ss.str() << ">");
+
+      returnCollection.emplace_back(ss.str());
+    }
+  } else {
+    auto entityName = std::string{"notprovided"};
+
+    try {
+      entityName = boost::get<std::string>(search_ast.at("configurable_entity.name"));
+
+      TRACE_(7, "StorageProvider::FileSystemDB::findVersionsByGlobalConfigName"
+                    << " Found entity filter=<" << entityName << ">.");
+
+    } catch (...) {
+    }
+    
+    auto versionentityname_pairs = search_index.findVersionsByGlobalConfigName(search_filter);
+
+    TRACE_(7, "StorageProvider::FileSystemDB::findVersionsByGlobalConfigName() search returned "
+                  << versionentityname_pairs.size() << " configurations.");
+
+    for (auto const& versionentityname_pair : versionentityname_pairs) {
+      std::stringstream ss;
+
+      ss << "{";
+      ss << "\"collection\" : \"" << collection_name << "\",";
+      ss << "\"dbprovider\" : \"filesystem\",";
+      ss << "\"dataformat\" : \"gui\",";
+      ss << "\"operation\" : \"load\",";
+      ss << "\"filter\" : {";
+      ss << "\"version\" : \"" << versionentityname_pair.second << "\"";
+      ss << ", \"configurable_entity.name\" : \"" << entityName << "\"";
+      ss << "}";
+      ss << "}";
+
+      TRACE_(7, "StorageProvider::FileSystemDB::findConfigVersions() found document=<" << ss.str() << ">");
+
+      returnCollection.emplace_back(ss.str());
+    }
+  }
   return returnCollection;
 }
 
@@ -301,7 +345,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigEntities(
 
   auto search_filter_document = JSONDocument{filter.json_buffer};
   auto search_filter = search_filter_document.findChild("filter").value();
-  
+
   auto collection = _provider->connection();
   collection = expand_environment_variables(collection);
 

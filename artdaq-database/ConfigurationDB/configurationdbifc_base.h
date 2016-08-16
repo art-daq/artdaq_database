@@ -8,11 +8,18 @@
 
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/BuildInfo/process_exceptions.h"
+
 #include "artdaq-database/ConfigurationDB/configurationdb.h"
 #include "artdaq-database/DataFormats/Json/json_reader.h"
 #include "artdaq-database/DataFormats/Json/json_writer.h"
 
 #include "options_operation_loadstore.h"
+
+namespace debug {
+std::string demangle(const char*);
+}
+
+using debug::demangle;
 
 namespace artdaq {
 namespace database {
@@ -40,11 +47,11 @@ class MakeSerializable final {
     return writeConfigurationImpl(data);
   } catch (std::exception const& e) {
     throw artdaq::database::exception("MakeSerializable::writeConfiguration")
-        << "Unable to write " << typeid(CONF).name() << " into " << typeid(TYPE).name()
+        << "Unable to write " << demangle(typeid(CONF).name()) << " into " << demangle(typeid(TYPE).name())
         << "; Exception msg:" << e.what() << ".";
   } catch (...) {
     throw artdaq::database::exception("MakeSerializable::writeConfiguration")
-        << "Unable to write " << typeid(CONF).name() << " into " << typeid(TYPE).name() << ".";
+        << "Unable to write " << demangle(typeid(CONF).name()) << " into " << demangle(typeid(TYPE).name()) << ".";
   }
 
   template <class TYPE>
@@ -52,21 +59,21 @@ class MakeSerializable final {
     return readConfigurationImpl(data);
   } catch (std::exception const& e) {
     throw artdaq::database::exception("MakeSerializable::readConfiguration")
-        << "Unable to read " << typeid(CONF).name() << " from " << typeid(TYPE).name() << "; Exception msg:" << e.what()
-        << ".";
+        << "Unable to read " << demangle(typeid(CONF).name()) << " from " << demangle(typeid(TYPE).name())
+        << "; Exception msg:" << e.what() << ".";
   } catch (...) {
-    throw artdaq::database::exception("MakeSerializable::readConfiguration") << "Unable to read " << typeid(CONF).name()
-                                                                             << " from " << typeid(TYPE).name() << ".";
+    throw artdaq::database::exception("MakeSerializable::readConfiguration")
+        << "Unable to read " << demangle(typeid(CONF).name()) << " from " << demangle(typeid(TYPE).name()) << ".";
   }
 
   std::string configurationName() const throw(artdaq::database::exception) try {
     return configurationNameImpl();
   } catch (std::exception const& e) {
     throw artdaq::database::exception("MakeSerializable::configurationName")
-        << "Unable to get configuration name" << typeid(CONF).name() << "; Exception msg:" << e.what() << ".";
+        << "Unable to get configuration name" << demangle(typeid(CONF).name()) << "; Exception msg:" << e.what() << ".";
   } catch (...) {
     throw artdaq::database::exception("MakeSerializable::configurationName") << "Unable to to get configuration name"
-                                                                             << typeid(CONF).name() << ".";
+                                                                             << demangle(typeid(CONF).name()) << ".";
   }
 
   MakeSerializable(CONF conf) : _conf(conf){};
@@ -87,18 +94,18 @@ class MakeSerializable final {
   template <class TYPE>
   bool writeConfigurationImpl(TYPE&) const {
     throw artdaq::database::runtime_exception("MakeSerializable::writeConfigurationImpl")
-        << "writeConfigurationImpl is not specialized for " << typeid(CONF).name();
+        << "writeConfigurationImpl is not specialized for " << demangle(typeid(CONF).name());
   }
 
   template <class TYPE>
   bool readConfigurationImpl(TYPE const&) {
     throw artdaq::database::runtime_exception("MakeSerializable::readConfigurationImpl")
-        << "readConfigurationImpl is not specialized for " << typeid(CONF).name();
+        << "readConfigurationImpl is not specialized for " << demangle(typeid(CONF).name());
   }
 
   std::string configurationNameImpl() const {
     throw artdaq::database::runtime_exception("MakeSerializable::configurationNameImpl")
-        << "configurationNameImpl is not specialized for " << typeid(CONF).name();
+        << "configurationNameImpl is not specialized for " << demangle(typeid(CONF).name());
   }
 
  private:
@@ -164,7 +171,15 @@ class ConfigurationSerializer final {
   std::string configurationName() const noexcept try {
     return Serializable_t{_conf}.configurationName();
   } catch (std::exception const&) {
-    return {typeid(std::decay<decltype(_conf)>).name()};
+    using configurationClazz = typename std::remove_pointer<typename std::remove_reference<CONF>::type>::type;
+
+    auto name = demangle(typeid(configurationClazz).name());
+
+    std::size_t found = name.find_last_of(":");
+
+    if (found != std::string::npos) return name.substr(found + 1);
+
+    return name;
   }
 
   // defaults
