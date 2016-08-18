@@ -92,21 +92,12 @@ class MakeSerializable final {
   // readImpl and writeImpl methods should be specialized
   // for concrete configuration types
   template <class TYPE>
-  bool writeConfigurationImpl(TYPE&) const {
-    throw artdaq::database::runtime_exception("MakeSerializable::writeConfigurationImpl")
-        << "writeConfigurationImpl is not specialized for " << demangle(typeid(CONF).name());
-  }
+  bool writeConfigurationImpl(TYPE&) const;
 
   template <class TYPE>
-  bool readConfigurationImpl(TYPE const&) {
-    throw artdaq::database::runtime_exception("MakeSerializable::readConfigurationImpl")
-        << "readConfigurationImpl is not specialized for " << demangle(typeid(CONF).name());
-  }
+  bool readConfigurationImpl(TYPE const&);
 
-  std::string configurationNameImpl() const {
-    throw artdaq::database::runtime_exception("MakeSerializable::configurationNameImpl")
-        << "configurationNameImpl is not specialized for " << demangle(typeid(CONF).name());
-  }
+  std::string configurationNameImpl() const;
 
  private:
   CONF _conf;
