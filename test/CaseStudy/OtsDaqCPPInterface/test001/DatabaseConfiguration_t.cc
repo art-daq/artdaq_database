@@ -26,7 +26,7 @@
 
 struct TestData {
   TestData() {
-    
+    /*
     artdaq::database::filesystem::debug::enable();
     artdaq::database::mongo::debug::enable();
     // artdaq::database::jsonutils::debug::enableJSONDocument();
@@ -45,7 +45,7 @@ struct TestData {
 
 //    debug::registerUngracefullExitHandlers();
     artdaq::database::dataformats::useFakeTime(true);
-    
+    */
     std::cout << "setup fixture\n";
   }
 
@@ -179,6 +179,42 @@ BOOST_AUTO_TEST_CASE(list_configuration_types) {
   BOOST_CHECK_EQUAL(found2, true);
 
   return;
+}
+
+BOOST_AUTO_TEST_CASE(find_configuration_version) {
+  auto ifc = DatabaseConfigurationInterface();
+
+   std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();
+
+   auto list = ifc.getVersions(cfg1.get());
+
+   auto found1 = (std::find(list.begin(), list.end(), fixture.version()) != list.end());
+
+   BOOST_CHECK_EQUAL(found1, true);
+   
+   auto found2 = (std::find(list.begin(), list.end(), fixture.version() + 1) != list.end());
+
+   BOOST_CHECK_EQUAL(found2, true);
+
+   return;
+}
+
+BOOST_AUTO_TEST_CASE(find_latest_configuration_version) {
+  auto ifc = DatabaseConfigurationInterface();
+
+   std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();
+
+   auto version = ifc.findLatestVersion(cfg1.get());
+
+   auto list = ifc.getVersions(cfg1.get());
+
+   std::cout << "Found versions\n";
+   
+   for(auto version:list) { std::cout << std::to_string(version) << ", "; }
+      
+   std::cout << "\nGot latest version" <<  std::to_string(version) << "\n";
+
+   return;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
