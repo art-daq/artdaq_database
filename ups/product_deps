@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_database  v1_03_01
+parent artdaq_database  v1_03_02
 defaultqual	e10:s35
 
 # These optional lines define the installed directories where
@@ -19,7 +19,7 @@ perllib  product_dir
 
 #
 product		version		optional
-artdaq_core 	v1_05_00
+artdaq_core 	v1_05_06
 #fhiclcpp       v3_12_09
 mongodb 	v3_2_7
 swig            v3_0_10
