@@ -24,7 +24,7 @@ artdaq_core 	v1_05_06
 mongodb 	v3_2_7
 swig            v3_0_10
 TRACE           v3_06_07	
-cetbuildtools	v5_04_01	-	only_for_build
+cetbuildtools	v5_04_03	-	only_for_build
 end_product_list
 
 # -nq- means there is no qualifier
@@ -32,7 +32,6 @@ end_product_list
 qualifier	artdaq_core 	mongodb		swig 		TRACE		notes
 e9:s21:debug   	e9:s21:debug	e9:debug	e9:debug	e9:debug	-std=c++14
 e9:s21:prof    	e9:s21:prof	e9:prof		e9:prof		e9:prof		-std=c++14
-
 e10:s35:debug   e10:s35:debug   e10:debug	e10:debug	e10:debug	-std=c++14
 e10:s35:prof    e10:s35:prof	e10:prof	e10:prof	e10:prof	-std=c++14
 
