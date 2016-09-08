@@ -39,10 +39,13 @@ cet_set_compiler_flags(DIAGS VIGILANT
 
 string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC )
 
-if( ${BTYPE_UC} MATCHES "DEBUG" )
-  MESSAGE (STATUS "Enable  -fsanitize=address")
-  cet_add_compiler_flags( -fsanitize=address)  
-endif()
+IF (SANITIZE_ADDRESS)
+  string(TOUPPER ${SANITIZE_ADDRESS} SANITIZE_ADDRESS_UC )
+  if( ${SANITIZE_ADDRESS_UC} MATCHES "TRUE" )
+    MESSAGE (STATUS "Enable  -fsanitize=address")
+    cet_add_compiler_flags(-fsanitize=address)
+  endif()
+ENDIF()
 
 cet_add_compiler_flags( -rdynamic -ldl)
 
