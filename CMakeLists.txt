@@ -40,7 +40,8 @@ cet_set_compiler_flags(DIAGS VIGILANT
 string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC )
 
 if( ${BTYPE_UC} MATCHES "DEBUG" )
-#  cet_add_compiler_flags( -fsanitize=address) 
+  MESSAGE (STATUS "Enable  -fsanitize=address")
+  cet_add_compiler_flags( -fsanitize=address)  
 endif()
 
 cet_add_compiler_flags( -rdynamic -ldl)
@@ -52,7 +53,7 @@ set(mongodb_product_version v3_2_7)
 # these are minimum required versions, not the actual product versions
 find_ups_boost(v1_61_0)
 find_ups_product (cetbuildtools v5_04_01)
-find_ups_product( artdaq_core v1_05_00 )
+#find_ups_product( artdaq_core v1_05_00 )
 find_ups_product( cetlib v1_18_02 )
 find_ups_product( cetpkgsupport v1_10_02 )
 find_ups_product( fhiclcpp v3_20_01 )
@@ -60,6 +61,7 @@ find_ups_product( sqlite v3_12_02_00)
 find_ups_product( mongodb ${mongodb_product_version} )
 find_ups_product( swig v3_0_10 )
 find_ups_product( TRACE v3_06_07 )
+find_ups_product( nodejs v4_5_0 )
 
 # Debug streamer.
 string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC)
