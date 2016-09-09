@@ -106,9 +106,9 @@ class json_node_t final {
 
     if (type() == type_t::OBJECT) {
       object_t& object = value_as<object_t>();
-      object[node_name] = T{};
+      object.push_back(data_t{node_name, T{}});
 
-      return unwrap(object.at(node_name)).value_as<T>();
+      return unwrap(object.back().value).value_as<T>();
     } else if (type() == type_t::ARRAY) {
       array_t& array = value_as<array_t>();
       array.push_back(T{});

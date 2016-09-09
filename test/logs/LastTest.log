@@ -1,0 +1,2822 @@
+Start testing: Sep 08 20:46 CDT
+----------------------------------------------------------
+1/2 Testing: LoadStore_store_filesystem_020_t
+1/2 Test: LoadStore_store_filesystem_020_t
+Command: "/home/lukhanin/scratch/current/artdaq-demo-base/products/cetbuildtools/v5_04_03/bin/cet_exec_test" "--wd" "/home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/test/ConfigurationDB/LoadStore/test020/LoadStore_store_filesystem_020_t.d" "--required-files" "" "--datafiles" "/home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/test/ConfigurationDB/LoadStore/test020/test011.src.837.json;/home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/test/ConfigurationDB/LoadStore/test020/test011.cmp.837.json;/home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/test/ConfigurationDB/LoadStore/test020/test011.flt.837.json" "--skip-return-code" "247" "LoadStore_t" "--searchquery=test011.flt.837.json" "-s" "test011.src.837.json" "-r" "test011.cmp.837.json"
+Directory: /home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/test/ConfigurationDB/LoadStore/test020/LoadStore_store_filesystem_020_t.d
+"LoadStore_store_filesystem_020_t" start time: Sep 08 20:46 CDT
+Output:
+----------------------------------------------------------
+removed ‘test011.cmp.792.json’
+removed ‘test011.flt.792.json’
+removed ‘test011.src.792.json’
+09-08 20:46:56.244195  1  0 artdaq::database::filesystem trace_enable
+09-08 20:46:56.244360  1  0 artdaq::database::filesystem::index trace_enable
+09-08 20:46:56.244446  1  0 artdaq::database::mongo trace_enable
+09-08 20:46:56.244564  1  0 artdaq::database::configuration::LoadStoreOperation trace_enable
+09-08 20:46:56.244620  1  0 artdaq::database::configuration::options::OperationBase trace_enable
+09-08 20:46:56.244650  1  0 artdaq::database::configuration::options::OperationLoadStore trace_enable
+09-08 20:46:56.244679  1  0 artdaq::database::configuration::LoadStoreOperationDetail trace_enable
+09-08 20:46:56.246646  1 14 Options: json query= <{
+   "filter":{
+      "version":"versionZ97397",
+      "configurable_entity.name":"ENTITY-testLoadStore"
+   },
+   "configuration":"testConfigA03172016-174859",
+   "collection":"testLoadStore",
+   "dbprovider":"filesystem",
+   "operation":"store",
+   "dataformat":"gui"
+}
+>
+09-08 20:46:56.246681  1 14 OperationBase::readJsonData() data=<{
+   "filter":{
+      "version":"versionZ97397",
+      "configurable_entity.name":"ENTITY-testLoadStore"
+   },
+   "configuration":"testConfigA03172016-174859",
+   "collection":"testLoadStore",
+   "dbprovider":"filesystem",
+   "operation":"store",
+   "dataformat":"gui"
+}
+>
+09-08 20:46:56.252881  1 12 Options: Updating provider from filesystem to filesystem.
+09-08 20:46:56.252911  1 10 Options: Updating operation from load to store.
+09-08 20:46:56.252921  1 14 Options: dataFormat args format=<gui>.
+09-08 20:46:56.252932  1 11 Options: Updating collection_name from notprovided to testLoadStore.
+09-08 20:46:56.257453  1 15 Options: searchFilter args search_filter=<{
+"version" : "versionZ97397",
+"configurable_entity.name" : "ENTITY-testLoadStore"
+}>.
+09-08 20:46:56.258155  1 12 Options: Updating global_configuration from notprovided to testConfigA03172016-174859.
+09-08 20:46:56.258560  1 10 Options: Updating version from notprovided to versionZ97397.
+09-08 20:46:56.258575  1 11 Options: Updating entity from notprovided to ENTITY-testLoadStore.
+09-08 20:46:56.262928  1 14 OperationBase::readJsonData() data=<{
+"filter" : {
+"version" : "versionZ97397",
+"configurable_entity.name" : "ENTITY-testLoadStore"
+},
+"dbprovider" : "filesystem",
+"operation" : "store",
+"collection" : "testLoadStore",
+"dataformat" : "gui",
+"configuration" : "testConfigA03172016-174859"
+}>
+09-08 20:46:56.263592  1 12 Options: Updating provider from filesystem to filesystem.
+09-08 20:46:56.263605  1 10 Options: Updating operation from load to store.
+09-08 20:46:56.263612  1 14 Options: dataFormat args format=<gui>.
+09-08 20:46:56.263619  1 11 Options: Updating collection_name from notprovided to testLoadStore.
+09-08 20:46:56.263764  1 15 Options: searchFilter args search_filter=<{
+"version" : "versionZ97397",
+"configurable_entity.name" : "ENTITY-testLoadStore"
+}>.
+09-08 20:46:56.264369  1 12 Options: Updating global_configuration from notprovided to testConfigA03172016-174859.
+09-08 20:46:56.264426  1 10 Options: Updating version from notprovided to versionZ97397.
+09-08 20:46:56.264436  1 11 Options: Updating entity from notprovided to ENTITY-testLoadStore.
+09-08 20:46:56.264461  1 15 store_configuration: begin
+09-08 20:46:56.341976  1 15 store_configuration: json_buffer=<{
+"document" : {
+"data" : {
+"prolog" : {
+"fhicl_pound_include_0" : "metrics.fcl",
+"ssp_standard" : {
+"metrics" : "@local::metrics",
+"max_fragment_size_words" : 262144,
+"fragment_receiver" : {
+"mpi_buffer_count" : 16,
+"mpi_sync_interval" : 24000,
+"first_event_builder_rank" : -1,
+"event_builder_count" : -1,
+"generator" : "SSP",
+"fragment_type" : "SSP",
+"interface_type" : 1,
+"verbosity" : 3,
+"DAQConfig" : {
+"MillisliceLength" : 10000000,
+"MillisliceOverlap" : 1000000,
+"UseExternalTimestamp" : 1,
+"StartOnNOvASync" : 1,
+"EmptyWriteDelay" : 1000000,
+"HardwareClockRate" : 64
+},
+"HardwareConfig" : {
+"eventDataInterfaceSelect" : 1,
+"ChannelControl" : {
+"ExtTriggerMode" : 1,
+"LEDTrigger" : 0,
+"TimestampRate" : 7
+},
+"ALL_channel_control" : 1,
+"ALL_led_threshold" : 100,
+"trigger_input_delay" : 55,
+"dsp_clock_control" : 19,
+"ALL_readout_window" : 700,
+"ALL_readout_pretrigger" : 50,
+"ALL_cfd_parameters" : 6144,
+"ALL_p_window" : 32,
+"ALL_i2_window" : 500,
+"ALL_m1_window" : 10,
+"ALL_m2_window" : 10,
+"ALL_d_window" : 20,
+"ALL_i1_window" : 500,
+"ALL_disc_width" : 10,
+"ALL_baseline_start" : 0,
+"ALL_bias_config" : 265488,
+"c2c_control" : 7,
+"c2c_master_intr_control" : 0,
+"comm_clock_control" : 1,
+"comm_led_config" : 0,
+"comm_led_input" : 0,
+"qi_dac_config" : 0,
+"qi_dac_control" : 1,
+"mon_config" : 1241088,
+"mon_select" : 16776960,
+"mon_gpio" : 0,
+"mon_control" : 65537,
+"c2c_slave_intr_control" : 0,
+"gpio_output_width" : 4096,
+"front_panel_config" : 4369,
+"dsp_led_config" : 0,
+"dsp_led_input" : 0,
+"baseline_delay" : 5,
+"diag_channel_input" : 0,
+"qi_config" : 268377856,
+"qi_delay" : 0,
+"qi_pulse_width" : 0,
+"external_gate_width" : 32768
+}
+}
+},
+"daq" : "@local::ssp_standard",
+"fhicl_pound_include_1" : "ssp_expert_run_options.fcl",
+"fhicl_pound_include_2" : "user_run_options.fcl",
+"ssp_standard" : "@local::daq",
+"ssp01_standard" : "@local::ssp_standard",
+"ssp01_standard.fragment_receiver.fragment_id" : "123",
+"ssp01_standard.fragment_receiver.board_id" : 0,
+"ssp01_standard.fragment_receiver.board_ip" : "192.168.1.109",
+"ssp01_standard.fragment_receiver.HardwareConfig.module_id" : 1,
+"ssp02_standard" : "@local::ssp_standard",
+"ssp02_standard.fragment_receiver.fragment_id" : 1,
+"ssp02_standard.fragment_receiver.board_id" : 1,
+"ssp02_standard.fragment_receiver.board_ip" : "192.168.1.117",
+"ssp02_standard.fragment_receiver.HardwareConfig.module_id" : 2,
+"ssp03_standard" : "@local::ssp_standard",
+"ssp03_standard.fragment_receiver.fragment_id" : 2,
+"ssp03_standard.fragment_receiver.board_id" : 2,
+"ssp03_standard.fragment_receiver.board_ip" : "192.168.1.113",
+"ssp03_standard.fragment_receiver.HardwareConfig.module_id" : 3,
+"ssp04_standard" : "@local::ssp_standard",
+"ssp04_standard.fragment_receiver.fragment_id" : 3,
+"ssp04_standard.fragment_receiver.board_id" : 3,
+"ssp04_standard.fragment_receiver.board_ip" : "192.168.1.110",
+"ssp04_standard.fragment_receiver.HardwareConfig.module_id" : 4,
+"ssp05_standard" : "@local::ssp_standard",
+"ssp05_standard.fragment_receiver.fragment_id" : 4,
+"ssp05_standard.fragment_receiver.board_id" : 4,
+"ssp05_standard.fragment_receiver.board_ip" : "192.168.1.114",
+"ssp05_standard.fragment_receiver.HardwareConfig.module_id" : 5,
+"ssp06_standard" : "@local::ssp_standard",
+"ssp06_standard.fragment_receiver.fragment_id" : 5,
+"ssp06_standard.fragment_receiver.board_id" : 5,
+"ssp06_standard.fragment_receiver.board_ip" : "192.168.1.106",
+"ssp06_standard.fragment_receiver.HardwareConfig.module_id" : 6,
+"ssp07_standard" : "@local::ssp_standard",
+"ssp07_standard.fragment_receiver.fragment_id" : 6,
+"ssp07_standard.fragment_receiver.board_id" : 6,
+"ssp07_standard.fragment_receiver.board_ip" : "192.168.1.105",
+"ssp07_standard.fragment_receiver.HardwareConfig.module_id" : 7,
+"ssp08_standard" : "@local::ssp_standard",
+"ssp08_standard.fragment_receiver.fragment_id" : 7,
+"ssp08_standard.fragment_receiver.board_id" : 7,
+"ssp08_standard.fragment_receiver.board_ip" : "192.168.1.105",
+"ssp08_standard.fragment_receiver.HardwareConfig.module_id" : 8
+},
+"main" : {
+
+}
+},
+"metadata" : {
+09-08 20:46:56.856903  1 15 store_configuration: insert_payload=<{"document":{
+"document" : {
+"data" : {
+"prolog" : {
+"fhicl_pound_include_0" : "metrics.fcl",
+"ssp_standard" : {
+"metrics" : "@local::metrics",
+"max_fragment_size_words" : 262144,
+"fragment_receiver" : {
+"mpi_buffer_count" : 16,
+"mpi_sync_interval" : 24000,
+"first_event_builder_rank" : -1,
+"event_builder_count" : -1,
+"generator" : "SSP",
+"fragment_type" : "SSP",
+"interface_type" : 1,
+"verbosity" : 3,
+"DAQConfig" : {
+"MillisliceLength" : 10000000,
+"MillisliceOverlap" : 1000000,
+"UseExternalTimestamp" : 1,
+"StartOnNOvASync" : 1,
+"EmptyWriteDelay" : 1000000,
+"HardwareClockRate" : 64
+},
+"HardwareConfig" : {
+"eventDataInterfaceSelect" : 1,
+"ChannelControl" : {
+"ExtTriggerMode" : 1,
+"LEDTrigger" : 0,
+"TimestampRate" : 7
+},
+"ALL_channel_control" : 1,
+"ALL_led_threshold" : 100,
+"trigger_input_delay" : 55,
+"dsp_clock_control" : 19,
+"ALL_readout_window" : 700,
+"ALL_readout_pretrigger" : 50,
+"ALL_cfd_parameters" : 6144,
+"ALL_p_window" : 32,
+"ALL_i2_window" : 500,
+"ALL_m1_window" : 10,
+"ALL_m2_window" : 10,
+"ALL_d_window" : 20,
+"ALL_i1_window" : 500,
+"ALL_disc_width" : 10,
+"ALL_baseline_start" : 0,
+"ALL_bias_config" : 265488,
+"c2c_control" : 7,
+"c2c_master_intr_control" : 0,
+"comm_clock_control" : 1,
+"comm_led_config" : 0,
+"comm_led_input" : 0,
+"qi_dac_config" : 0,
+"qi_dac_control" : 1,
+"mon_config" : 1241088,
+"mon_select" : 16776960,
+"mon_gpio" : 0,
+"mon_control" : 65537,
+"c2c_slave_intr_control" : 0,
+"gpio_output_width" : 4096,
+"front_panel_config" : 4369,
+"dsp_led_config" : 0,
+"dsp_led_input" : 0,
+"baseline_delay" : 5,
+"diag_channel_input" : 0,
+"qi_config" : 268377856,
+"qi_delay" : 0,
+"qi_pulse_width" : 0,
+"external_gate_width" : 32768
+}
+}
+},
+"daq" : "@local::ssp_standard",
+"fhicl_pound_include_1" : "ssp_expert_run_options.fcl",
+"fhicl_pound_include_2" : "user_run_options.fcl",
+"ssp_standard" : "@local::daq",
+"ssp01_standard" : "@local::ssp_standard",
+"ssp01_standard.fragment_receiver.fragment_id" : "123",
+"ssp01_standard.fragment_receiver.board_id" : 0,
+"ssp01_standard.fragment_receiver.board_ip" : "192.168.1.109",
+"ssp01_standard.fragment_receiver.HardwareConfig.module_id" : 1,
+"ssp02_standard" : "@local::ssp_standard",
+"ssp02_standard.fragment_receiver.fragment_id" : 1,
+"ssp02_standard.fragment_receiver.board_id" : 1,
+"ssp02_standard.fragment_receiver.board_ip" : "192.168.1.117",
+"ssp02_standard.fragment_receiver.HardwareConfig.module_id" : 2,
+"ssp03_standard" : "@local::ssp_standard",
+"ssp03_standard.fragment_receiver.fragment_id" : 2,
+"ssp03_standard.fragment_receiver.board_id" : 2,
+"ssp03_standard.fragment_receiver.board_ip" : "192.168.1.113",
+"ssp03_standard.fragment_receiver.HardwareConfig.module_id" : 3,
+"ssp04_standard" : "@local::ssp_standard",
+"ssp04_standard.fragment_receiver.fragment_id" : 3,
+"ssp04_standard.fragment_receiver.board_id" : 3,
+"ssp04_standard.fragment_receiver.board_ip" : "192.168.1.110",
+"ssp04_standard.fragment_receiver.HardwareConfig.module_id" : 4,
+"ssp05_standard" : "@local::ssp_standard",
+"ssp05_standard.fragment_receiver.fragment_id" : 4,
+"ssp05_standard.fragment_receiver.board_id" : 4,
+"ssp05_standard.fragment_receiver.board_ip" : "192.168.1.114",
+"ssp05_standard.fragment_receiver.HardwareConfig.module_id" : 5,
+"ssp06_standard" : "@local::ssp_standard",
+"ssp06_standard.fragment_receiver.fragment_id" : 5,
+"ssp06_standard.fragment_receiver.board_id" : 5,
+"ssp06_standard.fragment_receiver.board_ip" : "192.168.1.106",
+"ssp06_standard.fragment_receiver.HardwareConfig.module_id" : 6,
+"ssp07_standard" : "@local::ssp_standard",
+"ssp07_standard.fragment_receiver.fragment_id" : 6,
+"ssp07_standard.fragment_receiver.board_id" : 6,
+"ssp07_standard.fragment_receiver.board_ip" : "192.168.1.105",
+"ssp07_standard.fragment_receiver.HardwareConfig.module_id" : 7,
+"ssp08_standard" : "@local::ssp_standard",
+"ssp08_standard.fragment_receiver.fragment_id" : 7,
+"ssp08_standard.fragment_receiver.board_id" : 7,
+"ssp08_standard.fragment_receiver.board_ip" : "192.168.1.105",
+"ssp08_standard.fragment_receiver.HardwareConfig.module_id" : 8
+},
+"main" : {
+
+}
+},
+09-08 20:46:56.857148  1  4 StorageProvider::FileSystemDB::store() begin
+09-08 20:46:56.857167  1  4 StorageProvider::FileSystemDB::store() args data=<{"document":{
+"document" : {
+"data" : {
+"prolog" : {
+"fhicl_pound_include_0" : "metrics.fcl",
+"ssp_standard" : {
+"metrics" : "@local::metrics",
+"max_fragment_size_words" : 262144,
+"fragment_receiver" : {
+"mpi_buffer_count" : 16,
+"mpi_sync_interval" : 24000,
+"first_event_builder_rank" : -1,
+"event_builder_count" : -1,
+"generator" : "SSP",
+"fragment_type" : "SSP",
+"interface_type" : 1,
+"verbosity" : 3,
+"DAQConfig" : {
+"MillisliceLength" : 10000000,
+"MillisliceOverlap" : 1000000,
+"UseExternalTimestamp" : 1,
+"StartOnNOvASync" : 1,
+"EmptyWriteDelay" : 1000000,
+"HardwareClockRate" : 64
+},
+"HardwareConfig" : {
+"eventDataInterfaceSelect" : 1,
+"ChannelControl" : {
+"ExtTriggerMode" : 1,
+"LEDTrigger" : 0,
+"TimestampRate" : 7
+},
+"ALL_channel_control" : 1,
+"ALL_led_threshold" : 100,
+"trigger_input_delay" : 55,
+"dsp_clock_control" : 19,
+"ALL_readout_window" : 700,
+"ALL_readout_pretrigger" : 50,
+"ALL_cfd_parameters" : 6144,
+"ALL_p_window" : 32,
+"ALL_i2_window" : 500,
+"ALL_m1_window" : 10,
+"ALL_m2_window" : 10,
+"ALL_d_window" : 20,
+"ALL_i1_window" : 500,
+"ALL_disc_width" : 10,
+"ALL_baseline_start" : 0,
+"ALL_bias_config" : 265488,
+"c2c_control" : 7,
+"c2c_master_intr_control" : 0,
+"comm_clock_control" : 1,
+"comm_led_config" : 0,
+"comm_led_input" : 0,
+"qi_dac_config" : 0,
+"qi_dac_control" : 1,
+"mon_config" : 1241088,
+"mon_select" : 16776960,
+"mon_gpio" : 0,
+"mon_control" : 65537,
+"c2c_slave_intr_control" : 0,
+"gpio_output_width" : 4096,
+"front_panel_config" : 4369,
+"dsp_led_config" : 0,
+"dsp_led_input" : 0,
+"baseline_delay" : 5,
+"diag_channel_input" : 0,
+"qi_config" : 268377856,
+"qi_delay" : 0,
+"qi_pulse_width" : 0,
+"external_gate_width" : 32768
+}
+}
+},
+"daq" : "@local::ssp_standard",
+"fhicl_pound_include_1" : "ssp_expert_run_options.fcl",
+"fhicl_pound_include_2" : "user_run_options.fcl",
+"ssp_standard" : "@local::daq",
+"ssp01_standard" : "@local::ssp_standard",
+"ssp01_standard.fragment_receiver.fragment_id" : "123",
+"ssp01_standard.fragment_receiver.board_id" : 0,
+"ssp01_standard.fragment_receiver.board_ip" : "192.168.1.109",
+"ssp01_standard.fragment_receiver.HardwareConfig.module_id" : 1,
+"ssp02_standard" : "@local::ssp_standard",
+"ssp02_standard.fragment_receiver.fragment_id" : 1,
+"ssp02_standard.fragment_receiver.board_id" : 1,
+"ssp02_standard.fragment_receiver.board_ip" : "192.168.1.117",
+"ssp02_standard.fragment_receiver.HardwareConfig.module_id" : 2,
+"ssp03_standard" : "@local::ssp_standard",
+"ssp03_standard.fragment_receiver.fragment_id" : 2,
+"ssp03_standard.fragment_receiver.board_id" : 2,
+"ssp03_standard.fragment_receiver.board_ip" : "192.168.1.113",
+"ssp03_standard.fragment_receiver.HardwareConfig.module_id" : 3,
+"ssp04_standard" : "@local::ssp_standard",
+"ssp04_standard.fragment_receiver.fragment_id" : 3,
+"ssp04_standard.fragment_receiver.board_id" : 3,
+"ssp04_standard.fragment_receiver.board_ip" : "192.168.1.110",
+"ssp04_standard.fragment_receiver.HardwareConfig.module_id" : 4,
+"ssp05_standard" : "@local::ssp_standard",
+"ssp05_standard.fragment_receiver.fragment_id" : 4,
+"ssp05_standard.fragment_receiver.board_id" : 4,
+"ssp05_standard.fragment_receiver.board_ip" : "192.168.1.114",
+"ssp05_standard.fragment_receiver.HardwareConfig.module_id" : 5,
+"ssp06_standard" : "@local::ssp_standard",
+"ssp06_standard.fragment_receiver.fragment_id" : 5,
+"ssp06_standard.fragment_receiver.board_id" : 5,
+"ssp06_standard.fragment_receiver.board_ip" : "192.168.1.106",
+"ssp06_standard.fragment_receiver.HardwareConfig.module_id" : 6,
+"ssp07_standard" : "@local::ssp_standard",
+"ssp07_standard.fragment_receiver.fragment_id" : 6,
+"ssp07_standard.fragment_receiver.board_id" : 6,
+"ssp07_standard.fragment_receiver.board_ip" : "192.168.1.105",
+"ssp07_standard.fragment_receiver.HardwareConfig.module_id" : 7,
+"ssp08_standard" : "@local::ssp_standard",
+"ssp08_standard.fragment_receiver.fragment_id" : 7,
+"ssp08_standard.fragment_receiver.board_id" : 7,
+"ssp08_standard.fragment_receiver.board_ip" : "192.168.1.105",
+"ssp08_standard.fragment_receiver.HardwareConfig.module_id" : 8
+},
+"ma
+09-08 20:46:56.905455  1 12 StorageProvider::FileSystemDB generate_oid=4900fb67751c4a05819c540e
+09-08 20:46:56.948753  1  4 StorageProvider::FileSystemDB::store() using generated oid=<4900fb67751c4a05819c540e>.
+09-08 20:46:56.948806  1  4 StorageProvider::FileSystemDB::store() collection_path=<file:///home/lukhanin/databases/filesystemdb/testLoadStore/>.
+09-08 20:46:56.948833  1 11 StorageProvider::FileSystemDB mkdir dir=</home/lukhanin/databases/filesystemdb/testLoadStore/>
+09-08 20:46:56.948869  1 11 StorageProvider::FileSystemDB Directory exists, checking permissions; path=</home/lukhanin/databases/filesystemdb/testLoadStore/>
+09-08 20:46:56.949024  1  4 StorageProvider::FileSystemDB::store() filename=</home/lukhanin/databases/filesystemdb/testLoadStore/4900fb67751c4a05819c540e.json>.
+09-08 20:46:57.098534  1  3 StorageProvider::FileSystemDB::index::_open() begin
+09-08 20:46:57.098554  1  3 StorageProvider::FileSystemDB::index::_open() args index_path=</home/lukhanin/databases/filesystemdb/testLoadStore/index.json>.
+09-08 20:46:57.098629  1  3 StorageProvider::FileSystemDB::index::_open() json=<{
+"version" : {
+"versionA79501" : [
+"e7a9231f2961481e99a11a98"
+],
+"versionB79501" : [
+"56f72df6341f4f80b678530a"
+],
+"versionC79501" : [
+"84d05571451044b28ae476e1"
+],
+"versionD79501" : [
+"d1c1b794a4874b4995dbedcf"
+],
+"versionZ59157" : [
+"dc72f71f22e04b06a3f1eb07"
+],
+"versionZ65077" : [
+"908b1210ad75409e8ba2c5fe"
+],
+"versionZ15893" : [
+"7c05e085e154466f969b2e32"
+]
+},
+"configurations.name" : {
+"notprovided" : [
+"56f72df6341f4f80b678530a",
+"84d05571451044b28ae476e1",
+"908b1210ad75409e8ba2c5fe",
+"d1c1b794a4874b4995dbedcf",
+"dc72f71f22e04b06a3f1eb07",
+"e7a9231f2961481e99a11a98"
+],
+"testConfigA03172016-174859" : [
+"7c05e085e154466f969b2e32"
+]
+},
+"configurable_entity.name" : {
+"notprovided" : [
+"56f72df6341f4f80b678530a",
+"e7a9231f2961481e99a11a98"
+],
+"ENTITY-testLoadStore" : [
+"7c05e085e154466f969b2e32",
+"84d05571451044b28ae476e1",
+"908b1210ad75409e8ba2c5fe",
+"d1c1b794a4874b4995dbedcf",
+"dc72f71f22e04b06a3f1eb07"
+]
+}
+}>
+09-08 20:46:57.099848  1  5 StorageProvider::FileSystemDB::index::addDocument() begin
+09-08 20:46:57.099864  1  5 StorageProvider::FileSystemDB::index::addDocument() args document=<{
+        "document" : {
+            "data" : {
+                "prolog" : {
+                    "fhicl_pound_include_0" : "metrics.fcl", 
+                    "ssp_standard" : {
+                        "metrics" : "@local::metrics", 
+                        "max_fragment_size_words" : 262144, 
+                        "fragment_receiver" : {
+                            "mpi_buffer_count" : 16, 
+                            "mpi_sync_interval" : 24000, 
+                            "first_event_builder_rank" : -1, 
+                            "event_builder_count" : -1, 
+                            "generator" : "SSP", 
+                            "fragment_type" : "SSP", 
+                            "interface_type" : 1, 
+                            "verbosity" : 3, 
+                            "DAQConfig" : {
+                                "MillisliceLength" : 10000000, 
+                                "MillisliceOverlap" : 1000000, 
+                                "UseExternalTimestamp" : 1, 
+                                "StartOnNOvASync" : 1, 
+                                "EmptyWriteDelay" : 1000000, 
+                                "HardwareClockRate" : 64
+                            }, 
+                            "HardwareConfig" : {
+                                "eventDataInterfaceSelect" : 1, 
+                                "ChannelControl" : {
+                                    "ExtTriggerMode" : 1, 
+                                    "LEDTrigger" : 0, 
+                                    "TimestampRate" : 7
+                                }, 
+                                "ALL_channel_control" : 1, 
+                                "ALL_led_threshold" : 100, 
+                                "trigger_input_delay" : 55, 
+                                "dsp_clock_control" : 19, 
+                                "ALL_readout_window" : 700, 
+                                "ALL_readout_pretrigger" : 50, 
+                                "ALL_cfd_parameters" : 6144, 
+                                "ALL_p_window" : 32, 
+                                "ALL_i2_window" : 500, 
+                                "ALL_m1_window" : 10, 
+                                "ALL_m2_window" : 10, 
+                                "ALL_d_window" : 20, 
+                                "ALL_i1_window" : 500, 
+                                "ALL_disc_width" : 10, 
+                                "ALL_baseline_start" : 0, 
+                                "ALL_bias_config" : 265488, 
+                                "c2c_control" : 7, 
+                                "c2c_master_intr_control" : 0, 
+                                "comm_clock_control" : 1, 
+                                "comm_led_config" : 0, 
+                                "comm_led_input" : 0, 
+                                "qi_dac_config" : 0, 
+                                "qi_dac_control" : 1, 
+                                "mon_config" : 1241088, 
+                                "mon_select" : 16776960, 
+                                "mon_gpio" : 0, 
+                                "mon_control" : 65537, 
+                                "c2c_slave_intr_control" : 0, 
+                                "gpio_output_width" : 4096, 
+                                "front_panel_config" : 4369, 
+                                "dsp_led_config" : 0, 
+                                "dsp_led_input" : 0, 
+                                "baseline_delay" : 5, 
+                                "diag_channel_input" : 0, 
+                                "qi_config" : 268377856, 
+                                "qi_delay" : 0, 
+                                "qi_pulse_width" : 0, 
+                                "external_gate_width" : 32768
+                            }
+                        }
+                    }, 
+                    "daq" : "@local::ssp_standard", 
+                    "fhicl_pound_include_1" : "ssp_expert_run_options.fcl", 
+                    "
+09-08 20:46:57.099993  1  5 StorageProvider::FileSystemDB::index::addDocument() args ouid=<4900fb67751c4a05819c540e>.
+09-08 20:46:57.122520  1  5 StorageProvider::FileSystemDB::index::addDocument() found 9 keys.
+09-08 20:46:57.122534  1  7 StorageProvider::FileSystemDB::index::_addVersion() begin
+09-08 20:46:57.122537  1  7 StorageProvider::FileSystemDB::index::_addVersion() args ouid=<4900fb67751c4a05819c540e>.
+09-08 20:46:57.122541  1  7 StorageProvider::FileSystemDB::index::_addVersion() args version=<versionZ97397>.
+09-08 20:46:57.122673  1  7 StorageProvider::FileSystemDB::index::_addConfiguration() begin
+09-08 20:46:57.122679  1  7 StorageProvider::FileSystemDB::index::_addConfiguration() args ouid=<4900fb67751c4a05819c540e>.
+09-08 20:46:57.122682  1  7 StorageProvider::FileSystemDB::index::_addConfiguration() args configuration=<testConfigA03172016-174859>.
+09-08 20:46:57.122715  1  7 StorageProvider::FileSystemDB::index::_addConfigurableEntity() begin
+09-08 20:46:57.122719  1  7 StorageProvider::FileSystemDB::index::_addConfigurableEntity() args ouid=<4900fb67751c4a05819c540e>.
+09-08 20:46:57.122723  1  7 StorageProvider::FileSystemDB::index::_addConfigurableEntity() args entity=<ENTITY-testLoadStore>.
+09-08 20:46:57.122815  1  4 StorageProvider::FileSystemDB::index::_close() begin
+09-08 20:46:57.123591  1  4 StorageProvider::FileSystemDB::index::_close() json=<{
+"version" : {
+"versionA79501" : [
+"e7a9231f2961481e99a11a98"
+],
+"versionB79501" : [
+"56f72df6341f4f80b678530a"
+],
+"versionC79501" : [
+"84d05571451044b28ae476e1"
+],
+"versionD79501" : [
+"d1c1b794a4874b4995dbedcf"
+],
+"versionZ59157" : [
+"dc72f71f22e04b06a3f1eb07"
+],
+"versionZ65077" : [
+"908b1210ad75409e8ba2c5fe"
+],
+"versionZ15893" : [
+"7c05e085e154466f969b2e32"
+],
+"versionZ97397" : [
+"4900fb67751c4a05819c540e"
+]
+},
+"configurations.name" : {
+"notprovided" : [
+"56f72df6341f4f80b678530a",
+"84d05571451044b28ae476e1",
+"908b1210ad75409e8ba2c5fe",
+"d1c1b794a4874b4995dbedcf",
+"dc72f71f22e04b06a3f1eb07",
+"e7a9231f2961481e99a11a98"
+],
+"testConfigA03172016-174859" : [
+"4900fb67751c4a05819c540e",
+"7c05e085e154466f969b2e32"
+]
+},
+"configurable_entity.name" : {
+"notprovided" : [
+"56f72df6341f4f80b678530a",
+"e7a9231f2961481e99a11a98"
+],
+"ENTITY-testLoadStore" : [
+"4900fb67751c4a05819c540e",
+"7c05e085e154466f969b2e32",
+"84d05571451044b28ae476e1",
+"908b1210ad75409e8ba2c5fe",
+"d1c1b794a4874b4995dbedcf",
+"dc72f71f22e04b06a3f1eb07"
+]
+}
+}>
+09-08 20:46:57.123699  1  4 StorageProvider::FileSystemDB::index::_close() Closed SearchIndex.
+09-08 20:46:57.123826  1 15 store_configuration: end
+Parsed options:
+{
+"filter" : {
+"version" : "versionZ97397",
+"configurable_entity.name" : "ENTITY-testLoadStore"
+},
+"dbprovider" : "filesystem",
+"operation" : "store",
+"collection" : "testLoadStore",
+"dataformat" : "gui",
+"configuration" : "testConfigA03172016-174859"
+}
+Running test:<store>
+returned:
+{
+"document" : {
+"data" : {
+"prolog" : {
+"fhicl_pound_include_0" : "metrics.fcl",
+"ssp_standard" : {
+"metrics" : "@local::metrics",
+"max_fragment_size_words" : 262144,
+"fragment_receiver" : {
+"mpi_buffer_count" : 16,
+"mpi_sync_interval" : 24000,
+"first_event_builder_rank" : -1,
+"event_builder_count" : -1,
+"generator" : "SSP",
+"fragment_type" : "SSP",
+"interface_type" : 1,
+"verbosity" : 3,
+"DAQConfig" : {
+"MillisliceLength" : 10000000,
+"MillisliceOverlap" : 1000000,
+"UseExternalTimestamp" : 1,
+"StartOnNOvASync" : 1,
+"EmptyWriteDelay" : 1000000,
+"HardwareClockRate" : 64
+},
+"HardwareConfig" : {
+"eventDataInterfaceSelect" : 1,
+"ChannelControl" : {
+"ExtTriggerMode" : 1,
+"LEDTrigger" : 0,
+"TimestampRate" : 7
+},
+"ALL_channel_control" : 1,
+"ALL_led_threshold" : 100,
+"trigger_input_delay" : 55,
+"dsp_clock_control" : 19,
+"ALL_readout_window" : 700,
+"ALL_readout_pretrigger" : 50,
+"ALL_cfd_parameters" : 6144,
+"ALL_p_window" : 32,
+"ALL_i2_window" : 500,
+"ALL_m1_window" : 10,
+"ALL_m2_window" : 10,
+"ALL_d_window" : 20,
+"ALL_i1_window" : 500,
+"ALL_disc_width" : 10,
+"ALL_baseline_start" : 0,
+"ALL_bias_config" : 265488,
+"c2c_control" : 7,
+"c2c_master_intr_control" : 0,
+"comm_clock_control" : 1,
+"comm_led_config" : 0,
+"comm_led_input" : 0,
+"qi_dac_config" : 0,
+"qi_dac_control" : 1,
+"mon_config" : 1241088,
+"mon_select" : 16776960,
+"mon_gpio" : 0,
+"mon_control" : 65537,
+"c2c_slave_intr_control" : 0,
+"gpio_output_width" : 4096,
+"front_panel_config" : 4369,
+"dsp_led_config" : 0,
+"dsp_led_input" : 0,
+"baseline_delay" : 5,
+"diag_channel_input" : 0,
+"qi_config" : 268377856,
+"qi_delay" : 0,
+"qi_pulse_width" : 0,
+"external_gate_width" : 32768
+}
+}
+},
+"daq" : "@local::ssp_standard",
+"fhicl_pound_include_1" : "ssp_expert_run_options.fcl",
+"fhicl_pound_include_2" : "user_run_options.fcl",
+"ssp_standard" : "@local::daq",
+"ssp01_standard" : "@local::ssp_standard",
+"ssp01_standard.fragment_receiver.fragment_id" : "123",
+"ssp01_standard.fragment_receiver.board_id" : 0,
+"ssp01_standard.fragment_receiver.board_ip" : "192.168.1.109",
+"ssp01_standard.fragment_receiver.HardwareConfig.module_id" : 1,
+"ssp02_standard" : "@local::ssp_standard",
+"ssp02_standard.fragment_receiver.fragment_id" : 1,
+"ssp02_standard.fragment_receiver.board_id" : 1,
+"ssp02_standard.fragment_receiver.board_ip" : "192.168.1.117",
+"ssp02_standard.fragment_receiver.HardwareConfig.module_id" : 2,
+"ssp03_standard" : "@local::ssp_standard",
+"ssp03_standard.fragment_receiver.fragment_id" : 2,
+"ssp03_standard.fragment_receiver.board_id" : 2,
+"ssp03_standard.fragment_receiver.board_ip" : "192.168.1.113",
+"ssp03_standard.fragment_receiver.HardwareConfig.module_id" : 3,
+"ssp04_standard" : "@local::ssp_standard",
+"ssp04_standard.fragment_receiver.fragment_id" : 3,
+"ssp04_standard.fragment_receiver.board_id" : 3,
+"ssp04_standard.fragment_receiver.board_ip" : "192.168.1.110",
+"ssp04_standard.fragment_receiver.HardwareConfig.module_id" : 4,
+"ssp05_standard" : "@local::ssp_standard",
+"ssp05_standard.fragment_receiver.fragment_id" : 4,
+"ssp05_standard.fragment_receiver.board_id" : 4,
+"ssp05_standard.fragment_receiver.board_ip" : "192.168.1.114",
+"ssp05_standard.fragment_receiver.HardwareConfig.module_id" : 5,
+"ssp06_standard" : "@local::ssp_standard",
+"ssp06_standard.fragment_receiver.fragment_id" : 5,
+"ssp06_standard.fragment_receiver.board_id" : 5,
+"ssp06_standard.fragment_receiver.board_ip" : "192.168.1.106",
+"ssp06_standard.fragment_receiver.HardwareConfig.module_id" : 6,
+"ssp07_standard" : "@local::ssp_standard",
+"ssp07_standard.fragment_receiver.fragment_id" : 6,
+"ssp07_standard.fragment_receiver.board_id" : 6,
+"ssp07_standard.fragment_receiver.board_ip" : "192.168.1.105",
+"ssp07_standard.fragment_receiver.HardwareConfig.module_id" : 7,
+"ssp08_standard" : "@local::ssp_standard",
+"ssp08_standard.fragment_receiver.fragment_id" : 7,
+"ssp08_standard.fragment_receiver.board_id" : 7,
+"ssp08_standard.fragment_receiver.board_ip" : "192.168.1.105",
+"ssp08_standard.fragment_receiver.HardwareConfig.module_id" : 8
+},
+"main" : {
+
+}
+},
+"metadata" : {
+"prolog" : {
+"type" : "table",
+"comment" : "#prolog",
+"children" : {
+"fhicl_pound_include_0" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp_standard" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"metrics" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"max_fragment_size_words" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"fragment_receiver" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"mpi_buffer_count" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"mpi_sync_interval" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"first_event_builder_rank" : {
+"type" : "number",
+"comment" : "# These two variables will be calculated by DAQInterface...",
+"annotation" : " "
+},
+"event_builder_count" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"generator" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : "###Don^t edit these lines"
+},
+"fragment_type" : {
+"type" : "string",
+"comment" : "###Don^t edit these lines",
+"annotation" : "###"
+},
+"interface_type" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "### 0=USB, 1=Ethernet, 2=Emulated"
+},
+"verbosity" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#0=silent, no errors or warnings."
+},
+"DAQConfig" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"MillisliceLength" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#Amount of time to assign to a single fragment in clock ticks"
+},
+"MillisliceOverlap" : {
+"type" : "number",
+"comment" : "#Amount of time to assign to a single fragment in clock ticks",
+"annotation" : "#Amount at start of next fragment to also put into current fragment"
+},
+"UseExternalTimestamp" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#0=Use internal timestamp to split events into millislices, 1=Use NOvA timestamp."
+},
+"StartOnNOvASync" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#Tell SSP to wait for sync pulse from NOvA timing unit before taking data."
+},
+"EmptyWriteDelay" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#Time in us that DAQ will wait for SSP events, before starting to build and send"
+},
+"HardwareClockRate" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#in MHz. Must be 64 for NOvA timestamping, 150 for internal."
+}
+}
+},
+"HardwareConfig" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"eventDataInterfaceSelect" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#0=USB, 1=Ethernet"
+},
+"ChannelControl" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"ExtTriggerMode" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#0=no external trigger"
+},
+"LEDTrigger" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#0=no leading edge trigger"
+},
+"TimestampRate" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#0=292.969kHz"
+}
+}
+},
+"ALL_channel_control" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ALL_led_threshold" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#Leading edge trigger threshold in ADC"
+},
+"trigger_input_delay" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#Delay to apply to front panel trigger."
+},
+"dsp_clock_control" : {
+"type" : "number",
+"comment" : "#Use NOvA TDU",
+"annotation" : "# Bit |  Meaning "
+},
+"ALL_readout_window" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#Number of ADC samples to read out"
+},
+"ALL_readout_pretrigger" : {
+"type" : "number",
+"comment" : "#Number of ADC samples to read out",
+"annotation" : "#Of which before trigger time"
+},
+"ALL_cfd_parameters" : {
+"type" : "number",
+"comment" : "#Leave alone unless you know what you^re doing!",
+"annotation" : " "
+},
+"ALL_p_window" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ALL_i2_window" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ALL_m1_window" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ALL_m2_window" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ALL_d_window" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ALL_i1_window" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ALL_disc_width" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ALL_baseline_start" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ALL_bias_config" : {
+"type" : "number",
+"comment" : "#ALL_bias_config:           0x00040E21 # 26.5V",
+"annotation" : "# 24.5V"
+},
+"c2c_control" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"c2c_master_intr_control" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"comm_clock_control" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"comm_led_config" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"comm_led_input" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"qi_dac_config" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"qi_dac_control" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"mon_config" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"mon_select" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"mon_gpio" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"mon_control" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"c2c_slave_intr_control" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"gpio_output_width" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"front_panel_config" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "# standard config?"
+},
+"dsp_led_config" : {
+"type" : "number",
+"comment" : "# standard config?",
+"annotation" : " "
+},
+"dsp_led_input" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"baseline_delay" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"diag_channel_input" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"qi_config" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"qi_delay" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"qi_pulse_width" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"external_gate_width" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+}
+}
+}
+},
+"daq" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"fhicl_pound_include_1" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"fhicl_pound_include_2" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp_standard" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp01_standard" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp01_standard.fragment_receiver.fragment_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp01_standard.fragment_receiver.board_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp01_standard.fragment_receiver.board_ip" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp01_standard.fragment_receiver.HardwareConfig.module_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp02_standard" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp02_standard.fragment_receiver.fragment_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp02_standard.fragment_receiver.board_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp02_standard.fragment_receiver.board_ip" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp02_standard.fragment_receiver.HardwareConfig.module_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp03_standard" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp03_standard.fragment_receiver.fragment_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp03_standard.fragment_receiver.board_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp03_standard.fragment_receiver.board_ip" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp03_standard.fragment_receiver.HardwareConfig.module_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp04_standard" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp04_standard.fragment_receiver.fragment_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp04_standard.fragment_receiver.board_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp04_standard.fragment_receiver.board_ip" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp04_standard.fragment_receiver.HardwareConfig.module_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp05_standard" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp05_standard.fragment_receiver.fragment_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp05_standard.fragment_receiver.board_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp05_standard.fragment_receiver.board_ip" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp05_standard.fragment_receiver.HardwareConfig.module_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp06_standard" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp06_standard.fragment_receiver.fragment_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp06_standard.fragment_receiver.board_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp06_standard.fragment_receiver.board_ip" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp06_standard.fragment_receiver.HardwareConfig.module_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp07_standard" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp07_standard.fragment_receiver.fragment_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp07_standard.fragment_receiver.board_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp07_standard.fragment_receiver.board_ip" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp07_standard.fragment_receiver.HardwareConfig.module_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp08_standard" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp08_standard.fragment_receiver.fragment_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp08_standard.fragment_receiver.board_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp08_standard.fragment_receiver.board_ip" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp08_standard.fragment_receiver.HardwareConfig.module_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+}
+}
+},
+"main" : {
+"type" : "table",
+"comment" : "#main",
+"children" : {
+
+}
+}
+},
+"search" : [
+{
+"name" : "find any",
+"query" : "not defined"
+}
+],
+"converted" : {
+
+}
+},
+"source" : {
+"encoding" : "base64",
+"format" : "json",
+"rawdata" : "as"
+},
+"version" : "demoVersion002",
+"configurations" : [
+{
+"name" : "demoConfig001",
+"assigned" : "Thu Sep  8 19:38:10 2016"
+}
+],
+"aliases" : {
+"active" : [
+
+],
+"history" : [
+
+]
+},
+"changelog" : "empty",
+"bookkeeping" : {
+"isdeleted" : false,
+"isreadonly" : true,
+"created" : "Tue Dec 29 18:19:25 2015",
+"updates" : [
+{
+"addToGlobalConfig" : "Thu Sep  8 19:38:10 2016"
+},
+{
+"setVersion" : "Thu Sep  8 19:38:10 2016"
+},
+{
+"setConfigurableEntity" : "Thu Sep  8 19:38:10 2016"
+}
+]
+},
+"configurable_entity" : {
+"name" : "notprovided"
+},
+"_id" : {
+"_oid" : "15781635e2564d60ac331274"
+}
+}
+<end of output>
+Test time =   0.97 sec
+----------------------------------------------------------
+Test Passed.
+"LoadStore_store_filesystem_020_t" end time: Sep 08 20:46 CDT
+"LoadStore_store_filesystem_020_t" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/2 Testing: LoadStore_store_filesystem_021_t
+2/2 Test: LoadStore_store_filesystem_021_t
+Command: "/home/lukhanin/scratch/current/artdaq-demo-base/products/cetbuildtools/v5_04_03/bin/cet_exec_test" "--wd" "/home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/test/ConfigurationDB/LoadStore/test021/LoadStore_store_filesystem_021_t.d" "--required-files" "" "--datafiles" "/home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/test/ConfigurationDB/LoadStore/test021/test011.src.046.json;/home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/test/ConfigurationDB/LoadStore/test021/test011.cmp.046.json;/home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/test/ConfigurationDB/LoadStore/test021/test011.flt.046.json" "--skip-return-code" "247" "LoadStore_t" "--searchquery=test011.flt.046.json" "-s" "test011.src.046.json" "-r" "test011.cmp.046.json"
+Directory: /home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/test/ConfigurationDB/LoadStore/test021/LoadStore_store_filesystem_021_t.d
+"LoadStore_store_filesystem_021_t" start time: Sep 08 20:46 CDT
+Output:
+----------------------------------------------------------
+09-08 20:46:57.217894  1  0 artdaq::database::filesystem trace_enable
+09-08 20:46:57.218074  1  0 artdaq::database::filesystem::index trace_enable
+09-08 20:46:57.218158  1  0 artdaq::database::mongo trace_enable
+09-08 20:46:57.218267  1  0 artdaq::database::configuration::LoadStoreOperation trace_enable
+09-08 20:46:57.218335  1  0 artdaq::database::configuration::options::OperationBase trace_enable
+09-08 20:46:57.218372  1  0 artdaq::database::configuration::options::OperationLoadStore trace_enable
+09-08 20:46:57.218400  1  0 artdaq::database::configuration::LoadStoreOperationDetail trace_enable
+09-08 20:46:57.220389  1 14 Options: json query= <{
+   "configurable_entity":"ENTITY-testLoadStore",
+   "version":"versionZ97397",
+   "configuration":"testConfigA03172016-174859",
+   "collection":"testLoadStore",
+   "dbprovider":"filesystem",
+   "operation":"store",
+   "dataformat":"gui"
+}
+>
+09-08 20:46:57.220435  1 14 OperationBase::readJsonData() data=<{
+   "configurable_entity":"ENTITY-testLoadStore",
+   "version":"versionZ97397",
+   "configuration":"testConfigA03172016-174859",
+   "collection":"testLoadStore",
+   "dbprovider":"filesystem",
+   "operation":"store",
+   "dataformat":"gui"
+}
+>
+09-08 20:46:57.226743  1 12 Options: Updating provider from filesystem to filesystem.
+09-08 20:46:57.226774  1 10 Options: Updating operation from load to store.
+09-08 20:46:57.226783  1 14 Options: dataFormat args format=<gui>.
+09-08 20:46:57.226794  1 11 Options: Updating collection_name from notprovided to testLoadStore.
+09-08 20:46:57.227763  1 12 Options: Updating global_configuration from notprovided to testConfigA03172016-174859.
+09-08 20:46:57.227780  1 10 Options: Updating version from notprovided to versionZ97397.
+09-08 20:46:57.227789  1 11 Options: Updating entity from notprovided to ENTITY-testLoadStore.
+09-08 20:46:57.227835  1  1 Options() no filter provided <{
+   "configurable_entity":"ENTITY-testLoadStore",
+   "version":"versionZ97397",
+   "configuration":"testConfigA03172016-174859",
+   "collection":"testLoadStore",
+   "dbprovider":"filesystem",
+   "operation":"store",
+   "dataformat":"gui"
+}
+>
+09-08 20:46:57.237132  1 14 OperationBase::readJsonData() data=<{
+"filter" : {
+"version" : "versionZ97397",
+"configurable_entity.name" : "ENTITY-testLoadStore",
+"configurations.name" : "testConfigA03172016-174859"
+},
+"dbprovider" : "filesystem",
+"operation" : "store",
+"collection" : "testLoadStore",
+"dataformat" : "gui",
+"configuration" : "testConfigA03172016-174859"
+}>
+09-08 20:46:57.237835  1 12 Options: Updating provider from filesystem to filesystem.
+09-08 20:46:57.237849  1 10 Options: Updating operation from load to store.
+09-08 20:46:57.237856  1 14 Options: dataFormat args format=<gui>.
+09-08 20:46:57.237863  1 11 Options: Updating collection_name from notprovided to testLoadStore.
+09-08 20:46:57.238067  1 15 Options: searchFilter args search_filter=<{
+"version" : "versionZ97397",
+"configurable_entity.name" : "ENTITY-testLoadStore",
+"configurations.name" : "testConfigA03172016-174859"
+}>.
+09-08 20:46:57.238769  1 12 Options: Updating global_configuration from notprovided to testConfigA03172016-174859.
+09-08 20:46:57.238835  1 10 Options: Updating version from notprovided to versionZ97397.
+09-08 20:46:57.238845  1 11 Options: Updating entity from notprovided to ENTITY-testLoadStore.
+09-08 20:46:57.238852  1 12 Options: Updating global_configuration from testConfigA03172016-174859 to testConfigA03172016-174859.
+09-08 20:46:57.238865  1 15 store_configuration: begin
+09-08 20:46:57.323581  1 15 store_configuration: json_buffer=<{
+"document" : {
+"data" : {
+"prolog" : {
+"fhicl_pound_include_0" : "metrics.fcl",
+"ssp_standard" : {
+"metrics" : "@local::metrics",
+"max_fragment_size_words" : 262144,
+"fragment_receiver" : {
+"mpi_buffer_count" : 16,
+"mpi_sync_interval" : 24000,
+"first_event_builder_rank" : -1,
+"event_builder_count" : -1,
+"generator" : "SSP",
+"fragment_type" : "SSP",
+"interface_type" : 1,
+"verbosity" : 3,
+"DAQConfig" : {
+"MillisliceLength" : 10000000,
+"MillisliceOverlap" : 1000000,
+"UseExternalTimestamp" : 1,
+"StartOnNOvASync" : 1,
+"EmptyWriteDelay" : 1000000,
+"HardwareClockRate" : 64
+},
+"HardwareConfig" : {
+"eventDataInterfaceSelect" : 1,
+"ChannelControl" : {
+"ExtTriggerMode" : 1,
+"LEDTrigger" : 0,
+"TimestampRate" : 7
+},
+"ALL_channel_control" : 1,
+"ALL_led_threshold" : 100,
+"trigger_input_delay" : 55,
+"dsp_clock_control" : 19,
+"ALL_readout_window" : 700,
+"ALL_readout_pretrigger" : 50,
+"ALL_cfd_parameters" : 6144,
+"ALL_p_window" : 32,
+"ALL_i2_window" : 500,
+"ALL_m1_window" : 10,
+"ALL_m2_window" : 10,
+"ALL_d_window" : 20,
+"ALL_i1_window" : 500,
+"ALL_disc_width" : 10,
+"ALL_baseline_start" : 0,
+"ALL_bias_config" : 265488,
+"c2c_control" : 7,
+"c2c_master_intr_control" : 0,
+"comm_clock_control" : 1,
+"comm_led_config" : 0,
+"comm_led_input" : 0,
+"qi_dac_config" : 0,
+"qi_dac_control" : 1,
+"mon_config" : 1241088,
+"mon_select" : 16776960,
+"mon_gpio" : 0,
+"mon_control" : 65537,
+"c2c_slave_intr_control" : 0,
+"gpio_output_width" : 4096,
+"front_panel_config" : 4369,
+"dsp_led_config" : 0,
+"dsp_led_input" : 0,
+"baseline_delay" : 5,
+"diag_channel_input" : 0,
+"qi_config" : 268377856,
+"qi_delay" : 0,
+"qi_pulse_width" : 0,
+"external_gate_width" : 32768
+}
+}
+},
+"daq" : "@local::ssp_standard",
+"fhicl_pound_include_1" : "ssp_expert_run_options.fcl",
+"fhicl_pound_include_2" : "user_run_options.fcl",
+"ssp_standard" : "@local::daq",
+"ssp01_standard" : "@local::ssp_standard",
+"ssp01_standard.fragment_receiver.fragment_id" : "123",
+"ssp01_standard.fragment_receiver.board_id" : 0,
+"ssp01_standard.fragment_receiver.board_ip" : "192.168.1.109",
+"ssp01_standard.fragment_receiver.HardwareConfig.module_id" : 1,
+"ssp02_standard" : "@local::ssp_standard",
+"ssp02_standard.fragment_receiver.fragment_id" : 1,
+"ssp02_standard.fragment_receiver.board_id" : 1,
+"ssp02_standard.fragment_receiver.board_ip" : "192.168.1.117",
+"ssp02_standard.fragment_receiver.HardwareConfig.module_id" : 2,
+"ssp03_standard" : "@local::ssp_standard",
+"ssp03_standard.fragment_receiver.fragment_id" : 2,
+"ssp03_standard.fragment_receiver.board_id" : 2,
+"ssp03_standard.fragment_receiver.board_ip" : "192.168.1.113",
+"ssp03_standard.fragment_receiver.HardwareConfig.module_id" : 3,
+"ssp04_standard" : "@local::ssp_standard",
+"ssp04_standard.fragment_receiver.fragment_id" : 3,
+"ssp04_standard.fragment_receiver.board_id" : 3,
+"ssp04_standard.fragment_receiver.board_ip" : "192.168.1.110",
+"ssp04_standard.fragment_receiver.HardwareConfig.module_id" : 4,
+"ssp05_standard" : "@local::ssp_standard",
+"ssp05_standard.fragment_receiver.fragment_id" : 4,
+"ssp05_standard.fragment_receiver.board_id" : 4,
+"ssp05_standard.fragment_receiver.board_ip" : "192.168.1.114",
+"ssp05_standard.fragment_receiver.HardwareConfig.module_id" : 5,
+"ssp06_standard" : "@local::ssp_standard",
+"ssp06_standard.fragment_receiver.fragment_id" : 5,
+"ssp06_standard.fragment_receiver.board_id" : 5,
+"ssp06_standard.fragment_receiver.board_ip" : "192.168.1.106",
+"ssp06_standard.fragment_receiver.HardwareConfig.module_id" : 6,
+"ssp07_standard" : "@local::ssp_standard",
+"ssp07_standard.fragment_receiver.fragment_id" : 6,
+"ssp07_standard.fragment_receiver.board_id" : 6,
+"ssp07_standard.fragment_receiver.board_ip" : "192.168.1.105",
+"ssp07_standard.fragment_receiver.HardwareConfig.module_id" : 7,
+"ssp08_standard" : "@local::ssp_standard",
+"ssp08_standard.fragment_receiver.fragment_id" : 7,
+"ssp08_standard.fragment_receiver.board_id" : 7,
+"ssp08_standard.fragment_receiver.board_ip" : "192.168.1.105",
+"ssp08_standard.fragment_receiver.HardwareConfig.module_id" : 8
+},
+"main" : {
+
+}
+},
+"metadata" : {
+09-08 20:46:57.838090  1 15 store_configuration: insert_payload=<{"document":{
+"document" : {
+"data" : {
+"prolog" : {
+"fhicl_pound_include_0" : "metrics.fcl",
+"ssp_standard" : {
+"metrics" : "@local::metrics",
+"max_fragment_size_words" : 262144,
+"fragment_receiver" : {
+"mpi_buffer_count" : 16,
+"mpi_sync_interval" : 24000,
+"first_event_builder_rank" : -1,
+"event_builder_count" : -1,
+"generator" : "SSP",
+"fragment_type" : "SSP",
+"interface_type" : 1,
+"verbosity" : 3,
+"DAQConfig" : {
+"MillisliceLength" : 10000000,
+"MillisliceOverlap" : 1000000,
+"UseExternalTimestamp" : 1,
+"StartOnNOvASync" : 1,
+"EmptyWriteDelay" : 1000000,
+"HardwareClockRate" : 64
+},
+"HardwareConfig" : {
+"eventDataInterfaceSelect" : 1,
+"ChannelControl" : {
+"ExtTriggerMode" : 1,
+"LEDTrigger" : 0,
+"TimestampRate" : 7
+},
+"ALL_channel_control" : 1,
+"ALL_led_threshold" : 100,
+"trigger_input_delay" : 55,
+"dsp_clock_control" : 19,
+"ALL_readout_window" : 700,
+"ALL_readout_pretrigger" : 50,
+"ALL_cfd_parameters" : 6144,
+"ALL_p_window" : 32,
+"ALL_i2_window" : 500,
+"ALL_m1_window" : 10,
+"ALL_m2_window" : 10,
+"ALL_d_window" : 20,
+"ALL_i1_window" : 500,
+"ALL_disc_width" : 10,
+"ALL_baseline_start" : 0,
+"ALL_bias_config" : 265488,
+"c2c_control" : 7,
+"c2c_master_intr_control" : 0,
+"comm_clock_control" : 1,
+"comm_led_config" : 0,
+"comm_led_input" : 0,
+"qi_dac_config" : 0,
+"qi_dac_control" : 1,
+"mon_config" : 1241088,
+"mon_select" : 16776960,
+"mon_gpio" : 0,
+"mon_control" : 65537,
+"c2c_slave_intr_control" : 0,
+"gpio_output_width" : 4096,
+"front_panel_config" : 4369,
+"dsp_led_config" : 0,
+"dsp_led_input" : 0,
+"baseline_delay" : 5,
+"diag_channel_input" : 0,
+"qi_config" : 268377856,
+"qi_delay" : 0,
+"qi_pulse_width" : 0,
+"external_gate_width" : 32768
+}
+}
+},
+"daq" : "@local::ssp_standard",
+"fhicl_pound_include_1" : "ssp_expert_run_options.fcl",
+"fhicl_pound_include_2" : "user_run_options.fcl",
+"ssp_standard" : "@local::daq",
+"ssp01_standard" : "@local::ssp_standard",
+"ssp01_standard.fragment_receiver.fragment_id" : "123",
+"ssp01_standard.fragment_receiver.board_id" : 0,
+"ssp01_standard.fragment_receiver.board_ip" : "192.168.1.109",
+"ssp01_standard.fragment_receiver.HardwareConfig.module_id" : 1,
+"ssp02_standard" : "@local::ssp_standard",
+"ssp02_standard.fragment_receiver.fragment_id" : 1,
+"ssp02_standard.fragment_receiver.board_id" : 1,
+"ssp02_standard.fragment_receiver.board_ip" : "192.168.1.117",
+"ssp02_standard.fragment_receiver.HardwareConfig.module_id" : 2,
+"ssp03_standard" : "@local::ssp_standard",
+"ssp03_standard.fragment_receiver.fragment_id" : 2,
+"ssp03_standard.fragment_receiver.board_id" : 2,
+"ssp03_standard.fragment_receiver.board_ip" : "192.168.1.113",
+"ssp03_standard.fragment_receiver.HardwareConfig.module_id" : 3,
+"ssp04_standard" : "@local::ssp_standard",
+"ssp04_standard.fragment_receiver.fragment_id" : 3,
+"ssp04_standard.fragment_receiver.board_id" : 3,
+"ssp04_standard.fragment_receiver.board_ip" : "192.168.1.110",
+"ssp04_standard.fragment_receiver.HardwareConfig.module_id" : 4,
+"ssp05_standard" : "@local::ssp_standard",
+"ssp05_standard.fragment_receiver.fragment_id" : 4,
+"ssp05_standard.fragment_receiver.board_id" : 4,
+"ssp05_standard.fragment_receiver.board_ip" : "192.168.1.114",
+"ssp05_standard.fragment_receiver.HardwareConfig.module_id" : 5,
+"ssp06_standard" : "@local::ssp_standard",
+"ssp06_standard.fragment_receiver.fragment_id" : 5,
+"ssp06_standard.fragment_receiver.board_id" : 5,
+"ssp06_standard.fragment_receiver.board_ip" : "192.168.1.106",
+"ssp06_standard.fragment_receiver.HardwareConfig.module_id" : 6,
+"ssp07_standard" : "@local::ssp_standard",
+"ssp07_standard.fragment_receiver.fragment_id" : 6,
+"ssp07_standard.fragment_receiver.board_id" : 6,
+"ssp07_standard.fragment_receiver.board_ip" : "192.168.1.105",
+"ssp07_standard.fragment_receiver.HardwareConfig.module_id" : 7,
+"ssp08_standard" : "@local::ssp_standard",
+"ssp08_standard.fragment_receiver.fragment_id" : 7,
+"ssp08_standard.fragment_receiver.board_id" : 7,
+"ssp08_standard.fragment_receiver.board_ip" : "192.168.1.105",
+"ssp08_standard.fragment_receiver.HardwareConfig.module_id" : 8
+},
+"main" : {
+
+}
+},
+09-08 20:46:57.838322  1  4 StorageProvider::FileSystemDB::store() begin
+09-08 20:46:57.838342  1  4 StorageProvider::FileSystemDB::store() args data=<{"document":{
+"document" : {
+"data" : {
+"prolog" : {
+"fhicl_pound_include_0" : "metrics.fcl",
+"ssp_standard" : {
+"metrics" : "@local::metrics",
+"max_fragment_size_words" : 262144,
+"fragment_receiver" : {
+"mpi_buffer_count" : 16,
+"mpi_sync_interval" : 24000,
+"first_event_builder_rank" : -1,
+"event_builder_count" : -1,
+"generator" : "SSP",
+"fragment_type" : "SSP",
+"interface_type" : 1,
+"verbosity" : 3,
+"DAQConfig" : {
+"MillisliceLength" : 10000000,
+"MillisliceOverlap" : 1000000,
+"UseExternalTimestamp" : 1,
+"StartOnNOvASync" : 1,
+"EmptyWriteDelay" : 1000000,
+"HardwareClockRate" : 64
+},
+"HardwareConfig" : {
+"eventDataInterfaceSelect" : 1,
+"ChannelControl" : {
+"ExtTriggerMode" : 1,
+"LEDTrigger" : 0,
+"TimestampRate" : 7
+},
+"ALL_channel_control" : 1,
+"ALL_led_threshold" : 100,
+"trigger_input_delay" : 55,
+"dsp_clock_control" : 19,
+"ALL_readout_window" : 700,
+"ALL_readout_pretrigger" : 50,
+"ALL_cfd_parameters" : 6144,
+"ALL_p_window" : 32,
+"ALL_i2_window" : 500,
+"ALL_m1_window" : 10,
+"ALL_m2_window" : 10,
+"ALL_d_window" : 20,
+"ALL_i1_window" : 500,
+"ALL_disc_width" : 10,
+"ALL_baseline_start" : 0,
+"ALL_bias_config" : 265488,
+"c2c_control" : 7,
+"c2c_master_intr_control" : 0,
+"comm_clock_control" : 1,
+"comm_led_config" : 0,
+"comm_led_input" : 0,
+"qi_dac_config" : 0,
+"qi_dac_control" : 1,
+"mon_config" : 1241088,
+"mon_select" : 16776960,
+"mon_gpio" : 0,
+"mon_control" : 65537,
+"c2c_slave_intr_control" : 0,
+"gpio_output_width" : 4096,
+"front_panel_config" : 4369,
+"dsp_led_config" : 0,
+"dsp_led_input" : 0,
+"baseline_delay" : 5,
+"diag_channel_input" : 0,
+"qi_config" : 268377856,
+"qi_delay" : 0,
+"qi_pulse_width" : 0,
+"external_gate_width" : 32768
+}
+}
+},
+"daq" : "@local::ssp_standard",
+"fhicl_pound_include_1" : "ssp_expert_run_options.fcl",
+"fhicl_pound_include_2" : "user_run_options.fcl",
+"ssp_standard" : "@local::daq",
+"ssp01_standard" : "@local::ssp_standard",
+"ssp01_standard.fragment_receiver.fragment_id" : "123",
+"ssp01_standard.fragment_receiver.board_id" : 0,
+"ssp01_standard.fragment_receiver.board_ip" : "192.168.1.109",
+"ssp01_standard.fragment_receiver.HardwareConfig.module_id" : 1,
+"ssp02_standard" : "@local::ssp_standard",
+"ssp02_standard.fragment_receiver.fragment_id" : 1,
+"ssp02_standard.fragment_receiver.board_id" : 1,
+"ssp02_standard.fragment_receiver.board_ip" : "192.168.1.117",
+"ssp02_standard.fragment_receiver.HardwareConfig.module_id" : 2,
+"ssp03_standard" : "@local::ssp_standard",
+"ssp03_standard.fragment_receiver.fragment_id" : 2,
+"ssp03_standard.fragment_receiver.board_id" : 2,
+"ssp03_standard.fragment_receiver.board_ip" : "192.168.1.113",
+"ssp03_standard.fragment_receiver.HardwareConfig.module_id" : 3,
+"ssp04_standard" : "@local::ssp_standard",
+"ssp04_standard.fragment_receiver.fragment_id" : 3,
+"ssp04_standard.fragment_receiver.board_id" : 3,
+"ssp04_standard.fragment_receiver.board_ip" : "192.168.1.110",
+"ssp04_standard.fragment_receiver.HardwareConfig.module_id" : 4,
+"ssp05_standard" : "@local::ssp_standard",
+"ssp05_standard.fragment_receiver.fragment_id" : 4,
+"ssp05_standard.fragment_receiver.board_id" : 4,
+"ssp05_standard.fragment_receiver.board_ip" : "192.168.1.114",
+"ssp05_standard.fragment_receiver.HardwareConfig.module_id" : 5,
+"ssp06_standard" : "@local::ssp_standard",
+"ssp06_standard.fragment_receiver.fragment_id" : 5,
+"ssp06_standard.fragment_receiver.board_id" : 5,
+"ssp06_standard.fragment_receiver.board_ip" : "192.168.1.106",
+"ssp06_standard.fragment_receiver.HardwareConfig.module_id" : 6,
+"ssp07_standard" : "@local::ssp_standard",
+"ssp07_standard.fragment_receiver.fragment_id" : 6,
+"ssp07_standard.fragment_receiver.board_id" : 6,
+"ssp07_standard.fragment_receiver.board_ip" : "192.168.1.105",
+"ssp07_standard.fragment_receiver.HardwareConfig.module_id" : 7,
+"ssp08_standard" : "@local::ssp_standard",
+"ssp08_standard.fragment_receiver.fragment_id" : 7,
+"ssp08_standard.fragment_receiver.board_id" : 7,
+"ssp08_standard.fragment_receiver.board_ip" : "192.168.1.105",
+"ssp08_standard.fragment_receiver.HardwareConfig.module_id" : 8
+},
+"ma
+09-08 20:46:57.886386  1 12 StorageProvider::FileSystemDB generate_oid=b0c71fc2e9294b9ba236761c
+09-08 20:46:57.928694  1  4 StorageProvider::FileSystemDB::store() using generated oid=<b0c71fc2e9294b9ba236761c>.
+09-08 20:46:57.928751  1  4 StorageProvider::FileSystemDB::store() collection_path=<file:///home/lukhanin/databases/filesystemdb/testLoadStore/>.
+09-08 20:46:57.928780  1 11 StorageProvider::FileSystemDB mkdir dir=</home/lukhanin/databases/filesystemdb/testLoadStore/>
+09-08 20:46:57.928820  1 11 StorageProvider::FileSystemDB Directory exists, checking permissions; path=</home/lukhanin/databases/filesystemdb/testLoadStore/>
+09-08 20:46:57.928997  1  4 StorageProvider::FileSystemDB::store() filename=</home/lukhanin/databases/filesystemdb/testLoadStore/b0c71fc2e9294b9ba236761c.json>.
+09-08 20:46:58.078090  1  3 StorageProvider::FileSystemDB::index::_open() begin
+09-08 20:46:58.078100  1  3 StorageProvider::FileSystemDB::index::_open() args index_path=</home/lukhanin/databases/filesystemdb/testLoadStore/index.json>.
+09-08 20:46:58.078172  1  3 StorageProvider::FileSystemDB::index::_open() json=<{
+"version" : {
+"versionA79501" : [
+"e7a9231f2961481e99a11a98"
+],
+"versionB79501" : [
+"56f72df6341f4f80b678530a"
+],
+"versionC79501" : [
+"84d05571451044b28ae476e1"
+],
+"versionD79501" : [
+"d1c1b794a4874b4995dbedcf"
+],
+"versionZ59157" : [
+"dc72f71f22e04b06a3f1eb07"
+],
+"versionZ65077" : [
+"908b1210ad75409e8ba2c5fe"
+],
+"versionZ15893" : [
+"7c05e085e154466f969b2e32"
+],
+"versionZ97397" : [
+"4900fb67751c4a05819c540e"
+]
+},
+"configurations.name" : {
+"notprovided" : [
+"56f72df6341f4f80b678530a",
+"84d05571451044b28ae476e1",
+"908b1210ad75409e8ba2c5fe",
+"d1c1b794a4874b4995dbedcf",
+"dc72f71f22e04b06a3f1eb07",
+"e7a9231f2961481e99a11a98"
+],
+"testConfigA03172016-174859" : [
+"4900fb67751c4a05819c540e",
+"7c05e085e154466f969b2e32"
+]
+},
+"configurable_entity.name" : {
+"notprovided" : [
+"56f72df6341f4f80b678530a",
+"e7a9231f2961481e99a11a98"
+],
+"ENTITY-testLoadStore" : [
+"4900fb67751c4a05819c540e",
+"7c05e085e154466f969b2e32",
+"84d05571451044b28ae476e1",
+"908b1210ad75409e8ba2c5fe",
+"d1c1b794a4874b4995dbedcf",
+"dc72f71f22e04b06a3f1eb07"
+]
+}
+}>
+09-08 20:46:58.079478  1  5 StorageProvider::FileSystemDB::index::addDocument() begin
+09-08 20:46:58.079493  1  5 StorageProvider::FileSystemDB::index::addDocument() args document=<{
+        "document" : {
+            "data" : {
+                "prolog" : {
+                    "fhicl_pound_include_0" : "metrics.fcl", 
+                    "ssp_standard" : {
+                        "metrics" : "@local::metrics", 
+                        "max_fragment_size_words" : 262144, 
+                        "fragment_receiver" : {
+                            "mpi_buffer_count" : 16, 
+                            "mpi_sync_interval" : 24000, 
+                            "first_event_builder_rank" : -1, 
+                            "event_builder_count" : -1, 
+                            "generator" : "SSP", 
+                            "fragment_type" : "SSP", 
+                            "interface_type" : 1, 
+                            "verbosity" : 3, 
+                            "DAQConfig" : {
+                                "MillisliceLength" : 10000000, 
+                                "MillisliceOverlap" : 1000000, 
+                                "UseExternalTimestamp" : 1, 
+                                "StartOnNOvASync" : 1, 
+                                "EmptyWriteDelay" : 1000000, 
+                                "HardwareClockRate" : 64
+                            }, 
+                            "HardwareConfig" : {
+                                "eventDataInterfaceSelect" : 1, 
+                                "ChannelControl" : {
+                                    "ExtTriggerMode" : 1, 
+                                    "LEDTrigger" : 0, 
+                                    "TimestampRate" : 7
+                                }, 
+                                "ALL_channel_control" : 1, 
+                                "ALL_led_threshold" : 100, 
+                                "trigger_input_delay" : 55, 
+                                "dsp_clock_control" : 19, 
+                                "ALL_readout_window" : 700, 
+                                "ALL_readout_pretrigger" : 50, 
+                                "ALL_cfd_parameters" : 6144, 
+                                "ALL_p_window" : 32, 
+                                "ALL_i2_window" : 500, 
+                                "ALL_m1_window" : 10, 
+                                "ALL_m2_window" : 10, 
+                                "ALL_d_window" : 20, 
+                                "ALL_i1_window" : 500, 
+                                "ALL_disc_width" : 10, 
+                                "ALL_baseline_start" : 0, 
+                                "ALL_bias_config" : 265488, 
+                                "c2c_control" : 7, 
+                                "c2c_master_intr_control" : 0, 
+                                "comm_clock_control" : 1, 
+                                "comm_led_config" : 0, 
+                                "comm_led_input" : 0, 
+                                "qi_dac_config" : 0, 
+                                "qi_dac_control" : 1, 
+                                "mon_config" : 1241088, 
+                                "mon_select" : 16776960, 
+                                "mon_gpio" : 0, 
+                                "mon_control" : 65537, 
+                                "c2c_slave_intr_control" : 0, 
+                                "gpio_output_width" : 4096, 
+                                "front_panel_config" : 4369, 
+                                "dsp_led_config" : 0, 
+                                "dsp_led_input" : 0, 
+                                "baseline_delay" : 5, 
+                                "diag_channel_input" : 0, 
+                                "qi_config" : 268377856, 
+                                "qi_delay" : 0, 
+                                "qi_pulse_width" : 0, 
+                                "external_gate_width" : 32768
+                            }
+                        }
+                    }, 
+                    "daq" : "@local::ssp_standard", 
+                    "fhicl_pound_include_1" : "ssp_expert_run_options.fcl", 
+                    "
+09-08 20:46:58.079619  1  5 StorageProvider::FileSystemDB::index::addDocument() args ouid=<b0c71fc2e9294b9ba236761c>.
+09-08 20:46:58.101853  1  5 StorageProvider::FileSystemDB::index::addDocument() found 9 keys.
+09-08 20:46:58.101867  1  7 StorageProvider::FileSystemDB::index::_addVersion() begin
+09-08 20:46:58.101871  1  7 StorageProvider::FileSystemDB::index::_addVersion() args ouid=<b0c71fc2e9294b9ba236761c>.
+09-08 20:46:58.101875  1  7 StorageProvider::FileSystemDB::index::_addVersion() args version=<versionZ97397>.
+09-08 20:46:58.101982  1  7 StorageProvider::FileSystemDB::index::_addConfiguration() begin
+09-08 20:46:58.101988  1  7 StorageProvider::FileSystemDB::index::_addConfiguration() args ouid=<b0c71fc2e9294b9ba236761c>.
+09-08 20:46:58.101991  1  7 StorageProvider::FileSystemDB::index::_addConfiguration() args configuration=<testConfigA03172016-174859>.
+09-08 20:46:58.102009  1  7 StorageProvider::FileSystemDB::index::_addConfigurableEntity() begin
+09-08 20:46:58.102013  1  7 StorageProvider::FileSystemDB::index::_addConfigurableEntity() args ouid=<b0c71fc2e9294b9ba236761c>.
+09-08 20:46:58.102016  1  7 StorageProvider::FileSystemDB::index::_addConfigurableEntity() args entity=<ENTITY-testLoadStore>.
+09-08 20:46:58.102107  1  4 StorageProvider::FileSystemDB::index::_close() begin
+09-08 20:46:58.102917  1  4 StorageProvider::FileSystemDB::index::_close() json=<{
+"version" : {
+"versionA79501" : [
+"e7a9231f2961481e99a11a98"
+],
+"versionB79501" : [
+"56f72df6341f4f80b678530a"
+],
+"versionC79501" : [
+"84d05571451044b28ae476e1"
+],
+"versionD79501" : [
+"d1c1b794a4874b4995dbedcf"
+],
+"versionZ59157" : [
+"dc72f71f22e04b06a3f1eb07"
+],
+"versionZ65077" : [
+"908b1210ad75409e8ba2c5fe"
+],
+"versionZ15893" : [
+"7c05e085e154466f969b2e32"
+],
+"versionZ97397" : [
+"4900fb67751c4a05819c540e",
+"b0c71fc2e9294b9ba236761c"
+]
+},
+"configurations.name" : {
+"notprovided" : [
+"56f72df6341f4f80b678530a",
+"84d05571451044b28ae476e1",
+"908b1210ad75409e8ba2c5fe",
+"d1c1b794a4874b4995dbedcf",
+"dc72f71f22e04b06a3f1eb07",
+"e7a9231f2961481e99a11a98"
+],
+"testConfigA03172016-174859" : [
+"4900fb67751c4a05819c540e",
+"7c05e085e154466f969b2e32",
+"b0c71fc2e9294b9ba236761c"
+]
+},
+"configurable_entity.name" : {
+"notprovided" : [
+"56f72df6341f4f80b678530a",
+"e7a9231f2961481e99a11a98"
+],
+"ENTITY-testLoadStore" : [
+"4900fb67751c4a05819c540e",
+"7c05e085e154466f969b2e32",
+"84d05571451044b28ae476e1",
+"908b1210ad75409e8ba2c5fe",
+"b0c71fc2e9294b9ba236761c",
+"d1c1b794a4874b4995dbedcf",
+"dc72f71f22e04b06a3f1eb07"
+]
+}
+}>
+09-08 20:46:58.103032  1  4 StorageProvider::FileSystemDB::index::_close() Closed SearchIndex.
+09-08 20:46:58.103140  1 15 store_configuration: end
+Parsed options:
+{
+"filter" : {
+"version" : "versionZ97397",
+"configurable_entity.name" : "ENTITY-testLoadStore",
+"configurations.name" : "testConfigA03172016-174859"
+},
+"dbprovider" : "filesystem",
+"operation" : "store",
+"collection" : "testLoadStore",
+"dataformat" : "gui",
+"configuration" : "testConfigA03172016-174859"
+}
+Running test:<store>
+returned:
+{
+"document" : {
+"data" : {
+"prolog" : {
+"fhicl_pound_include_0" : "metrics.fcl",
+"ssp_standard" : {
+"metrics" : "@local::metrics",
+"max_fragment_size_words" : 262144,
+"fragment_receiver" : {
+"mpi_buffer_count" : 16,
+"mpi_sync_interval" : 24000,
+"first_event_builder_rank" : -1,
+"event_builder_count" : -1,
+"generator" : "SSP",
+"fragment_type" : "SSP",
+"interface_type" : 1,
+"verbosity" : 3,
+"DAQConfig" : {
+"MillisliceLength" : 10000000,
+"MillisliceOverlap" : 1000000,
+"UseExternalTimestamp" : 1,
+"StartOnNOvASync" : 1,
+"EmptyWriteDelay" : 1000000,
+"HardwareClockRate" : 64
+},
+"HardwareConfig" : {
+"eventDataInterfaceSelect" : 1,
+"ChannelControl" : {
+"ExtTriggerMode" : 1,
+"LEDTrigger" : 0,
+"TimestampRate" : 7
+},
+"ALL_channel_control" : 1,
+"ALL_led_threshold" : 100,
+"trigger_input_delay" : 55,
+"dsp_clock_control" : 19,
+"ALL_readout_window" : 700,
+"ALL_readout_pretrigger" : 50,
+"ALL_cfd_parameters" : 6144,
+"ALL_p_window" : 32,
+"ALL_i2_window" : 500,
+"ALL_m1_window" : 10,
+"ALL_m2_window" : 10,
+"ALL_d_window" : 20,
+"ALL_i1_window" : 500,
+"ALL_disc_width" : 10,
+"ALL_baseline_start" : 0,
+"ALL_bias_config" : 265488,
+"c2c_control" : 7,
+"c2c_master_intr_control" : 0,
+"comm_clock_control" : 1,
+"comm_led_config" : 0,
+"comm_led_input" : 0,
+"qi_dac_config" : 0,
+"qi_dac_control" : 1,
+"mon_config" : 1241088,
+"mon_select" : 16776960,
+"mon_gpio" : 0,
+"mon_control" : 65537,
+"c2c_slave_intr_control" : 0,
+"gpio_output_width" : 4096,
+"front_panel_config" : 4369,
+"dsp_led_config" : 0,
+"dsp_led_input" : 0,
+"baseline_delay" : 5,
+"diag_channel_input" : 0,
+"qi_config" : 268377856,
+"qi_delay" : 0,
+"qi_pulse_width" : 0,
+"external_gate_width" : 32768
+}
+}
+},
+"daq" : "@local::ssp_standard",
+"fhicl_pound_include_1" : "ssp_expert_run_options.fcl",
+"fhicl_pound_include_2" : "user_run_options.fcl",
+"ssp_standard" : "@local::daq",
+"ssp01_standard" : "@local::ssp_standard",
+"ssp01_standard.fragment_receiver.fragment_id" : "123",
+"ssp01_standard.fragment_receiver.board_id" : 0,
+"ssp01_standard.fragment_receiver.board_ip" : "192.168.1.109",
+"ssp01_standard.fragment_receiver.HardwareConfig.module_id" : 1,
+"ssp02_standard" : "@local::ssp_standard",
+"ssp02_standard.fragment_receiver.fragment_id" : 1,
+"ssp02_standard.fragment_receiver.board_id" : 1,
+"ssp02_standard.fragment_receiver.board_ip" : "192.168.1.117",
+"ssp02_standard.fragment_receiver.HardwareConfig.module_id" : 2,
+"ssp03_standard" : "@local::ssp_standard",
+"ssp03_standard.fragment_receiver.fragment_id" : 2,
+"ssp03_standard.fragment_receiver.board_id" : 2,
+"ssp03_standard.fragment_receiver.board_ip" : "192.168.1.113",
+"ssp03_standard.fragment_receiver.HardwareConfig.module_id" : 3,
+"ssp04_standard" : "@local::ssp_standard",
+"ssp04_standard.fragment_receiver.fragment_id" : 3,
+"ssp04_standard.fragment_receiver.board_id" : 3,
+"ssp04_standard.fragment_receiver.board_ip" : "192.168.1.110",
+"ssp04_standard.fragment_receiver.HardwareConfig.module_id" : 4,
+"ssp05_standard" : "@local::ssp_standard",
+"ssp05_standard.fragment_receiver.fragment_id" : 4,
+"ssp05_standard.fragment_receiver.board_id" : 4,
+"ssp05_standard.fragment_receiver.board_ip" : "192.168.1.114",
+"ssp05_standard.fragment_receiver.HardwareConfig.module_id" : 5,
+"ssp06_standard" : "@local::ssp_standard",
+"ssp06_standard.fragment_receiver.fragment_id" : 5,
+"ssp06_standard.fragment_receiver.board_id" : 5,
+"ssp06_standard.fragment_receiver.board_ip" : "192.168.1.106",
+"ssp06_standard.fragment_receiver.HardwareConfig.module_id" : 6,
+"ssp07_standard" : "@local::ssp_standard",
+"ssp07_standard.fragment_receiver.fragment_id" : 6,
+"ssp07_standard.fragment_receiver.board_id" : 6,
+"ssp07_standard.fragment_receiver.board_ip" : "192.168.1.105",
+"ssp07_standard.fragment_receiver.HardwareConfig.module_id" : 7,
+"ssp08_standard" : "@local::ssp_standard",
+"ssp08_standard.fragment_receiver.fragment_id" : 7,
+"ssp08_standard.fragment_receiver.board_id" : 7,
+"ssp08_standard.fragment_receiver.board_ip" : "192.168.1.105",
+"ssp08_standard.fragment_receiver.HardwareConfig.module_id" : 8
+},
+"main" : {
+
+}
+},
+"metadata" : {
+"prolog" : {
+"type" : "table",
+"comment" : "#prolog",
+"children" : {
+"fhicl_pound_include_0" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp_standard" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"metrics" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"max_fragment_size_words" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"fragment_receiver" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"mpi_buffer_count" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"mpi_sync_interval" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"first_event_builder_rank" : {
+"type" : "number",
+"comment" : "# These two variables will be calculated by DAQInterface...",
+"annotation" : " "
+},
+"event_builder_count" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"generator" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : "###Don^t edit these lines"
+},
+"fragment_type" : {
+"type" : "string",
+"comment" : "###Don^t edit these lines",
+"annotation" : "###"
+},
+"interface_type" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "### 0=USB, 1=Ethernet, 2=Emulated"
+},
+"verbosity" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#0=silent, no errors or warnings."
+},
+"DAQConfig" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"MillisliceLength" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#Amount of time to assign to a single fragment in clock ticks"
+},
+"MillisliceOverlap" : {
+"type" : "number",
+"comment" : "#Amount of time to assign to a single fragment in clock ticks",
+"annotation" : "#Amount at start of next fragment to also put into current fragment"
+},
+"UseExternalTimestamp" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#0=Use internal timestamp to split events into millislices, 1=Use NOvA timestamp."
+},
+"StartOnNOvASync" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#Tell SSP to wait for sync pulse from NOvA timing unit before taking data."
+},
+"EmptyWriteDelay" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#Time in us that DAQ will wait for SSP events, before starting to build and send"
+},
+"HardwareClockRate" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#in MHz. Must be 64 for NOvA timestamping, 150 for internal."
+}
+}
+},
+"HardwareConfig" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"eventDataInterfaceSelect" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#0=USB, 1=Ethernet"
+},
+"ChannelControl" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"ExtTriggerMode" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#0=no external trigger"
+},
+"LEDTrigger" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#0=no leading edge trigger"
+},
+"TimestampRate" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#0=292.969kHz"
+}
+}
+},
+"ALL_channel_control" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ALL_led_threshold" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#Leading edge trigger threshold in ADC"
+},
+"trigger_input_delay" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#Delay to apply to front panel trigger."
+},
+"dsp_clock_control" : {
+"type" : "number",
+"comment" : "#Use NOvA TDU",
+"annotation" : "# Bit |  Meaning "
+},
+"ALL_readout_window" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "#Number of ADC samples to read out"
+},
+"ALL_readout_pretrigger" : {
+"type" : "number",
+"comment" : "#Number of ADC samples to read out",
+"annotation" : "#Of which before trigger time"
+},
+"ALL_cfd_parameters" : {
+"type" : "number",
+"comment" : "#Leave alone unless you know what you^re doing!",
+"annotation" : " "
+},
+"ALL_p_window" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ALL_i2_window" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ALL_m1_window" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ALL_m2_window" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ALL_d_window" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ALL_i1_window" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ALL_disc_width" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ALL_baseline_start" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ALL_bias_config" : {
+"type" : "number",
+"comment" : "#ALL_bias_config:           0x00040E21 # 26.5V",
+"annotation" : "# 24.5V"
+},
+"c2c_control" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"c2c_master_intr_control" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"comm_clock_control" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"comm_led_config" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"comm_led_input" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"qi_dac_config" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"qi_dac_control" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"mon_config" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"mon_select" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"mon_gpio" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"mon_control" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"c2c_slave_intr_control" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"gpio_output_width" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"front_panel_config" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : "# standard config?"
+},
+"dsp_led_config" : {
+"type" : "number",
+"comment" : "# standard config?",
+"annotation" : " "
+},
+"dsp_led_input" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"baseline_delay" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"diag_channel_input" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"qi_config" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"qi_delay" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"qi_pulse_width" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"external_gate_width" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+}
+}
+}
+},
+"daq" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"fhicl_pound_include_1" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"fhicl_pound_include_2" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp_standard" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp01_standard" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp01_standard.fragment_receiver.fragment_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp01_standard.fragment_receiver.board_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp01_standard.fragment_receiver.board_ip" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp01_standard.fragment_receiver.HardwareConfig.module_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp02_standard" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp02_standard.fragment_receiver.fragment_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp02_standard.fragment_receiver.board_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp02_standard.fragment_receiver.board_ip" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp02_standard.fragment_receiver.HardwareConfig.module_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp03_standard" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp03_standard.fragment_receiver.fragment_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp03_standard.fragment_receiver.board_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp03_standard.fragment_receiver.board_ip" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp03_standard.fragment_receiver.HardwareConfig.module_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp04_standard" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp04_standard.fragment_receiver.fragment_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp04_standard.fragment_receiver.board_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp04_standard.fragment_receiver.board_ip" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp04_standard.fragment_receiver.HardwareConfig.module_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp05_standard" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp05_standard.fragment_receiver.fragment_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp05_standard.fragment_receiver.board_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp05_standard.fragment_receiver.board_ip" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp05_standard.fragment_receiver.HardwareConfig.module_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp06_standard" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp06_standard.fragment_receiver.fragment_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp06_standard.fragment_receiver.board_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp06_standard.fragment_receiver.board_ip" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp06_standard.fragment_receiver.HardwareConfig.module_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp07_standard" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp07_standard.fragment_receiver.fragment_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp07_standard.fragment_receiver.board_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp07_standard.fragment_receiver.board_ip" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp07_standard.fragment_receiver.HardwareConfig.module_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp08_standard" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp08_standard.fragment_receiver.fragment_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp08_standard.fragment_receiver.board_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp08_standard.fragment_receiver.board_ip" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"ssp08_standard.fragment_receiver.HardwareConfig.module_id" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+}
+}
+},
+"main" : {
+"type" : "table",
+"comment" : "#main",
+"children" : {
+
+}
+}
+},
+"search" : [
+{
+"name" : "find any",
+"query" : "not defined"
+}
+],
+"converted" : {
+
+}
+},
+"source" : {
+"encoding" : "base64",
+"format" : "json",
+"rawdata" : "as"
+},
+"version" : "demoVersion002",
+"configurations" : [
+{
+"name" : "demoConfig001",
+"assigned" : "Thu Sep  8 19:38:10 2016"
+}
+],
+"aliases" : {
+"active" : [
+
+],
+"history" : [
+
+]
+},
+"changelog" : "empty",
+"bookkeeping" : {
+"isdeleted" : false,
+"isreadonly" : true,
+"created" : "Tue Dec 29 18:19:25 2015",
+"updates" : [
+{
+"addToGlobalConfig" : "Thu Sep  8 19:38:10 2016"
+},
+{
+"setVersion" : "Thu Sep  8 19:38:10 2016"
+},
+{
+"setConfigurableEntity" : "Thu Sep  8 19:38:10 2016"
+}
+]
+},
+"configurable_entity" : {
+"name" : "notprovided"
+},
+"_id" : {
+"_oid" : "15781635e2564d60ac331274"
+}
+}
+<end of output>
+Test time =   0.98 sec
+----------------------------------------------------------
+Test Passed.
+"LoadStore_store_filesystem_021_t" end time: Sep 08 20:46 CDT
+"LoadStore_store_filesystem_021_t" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Sep 08 20:46 CDT

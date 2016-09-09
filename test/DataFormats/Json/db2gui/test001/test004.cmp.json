@@ -122,8 +122,9 @@
 },
 "metadata" : {
 "prolog" : {
-"type" : "table",
 "comment" : "#prolog",
+"type" : "table",
+"annotation" : "//Auto generated prolog",
 "children" : {
 "fhicl_pound_include_0" : {
 "type" : "string",
@@ -673,8 +674,9 @@
 }
 },
 "main" : {
-"type" : "table",
 "comment" : "#main",
+"type" : "table",
+"annotation" : "//Auto generated main",
 "children" : {
 
 }
@@ -1472,7 +1474,11 @@
 "configurations" : [
 {
 "name" : "demoConfig001",
-"assigned" : "Thu Sep  8 18:35:35 2016"
+"assigned" : "Wed Sep  7 16:04:32 2016"
+},
+{
+"name" : "demoConfig002",
+"assigned" : "Thu Sep  8 15:27:35 2016"
 }
 ],
 "aliases" : {
@@ -1490,13 +1496,16 @@
 "created" : "Tue Dec 29 18:19:25 2015",
 "updates" : [
 {
-"addToGlobalConfig" : "Thu Sep  8 18:35:35 2016"
+"addToGlobalConfig" : "Wed Sep  7 16:04:32 2016"
 },
 {
-"setVersion" : "Thu Sep  8 18:35:35 2016"
+"setVersion" : "Wed Sep  7 16:04:32 2016"
 },
 {
-"setConfigurableEntity" : "Thu Sep  8 18:35:35 2016"
+"setConfigurableEntity" : "Wed Sep  7 16:04:33 2016"
+},
+{
+"addToGlobalConfig" : "Thu Sep  8 15:27:35 2016"
 }
 ]
 },
@@ -1504,6 +1513,6 @@
 "name" : "notprovided"
 },
 "_id" : {
-"_oid" : "253f2125e1e14768b193e458"
+"_oid" : "e937e41839834bbf9f20ec3d"
 }
 }

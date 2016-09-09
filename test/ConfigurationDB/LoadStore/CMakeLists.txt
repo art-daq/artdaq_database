@@ -39,7 +39,6 @@ message(STATUS "VERSION_NUMBER=${VERSION_NUMBER}")
 set (CONFIG_NUMBER "03172016-174859")
 set (TEST_CONFIG_NAME "testConfigA${CONFIG_NUMBER}")
 
-
 SET (TEST_VERSION_NAME    versionA${VERSION_NUMBER} )
 add_subdirectory(test001)
 add_subdirectory(test003)
@@ -56,4 +55,7 @@ SET (TEST_VERSION_NAME    versionD${VERSION_NUMBER} )
 add_subdirectory(test012)
 add_subdirectory(test014)
 
+SET (TEST_VERSION_NAME    versionZ${VERSION_NUMBER} )
+add_subdirectory(test020)
+add_subdirectory(test021)
 

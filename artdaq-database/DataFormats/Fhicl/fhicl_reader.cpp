@@ -79,9 +79,9 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
       auto& data = make_SubNode(data_node, literal::prolog_node);
 
       auto& prolog = make_SubNode(metadata_node, literal::prolog_node);
-      prolog[literal::comment] = std::string{"#"}.append(literal::prolog_node);
       prolog[literal::type] = std::string{literal::table};
-      prolog[literal::annotation] = std::string{"//Auto generated "}.append(literal::prolog_node);
+      prolog[literal::comment] = std::string{"#"}.append(literal::prolog_node);
+//      prolog[literal::annotation] = std::string{"//Auto generated "}.append(literal::prolog_node);
 
       auto& metadata = make_SubNode(prolog, literal::children);
 
@@ -101,9 +101,9 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
       auto& data = make_SubNode(data_node, literal::main_node);
 
       auto& main = make_SubNode(metadata_node, literal::main_node);
-      main[literal::comment] = std::string{"#"}.append(literal::main_node);
       main[literal::type] = std::string{literal::table};
-      main[literal::annotation] = std::string{"//Auto generated "}.append(literal::main_node);
+      main[literal::comment] = std::string{"#"}.append(literal::main_node);
+//      main[literal::annotation] = std::string{"//Auto generated "}.append(literal::main_node);
 
       auto& metadata = make_SubNode(main, literal::children);
 
