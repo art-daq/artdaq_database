@@ -106,10 +106,20 @@ void LoadStoreOperation::readJsonData(JsonData const& data) {
   }
 
   try {
-      globalConfiguration(boost::get<std::string>(dataAST.at(cfl::option::configuration)));
-    } catch (...) {
+    globalConfiguration(boost::get<std::string>(dataAST.at(cfl::option::configuration)));
+  } catch (...) {
   }
-  
+
+  try {
+    version(boost::get<std::string>(dataAST.at(cfl::option::version)));
+  } catch (...) {
+  }
+
+  try {
+    configurableEntity(boost::get<std::string>(dataAST.at(cfl::gui::configurable_entity)));
+  } catch (...) {
+  }
+
   try {
     auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(cfl::option::searchfilter));
 
@@ -240,7 +250,6 @@ JsonData LoadStoreOperation::globalConfiguration_to_JsonData() const {
 
   return {json_buffer};
 }
-
 
 JsonData LoadStoreOperation::collectionName_to_JsonData() const {
   using namespace artdaq::database::json;

@@ -685,7 +685,8 @@
                     "name" : "find any", 
                     "query" : "not defined"
                 }
-            ], "converted":{}
+            ],
+	    "converted" : {}
         }, 
         "source" : {
             "encoding" : "base64", 
