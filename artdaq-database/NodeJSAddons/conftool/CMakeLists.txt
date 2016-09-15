@@ -1,7 +1,7 @@
 set(NODEJS_ADDON_NAME "conftoolg" )
 
-art_make(
-  LIB_LIBRARIES
+cet_make(
+  LIBRARIES
   artdaq-database_ConfigurationDB
   ${FHICLCPP}
   ${CETLIB}

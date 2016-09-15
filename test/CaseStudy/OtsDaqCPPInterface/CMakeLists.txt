@@ -1,6 +1,6 @@
-art_make(
+cet_make(
   LIBRARY_NAME artdaq-database_OtsDaqCPPInterface
-  LIB_LIBRARIES
+  LIBRARIES
   artdaq-database_ConfigurationDB
   )
 

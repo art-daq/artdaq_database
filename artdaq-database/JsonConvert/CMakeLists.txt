@@ -1,6 +1,4 @@
-art_make(
-  LIB_LIBRARIES
-  )
+cet_make(  )
 
 install_headers()
 install_source()

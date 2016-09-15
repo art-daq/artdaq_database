@@ -19,21 +19,25 @@ perllib  product_dir
 
 #
 product		version		optional
-fhiclcpp        v3_20_01
+artdaq_utilities v1_00_08
 mongodb 	v3_2_7
 TRACE           v3_06_07	-	optional
 swig            v3_0_10		-	optional
-nodejs		v4_5_0		-	optional
+nodejs		v4_5_0		-	only_for_build
 cetbuildtools	v5_04_03	-	only_for_build
 end_product_list
 
 # -nq- means there is no qualifier
 # a "-" means the dependent product is not required by the parent and will not be setup
-qualifier	fhiclcpp 	mongodb		TRACE		swig		nodejs	notes
-e9:s21:debug   	e9:debug	e9:debug	e9:debug	e9:debug	-nq-	-std=c++14
-e9:s21:prof    	e9:prof		e9:prof		e9:prof		e9:prof		-nq-	-std=c++14
-e10:s35:debug   e10:debug   	e10:debug	e10:debug	e10:debug	-nq-	-std=c++14
-e10:s35:prof    e10:prof	e10:prof	e10:prof	e10:prof	-nq-	-std=c++14
+qualifier	artdaq_utilities	mongodb		TRACE		swig		notes
+e9:s21:debug   	e9:s21:debug		e9:debug	e9:debug	e9:debug	-std=c++14
+e9:s21:prof    	e9:s21:prof		e9:prof		e9:prof		e9:prof		-std=c++14
+e10:s34:debug   e10:s34:debug   	e10:debug	e10:debug	e10:debug	-std=c++14
+e10:s34:prof    e10:s34:prof		e10:prof	e10:prof	e10:prof	-std=c++14
+e10:s35:debug   e10:s35:debug   	e10:debug	e10:debug	e10:debug	-std=c++14
+e10:s35:prof    e10:s35:prof		e10:prof	e10:prof	e10:prof	-std=c++14
+e10:s41:debug   e10:s41:debug   	e10:debug	e10:debug	e10:debug	-std=c++14
+e10:s41:prof    e10:s41:prof		e10:prof	e10:prof	e10:prof	-std=c++14
 
 end_qualifier_list
 
