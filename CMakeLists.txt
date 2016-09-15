@@ -60,9 +60,7 @@ find_ups_product( cetpkgsupport v1_10_02 )
 find_ups_product( fhiclcpp v3_20_01 )
 find_ups_product( sqlite v3_12_02_00)
 find_ups_product( mongodb v3_2_7 )
-find_ups_product( swig v3_0_10 )
 find_ups_product( TRACE v3_06_07 )
-find_ups_product( nodejs v4_5_0 )
 
 # Debug streamer.
 string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC)
