@@ -120,9 +120,8 @@
 },
 "metadata" : {
 "prolog" : {
-"comment" : "#prolog",
 "type" : "table",
-"annotation" : "//Auto generated prolog",
+"comment" : "#prolog",
 "children" : {
 "fhicl_pound_include_0" : {
 "type" : "string",
@@ -404,9 +403,8 @@
 }
 },
 "main" : {
-"comment" : "#main",
 "type" : "table",
-"annotation" : "//Auto generated main",
+"comment" : "#main",
 "children" : {
 "rce05_standard" : {
 "type" : "string",

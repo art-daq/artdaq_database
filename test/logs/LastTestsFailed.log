@@ -1,1 +1,6 @@
-1:LoadStore_store_filesystem_020_t
+117:ManageConfigs_buildfilter_filesystem_002_t
+118:ManageConfigs_buildfilter_filesystem_012_t
+120:ManageConfigs_findversions_mongo_003_t
+122:ManageConfigs_findversions_mongo_013_t
+124:ManageConfigs_findentities_mongo_004_t
+135:BulkOperations_newconfig_filesystem_001_t

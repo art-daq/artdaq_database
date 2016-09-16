@@ -1,0 +1,13 @@
+set(CTEST_CUSTOM_PRE_TEST "/usr/bin/rm -rf ${CMAKE_BINARY_DIR}/databases; /usr/bin/mkdir -p ${CMAKE_BINARY_DIR}/databases/mongodb; \
+/usr/bin/printenv ; \
+mongod  \
+--dbpath ${CMAKE_BINARY_DIR}/databases/mongodb \
+--logpath ${CMAKE_BINARY_DIR}/databases/mongod.log \
+--logappend \
+--pidfilepath=${CMAKE_BINARY_DIR}/databases/mongod.pid \
+--bind_ip=127.0.0.1 \
+--fork; sleep 5; netstat -apnt4; \
+tail -10 ${CMAKE_BINARY_DIR}/databases/mongod.log ")  
+
+set(CTEST_CUSTOM_POST_TEST "pkill -F  ${CMAKE_BINARY_DIR}/databases/mongod.pid; \
+sleep 2; tail -10 ${CMAKE_BINARY_DIR}/databases/mongod.log ; ")

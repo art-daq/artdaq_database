@@ -2,7 +2,7 @@ SET ( TEST_NAME "BulkOperations_newconfig" )
 
 SET ( TEST_COLLECTION_NAME_QUAL "newconfig" )
 
-SET ( TEST_NUMBER "015" )
+SET ( TEST_NUMBER "001" )
 
 SET ( TEST_FILE_NUMBER "011" )
 SET ( TEST_DBPROVIDER "filesystem" )

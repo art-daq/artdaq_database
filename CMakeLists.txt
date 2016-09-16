@@ -72,13 +72,6 @@ endif()
 find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_LIB} )
 find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_LIB} )
 
-# macros for art_dictionary and simple_plugin
-#include(ArtDictionary)
-#include(ArtMake)
-#include(BuildPlugins)
-
-include(NodeJSAddon)
-
 # testing
 add_subdirectory(test)
 
