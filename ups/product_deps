@@ -23,7 +23,7 @@ artdaq_utilities v1_00_08
 mongodb 	v3_2_7
 TRACE           v3_06_07	-	optional
 swig            v3_0_10		-	optional
-nodejs		v4_5_0		-	only_for_build
+nodejs		v4_5_0		-	optional
 cetbuildtools	v5_04_03	-	only_for_build
 end_product_list
 
