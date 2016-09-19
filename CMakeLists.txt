@@ -68,6 +68,10 @@ if(BTYPE_UC STREQUAL DEBUG)
   add_definitions(-DDEBUGME)
 endif()
 
+
+# Build Node Addons
+include(NodeJSAddon)
+
 # MongoDB Libraries
 find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_LIB} )
 find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_LIB} )
