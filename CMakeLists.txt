@@ -24,8 +24,8 @@ IF (NOT CETBUILDTOOLS_VERSION)
 ENDIF()
 
 set(CMAKE_MODULE_PATH
-	${CMAKE_CURRENT_SOURCE_DIR}/Modules
-	$ENV{CETBUILDTOOLS_DIR}/Modules
+    $ENV{ARTDAQ_UTILITIES_DIR}/Modules
+    $ENV{CETBUILDTOOLS_DIR}/Modules
 	${CMAKE_MODULE_PATH})
 
 include(CetCMakeEnv)
@@ -51,20 +51,16 @@ cet_add_compiler_flags( -rdynamic -ldl)
 
 cet_report_compiler_flags()
 
-set(mongodb_product_version v3_2_7)
-
 # these are minimum required versions, not the actual product versions
 find_ups_boost(v1_61_0)
 find_ups_product (cetbuildtools v5_04_01)
-#find_ups_product( artdaq_core v1_05_00 )
+find_ups_product( artdaq_utilities v1_00_08 )
 find_ups_product( cetlib v1_18_02 )
 find_ups_product( cetpkgsupport v1_10_02 )
 find_ups_product( fhiclcpp v3_20_01 )
 find_ups_product( sqlite v3_12_02_00)
-find_ups_product( mongodb ${mongodb_product_version} )
-find_ups_product( swig v3_0_10 )
+find_ups_product( mongodb v3_2_7 )
 find_ups_product( TRACE v3_06_07 )
-find_ups_product( nodejs v4_5_0 )
 
 # Debug streamer.
 string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC)
@@ -72,10 +68,13 @@ if(BTYPE_UC STREQUAL DEBUG)
   add_definitions(-DDEBUGME)
 endif()
 
-# macros for art_dictionary and simple_plugin
-#include(ArtDictionary)
-include(ArtMake)
-#include(BuildPlugins)
+
+# Build Node Addons
+include(NodeJSAddon)
+
+# MongoDB Libraries
+find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_LIB} )
+find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_LIB} )
 
 # testing
 add_subdirectory(test)

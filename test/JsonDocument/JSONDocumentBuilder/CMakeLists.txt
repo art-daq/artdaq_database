@@ -1,11 +1,4 @@
-find_ups_product( mongodb ${mongodb_product_version} )
-
-include_directories($ENV{MONGODB_INC})
-
-
-find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_LIB} )
-
-art_make_exec(JSONDocumentBuilder_t
+cet_make_exec(JSONDocumentBuilder_t
   LIBRARIES
   artdaq-database_StackTrace
   artdaq-database_JsonDocument

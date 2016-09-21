@@ -1,5 +1,5 @@
-art_make(
-  LIB_LIBRARIES
+cet_make(
+  LIBRARIES
   artdaq-database_BasicTypes
   artdaq-database_JsonDocument
   ${BSONCXXLIB}

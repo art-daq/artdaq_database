@@ -1,4 +1,4 @@
-art_make_exec(ConvertJson_t
+cet_make_exec(ConvertJson_t
   LIBRARIES
   artdaq-database_StackTrace
   artdaq-database_DataFormats_common

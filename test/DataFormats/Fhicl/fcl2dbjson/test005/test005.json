@@ -115,17 +115,15 @@
 },
 "metadata" : {
 "prolog" : {
-"comment" : "#prolog",
 "type" : "table",
-"annotation" : "//Auto generated prolog",
+"comment" : "#prolog",
 "children" : {
 
 }
 },
 "main" : {
-"comment" : "#main",
 "type" : "table",
-"annotation" : "//Auto generated main",
+"comment" : "#main",
 "children" : {
 "services" : {
 "type" : "table",

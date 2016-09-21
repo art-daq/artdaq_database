@@ -1,5 +1,5 @@
-art_make(
-  LIB_LIBRARIES
+cet_make(
+  LIBRARIES
   ${FHICLCPP}
   ${CETLIB}
   )
