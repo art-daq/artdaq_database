@@ -84,8 +84,8 @@ std::set<int> DatabaseConfigurationInterface::getVersions(const ConfigurationBas
   return {};
 }
 
-// returns a list of all configuration data types
-std::list<std::string /*name*/> DatabaseConfigurationInterface::listConfigurationsTypes() const
+// returns a set of all configuration data types
+std::set<std::string /*name*/> DatabaseConfigurationInterface::listConfigurationsTypes() const
     throw(std::runtime_error) try {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
 
@@ -101,7 +101,7 @@ std::list<std::string /*name*/> DatabaseConfigurationInterface::listConfiguratio
 }
 
 // find all global configurations in database
-std::list<std::string /*name*/> DatabaseConfigurationInterface::findAllGlobalConfigurations() const
+std::set<std::string /*name*/> DatabaseConfigurationInterface::findAllGlobalConfigurations() const
     throw(std::runtime_error) try {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
 

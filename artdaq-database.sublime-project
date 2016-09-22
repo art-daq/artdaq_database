@@ -1,18 +1,12 @@
 {
-    "project_name": "main",
-    "folders":
-    [
-        {
-            "path": "."
-        }
-    ],
-    "build_systems":
-    [
-        {
-            "name": "cmake",
-            "working_dir": "${project_path}",
-            "shell_cmd": "./rebuild.sh",
-            "shell": true
-        }
-    ]
+	"build_systems":
+	[
+		{
+			"name": "cmake",
+			"shell": true,
+			"shell_cmd": "./rebuild.sh",
+			"working_dir": "${project_path}"
+		}
+	],
+	"project_name": "main"
 }

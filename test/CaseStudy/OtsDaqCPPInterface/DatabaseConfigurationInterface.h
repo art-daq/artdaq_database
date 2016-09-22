@@ -32,11 +32,11 @@ class DatabaseConfigurationInterface : public ConfigurationInterface {
   // find all configuration versions by configuration type
   std::set<int> getVersions(const ConfigurationBase* /*configuration*/) const noexcept;
 
-  // returns a list of all configuration data types
-  std::list<std::string /*name*/> listConfigurationsTypes() const throw(std::runtime_error);
+  // returns a set of all configuration data types
+  std::set<std::string /*name*/> listConfigurationsTypes() const throw(std::runtime_error);
 
   // find all global configurations in database
-  std::list<std::string /*name*/> findAllGlobalConfigurations() const throw(std::runtime_error);
+  std::set<std::string /*name*/> findAllGlobalConfigurations() const throw(std::runtime_error);
 
   // return the contents of a global configuration
   config_version_map_t loadGlobalConfiguration(std::string const& /*globalConfiguration*/) const

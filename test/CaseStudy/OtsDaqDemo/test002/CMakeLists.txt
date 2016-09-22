@@ -1,46 +1,38 @@
-SET ( TEST_NUMBER "002" )
 SET ( TEST_NAME "load" )
 
+SET ( TEST_NUMBER "001" )
 
-cet_test(OtsDaqDemo_mongo_${TEST_NAME}_${TEST_NUMBER}_01_t HANDBUILT  TEST_EXEC OtsDaqDemo_t 
+SET ( TEST_DBPROVIDER "filesystem" )
+string(RANDOM LENGTH 3 ALPHABET 0123456789 RAND_NAME)
+configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.src.json ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.cmp.${RAND_NAME}.json @ONLY )
+cet_test(OtsDaqDemo_${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC OtsDaqDemo_t 
   DATAFILES 
-    ${CMAKE_CURRENT_SOURCE_DIR}/test001.src.json 
-  TEST_ARGS -d mongo -o store -t test_OtsDaqDemo${TEST_NAME}_${TEST_NUMBER} -c test001.src.json -f json -v version -g config1 )
+    ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.cmp.${RAND_NAME}.json 
+  TEST_ARGS -o ${TEST_NAME} -d ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f json -v ${TEST_VERSION_NAME}_${TEST_NUMBER}   -r test${TEST_NUMBER}.cmp.${RAND_NAME}.json )
 
-  
-cet_test(OtsDaqDemo_filesystem_${TEST_NAME}_${TEST_NUMBER}_01_t HANDBUILT  TEST_EXEC OtsDaqDemo_t 
+SET ( TEST_DBPROVIDER "mongo" )
+string(RANDOM LENGTH 3 ALPHABET 0123456789 RAND_NAME)
+configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.src.json ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.cmp.${RAND_NAME}.json @ONLY )
+cet_test(OtsDaqDemo_${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC OtsDaqDemo_t 
   DATAFILES 
-    ${CMAKE_CURRENT_SOURCE_DIR}/test001.src.json 
-  TEST_ARGS -d filesystem -o store -t test_OtsDaqDemo${TEST_NAME}_${TEST_NUMBER} -c test001.src.json -f json -v version -g config1 )
+    ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.cmp.${RAND_NAME}.json 
+  TEST_ARGS -o ${TEST_NAME} -d ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f json -v ${TEST_VERSION_NAME}_${TEST_NUMBER}  -r test${TEST_NUMBER}.cmp.${RAND_NAME}.json )
 
-cet_test(OtsDaqDemo_mongo_${TEST_NAME}_${TEST_NUMBER}_02_t HANDBUILT  TEST_EXEC OtsDaqDemo_t 
+SET ( TEST_NUMBER "002" )
+
+SET ( TEST_DBPROVIDER "filesystem" )
+string(RANDOM LENGTH 3 ALPHABET 0123456789 RAND_NAME)
+configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.src.json ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.cmp.${RAND_NAME}.json @ONLY )
+cet_test(OtsDaqDemo_${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC OtsDaqDemo_t 
   DATAFILES 
-    ${CMAKE_CURRENT_SOURCE_DIR}/test002.src.json 
-  TEST_ARGS -d mongo -o store -t test_OtsDaqDemo${TEST_NAME}_${TEST_NUMBER} -c test002.src.json -f json -v version -g config2 )
+    ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.cmp.${RAND_NAME}.json 
+  TEST_ARGS -o ${TEST_NAME} -d ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f json -v ${TEST_VERSION_NAME}_${TEST_NUMBER}   -r test${TEST_NUMBER}.cmp.${RAND_NAME}.json )
 
-  
-cet_test(OtsDaqDemo_filesystem_${TEST_NAME}_${TEST_NUMBER}_02_t HANDBUILT  TEST_EXEC OtsDaqDemo_t 
+SET ( TEST_DBPROVIDER "mongo" )
+string(RANDOM LENGTH 3 ALPHABET 0123456789 RAND_NAME)
+configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.src.json ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.cmp.${RAND_NAME}.json @ONLY )
+cet_test(OtsDaqDemo_${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC OtsDaqDemo_t 
   DATAFILES 
-    ${CMAKE_CURRENT_SOURCE_DIR}/test002.src.json 
-  TEST_ARGS -d filesystem -o store -t test_OtsDaqDemo${TEST_NAME}_${TEST_NUMBER} -c test002.src.json -f json -v version -g config2 )
-
-  
-cet_test(OtsDaqDemo_mongo_${TEST_NAME}_${TEST_NUMBER}_11_t HANDBUILT  TEST_EXEC OtsDaqDemo_t 
-  DATAFILES 
-  TEST_ARGS -d mongo -o load -t test_OtsDaqDemo${TEST_NAME}_${TEST_NUMBER} -c test002.res.json -f json -g config1 )
-
-  
-cet_test(OtsDaqDemo_filesystem_${TEST_NAME}_${TEST_NUMBER}_11_t HANDBUILT  TEST_EXEC OtsDaqDemo_t 
-  DATAFILES 
-  TEST_ARGS -d filesystem -o load -t test_OtsDaqDemo${TEST_NAME}_${TEST_NUMBER} -c test002.res.json -f json -g config1 )
-
-
-cet_test(OtsDaqDemo_mongo_${TEST_NAME}_${TEST_NUMBER}_12_t HANDBUILT  TEST_EXEC OtsDaqDemo_t 
-  DATAFILES 
-  TEST_ARGS -d mongo -o load -t test_OtsDaqDemo${TEST_NAME}_${TEST_NUMBER} -c test002.res.json -f json -g config2 )
-
-  
-cet_test(OtsDaqDemo_filesystem_${TEST_NAME}_${TEST_NUMBER}_12_t HANDBUILT  TEST_EXEC OtsDaqDemo_t 
-  DATAFILES 
-  TEST_ARGS -d filesystem -o load -t test_OtsDaqDemo${TEST_NAME}_${TEST_NUMBER} -c test002.res.json -f json -g config2 )
+    ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.cmp.${RAND_NAME}.json 
+  TEST_ARGS -o ${TEST_NAME} -d ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f json -v ${TEST_VERSION_NAME}_${TEST_NUMBER}  -r test${TEST_NUMBER}.cmp.${RAND_NAME}.json )
   

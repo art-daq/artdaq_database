@@ -2,8 +2,8 @@
     "ROOT": {
         "@xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
         "DATA_SET": {
-            "COMMENT_DESCRIPTION": null,
-            "CREATED_BY_USER": null,
+            "COMMENT_DESCRIPTION": "",
+            "CREATED_BY_USER": "",
             "DATA": [
                 {
                     "KILL_MASK": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",

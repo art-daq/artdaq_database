@@ -3,7 +3,7 @@
         "@xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
         "@xsi:noNamespaceSchemaLocation": "../../ConfigurationBase.xsd",
         "DATA_SET": {
-            "COMMENT_DESCRIPTION": null,
+            "COMMENT_DESCRIPTION": "",
             "CREATED_BY_USER": "Uplegger",
             "DATA": [
                 {
