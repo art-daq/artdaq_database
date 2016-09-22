@@ -1,15 +1,8 @@
-set(NODEJS_ADDON_NAME "conftoolg" )
+create_nodejs_addon ( ADDON_NAME "conftoolg"
+					  LIBRARIES
+					  artdaq-database_ConfigurationDB
+					  INCLUDES
+					  ${CMAKE_SOURCE_DIR}/artdaq-database)
 
-cet_make(
-  LIBRARIES
-  artdaq-database_ConfigurationDB
-  ${FHICLCPP}
-  ${CETLIB}
-  )
-
-set (NODEJS_ADDON_INCLUDES ${CMAKE_SOURCE_DIR}/artdaq-database)
-
-set (NODEJS_ADDON_LIBS "artdaq-database_ConfigurationDB")
-
-create_nodejs_addon ( ${NODEJS_ADDON_NAME} ${NODEJS_ADDON_INCLUDES} ${NODEJS_ADDON_LIBS})
-
+install_headers()
+install_source()
