@@ -3,8 +3,8 @@
         "@xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
         "@xsi:noNamespaceSchemaLocation": "../../ConfigurationBase.xsd",
         "DATA_SET": {
-            "COMMENT_DESCRIPTION": null,
-            "CREATED_BY_USER": null,
+            "COMMENT_DESCRIPTION": "",
+            "CREATED_BY_USER": "",
             "DATA": [
                 {
                     "COMPONENT_NAME": "FPix_BmI_D1_BLD1_PNL1_PLQ1_ROC0",

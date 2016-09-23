@@ -183,10 +183,10 @@ struct ConfigurationInterface final {
   }
 
   //==============================================================================
-  // returns a list of global configuration names matching the mongosearch
+  // returns a set of global configuration names matching the mongosearch
   // criteria, or all global configuration names if criteria is emapty.
-  std::list<std::string> findGlobalConfigurations(std::string const& mongosearch) const {
-    auto returnList = std::list<std::string>{};  // RVO
+  std::set<std::string> findGlobalConfigurations(std::string const& mongosearch) const {
+    auto returnSet = std::set<std::string>{};  // RVO
 
     constexpr auto apifunctname = "ConfigurationInterface::findGlobalConfigurations";
 
@@ -215,21 +215,21 @@ struct ConfigurationInterface final {
           auto const& filter = boost::get<jsn::object_t>(query).at(cfl::filterx);
           auto const& configuration =
               boost::get<std::string>(boost::get<jsn::object_t>(filter).at(cfl::filter::configuration));
-          returnList.emplace_back(configuration);
+          returnSet.insert(configuration);
         }
       } catch (std::exception const& e) {
         throw artdaq::database::runtime_exception(apifunctname)
             << "Unable to read configuration names from  JSON:" << apiCallResult.second << "; Exception:" << e.what();
       }
     } catch (std::exception const& e) {
-      returnList.clear();
+      returnSet.clear();
       throw artdaq::database::runtime_exception(apifunctname) << "Exception:" << e.what();
     } catch (...) {
-      returnList.clear();
+      returnSet.clear();
       throw artdaq::database::runtime_exception(apifunctname) << "Unknown exception";
     }
 
-    return returnList;  // RVO
+    return returnSet;  // RVO
   }
 
   //==============================================================================
@@ -369,9 +369,9 @@ struct ConfigurationInterface final {
     return {false, make_error_msg("Unknown exception")};
   }
 
-  // returns a list of configuration collection names
-  std::list<std::string> listCollectionNames(std::string const& name_prefix) const {
-    auto returnList = std::list<std::string>{};  // RVO
+  // returns a set of configuration collection names
+  std::set<std::string> listCollectionNames(std::string const& name_prefix) const {
+    auto returnSet = std::set<std::string>{};  // RVO
 
     constexpr auto apifunctname = "ConfigurationInterface::listCollectionNames";
 
@@ -397,10 +397,10 @@ struct ConfigurationInterface final {
     for (auto const& searchResult : searchResults) {
       auto const& query = boost::get<jsn::object_t>(searchResult).at(cfl::document::query);
       auto const& collectionName = boost::get<jsn::object_t>(query).at(cfl::option::collection);
-      returnList.push_back(boost::get<std::string>(collectionName));
+      returnSet.insert(boost::get<std::string>(collectionName));
     }
 
-    return returnList;
+    return returnSet;
   }
 
   // defaults

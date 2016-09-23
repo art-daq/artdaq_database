@@ -1,0 +1,3 @@
+test/logs
+*.sublime-*
+.kdev4
