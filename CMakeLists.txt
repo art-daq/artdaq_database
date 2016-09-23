@@ -52,7 +52,7 @@ cet_add_compiler_flags( -rdynamic -ldl)
 cet_report_compiler_flags()
 
 # these are minimum required versions, not the actual product versions
-find_ups_boost(v1_61_0)
+find_ups_boost(v1_57_0)
 find_ups_product (cetbuildtools v5_04_01)
 find_ups_product( artdaq_utilities v1_00_08 )
 find_ups_product( cetlib v1_18_02 )
