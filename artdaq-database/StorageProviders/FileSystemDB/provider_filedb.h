@@ -12,7 +12,7 @@ void enable();
 }
 
 namespace literal {
-constexpr auto FILEURI = "file://";
+constexpr auto FILEURI = "filesystemdb://";
 constexpr auto search_index = "index.json";
 constexpr auto db_name = "test_configuration_db";
 }
@@ -20,6 +20,8 @@ constexpr auto db_name = "test_configuration_db";
 struct DBConfig final {
   DBConfig() : uri{std::string{literal::FILEURI} + "${ARTDAQ_DATABASE_DATADIR}/filesystemdb" + "/" + literal::db_name} {
     auto tmpURI = expand_environment_variables("${ARTDAQ_DATABASE_URI}");
+    tmpURI.pop_back();//remove trailing slash
+    
     auto prefixURI = std::string{literal::FILEURI};
 
     if (tmpURI.length() > prefixURI.length() && std::equal(prefixURI.begin(), prefixURI.end(), tmpURI.begin()))
