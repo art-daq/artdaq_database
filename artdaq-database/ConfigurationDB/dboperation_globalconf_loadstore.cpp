@@ -194,7 +194,7 @@ result_pair_t json::load_globalconfiguration(std::string const& search_filter,
     auto database_format = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
     is.close();
 
-    database_format.pop_back();
+    //database_format.pop_back();
 
     conf_tarbzip2_base64 = "{\"conf.tar.bzip2.base64\":\"" + database_format + "\"}";
     return result_pair_t{true, conf_tarbzip2_base64};

@@ -152,7 +152,8 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByGlob
   assert(!search.json_buffer.empty());
   auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
   TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByGlobalConfigName() begin");
-  TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByGlobalConfigName() args search=<" << search.json_buffer << ">.");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByGlobalConfigName() args search=<" << search.json_buffer
+                                                                                                   << ">.");
 
   auto reader = JsonReader{};
 
@@ -174,7 +175,7 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByGlob
 
   } catch (...) {
   }
-  
+
   return _indexed_filtered_innerjoin_over_ouid("version", "configurations.name", configNameFilter);
 }
 
@@ -182,7 +183,8 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByEnti
   assert(!search.json_buffer.empty());
   auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
   TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByEntityName() begin");
-  TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByEntityName() args search=<" << search.json_buffer << ">.");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByEntityName() args search=<" << search.json_buffer
+                                                                                             << ">.");
 
   auto reader = JsonReader{};
 
@@ -204,7 +206,7 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByEnti
 
   } catch (...) {
   }
-  
+
   return _indexed_filtered_innerjoin_over_ouid("version", "configurable_entity.name", entityNameFilter);
 }
 

@@ -539,38 +539,6 @@ std::list<std::string> find_subdirs(std::string const& d) {
   return returnValue;
 }
 
-object_id_t generate_oid() {
-  std::ifstream is("/proc/sys/kernel/random/uuid");
-
-  std::string oid((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-
-  oid.erase(std::remove(oid.begin(), oid.end(), '-'), oid.end());
-  oid.resize(24);
-
-  TRACE_(12, "StorageProvider::FileSystemDB generate_oid=" << oid);
-
-  return oid;
-}
-
-std::string expand_environment_variables(std::string var) {
-  wordexp_t p;
-  char** w;
-
-  ::wordexp(var.c_str(), &p, 0);
-
-  w = p.we_wordv;
-
-  std::stringstream ss;
-
-  for (size_t i = 0; i < p.we_wordc; i++) ss << w[i] << "/";
-
-  ::wordfree(&p);
-
-  return ss.str();
-  // auto retValue = ss.str();
-  // return retValue.substr(0, retValue.find_last_of("\\/"));;
-}
-
 object_id_t extract_oid(std::string const& filter) {
   auto ex = std::regex("^\\{[^:]+:\\s+([\\s\\S]+)\\}$");
 
@@ -610,7 +578,6 @@ object_id_t extract_oid(std::string const& filter) {
 
   return match;
 }
-
 
 
 namespace filesystem {
