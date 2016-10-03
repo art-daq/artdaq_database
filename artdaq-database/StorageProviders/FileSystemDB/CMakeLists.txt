@@ -3,8 +3,6 @@ cet_make(
   artdaq-database_BasicTypes
   artdaq-database_JsonDocument
   artdaq-database_StorageProviders
-  ${BSONCXXLIB}
-  ${MONGOCXXLIB}
   ${CETLIB}
   ${Boost_FILESYSTEM_LIBRARY}    
   ${Boost_SYSTEM_LIBRARY}    

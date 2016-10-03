@@ -8,8 +8,6 @@ cet_make(
   artdaq-database_BasicTypes
   artdaq-database_StorageProviders_MongoDB  
   artdaq-database_StorageProviders_FileSystemDB  
- # ${BSONCXXLIB}
- # ${MONGOCXXLIB}  
   ${FHICLCPP}  
   ${SQLITE3}
   ${CETLIB}
