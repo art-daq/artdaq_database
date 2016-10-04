@@ -3,8 +3,8 @@
         "@xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
         "@xsi:noNamespaceSchemaLocation": "../../ConfigurationBase.xsd",
         "DATA_SET": {
-            "COMMENT_DESCRIPTION": null,
-            "CREATED_BY_USER": null,
+            "COMMENT_DESCRIPTION": "",
+            "CREATED_BY_USER": "",
             "DATA": {
                 "CHANNEL0_STATUS": "on",
                 "CHANNEL1_STATUS": "on",

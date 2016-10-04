@@ -12,14 +12,25 @@ void enable();
 }
 
 namespace literal {
-constexpr auto FILEURI = "file://";
+constexpr auto FILEURI = "filesystemdb://";
 constexpr auto search_index = "index.json";
+constexpr auto db_name = "test_configuration_db";
 }
 
 struct DBConfig final {
-  std::string path = "${ARTDAQ_DATABASE_DATADIR}/filesystemdb";
-  std::string db_name = "test_configuration_db";
-  const std::string connectionURI() const { return std::string{literal::FILEURI} + path; };
+  DBConfig() : uri{std::string{literal::FILEURI} + "${ARTDAQ_DATABASE_DATADIR}/filesystemdb" + "/" + literal::db_name} {
+    auto tmpURI = expand_environment_variables("${ARTDAQ_DATABASE_URI}");
+    tmpURI.pop_back();//remove trailing slash
+    
+    auto prefixURI = std::string{literal::FILEURI};
+
+    if (tmpURI.length() > prefixURI.length() && std::equal(prefixURI.begin(), prefixURI.end(), tmpURI.begin()))
+      uri = tmpURI;
+  }
+
+  DBConfig(std::string uri_) : uri{uri_} { assert(!uri_.empty()); }
+  std::string uri;
+  const std::string connectionURI() const { return uri; };
 };
 
 class FileSystemDB final {

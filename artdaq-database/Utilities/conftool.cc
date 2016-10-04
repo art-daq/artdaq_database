@@ -184,12 +184,13 @@ int main(int argc, char *argv[]) try {
     return process_exit_code::SUCCESS;
   }else if (options.operation().compare(literal::operation::store)==0 ||
       options.operation().compare(literal::operation::globalconfstore)==0) {
-      std::ofstream os(file_res_name.c_str());
+     /* std::ofstream os(file_res_name.c_str());
       std::copy(returned.begin(), returned.end(),
               std::ostream_iterator<char>(os));
       os.close();
 
       std::cout << "Wrote responce to file:" << file_res_name << "\n";
+      */
       return process_exit_code::SUCCESS;	
    } 
 

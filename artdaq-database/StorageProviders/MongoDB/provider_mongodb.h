@@ -14,11 +14,25 @@ namespace debug {
 void enable();
 }
 
+namespace literal {
+constexpr auto MONGOURI = "mongodb://";
+constexpr auto hostname = "127.0.0.1";
+constexpr auto port = "27017";
+constexpr auto db_name = "test_configuration_db";
+}
+
 struct DBConfig final {
-  std::string hostname = "127.0.0.1";
-  unsigned int port = 27017;
-  std::string db_name = "test_configuration_db";
-  const std::string connectionURI() const { return "mongodb://" + hostname + ":" + std::to_string(port); };
+  DBConfig() : uri{std::string{literal::MONGOURI} + literal::hostname + ":" + literal::port + "/" + literal::db_name} {
+    auto tmpURI = expand_environment_variables("${ARTDAQ_DATABASE_URI}");
+    tmpURI.pop_back();//remove trailing slash
+
+    auto prefixURI = std::string{literal::MONGOURI};
+    if (tmpURI.length() > prefixURI.length() && std::equal(prefixURI.begin(), prefixURI.end(), tmpURI.begin()))
+      uri = tmpURI;
+  }
+  DBConfig(std::string uri_) : uri{uri_} { assert(!uri_.empty()); }
+  std::string uri;
+  const std::string connectionURI() const { return uri; };
 };
 
 class MongoDB final {
@@ -39,7 +53,7 @@ class MongoDB final {
       : _config{config},
         _instance{},
         _client{mongocxx::uri{_config.connectionURI()}},
-        _connection{_client[_config.db_name]} {}
+        _connection{_client[_client.uri().database()]} {}
 
  private:
   DBConfig _config;

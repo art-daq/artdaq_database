@@ -1,0 +1,32 @@
+{
+	"NAME": "XDAQ_APPLICATION_CONFIGURATION",
+	"COMMENT": "comment_ \" \" ",
+	"AUTHOR": "",
+	"CREATION_TIME": 1475335554,
+	"COL_TYPES": {
+		"APPLICATION_GROUP": "VARCHAR2",
+		"APPLICATION": "VARCHAR2",
+		"SUPERVISOR_CONFIGURATION": "VARCHAR2",
+		"SUPERVISOR_UID": "VARCHAR2",
+		"STATUS": "VARCHAR2",
+		"CLASS": "VARCHAR2",
+		"ID": "VARCHAR2",
+		"INSTANCE": "VARCHAR2",
+		"NETWORK": "VARCHAR2",
+		"GROUP": "VARCHAR2",
+		"MODULE": "VARCHAR2"
+	},
+	"DATA_SET": [{
+		"APPLICATION_GROUP": "ots::super",
+		"APPLICATION": "aa:super",
+		"SUPERVISOR_CONFIGURATION": ":",
+		"SUPERVISOR_UID": "\":\"",
+		"STATUS": "",
+		"CLA\":\"SS": "",
+		"ID": "",
+		"INSTANCE": "",
+		"NETW:ORK": "",
+		"GROUP": "",
+		"MODULE": ""
+	}]
+}
