@@ -19,8 +19,11 @@ constexpr auto db_name = "test_configuration_db";
 
 struct DBConfig final {
   DBConfig() : uri{std::string{literal::FILEURI} + "${ARTDAQ_DATABASE_DATADIR}/filesystemdb" + "/" + literal::db_name} {
-    auto tmpURI = expand_environment_variables("${ARTDAQ_DATABASE_URI}");
-    tmpURI.pop_back();//remove trailing slash
+    
+    auto tmpURI = getenv("ARTDAQ_DATABASE_URI")?expand_environment_variables("${ARTDAQ_DATABASE_URI}"):std::string("");
+    
+    if(tmpURI.back()=='/')    
+      tmpURI.pop_back();//remove trailing slash
     
     auto prefixURI = std::string{literal::FILEURI};
 
