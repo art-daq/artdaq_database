@@ -29,7 +29,8 @@ using artdaq::database::sharedtypes::unwrap;
 
 typedef std::vector<object_id_t> (SearchIndex::*matching_function_t)(std::string const&);
 
-SearchIndex::SearchIndex(boost::filesystem::path const& path) : _index{}, _path{path}, _isOpen{_open(path)} {}
+SearchIndex::SearchIndex(boost::filesystem::path const& path)
+    : _index{}, _path{path}, _isDirty{false}, _isOpen{_open(path)} {}
 
 SearchIndex::~SearchIndex() {
   try {
@@ -289,6 +290,8 @@ bool SearchIndex::addDocument(JsonData const& document, object_id_t const& ouid)
   TRACE_(5, "StorageProvider::FileSystemDB::index::addDocument() found " << doc_ast.size() << " keys.");
 
   try {
+    _isDirty = true;
+
     auto version = boost::get<std::string>(doc_ast.at("version"));
 
     _addVersion(ouid, version);
@@ -344,6 +347,8 @@ bool SearchIndex::removeDocument(JsonData const& document, object_id_t const& ou
   TRACE_(5, "StorageProvider::FileSystemDB::index::removeDocument() found " << doc_ast.size() << " keys.");
 
   try {
+    _isDirty = true;
+
     auto version = boost::get<std::string>(doc_ast.at("version"));
 
     _removeVersion(ouid, version);
@@ -419,13 +424,55 @@ bool SearchIndex::_open(boost::filesystem::path const& index_path) {
 
   if (reader.read(json, _index)) return true;
 
-  TRACE_(3, "StorageProvider::FileSystemDB::index::_open() Failed to open SearchIndex.");
+  if (shouldAutoRebuildSearchIndex() && _rebuild(index_path)) return true;
 
-  return false;
+  TRACE_(3, "StorageProvider::FileSystemDB::index::_open() SearchIndex is corrupt and needs to be rebuilt.");
+  
+  throw cet::exception("FileSystemDB")
+      << "StorageProvider::FileSystemDB::SearchIndex SearchIndex is corrupt and needs to be rebuilt, path=<"
+      << index_path.c_str() << ">";
+}
+
+bool SearchIndex::_rebuild(boost::filesystem::path const& index_path) {
+  TRACE_(13, "StorageProvider::FileSystemDB::index::_rebuld() begin");
+  TRACE_(13, "StorageProvider::FileSystemDB::index::_rebuld() args index_path=<" << index_path.c_str() << ">.");
+
+  try {
+    if (!_create(index_path))
+      TRACE_(13, "Exception in StorageProvider::FileSystemDB::index::_rebuild() "
+                     << boost::current_exception_diagnostic_information());
+
+    if (!_open(index_path))
+      TRACE_(13, "Exception in StorageProvider::FileSystemDB::index::_rebuild() "
+                     << boost::current_exception_diagnostic_information());
+
+    auto files = list_files_in_directory(index_path.parent_path(), "");
+
+    for (auto const& file : files) {
+      if (file.filename() == "index.json") continue;
+
+      std::ifstream is(index_path.c_str());
+
+      std::string json((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+
+      is.close();
+
+      addDocument({json}, file.stem().string());
+    }
+
+    _isDirty = true;
+    _isOpen = true;
+
+    return true;
+  } catch (...) {
+    TRACE_(13, "StorageProvider::FileSystemDB::index::_rebuild() Failed to rebuild SearchIndex; error:"
+                   << boost::current_exception_diagnostic_information());
+    return false;
+  }
 }
 
 bool SearchIndex::_close() {
-  if (!_isOpen) return true;
+  if (!_isOpen || !_isDirty) return true;
 
   TRACE_(4, "StorageProvider::FileSystemDB::index::_close() begin");
 
@@ -880,4 +927,9 @@ T const& unwrapper<const jsn::value_t>::value_as() {
   using V = typename std::remove_const<T>::type;
 
   return boost::get<V>(any);
+}
+
+bool dbfsi::shouldAutoRebuildSearchIndex(bool rebuild) {
+  static const bool _shouldAutoRebuildSearchIndex = rebuild;
+  return _shouldAutoRebuildSearchIndex;
 }

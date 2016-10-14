@@ -1,2 +1,5 @@
-<!--TODO replace with valid contents -->
-<data />
+<system>
+   <config>
+      <DebugCmdTime></DebugCmdTime>
+   </config>
+</system>
