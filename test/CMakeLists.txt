@@ -10,9 +10,9 @@ cet_test_env("ARTDAQ_DATABASE_DATADIR=${CMAKE_BINARY_DIR}/databases")
 
 #test order is important
 #add_subdirectory(JsonDocument)
-add_subdirectory(DataFormats)
+#add_subdirectory(DataFormats)
 #add_subdirectory(ConfigurationDB)
 #add_subdirectory(CaseStudy)
-#add_subdirectory(StorageProviders)
+add_subdirectory(StorageProviders)
 
 #add_subdirectory(JSONConvert)
