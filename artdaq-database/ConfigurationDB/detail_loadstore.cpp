@@ -42,6 +42,7 @@ using Options = cf::LoadStoreOperation;
 
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::basictypes::FhiclData;
+using artdaq::database::basictypes::XmlData;
 using artdaq::database::jsonutils::JSONDocument;
 using artdaq::database::jsonutils::JSONDocumentBuilder;
 
@@ -125,6 +126,27 @@ void store_configuration(Options const& options, std::string& conf) {
       }
       
       returnValue= fhicl.fhicl_buffer;
+      returnValueChanged = true;
+
+      break;
+    }
+    case data_format_t::xml: {
+      // convert from xml to json and back to xml
+      
+      data = XmlData{conf};
+
+      auto xml = XmlData{};
+
+      if (!data.convert_to<XmlData>(xml)) {
+        TRACE_(17, "store_configuration: Unable to convert json data to fcl; json=<" << data.json_buffer << ">");
+
+        throw cet::exception("store_configuration") << "Unable to reverse xml-to-json convertion";
+      } else {
+        TRACE_(17, "store_configuration: Converted json data to fcl; json=<" << data.json_buffer << ">");
+        TRACE_(17, "store_configuration: Converted json data to fcl; fcl=<" << xml.xml_buffer << ">");
+      }
+      
+      returnValue= xml.xml_buffer;
       returnValueChanged = true;
 
       break;
@@ -256,6 +278,22 @@ void load_configuration(Options const& options, std::string& conf) {
 
       break;
     }
+    case data_format_t::xml: {
+      auto document = JSONDocument{search_result.json_buffer};
+      auto json = JsonData{document.findChild(db::jsonutils::literal::document).to_string()};
+
+      auto xml = XmlData{};
+      if (!json.convert_to<XmlData>(xml)) {
+        TRACE_(16, "load_configuration: Unable to convert json data to xml; json=<" << json.json_buffer << ">");
+
+        throw cet::exception("load_configuration") << "Unable to reverse xml-to-json convertion";
+      }
+      returnValue = xml.xml_buffer;
+
+      returnValueChanged = true;
+
+      break;
+    }    
   }
 
   if (returnValueChanged) conf.swap(returnValue);

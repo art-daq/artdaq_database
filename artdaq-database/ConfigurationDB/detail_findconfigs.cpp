@@ -91,7 +91,8 @@ void find_global_configurations(Options const& options, std::string& configs) {
     case data_format_t::db:
     case data_format_t::json:
     case data_format_t::unknown:
-    case data_format_t::fhicl: {
+    case data_format_t::fhicl:
+    case data_format_t::xml:{
       if (!db::json_db_to_gui(search_result.json_buffer, returnValue)) {
         throw cet::exception("find_global_configurations") << "Unsupported data format.";
       }
@@ -142,7 +143,8 @@ void build_global_configuration_search_filter(Options const& options, std::strin
     case data_format_t::db:
     case data_format_t::json:
     case data_format_t::unknown:
-    case data_format_t::fhicl: {
+    case data_format_t::fhicl: 
+    case data_format_t::xml:{
       if (!db::json_db_to_gui(search_result.json_buffer, returnValue)) {
         throw cet::exception("build_global_configuration_search_filter") << "Unsupported data format.";
       }

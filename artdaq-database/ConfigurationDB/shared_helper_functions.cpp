@@ -39,6 +39,9 @@ std::string cf::to_string(data_format_t const& f) {
 
     case data_format_t::db:
       return "db";
+      
+    case data_format_t::xml:
+      return "xml";      
   }
 }
 
@@ -53,6 +56,8 @@ data_format_t cf::to_data_format(std::string const& f) {
     return data_format_t::gui;
   } else if (f.compare("db") == 0) {
     return data_format_t::db;
+  }else if (f.compare("xml") == 0) {
+    return data_format_t::xml;    
   } else {
     return data_format_t::unknown;
   }
