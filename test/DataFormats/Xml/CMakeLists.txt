@@ -9,6 +9,6 @@ cet_make_exec(XMLConvert_t
 ) 
 
 add_subdirectory(test001)
-#add_subdirectory(test002)
+add_subdirectory(test002)
 
 install_source()

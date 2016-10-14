@@ -1,6 +1,6 @@
 cet_enable_asserts()
 
-#configure_file("CTestCustom.cmake.in" ${CMAKE_BINARY_DIR}/CTestCustom.cmake)
+configure_file("CTestCustom.cmake.in" ${CMAKE_BINARY_DIR}/CTestCustom.cmake)
 
 # Make sure tests have correct environment settings.
 include(CetTest)
