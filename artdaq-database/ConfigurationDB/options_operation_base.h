@@ -52,6 +52,9 @@ class OperationBase {
   virtual JsonData writeJsonData() const;
 
  private:
+  std::string _getProviderFromURI();
+  
+ private:  
   std::string _process_name = {literal::notprovided};
 
   std::string _provider = {literal::database_provider_filesystem};

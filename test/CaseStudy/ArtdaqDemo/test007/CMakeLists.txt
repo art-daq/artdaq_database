@@ -2,6 +2,7 @@ SET ( TEST_NUMBER "007" )
 
 SET ( TEST_NAME "ArtdaqDemo_store" )
 SET ( TEST_DBPROVIDER "filesystem" )
+cet_test_env("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}")
 
 
 cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_01_t HANDBUILT  TEST_EXEC ArtdaqDemo_t 
@@ -45,6 +46,7 @@ cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_06_t HANDBUILT  TEST_EXE
   TEST_ARGS -d ${TEST_DBPROVIDER} -o store -c artdaq_EventBuilder2 -s EventBuilder_topol.fnal.gov_5236.src.fcl -r EventBuilder_topol.fnal.gov_5236.cmp.fcl -f fhicl -v ${TEST_VERSION_NAME} -g ${TEST_CONFIGURATION_NAME}-${TEST_NUMBER} )
 
 SET ( TEST_DBPROVIDER "mongo" )
+cet_test_env("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_MONGO}")
   
 cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_11_t HANDBUILT  TEST_EXEC ArtdaqDemo_t 
   DATAFILES 
