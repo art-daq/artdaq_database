@@ -72,7 +72,7 @@
 "fileMode" : "NOMERGE"
 }
 },
-"source" : {
+"origin" : {
 "module_type" : "NetMonInput"
 }
 },
@@ -324,7 +324,7 @@
 }
 }
 },
-"source" : {
+"origin" : {
 "type" : "table",
 "comment" : " ",
 "children" : {
@@ -674,7 +674,7 @@
 },
 {
 "type" : "table",
-"name" : "source",
+"name" : "origin",
 "comment" : " ",
 "children" : [
 {
@@ -689,10 +689,10 @@
 ]
 }
 },
-"source" : {
-"encoding" : "base64",
-"format" : "json",
-"rawdata" : "as"
+"origin" : {
+ 
+"format" : "json"
+ 
 },
 "version" : "version001",
 "configurations" : [

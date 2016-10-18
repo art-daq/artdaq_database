@@ -25,10 +25,8 @@
       ]
    },
    "version":"version1",   
-   "source":{
-      "encoding":"base64",
-      "format":"json",
-      "rawdata":"as"
+   "origin":{
+      "format":"json"
    },   
    "configurations":[
       "config1"

@@ -25,10 +25,10 @@
         ]
     }, 
     "version" : "updatedVersion", 
-    "source" : {
-        "encoding" : "base64", 
-        "format" : "json", 
-        "rawdata" : "as"
+    "origin" : {
+          
+        "format" : "json" 
+         
     }, 
     "configurations" : [
         "config1"

@@ -52,10 +52,10 @@
                 }
             ]
         }, 
-        "source" : {
-            "encoding" : "base64", 
-            "format" : "json", 
-            "rawdata" : "as"
+        "origin" : {
+              
+            "format" : "json" 
+             
         }, 
         "version" : "0", 
         "configurations" : [

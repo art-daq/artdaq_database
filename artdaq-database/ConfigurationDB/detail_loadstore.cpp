@@ -32,6 +32,7 @@ namespace cfl = cf::literal;
 namespace cflo = cfl::operation;
 namespace cflp = cfl::provider;
 namespace cfld = cfl::document;
+namespace cfls = cfl::origin;
 
 namespace cftd = cf::debug::detail;
 
@@ -225,7 +226,21 @@ void load_configuration(Options const& options, std::string& conf) {
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
 
-  switch (options.dataFormat()) {
+  auto dataFormat = options.dataFormat();
+  
+  if(dataFormat == data_format_t::origin ){
+      auto resultAst = jsn::object_t{};
+      
+      if(!jsn::JsonReader{}.read(search_result.json_buffer,resultAst))
+	throw cet::exception("load_configuration")<< "Invalid json data";
+
+      auto const& docAst = boost::get<jsn::object_t>(resultAst.at(cfls::origin));
+      dataFormat=to_data_format(boost::get<std::string>(docAst.at(cfls::format)));
+
+      TRACE_(16, "load_configuration: dataFormat=<" << to_string(dataFormat) << ">");
+  }
+  
+  switch (dataFormat) {
     default:
     case data_format_t::db: {
       returnValue = search_result.json_buffer;

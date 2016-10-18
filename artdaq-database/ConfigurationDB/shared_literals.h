@@ -92,6 +92,14 @@ constexpr auto search = "search";
 constexpr auto query = "query";
 }
 
+namespace origin {
+constexpr auto origin = "origin";
+constexpr auto source = "source";
+constexpr auto timestamp = "timestamp";
+constexpr auto format = "format";
+constexpr auto rawdata = "rawdata";
+}
+
 constexpr auto name = "name";
 
 constexpr auto filterx = "filter";

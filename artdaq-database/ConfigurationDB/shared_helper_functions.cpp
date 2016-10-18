@@ -41,7 +41,11 @@ std::string cf::to_string(data_format_t const& f) {
       return "db";
       
     case data_format_t::xml:
-      return "xml";      
+      return "xml";
+  
+    case data_format_t::origin:
+      return "origin";
+      
   }
 }
 
@@ -58,6 +62,8 @@ data_format_t cf::to_data_format(std::string const& f) {
     return data_format_t::db;
   }else if (f.compare("xml") == 0) {
     return data_format_t::xml;    
+  }else if (f.compare("origin") == 0) {
+    return data_format_t::origin;    
   } else {
     return data_format_t::unknown;
   }

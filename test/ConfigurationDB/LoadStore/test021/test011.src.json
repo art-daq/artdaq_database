@@ -331,8 +331,8 @@
 "type":"table","name":"main","comment":"#main","children":[]}
 ],"changelog":"empty"}
 }
-,"source":{
-"encoding":"base64","format":"json","rawdata":"as"}
+,"origin":{
+"format":"json"}
 ,"version":"demoVersion002","configurations":[{
 "name":"demoConfig001","assigned":"Thu Sep  8 19:38:10 2016"}
 ],"aliases":{
@@ -683,8 +683,8 @@
 "type":"table","name":"main","comment":"#main","children":[]}
 ],"changelog":"empty"}
 }
-,"source":{
-"encoding":"base64","format":"json","rawdata":"as"}
+,"origin":{
+"format":"json"}
 ,"version":"demoVersion002","configurations":[{
 "name":"demoConfig001","assigned":"Thu Sep  8 19:38:10 2016"}
 ],"aliases":{
