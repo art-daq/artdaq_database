@@ -403,7 +403,7 @@ bool SearchIndex::_open(boost::filesystem::path const& index_path) {
         << "StorageProvider::FileSystemDB::SearchIndex SearchIndex was aready opened, path=<" << index_path.c_str()
         << ">";
   }
-
+  
   if (!boost::filesystem::exists(index_path) && !_create(index_path)) {
     TRACE_(3, "StorageProvider::FileSystemDB::SearchIndex Failed creating SearchIndex, path=<" << index_path.c_str()
                                                                                                << ">");
@@ -448,10 +448,14 @@ bool SearchIndex::_rebuild(boost::filesystem::path const& index_path) {
 
     auto files = list_files_in_directory(index_path.parent_path(), "");
 
+    TRACE_(13, "StorageProvider::FileSystemDB::index::_rebuld() found " << files.size() << " existing documents in " << index_path.parent_path().string() );
+    
     for (auto const& file : files) {
       if (file.filename() == "index.json") continue;
 
-      std::ifstream is(index_path.c_str());
+      TRACE_(13, "StorageProvider::FileSystemDB::index::_rebuld() Adding " << file.c_str() );
+
+      std::ifstream is(file.c_str());
 
       std::string json((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
 
@@ -885,9 +889,6 @@ file_paths_t list_files_in_directory(boost::filesystem::path const& path, std::s
                                          << path.string() << ">";
   }
 
-  auto end = boost::filesystem::directory_iterator{};
-  auto iter = boost::filesystem::directory_iterator(path);
-
   if (!boost::filesystem::exists(path) || !boost::filesystem::is_directory(path)) {
     TRACE_(12, "StorageProvider::FileSystemDB Failed listing files in the directory; directory doesn't exist =<"
                    << path.string() << ">");
@@ -895,9 +896,12 @@ file_paths_t list_files_in_directory(boost::filesystem::path const& path, std::s
 
   result.reserve(100);
 
+  auto end = boost::filesystem::directory_iterator{};
+  auto iter = boost::filesystem::directory_iterator(path);
+
   for (; iter != end; ++iter) {
-    if (boost::filesystem::is_regular_file(iter->status()) && iter->path().filename().empty()) {
-      result.push_back(iter->path().filename());
+    if (boost::filesystem::is_regular_file(iter->status()) && !iter->path().filename().empty()) {
+      result.push_back(iter->path());
     }
   }
   return result;
