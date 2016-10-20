@@ -3,10 +3,16 @@ include(CetParseArgs)
 
 set(CAN_BUILD true)
 
+if(NOT EXISTS "$ENV{PYTHON_DIR}")
+    message("Directory \"$ENV{PYTHON_DIR}\" does not exist, can't build Python addons!")
+  set(CAN_BUILD false)
+endif(NOT EXISTS "$ENV{PYTHON_DIR}")
+
 if(NOT EXISTS "$ENV{SWIG_DIR}")
     message("Directory \"$ENV{SWIG_DIR}\" does not exist, can't build Python addons!")
   set(CAN_BUILD false)
 endif(NOT EXISTS "$ENV{SWIG_DIR}")
+
 
 if(CAN_BUILD)
   #find_ups_product(swig v3)
@@ -17,6 +23,9 @@ if(CAN_BUILD)
   
   FIND_PACKAGE(PythonLibs)  
   INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
+
+#  find_ups_product(python v2_7_11)
+  INCLUDE_DIRECTORIES($ENV{PYTHON_INCLUDE})
 endif(CAN_BUILD)
 
 macro (create_python_addon)
