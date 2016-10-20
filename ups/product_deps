@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_database  v1_03_12
+parent artdaq_database  v1_03_13
 defaultqual	e10:s35
 
 # These optional lines define the installed directories where
@@ -48,7 +48,7 @@ table_fragment_begin
 envSet( ARTDAQ_DATABASE_DATADIR, ${HOME}/databases )
 envSet( ARTDAQ_DATABASE_URI,"filesystemdb://${ARTDAQ_DATABASE_DATADIR}/filesystemdb/test_db")
 
-#envPrepend(PYTHONPATH, "${${UPS_PROD_NAME_UC}_FQ_DIR}/python")
+envPrepend(PYTHONPATH, "${${UPS_PROD_NAME_UC}_FQ_DIR}/python")
 
 table_fragment_end
 
