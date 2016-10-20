@@ -403,7 +403,7 @@ bool SearchIndex::_open(boost::filesystem::path const& index_path) {
         << "StorageProvider::FileSystemDB::SearchIndex SearchIndex was aready opened, path=<" << index_path.c_str()
         << ">";
   }
-  
+
   if (!boost::filesystem::exists(index_path) && !_create(index_path)) {
     TRACE_(3, "StorageProvider::FileSystemDB::SearchIndex Failed creating SearchIndex, path=<" << index_path.c_str()
                                                                                                << ">");
@@ -427,7 +427,7 @@ bool SearchIndex::_open(boost::filesystem::path const& index_path) {
   if (shouldAutoRebuildSearchIndex() && _rebuild(index_path)) return true;
 
   TRACE_(3, "StorageProvider::FileSystemDB::index::_open() SearchIndex is corrupt and needs to be rebuilt.");
-  
+
   throw cet::exception("FileSystemDB")
       << "StorageProvider::FileSystemDB::SearchIndex SearchIndex is corrupt and needs to be rebuilt, path=<"
       << index_path.c_str() << ">";
@@ -448,12 +448,13 @@ bool SearchIndex::_rebuild(boost::filesystem::path const& index_path) {
 
     auto files = list_files_in_directory(index_path.parent_path(), "");
 
-    TRACE_(13, "StorageProvider::FileSystemDB::index::_rebuld() found " << files.size() << " existing documents in " << index_path.parent_path().string() );
-    
+    TRACE_(13, "StorageProvider::FileSystemDB::index::_rebuld() found " << files.size() << " existing documents in "
+                                                                        << index_path.parent_path().string());
+
     for (auto const& file : files) {
       if (file.filename() == "index.json") continue;
 
-      TRACE_(13, "StorageProvider::FileSystemDB::index::_rebuld() Adding " << file.c_str() );
+      TRACE_(13, "StorageProvider::FileSystemDB::index::_rebuld() Adding " << file.c_str());
 
       std::ifstream is(file.c_str());
 
@@ -841,7 +842,14 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::_indexed_filtered_
   auto acceptValue = [&right_begins_with](auto const& value) {
     if (value.size() < right_begins_with.size() || value == "notprovided") return false;
 
-    if (std::equal(right_begins_with.begin(), right_begins_with.end(), value.begin())) return true;
+    auto first(std::begin(right_begins_with)), last(std::end(right_begins_with));
+
+    if (right_begins_with.back() != '*') {
+      if (value.size() == right_begins_with.size() && std::equal(first, last, value.begin())) return true;
+    } else {
+      if (std::equal(first, std::prev(last), value.begin())) return true;
+    }
+
     return false;
   };
 
@@ -855,7 +863,7 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::_indexed_filtered_
     if (!acceptValue(right_element.key)) continue;
 
     TRACE_(5, "StorageProvider::FileSystemDB::index::_indexed_filtered_innerjoin_over_ouid()"
-                  << " accepted value  " << right_element.key << " begin with " << right_begins_with);
+                  << " accepted value  " << right_element.key << " begins with " << right_begins_with);
 
     auto& right_ouid_list = boost::get<jsn::array_t>(right_element.value);
 
