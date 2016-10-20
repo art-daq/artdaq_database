@@ -31,10 +31,9 @@
                 }
             ]
         }, 
-        "source" : {
-            "encoding" : "base64", 
-            "format" : "fhicl", 
-            "rawdata" : "Ly9jb21tZW50IDENCmE6MSAjYW5ub3RhdGlvbiAxDQovL2NvbW1lbnQgMg0KYjp7DQogIGM6IjIiICNhbm5vdGF0aW9uIDINCiAgLy9jb21tZW50IDMNCiAgZDpbMiw1LDZdICNhbm5vdGF0aW9uIDMNCn0="
+        "origin" : {
+              
+            "format" : "fhicl"
         }, 
         "data" : {
             "aa" : 3, 

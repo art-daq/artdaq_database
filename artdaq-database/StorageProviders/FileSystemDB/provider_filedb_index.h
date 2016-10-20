@@ -29,7 +29,7 @@ class SearchIndex final {
   std::vector<std::pair<std::string, std::string>> findAllGlobalConfigurations(JsonData const&);
   std::vector<std::pair<std::string, std::string>> findVersionsByGlobalConfigName(JsonData const&);
   std::vector<std::pair<std::string, std::string>> findVersionsByEntityName(JsonData const&);
-  
+
   std::vector<std::string> findConfigEntities(JsonData const&);
 
   bool addDocument(JsonData const&, object_id_t const&);
@@ -69,12 +69,16 @@ class SearchIndex final {
   bool _open(boost::filesystem::path const&);
   bool _create(boost::filesystem::path const&);
   bool _close();
+  bool _rebuild(boost::filesystem::path const&);
 
  private:
   object_t _index;
   boost::filesystem::path _path;
+  bool _isDirty;
   bool _isOpen;
 };
+
+bool shouldAutoRebuildSearchIndex(bool = false);
 
 template <typename TYPE>
 void SearchIndex::_make_unique_sorted(jsn::array_t& ouids) {

@@ -32,6 +32,7 @@ namespace cfl = cf::literal;
 namespace cflo = cfl::operation;
 namespace cflp = cfl::provider;
 namespace cfld = cfl::document;
+namespace cfls = cfl::origin;
 
 namespace cftd = cf::debug::detail;
 
@@ -42,6 +43,7 @@ using Options = cf::LoadStoreOperation;
 
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::basictypes::FhiclData;
+using artdaq::database::basictypes::XmlData;
 using artdaq::database::jsonutils::JSONDocument;
 using artdaq::database::jsonutils::JSONDocumentBuilder;
 
@@ -129,6 +131,27 @@ void store_configuration(Options const& options, std::string& conf) {
 
       break;
     }
+    case data_format_t::xml: {
+      // convert from xml to json and back to xml
+      
+      data = XmlData{conf};
+
+      auto xml = XmlData{};
+
+      if (!data.convert_to<XmlData>(xml)) {
+        TRACE_(17, "store_configuration: Unable to convert json data to fcl; json=<" << data.json_buffer << ">");
+
+        throw cet::exception("store_configuration") << "Unable to reverse xml-to-json convertion";
+      } else {
+        TRACE_(17, "store_configuration: Converted json data to fcl; json=<" << data.json_buffer << ">");
+        TRACE_(17, "store_configuration: Converted json data to fcl; fcl=<" << xml.xml_buffer << ">");
+      }
+      
+      returnValue= xml.xml_buffer;
+      returnValueChanged = true;
+
+      break;
+    }
   }
 
   TRACE_(15, "store_configuration: json_buffer=<" << data.json_buffer << ">");
@@ -203,7 +226,21 @@ void load_configuration(Options const& options, std::string& conf) {
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
 
-  switch (options.dataFormat()) {
+  auto dataFormat = options.dataFormat();
+  
+  if(dataFormat == data_format_t::origin ){
+      auto resultAst = jsn::object_t{};
+      
+      if(!jsn::JsonReader{}.read(search_result.json_buffer,resultAst))
+	throw cet::exception("load_configuration")<< "Invalid json data";
+
+      auto const& docAst = boost::get<jsn::object_t>(resultAst.at(cfls::origin));
+      dataFormat=to_data_format(boost::get<std::string>(docAst.at(cfls::format)));
+
+      TRACE_(16, "load_configuration: dataFormat=<" << to_string(dataFormat) << ">");
+  }
+  
+  switch (dataFormat) {
     default:
     case data_format_t::db: {
       returnValue = search_result.json_buffer;
@@ -256,6 +293,22 @@ void load_configuration(Options const& options, std::string& conf) {
 
       break;
     }
+    case data_format_t::xml: {
+      auto document = JSONDocument{search_result.json_buffer};
+      auto json = JsonData{document.findChild(db::jsonutils::literal::document).to_string()};
+
+      auto xml = XmlData{};
+      if (!json.convert_to<XmlData>(xml)) {
+        TRACE_(16, "load_configuration: Unable to convert json data to xml; json=<" << json.json_buffer << ">");
+
+        throw cet::exception("load_configuration") << "Unable to reverse xml-to-json convertion";
+      }
+      returnValue = xml.xml_buffer;
+
+      returnValueChanged = true;
+
+      break;
+    }    
   }
 
   if (returnValueChanged) conf.swap(returnValue);

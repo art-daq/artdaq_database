@@ -45,6 +45,28 @@ struct tostring_visitor : public boost::static_visitor<std::string> {
   std::string operator()(bool const& val) const { return val ? "true" : "false"; }
 };
 
+struct type_visitor : public boost::static_visitor<type_t> {
+    type_t operator()(object_t const&) const { return type_t::OBJECT; }
+    type_t operator()(array_t const&) const { return type_t::ARRAY; }
+    type_t operator()(std::string const&) const { return type_t::VALUE; }
+    type_t operator()(double const&) const { return type_t::VALUE;}
+    type_t operator()(int const&) const { return type_t::VALUE;}
+    type_t operator()(bool const&) const { return type_t::VALUE; }
+
+    type_t operator()(object_t &) const { return type_t::OBJECT; }
+    type_t operator()(array_t &) const { return type_t::ARRAY; }
+    type_t operator()(std::string &) const { return type_t::VALUE; }
+    type_t operator()(double &) const { return type_t::VALUE;}
+    type_t operator()(int &) const { return type_t::VALUE;}
+    type_t operator()(bool &) const { return type_t::VALUE; }
+};
+
+template <typename T>
+  type_t type(T& var){
+    assert(!var.empty());
+      return boost::apply_visitor(type_visitor(), var);
+}
+
 std::pair<bool, std::string> operator==(value_t const&, value_t const&);
 std::pair<bool, std::string> operator==(data_t const&, data_t const&);
 std::pair<bool, std::string> operator==(array_t const&, array_t const&);

@@ -26,6 +26,10 @@ using dbbt::JsonData;
 using cf::OperationBase;
 using cf::options::data_format_t;
 
+namespace artdaq {namespace database {
+std::string expand_environment_variables(std::string var);  
+}}
+
 OperationBase::OperationBase(std::string const& process_name) : _process_name{process_name} {}
 
 std::string const& OperationBase::operation() const noexcept {
@@ -137,7 +141,7 @@ bpo::options_description OperationBase::makeProgramOptions() const {
   descstr << _process_name;
   descstr << " <" << cfl::option::searchquery << ">";
 
-  descstr << "  <-d <" << cfl::option::provider << ">>";
+  //descstr << "  <-d <" << cfl::option::provider << ">>";
   descstr << "  <-o <" << cfl::option::operation << ">>";
   descstr << "  <-f <" << cfl::option::format << ">>";
   descstr << "  <-c <" << cfl::option::collection << ">>";
@@ -151,16 +155,18 @@ bpo::options_description OperationBase::makeProgramOptions() const {
     return std::string{long_name}.append(",").append(short_name);
   };
 
-  opts.add_options()("help,h", "Produce help message");
-  opts.add_options()(make_opt_name(cfl::option::provider, "d").c_str(), bpo::value<std::string>(),
-                     "Database provider name");
+  opts.add_options()("help,h", "Produce help message");  
+
   opts.add_options()(make_opt_name(cfl::option::operation, "o").c_str(), bpo::value<std::string>(),
                      "Database operation name");
   opts.add_options()(make_opt_name(cfl::option::format, "f").c_str(), bpo::value<std::string>(),
-                     "In/Out data format [fhicl, gui, or db]");
+                     "In/Out data format [fhicl, xml, gui, or db]");
   opts.add_options()(make_opt_name(cfl::option::collection, "c").c_str(), bpo::value<std::string>(),
                      "Configuration collection name");
 
+  opts.add_options()(make_opt_name(cfl::option::provider, "d").c_str(), bpo::value<std::string>(),
+                     "Database provider name; depricated");
+  
   opts.add_options()(cfl::option::searchfilter, bpo::value<std::string>(), "Search filter");
 
   opts.add_options()(cfl::option::searchquery, bpo::value<std::string>(), "Search query");
@@ -169,6 +175,16 @@ bpo::options_description OperationBase::makeProgramOptions() const {
                      "Expected result file name");
 
   return opts;
+}
+
+std::string OperationBase::_getProviderFromURI(){
+  auto tmpURI = getenv("ARTDAQ_DATABASE_URI")?db::expand_environment_variables("${ARTDAQ_DATABASE_URI}"):std::string("");
+
+  auto tmpDB=std::string(cfl::provider::mongo);
+  if(std::equal(std::begin(tmpDB) , std::end(tmpDB), tmpURI.begin()))
+    return  cfl::provider::mongo;
+  
+  return cfl::provider::filesystem;
 }
 
 int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
@@ -191,6 +207,10 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
     return process_exit_code::SUCCESS;
   }
 
+  
+  provider(_getProviderFromURI());
+  
+/*
   if (!vm.count(cfl::option::provider)) {
     std::cerr << "Exception from command line processing in " << _process_name << ": no datbase provider name given.\n"
               << "For usage and an options list, please do '" << _process_name << " --help"
@@ -199,6 +219,7 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
   } else {
     provider(vm[cfl::option::provider].as<std::string>());
   }
+*/
 
   if (!vm.count(cfl::option::operation)) {
     std::cerr << "Exception from command line processing in " << _process_name << ": no database operation given.\n"
@@ -239,7 +260,8 @@ void OperationBase::readJsonData(JsonData const& data) {
   }
 
   try {
-    provider(boost::get<std::string>(filterAST.at(cfl::option::provider)));
+    provider(_getProviderFromURI());
+    //provider(boost::get<std::string>(filterAST.at(cfl::option::provider)));
   } catch (...) {
   }
 
@@ -278,7 +300,7 @@ JsonData OperationBase::writeJsonData() const {
   auto docAST = object_t{};
 
   docAST[cfl::option::searchfilter] = searchFilterAST;
-  docAST[cfl::option::provider] = provider();
+  //docAST[cfl::option::provider] = provider();
   docAST[cfl::option::operation] = operation();
   docAST[cfl::option::collection] = collectionName();
   docAST[cfl::option::format] = cf::to_string(dataFormat());

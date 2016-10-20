@@ -186,6 +186,18 @@ JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& doc
     TRACE_(2, "createFrom() No converted.changelog");
   }
   
+  // replace data origin if any
+  try {
+    auto data = document.findChild(literal::origin);
+
+    TRACE_(2, "createFrom() Found origin=<" << data << ">");
+    
+    _document.replaceChild(data, literal::origin);
+
+  } catch (notfound_exception const&) {
+    TRACE_(2, "createFrom() No origin");
+  }
+  
   // replace data if any
   try {
     auto data = document.findChild(literal::data);
@@ -198,6 +210,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& doc
   } catch (notfound_exception const&) {
     TRACE_(2, "createFrom() No document.data");
   }
+
 
   // document contains data only
   _document.replaceChild(document, literal::data);

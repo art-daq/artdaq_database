@@ -7,6 +7,8 @@
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
+#include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb_index.h"
+
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 
 #include "artdaq-database/DataFormats/Json/json_reader.h"
@@ -47,8 +49,10 @@ int main(int argc, char *argv[]) try {
 
   debug::registerUngracefullExitHandlers();
   artdaq::database::dataformats::useFakeTime(true);
+  artdaq::database::filesystem::index::debug::enable();
 #endif
 
+  artdaq::database::filesystem::index::shouldAutoRebuildSearchIndex(true);
   auto options = Options{argv[0]};
   auto desc = options.makeProgramOptions();
 

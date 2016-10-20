@@ -15,8 +15,8 @@ constexpr auto comments = "document.metadata.comments";
 constexpr auto changelog = "changelog";
 
 
-constexpr auto source = "document.source";
-constexpr auto source_rawdata = "document.source.rawdata";
+constexpr auto origin = "origin";
+constexpr auto source_rawdata = "origin.rawdata";
 
 constexpr auto version = "version";
 constexpr auto id = "document._id";
@@ -73,10 +73,8 @@ constexpr auto template__default_document =
     "\t\t}\n"
     "\t    ]\n"
     "\t},\n"
-    "\t\"source\": {\n"
-    "\t    \"encoding\": \"base64\",\n"
-    "\t    \"format\": \"json\",\n"
-    "\t    \"rawdata\": \"as\"\n"
+    "\t\"origin\": {\n"
+    "\t    \"format\": \"json\"\n"
     "    },\n"
     "    \n"
     "    \"version\": \"default\",\n"

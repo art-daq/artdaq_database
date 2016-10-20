@@ -32,8 +32,8 @@ bool test_buildfilter(Options const&, std::string const&);
 int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
-  // artdaq::database::jsonutils::debug::enableJSONDocument();
-  // artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
+  //artdaq::database::jsonutils::debug::enableJSONDocument();
+  //artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
 
   artdaq::database::configuration::debug::enableLoadStoreOperation();
   artdaq::database::configuration::debug::options::enableOperationBase();

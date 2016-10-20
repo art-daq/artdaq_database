@@ -1,0 +1,17 @@
+      <DataDpm index="15">
+         <DataBuffer index="0">
+            <DaqHost>192.168.204.2</DaqHost>
+            <DaqPort>8998</DaqPort>
+         </DataBuffer>
+         <LbneFrontEnd index="0">
+            <AdcClkPhase>0xd5</AdcClkPhase>
+            <AdcLatchLoc1>0x6</AdcLatchLoc1>
+            <AdcLatchLoc2>0x7</AdcLatchLoc2>
+            <AdcLatchLoc3>0x6</AdcLatchLoc3>
+            <AdcLatchLoc4>0x7</AdcLatchLoc4>
+            <AdcLatchLoc5>0x6</AdcLatchLoc5>
+            <AdcLatchLoc6>0x7</AdcLatchLoc6>
+            <AdcLatchLoc7>0x6</AdcLatchLoc7>
+            <AdcLatchLoc8>0x6</AdcLatchLoc8>
+         </LbneFrontEnd>
+      </DataDpm> 

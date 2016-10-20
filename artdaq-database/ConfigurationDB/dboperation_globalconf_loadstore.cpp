@@ -90,10 +90,17 @@ result_pair_t json::store_globalconfiguration(std::string const& search_filter,
 
     for (auto const& file_name : list_files(tmp_dir_name)) {
       options.collectionName(collection_name_from_relative_path(file_name));
-      if (file_name.rfind(".fcl") != std::string::npos) {
-        auto result = detail::store_configuration_file(options, file_name);
-        if (!result.first) oss << "Failed to import " << file_name << ", details:" << result.second;
-      }
+      if (file_name.rfind(".fcl") != std::string::npos || file_name.rfind(".fhicl") != std::string::npos)
+	options.dataFormat(options::data_format_t::fhicl);
+      else if (file_name.rfind(".jsn") != std::string::npos || file_name.rfind(".json") != std::string::npos)
+      	options.dataFormat(options::data_format_t::json);
+      else if (file_name.rfind(".xml") != std::string::npos)
+      	options.dataFormat(options::data_format_t::xml);
+      else 
+	continue;
+     
+      auto result = detail::store_configuration_file(options, file_name);
+      if (!result.first) oss << "Failed to import " << file_name << ", details:" << result.second;
     }
 
     system_cmd = "rm -rf " + tmp_dir_name;
@@ -166,7 +173,7 @@ result_pair_t json::load_globalconfiguration(std::string const& search_filter,
       auto tmpOpts = LoadStoreOperation{literal::operation::globalconfload};
       tmpOpts.readJsonData({configuration});
 
-      tmpOpts.dataFormat("fhicl");
+      tmpOpts.dataFormat(options::data_format_t::origin);
 
       TRACE_(10, "load_globalconfiguration: looping over configurations operation=<" << tmpOpts.to_string() << ">");
 

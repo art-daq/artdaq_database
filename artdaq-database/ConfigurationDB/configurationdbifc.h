@@ -340,7 +340,7 @@ struct ConfigurationInterface final {
       auto op = jsn::object_t{};
       op[cfl::option::configuration] = configuration;
       op[cfl::option::collection] = versionInfo.configuration;
-      op[cfl::option::provider] = _database_provider;
+      //op[cfl::option::provider] = _database_provider;
       op[cfl::option::format] = to_string(data_format_t::gui);
       op[cfl::option::operation] = std::string{cfl::operation::addconfig};
       op[cfl::filterx] = jsn::object_t{};

@@ -63,10 +63,10 @@
 ]
 }
 },
-"source" : {
-"encoding" : "base64",
-"format" : "json",
-"rawdata" : "as"
+"origin" : {
+ 
+"format" : "json"
+ 
 },
 "version" : "version",
 "configurations" : [

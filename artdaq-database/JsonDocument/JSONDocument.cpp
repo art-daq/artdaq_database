@@ -221,10 +221,10 @@ JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t con
                                                            << ">");
 
     if (childDocument.count(path_tokens.at(currentDepth)) == 0) {
-      TRACE_(4, "replaceChild() recurse() Error: Replace failed for" << path_tokens.at(currentDepth)
+      TRACE_(4, "replaceChild() recurse() Error: Replace failed for " << path_tokens.at(currentDepth)
                                                                      << ", search path =<" << path << ">.");
 
-      throw notfound_exception("JSONDocument") << "Replace failed for" << path_tokens.at(currentDepth)
+      throw notfound_exception("JSONDocument") << "Replace failed for " << path_tokens.at(currentDepth)
                                                << ", search path =<" << path << ">.";
     }
 
@@ -423,7 +423,7 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) {
       TRACE_(3, "deleteChild() recurse() jsn::value_t is not jsn::object_t;  value=" << boost::apply_visitor(
                     jsn::print_visitor(), childValue));
 
-      throw notfound_exception("JSONDocument") << "Replace failed for" << path_tokens.at(currentDepth)
+      throw notfound_exception("JSONDocument") << "Replace failed for " << path_tokens.at(currentDepth)
                                                << ", deleteChild() recurse() jsn::value_t is not jsn::object_t;  value="
                                                << boost::apply_visitor(jsn::print_visitor(), childValue);
     }
@@ -435,10 +435,10 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) {
                                                           << ">");
 
     if (childDocument.count(path_tokens.at(currentDepth)) == 0) {
-      TRACE_(3, "deleteChild() recurse() Error: Replace failed for" << path_tokens.at(currentDepth)
+      TRACE_(3, "deleteChild() recurse() Error: Replace failed for " << path_tokens.at(currentDepth)
                                                                     << ", search path =<" << path << ">.");
 
-      throw notfound_exception("JSONDocument") << "Replace failed for" << path_tokens.at(currentDepth)
+      throw notfound_exception("JSONDocument") << "Replace failed for " << path_tokens.at(currentDepth)
                                                << ", search path =<" << path << ">.";
     }
 

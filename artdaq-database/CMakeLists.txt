@@ -10,7 +10,7 @@ add_subdirectory(ConfigurationDB)
 add_subdirectory(DemoTypes)
 
 add_subdirectory(Utilities)
-add_subdirectory(NodeJSAddons)
+add_subdirectory(SWIGBindings)
 #add_subdirectory(JsonConvert)
 
 

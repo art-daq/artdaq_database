@@ -431,7 +431,7 @@
 }
 ],
 "origin" : {
-"source" : "fhicl_to_json",
+"origin" : "fhicl_to_json",
 "timestamp" : "Mon Feb  8 14:00:30 2016"
 }
 }

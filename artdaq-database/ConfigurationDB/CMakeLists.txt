@@ -3,7 +3,8 @@ cet_make(
   artdaq-database_StackTrace
   artdaq-database_DataFormats_common  
   artdaq-database_DataFormats_Json
-  artdaq-database_DataFormats_Fhicl  
+  artdaq-database_DataFormats_Fhicl
+  artdaq-database_DataFormats_Xml  
   artdaq-database_JsonDocument
   artdaq-database_BasicTypes
   artdaq-database_StorageProviders_MongoDB  

@@ -282,7 +282,8 @@ void list_collection_names(Options const& options, std::string& collections){
     case data_format_t::db:
     case data_format_t::json:
     case data_format_t::unknown:
-    case data_format_t::fhicl: {
+    case data_format_t::fhicl: 
+    case data_format_t::xml: {
       throw cet::exception("list_collection_names") << "Unsupported data format.";
       break;
     }
