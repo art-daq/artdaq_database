@@ -25,6 +25,9 @@ class LoadStoreOperation final : public OperationBase {
   std::string const& version() const noexcept;
   std::string const& version(std::string const&);
 
+  std::string const& sourceFileName() const noexcept;
+  std::string const& sourceFileName(std::string const&);
+
   std::string const& configurableEntity() const noexcept;
   std::string const& configurableEntity(std::string const&);
 
@@ -49,6 +52,8 @@ class LoadStoreOperation final : public OperationBase {
   std::string _version = {literal::notprovided};
   std::string _configurable_entity = {literal::notprovided};
   std::string _global_configuration = {literal::notprovided};
+  std::string _source_file_name = {literal::notprovided};
+
 };
 
 namespace debug {

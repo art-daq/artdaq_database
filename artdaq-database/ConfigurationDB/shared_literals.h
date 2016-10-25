@@ -98,6 +98,7 @@ constexpr auto source = "source";
 constexpr auto timestamp = "timestamp";
 constexpr auto format = "format";
 constexpr auto rawdata = "rawdata";
+constexpr auto filename = "filename";
 }
 
 constexpr auto name = "name";
