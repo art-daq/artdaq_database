@@ -146,6 +146,11 @@ function read_command_line_options() {
   return 0
 } 
 
+function touch_log() {
+conftool_log=${conftool_log_dir}/conftool-$(date +"%Y%m%d-%H%M%S")-${USER}.log
+touch ${conftool_log}
+}
+
 function redirect_stdout_stderr_tolog(){  
 conftool_log=${conftool_log_dir}/conftool-$(date +"%Y%m%d-%H%M%S")-${USER}.log
 #exec 1<&-
@@ -181,16 +186,26 @@ function export_global_config()
  fi
 
  if [ -d "${newconfig_dir}" ]; then
- /usr/bin/rm -rf ${newconfig_dir}
+  oldconfig_dir="${newconfig_dir}.$(date +"%Y%m%d-%H%M%S").saved"
+  mv ${newconfig_dir} ${oldconfig_dir}
+  printf "\nInfo: Saved old configuration into ${oldconfig_dir}"
  fi
 
- /usr/bin/mkdir -p ${newconfig_dir}
+ mkdir -p ${newconfig_dir}
 
 
  global_config_name=$1
  
  tmp_file_name=config.${global_config_name}.tar.bzip2.base64
 
+ empty_search_result=$(conftool -o findconfigs  -f gui -g dummuy |grep \"search\")
+ search_result=$(conftool -o findconfigs  -f gui -g ${global_config_name} |grep \"search\")
+ 
+ if [[ "${search_result}" == "${empty_search_result}" ]];then
+  printf "\nError: Failed to export config data; ${global_config_name} is missing in the database"
+  return 3
+ fi
+ 
  conftool -o globalconfload -d filesystem -f gui -g ${global_config_name} -r ${tmp_file_name}.out
  result_code=$? 
  if [[  $result_code -gt 0 ]]; then 
@@ -242,7 +257,7 @@ function import_global_config()
  search_result=$(conftool -o findconfigs  -f gui -g ${global_config_name} |grep \"search\")
  
  if [[ "${search_result}" != "${empty_search_result}" ]];then
-  printf "\nError: Failed to import config data; ${global_config_name} already exist"
+  printf "\nError: Failed to import config data; ${global_config_name} already exists in the database"
   return 3
  fi
  
@@ -351,7 +366,7 @@ function main()
 {
   read_command_line_options $*
   if [[ $? -ne 0 ]]; then
-    printf "\nError: wrong options >>>$*<<<"
+    printf "\nError: wrong or incomplete options \"$*\""
     show_help
     exit 1
   fi
@@ -361,16 +376,19 @@ function main()
     exit 0
   fi
 
-  redirect_stdout_stderr_tolog
-  
-  printf "\nInfo: noperation=${operation_name}, configuration=${global_config_name}, version=${version_name}, source=${source_dir}\n"
-
   setup_config_editor
   if [[  $? -gt 0 ]]; then 
+    touch_log
     printf "\nInfo: Exiting..."
     return 1
   fi
+
+  unset ARTDAQ_DATABASE_URI
+
+  redirect_stdout_stderr_tolog
   
+  printf "\nInfo: operation=${operation_name}, configuration=${global_config_name}, version=${version_name}, source=${source_dir}\n"
+
   printf "\nInfo: using $(which conftool)"
   
   export ARTDAQ_DATABASE_DATADIR=/home/nfs/dunedaq/daqarea/databases
@@ -395,10 +413,10 @@ function main()
 main $*
 result_code=$?
 if [[  $result_code -gt 0 ]]; then 
-  printf "failed\n"  
+  printf "\nReturn status: failed\n"  
   cat ${conftool_log_dir}/$(ls -t  ${conftool_log_dir} |head -1)
   exit 1
 fi 
 
-printf "succeed\n"
+printf "\nReturn status: succeed\n"
 exit 0
