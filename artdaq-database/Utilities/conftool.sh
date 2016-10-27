@@ -387,7 +387,17 @@ function main()
 
   redirect_stdout_stderr_tolog
   
-  printf "\nInfo: operation=${operation_name}, configuration=${global_config_name}, version=${version_name}, source=${source_dir}\n"
+  printf "\nInfo: operation=${operation_name}, configuration=${global_config_name}, "
+  
+  if [[ "${version_name_present}" == "${yes}" ]] ; then
+    printf "version=${version_name}, "
+  fi
+
+  if [[ "${source_dir_present}" == "${yes}" ]] ; then
+    printf "source=${source_dir}"
+  fi
+
+  printf "\n"
 
   printf "\nInfo: using $(which conftool)"
   
