@@ -30,3 +30,5 @@ cet_make_exec(readfhicl
 install_headers()
 install_source()
 
+
+cet_script (conftool.sh)

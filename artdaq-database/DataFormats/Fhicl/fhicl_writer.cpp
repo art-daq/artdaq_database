@@ -106,8 +106,8 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
 void artdaq::database::fhicl::debug::enableFhiclWriter() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::fhicl::FhiclWrite trace_enable");
 }

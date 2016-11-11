@@ -30,7 +30,8 @@ using artdaq::database::basictypes::JsonData;
 namespace artdaq { namespace database {std::string expand_environment_variables(std::string var);} }
 
 int main(int argc, char *argv[]) try {
-#if 0
+
+#if 1
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
   artdaq::database::jsonutils::debug::enableJSONDocument();
@@ -171,6 +172,15 @@ int main(int argc, char *argv[]) try {
   if (!result.first) {
     std::cout << "Failed; error message: " << result.second << "\n";
     std::cout << debug::current_exception_diagnostic_information();
+
+    try{ 
+	if (0 != system("tshow") )
+	  std::cout << "Unable to read trace buffer\n";  
+    }
+    catch(...){
+	  std::cout << "Caught exception while reading trace buffer\n";  
+    }
+    
     return process_exit_code::FAILURE;
   }
 
@@ -204,6 +214,13 @@ int main(int argc, char *argv[]) try {
 } catch (...) {
   std::cout << "Process exited with error: "
             << boost::current_exception_diagnostic_information();
+try{ 
+    if (0 != system("tshow") )
+      std::cout << "Unable to read trace buffer\n";  
+}
+catch(...){
+      std::cout << "Caught exception while reading trace buffer\n";  
+}
   return process_exit_code::UNCAUGHT_EXCEPTION;
 }
 

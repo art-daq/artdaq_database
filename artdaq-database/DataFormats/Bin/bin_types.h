@@ -1,0 +1,6 @@
+#ifndef _ARTDAQ_DATABASE_DATAFORMATS_BINTYPES_H_
+#define _ARTDAQ_DATABASE_DATAFORMATS_BINTYPES_H_
+
+#include "artdaq-database/DataFormats/common.h"
+
+#endif /* _ARTDAQ_DATABASE_DATAFORMATS_BINTYPES_H_ */

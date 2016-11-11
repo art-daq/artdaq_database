@@ -1,23 +1,23 @@
 #include "artdaq-database/DataFormats/common.h"
 
-#include "artdaq-database/DataFormats/Conf/convertconf2json.h"
-#include "artdaq-database/DataFormats/Conf/conf_reader.h"
+#include "artdaq-database/DataFormats/Bin/convertbin2json.h"
+#include "artdaq-database/DataFormats/Bin/bin_reader.h"
 #include "artdaq-database/DataFormats/common/shared_literals.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "CNF:ConfReader_C"
+#define TRACE_NAME "BIN:BinReader_C"
 
-namespace fcl = artdaq::database::conf;
+namespace fcl = artdaq::database::bin;
 namespace jsn = artdaq::database::json;
 
-using artdaq::database::conf::ConfReader;
+using artdaq::database::bin::BinReader;
 
 namespace literal = artdaq::database::dataformats::literal;
 
-bool ConfReader::read(std::string const& in [[gnu::unused]], jsn::object_t& json_object) {
+bool BinReader::read(std::vector<unsigned char> const& in [[gnu::unused]], jsn::object_t& json_object) {
   assert(!in.empty());
   assert(json_object.empty());
 
@@ -27,7 +27,7 @@ bool ConfReader::read(std::string const& in [[gnu::unused]], jsn::object_t& json
     auto object = jsn::object_t();
     object[literal::data_node] = jsn::object_t();
 
-    // TODO: convert CONF into Json AST
+    // TODO: convert BIN into Json AST
 
     json_object.swap(object);
 
@@ -43,11 +43,11 @@ bool ConfReader::read(std::string const& in [[gnu::unused]], jsn::object_t& json
   }
 }
 
-void artdaq::database::conf::debug::enableConfReader() {
+void artdaq::database::bin::debug::enableBinReader() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::conf::ConfReader trace_enable");
+  TRACE_(0, "artdaq::database::bin::BinReader trace_enable");
 }

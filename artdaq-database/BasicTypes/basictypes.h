@@ -6,5 +6,6 @@
 #include "artdaq-database/BasicTypes/data_fhicl.h"
 #include "artdaq-database/BasicTypes/data_json.h"
 #include "artdaq-database/BasicTypes/data_xml.h"
+#include "artdaq-database/BasicTypes/data_bin.h"
 
 #endif /* _ARTDAQ_DATABASE_BASICTYPES_H_ */
