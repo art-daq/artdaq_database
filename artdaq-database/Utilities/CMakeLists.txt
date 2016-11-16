@@ -26,6 +26,7 @@ cet_make_exec(readfhicl
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
+cet_script(conftool.sh)
 
 install_headers()
 install_source()

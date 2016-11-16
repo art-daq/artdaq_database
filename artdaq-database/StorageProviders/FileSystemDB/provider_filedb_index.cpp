@@ -815,9 +815,21 @@ std::vector<std::string> SearchIndex::_filtered_attribute_list(std::string const
   auto returnCollection = std::vector<std::string>{};
 
   auto acceptValue = [&attribute_begins_with](auto const& value) {
+    if(attribute_begins_with.empty())
+	return true;
+
     if (value.size() < attribute_begins_with.size() || value == "notprovided") return false;
 
-    if (std::equal(attribute_begins_with.begin(), attribute_begins_with.end(), value.begin())) return true;
+    auto first(std::begin(attribute_begins_with)), last(std::end(attribute_begins_with));
+
+    if (attribute_begins_with.back() != '*') {
+      if (value.size() == attribute_begins_with.size() && std::equal(first, last, value.begin())) return true;
+    } else {
+      if (std::equal(first, std::prev(last), value.begin())) return true;
+    }
+    
+    //if (std::equal(attribute_begins_with.begin(), attribute_begins_with.end(), value.begin())) return true;
+    
     return false;
   };
 
