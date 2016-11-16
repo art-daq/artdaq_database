@@ -14,7 +14,6 @@
 #include <typeinfo>
 
 #include "artdaq-database/BuildInfo/printStackTrace.h"
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 
 #include <boost/exception/diagnostic_information.hpp>
 
@@ -194,8 +193,8 @@ void registerUncaughtExceptionHandler() { std::set_unexpected(uncaughtExceptionH
 void trace_enable() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", trace_mode::modeM);
-  TRACE_CNTL("modeS", trace_mode::modeS);
+  TRACE_CNTL("modeM", 1LL);
+  TRACE_CNTL("modeS", 1LL);
 }
 
 void registerUngracefullExitHandlers() {

@@ -28,10 +28,7 @@
 #include <boost/mpl/print.hpp>
 
 #include "cetlib/coded_exception.h"
-
 #include "trace.h"
-
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 
 //#define BOOST_SPIRIT_KARMA_DEBUG
 //#define BOOST_SPIRIT_QI_DEBUG

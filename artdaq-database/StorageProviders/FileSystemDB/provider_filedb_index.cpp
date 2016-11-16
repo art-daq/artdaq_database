@@ -930,8 +930,8 @@ file_paths_t list_files_in_directory(boost::filesystem::path const& path, std::s
 void dbfsi::debug::enable() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", trace_mode::modeM);
-  TRACE_CNTL("modeS", trace_mode::modeS);
+  TRACE_CNTL("modeM", 1LL);
+  TRACE_CNTL("modeS", 1LL);
 
   TRACE_(0, "artdaq::database::filesystem::index trace_enable");
 }

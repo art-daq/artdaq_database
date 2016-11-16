@@ -6,8 +6,6 @@
 #include "artdaq-database/DataFormats/Json/json_reader.h"
 #include "artdaq-database/DataFormats/Json/json_writer.h"
 
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
-
 #include <boost/variant/get.hpp>
 
 #ifdef TRACE_NAME
@@ -439,8 +437,8 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
 void artdaq::database::json::debug::enableJSON2GUIJSON() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", trace_mode::modeM);
-  TRACE_CNTL("modeS", trace_mode::modeS);
+  TRACE_CNTL("modeM", 1LL);
+  TRACE_CNTL("modeS", 1LL);
 
   TRACE_(0, "artdaq::database::JSON2GUIJSON trace_enable");
 }
