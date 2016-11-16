@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export artdaq_database_version=v1_03_11
-export config_editor_version=v1_00_01
+export artdaq_database_version=v1_03_17
+export config_editor_version=v1_00_02
 
 conftool_log_dir=/home/nfs/daqoutput/daqlogs/conftool
 
