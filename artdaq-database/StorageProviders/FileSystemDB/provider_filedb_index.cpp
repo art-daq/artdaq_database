@@ -818,7 +818,7 @@ std::vector<std::string> SearchIndex::_filtered_attribute_list(std::string const
     if(attribute_begins_with.empty())
 	return true;
 
-    if (value.size() < attribute_begins_with.size() || value == "notprovided") return false;
+    if (value.size() < attribute_begins_with.size() /*|| value == "notprovided"*/) return false;
 
     auto first(std::begin(attribute_begins_with)), last(std::end(attribute_begins_with));
 
@@ -852,7 +852,7 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::_indexed_filtered_
   auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
 
   auto acceptValue = [&right_begins_with](auto const& value) {
-    if (value.size() < right_begins_with.size() || value == "notprovided") return false;
+    if (value.size() < right_begins_with.size() /*|| value == "notprovided"*/) return false;
 
     auto first(std::begin(right_begins_with)), last(std::end(right_begins_with));
 
