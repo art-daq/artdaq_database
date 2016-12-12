@@ -22,12 +22,11 @@ constexpr auto db_name = "test_configuration_db";
 }
 
 struct DBConfig final {
-  DBConfig() : uri{std::string{literal::MONGOURI} + literal::hostname + ":" + literal::port + "/" + literal::db_name} {    
-    
-    auto tmpURI = getenv("ARTDAQ_DATABASE_URI")?expand_environment_variables("${ARTDAQ_DATABASE_URI}"):std::string("");
-    
-    if(tmpURI.back()=='/')    
-      tmpURI.pop_back();//remove trailing slash
+  DBConfig() : uri{std::string{literal::MONGOURI} + literal::hostname + ":" + literal::port + "/" + literal::db_name} {
+    auto tmpURI =
+        getenv("ARTDAQ_DATABASE_URI") ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
+
+    if (tmpURI.back() == '/') tmpURI.pop_back();  // remove trailing slash
 
     auto prefixURI = std::string{literal::MONGOURI};
     if (tmpURI.length() > prefixURI.length() && std::equal(prefixURI.begin(), prefixURI.end(), tmpURI.begin()))
@@ -40,7 +39,7 @@ struct DBConfig final {
 
 class MongoDB final {
  public:
-  auto& connection() { return _connection; }
+  mongocxx::database& connection();
 
   static std::shared_ptr<MongoDB> create(DBConfig const& config) {
     return std::make_shared<MongoDB, DBConfig const&, PassKeyIdiom const&>(config, {});

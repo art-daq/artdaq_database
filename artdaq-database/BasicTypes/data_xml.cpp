@@ -43,7 +43,7 @@ XmlData::XmlData(std::string const& buffer) : xml_buffer{buffer} {}
 
 XmlData::XmlData(JsonData const& document) {
   namespace literal = artdaq::database::dataformats::literal;
-  
+
   assert(!document.json_buffer.empty());
 
   TRACE_(1, "XML document=" << document.json_buffer);
@@ -53,10 +53,14 @@ XmlData::XmlData(JsonData const& document) {
   auto results = std::smatch();
 
   if (!std::regex_search(document.json_buffer, results, ex))
-    throw std::runtime_error("JSON to XML convertion error, regex_search()==false; JSON buffer: " + document.json_buffer);
+    throw std::runtime_error("JSON to XML convertion error, regex_search()==false; JSON buffer: " +
+                             document.json_buffer);
 
   if (results.size() != 1)
-    throw std::runtime_error("JSON to XML convertion error, regex_search().size()!=1; JSON buffer: " + document.json_buffer);
+    throw std::runtime_error(
+        "JSON to XML convertion error, "
+        "regex_search().size()!=1; JSON buffer: " +
+        document.json_buffer);
 
   auto base64 = std::string(results[0]);
   TRACE_(2, "XML base64=" << base64);
@@ -71,7 +75,7 @@ XmlData::XmlData(JsonData const& document) {
 
 XmlData::operator JsonData() const {
   namespace literal = artdaq::database::dataformats::literal;
-  
+
   TRACE_(5, "XML xml=" << xml_buffer);
 
   auto json = JsonData("");
@@ -103,8 +107,8 @@ std::istream& operator>>(std::istream& is, XmlData& data) {
 }
 
 std::ostream& operator<<(std::ostream& os, XmlData const& data) {
-    os << data.xml_buffer;
-    return os;
+  os << data.xml_buffer;
+  return os;
 }
 
 }  // namespace basictypes

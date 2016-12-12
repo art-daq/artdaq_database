@@ -66,4 +66,5 @@ void enableOperationManageAliases();
 }  // namespace database
 }  // namespace artdaq
 
-#endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_MANAGEALIASES_H_ */
+#endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_MANAGEALIASES_H_ \
+          */

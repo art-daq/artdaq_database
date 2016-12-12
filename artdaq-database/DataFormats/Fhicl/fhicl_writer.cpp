@@ -2,6 +2,7 @@
 
 #include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
 
+#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/DataFormats/Fhicl/convertfhicl2jsondb.h"
 #include "artdaq-database/DataFormats/Fhicl/fhicl_types.h"
 #include "artdaq-database/DataFormats/Fhicl/fhicl_writer.h"
@@ -106,8 +107,8 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
 void artdaq::database::fhicl::debug::enableFhiclWriter() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeM", trace_mode::modeM);
 
   TRACE_(0, "artdaq::database::fhicl::FhiclWrite trace_enable");
 }

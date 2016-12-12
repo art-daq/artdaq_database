@@ -1,6 +1,6 @@
 #include "artdaq-database/ConfigurationDB/common.h"
 
-#include "artdaq-database/ConfigurationDB/dboperation_manageconfigs.h"
+#include "artdaq-database/ConfigurationDB/dboperation_metadata.h"
 
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
 #include "artdaq-database/ConfigurationDB/shared_literals.h"
@@ -32,10 +32,10 @@ namespace cflo = cfl::operation;
 namespace cflp = cfl::provider;
 namespace cftd = cf::debug::detail;
 
-using cf::ManageConfigsOperation;
+using cf::LoadStoreOperation;
 using cf::options::data_format_t;
 
-using Options = cf::ManageConfigsOperation;
+using Options = cf::LoadStoreOperation;
 
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::basictypes::FhiclData;
@@ -54,23 +54,23 @@ namespace database {
 namespace configuration {
 namespace detail {
 
-typedef JsonData (*provider_findglobalconfigs_t)(Options const& /*options*/, JsonData const& /*search_filter*/);
-typedef JsonData (*provider_buildconfigsearchfilter_t)(Options const& /*options*/, JsonData const& /*search_filter*/);
+typedef JsonData (*provider_listdatabases_t)(Options const& /*options*/, JsonData const& /*search_filter*/);
+typedef JsonData (*provider_readdbinfo_t)(Options const& /*options*/, JsonData const& /*search_filter*/);
 
-void find_global_configurations(Options const& options, std::string& configs) {
+void list_database_names(Options const& options, std::string& configs) {
   assert(configs.empty());
-  assert(options.operation().compare(cflo::findconfigs) == 0);
+  assert(options.operation().compare(cflo::listdatabases) == 0);
 
-  TRACE_(11, "find_global_configurations: begin");
-  TRACE_(11, "find_global_configurations args options=<" << options.to_string() << ">");
+  TRACE_(11, "list_database_names: begin");
+  TRACE_(11, "list_database_names args options=<" << options.to_string() << ">");
 
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers =
-        std::map<std::string, provider_findglobalconfigs_t>{{cflp::mongo, cf::mongo::findGlobalConfigs},
-                                                            {cflp::filesystem, cf::filesystem::findGlobalConfigs},
-                                                            {cflp::ucond, cf::ucond::findGlobalConfigs}};
+        std::map<std::string, provider_listdatabases_t>{{cflp::mongo, cf::mongo::listDatabaseNames},
+                                                        {cflp::filesystem, cf::filesystem::listDatabaseNames},
+                                                        {cflp::ucond, cf::ucond::listDatabaseNames}};
 
     return providers.at(name);
   };
@@ -89,7 +89,7 @@ void find_global_configurations(Options const& options, std::string& configs) {
     case data_format_t::fhicl:
     case data_format_t::xml: {
       if (!db::json_db_to_gui(search_result.json_buffer, returnValue)) {
-        throw cet::exception("find_global_configurations") << "Unsupported data format.";
+        throw cet::exception("list_database_names") << "Unsupported data format.";
       }
       break;
     }
@@ -103,22 +103,21 @@ void find_global_configurations(Options const& options, std::string& configs) {
 
   if (returnValueChanged) configs.swap(returnValue);
 
-  TRACE_(11, "find_global_configurations: end");
+  TRACE_(11, "list_database_names: end");
 }
-void build_global_configuration_search_filter(Options const& options, std::string& filters) {
+void read_database_info(Options const& options, std::string& filters) {
   assert(filters.empty());
-  assert(options.operation().compare(cflo::buildfilter) == 0);
+  assert(options.operation().compare(cflo::readdbinfo) == 0);
 
-  TRACE_(12, "build_global_configuration_search_filter: begin");
-  TRACE_(11, "build_global_configuration_search_filter args options=<" << options.to_string() << ">");
+  TRACE_(12, "read_database_info: begin");
+  TRACE_(11, "read_database_info args options=<" << options.to_string() << ">");
 
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_buildconfigsearchfilter_t>{
-        {cflp::mongo, cf::mongo::buildConfigSearchFilter},
-        {cflp::filesystem, cf::filesystem::buildConfigSearchFilter},
-        {cflp::ucond, cf::ucond::buildConfigSearchFilter}};
+    auto providers = std::map<std::string, provider_readdbinfo_t>{{cflp::mongo, cf::mongo::readDatabaseInfo},
+                                                                  {cflp::filesystem, cf::filesystem::readDatabaseInfo},
+                                                                  {cflp::ucond, cf::ucond::readDatabaseInfo}};
 
     return providers.at(name);
   };
@@ -137,7 +136,7 @@ void build_global_configuration_search_filter(Options const& options, std::strin
     case data_format_t::fhicl:
     case data_format_t::xml: {
       if (!db::json_db_to_gui(search_result.json_buffer, returnValue)) {
-        throw cet::exception("build_global_configuration_search_filter") << "Unsupported data format.";
+        throw cet::exception("read_database_info") << "Unsupported data format.";
       }
       break;
     }
@@ -151,19 +150,19 @@ void build_global_configuration_search_filter(Options const& options, std::strin
 
   if (returnValueChanged) filters.swap(returnValue);
 
-  TRACE_(11, "build_global_configuration_search_filter: end");
+  TRACE_(11, "read_database_info: end");
 }
 }  // namespace detail
 }  // namespace configuration
 }  // namespace database
 }  // namespace artdaq
 
-void cftd::enableFindConfigsOperation() {
+void cftd::enableMetadataOperation() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::FindConfigsDetail trace_enable");
+  TRACE_(0, "artdaq::database::configuration::MetadataOperation trace_enable");
 }

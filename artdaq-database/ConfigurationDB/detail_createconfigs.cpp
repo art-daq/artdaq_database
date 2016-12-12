@@ -5,8 +5,7 @@
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
 #include "artdaq-database/ConfigurationDB/shared_literals.h"
 
-#include "artdaq-database/ConfigurationDB/dispatch_filedb.h"
-#include "artdaq-database/ConfigurationDB/dispatch_mongodb.h"
+#include "artdaq-database/ConfigurationDB/configuration_dbproviders.h"
 
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
@@ -66,17 +65,13 @@ void add_configuration_to_global_configuration(Options const& options, std::stri
   TRACE_(11, "add_configuration_to_global_configuration: begin");
   TRACE_(11, "add_configuration_to_global_configuration args options=<" << options.to_string() << ">");
 
-  if (cf::not_equal(options.provider(), cflp::filesystem) && cf::not_equal(options.provider(), cflp::mongo)) {
-    TRACE_(11, "Error in add_configuration_to_global_configuration:"
-                   << " Invalid database provider; database provider=" << options.provider() << ".");
-
-    throw cet::exception("add_configuration_to_global_configuration")
-        << "Invalid database provider; database provider=" << options.provider() << ".";
-  }
+  validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_addtoglobalconfig_t>{
-        {cflp::mongo, cf::mongo::addConfigToGlobalConfig}, {cflp::filesystem, cf::filesystem::addConfigToGlobalConfig}};
+    auto providers =
+        std::map<std::string, provider_addtoglobalconfig_t>{{cflp::mongo, cf::mongo::addConfigToGlobalConfig},
+                                                            {cflp::filesystem, cf::filesystem::addConfigToGlobalConfig},
+                                                            {cflp::ucond, cf::ucond::addConfigToGlobalConfig}};
 
     return providers.at(name);
   };
@@ -122,7 +117,9 @@ void create_new_global_configuration(std::string const& operations, std::string&
   object_t operations_ast;
 
   if (!reader.read(operations, operations_ast)) {
-    TRACE_(11, "create_new_global_configuration() Failed to create an AST from operations JSON.");
+    TRACE_(11,
+           "create_new_global_configuration() Failed to create an AST from "
+           "operations JSON.");
 
     throw cet::exception("create_new_global_configuration") << "Failed to create an AST from operations JSON.";
   }
@@ -155,17 +152,13 @@ void find_configuration_versions(Options const& options, std::string& versions) 
   TRACE_(12, "find_configuration_versions: begin");
   TRACE_(12, "find_configuration_versions args options=<" << options.to_string() << ">");
 
-  if (cf::not_equal(options.provider(), cflp::filesystem) && cf::not_equal(options.provider(), cflp::mongo)) {
-    TRACE_(12, "Error in find_configuration_versions:"
-                   << " Invalid database provider; database provider=" << options.provider() << ".");
-
-    throw cet::exception("find_configuration_versions")
-        << "Invalid database provider; database provider=" << options.provider() << ".";
-  }
+  validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_findversions_t>{
-        {cflp::mongo, cf::mongo::findConfigVersions}, {cflp::filesystem, cf::filesystem::findConfigVersions}};
+    auto providers =
+        std::map<std::string, provider_findversions_t>{{cflp::mongo, cf::mongo::findConfigVersions},
+                                                       {cflp::filesystem, cf::filesystem::findConfigVersions},
+                                                       {cflp::ucond, cf::ucond::findConfigVersions}};
 
     return providers.at(name);
   };
@@ -205,17 +198,13 @@ void find_configuration_entities(Options const& options, std::string& entities) 
   TRACE_(13, "find_configuration_entities: begin");
   TRACE_(13, "find_configuration_entities args options=<" << options.to_string() << ">");
 
-  if (cf::not_equal(options.provider(), cflp::filesystem) && cf::not_equal(options.provider(), cflp::mongo)) {
-    TRACE_(13, "Error in find_configuration_entities:"
-                   << " Invalid database provider; database provider=" << options.provider() << ".");
-
-    throw cet::exception("find_configuration_entities")
-        << "Invalid database provider; database provider=" << options.provider() << ".";
-  }
+  validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_findentities_t>{
-        {cflp::mongo, cf::mongo::findConfigEntities}, {cflp::filesystem, cf::filesystem::findConfigEntities}};
+    auto providers =
+        std::map<std::string, provider_findentities_t>{{cflp::mongo, cf::mongo::findConfigEntities},
+                                                       {cflp::filesystem, cf::filesystem::findConfigEntities},
+                                                       {cflp::ucond, cf::ucond::findConfigEntities}};
 
     return providers.at(name);
   };
@@ -249,24 +238,20 @@ void find_configuration_entities(Options const& options, std::string& entities) 
   TRACE_(13, "find_configuration_entities: end entities=" << entities);
 }
 
-void list_collection_names(Options const& options, std::string& collections){
+void list_collection_names(Options const& options, std::string& collections) {
   assert(collections.empty());
   assert(options.operation().compare(cflo::listcollections) == 0);
 
   TRACE_(13, "list_collection_names: begin");
   TRACE_(13, "list_collection_names args search_filter=<" << options.to_string() << ">");
 
-  if (cf::not_equal(options.provider(), cflp::filesystem) && cf::not_equal(options.provider(), cflp::mongo)) {
-    TRACE_(13, "Error in list_collection_names:"
-                   << " Invalid database provider; database provider=" << options.provider() << ".");
-
-    throw cet::exception("list_collection_names")
-        << "Invalid database provider; database provider=" << options.provider() << ".";
-  }
+  validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_findversions_t>{
-        {cflp::mongo, cf::mongo::listCollectionNames}, {cflp::filesystem, cf::filesystem::listCollectionNames}};
+    auto providers =
+        std::map<std::string, provider_findversions_t>{{cflp::mongo, cf::mongo::listCollectionNames},
+                                                       {cflp::filesystem, cf::filesystem::listCollectionNames},
+                                                       {cflp::ucond, cf::ucond::listCollectionNames}};
 
     return providers.at(name);
   };
@@ -282,7 +267,7 @@ void list_collection_names(Options const& options, std::string& collections){
     case data_format_t::db:
     case data_format_t::json:
     case data_format_t::unknown:
-    case data_format_t::fhicl: 
+    case data_format_t::fhicl:
     case data_format_t::xml: {
       throw cet::exception("list_collection_names") << "Unsupported data format.";
       break;
@@ -312,5 +297,7 @@ void cftd::enableCreateConfigsOperation() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::CreateConfigsOperationDetail trace_enable");
+  TRACE_(0,
+         "artdaq::database::configuration::CreateConfigsOperationDetail "
+         "trace_enable");
 }

@@ -197,9 +197,9 @@ struct table_of : vector_of<KVP> {
     if (pair == pairs.end()) throw std::out_of_range("Key not found; key=" + key);
 
     auto deleted = pair->value;
-    
+
     pairs.erase(pair);
-    
+
     return deleted;
   }
 };

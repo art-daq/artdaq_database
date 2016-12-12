@@ -2,6 +2,7 @@
 #include "artdaq-database/DataFormats/common/helper_functions.h"
 #include "artdaq-database/DataFormats/common/shared_literals.h"
 
+#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/DataFormats/Fhicl/convertfhicl2jsondb.h"
 #include "artdaq-database/DataFormats/Fhicl/fhicl_reader.h"
 #include "artdaq-database/DataFormats/Fhicl/fhicl_types.h"
@@ -81,7 +82,8 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
       auto& prolog = make_SubNode(metadata_node, literal::prolog_node);
       prolog[literal::type] = std::string{literal::table};
       prolog[literal::comment] = std::string{"#"}.append(literal::prolog_node);
-//      prolog[literal::annotation] = std::string{"//Auto generated "}.append(literal::prolog_node);
+      //      prolog[literal::annotation] = std::string{"//Auto generated
+      //      "}.append(literal::prolog_node);
 
       auto& metadata = make_SubNode(prolog, literal::children);
 
@@ -103,7 +105,8 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
       auto& main = make_SubNode(metadata_node, literal::main_node);
       main[literal::type] = std::string{literal::table};
       main[literal::comment] = std::string{"#"}.append(literal::main_node);
-//      main[literal::annotation] = std::string{"//Auto generated "}.append(literal::main_node);
+      //      main[literal::annotation] = std::string{"//Auto generated
+      //      "}.append(literal::main_node);
 
       auto& metadata = make_SubNode(main, literal::children);
 
@@ -178,8 +181,8 @@ bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
 void artdaq::database::fhicl::debug::enableFhiclReader() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeM", trace_mode::modeM);
 
   TRACE_(0, "artdaq::database::fhicl::FhiclReader trace_enable");
 }

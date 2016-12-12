@@ -35,7 +35,6 @@ void find_configuration_versions(LoadStoreOperation const&, std::string&);
 void find_configuration_entities(LoadStoreOperation const&, std::string&);
 void list_collection_names(LoadStoreOperation const&, std::string&);
 
-
 }  // namespace detail
 }  // namespace configuration
 }  // namespace database
@@ -58,7 +57,7 @@ result_pair_t opts::create_new_global_configuration(LoadStoreOperation const& /*
   return result_pair_t{false, "Not Implemented"};
 }
 
-result_pair_t opts::list_collection_names(LoadStoreOperation const& options) noexcept{
+result_pair_t opts::list_collection_names(LoadStoreOperation const& options) noexcept {
   try {
     auto returnValue = std::string{};
 
@@ -124,7 +123,7 @@ result_pair_t json::create_new_global_configuration(std::string const& operation
   }
 }
 
-result_pair_t json::list_collection_names(std::string const& search_filter) noexcept{
+result_pair_t json::list_collection_names(std::string const& search_filter) noexcept {
   try {
     if (search_filter.empty()) return std::make_pair(false, make_error_msg(literal::msg::empty_filter));
 
@@ -139,7 +138,6 @@ result_pair_t json::list_collection_names(std::string const& search_filter) noex
     return result_pair_t{false, boost::current_exception_diagnostic_information()};
   }
 }
-
 
 result_pair_t json::find_configuration_versions(std::string const& search_filter) noexcept {
   try {

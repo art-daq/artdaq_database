@@ -2,10 +2,10 @@
 #include <cassert>
 #include <sstream>
 
-#include <cstdlib>
 #include <libgen.h>
 #include <boost/filesystem.hpp>
 #include <boost/range/iterator_range.hpp>
+#include <cstdlib>
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
 
 namespace cf = artdaq::database::configuration;
@@ -39,13 +39,12 @@ std::string cf::to_string(data_format_t const& f) {
 
     case data_format_t::db:
       return "db";
-      
+
     case data_format_t::xml:
       return "xml";
-  
+
     case data_format_t::origin:
       return "origin";
-      
   }
 }
 
@@ -60,10 +59,10 @@ data_format_t cf::to_data_format(std::string const& f) {
     return data_format_t::gui;
   } else if (f.compare("db") == 0) {
     return data_format_t::db;
-  }else if (f.compare("xml") == 0) {
-    return data_format_t::xml;    
-  }else if (f.compare("origin") == 0) {
-    return data_format_t::origin;    
+  } else if (f.compare("xml") == 0) {
+    return data_format_t::xml;
+  } else if (f.compare("origin") == 0) {
+    return data_format_t::origin;
   } else {
     return data_format_t::unknown;
   }
@@ -126,7 +125,7 @@ bool cf::mkdir(std::string const& path) {
 
   auto cmd = std::string{"mkdir -p "};
   cmd.append(path.c_str());
-  
+
   return 0 == system(cmd.c_str());
 }
 
@@ -134,6 +133,6 @@ bool cf::mkdirfile(std::string const& file) {
   assert(!file.empty());
 
   auto tmp = std::string{file.c_str()};
-  
+
   return mkdir(dirname((char*)tmp.c_str()));
 }

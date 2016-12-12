@@ -64,7 +64,9 @@ result_pair_t json::store_globalconfiguration(std::string const& search_filter,
 
     if (0 != system(system_cmd.c_str()))
       throw artdaq::database::runtime_exception("store_globalconfiguration")
-          << "store_globalconfiguration: Unable to create a temp directory; system_cmd=" << system_cmd;
+          << "store_globalconfiguration: Unable to create a temp directory; "
+             "system_cmd="
+          << system_cmd;
 
     auto filename = std::string{tmp_dir_name};
     filename += "/conf.tarbzip2.base64";
@@ -77,28 +79,31 @@ result_pair_t json::store_globalconfiguration(std::string const& search_filter,
 
     if (0 != system(system_cmd.c_str()))
       throw artdaq::database::runtime_exception("store_globalconfiguration")
-          << "store_globalconfiguration: Unable to unzip configuration files; system_cmd=" << system_cmd;
+          << "store_globalconfiguration: Unable to unzip configuration files; "
+             "system_cmd="
+          << system_cmd;
 
     system_cmd = "rm -f " + filename;
 
     if (0 != system(system_cmd.c_str()))
       throw artdaq::database::runtime_exception("store_globalconfiguration")
-          << "store_globalconfiguration: Unable to delete a temp file ; system_cmd=" << system_cmd;
-
+          << "store_globalconfiguration: Unable to delete a temp file ; "
+             "system_cmd="
+          << system_cmd;
 
     std::ostringstream oss;
 
     for (auto const& file_name : list_files(tmp_dir_name)) {
       options.collectionName(collection_name_from_relative_path(file_name));
       if (file_name.rfind(".fcl") != std::string::npos || file_name.rfind(".fhicl") != std::string::npos)
-	options.dataFormat(options::data_format_t::fhicl);
+        options.dataFormat(options::data_format_t::fhicl);
       else if (file_name.rfind(".jsn") != std::string::npos || file_name.rfind(".json") != std::string::npos)
-      	options.dataFormat(options::data_format_t::json);
+        options.dataFormat(options::data_format_t::json);
       else if (file_name.rfind(".xml") != std::string::npos)
-      	options.dataFormat(options::data_format_t::xml);
-      else 
-	continue;
-     
+        options.dataFormat(options::data_format_t::xml);
+      else
+        continue;
+
       auto result = detail::store_configuration_file(options, file_name);
       if (!result.first) oss << "Failed to import " << file_name << ", details:" << result.second;
     }
@@ -107,8 +112,10 @@ result_pair_t json::store_globalconfiguration(std::string const& search_filter,
 
     if (0 != system(system_cmd.c_str()))
       throw artdaq::database::runtime_exception("store_globalconfiguration")
-          << "store_globalconfiguration: Unable to delete a temp directory; system_cmd=" << system_cmd;
-    
+          << "store_globalconfiguration: Unable to delete a temp directory; "
+             "system_cmd="
+          << system_cmd;
+
     auto error_message = std::string{oss.str()};
 
     if (!error_message.empty()) return result_pair_t{false, make_error_msg(error_message)};
@@ -155,7 +162,9 @@ result_pair_t json::load_globalconfiguration(std::string const& search_filter,
 
     if (0 != system(system_cmd.c_str()))
       throw artdaq::database::runtime_exception("load_globalconfiguration")
-          << "load_globalconfiguration: Unable to zip configuration files; system_cmd=" << system_cmd;
+          << "load_globalconfiguration: Unable to zip configuration files; "
+             "system_cmd="
+          << system_cmd;
 
     auto const& confArray = boost::get<jsn::array_t>(resultAST.at(literal::document::search));
 
@@ -188,11 +197,14 @@ result_pair_t json::load_globalconfiguration(std::string const& search_filter,
 
     if (!error_message.empty()) return result_pair_t{false, make_error_msg(error_message)};
 
-    system_cmd = "tar cjf - "+ tmp_dir_name + "/* -C " + tmp_dir_name + " |base64 --wrap=0 > " + tmp_dir_name + "/conf.tar.bzip2.base64";
+    system_cmd = "tar cjf - " + tmp_dir_name + "/* -C " + tmp_dir_name + " |base64 --wrap=0 > " + tmp_dir_name +
+                 "/conf.tar.bzip2.base64";
 
     if (0 != system(system_cmd.c_str())) {
       throw artdaq::database::runtime_exception("store_globalconfiguration")
-          << "store_globalconfiguration: Unable to create a tar.bzip2 file; system_cmd=" << system_cmd;
+          << "store_globalconfiguration: Unable to create a tar.bzip2 file; "
+             "system_cmd="
+          << system_cmd;
     } else {
       TRACE_(10, "load_globalconfiguration: executed command =<" << system_cmd << ">");
     }
@@ -201,7 +213,7 @@ result_pair_t json::load_globalconfiguration(std::string const& search_filter,
     auto database_format = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
     is.close();
 
-    //database_format.pop_back();
+    // database_format.pop_back();
 
     conf_tarbzip2_base64 = "{\"conf.tar.bzip2.base64\":\"" + database_format + "\"}";
     return result_pair_t{true, conf_tarbzip2_base64};
@@ -226,7 +238,8 @@ result_pair_t load_configuration_file(LoadStoreOperation const& options, std::st
 
   if (!mkdirfile(file_out_name))
     throw artdaq::database::runtime_exception("load_configuration_file")
-        << "load_configuration_file: Unable to create a directory path for writing a config file file="
+        << "load_configuration_file: Unable to create a directory path for "
+           "writing a config file file="
         << file_out_name;
 
   std::ofstream os(file_out_name.c_str());
@@ -283,5 +296,7 @@ void debug::enableGlobalConfLoadStoreOperation() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::GlobalConfLoadStoreOperation trace_enable");
+  TRACE_(0,
+         "artdaq::database::configuration::GlobalConfLoadStoreOperation "
+         "trace_enable");
 }

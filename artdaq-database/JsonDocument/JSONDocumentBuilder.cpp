@@ -1,3 +1,4 @@
+#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/JsonDocument/JSONDocument_template.h"
 #include "artdaq-database/JsonDocument/common.h"
@@ -185,32 +186,31 @@ JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& doc
   } catch (notfound_exception const&) {
     TRACE_(2, "createFrom() No converted.changelog");
   }
-  
+
   // replace data origin if any
   try {
     auto data = document.findChild(literal::origin);
 
     TRACE_(2, "createFrom() Found origin=<" << data << ">");
-    
+
     _document.replaceChild(data, literal::origin);
 
   } catch (notfound_exception const&) {
     TRACE_(2, "createFrom() No origin");
   }
-  
+
   // replace data if any
   try {
     auto data = document.findChild(literal::data);
 
     TRACE_(2, "createFrom() Found document.data=<" << data << ">");
-    
+
     _document.replaceChild(data, literal::data);
 
     return self();
   } catch (notfound_exception const&) {
     TRACE_(2, "createFrom() No document.data");
   }
-
 
   // document contains data only
   _document.replaceChild(document, literal::data);
@@ -365,8 +365,8 @@ namespace debug {
 void enableJSONDocumentBuilder() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeM", trace_mode::modeM);
 
   TRACE_(0, "artdaq::database::JSONDocumentBuilder trace_enable");
 }

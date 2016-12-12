@@ -35,9 +35,7 @@ std::string const& BulkOperations::bulkOperations() const noexcept {
   return _bulk_operations;
 }
 
-data_format_t const& BulkOperations::dataFormat() const noexcept{
-    return _data_format;
-}
+data_format_t const& BulkOperations::dataFormat() const noexcept { return _data_format; }
 
 std::string const& BulkOperations::bulkOperations(std::string const& search_filter) {
   assert(!search_filter.empty());
@@ -108,7 +106,7 @@ void BulkOperations::readJsonData(JsonData const& data) {
   }
 
   bulkOperations(data.json_buffer);
-  
+
   auto const& operations = boost::get<jsn::array_t>(dataAST.at(cfl::operation::operations));
 
   for (auto& operation : operations) {

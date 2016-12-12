@@ -8,6 +8,10 @@ namespace database {
 
 using object_id_t = std::string;
 
+namespace metadata {
+constexpr auto system_metadata = "system.metadata";
+}
+
 template <typename TYPE, typename IMPL>
 class StorageProvider final {
  public:
@@ -49,7 +53,13 @@ class StorageProvider final {
 
   template <typename FILTER>
   std::list<FILTER> listCollectionNames(FILTER const&);
-  
+
+  template <typename FILTER>
+  std::list<FILTER> listDatabaseNames(FILTER const&);
+
+  template <typename FILTER>
+  std::list<FILTER> databaseMetadata(FILTER const&);
+
  private:
   std::shared_ptr<IMPL> _provider;
 };
@@ -57,7 +67,9 @@ class StorageProvider final {
 constexpr auto ouid_invalid = "000000000000000000000000";
 
 std::string expand_environment_variables(std::string var);
-object_id_t  generate_oid();
+object_id_t generate_oid();
+object_id_t extract_oid(std::string const&);
+std::string make_database_metadata();
 
 }  // namespace database
 }  // namespace artdaq

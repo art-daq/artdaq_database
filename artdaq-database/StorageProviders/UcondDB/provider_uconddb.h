@@ -1,24 +1,24 @@
-#ifndef _ARTDAQ_DATABASE_PROVIDER_FILESYSTEM_H_
-#define _ARTDAQ_DATABASE_PROVIDER_FILESYSTEM_H_
+#ifndef _ARTDAQ_DATABASE_PROVIDER_UCOND_H_
+#define _ARTDAQ_DATABASE_PROVIDER_UCOND_H_
 
 #include "artdaq-database/StorageProviders/common.h"
 #include "artdaq-database/StorageProviders/storage_providers.h"
 
 namespace artdaq {
 namespace database {
-namespace filesystem {
+namespace ucond {
 namespace debug {
 void enable();
 }
 
 namespace literal {
-constexpr auto FILEURI = "filesystemdb://";
+constexpr auto FILEURI = "uconddb://";
 constexpr auto search_index = "index.json";
 constexpr auto db_name = "test_configuration_db";
 }
 
 struct DBConfig final {
-  DBConfig() : uri{std::string{literal::FILEURI} + "${ARTDAQ_DATABASE_DATADIR}/filesystemdb" + "/" + literal::db_name} {
+  DBConfig() : uri{std::string{literal::FILEURI} + "${ARTDAQ_DATABASE_DATADIR}/uconddb" + "/" + literal::db_name} {
     auto tmpURI =
         getenv("ARTDAQ_DATABASE_URI") ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
 
@@ -35,21 +35,21 @@ struct DBConfig final {
   const std::string connectionURI() const { return uri; };
 };
 
-class FileSystemDB final {
+class UcondDB final {
  public:
   std::string& connection();
 
-  static std::shared_ptr<FileSystemDB> create(DBConfig const& config) {
-    return std::make_shared<FileSystemDB, DBConfig const&, PassKeyIdiom const&>(config, {});
+  static std::shared_ptr<UcondDB> create(DBConfig const& config) {
+    return std::make_shared<UcondDB, DBConfig const&, PassKeyIdiom const&>(config, {});
   }
 
   class PassKeyIdiom {
    private:
-    friend std::shared_ptr<FileSystemDB> FileSystemDB::create(DBConfig const& config);
+    friend std::shared_ptr<UcondDB> UcondDB::create(DBConfig const& config);
     PassKeyIdiom() {}
   };
 
-  explicit FileSystemDB(DBConfig const& config, PassKeyIdiom const&)
+  explicit UcondDB(DBConfig const& config, PassKeyIdiom const&)
       : _config{config}, _client{_config.connectionURI()}, _connection{_config.connectionURI() + "/"} {}
 
  private:
@@ -61,15 +61,15 @@ class FileSystemDB final {
 using artdaq::database::StorageProvider;
 
 template <typename TYPE>
-using FileSystemDBProvider = StorageProvider<TYPE, FileSystemDB>;
+using UcondDBProvider = StorageProvider<TYPE, UcondDB>;
 
 template <typename TYPE>
-using DBProvider = FileSystemDBProvider<TYPE>;
+using DBProvider = UcondDBProvider<TYPE>;
 
-using DB = FileSystemDB;
+using DB = UcondDB;
 
-}  // namespace filesystem
+}  // namespace ucond
 }  // namespace database
 }  // namespace artdaq
 
-#endif /* _ARTDAQ_DATABASE_PROVIDER_FILESYSTEM_H_ */
+#endif /* _ARTDAQ_DATABASE_PROVIDER_UCOND_H_ */

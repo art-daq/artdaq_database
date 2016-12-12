@@ -1,6 +1,7 @@
 #include "artdaq-database/DataFormats/common/helper_functions.h"
 #include "artdaq-database/DataFormats/common/shared_literals.h"
 
+#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/DataFormats/Conf/conf_common.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
 
@@ -106,8 +107,8 @@ namespace debug {
 void enableConfJson() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeM", trace_mode::modeM);
 
   TRACE_(0, "artdaq::database::confjson trace_enable");
 }

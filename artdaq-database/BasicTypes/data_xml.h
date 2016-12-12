@@ -24,13 +24,12 @@ struct XmlData {
   operator JsonData() const;
 
   static constexpr auto type_version() { return "V100"; }
-  
+
   std::string xml_buffer;
 };
 
 std::istream& operator>>(std::istream&, artdaq::database::basictypes::XmlData&);
 std::ostream& operator<<(std::ostream&, artdaq::database::basictypes::XmlData const&);
-
 
 }  // namespace basictypes
 }  // namespace database

@@ -33,7 +33,8 @@ struct JsonDeserializer {
 
   template <typename Value>
   void value(Value& value) {
-    // std::cout << "\n Reading " << typeid(value).name() << " "  << path.back() << "=";
+    // std::cout << "\n Reading " << typeid(value).name() << " "  << path.back()
+    // << "=";
 
     if (array_elemnt_index < 0) {
       value = subtree.get<Value>(path.back());

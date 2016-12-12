@@ -13,3 +13,5 @@ result_pair_t find_configuration_versions(std::string const& search_filter);
 result_pair_t find_configuration_entities(std::string const& search_filter);
 result_pair_t load_globalconfiguration(std::string const& search_filter);
 result_pair_t store_globalconfiguration(std::string const& search_filter, std::string const& tarbz2base64);
+result_pair_t list_database_names(std::string const& search_filter);
+result_pair_t read_database_info(std::string const& search_filter);

@@ -44,7 +44,7 @@ class ManageConfigsOperation final : public OperationBase {
   JsonData writeJsonData() const override;
 
  private:
-  std::string _version = {literal::notprovided};   
+  std::string _version = {literal::notprovided};
   std::string _configurable_entity = {literal::notprovided};
   std::string _global_configuration = {literal::notprovided};
 };
@@ -59,4 +59,5 @@ void enableOperationManageConfigs();
 }  // namespace database
 }  // namespace artdaq
 
-#endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_MANAGECONFIGS_H_ */
+#endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_MANAGECONFIGS_H_ \
+          */

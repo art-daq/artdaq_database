@@ -37,9 +37,8 @@ std::string adj::filterJson(std::string const& json_buffer) {
       throw cet::exception("JSONDocument_utils") << "Failed reading JSON buffer: << " << json_buffer << ">>\n";
     }
 
-    if(doc_ast1.empty())
-      return json_buffer;
-    
+    if (doc_ast1.empty()) return json_buffer;
+
     auto jsonout = std::string();
 
     if (!jsn::JsonWriter{}.write(doc_ast1, jsonout)) {

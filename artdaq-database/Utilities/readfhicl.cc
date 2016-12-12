@@ -57,7 +57,8 @@ int main(int argc, char* argv[]) try {
   // the command line. If not defined, look in the current directory.
 
   if (getenv("FHICL_FILE_PATH") == nullptr) {
-    std::cerr << "INFO: environment variable FHICL_FILE_PATH was not set. Using \".\"\n";
+    std::cerr << "INFO: environment variable FHICL_FILE_PATH was not set. "
+                 "Using \".\"\n";
     setenv("FHICL_FILE_PATH", ".", 0);
   }
 
@@ -69,19 +70,19 @@ int main(int argc, char* argv[]) try {
 
   auto idx = std::size_t{0};
 
-  conf.reserve(conf.size()+512);
+  conf.reserve(conf.size() + 512);
 
   std::for_each(std::sregex_iterator(conf.begin(), conf.end(), std::regex{"(#include\\s)([^'\"]*)"}),
                 std::sregex_iterator(), [&conf, &idx](auto& m) {
                   conf.replace(m.position(), m.length(), "fhicl_pound_include_" + std::to_string(idx++) + ":");
                 });
 
-  std::cout << "input\n" << conf <<  "\n";
-  
+  std::cout << "input\n" << conf << "\n";
+
   ::fhicl::intermediate_table fhicl_table;
-  
+
   ::shims::isSnippetMode(true);
-  
+
   parse_document(conf, fhicl_table);
 
   for (auto const& atom : fhicl_table) std::cout << "\n" << atom.first << ":" << atom.second;

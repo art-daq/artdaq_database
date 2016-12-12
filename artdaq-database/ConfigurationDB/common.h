@@ -4,11 +4,11 @@
 #include <algorithm>
 #include <cassert>
 #include <ctime>
-#include <fstream> 
+#include <fstream>
 #include <iostream>
 #include <iterator>
-#include <map>
 #include <list>
+#include <map>
 #include <memory>
 #include <sstream>
 #include <string>

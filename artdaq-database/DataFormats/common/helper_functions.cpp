@@ -9,12 +9,12 @@ namespace database {
 namespace dataformats {
 
 std::string filter_jsonstring(std::string const& str) {
-  auto retValue= std::string{str.c_str()};
-  
+  auto retValue = std::string{str.c_str()};
+
   retValue = std::regex_replace(retValue, std::regex("\""), "|");
   retValue = std::regex_replace(retValue, std::regex("\'"), "^");
   retValue = std::regex_replace(retValue, std::regex("\t"), "    ");
-  
+
   return retValue;
 }
 

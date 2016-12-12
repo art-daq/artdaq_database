@@ -30,7 +30,11 @@ enum struct type_t { NOTSET = 0, VALUE, DATA, OBJECT, ARRAY };
 struct print_visitor : public boost::static_visitor<std::string> {
   std::string operator()(object_t const&) const { return "object(...)"; }
   std::string operator()(array_t const&) const { return "array(...)"; }
-  std::string operator()(std::string const& val) const { std::stringstream ss; ss << "std::string(" << val << ")";  return ss.str();}
+  std::string operator()(std::string const& val) const {
+    std::stringstream ss;
+    ss << "std::string(" << val << ")";
+    return ss.str();
+  }
   std::string operator()(double const& val) const { return "double(" + std::to_string(val) + ")"; }
   std::string operator()(int const& val) const { return "int(" + std::to_string(val) + ")"; }
   std::string operator()(bool const& val) const { return val ? "bool(true)" : "bool(false)"; }
@@ -40,31 +44,31 @@ struct tostring_visitor : public boost::static_visitor<std::string> {
   std::string operator()(object_t const&) const { return "object(...)"; }
   std::string operator()(array_t const&) const { return "array(...)"; }
   std::string operator()(std::string const& val) const { return val; }
-  std::string operator()(double const& val) const { return std::to_string(val);}
-  std::string operator()(int const& val) const { return std::to_string(val);}
+  std::string operator()(double const& val) const { return std::to_string(val); }
+  std::string operator()(int const& val) const { return std::to_string(val); }
   std::string operator()(bool const& val) const { return val ? "true" : "false"; }
 };
 
 struct type_visitor : public boost::static_visitor<type_t> {
-    type_t operator()(object_t const&) const { return type_t::OBJECT; }
-    type_t operator()(array_t const&) const { return type_t::ARRAY; }
-    type_t operator()(std::string const&) const { return type_t::VALUE; }
-    type_t operator()(double const&) const { return type_t::VALUE;}
-    type_t operator()(int const&) const { return type_t::VALUE;}
-    type_t operator()(bool const&) const { return type_t::VALUE; }
+  type_t operator()(object_t const&) const { return type_t::OBJECT; }
+  type_t operator()(array_t const&) const { return type_t::ARRAY; }
+  type_t operator()(std::string const&) const { return type_t::VALUE; }
+  type_t operator()(double const&) const { return type_t::VALUE; }
+  type_t operator()(int const&) const { return type_t::VALUE; }
+  type_t operator()(bool const&) const { return type_t::VALUE; }
 
-    type_t operator()(object_t &) const { return type_t::OBJECT; }
-    type_t operator()(array_t &) const { return type_t::ARRAY; }
-    type_t operator()(std::string &) const { return type_t::VALUE; }
-    type_t operator()(double &) const { return type_t::VALUE;}
-    type_t operator()(int &) const { return type_t::VALUE;}
-    type_t operator()(bool &) const { return type_t::VALUE; }
+  type_t operator()(object_t&) const { return type_t::OBJECT; }
+  type_t operator()(array_t&) const { return type_t::ARRAY; }
+  type_t operator()(std::string&) const { return type_t::VALUE; }
+  type_t operator()(double&) const { return type_t::VALUE; }
+  type_t operator()(int&) const { return type_t::VALUE; }
+  type_t operator()(bool&) const { return type_t::VALUE; }
 };
 
 template <typename T>
-  type_t type(T& var){
-    assert(!var.empty());
-      return boost::apply_visitor(type_visitor(), var);
+type_t type(T& var) {
+  assert(!var.empty());
+  return boost::apply_visitor(type_visitor(), var);
 }
 
 std::pair<bool, std::string> operator==(value_t const&, value_t const&);

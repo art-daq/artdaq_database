@@ -2,6 +2,7 @@
 #include "artdaq-database/DataFormats/common/helper_functions.h"
 #include "artdaq-database/DataFormats/common/shared_literals.h"
 
+#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/DataFormats/Fhicl/convertfhicl2jsondb.h"
 #include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
 #include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
@@ -426,8 +427,8 @@ T& unwrapper<fcl::value_t>::value_as() {
 void artdaq::database::fhicljson::debug::enableFCL2JSON() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeM", trace_mode::modeM);
 
   TRACE_(0, "artdaq::database::convertjson::FCL2JSON trace_enable");
 }

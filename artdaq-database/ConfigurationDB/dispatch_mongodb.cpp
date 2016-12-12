@@ -104,8 +104,9 @@ JsonData prov::findGlobalConfigs(ManageConfigsOperation const& options, JsonData
   auto global_configs = provider->findGlobalConfigs(search_payload);
 
   if (global_configs.empty()) {
-    return {literal::empty_search_result};        
-    //throw cet::exception("operation_findconfigs") << "No global configurations were found.";
+    return {literal::empty_search_result};
+    // throw cet::exception("operation_findconfigs") << "No global
+    // configurations were found.";
   }
 
   auto needComma = bool{false};
@@ -174,7 +175,8 @@ JsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, Js
   }
 
   auto ex = std::regex(
-      "\"configurations\\.name\"\\s*:\\s*\"((\\\\\"|[^\"])*)\"\\,\\s*\"configurable_entity\\.name\"\\s*:\\s*\"((\\\\\"|"
+      "\"configurations\\.name\"\\s*:\\s*\"((\\\\\"|[^\"])*)\"\\,"
+      "\\s*\"configurable_entity\\.name\"\\s*:\\s*\"((\\\\\"|"
       "[^\"])*)\"");
 
   auto needComma = bool{false};
@@ -200,7 +202,8 @@ JsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, Js
         for (size_t i = 0; i < results.size(); ++i) {
           std::ssub_match sub_match = results[i];
           std::string piece = sub_match.str();
-                     TRACE_(18, "operation_buildfilter: submatch*** " << i << ": " << piece << '\n');
+                     TRACE_(18, "operation_buildfilter: submatch*** " << i << ":
+       " << piece << '\n');
         }
     */
     if (results.size() != 5)
@@ -240,12 +243,14 @@ JsonData prov::findConfigVersions(LoadStoreOperation const& options, JsonData co
   auto config_versions = provider->findConfigVersions(search_filter);
 
   if (config_versions.empty()) {
-     return {literal::empty_search_result};    
-    //throw cet::exception("operation_findversions") << "No configuration versions were found.";
+    return {literal::empty_search_result};
+    // throw cet::exception("operation_findversions") << "No configuration
+    // versions were found.";
   }
 
   auto ex = std::regex(
-      "\"version\"\\s*:\\s*\"((\\\\\"|[^\"])*)\"\\,\\s*\"configurable_entity\\.name\"\\s*:\\s*\"((\\\\\"|"
+      "\"version\"\\s*:\\s*\"((\\\\\"|[^\"])*)\"\\,\\s*"
+      "\"configurable_entity\\.name\"\\s*:\\s*\"((\\\\\"|"
       "[^\"])*)\"");
 
   auto needComma = bool{false};
@@ -271,14 +276,16 @@ JsonData prov::findConfigVersions(LoadStoreOperation const& options, JsonData co
             for (size_t i = 0; i < results.size(); ++i) {
               std::ssub_match sub_match = results[i];
               std::string piece = sub_match.str();
-                         TRACE_(18, "operation_findversions: submatch*** " << i << ": " << piece << '\n');
+                         TRACE_(18, "operation_findversions: submatch*** " << i
+       << ": " << piece << '\n');
             }
     */
     if (results.size() != 5)
       throw cet::exception("operation_findversions") << "Unsupported filter string, wrong result count";
 
     ss << printComma() << "{";
-    ss << "\"name\" :\"" << results[1].str() /*<< ":" << results[3].str()*/ << "\",";
+    ss << "\"name\" :\"" << results[1].str() /*<< ":" << results[3].str()*/
+       << "\",";
     ss << "\"query\" :" << config_version.json_buffer;
     ss << "}";
   }
@@ -311,8 +318,9 @@ JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData co
   auto config_entities = provider->findConfigEntities(search_filter);
 
   if (config_entities.empty()) {
-    return {literal::empty_search_result};        
-   // throw cet::exception("operation_findentities") << "No configuration entities were found.";
+    return {literal::empty_search_result};
+    // throw cet::exception("operation_findentities") << "No configuration
+    // entities were found.";
   }
 
   auto ex = std::regex("\\s\"(configurable_entity\\.name)\"\\s:\\s\"((\\\\\"|[^\"])*)\"");
@@ -342,7 +350,8 @@ JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData co
             for (size_t i = 0; i < results.size(); ++i) {
               std::ssub_match sub_match = results[i];
               std::string piece = sub_match.str();
-                         TRACE_(18, "operation_findentities: submatch*** " << i << ": " << piece << '\n');
+                         TRACE_(18, "operation_findentities: submatch*** " << i
+       << ": " << piece << '\n');
             }
     */
 
@@ -350,7 +359,8 @@ JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData co
       throw cet::exception("operation_findentities") << "Unsupported filter string, wrong result count";
 
     ss << printComma() << "{";
-    ss << "\"name\" :\"" << results[2].str() /*<< ":" << results[3].str()*/ << "\",";
+    ss << "\"name\" :\"" << results[2].str() /*<< ":" << results[3].str()*/
+       << "\",";
     ss << "\"query\" :" << config_entity.json_buffer;
     ss << "}";
   }
@@ -413,11 +423,13 @@ JsonData prov::listCollectionNames(LoadStoreOperation const& options, JsonData c
   assert(options.operation().compare(literal::operation::listcollections) == 0);
 
   if (options.operation().compare(literal::operation::listcollections) != 0) {
-    throw cet::exception("operation_listcollections") << "Wrong operation option; operation=<" << options.operation() << ">.";
+    throw cet::exception("operation_listcollections") << "Wrong operation option; operation=<" << options.operation()
+                                                      << ">.";
   }
 
   if (options.provider().compare(literal::provider::mongo) != 0) {
-    throw cet::exception("operation_listcollections") << "Wrong provider option; provider=<" << options.provider() << ">.";
+    throw cet::exception("operation_listcollections") << "Wrong provider option; provider=<" << options.provider()
+                                                      << ">.";
   }
 
   TRACE_(20, "operation_listcollections: begin");
@@ -427,10 +439,11 @@ JsonData prov::listCollectionNames(LoadStoreOperation const& options, JsonData c
   auto provider = DBI::DBProvider<JsonData>::create(database);
 
   auto collection_names = provider->listCollectionNames(search_payload);
-  
+
   if (collection_names.empty()) {
     return {literal::empty_search_result};
-    //throw cet::exception("operation_listcollections") << "No configuration entities were found.";
+    // throw cet::exception("operation_listcollections") << "No configuration
+    // entities were found.";
   }
 
   auto needComma = bool{false};
@@ -455,6 +468,98 @@ JsonData prov::listCollectionNames(LoadStoreOperation const& options, JsonData c
   }
 
   ss << "] }";
+
+  return {ss.str()};
+}
+
+JsonData prov::listDatabaseNames(LoadStoreOperation const& options, JsonData const& search_payload) {
+  assert(options.provider().compare(literal::provider::mongo) == 0);
+  assert(options.operation().compare(literal::operation::listdatabases) == 0);
+
+  if (options.operation().compare(literal::operation::listdatabases) != 0) {
+    throw cet::exception("operation_listdatabases") << "Wrong operation option; operation=<" << options.operation()
+                                                    << ">.";
+  }
+
+  if (options.provider().compare(literal::provider::mongo) != 0) {
+    throw cet::exception("operation_listdatabases") << "Wrong provider option; provider=<" << options.provider()
+                                                    << ">.";
+  }
+
+  TRACE_(20, "operation_listdatabases: begin");
+
+  auto config = DBI::DBConfig{};
+  auto database = DBI::DB::create(config);
+  auto provider = DBI::DBProvider<JsonData>::create(database);
+
+  auto database_names = provider->listDatabaseNames(search_payload);
+
+  if (database_names.empty()) {
+    return {literal::empty_search_result};
+    // throw cet::exception("operation_listdatabases") << "No configuration
+    // entities were found.";
+  }
+
+  auto needComma = bool{false};
+  auto printComma = [&needComma]() {
+    if (needComma) return ", ";
+    needComma = true;
+    return " ";
+  };
+
+  std::stringstream ss;
+
+  ss << "{ \"search\": [\n";
+
+  for (auto const& database_name : database_names) {
+    auto name = JSONDocument{database_name.json_buffer}.findChild("database").value();
+    TRACE_(18, "operation_listdatabases: database=<" << name << '>');
+
+    ss << printComma() << "{";
+    ss << "\"name\" :\"" << name << "\",";
+    ss << "\"query\" :" << database_name.json_buffer;
+    ss << "}\n";
+  }
+
+  ss << "] }";
+
+  return {ss.str()};
+}
+
+JsonData prov::readDatabaseInfo(LoadStoreOperation const& options, JsonData const& search_payload) {
+  assert(options.provider().compare(literal::provider::mongo) == 0);
+  assert(options.operation().compare(literal::operation::readdbinfo) == 0);
+
+  if (options.operation().compare(literal::operation::readdbinfo) != 0) {
+    throw cet::exception("operation_listdatabases") << "Wrong operation option; operation=<" << options.operation()
+                                                    << ">.";
+  }
+
+  if (options.provider().compare(literal::provider::mongo) != 0) {
+    throw cet::exception("operation_listdatabases") << "Wrong provider option; provider=<" << options.provider()
+                                                    << ">.";
+  }
+
+  TRACE_(20, "operation_listdatabases: begin");
+
+  auto config = DBI::DBConfig{};
+  auto database = DBI::DB::create(config);
+  auto provider = DBI::DBProvider<JsonData>::create(database);
+
+  auto database_metadata = provider->databaseMetadata(search_payload);
+
+  if (database_metadata.empty()) {
+    return {literal::empty_search_result};
+    // throw cet::exception("operation_listdatabases") << "No configuration
+    // entities were found.";
+  }
+
+  auto const database_info = database_metadata.begin();
+
+  std::stringstream ss;
+  ss << "{ \"search\":\n";
+  ss << database_info->json_buffer;
+  ss << "\n}";
 
   return {ss.str()};
 }

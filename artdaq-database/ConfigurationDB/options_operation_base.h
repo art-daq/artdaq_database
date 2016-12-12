@@ -53,8 +53,8 @@ class OperationBase {
 
  private:
   std::string _getProviderFromURI();
-  
- private:  
+
+ private:
   std::string _process_name = {literal::notprovided};
 
   std::string _provider = {literal::database_provider_filesystem};

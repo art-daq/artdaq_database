@@ -14,7 +14,6 @@ constexpr auto comments = "document.metadata.comments";
 
 constexpr auto changelog = "changelog";
 
-
 constexpr auto origin = "origin";
 constexpr auto source_rawdata = "origin.rawdata";
 
@@ -93,7 +92,7 @@ constexpr auto template__default_document =
     "        \"created\": \"Tue Dec 29 18:19:25 2015\",\n"
     "        \"updates\": [\n"
     "        ]\n"
-    "    }\n"    
+    "    }\n"
     "}";
 
 }  // namespace jsonutils

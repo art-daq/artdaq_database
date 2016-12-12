@@ -1,3 +1,4 @@
+#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb_index.h"
 #include "artdaq-database/StorageProviders/common.h"
@@ -16,7 +17,8 @@
 
 #define TRACE_NAME "PRVDR:FileDB_C"
 
-namespace dbfsl = artdaq::database::filesystem::literal;
+namespace db = artdaq::database;
+namespace dbfsl = db::filesystem::literal;
 
 namespace artdaq {
 namespace database {
@@ -34,6 +36,34 @@ object_id_t extract_oid(std::string const&);
 std::list<std::string> find_subdirs(std::string const&);
 
 std::string expand_environment_variables(std::string var);
+
+std::string& FileSystemDB::connection() {
+  auto collection = _connection + db::metadata::system_metadata;
+  collection = expand_environment_variables(collection);
+
+  auto path = boost::filesystem::path(collection.c_str());
+
+  if (boost::filesystem::exists(path)) return _connection;
+
+  auto oid = generate_oid();
+
+  std::stringstream ss;
+  ss << "{";
+  ss << make_database_metadata() << ",";
+  ss << "\"_id\":\" { \"_oid\":" << oid << "\"}";
+  ss << "}";
+
+  auto filename = mkdir(collection) + oid + ".json";
+
+  std::ofstream os(filename);
+  auto json = ss.str();
+  std::copy(json.begin(), json.end(), std::ostream_iterator<char>(os));
+  os.close();
+
+  TRACE_(5, "StorageProvider::FileSystemDB::connection created metadata record id=" << oid);
+
+  return _connection;
+}
 
 template <>
 template <>
@@ -153,8 +183,10 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findGlobalConfigs(J
   auto collection_names = find_subdirs(dir_name);
 
   for (auto const& collection_name : collection_names) {
-    TRACE_(5, "StorageProvider::FileSystemDB::findGlobalConfigs() querying collection_name=<" << collection_name
-                                                                                              << ">");
+    TRACE_(5,
+           "StorageProvider::FileSystemDB::findGlobalConfigs() querying "
+           "collection_name=<"
+               << collection_name << ">");
 
     auto index_path = boost::filesystem::path(dir_name.c_str()).append(collection_name).append(dbfsl::search_index);
 
@@ -203,8 +235,10 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::buildConfigSearchFi
   auto collection_names = find_subdirs(dir_name);
 
   for (auto const& collection_name : collection_names) {
-    TRACE_(6, "StorageProvider::FileSystemDB::buildConfigSearchFilter() querying collection_name=<" << collection_name
-                                                                                                    << ">");
+    TRACE_(6,
+           "StorageProvider::FileSystemDB::buildConfigSearchFilter() "
+           "querying collection_name=<"
+               << collection_name << ">");
 
     auto index_path = boost::filesystem::path(dir_name.c_str()).append(collection_name).append(dbfsl::search_index);
 
@@ -212,8 +246,10 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::buildConfigSearchFi
 
     auto configentityname_pairs = search_index.findAllGlobalConfigurations(search_filter);
 
-    TRACE_(6, "StorageProvider::FileSystemDB::buildConfigSearchFilter() search returned "
-                  << configentityname_pairs.size() << " configurations.");
+    TRACE_(6,
+           "StorageProvider::FileSystemDB::buildConfigSearchFilter() search "
+           "returned "
+               << configentityname_pairs.size() << " configurations.");
 
     for (auto const& configentityname_pair : configentityname_pairs) {
       std::stringstream ss;
@@ -229,7 +265,10 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::buildConfigSearchFi
       ss << "}";
       ss << "}";
 
-      TRACE_(6, "StorageProvider::FileSystemDB::buildConfigSearchFilter() found document=<" << ss.str() << ">");
+      TRACE_(6,
+             "StorageProvider::FileSystemDB::buildConfigSearchFilter() "
+             "found document=<"
+                 << ss.str() << ">");
 
       returnCollection.emplace_back(ss.str());
     }
@@ -274,8 +313,10 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigVersions(
   if (search_ast.count("configurations.name") == 0) {
     auto versionentityname_pairs = search_index.findVersionsByEntityName(search_filter);
 
-    TRACE_(7, "StorageProvider::FileSystemDB::findVersionsByEntityName() search returned "
-                  << versionentityname_pairs.size() << " configurations.");
+    TRACE_(7,
+           "StorageProvider::FileSystemDB::findVersionsByEntityName() "
+           "search returned "
+               << versionentityname_pairs.size() << " configurations.");
 
     for (auto const& versionentityname_pair : versionentityname_pairs) {
       std::stringstream ss;
@@ -306,11 +347,13 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigVersions(
 
     } catch (...) {
     }
-    
+
     auto versionentityname_pairs = search_index.findVersionsByGlobalConfigName(search_filter);
 
-    TRACE_(7, "StorageProvider::FileSystemDB::findVersionsByGlobalConfigName() search returned "
-                  << versionentityname_pairs.size() << " configurations.");
+    TRACE_(7,
+           "StorageProvider::FileSystemDB::findVersionsByGlobalConfigName() "
+           "search returned "
+               << versionentityname_pairs.size() << " configurations.");
 
     for (auto const& versionentityname_pair : versionentityname_pairs) {
       std::stringstream ss;
@@ -353,8 +396,10 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigEntities(
   auto collection_names = find_subdirs(dir_name);
 
   for (auto const& collection_name : collection_names) {
-    TRACE_(9, "StorageProvider::FileSystemDB::findConfigEntities() querying collection_name=<" << collection_name
-                                                                                               << ">");
+    TRACE_(9,
+           "StorageProvider::FileSystemDB::findConfigEntities() querying "
+           "collection_name=<"
+               << collection_name << ">");
 
     auto index_path = boost::filesystem::path(dir_name.c_str()).append(collection_name).append(dbfsl::search_index);
 
@@ -395,7 +440,6 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigEntities(
   return returnCollection;
 }
 
-
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listCollectionNames(JsonData const& search_filter) {
@@ -403,7 +447,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listCollectionNames
   auto returnCollection = std::list<JsonData>();
   TRACE_(12, "StorageProvider::FileSystemDB::listCollectionNames() begin");
   TRACE_(12, "StorageProvider::FileSystemDB::listCollectionNames() args data=<" << search_filter.json_buffer << ">");
-  
+
   auto collection = _provider->connection();
   collection = expand_environment_variables(collection);
 
@@ -411,22 +455,25 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listCollectionNames
   auto collection_names = find_subdirs(dir_name);
 
   for (auto const& collection_name : collection_names) {
-    TRACE_(12, "StorageProvider::FileSystemDB::listCollectionNames() found collection_name=<" << collection_name << ">");
+    TRACE_(12,
+           "StorageProvider::FileSystemDB::listCollectionNames() found "
+           "collection_name=<"
+               << collection_name << ">");
 
-      std::stringstream ss;
+    std::stringstream ss;
 
-      ss << "{";
-      ss << "\"collection\" : \"" << collection_name << "\",";
-      ss << "\"dbprovider\" : \"filesystem\",";
-      ss << "\"dataformat\" : \"gui\",";
-      ss << "\"operation\" : \"findversions\",";
-      ss << "\"filter\" : { }";
-      ss << "}";
+    ss << "{";
+    ss << "\"collection\" : \"" << collection_name << "\",";
+    ss << "\"dbprovider\" : \"filesystem\",";
+    ss << "\"dataformat\" : \"gui\",";
+    ss << "\"operation\" : \"findversions\",";
+    ss << "\"filter\" : { }";
+    ss << "}";
 
-      TRACE_(12, "StorageProvider::FileSystemDB::listCollectionNames() found document=<" << ss.str() << ">");
+    TRACE_(12, "StorageProvider::FileSystemDB::listCollectionNames() found document=<" << ss.str() << ">");
 
-      returnCollection.emplace_back(ss.str());
-  }  
+    returnCollection.emplace_back(ss.str());
+  }
   return returnCollection;
 }
 
@@ -439,6 +486,56 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::addConfigToGlobalCo
   TRACE_(8, "StorageProvider::FileSystemDB::addConfigToGlobalConfig() begin");
   TRACE_(8, "StorageProvider::FileSystemDB::addConfigToGlobalConfig() args data=<" << search_filter.json_buffer << ">");
 
+  return returnCollection;
+}
+
+template <>
+template <>
+std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listDatabaseNames(JsonData const& search_filter) {
+  assert(!search_filter.json_buffer.empty());
+  auto returnCollection = std::list<JsonData>();
+
+  TRACE_(9, "StorageProvider::FileSystemDB::listDatabaseNames() begin");
+  TRACE_(9, "StorageProvider::FileSystemDB::listDatabaseNames() args data=<" << search_filter.json_buffer << ">");
+
+  auto database = _provider->connection();
+
+  auto found = database.find_last_not_of("\\/");
+  if (found != std::string::npos) database.erase(found + 1);
+
+  auto database_names = find_subdirs(database);
+
+  for (auto const& database_name : database_names) {
+    TRACE_(9, "StorageProvider::FileSystemDB::listDatabaseNames() found databases=<" << database_name << ">");
+
+    if (database_name == "system") continue;
+
+    TRACE_(9,
+           "StorageProvider::FileSystemDB::listDatabaseNames() found "
+           "database_name=<"
+               << database_name << ">");
+
+    std::stringstream ss;
+    ss << "{";
+    ss << "\"database\" : \"" << database_name << "\",";
+    ss << "\"dbprovider\" : \"database\",";
+    ss << "\"dataformat\" : \"gui\",";
+    ss << "\"filter\" : {}";
+    ss << "}";
+
+    TRACE_(9, "StorageProvider::FileSystemDB::listDatabaseNames() found document=<" << ss.str() << ">");
+
+    returnCollection.emplace_back(ss.str());
+  }
+
+  return returnCollection;
+}
+
+template <>
+template <>
+std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::databaseMetadata(JsonData const& search_filter) {
+  assert(!search_filter.json_buffer.empty());
+  auto returnCollection = std::list<JsonData>();
   return returnCollection;
 }
 
@@ -455,19 +552,24 @@ std::string mkdir(std::string const& d) {
 
   if (boost::filesystem::exists(path)) {
     if (boost::filesystem::is_directory(path)) {
-      TRACE_(11, "StorageProvider::FileSystemDB Directory exists, checking permissions; path=<" << dir << ">");
+      TRACE_(11,
+             "StorageProvider::FileSystemDB Directory exists, checking "
+             "permissions; path=<"
+                 << dir << ">");
 
       auto mask = boost::filesystem::perms::owner_write | boost::filesystem::perms::owner_read;
 
       if ((boost::filesystem::status(path).permissions() & mask) != mask) {
-        TRACE_(11, "StorageProvider::FileSystemDB Directory  <"
-                       << dir << "> has wrong permissions; needs to be owner readable and writable");
-        throw cet::exception("FileSystemDB") << "Directory  <" << dir
-                                             << "> has wrong permissions; needs to be owner readable and writable";
+        TRACE_(11, "StorageProvider::FileSystemDB Directory  <" << dir << "> has wrong permissions; needs to be owner "
+                                                                          "readable and writable");
+        throw cet::exception("FileSystemDB") << "Directory  <" << dir << "> has wrong permissions; needs to be "
+                                                                         "owner readable and writable";
       }
     } else {
-      TRACE_(11, "StorageProvider::FileSystemDB Failed creating a directory, sometging in the way path=<" << dir
-                                                                                                          << ">");
+      TRACE_(11,
+             "StorageProvider::FileSystemDB Failed creating a directory, "
+             "sometging in the way path=<"
+                 << dir << ">");
       throw cet::exception("FileSystemDB") << "Failed creating a directory, sometging in the way path=<" << dir << ">";
     }
   }
@@ -491,8 +593,10 @@ std::string mkdir(std::string const& d) {
   boost::filesystem::permissions(path, perms, ec);
 
   if (ec != boost::system::errc::success) {
-    TRACE_(11, "StorageProvider::FileSystemDB Failed enforcing directory permissions for path=<"
-                   << dir << "> error code=" << ec.message());
+    TRACE_(11,
+           "StorageProvider::FileSystemDB Failed enforcing directory "
+           "permissions for path=<"
+               << dir << "> error code=" << ec.message());
     throw cet::exception("FileSystemDB") << "Failed enforcing directory permissions for path=<" << dir
                                          << "> error code=" << ec.message();
   }
@@ -514,15 +618,20 @@ std::list<std::string> find_subdirs(std::string const& d) {
   auto path = boost::filesystem::path(dir.c_str());
 
   if (!boost::filesystem::exists(path)) {
-    TRACE_(11, "StorageProvider::FileSystemDB Failed searching for subdirectories, directory does not exist path=<"
-                   << dir << ">");
-    throw cet::exception("FileSystemDB") << "Failed searching for subdirectories, directory does not exist path=<"
+    TRACE_(11,
+           "StorageProvider::FileSystemDB Failed searching for "
+           "subdirectories, directory does not exist path=<"
+               << dir << ">");
+    throw cet::exception("FileSystemDB") << "Failed searching for subdirectories, directory does not exist "
+                                            "path=<"
                                          << dir << ">";
   }
 
   if (!boost::filesystem::is_directory(path)) {
-    TRACE_(11, "StorageProvider::FileSystemDB Failed searching for subdirectories, not a directory path=<" << dir
-                                                                                                           << ">");
+    TRACE_(11,
+           "StorageProvider::FileSystemDB Failed searching for "
+           "subdirectories, not a directory path=<"
+               << dir << ">");
     throw cet::exception("FileSystemDB") << "Failed searching for subdirectories, not a directory path=<" << dir << ">";
   }
 
@@ -539,54 +648,13 @@ std::list<std::string> find_subdirs(std::string const& d) {
   return returnValue;
 }
 
-object_id_t extract_oid(std::string const& filter) {
-  auto ex = std::regex("^\\{[^:]+:\\s+([\\s\\S]+)\\}$");
-
-  auto results = std::smatch();
-
-  if (!std::regex_search(filter, results, ex))
-    throw cet::exception("JSONDocument") << ("Regex ouid search failed; JSON buffer:" + filter);
-
-  if (results.size() != 2) {
-    // we are interested in a second match
-    TRACE_(12, "value()"
-                   << "JSON regex_search() result count=" << results.size());
-    for (auto const& result : results) {
-      TRACE_(12, "value()"
-                     << "JSON regex_search() result=" << result);
-    }
-
-    throw cet::exception("JSONDocument") << ("Regex search failed, regex_search().size()!=1; JSON buffer: " + filter);
-  }
-
-  auto match = std::string(results[1]);
-
-  match.erase(match.find_last_not_of(" \n\r\t") + 1);
-
-  auto dequote = [](auto s) {
-
-    if (s[0] == '"' && s[s.length() - 1] == '"')
-      return s.substr(1, s.length() - 2);
-    else
-      return s;
-  };
-
-  match = dequote(match);
-
-  TRACE_(12, "value()"
-                 << "JSON regex_search() result=" << match);
-
-  return match;
-}
-
-
 namespace filesystem {
 namespace debug {
 void enable() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeM", trace_mode::modeM);
 
   TRACE_(0, "artdaq::database::filesystem trace_enable");
 

@@ -26,9 +26,11 @@ using dbbt::JsonData;
 using cf::OperationBase;
 using cf::options::data_format_t;
 
-namespace artdaq {namespace database {
-std::string expand_environment_variables(std::string var);  
-}}
+namespace artdaq {
+namespace database {
+std::string expand_environment_variables(std::string var);
+}
+}
 
 OperationBase::OperationBase(std::string const& process_name) : _process_name{process_name} {}
 
@@ -75,7 +77,8 @@ std::string const& OperationBase::provider(std::string const& provider) {
 
   if (cf::not_equal(provider, cfl::database_provider_filesystem) &&
       cf::not_equal(provider, cfl::database_provider_mongo)) {
-    throw db::invalid_option_exception("OperationBase") << "Invalid database provider; database provider=" << provider << ".";
+    throw db::invalid_option_exception("OperationBase") << "Invalid database provider; database provider=" << provider
+                                                        << ".";
   }
 
   TRACE_(12, "Options: Updating provider from " << _provider << " to " << provider << ".");
@@ -120,7 +123,7 @@ std::string const& OperationBase::searchFilter() const noexcept {
 std::string const& OperationBase::searchFilter(std::string const& search_filter) {
   assert(!search_filter.empty());
 
-  auto tmp =cf::dequote(search_filter);
+  auto tmp = cf::dequote(search_filter);
   TRACE_(15, "Options: searchFilter args search_filter=<" << tmp << ">.");
 
   _search_filter = tmp;
@@ -141,7 +144,7 @@ bpo::options_description OperationBase::makeProgramOptions() const {
   descstr << _process_name;
   descstr << " <" << cfl::option::searchquery << ">";
 
-  //descstr << "  <-d <" << cfl::option::provider << ">>";
+  // descstr << "  <-d <" << cfl::option::provider << ">>";
   descstr << "  <-o <" << cfl::option::operation << ">>";
   descstr << "  <-f <" << cfl::option::format << ">>";
   descstr << "  <-c <" << cfl::option::collection << ">>";
@@ -155,7 +158,7 @@ bpo::options_description OperationBase::makeProgramOptions() const {
     return std::string{long_name}.append(",").append(short_name);
   };
 
-  opts.add_options()("help,h", "Produce help message");  
+  opts.add_options()("help,h", "Produce help message");
 
   opts.add_options()(make_opt_name(cfl::option::operation, "o").c_str(), bpo::value<std::string>(),
                      "Database operation name");
@@ -166,7 +169,7 @@ bpo::options_description OperationBase::makeProgramOptions() const {
 
   opts.add_options()(make_opt_name(cfl::option::provider, "d").c_str(), bpo::value<std::string>(),
                      "Database provider name; depricated");
-  
+
   opts.add_options()(cfl::option::searchfilter, bpo::value<std::string>(), "Search filter");
 
   opts.add_options()(cfl::option::searchquery, bpo::value<std::string>(), "Search query");
@@ -177,13 +180,13 @@ bpo::options_description OperationBase::makeProgramOptions() const {
   return opts;
 }
 
-std::string OperationBase::_getProviderFromURI(){
-  auto tmpURI = getenv("ARTDAQ_DATABASE_URI")?db::expand_environment_variables("${ARTDAQ_DATABASE_URI}"):std::string("");
+std::string OperationBase::_getProviderFromURI() {
+  auto tmpURI =
+      getenv("ARTDAQ_DATABASE_URI") ? db::expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
 
-  auto tmpDB=std::string(cfl::provider::mongo);
-  if(std::equal(std::begin(tmpDB) , std::end(tmpDB), tmpURI.begin()))
-    return  cfl::provider::mongo;
-  
+  auto tmpDB = std::string(cfl::provider::mongo);
+  if (std::equal(std::begin(tmpDB), std::end(tmpDB), tmpURI.begin())) return cfl::provider::mongo;
+
   return cfl::provider::filesystem;
 }
 
@@ -194,11 +197,11 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
   }
 
   if (vm.count(cfl::option::searchquery)) {
-    auto json = vm[cfl::option::searchquery].as<std::string>();    
-    std::ifstream is(json.c_str());    
+    auto json = vm[cfl::option::searchquery].as<std::string>();
+    std::ifstream is(json.c_str());
     if (is.good()) {
       json = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-      is.close();      
+      is.close();
     }
 
     TRACE_(14, "Options: json query= <" << json << ">");
@@ -207,19 +210,20 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
     return process_exit_code::SUCCESS;
   }
 
-  
   provider(_getProviderFromURI());
-  
-/*
-  if (!vm.count(cfl::option::provider)) {
-    std::cerr << "Exception from command line processing in " << _process_name << ": no datbase provider name given.\n"
-              << "For usage and an options list, please do '" << _process_name << " --help"
-              << "'.\n";
-    return process_exit_code::INVALID_ARGUMENT | 1;
-  } else {
-    provider(vm[cfl::option::provider].as<std::string>());
-  }
-*/
+
+  /*
+    if (!vm.count(cfl::option::provider)) {
+      std::cerr << "Exception from command line processing in " << _process_name
+    << ": no datbase provider name given.\n"
+                << "For usage and an options list, please do '" << _process_name
+    << " --help"
+                << "'.\n";
+      return process_exit_code::INVALID_ARGUMENT | 1;
+    } else {
+      provider(vm[cfl::option::provider].as<std::string>());
+    }
+  */
 
   if (!vm.count(cfl::option::operation)) {
     std::cerr << "Exception from command line processing in " << _process_name << ": no database operation given.\n"
@@ -246,14 +250,13 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
 
 void OperationBase::readJsonData(JsonData const& data) {
   assert(!data.json_buffer.empty());
-  assert(data.json_buffer!=cfl::notprovided);
+  assert(data.json_buffer != cfl::notprovided);
 
   TRACE_(14, "OperationBase::readJsonData() data=<" << data.json_buffer << ">");
 
   using namespace artdaq::database::json;
   auto filterAST = object_t{};
 
-  
   if (!JsonReader{}.read(data.json_buffer, filterAST)) {
     TRACE_(14, "OperationBase: JSON buffer= <" << data.json_buffer << ">");
     throw db::invalid_option_exception("OperationBase") << "OperationBase: Unable to read JSON buffer.";
@@ -261,7 +264,7 @@ void OperationBase::readJsonData(JsonData const& data) {
 
   try {
     provider(_getProviderFromURI());
-    //provider(boost::get<std::string>(filterAST.at(cfl::option::provider)));
+    // provider(boost::get<std::string>(filterAST.at(cfl::option::provider)));
   } catch (...) {
   }
 
@@ -300,11 +303,11 @@ JsonData OperationBase::writeJsonData() const {
   auto docAST = object_t{};
 
   docAST[cfl::option::searchfilter] = searchFilterAST;
-  //docAST[cfl::option::provider] = provider();
+  // docAST[cfl::option::provider] = provider();
   docAST[cfl::option::operation] = operation();
   docAST[cfl::option::collection] = collectionName();
   docAST[cfl::option::format] = cf::to_string(dataFormat());
-  
+
   auto json_buffer = std::string{};
 
   if (!JsonWriter{}.write(docAST, json_buffer)) {

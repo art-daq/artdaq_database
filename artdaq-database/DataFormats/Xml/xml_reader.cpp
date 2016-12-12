@@ -6,6 +6,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+#include "artdaq-database/BuildInfo/process_exit_codes.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -46,7 +47,7 @@ bool XmlReader::read(std::string const& in, jsn::object_t& json_object) {
           json_tree.push_back({xml_branch.first, std::string(xml_branch.second.data())});
           continue;
         }
-        
+
         json_tree.push_back({xml_branch.first, jsn::object_t{}});
         auto& json_branch = boost::get<jsn::object_t>(json_tree.back().value);
         convert(xml_branch.second, json_branch);
@@ -55,9 +56,8 @@ bool XmlReader::read(std::string const& in, jsn::object_t& json_object) {
 
     convert(xml_tree, json_tree);
 
-    if(json_tree.empty())
-      return false;
-      
+    if (json_tree.empty()) return false;
+
     json_object.swap(object);
 
     TRACE_(2, "read() end");
@@ -75,8 +75,8 @@ bool XmlReader::read(std::string const& in, jsn::object_t& json_object) {
 void artdaq::database::xml::debug::enableXmlReader() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeM", trace_mode::modeM);
 
   TRACE_(0, "artdaq::database::xml::XmlReader trace_enable");
 }

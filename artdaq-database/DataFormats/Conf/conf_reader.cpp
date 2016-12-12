@@ -1,7 +1,8 @@
 #include "artdaq-database/DataFormats/common.h"
 
-#include "artdaq-database/DataFormats/Conf/convertconf2json.h"
+#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/DataFormats/Conf/conf_reader.h"
+#include "artdaq-database/DataFormats/Conf/convertconf2json.h"
 #include "artdaq-database/DataFormats/common/shared_literals.h"
 
 #ifdef TRACE_NAME
@@ -17,7 +18,7 @@ using artdaq::database::conf::ConfReader;
 
 namespace literal = artdaq::database::dataformats::literal;
 
-bool ConfReader::read(std::string const& in [[gnu::unused]], jsn::object_t& json_object) {
+bool ConfReader::read(std::string const& in[[gnu::unused]], jsn::object_t& json_object) {
   assert(!in.empty());
   assert(json_object.empty());
 
@@ -46,8 +47,8 @@ bool ConfReader::read(std::string const& in [[gnu::unused]], jsn::object_t& json
 void artdaq::database::conf::debug::enableConfReader() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeM", trace_mode::modeM);
 
   TRACE_(0, "artdaq::database::conf::ConfReader trace_enable");
 }

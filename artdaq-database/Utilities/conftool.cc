@@ -27,9 +27,13 @@ using Options = cf::ManageConfigsOperation;
 using artdaq::database::jsonutils::JSONDocument;
 using artdaq::database::basictypes::JsonData;
 
-namespace artdaq { namespace database {std::string expand_environment_variables(std::string var);} }
+namespace artdaq {
+namespace database {
+std::string expand_environment_variables(std::string var);
+}
+}
 
-int main(int argc, char *argv[]) try {
+int main(int argc, char* argv[]) try {
 #if 0
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
@@ -61,9 +65,8 @@ int main(int argc, char *argv[]) try {
   try {
     bpo::store(bpo::command_line_parser(argc, argv).options(desc).run(), vm);
     bpo::notify(vm);
-  } catch (bpo::error const &e) {
-    std::cerr << "Exception from command line processing in " << argv[0] << ": "
-              << e.what() << "\n";
+  } catch (bpo::error const& e) {
+    std::cerr << "Exception from command line processing in " << argv[0] << ": " << e.what() << "\n";
     return process_exit_code::INVALID_ARGUMENT;
   }
 
@@ -79,14 +82,12 @@ int main(int argc, char *argv[]) try {
   }
 
   auto file_res_name = std::string{"${HOME}/${0}.result.out"};
- 
-  if (options.operation().compare(literal::operation::load)==0 ||
-      options.operation().compare(literal::operation::globalconfload)==0) {
+
+  if (options.operation().compare(literal::operation::load) == 0 ||
+      options.operation().compare(literal::operation::globalconfload) == 0) {
     if (!vm.count(literal::option::result)) {
-      std::cerr << "Exception from command line processing in " << argv[0]
-                << ": no result file name given.\n"
-                << "For usage and an options list, please do '" << argv[0]
-                << " --help"
+      std::cerr << "Exception from command line processing in " << argv[0] << ": no result file name given.\n"
+                << "For usage and an options list, please do '" << argv[0] << " --help"
                 << "'.\n";
 
       return process_exit_code::INVALID_ARGUMENT | 1;
@@ -97,11 +98,11 @@ int main(int argc, char *argv[]) try {
 
   file_res_name = artdaq::database::expand_environment_variables(file_res_name);
   file_res_name.pop_back();
-  
+
   auto file_src_name = file_res_name;
 
   if (vm.count(literal::option::source)) {
-    file_src_name =  artdaq::database::expand_environment_variables(vm[literal::option::source].as<std::string>());
+    file_src_name = artdaq::database::expand_environment_variables(vm[literal::option::source].as<std::string>());
     file_src_name.pop_back();
   }
 
@@ -112,54 +113,37 @@ int main(int argc, char *argv[]) try {
 
   using namespace artdaq::database::configuration::json;
 
-  cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP,
-                        std::string const &, std::string &>(
-      literal::operation::load, load_configuration, options_string,
-      test_document);
+  cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP, std::string const&, std::string&>(
+      literal::operation::load, load_configuration, options_string, test_document);
 
-  cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP,
-                        std::string const &, std::string &>(
-      literal::operation::globalconfload, load_globalconfiguration,
-      options_string, test_document);
+  cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP, std::string const&, std::string&>(
+      literal::operation::globalconfload, load_globalconfiguration, options_string, test_document);
 
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP,
-                        std::string const &>(
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
       "findconfigs", find_global_configurations, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP,
-                        std::string const &>(
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
       "buildfilter", build_global_configuration_search_filter, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP,
-                        std::string const &>(
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
       "addconfig", add_configuration_to_global_configuration, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP,
-                        std::string const &>(
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
       "findversions", find_configuration_versions, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP,
-                        std::string const &>(
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
       "findentities", find_configuration_entities, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP,
-                        std::string const &>("addalias", add_version_alias,
-                                             options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP,
-                        std::string const &>(
-      "removealias", remove_version_alias, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP,
-                        std::string const &>(
-      "findaliases", find_version_aliases, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>("addalias", add_version_alias,
+                                                                                  options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>("removealias", remove_version_alias,
+                                                                                  options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>("findaliases", find_version_aliases,
+                                                                                  options_string);
   try {
     std::ifstream is(file_src_name);
-    test_document = std::string((std::istreambuf_iterator<char>(is)),
-                                std::istreambuf_iterator<char>());
+    test_document = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
     is.close();
-    cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP,
-                          std::string const &, std::string const &>(
-        literal::operation::store, store_configuration, options_string,
-        test_document);
+    cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
+        literal::operation::store, store_configuration, options_string, test_document);
 
-    cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP,
-                          std::string const &, std::string const &>(
-        literal::operation::globalconfstore, store_globalconfiguration,
-        options_string, test_document);
+    cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
+        literal::operation::globalconfstore, store_globalconfiguration, options_string, test_document);
 
   } catch (...) {
   }
@@ -176,64 +160,82 @@ int main(int argc, char *argv[]) try {
 
   auto returned = std::string{result.second};
 
-  if (options.operation().compare(literal::operation::load)==0 ||
-      options.operation().compare(literal::operation::globalconfload)==0) {
+  if (options.operation().compare(literal::operation::load) == 0 ||
+      options.operation().compare(literal::operation::globalconfload) == 0) {
     std::ofstream os(file_res_name.c_str());
-    std::copy(returned.begin(), returned.end(),
-              std::ostream_iterator<char>(os));
+    std::copy(returned.begin(), returned.end(), std::ostream_iterator<char>(os));
     os.close();
 
     std::cout << "Wrote file:" << file_res_name << "\n";
 
     return process_exit_code::SUCCESS;
-  }else if (options.operation().compare(literal::operation::store)==0 ||
-      options.operation().compare(literal::operation::globalconfstore)==0) {
-     /* std::ofstream os(file_res_name.c_str());
-      std::copy(returned.begin(), returned.end(),
-              std::ostream_iterator<char>(os));
-      os.close();
+  } else if (options.operation().compare(literal::operation::store) == 0 ||
+             options.operation().compare(literal::operation::globalconfstore) == 0) {
+    /* std::ofstream os(file_res_name.c_str());
+     std::copy(returned.begin(), returned.end(),
+             std::ostream_iterator<char>(os));
+     os.close();
 
-      std::cout << "Wrote responce to file:" << file_res_name << "\n";
-      */
-      return process_exit_code::SUCCESS;	
-   } 
+     std::cout << "Wrote responce to file:" << file_res_name << "\n";
+     */
+    return process_exit_code::SUCCESS;
+  }
 
   std::cout << "Results(Returned value):\n" << returned << "\n";
   return process_exit_code::SUCCESS;
-   
+
 } catch (...) {
-  std::cout << "Process exited with error: "
-            << boost::current_exception_diagnostic_information();
+  std::cout << "Process exited with error: " << boost::current_exception_diagnostic_information();
   return process_exit_code::UNCAUGHT_EXCEPTION;
 }
 
-
 /*
- 
+
 rm -rf ~/databases/filesystemdb*
 
 export MY_PROJECT_SRC_DIR="/home/lukhanin/scratch/current/artdaq-demo-base"
-export MY_TEST_FILES_DIR=${MY_PROJECT_SRC_DIR}/artdaq-utilities-database/test/CaseStudy/ArtdaqDemo/test007
+export
+MY_TEST_FILES_DIR=${MY_PROJECT_SRC_DIR}/artdaq-utilities-database/test/CaseStudy/ArtdaqDemo/test007
 export MY_TMP_FILES_DIR=${MY_PROJECT_SRC_DIR}/tmp
 mkdir -p ${MY_TMP_FILES_DIR}
 
-conftool -d filesystem -f fhicl -o store -v ver01 -g mytest01 -e agg1  -c artdaq_Aggregator -s ${MY_TEST_FILES_DIR}/Aggregator_topol.fnal.gov_5265.src.fcl
-conftool -d filesystem -f fhicl -o store -v ver01 -g mytest01 -e agg2  -c artdaq_Aggregator -s ${MY_TEST_FILES_DIR}/Aggregator_topol.fnal.gov_5266.src.fcl
-conftool -d filesystem -f fhicl -o store -v ver01 -g mytest01 -e br1   -c artdaq_BoardReader -s ${MY_TEST_FILES_DIR}/BoardReader_TOY1_topol.fnal.gov_5205.src.fcl
-conftool -d filesystem -f fhicl -o store -v ver01 -g mytest01 -e br2   -c artdaq_BoardReader -s ${MY_TEST_FILES_DIR}/BoardReader_TOY2_topol.fnal.gov_5206.src.fcl
-conftool -d filesystem -f fhicl -o store -v ver01 -g mytest01 -e eb1   -c artdaq_EventBuilder -s ${MY_TEST_FILES_DIR}/EventBuilder_topol.fnal.gov_5235.src.fcl
-conftool -d filesystem -f fhicl -o store -v ver01 -g mytest01 -e eb2   -c artdaq_EventBuilder -s ${MY_TEST_FILES_DIR}/EventBuilder_topol.fnal.gov_5236.src.fcl
+conftool -d filesystem -f fhicl -o store -v ver01 -g mytest01 -e agg1  -c
+artdaq_Aggregator -s ${MY_TEST_FILES_DIR}/Aggregator_topol.fnal.gov_5265.src.fcl
+conftool -d filesystem -f fhicl -o store -v ver01 -g mytest01 -e agg2  -c
+artdaq_Aggregator -s ${MY_TEST_FILES_DIR}/Aggregator_topol.fnal.gov_5266.src.fcl
+conftool -d filesystem -f fhicl -o store -v ver01 -g mytest01 -e br1   -c
+artdaq_BoardReader -s
+${MY_TEST_FILES_DIR}/BoardReader_TOY1_topol.fnal.gov_5205.src.fcl
+conftool -d filesystem -f fhicl -o store -v ver01 -g mytest01 -e br2   -c
+artdaq_BoardReader -s
+${MY_TEST_FILES_DIR}/BoardReader_TOY2_topol.fnal.gov_5206.src.fcl
+conftool -d filesystem -f fhicl -o store -v ver01 -g mytest01 -e eb1   -c
+artdaq_EventBuilder -s
+${MY_TEST_FILES_DIR}/EventBuilder_topol.fnal.gov_5235.src.fcl
+conftool -d filesystem -f fhicl -o store -v ver01 -g mytest01 -e eb2   -c
+artdaq_EventBuilder -s
+${MY_TEST_FILES_DIR}/EventBuilder_topol.fnal.gov_5236.src.fcl
 
 conftool -d filesystem -f gui -o findconfigs
-conftool -d filesystem -f gui -o buildfilter 
+conftool -d filesystem -f gui -o buildfilter
 conftool -d filesystem -f gui -o findentities
 
 
-conftool -d filesystem -f fhicl -o load -v ver01 -g mytest01 -e agg1  -c artdaq_Aggregator -r ${MY_TMP_FILES_DIR}/Aggregator_topol.fnal.gov_5265.src.fcl
-conftool -d filesystem -f fhicl -o load -v ver01 -g mytest01 -e agg2  -c artdaq_Aggregator -r ${MY_TMP_FILES_DIR}/Aggregator_topol.fnal.gov_5266.src.fcl
-conftool -d filesystem -f fhicl -o load -v ver01 -g mytest01 -e br1   -c artdaq_BoardReader -r ${MY_TMP_FILES_DIR}/BoardReader_TOY1_topol.fnal.gov_5205.src.fcl
-conftool -d filesystem -f fhicl -o load -v ver01 -g mytest01 -e br2   -c artdaq_BoardReader -r ${MY_TMP_FILES_DIR}/BoardReader_TOY2_topol.fnal.gov_5206.src.fcl
-conftool -d filesystem -f fhicl -o load -v ver01 -g mytest01 -e eb1   -c artdaq_EventBuilder -r ${MY_TMP_FILES_DIR}/EventBuilder_topol.fnal.gov_5235.src.fcl
-conftool -d filesystem -f fhicl -o load -v ver01 -g mytest01 -e eb2   -c artdaq_EventBuilder -r ${MY_TMP_FILES_DIR}/EventBuilder_topol.fnal.gov_5236.src.fcl
- 
+conftool -d filesystem -f fhicl -o load -v ver01 -g mytest01 -e agg1  -c
+artdaq_Aggregator -r ${MY_TMP_FILES_DIR}/Aggregator_topol.fnal.gov_5265.src.fcl
+conftool -d filesystem -f fhicl -o load -v ver01 -g mytest01 -e agg2  -c
+artdaq_Aggregator -r ${MY_TMP_FILES_DIR}/Aggregator_topol.fnal.gov_5266.src.fcl
+conftool -d filesystem -f fhicl -o load -v ver01 -g mytest01 -e br1   -c
+artdaq_BoardReader -r
+${MY_TMP_FILES_DIR}/BoardReader_TOY1_topol.fnal.gov_5205.src.fcl
+conftool -d filesystem -f fhicl -o load -v ver01 -g mytest01 -e br2   -c
+artdaq_BoardReader -r
+${MY_TMP_FILES_DIR}/BoardReader_TOY2_topol.fnal.gov_5206.src.fcl
+conftool -d filesystem -f fhicl -o load -v ver01 -g mytest01 -e eb1   -c
+artdaq_EventBuilder -r
+${MY_TMP_FILES_DIR}/EventBuilder_topol.fnal.gov_5235.src.fcl
+conftool -d filesystem -f fhicl -o load -v ver01 -g mytest01 -e eb2   -c
+artdaq_EventBuilder -r
+${MY_TMP_FILES_DIR}/EventBuilder_topol.fnal.gov_5236.src.fcl
+
  */

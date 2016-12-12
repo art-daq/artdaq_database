@@ -1,5 +1,6 @@
 #include "artdaq-database/DataFormats/common.h"
 
+#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/DataFormats/Xml/convertxml2json.h"
 #include "artdaq-database/DataFormats/Xml/xml_writer.h"
 #include "artdaq-database/DataFormats/common/shared_literals.h"
@@ -66,9 +67,8 @@ bool XmlWriter::write(jsn::object_t const& json_object, std::string& out) {
 
     auto buffer = sout.str();
 
-    if(buffer.empty())
-      return false;
-    
+    if (buffer.empty()) return false;
+
     out.swap(buffer);
 
     TRACE_(2, "write() end");
@@ -85,8 +85,8 @@ bool XmlWriter::write(jsn::object_t const& json_object, std::string& out) {
 void artdaq::database::xml::debug::enableXmlWriter() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeM", trace_mode::modeM);
 
   TRACE_(0, "artdaq::database::xml::XmlWriter trace_enable");
 }

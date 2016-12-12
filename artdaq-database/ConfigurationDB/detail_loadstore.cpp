@@ -5,8 +5,7 @@
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
 #include "artdaq-database/ConfigurationDB/shared_literals.h"
 
-#include "artdaq-database/ConfigurationDB/dispatch_filedb.h"
-#include "artdaq-database/ConfigurationDB/dispatch_mongodb.h"
+#include "artdaq-database/ConfigurationDB/configuration_dbproviders.h"
 
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
@@ -75,15 +74,7 @@ void store_configuration(Options const& options, std::string& conf) {
     throw cet::exception("store_configuration") << "Invalid configuration; configuration is empty.";
   }
 
-  if (cf::not_equal(options.provider(), cflp::filesystem) && cf::not_equal(options.provider(), cflp::mongo)) {
-    TRACE_(15,
-           "Error in store_configuration: Invalid database provider; "
-           "database provider="
-               << options.provider() << ".");
-
-    throw cet::exception("store_configuration") << "Invalid database provider; database provider=" << options.provider()
-                                                << ".";
-  }
+  validate_dbprovider_name(options.provider());
 
   auto data = JsonData{conf};
   auto returnValue = std::string{};
@@ -92,7 +83,7 @@ void store_configuration(Options const& options, std::string& conf) {
   switch (options.dataFormat()) {
     default:
     case data_format_t::json:
-       data = JsonData{std::string("{\"data\":").append(conf).append("}")};  
+      data = JsonData{std::string("{\"data\":").append(conf).append("}")};
       break;
 
     case data_format_t::unknown: {
@@ -101,10 +92,10 @@ void store_configuration(Options const& options, std::string& conf) {
       break;
     }
     case data_format_t::gui: {
-      if (!db::json_gui_to_db(conf, returnValue)) {	
+      if (!db::json_gui_to_db(conf, returnValue)) {
         throw cet::exception("store_configuration") << "GUI to DB data convertion failed";
       }
-    
+
       data = JsonData{returnValue};
 
       returnValueChanged = true;
@@ -125,15 +116,15 @@ void store_configuration(Options const& options, std::string& conf) {
         TRACE_(17, "store_configuration: Converted json data to fcl; json=<" << data.json_buffer << ">");
         TRACE_(17, "store_configuration: Converted json data to fcl; fcl=<" << fhicl.fhicl_buffer << ">");
       }
-      
-      returnValue= fhicl.fhicl_buffer;
+
+      returnValue = fhicl.fhicl_buffer;
       returnValueChanged = true;
 
       break;
     }
     case data_format_t::xml: {
       // convert from xml to json and back to xml
-      
+
       data = XmlData{conf};
 
       auto xml = XmlData{};
@@ -146,8 +137,8 @@ void store_configuration(Options const& options, std::string& conf) {
         TRACE_(17, "store_configuration: Converted json data to fcl; json=<" << data.json_buffer << ">");
         TRACE_(17, "store_configuration: Converted json data to fcl; fcl=<" << xml.xml_buffer << ">");
       }
-      
-      returnValue= xml.xml_buffer;
+
+      returnValue = xml.xml_buffer;
       returnValueChanged = true;
 
       break;
@@ -176,8 +167,8 @@ void store_configuration(Options const& options, std::string& conf) {
   TRACE_(15, "store_configuration: insert_payload=<" << insert_payload.json_buffer << ">");
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_store_t>{{cflp::mongo, cf::mongo::store},
-                                                             {cflp::filesystem, cf::filesystem::store}};
+    auto providers = std::map<std::string, provider_store_t>{
+        {cflp::mongo, cf::mongo::store}, {cflp::filesystem, cf::filesystem::store}, {cflp::ucond, cf::ucond::store}};
 
     return providers.at(name);
   };
@@ -199,15 +190,7 @@ void load_configuration(Options const& options, std::string& conf) {
     throw cet::exception("load_configuration") << "Invalid configuration; configuration is not empty.";
   }
 
-  if (cf::not_equal(options.provider(), cflp::filesystem) && cf::not_equal(options.provider(), cflp::mongo)) {
-    TRACE_(16,
-           "Error in load_configuration: Invalid database provider; "
-           "database provider="
-               << options.provider() << ".");
-
-    throw cet::exception("load_configuration") << "Invalid database provider; database provider=" << options.provider()
-                                               << ".";
-  }
+  validate_dbprovider_name(options.provider());
 
   auto search_payload = JsonData{"{\"filter\":" + options.search_filter_to_JsonData().json_buffer +
                                  +", \"collection\":\"" + options.collectionName() + "\"}"};
@@ -215,8 +198,8 @@ void load_configuration(Options const& options, std::string& conf) {
   TRACE_(16, "load_configuration: search_payload=<" << search_payload.json_buffer << ">");
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_load_t>{{cflp::mongo, cf::mongo::load},
-                                                            {cflp::filesystem, cf::filesystem::load}};
+    auto providers = std::map<std::string, provider_load_t>{
+        {cflp::mongo, cf::mongo::load}, {cflp::filesystem, cf::filesystem::load}, {cflp::ucond, cf::ucond::load}};
 
     return providers.at(name);
   };
@@ -227,19 +210,19 @@ void load_configuration(Options const& options, std::string& conf) {
   auto returnValueChanged = bool{false};
 
   auto dataFormat = options.dataFormat();
-  
-  if(dataFormat == data_format_t::origin ){
-      auto resultAst = jsn::object_t{};
-      
-      if(!jsn::JsonReader{}.read(search_result.json_buffer,resultAst))
-	throw cet::exception("load_configuration")<< "Invalid json data";
 
-      auto const& docAst = boost::get<jsn::object_t>(resultAst.at(cfls::origin));
-      dataFormat=to_data_format(boost::get<std::string>(docAst.at(cfls::format)));
+  if (dataFormat == data_format_t::origin) {
+    auto resultAst = jsn::object_t{};
 
-      TRACE_(16, "load_configuration: dataFormat=<" << to_string(dataFormat) << ">");
+    if (!jsn::JsonReader{}.read(search_result.json_buffer, resultAst))
+      throw cet::exception("load_configuration") << "Invalid json data";
+
+    auto const& docAst = boost::get<jsn::object_t>(resultAst.at(cfls::origin));
+    dataFormat = to_data_format(boost::get<std::string>(docAst.at(cfls::format)));
+
+    TRACE_(16, "load_configuration: dataFormat=<" << to_string(dataFormat) << ">");
   }
-  
+
   switch (dataFormat) {
     default:
     case data_format_t::db: {
@@ -259,16 +242,16 @@ void load_configuration(Options const& options, std::string& conf) {
 
     case data_format_t::json: {
       auto resultAst = jsn::object_t{};
-      
-      if(!jsn::JsonReader{}.read(search_result.json_buffer,resultAst))
-	throw cet::exception("load_configuration")<< "Invalid json data";
+
+      if (!jsn::JsonReader{}.read(search_result.json_buffer, resultAst))
+        throw cet::exception("load_configuration") << "Invalid json data";
 
       auto const& docAst = boost::get<jsn::object_t>(resultAst.at(cfld::document));
       auto const& dataAst = boost::get<jsn::object_t>(docAst.at(cfld::data));
 
-      if(!jsn::JsonWriter{}.write(dataAst,returnValue))
-	throw cet::exception("load_configuration")<< "Invalid json data";
-      
+      if (!jsn::JsonWriter{}.write(dataAst, returnValue))
+        throw cet::exception("load_configuration") << "Invalid json data";
+
       returnValueChanged = true;
       break;
     }
@@ -308,7 +291,7 @@ void load_configuration(Options const& options, std::string& conf) {
       returnValueChanged = true;
 
       break;
-    }    
+    }
   }
 
   if (returnValueChanged) conf.swap(returnValue);

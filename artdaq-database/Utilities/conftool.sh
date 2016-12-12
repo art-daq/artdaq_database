@@ -1,9 +1,9 @@
 #!/bin/bash
 
-export artdaq_database_version=v1_03_17
-export config_editor_version=v1_00_02
+export artdaq_database_version=v1_03_18
+export config_editor_version=v1_00_03
 
-conftool_log_dir=/home/nfs/daqoutput/daqlogs/conftool
+conftool_log_dir=${HOME}/daqoutput/daqlogs/conftool
 
 function show_help(){
 printf "\n\nUsage: $(basename $0) [OPERATION] [OPTION]...\n"
@@ -401,7 +401,7 @@ function main()
 
   printf "\nInfo: using $(which conftool)"
   
-  export ARTDAQ_DATABASE_DATADIR=/home/nfs/dunedaq/daqarea/databases
+  export ARTDAQ_DATABASE_DATADIR=${HOME}/daqarea/databases
   
   printf "\n"
   

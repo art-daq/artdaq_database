@@ -1,5 +1,6 @@
 #include "artdaq-database/DataFormats/common.h"
 
+#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/DataFormats/Xml/convertxml2json.h"
 #include "artdaq-database/DataFormats/Xml/xml_common.h"
 
@@ -14,8 +15,8 @@
 void artdaq::database::xmljson::debug::enableXml2Json() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeM", trace_mode::modeM);
 
   TRACE_(0, "artdaq::database::xml2json trace_enable");
 }

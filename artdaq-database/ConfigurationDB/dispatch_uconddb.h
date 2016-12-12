@@ -1,5 +1,5 @@
-#ifndef _ARTDAQ_DATABASE_CONFIGURATIONDB_DISPATCH_MONGO_H_
-#define _ARTDAQ_DATABASE_CONFIGURATIONDB_DISPATCH_MONGO_H_
+#ifndef _ARTDAQ_DATABASE_CONFIGURATIONDB_DISPATCH_UCOND_H_
+#define _ARTDAQ_DATABASE_CONFIGURATIONDB_DISPATCH_UCOND_H_
 
 #include "artdaq-database/ConfigurationDB/common.h"
 
@@ -13,7 +13,7 @@ class LoadStoreOperation;
 class ManageConfigsOperation;
 class ManageAliasesOperation;
 
-namespace mongo {
+namespace ucond {
 using artdaq::database::basictypes::JsonData;
 
 namespace cf = artdaq::database::configuration;
@@ -36,9 +36,9 @@ JsonData readDatabaseInfo(cf::LoadStoreOperation const& /*options*/, JsonData co
 
 }  // namespace mongo
 namespace debug {
-void enableDBOperationMongo();
+void enableDBOperationUcond();
 }
 }  // namespace configuration
 }  // namespace database
 }  // namespace artdaq
-#endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_DISPATCH_MONGO_H_ */
+#endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_DISPATCH_UCOND_H_ */

@@ -103,7 +103,6 @@ std::vector<std::string> JSONDocument::_split_path(std::string const& path) cons
 
 bool JSONDocument::isReadonly() const { return false; }
 
-
 std::ostream& operator<<(std::ostream& os, JSONDocument const& document) {
   os << document.to_string();
 

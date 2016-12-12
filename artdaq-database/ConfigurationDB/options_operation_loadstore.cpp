@@ -106,14 +106,12 @@ std::string const& LoadStoreOperation::sourceFileName(std::string const& source_
     throw cet::exception("Options") << "Invalid source file name; source file name is empty.";
   }
 
-  TRACE_(12, "Options: Updating source_file_name from " << _source_file_name << " to " << source_file_name
-                                                            << ".");
+  TRACE_(12, "Options: Updating source_file_name from " << _source_file_name << " to " << source_file_name << ".");
 
   _source_file_name = source_file_name;
 
   return _source_file_name;
 }
-
 
 void LoadStoreOperation::readJsonData(JsonData const& data) {
   assert(!data.json_buffer.empty());
@@ -146,7 +144,7 @@ void LoadStoreOperation::readJsonData(JsonData const& data) {
     sourceFileName(boost::get<std::string>(dataAST.at(cfl::option::source)));
   } catch (...) {
   }
-  
+
   try {
     auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(cfl::option::searchfilter));
 
@@ -171,7 +169,7 @@ void LoadStoreOperation::readJsonData(JsonData const& data) {
       sourceFileName(boost::get<std::string>(dataAST.at(cfl::option::source)));
     } catch (...) {
     }
-    
+
   } catch (...) {
     TRACE_(1, "Options() no filter provided <" << data << ">");
   }
@@ -197,7 +195,7 @@ int LoadStoreOperation::readProgramOptions(bpo::variables_map const& vm) {
   if (vm.count(cfl::option::source)) {
     sourceFileName(vm[cfl::option::source].as<std::string>());
   }
-  
+
   return process_exit_code::SUCCESS;
 }
 
@@ -233,7 +231,7 @@ JsonData LoadStoreOperation::writeJsonData() const {
   if (globalConfiguration() != cfl::notprovided) docAST[cfl::option::configuration] = globalConfiguration();
 
   if (sourceFileName() != cfl::notprovided) docAST[cfl::option::source] = sourceFileName();
-  
+
   auto json_buffer = std::string{};
 
   if (!JsonWriter{}.write(docAST, json_buffer)) {
@@ -341,5 +339,7 @@ void cf::debug::options::enableLoadStoreOperation() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::options::OperationLoadStore trace_enable");
+  TRACE_(0,
+         "artdaq::database::configuration::options::OperationLoadStore "
+         "trace_enable");
 }

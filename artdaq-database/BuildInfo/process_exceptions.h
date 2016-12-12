@@ -11,12 +11,12 @@ class exception : public cet::exception {
   explicit exception(Category const& category) : cet::exception{category} {}
 
   exception(Category const& category, std::string const& message) : cet::exception{category, message} {}
-  
+
   template <typename W>
   exception& operator<<(W const& w) {
     this->append(w);
-  return *this;
-  }  
+    return *this;
+  }
 };
 
 class invalid_option_exception : public exception {
@@ -36,7 +36,6 @@ class runtime_exception : public exception {
 
   runtime_exception(Category const& category, std::string const& message) : exception{category, message} {}
 };
-
 }
 }
 #endif  // _PROCESS_EXCEPTIONS_H_

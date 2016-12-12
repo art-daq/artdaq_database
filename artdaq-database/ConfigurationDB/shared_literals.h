@@ -13,8 +13,9 @@ constexpr auto globalconfload = "globalconfload";
 constexpr auto store = "store";
 constexpr auto load = "load";
 
-
 constexpr auto listcollections = "listcollections";
+constexpr auto listdatabases = "listdatabases";
+constexpr auto readdbinfo = "readdbinfo";
 
 constexpr auto findconfigs = "findconfigs";
 constexpr auto findversions = "findversions";
@@ -28,12 +29,12 @@ constexpr auto addalias = "addalias";
 constexpr auto rmalias = "rmalias";
 constexpr auto findalias = "findalias";
 constexpr auto operations = "operations";
-
 }
 
 namespace provider {
 constexpr auto mongo = "mongo";
 constexpr auto filesystem = "filesystem";
+constexpr auto ucond = "ucond";
 }
 
 namespace result {
@@ -77,7 +78,10 @@ constexpr auto operations = "operations";
 namespace msg {
 constexpr auto empty_filter = "Search filter is empty";
 constexpr auto empty_document = "Json document is empty";
-constexpr auto cant_call_system= "Unable to call system() from this API; check if either set-user-ID or set-group-ID are used in the program execution context.";
+constexpr auto cant_call_system =
+    "Unable to call system() from this API; "
+    "check if either set-user-ID or set-group-ID "
+    "are used in the program execution context.";
 }
 
 namespace search {

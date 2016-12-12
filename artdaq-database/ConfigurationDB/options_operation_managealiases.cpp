@@ -123,7 +123,8 @@ std::string const& ManageAliasesOperation::globalConfigurationAlias(std::string 
   assert(!global_configuration_alias.empty());
 
   if (global_configuration_alias.empty()) {
-    throw cet::exception("Options") << "Invalid global configuration alias; global configuration alias is empty.";
+    throw cet::exception("Options") << "Invalid global configuration alias; "
+                                       "global configuration alias is empty.";
   }
 
   TRACE_(10, "Options: Updating global configuration alias from " << _global_configuration_alias << " to "
@@ -143,7 +144,8 @@ void ManageAliasesOperation::readJsonData(JsonData const& data) {
   auto dataAST = object_t{};
 
   if (!JsonReader{}.read(data.json_buffer, dataAST)) {
-    throw db::invalid_option_exception("ManageAliasesOperation") << "ManageAliasesOperation: Unable to read JSON buffer.";
+    throw db::invalid_option_exception("ManageAliasesOperation")
+        << "ManageAliasesOperation: Unable to read JSON buffer.";
   }
 
   try {
@@ -294,5 +296,7 @@ void cf::debug::options::enableOperationManageAliases() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::options::OperationManageAliases trace_enable");
+  TRACE_(0,
+         "artdaq::database::configuration::options::OperationManageAliases "
+         "trace_enable");
 }

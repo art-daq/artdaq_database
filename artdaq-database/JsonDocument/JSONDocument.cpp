@@ -1,6 +1,7 @@
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/JsonDocument/common.h"
 
+#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
 
 #ifdef TRACE_NAME
@@ -35,7 +36,10 @@ bool matches(jsn::value_t const& left, jsn::value_t const& right) {
       auto const& templateVal = templateKVP.value;
 
       if (!matches(templateVal, candidateVal)) {
-        TRACE_(26, "artdaq::database::jsonutils::matches() objects are different at key=<" << templateKVP.key << ">");
+        TRACE_(26,
+               "artdaq::database::jsonutils::matches() objects are "
+               "different at key=<"
+                   << templateKVP.key << ">");
 
         return false;
       }
@@ -105,7 +109,8 @@ JSONDocument JSONDocument::findChild(path_t const& path) const {
                     jsn::print_visitor(), childValue));
 
       throw notfound_exception("JSONDocument") << "Search failed for json element name=" << path_tokens.at(currentDepth)
-                                               << ", findChild() recurse() jsn::value_t is not jsn::object_t;  value="
+                                               << ", findChild() recurse() jsn::value_t is not jsn::object_t;  "
+                                                  "value="
                                                << boost::apply_visitor(jsn::print_visitor(), childValue);
     }
 
@@ -116,8 +121,10 @@ JSONDocument JSONDocument::findChild(path_t const& path) const {
                                                          << ">");
 
     if (childDocument.count(path_tokens.at(currentDepth)) == 0) {
-      TRACE_(5, "findChild() recurse() Error: Search failed for json element name=" << path_tokens.at(currentDepth) << ", search path =<"
-                                                                 << path << ">.");
+      TRACE_(5,
+             "findChild() recurse() Error: Search failed for json "
+             "element name="
+                 << path_tokens.at(currentDepth) << ", search path =<" << path << ">.");
 
       throw notfound_exception("JSONDocument") << "Search failed for json element name=" << path_tokens.at(currentDepth)
                                                << ", search path =<" << path << ">.";
@@ -208,10 +215,10 @@ JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t con
       TRACE_(4, "replaceChild() recurse() jsn::value_t is not jsn::object_t;  value=" << boost::apply_visitor(
                     jsn::print_visitor(), childValue));
 
-      throw notfound_exception("JSONDocument")
-          << "Replace failed for" << path_tokens.at(currentDepth)
-          << ", replaceChild() recurse() jsn::value_t is not jsn::object_t;  value="
-          << boost::apply_visitor(jsn::print_visitor(), childValue);
+      throw notfound_exception("JSONDocument") << "Replace failed for" << path_tokens.at(currentDepth)
+                                               << ", replaceChild() recurse() jsn::value_t is not jsn::object_t;  "
+                                                  "value="
+                                               << boost::apply_visitor(jsn::print_visitor(), childValue);
     }
 
     auto& childDocument = boost::get<jsn::object_t>(childValue);
@@ -222,7 +229,7 @@ JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t con
 
     if (childDocument.count(path_tokens.at(currentDepth)) == 0) {
       TRACE_(4, "replaceChild() recurse() Error: Replace failed for " << path_tokens.at(currentDepth)
-                                                                     << ", search path =<" << path << ">.");
+                                                                      << ", search path =<" << path << ">.");
 
       throw notfound_exception("JSONDocument") << "Replace failed for " << path_tokens.at(currentDepth)
                                                << ", search path =<" << path << ">.";
@@ -327,7 +334,8 @@ JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t cons
                     jsn::print_visitor(), childValue));
 
       throw notfound_exception("JSONDocument") << "Insert failed for" << path_tokens.at(currentDepth)
-                                               << ", insertChild() recurse() jsn::value_t is not jsn::object_t;  value="
+                                               << ", insertChild() recurse() jsn::value_t is not jsn::object_t;  "
+                                                  "value="
                                                << boost::apply_visitor(jsn::print_visitor(), childValue);
     }
 
@@ -424,7 +432,8 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) {
                     jsn::print_visitor(), childValue));
 
       throw notfound_exception("JSONDocument") << "Replace failed for " << path_tokens.at(currentDepth)
-                                               << ", deleteChild() recurse() jsn::value_t is not jsn::object_t;  value="
+                                               << ", deleteChild() recurse() jsn::value_t is not jsn::object_t;  "
+                                                  "value="
                                                << boost::apply_visitor(jsn::print_visitor(), childValue);
     }
 
@@ -436,7 +445,7 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) {
 
     if (childDocument.count(path_tokens.at(currentDepth)) == 0) {
       TRACE_(3, "deleteChild() recurse() Error: Replace failed for " << path_tokens.at(currentDepth)
-                                                                    << ", search path =<" << path << ">.");
+                                                                     << ", search path =<" << path << ">.");
 
       throw notfound_exception("JSONDocument") << "Replace failed for " << path_tokens.at(currentDepth)
                                                << ", search path =<" << path << ">.";
@@ -459,7 +468,6 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) {
   jsn::JsonWriter().write(boost::get<jsn::object_t>(document), tmpJson);
   TRACE_(3, "deleteChild() resultDocument=<" << tmpJson << ">");
 
-  
   auto return_json = std::string{};
   if (deleted_value.type() == typeid(jsn::object_t)) {
     auto const& deleted_object = boost::get<jsn::object_t>(deleted_value);
@@ -472,7 +480,7 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) {
     deleted_object["deleted"] = deleted_value;
     jsn::JsonWriter().write(deleted_object, return_json);
   }
-  
+
   if (path == "_id") std::replace(return_json.begin(), return_json.end(), '$', '_');
 
   TRACE_(3, "deleteChild() deletedChild=<" << return_json << ">");
@@ -509,7 +517,8 @@ JSONDocument JSONDocument::appendChild(JSONDocument const& newChild, path_t cons
     TRACE_(4, "appendChild()"
                   << " Invalid newChild document, found invalid insert payload.");
 
-    throw cet::exception("JSONDocument") << " Invalid newChild document, found invalid insert payload; json_buffer="
+    throw cet::exception("JSONDocument") << " Invalid newChild document, found invalid insert payload; "
+                                            "json_buffer="
                                          << newChild._json_buffer;
   }
 
@@ -535,7 +544,8 @@ JSONDocument JSONDocument::appendChild(JSONDocument const& newChild, path_t cons
 
   if (firstResultIt->value.type() != typeid(jsn::array_t)) {
     TRACE_(13, "appendChild() Not an array element, path=<" << path << ">");
-    throw cet::exception("JSONDocument") << "Failed to appendChild(); target path is not an array_t element, path=<"
+    throw cet::exception("JSONDocument") << "Failed to appendChild(); target path is not an array_t element, "
+                                            "path=<"
                                          << path << ">";
   }
 
@@ -588,7 +598,8 @@ JSONDocument JSONDocument::removeChild(JSONDocument const& delChild, path_t cons
     TRACE_(4, "removeChild()"
                   << " Invalid delChild document, found invalid delete payload.");
 
-    throw cet::exception("JSONDocument") << " Invalid delChild document, found invalid delete payload; json_buffer="
+    throw cet::exception("JSONDocument") << " Invalid delChild document, found invalid delete payload; "
+                                            "json_buffer="
                                          << delChild._json_buffer;
   }
 
@@ -614,7 +625,8 @@ JSONDocument JSONDocument::removeChild(JSONDocument const& delChild, path_t cons
 
   if (firstResultIt->value.type() != typeid(jsn::array_t)) {
     TRACE_(13, "appendChild() Not an array element, path=<" << path << ">");
-    throw cet::exception("JSONDocument") << "Failed to appendChild(); target path is not an array_t element, path=<"
+    throw cet::exception("JSONDocument") << "Failed to appendChild(); target path is not an array_t element, "
+                                            "path=<"
                                          << path << ">";
   }
 
@@ -751,8 +763,8 @@ namespace debug {
 void enableJSONDocument() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeM", trace_mode::modeM);
 
   TRACE_(0, "artdaq::database::JSONDocument trace_enable");
 }

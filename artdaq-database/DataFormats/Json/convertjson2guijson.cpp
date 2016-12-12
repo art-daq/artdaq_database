@@ -2,6 +2,7 @@
 #include "artdaq-database/DataFormats/common/shared_literals.h"
 #include "artdaq-database/DataFormats/common/shared_types.h"
 
+#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/DataFormats/Json/convertjson2guijson.h"
 #include "artdaq-database/DataFormats/Json/json_reader.h"
 #include "artdaq-database/DataFormats/Json/json_writer.h"
@@ -22,7 +23,8 @@ using artdaq::database::json::gui2db;
 
 /*
  * http://stackoverflow.com/questions/21832701/does-json-syntax-allow-duplicate-keys-in-an-object
- * For now, to have a "better" compartibilty with FHICL I'll allow duplicate key names in JSON.
+ * For now, to have a "better" compartibilty with FHICL I'll allow duplicate key
+ * names in JSON.
 */
 
 template <>
@@ -368,7 +370,8 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
               child.count(literal::children) == 0)
             type_name = std::string{literal::string};
 
-          // auto const& node_name = unwrap( child ).value_as<const std::string>( literal::name );
+          // auto const& node_name = unwrap( child ).value_as<const std::string>(
+          // literal::name );
 
           TRACE_(15, "json_gui_to_db() operator() switch ARRAY child type=" << type_name);
 
@@ -420,7 +423,7 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
             new_metadata_node.value_as<object_t>()[literal::annotation] =
                 unwrap(child).value_as<const std::string>(literal::annotation);
 
-            data_node.value_as<object_t>().push_back(data_t{node_name,child_value});
+            data_node.value_as<object_t>().push_back(data_t{node_name, child_value});
           }
         } else if (value.type() == typeid(array_t)) {
           data_node.value_as<array_t>().push_back(value);
@@ -437,8 +440,8 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
 void artdaq::database::json::debug::enableJSON2GUIJSON() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeM", trace_mode::modeM);
 
   TRACE_(0, "artdaq::database::JSON2GUIJSON trace_enable");
 }

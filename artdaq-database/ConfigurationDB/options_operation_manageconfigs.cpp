@@ -102,14 +102,15 @@ void ManageConfigsOperation::readJsonData(JsonData const& data) {
   auto dataAST = object_t{};
 
   if (!JsonReader{}.read(data.json_buffer, dataAST)) {
-    throw db::invalid_option_exception("ManageConfigsOperation") << "ManageConfigsOperation: Unable to read JSON buffer.";
+    throw db::invalid_option_exception("ManageConfigsOperation")
+        << "ManageConfigsOperation: Unable to read JSON buffer.";
   }
 
   try {
-      globalConfiguration(boost::get<std::string>(dataAST.at(cfl::option::configuration)));
-    } catch (...) {
+    globalConfiguration(boost::get<std::string>(dataAST.at(cfl::option::configuration)));
+  } catch (...) {
   }
-  
+
   try {
     auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(cfl::option::searchfilter));
 
@@ -119,7 +120,7 @@ void ManageConfigsOperation::readJsonData(JsonData const& data) {
       version(boost::get<std::string>(filterAST.at(cfl::filter::version)));
     } catch (...) {
     }
-    
+
     try {
       configurableEntity(boost::get<std::string>(filterAST.at(cfl::filter::entity)));
     } catch (...) {
@@ -171,7 +172,7 @@ bpo::options_description ManageConfigsOperation::makeProgramOptions() const {
 
   opts.add_options()(make_opt_name(cfl::option::source, "s").c_str(), bpo::value<std::string>(),
                      "Configuration source file name");
-  
+
   return opts;
 }
 
@@ -226,7 +227,6 @@ JsonData ManageConfigsOperation::search_filter_to_JsonData() const {
   return {json_buffer};
 }
 
-
 JsonData ManageConfigsOperation::globalConfiguration_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
@@ -279,5 +279,7 @@ void cf::debug::options::enableOperationManageConfigs() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::options::OperationFindConfigs trace_enable");
+  TRACE_(0,
+         "artdaq::database::configuration::options::OperationFindConfigs "
+         "trace_enable");
 }

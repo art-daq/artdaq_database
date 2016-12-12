@@ -8,7 +8,8 @@ cet_make(
   artdaq-database_JsonDocument
   artdaq-database_BasicTypes
   artdaq-database_StorageProviders_MongoDB  
-  artdaq-database_StorageProviders_FileSystemDB  
+  artdaq-database_StorageProviders_FileSystemDB
+  artdaq-database_StorageProviders_UcondDB
   ${FHICLCPP}  
   ${SQLITE3}
   ${CETLIB}
