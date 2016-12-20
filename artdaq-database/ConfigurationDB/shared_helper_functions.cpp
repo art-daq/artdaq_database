@@ -45,6 +45,9 @@ std::string cf::to_string(data_format_t const& f) {
 
     case data_format_t::origin:
       return "origin";
+
+    case data_format_t::console:
+      return "console";
   }
 }
 
@@ -63,6 +66,8 @@ data_format_t cf::to_data_format(std::string const& f) {
     return data_format_t::xml;
   } else if (f.compare("origin") == 0) {
     return data_format_t::origin;
+  } else if (f.compare("console") == 0) {
+    return data_format_t::console;
   } else {
     return data_format_t::unknown;
   }
@@ -101,9 +106,9 @@ std::string cf::collection_name_from_relative_path(std::string const& file_path_
   //  parent = dirname(parent);
   //  names.push_front(basename(parent));
 
-  std::stringstream ss;
-  for (auto const& name : names) ss << name << ".";
-  auto collName = ss.str();
+  std::ostringstream oss;
+  for (auto const& name : names) oss << name << ".";
+  auto collName = oss.str();
   collName.pop_back();
 
   return collName;

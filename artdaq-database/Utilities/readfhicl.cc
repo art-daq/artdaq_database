@@ -72,10 +72,8 @@ int main(int argc, char* argv[]) try {
 
   conf.reserve(conf.size() + 512);
 
-  std::for_each(std::sregex_iterator(conf.begin(), conf.end(), std::regex{"(#include\\s)([^'\"]*)"}),
-                std::sregex_iterator(), [&conf, &idx](auto& m) {
-                  conf.replace(m.position(), m.length(), "fhicl_pound_include_" + std::to_string(idx++) + ":");
-                });
+  std::for_each(std::sregex_iterator(conf.begin(), conf.end(), std::regex{"(#include\\s)([^'\"]*)"}), std::sregex_iterator(),
+                [&conf, &idx](auto& m) { conf.replace(m.position(), m.length(), "fhicl_pound_include_" + std::to_string(idx++) + ":"); });
 
   std::cout << "input\n" << conf << "\n";
 

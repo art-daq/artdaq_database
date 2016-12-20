@@ -9,6 +9,7 @@ cet_make_exec(ConfigAliasBuilder_t
   artdaq-database_ConfigurationDB
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
+  artdaq-database_StorageProviders_UcondDB  
   ${FHICLCPP}
   ${SQLITE3}
   ${CETLIB}

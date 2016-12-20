@@ -75,8 +75,7 @@ class json_node_t final {
       return boost::get<T&>(value);
     } else if (_any.which() == 1) {
       auto& value = boost::get<json_any_cref_t>(_any);
-      TRACE_(2, "json_node_t() value_as() const any.which()=" << _any.which()
-                                                              << " const value.which()=" << value.which());
+      TRACE_(2, "json_node_t() value_as() const any.which()=" << _any.which() << " const value.which()=" << value.which());
       return boost::get<T const&>(value);
     }
 
@@ -170,8 +169,7 @@ json_node_t json_node_t::make_json_node(T const& t) {
 
 class db2gui final {
  public:
-  explicit db2gui(json_node_t data_node, json_node_t metadata_node)
-      : _data_node{std::move(data_node)}, _metadata_node{std::move(metadata_node)} {}
+  explicit db2gui(json_node_t data_node, json_node_t metadata_node) : _data_node{std::move(data_node)}, _metadata_node{std::move(metadata_node)} {}
 
   void operator()(json_node_t&) const;
 

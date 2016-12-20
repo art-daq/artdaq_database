@@ -68,16 +68,14 @@ void add_configuration_to_global_configuration(Options const& options, std::stri
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers =
-        std::map<std::string, provider_addtoglobalconfig_t>{{cflp::mongo, cf::mongo::addConfigToGlobalConfig},
-                                                            {cflp::filesystem, cf::filesystem::addConfigToGlobalConfig},
-                                                            {cflp::ucond, cf::ucond::addConfigToGlobalConfig}};
+    auto providers = std::map<std::string, provider_addtoglobalconfig_t>{{cflp::mongo, cf::mongo::addConfigToGlobalConfig},
+                                                                         {cflp::filesystem, cf::filesystem::addConfigToGlobalConfig},
+                                                                         {cflp::ucond, cf::ucond::addConfigToGlobalConfig}};
 
     return providers.at(name);
   };
 
-  auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
+  auto search_result = dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -155,16 +153,14 @@ void find_configuration_versions(Options const& options, std::string& versions) 
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers =
-        std::map<std::string, provider_findversions_t>{{cflp::mongo, cf::mongo::findConfigVersions},
-                                                       {cflp::filesystem, cf::filesystem::findConfigVersions},
-                                                       {cflp::ucond, cf::ucond::findConfigVersions}};
+    auto providers = std::map<std::string, provider_findversions_t>{{cflp::mongo, cf::mongo::findConfigVersions},
+                                                                    {cflp::filesystem, cf::filesystem::findConfigVersions},
+                                                                    {cflp::ucond, cf::ucond::findConfigVersions}};
 
     return providers.at(name);
   };
 
-  auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
+  auto search_result = dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -180,6 +176,12 @@ void find_configuration_versions(Options const& options, std::string& versions) 
     }
 
     case data_format_t::gui: {
+      returnValue = search_result.json_buffer;
+      returnValueChanged = true;
+      break;
+    }
+
+    case data_format_t::console: {
       returnValue = search_result.json_buffer;
       returnValueChanged = true;
       break;
@@ -201,16 +203,14 @@ void find_configuration_entities(Options const& options, std::string& entities) 
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers =
-        std::map<std::string, provider_findentities_t>{{cflp::mongo, cf::mongo::findConfigEntities},
-                                                       {cflp::filesystem, cf::filesystem::findConfigEntities},
-                                                       {cflp::ucond, cf::ucond::findConfigEntities}};
+    auto providers = std::map<std::string, provider_findentities_t>{{cflp::mongo, cf::mongo::findConfigEntities},
+                                                                    {cflp::filesystem, cf::filesystem::findConfigEntities},
+                                                                    {cflp::ucond, cf::ucond::findConfigEntities}};
 
     return providers.at(name);
   };
 
-  auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
+  auto search_result = dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -230,59 +230,18 @@ void find_configuration_entities(Options const& options, std::string& entities) 
       returnValueChanged = true;
       break;
     }
-  }
 
-  if (returnValueChanged) entities.swap(returnValue);
-
-  TRACE_(13, "find_configuration_entities: end");
-  TRACE_(13, "find_configuration_entities: end entities=" << entities);
-}
-
-void list_collection_names(Options const& options, std::string& collections) {
-  assert(collections.empty());
-  assert(options.operation().compare(cflo::listcollections) == 0);
-
-  TRACE_(13, "list_collection_names: begin");
-  TRACE_(13, "list_collection_names args search_filter=<" << options.to_string() << ">");
-
-  validate_dbprovider_name(options.provider());
-
-  auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers =
-        std::map<std::string, provider_findversions_t>{{cflp::mongo, cf::mongo::listCollectionNames},
-                                                       {cflp::filesystem, cf::filesystem::listCollectionNames},
-                                                       {cflp::ucond, cf::ucond::listCollectionNames}};
-
-    return providers.at(name);
-  };
-
-  auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.collectionName_to_JsonData().json_buffer);
-
-  auto returnValue = std::string{};
-  auto returnValueChanged = bool{false};
-
-  switch (options.dataFormat()) {
-    default:
-    case data_format_t::db:
-    case data_format_t::json:
-    case data_format_t::unknown:
-    case data_format_t::fhicl:
-    case data_format_t::xml: {
-      throw cet::exception("list_collection_names") << "Unsupported data format.";
-      break;
-    }
-
-    case data_format_t::gui: {
+    case data_format_t::console: {
       returnValue = search_result.json_buffer;
       returnValueChanged = true;
       break;
     }
   }
 
-  if (returnValueChanged) collections.swap(returnValue);
+  if (returnValueChanged) entities.swap(returnValue);
 
-  TRACE_(13, "list_collection_names: end");
+  TRACE_(13, "find_configuration_entities: end");
+  TRACE_(13, "find_configuration_entities: end entities=" << entities);
 }
 
 }  // namespace detail

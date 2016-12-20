@@ -59,8 +59,7 @@ struct extra_opts {
 struct fcl2jsondb final {
   using fcl_value = ::fhicl::extended_value;
   using fhicl_key_value_pair_t = std::pair<const std::string, fcl_value> const;
-  using args_tuple_t =
-      std::tuple<fhicl_key_value_pair_t const&, fhicl_key_value_pair_t const&, comments_t const&, extra_opts const&>;
+  using args_tuple_t = std::tuple<fhicl_key_value_pair_t const&, fhicl_key_value_pair_t const&, comments_t const&, extra_opts const&>;
 
   explicit fcl2jsondb(args_tuple_t);
 

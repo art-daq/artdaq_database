@@ -100,13 +100,11 @@ JSONDocument JSONDocument::findChild(path_t const& path) const {
 
   auto tmpJson = std::string{};
 
-  std::function<jsn::value_t const(jsn::value_t const&, std::size_t)> recurse = [&](jsn::value_t const& childValue,
-                                                                                    std::size_t currentDepth) {
+  std::function<jsn::value_t const(jsn::value_t const&, std::size_t)> recurse = [&](jsn::value_t const& childValue, std::size_t currentDepth) {
     TRACE_(5, "findChild() recurse() args currentDepth=" << currentDepth);
 
     if (childValue.type() != typeid(const jsn::object_t)) {
-      TRACE_(5, "findChild() recurse() jsn::value_t is not jsn::object_t;  value=" << boost::apply_visitor(
-                    jsn::print_visitor(), childValue));
+      TRACE_(5, "findChild() recurse() jsn::value_t is not jsn::object_t;  value=" << boost::apply_visitor(jsn::print_visitor(), childValue));
 
       throw notfound_exception("JSONDocument") << "Search failed for json element name=" << path_tokens.at(currentDepth)
                                                << ", findChild() recurse() jsn::value_t is not jsn::object_t;  "
@@ -117,8 +115,7 @@ JSONDocument JSONDocument::findChild(path_t const& path) const {
     auto const& childDocument = boost::get<jsn::object_t>(childValue);
 
     tmpJson.clear();
-    TRACE_(5, "findChild() recurse() args currentView=<" << (jsn::JsonWriter().write(childDocument, tmpJson), tmpJson)
-                                                         << ">");
+    TRACE_(5, "findChild() recurse() args currentView=<" << (jsn::JsonWriter().write(childDocument, tmpJson), tmpJson) << ">");
 
     if (childDocument.count(path_tokens.at(currentDepth)) == 0) {
       TRACE_(5,
@@ -126,8 +123,8 @@ JSONDocument JSONDocument::findChild(path_t const& path) const {
              "element name="
                  << path_tokens.at(currentDepth) << ", search path =<" << path << ">.");
 
-      throw notfound_exception("JSONDocument") << "Search failed for json element name=" << path_tokens.at(currentDepth)
-                                               << ", search path =<" << path << ">.";
+      throw notfound_exception("JSONDocument") << "Search failed for json element name=" << path_tokens.at(currentDepth) << ", search path =<" << path
+                                               << ">.";
     }
 
     auto const& matchedValue = childDocument.at(path_tokens.at(currentDepth));
@@ -207,13 +204,11 @@ JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t con
 
   auto tmpJson = std::string{};
 
-  std::function<jsn::value_t(jsn::value_t&, std::size_t)> recurse = [&](jsn::value_t& childValue,
-                                                                        std::size_t currentDepth) {
+  std::function<jsn::value_t(jsn::value_t&, std::size_t)> recurse = [&](jsn::value_t& childValue, std::size_t currentDepth) {
     TRACE_(4, "replaceChild() recurse() args currentDepth=" << currentDepth);
 
     if (currentDepth == 0 && childValue.type() != typeid(jsn::object_t)) {
-      TRACE_(4, "replaceChild() recurse() jsn::value_t is not jsn::object_t;  value=" << boost::apply_visitor(
-                    jsn::print_visitor(), childValue));
+      TRACE_(4, "replaceChild() recurse() jsn::value_t is not jsn::object_t;  value=" << boost::apply_visitor(jsn::print_visitor(), childValue));
 
       throw notfound_exception("JSONDocument") << "Replace failed for" << path_tokens.at(currentDepth)
                                                << ", replaceChild() recurse() jsn::value_t is not jsn::object_t;  "
@@ -224,15 +219,12 @@ JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t con
     auto& childDocument = boost::get<jsn::object_t>(childValue);
 
     tmpJson.clear();
-    TRACE_(4, "replaceChild() recurse() args childValue=<" << (jsn::JsonWriter().write(childDocument, tmpJson), tmpJson)
-                                                           << ">");
+    TRACE_(4, "replaceChild() recurse() args childValue=<" << (jsn::JsonWriter().write(childDocument, tmpJson), tmpJson) << ">");
 
     if (childDocument.count(path_tokens.at(currentDepth)) == 0) {
-      TRACE_(4, "replaceChild() recurse() Error: Replace failed for " << path_tokens.at(currentDepth)
-                                                                      << ", search path =<" << path << ">.");
+      TRACE_(4, "replaceChild() recurse() Error: Replace failed for " << path_tokens.at(currentDepth) << ", search path =<" << path << ">.");
 
-      throw notfound_exception("JSONDocument") << "Replace failed for " << path_tokens.at(currentDepth)
-                                               << ", search path =<" << path << ">.";
+      throw notfound_exception("JSONDocument") << "Replace failed for " << path_tokens.at(currentDepth) << ", search path =<" << path << ">.";
     }
 
     auto& matchedValue = childDocument.at(path_tokens.at(currentDepth));
@@ -325,13 +317,11 @@ JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t cons
 
   auto tmpJson = std::string{};
 
-  std::function<jsn::value_t(jsn::value_t&, std::size_t)> recurse = [&](jsn::value_t& childValue,
-                                                                        std::size_t currentDepth) {
+  std::function<jsn::value_t(jsn::value_t&, std::size_t)> recurse = [&](jsn::value_t& childValue, std::size_t currentDepth) {
     TRACE_(4, "insertChild() recurse() args currentDepth=" << currentDepth);
 
     if (currentDepth == 0 && childValue.type() != typeid(jsn::object_t)) {
-      TRACE_(4, "insertChild() recurse() jsn::value_t is not jsn::object_t;  value=" << boost::apply_visitor(
-                    jsn::print_visitor(), childValue));
+      TRACE_(4, "insertChild() recurse() jsn::value_t is not jsn::object_t;  value=" << boost::apply_visitor(jsn::print_visitor(), childValue));
 
       throw notfound_exception("JSONDocument") << "Insert failed for" << path_tokens.at(currentDepth)
                                                << ", insertChild() recurse() jsn::value_t is not jsn::object_t;  "
@@ -342,24 +332,21 @@ JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t cons
     auto& childDocument = boost::get<jsn::object_t>(childValue);
 
     tmpJson.clear();
-    TRACE_(4, "insertChild() recurse() args childValue=<" << (jsn::JsonWriter().write(childDocument, tmpJson), tmpJson)
-                                                          << ">");
+    TRACE_(4, "insertChild() recurse() args childValue=<" << (jsn::JsonWriter().write(childDocument, tmpJson), tmpJson) << ">");
 
     auto numberOfChildren = childDocument.count(path_tokens.at(currentDepth));
 
     if (currentDepth == 0 && numberOfChildren != 0) {
-      TRACE_(4, "insertChild() recurse() Error: Insert failed for" << path_tokens.at(currentDepth) << ", search path =<"
-                                                                   << path << ">; Child exists, call replace instead.");
+      TRACE_(4, "insertChild() recurse() Error: Insert failed for" << path_tokens.at(currentDepth) << ", search path =<" << path
+                                                                   << ">; Child exists, call replace instead.");
 
-      throw notfound_exception("JSONDocument") << "Insert failed for" << path_tokens.at(currentDepth)
-                                               << ", search path =<" << path << ">; Child exists, call replace instead";
+      throw notfound_exception("JSONDocument") << "Insert failed for" << path_tokens.at(currentDepth) << ", search path =<" << path
+                                               << ">; Child exists, call replace instead";
 
     } else if (currentDepth != 0 && numberOfChildren == 0) {
-      TRACE_(4, "insertChild() recurse() Error: Insert failed for" << path_tokens.at(currentDepth) << ", search path =<"
-                                                                   << path << ">.");
+      TRACE_(4, "insertChild() recurse() Error: Insert failed for" << path_tokens.at(currentDepth) << ", search path =<" << path << ">.");
 
-      throw notfound_exception("JSONDocument") << "Insert failed for" << path_tokens.at(currentDepth)
-                                               << ", search path =<" << path << ">.";
+      throw notfound_exception("JSONDocument") << "Insert failed for" << path_tokens.at(currentDepth) << ", search path =<" << path << ">.";
     } else if (currentDepth == 0 && numberOfChildren == 0) {
       childDocument[path_tokens.at(currentDepth)] = newValue;
       return newValue;
@@ -423,13 +410,11 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) {
 
   auto tmpJson = std::string{};
 
-  std::function<jsn::value_t(jsn::value_t&, std::size_t)> recurse = [&](jsn::value_t& childValue,
-                                                                        std::size_t currentDepth) {
+  std::function<jsn::value_t(jsn::value_t&, std::size_t)> recurse = [&](jsn::value_t& childValue, std::size_t currentDepth) {
     TRACE_(3, "deleteChild() recurse() args currentDepth=" << currentDepth);
 
     if (currentDepth == 0 && childValue.type() != typeid(jsn::object_t)) {
-      TRACE_(3, "deleteChild() recurse() jsn::value_t is not jsn::object_t;  value=" << boost::apply_visitor(
-                    jsn::print_visitor(), childValue));
+      TRACE_(3, "deleteChild() recurse() jsn::value_t is not jsn::object_t;  value=" << boost::apply_visitor(jsn::print_visitor(), childValue));
 
       throw notfound_exception("JSONDocument") << "Replace failed for " << path_tokens.at(currentDepth)
                                                << ", deleteChild() recurse() jsn::value_t is not jsn::object_t;  "
@@ -440,15 +425,12 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) {
     auto& childDocument = boost::get<jsn::object_t>(childValue);
 
     tmpJson.clear();
-    TRACE_(3, "deleteChild() recurse() args childValue=<" << (jsn::JsonWriter().write(childDocument, tmpJson), tmpJson)
-                                                          << ">");
+    TRACE_(3, "deleteChild() recurse() args childValue=<" << (jsn::JsonWriter().write(childDocument, tmpJson), tmpJson) << ">");
 
     if (childDocument.count(path_tokens.at(currentDepth)) == 0) {
-      TRACE_(3, "deleteChild() recurse() Error: Replace failed for " << path_tokens.at(currentDepth)
-                                                                     << ", search path =<" << path << ">.");
+      TRACE_(3, "deleteChild() recurse() Error: Replace failed for " << path_tokens.at(currentDepth) << ", search path =<" << path << ">.");
 
-      throw notfound_exception("JSONDocument") << "Replace failed for " << path_tokens.at(currentDepth)
-                                               << ", search path =<" << path << ">.";
+      throw notfound_exception("JSONDocument") << "Replace failed for " << path_tokens.at(currentDepth) << ", search path =<" << path << ">.";
     }
 
     auto& matchedValue = childDocument.at(path_tokens.at(currentDepth));
@@ -709,8 +691,7 @@ std::string JSONDocument::value_at(JSONDocument const& document, std::size_t ind
   // needed for compatibility with mongodb
   if (json_buffer.find("\"0\"") != std::string::npos) json_buffer.replace(json_buffer.find("\"0\""), 3, "\"payload\"");
 
-  if (json_buffer.find("\"payload\"") == std::string::npos)
-    json_buffer = "{ \"payload\":" + document._json_buffer + "}";
+  if (json_buffer.find("\"payload\"") == std::string::npos) json_buffer = "{ \"payload\":" + document._json_buffer + "}";
 
   TRACE_(14, "value_at() json_buffer=<" << json_buffer << ">");
 
@@ -736,14 +717,12 @@ std::string JSONDocument::value_at(JSONDocument const& document, std::size_t ind
 
   if (valueArray.empty()) {
     TRACE_(14, "value_at() Failed to call value_at(); valueArray is empty, document=<" << document._json_buffer << ">");
-    throw cet::exception("JSONDocument") << "Failed to call value_at(); valueArray is empty, document=<"
-                                         << document._json_buffer << ">";
+    throw cet::exception("JSONDocument") << "Failed to call value_at(); valueArray is empty, document=<" << document._json_buffer << ">";
   }
 
   if (valueArray.size() < index) {
     TRACE_(14, "value_at() Failed to call value_at(); not enough elements, document=<" << document._json_buffer << ">");
-    throw cet::exception("JSONDocument") << "Failed to call value_at(); not enough elements, document=<"
-                                         << document._json_buffer << ">";
+    throw cet::exception("JSONDocument") << "Failed to call value_at(); not enough elements, document=<" << document._json_buffer << ">";
   }
 
   auto pos = valueArray.begin();
@@ -764,7 +743,7 @@ void enableJSONDocument() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);
-  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::JSONDocument trace_enable");
 }

@@ -34,8 +34,7 @@ std::string JSONDocument::value(JSONDocument const& document) {
                      << "JSON regex_search() result=" << result);
     }
 
-    throw cet::exception("JSONDocument") << ("Regex search failed, regex_search().size()!=1; JSON buffer: " +
-                                             document._json_buffer);
+    throw cet::exception("JSONDocument") << ("Regex search failed, regex_search().size()!=1; JSON buffer: " + document._json_buffer);
   }
 
   auto match = std::string(results[1]);
@@ -91,9 +90,9 @@ std::vector<std::string> JSONDocument::_split_path(std::string const& path) cons
   std::vector<std::string> tokens{std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>{}};
 
   if (!tokens.empty()) {
-    std::stringstream ss;
-    for (auto const& token : tokens) ss << "\"" << token << "\",";
-    TRACE_(1, "split_path() loop token=<" << ss.str() << ">");
+    std::ostringstream oss;
+    for (auto const& token : tokens) oss << "\"" << token << "\",";
+    TRACE_(1, "split_path() loop token=<" << oss.str() << ">");
   } else {
     TRACE_(1, "split_path() token=<empty> ");
   }

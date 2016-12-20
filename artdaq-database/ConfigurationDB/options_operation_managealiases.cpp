@@ -85,8 +85,7 @@ std::string const& ManageAliasesOperation::globalConfiguration(std::string const
     throw cet::exception("Options") << "Invalid global config; global config is empty.";
   }
 
-  TRACE_(12, "Options: Updating global_configuration from " << _global_configuration << " to " << global_configuration
-                                                            << ".");
+  TRACE_(12, "Options: Updating global_configuration from " << _global_configuration << " to " << global_configuration << ".");
 
   _global_configuration = global_configuration;
 
@@ -127,8 +126,7 @@ std::string const& ManageAliasesOperation::globalConfigurationAlias(std::string 
                                        "global configuration alias is empty.";
   }
 
-  TRACE_(10, "Options: Updating global configuration alias from " << _global_configuration_alias << " to "
-                                                                  << global_configuration_alias << ".");
+  TRACE_(10, "Options: Updating global configuration alias from " << _global_configuration_alias << " to " << global_configuration_alias << ".");
 
   _global_configuration_alias = global_configuration_alias;
 
@@ -144,8 +142,7 @@ void ManageAliasesOperation::readJsonData(JsonData const& data) {
   auto dataAST = object_t{};
 
   if (!JsonReader{}.read(data.json_buffer, dataAST)) {
-    throw db::invalid_option_exception("ManageAliasesOperation")
-        << "ManageAliasesOperation: Unable to read JSON buffer.";
+    throw db::invalid_option_exception("ManageAliasesOperation") << "ManageAliasesOperation: Unable to read JSON buffer.";
   }
 
   try {
@@ -214,23 +211,16 @@ int ManageAliasesOperation::readProgramOptions(bpo::variables_map const& vm) {
 bpo::options_description ManageAliasesOperation::makeProgramOptions() const {
   auto opts = OperationBase::makeProgramOptions();
 
-  auto make_opt_name = [](auto& long_name, auto& short_name) {
-    return std::string{long_name}.append(",").append(short_name);
-  };
+  auto make_opt_name = [](auto& long_name, auto& short_name) { return std::string{long_name}.append(",").append(short_name); };
 
-  opts.add_options()(make_opt_name(cfl::option::version, "v").c_str(), bpo::value<std::string>(),
-                     "Configuration version");
+  opts.add_options()(make_opt_name(cfl::option::version, "v").c_str(), bpo::value<std::string>(), "Configuration version");
 
-  opts.add_options()(make_opt_name(cfl::option::version_alias, "a").c_str(), bpo::value<std::string>(),
-                     "Version alias");
+  opts.add_options()(make_opt_name(cfl::option::version_alias, "a").c_str(), bpo::value<std::string>(), "Version alias");
 
-  opts.add_options()(make_opt_name(cfl::option::entity, "e").c_str(), bpo::value<std::string>(),
-                     "Configurable-entity name");
-  opts.add_options()(make_opt_name(cfl::option::configuration, "g").c_str(), bpo::value<std::string>(),
-                     "Global configuration name");
+  opts.add_options()(make_opt_name(cfl::option::entity, "e").c_str(), bpo::value<std::string>(), "Configurable-entity name");
+  opts.add_options()(make_opt_name(cfl::option::configuration, "g").c_str(), bpo::value<std::string>(), "Global configuration name");
 
-  opts.add_options()(make_opt_name(cfl::option::configuration_alias, "q").c_str(), bpo::value<std::string>(),
-                     "Configuration alias");
+  opts.add_options()(make_opt_name(cfl::option::configuration_alias, "q").c_str(), bpo::value<std::string>(), "Configuration alias");
 
   return opts;
 }
@@ -246,8 +236,7 @@ JsonData ManageAliasesOperation::writeJsonData() const {
 
   if (globalConfiguration() != cfl::notprovided) docAST[cfl::option::configuration] = globalConfiguration();
   if (versionAlias() != cfl::notprovided) docAST[cfl::option::version_alias] = versionAlias();
-  if (globalConfigurationAlias() != cfl::notprovided)
-    docAST[cfl::option::configuration_alias] = globalConfigurationAlias();
+  if (globalConfigurationAlias() != cfl::notprovided) docAST[cfl::option::configuration_alias] = globalConfigurationAlias();
   if (version() != cfl::notprovided) docAST[cfl::option::version] = version();
 
   auto json_buffer = std::string{};

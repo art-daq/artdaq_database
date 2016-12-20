@@ -1,0 +1,12 @@
+{ "search":
+{
+    "_id" : {
+        "$oid" : "5859b2581a72ba61c1632371"
+    }, 
+    "document" : {
+        "name" : "artdaq", 
+        "uri" : "mongodb://127.0.0.1:27017/test_db/", 
+        "create_time" : "Tue Dec 20 16:36:08 2016"
+    }
+}
+}

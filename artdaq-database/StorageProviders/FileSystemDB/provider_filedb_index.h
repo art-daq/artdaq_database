@@ -60,8 +60,7 @@ class SearchIndex final {
   template <typename TYPE>
   void _make_unique_sorted(jsn::array_t&);
 
-  std::vector<std::pair<std::string, std::string>> _indexed_filtered_innerjoin_over_ouid(std::string const&,
-                                                                                         std::string const&,
+  std::vector<std::pair<std::string, std::string>> _indexed_filtered_innerjoin_over_ouid(std::string const&, std::string const&,
                                                                                          std::string const&) const;
   std::vector<std::string> _filtered_attribute_list(std::string const& attribute, std::string const& attribute_with);
 
@@ -86,8 +85,7 @@ void SearchIndex::_make_unique_sorted(jsn::array_t& ouids) {
 
   tmp.reserve(ouids.size());
 
-  std::for_each(ouids.begin(), ouids.end(),
-                [&tmp](jsn::value_t const& value) { tmp.emplace_back(boost::get<TYPE>(value)); });
+  std::for_each(ouids.begin(), ouids.end(), [&tmp](jsn::value_t const& value) { tmp.emplace_back(boost::get<TYPE>(value)); });
 
   std::sort(tmp.begin(), tmp.end());
 

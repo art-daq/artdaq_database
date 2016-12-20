@@ -150,8 +150,8 @@ void terminateHandler() {
       char funcname[1024];
       int status = 0;
 
-      TRACE_(1, "Terminate called after throwing an instance of \'"
-                    << abi::__cxa_demangle(typeid(ex).name(), funcname, &funcnamesize, &status) << "\'");
+      TRACE_(1, "Terminate called after throwing an instance of \'" << abi::__cxa_demangle(typeid(ex).name(), funcname, &funcnamesize, &status)
+                                                                    << "\'");
 
       TRACE_(1, " what(): " << ex.what());
 
@@ -195,7 +195,7 @@ void trace_enable() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);
-  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
 }
 
 void registerUngracefullExitHandlers() {

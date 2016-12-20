@@ -44,64 +44,64 @@ JSONDocumentBuilder::JSONDocumentBuilder() : _document(template__empty_document)
 JSONDocumentBuilder::JSONDocumentBuilder(JSONDocument const& document) : _document(document) {}
 
 JSONDocument JSONDocumentBuilder::_makeAlias(JSONDocument const& newAlias) const {
-  std::stringstream ss;
+  std::ostringstream oss;
 
-  ss << '{';
-  ss << "name"_quoted << colon << quoted_(JSONDocument::value(newAlias));
-  ss << '}';
+  oss << '{';
+  oss << "name"_quoted << colon << quoted_(JSONDocument::value(newAlias));
+  oss << '}';
 
-  TRACE_(10, "_makeAlias() activeAlias<" << ss.str() << ">");
+  TRACE_(10, "_makeAlias() activeAlias<" << oss.str() << ">");
 
-  return {ss.str()};
+  return {oss.str()};
 }
 
 JSONDocument JSONDocumentBuilder::_makeObjectId(JSONDocument const& objectId) const {
-  std::stringstream ss;
+  std::ostringstream oss;
 
-  ss << '{';
-  ss << "_oid"_quoted << colon << quoted_(JSONDocument::value(objectId));
-  ss << '}';
+  oss << '{';
+  oss << "_oid"_quoted << colon << quoted_(JSONDocument::value(objectId));
+  oss << '}';
 
-  TRACE_(10, "_makeObjectId() objectId<" << ss.str() << ">");
+  TRACE_(10, "_makeObjectId() objectId<" << oss.str() << ">");
 
-  return {ss.str()};
+  return {oss.str()};
 }
 
 JSONDocument JSONDocumentBuilder::_makeaddToGlobalConfig(JSONDocument const& config) const {
-  std::stringstream ss;
-  ss << '{';
-  ss << "name"_quoted << colon << quoted_(JSONDocument::value(config));
-  ss << comma;
-  ss << "assigned"_quoted << colon << quoted_(timestamp());
-  ss << '}';
+  std::ostringstream oss;
+  oss << '{';
+  oss << "name"_quoted << colon << quoted_(JSONDocument::value(config));
+  oss << comma;
+  oss << "assigned"_quoted << colon << quoted_(timestamp());
+  oss << '}';
 
-  TRACE_(10, "_makeaddToGlobalConfig() globalConfig<" << ss.str() << ">");
+  TRACE_(10, "_makeaddToGlobalConfig() globalConfig<" << oss.str() << ">");
 
-  return {ss.str()};
+  return {oss.str()};
 }
 
 JSONDocument JSONDocumentBuilder::_makeActiveAlias(JSONDocument const& newAlias) const {
-  std::stringstream ss;
-  ss << '{';
-  ss << "name"_quoted << colon << quoted_(JSONDocument::value(newAlias));
-  ss << comma;
-  ss << "assigned"_quoted << colon << quoted_(timestamp());
-  ss << '}';
+  std::ostringstream oss;
+  oss << '{';
+  oss << "name"_quoted << colon << quoted_(JSONDocument::value(newAlias));
+  oss << comma;
+  oss << "assigned"_quoted << colon << quoted_(timestamp());
+  oss << '}';
 
-  TRACE_(10, "_makeActiveAlias() activeAlias<" << ss.str() << ">");
+  TRACE_(10, "_makeActiveAlias() activeAlias<" << oss.str() << ">");
 
-  return {ss.str()};
+  return {oss.str()};
 }
 
 JSONDocument JSONDocumentBuilder::_makeHistoryAlias(JSONDocument const& activeAlias) const {
-  std::stringstream ss;
-  ss << '{';
-  ss << "removed"_quoted << colon << quoted_(timestamp());
-  ss << '}';
+  std::ostringstream oss;
+  oss << '{';
+  oss << "removed"_quoted << colon << quoted_(timestamp());
+  oss << '}';
 
   auto historyAlias = JSONDocument{JSONDocument::value_at(activeAlias, 0)};
 
-  historyAlias.insertChild({ss.str()}, "removed");
+  historyAlias.insertChild({oss.str()}, "removed");
 
   TRACE_(10, "_makeHistoryAlias() historyAlias<" << historyAlias << ">");
 
@@ -109,53 +109,53 @@ JSONDocument JSONDocumentBuilder::_makeHistoryAlias(JSONDocument const& activeAl
 }
 
 JSONDocument JSONDocumentBuilder::_makeReadonly() const {
-  std::stringstream ss;
+  std::ostringstream oss;
 
-  ss << '{';
-  ss << "isreadonly"_quoted << colon << "true";
-  ss << '}';
+  oss << '{';
+  oss << "isreadonly"_quoted << colon << "true";
+  oss << '}';
 
-  return {ss.str()};
+  return {oss.str()};
 }
 
 JSONDocument JSONDocumentBuilder::_makeDeleted() const {
-  std::stringstream ss;
+  std::ostringstream oss;
 
-  ss << '{';
-  ss << "isdeleted"_quoted << colon << "true";
-  ss << '}';
+  oss << '{';
+  oss << "isdeleted"_quoted << colon << "true";
+  oss << '}';
 
-  return {ss.str()};
+  return {oss.str()};
 }
 
 JSONDocument JSONDocumentBuilder::_wrap_as_payload(JSONDocument const& document) const {
-  std::stringstream ss;
-  ss << '{';
-  ss << "payload"_quoted << colon << document.to_string();
-  ss << '}';
+  std::ostringstream oss;
+  oss << '{';
+  oss << "payload"_quoted << colon << document.to_string();
+  oss << '}';
 
-  return {ss.str()};
+  return {oss.str()};
 }
 
 JSONDocument JSONDocumentBuilder::_bookkeeping_update_payload(std::string action = "update") const {
-  std::stringstream ss;
-  ss << '{';
-  ss << quoted_(action) << colon << quoted_(timestamp());
-  ss << '}';
+  std::ostringstream oss;
+  oss << '{';
+  oss << quoted_(action) << colon << quoted_(timestamp());
+  oss << '}';
 
-  return _wrap_as_payload({ss.str()});
+  return _wrap_as_payload({oss.str()});
 }
 
 using string_pair_t = std::pair<std::string, std::string>;
 
 template <>
 JSONDocument toJSONDocument<string_pair_t>(string_pair_t const& pair) {
-  std::stringstream ss;
-  ss << '{';
-  ss << quoted_(pair.first) << colon << quoted_(pair.second);
-  ss << '}';
+  std::ostringstream oss;
+  oss << '{';
+  oss << quoted_(pair.first) << colon << quoted_(pair.second);
+  oss << '}';
 
-  return {ss.str()};
+  return {oss.str()};
 }
 
 JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& document) {
@@ -366,7 +366,7 @@ void enableJSONDocumentBuilder() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);
-  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::JSONDocumentBuilder trace_enable");
 }

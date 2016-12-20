@@ -1,0 +1,3 @@
+{ "search": [
+ {"name" :"metadata","query" :{"collection" : "metadata","dbprovider" : "filesystem","dataformat" : "gui","operation" : "findversions","filter" : { }}}
+] }

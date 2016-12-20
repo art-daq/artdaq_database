@@ -38,9 +38,7 @@ bool conf_to_json(std::string const& conf, std::string& json) {
   json_root[literal::document_node] = jsn::object_t{};
   json_root[literal::origin_node] = jsn::object_t{};
 
-  auto get_object = [&json_root](std::string const& name) -> auto& {
-    return boost::get<jsn::object_t>(json_root[name]);
-  };
+  auto get_object = [&json_root](std::string const& name) -> auto& { return boost::get<jsn::object_t>(json_root[name]); };
   get_object(literal::origin_node)[literal::format] = std::string("conf");
   get_object(literal::origin_node)[literal::source] = std::string("conf_to_json");
   get_object(literal::origin_node)[literal::timestamp] = artdaq::database::dataformats::timestamp();
@@ -84,9 +82,7 @@ bool json_to_conf(std::string const& json, std::string& conf) {
     return result;
   }
 
-  auto get_object = [&json_root](std::string const& name) -> auto& {
-    return boost::get<jsn::object_t>(json_root.at(name));
-  };
+  auto get_object = [&json_root](std::string const& name) -> auto& { return boost::get<jsn::object_t>(json_root.at(name)); };
 
   auto& json_node = get_object(literal::document_node);
 
@@ -108,7 +104,7 @@ void enableConfJson() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);
-  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::confjson trace_enable");
 }

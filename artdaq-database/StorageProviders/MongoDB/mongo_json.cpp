@@ -239,9 +239,9 @@ class json_visitor {
 };
 
 std::string adm::to_json(bsoncxx::document::view view) {
-  std::stringstream ss;
-  json_visitor v(ss, false, 0);
+  std::ostringstream oss;
+  json_visitor v(oss, false, 0);
   v.visit_value(bsoncxx::types::b_document{view});
 
-  return ss.str();
+  return oss.str();
 }

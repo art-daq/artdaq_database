@@ -87,8 +87,7 @@ void store_configuration(Options const& options, std::string& conf) {
       break;
 
     case data_format_t::unknown: {
-      throw cet::exception("store_configuration")
-          << "Invalid data format; data format=" << cf::to_string(options.dataFormat()) << ".";
+      throw cet::exception("store_configuration") << "Invalid data format; data format=" << cf::to_string(options.dataFormat()) << ".";
       break;
     }
     case data_format_t::gui: {
@@ -161,8 +160,7 @@ void store_configuration(Options const& options, std::string& conf) {
   builder.setConfigurableEntity(configurableEntity);
 
   auto document = std::move(builder.extract());
-  auto insert_payload =
-      JsonData{"{\"document\":" + document.to_string() + ", \"collection\":\"" + options.collectionName() + "\"}"};
+  auto insert_payload = JsonData{"{\"document\":" + document.to_string() + ", \"collection\":\"" + options.collectionName() + "\"}"};
 
   TRACE_(15, "store_configuration: insert_payload=<" << insert_payload.json_buffer << ">");
 
@@ -192,8 +190,8 @@ void load_configuration(Options const& options, std::string& conf) {
 
   validate_dbprovider_name(options.provider());
 
-  auto search_payload = JsonData{"{\"filter\":" + options.search_filter_to_JsonData().json_buffer +
-                                 +", \"collection\":\"" + options.collectionName() + "\"}"};
+  auto search_payload =
+      JsonData{"{\"filter\":" + options.search_filter_to_JsonData().json_buffer + +", \"collection\":\"" + options.collectionName() + "\"}"};
 
   TRACE_(16, "load_configuration: search_payload=<" << search_payload.json_buffer << ">");
 
@@ -214,8 +212,7 @@ void load_configuration(Options const& options, std::string& conf) {
   if (dataFormat == data_format_t::origin) {
     auto resultAst = jsn::object_t{};
 
-    if (!jsn::JsonReader{}.read(search_result.json_buffer, resultAst))
-      throw cet::exception("load_configuration") << "Invalid json data";
+    if (!jsn::JsonReader{}.read(search_result.json_buffer, resultAst)) throw cet::exception("load_configuration") << "Invalid json data";
 
     auto const& docAst = boost::get<jsn::object_t>(resultAst.at(cfls::origin));
     dataFormat = to_data_format(boost::get<std::string>(docAst.at(cfls::format)));
@@ -243,21 +240,18 @@ void load_configuration(Options const& options, std::string& conf) {
     case data_format_t::json: {
       auto resultAst = jsn::object_t{};
 
-      if (!jsn::JsonReader{}.read(search_result.json_buffer, resultAst))
-        throw cet::exception("load_configuration") << "Invalid json data";
+      if (!jsn::JsonReader{}.read(search_result.json_buffer, resultAst)) throw cet::exception("load_configuration") << "Invalid json data";
 
       auto const& docAst = boost::get<jsn::object_t>(resultAst.at(cfld::document));
       auto const& dataAst = boost::get<jsn::object_t>(docAst.at(cfld::data));
 
-      if (!jsn::JsonWriter{}.write(dataAst, returnValue))
-        throw cet::exception("load_configuration") << "Invalid json data";
+      if (!jsn::JsonWriter{}.write(dataAst, returnValue)) throw cet::exception("load_configuration") << "Invalid json data";
 
       returnValueChanged = true;
       break;
     }
     case data_format_t::unknown:
-      throw cet::exception("load_configuration")
-          << "Invalid data format; data format=" << cf::to_string(options.dataFormat()) << ".";
+      throw cet::exception("load_configuration") << "Invalid data format; data format=" << cf::to_string(options.dataFormat()) << ".";
       break;
 
     case data_format_t::fhicl: {

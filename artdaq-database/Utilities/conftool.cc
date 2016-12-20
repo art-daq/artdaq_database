@@ -34,7 +34,7 @@ std::string expand_environment_variables(std::string var);
 }
 
 int main(int argc, char* argv[]) try {
-#if 0
+#if 1
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
   artdaq::database::jsonutils::debug::enableJSONDocument();
@@ -42,12 +42,12 @@ int main(int argc, char* argv[]) try {
 
   artdaq::database::configuration::debug::enableFindConfigsOperation();
   artdaq::database::configuration::debug::enableCreateConfigsOperation();
-  
+
   artdaq::database::configuration::debug::options::enableOperationBase();
   artdaq::database::configuration::debug::options::enableOperationManageConfigs();
   artdaq::database::configuration::debug::detail::enableCreateConfigsOperation();
   artdaq::database::configuration::debug::detail::enableFindConfigsOperation();
-  
+
   artdaq::database::configuration::debug::enableDBOperationMongo();
   artdaq::database::configuration::debug::enableDBOperationFileSystem();
 
@@ -83,8 +83,7 @@ int main(int argc, char* argv[]) try {
 
   auto file_res_name = std::string{"${HOME}/${0}.result.out"};
 
-  if (options.operation().compare(literal::operation::load) == 0 ||
-      options.operation().compare(literal::operation::globalconfload) == 0) {
+  if (options.operation().compare(literal::operation::load) == 0 || options.operation().compare(literal::operation::globalconfload) == 0) {
     if (!vm.count(literal::option::result)) {
       std::cerr << "Exception from command line processing in " << argv[0] << ": no result file name given.\n"
                 << "For usage and an options list, please do '" << argv[0] << " --help"
@@ -119,22 +118,29 @@ int main(int argc, char* argv[]) try {
   cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP, std::string const&, std::string&>(
       literal::operation::globalconfload, load_globalconfiguration, options_string, test_document);
 
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      "findconfigs", find_global_configurations, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      "buildfilter", build_global_configuration_search_filter, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      "addconfig", add_configuration_to_global_configuration, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      "findversions", find_configuration_versions, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      "findentities", find_configuration_entities, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>("addalias", add_version_alias,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(literal::operation::findconfigs, find_global_configurations,
                                                                                   options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>("removealias", remove_version_alias,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(literal::operation::buildfilter,
+                                                                                  build_global_configuration_search_filter, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(literal::operation::addconfig,
+                                                                                  add_configuration_to_global_configuration, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(literal::operation::findversions, find_configuration_versions,
                                                                                   options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>("findaliases", find_version_aliases,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(literal::operation::findentities, find_configuration_entities,
                                                                                   options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(literal::operation::addalias, add_version_alias, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(literal::operation::rmalias, remove_version_alias, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(literal::operation::findalias, find_version_aliases,
+                                                                                  options_string);
+
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(literal::operation::listdatabases, list_database_names,
+                                                                                  options_string);
+
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(literal::operation::listcollections, list_collection_names,
+                                                                                  options_string);
+
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(literal::operation::readdbinfo, read_database_info, options_string);
+
   try {
     std::ifstream is(file_src_name);
     test_document = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
@@ -160,8 +166,7 @@ int main(int argc, char* argv[]) try {
 
   auto returned = std::string{result.second};
 
-  if (options.operation().compare(literal::operation::load) == 0 ||
-      options.operation().compare(literal::operation::globalconfload) == 0) {
+  if (options.operation().compare(literal::operation::load) == 0 || options.operation().compare(literal::operation::globalconfload) == 0) {
     std::ofstream os(file_res_name.c_str());
     std::copy(returned.begin(), returned.end(), std::ostream_iterator<char>(os));
     os.close();
@@ -169,8 +174,7 @@ int main(int argc, char* argv[]) try {
     std::cout << "Wrote file:" << file_res_name << "\n";
 
     return process_exit_code::SUCCESS;
-  } else if (options.operation().compare(literal::operation::store) == 0 ||
-             options.operation().compare(literal::operation::globalconfstore) == 0) {
+  } else if (options.operation().compare(literal::operation::store) == 0 || options.operation().compare(literal::operation::globalconfstore) == 0) {
     /* std::ofstream os(file_res_name.c_str());
      std::copy(returned.begin(), returned.end(),
              std::ostream_iterator<char>(os));

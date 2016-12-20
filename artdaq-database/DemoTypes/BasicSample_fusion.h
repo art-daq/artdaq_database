@@ -17,8 +17,7 @@ struct f2;
 }
 }
 
-BOOST_FUSION_ADAPT_ASSOC_STRUCT(cfg::BasicSampleB,
-                                (int, f1, BasicSampleBKeys::keys::f1)(double, f2, BasicSampleBKeys::keys::f2))
+BOOST_FUSION_ADAPT_ASSOC_STRUCT(cfg::BasicSampleB, (int, f1, BasicSampleBKeys::keys::f1)(double, f2, BasicSampleBKeys::keys::f2))
 
 // used by boost_unit_test
 inline bool operator==(const BasicSampleB& r, const BasicSampleB& l) { return (r.f1 == l.f1 && r.f2 == l.f2); }
@@ -33,10 +32,8 @@ struct value5;
 }
 }
 
-BOOST_FUSION_ADAPT_ASSOC_STRUCT(cfg::BasicSample,
-                                (int, value1, BasicSampleKeys::keys::value1)(
-                                    double, value2, BasicSampleKeys::keys::value2)(std::string, value3,
-                                                                                   BasicSampleKeys::keys::value3)
+BOOST_FUSION_ADAPT_ASSOC_STRUCT(cfg::BasicSample, (int, value1, BasicSampleKeys::keys::value1)(double, value2, BasicSampleKeys::keys::value2)(
+                                                      std::string, value3, BasicSampleKeys::keys::value3)
                                 //(std::vector<BasicSampleB>,   value4,	BasicSampleKeys::keys::value4)
                                 (std::vector<int>, value5, BasicSampleKeys::keys::value5))
 

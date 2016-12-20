@@ -86,8 +86,7 @@ JsonData prov::findGlobalConfigs(ManageConfigsOperation const& options, JsonData
   assert(options.operation().compare(literal::operation::findconfigs) == 0);
 
   if (options.operation().compare(literal::operation::findconfigs) != 0) {
-    throw cet::exception("operation_findconfigs") << "Wrong operation option; operation=<" << options.operation()
-                                                  << ">.";
+    throw cet::exception("operation_findconfigs") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
   if (options.provider().compare(literal::provider::filesystem) != 0) {
@@ -116,7 +115,7 @@ JsonData prov::findGlobalConfigs(ManageConfigsOperation const& options, JsonData
     return " ";
   };
 
-  std::stringstream ss;
+  std::ostringstream oss;
 
   auto seenValues = std::list<std::string>{};
   seenValues.push_back(literal::notprovided);
@@ -129,7 +128,7 @@ JsonData prov::findGlobalConfigs(ManageConfigsOperation const& options, JsonData
     return true;
   };
 
-  ss << "{ \"search\": [";
+  oss << "{ \"search\": [";
 
   for (auto const& global_config : global_configs) {
     auto doc = JSONDocument{global_config.json_buffer};
@@ -138,15 +137,15 @@ JsonData prov::findGlobalConfigs(ManageConfigsOperation const& options, JsonData
 
     if (!isNew(global_config_name)) continue;
 
-    ss << printComma() << "{";
-    ss << "\"name\" :\"" << global_config_name << "\",";
-    ss << "\"query\" :" << global_config.json_buffer;
-    ss << "}";
+    oss << printComma() << "{";
+    oss << "\"name\" :\"" << global_config_name << "\",";
+    oss << "\"query\" :" << global_config.json_buffer;
+    oss << "}";
   }
 
-  ss << "] }";
+  oss << "] }";
 
-  return {ss.str()};
+  return {oss.str()};
 }
 
 JsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, JsonData const& search_payload) {
@@ -154,8 +153,7 @@ JsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, Js
   assert(options.operation().compare(literal::operation::buildfilter) == 0);
 
   if (options.operation().compare(literal::operation::buildfilter) != 0) {
-    throw cet::exception("operation_buildfilter") << "Wrong operation option; operation=<" << options.operation()
-                                                  << ">.";
+    throw cet::exception("operation_buildfilter") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
   if (options.provider().compare(literal::provider::filesystem) != 0) {
@@ -187,17 +185,16 @@ JsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, Js
     return " ";
   };
 
-  std::stringstream ss;
+  std::ostringstream oss;
 
-  ss << "{ \"search\": [";
+  oss << "{ \"search\": [";
 
   for (auto const& search_filter : search_filters) {
     auto filter_json = JSONDocument{search_filter.json_buffer}.findChild("filter").value();
 
     auto results = std::smatch();
 
-    if (!std::regex_search(filter_json, results, ex))
-      throw cet::exception("operation_buildfilter") << "Unsupported filter string, no match";
+    if (!std::regex_search(filter_json, results, ex)) throw cet::exception("operation_buildfilter") << "Unsupported filter string, no match";
 
     /*
         for (size_t i = 0; i < results.size(); ++i) {
@@ -207,18 +204,17 @@ JsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, Js
        " << piece << '\n';
         }
     */
-    if (results.size() != 5)
-      throw cet::exception("operation_buildfilter") << "Unsupported filter string, wrong result count";
+    if (results.size() != 5) throw cet::exception("operation_buildfilter") << "Unsupported filter string, wrong result count";
 
-    ss << printComma() << "{";
-    ss << "\"name\" :\"" << results[1].str() << ":" << results[3].str() << "\",";
-    ss << "\"query\" :" << search_filter.json_buffer;
-    ss << "}";
+    oss << printComma() << "{";
+    oss << "\"name\" :\"" << results[1].str() << ":" << results[3].str() << "\",";
+    oss << "\"query\" :" << search_filter.json_buffer;
+    oss << "}";
   }
 
-  ss << "] }";
+  oss << "] }";
 
-  return {ss.str()};
+  return {oss.str()};
 }
 
 JsonData prov::findConfigVersions(LoadStoreOperation const& options, JsonData const& /*not used*/) {
@@ -226,8 +222,7 @@ JsonData prov::findConfigVersions(LoadStoreOperation const& options, JsonData co
   assert(options.operation().compare(literal::operation::findversions) == 0);
 
   if (options.operation().compare(literal::operation::findversions) != 0) {
-    throw cet::exception("operation_findversions") << "Wrong operation option; operation=<" << options.operation()
-                                                   << ">.";
+    throw cet::exception("operation_findversions") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
   if (options.provider().compare(literal::provider::filesystem) != 0) {
@@ -261,17 +256,16 @@ JsonData prov::findConfigVersions(LoadStoreOperation const& options, JsonData co
     return " ";
   };
 
-  std::stringstream ss;
+  std::ostringstream oss;
 
-  ss << "{ \"search\": [";
+  oss << "{ \"search\": [";
 
   for (auto const& config_version : config_versions) {
     auto filter_json = JSONDocument{config_version.json_buffer}.findChild("filter").value();
 
     auto results = std::smatch();
 
-    if (!std::regex_search(filter_json, results, ex))
-      throw cet::exception("operation_findversions") << "Unsupported filter string, no match";
+    if (!std::regex_search(filter_json, results, ex)) throw cet::exception("operation_findversions") << "Unsupported filter string, no match";
 
     /*
             for (size_t i = 0; i < results.size(); ++i) {
@@ -281,19 +275,18 @@ JsonData prov::findConfigVersions(LoadStoreOperation const& options, JsonData co
        << ": " << piece << '\n');
             }
     */
-    if (results.size() != 5)
-      throw cet::exception("operation_findversions") << "Unsupported filter string, wrong result count";
+    if (results.size() != 5) throw cet::exception("operation_findversions") << "Unsupported filter string, wrong result count";
 
-    ss << printComma() << "{";
-    ss << "\"name\" :\"" << results[1].str() /*<< ":" << results[3].str()*/
+    oss << printComma() << "{";
+    oss << "\"name\" :\"" << results[1].str() /*<< ":" << results[3].str()*/
        << "\",";
-    ss << "\"query\" :" << config_version.json_buffer;
-    ss << "}";
+    oss << "\"query\" :" << config_version.json_buffer;
+    oss << "}";
   }
 
-  ss << "] }";
+  oss << "] }";
 
-  return {ss.str()};
+  return {oss.str()};
 }
 
 JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData const& /*not used*/) {
@@ -301,8 +294,7 @@ JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData co
   assert(options.operation().compare(literal::operation::findentities) == 0);
 
   if (options.operation().compare(literal::operation::findentities) != 0) {
-    throw cet::exception("operation_findentities") << "Wrong operation option; operation=<" << options.operation()
-                                                   << ">.";
+    throw cet::exception("operation_findentities") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
   if (options.provider().compare(literal::provider::filesystem) != 0) {
@@ -333,9 +325,9 @@ JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData co
     return " ";
   };
 
-  std::stringstream ss;
+  std::ostringstream oss;
 
-  ss << "{ \"search\": [\n";
+  oss << "{ \"search\": [\n";
 
   for (auto const& config_entity : config_entities) {
     auto filter_json = JSONDocument{config_entity.json_buffer}.findChild("filter").value();
@@ -343,8 +335,7 @@ JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData co
 
     auto results = std::smatch();
 
-    if (!std::regex_search(filter_json, results, ex))
-      throw cet::exception("operation_findentities") << "Unsupported filter string, no match";
+    if (!std::regex_search(filter_json, results, ex)) throw cet::exception("operation_findentities") << "Unsupported filter string, no match";
 
     /*
             for (size_t i = 0; i < results.size(); ++i) {
@@ -355,19 +346,18 @@ JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData co
             }
     */
 
-    if (results.size() != 4)
-      throw cet::exception("operation_findentities") << "Unsupported filter string, wrong result count";
+    if (results.size() != 4) throw cet::exception("operation_findentities") << "Unsupported filter string, wrong result count";
 
-    ss << printComma() << "{";
-    ss << "\"name\" :\"" << results[2].str() /*<< ":" << results[3].str()*/
+    oss << printComma() << "{";
+    oss << "\"name\" :\"" << results[2].str() /*<< ":" << results[3].str()*/
        << "\",";
-    ss << "\"query\" :" << config_entity.json_buffer;
-    ss << "}\n";
+    oss << "\"query\" :" << config_entity.json_buffer;
+    oss << "}\n";
   }
 
-  ss << "] }";
+  oss << "] }";
 
-  return {ss.str()};
+  return {oss.str()};
 }
 
 JsonData prov::addConfigToGlobalConfig(LoadStoreOperation const& options, JsonData const& search_payload) {
@@ -387,8 +377,7 @@ JsonData prov::addConfigToGlobalConfig(LoadStoreOperation const& options, JsonDa
   auto new_options = options;
   new_options.operation(literal::operation::load);
 
-  auto search =
-      JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collectionName() + "\"}"};
+  auto search = JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collectionName() + "\"}"};
   TRACE_(20, "operation_addconfig: args search_payload=<" << search.json_buffer << ">");
 
   auto document = filesystem::load(new_options, search);
@@ -404,9 +393,8 @@ JsonData prov::addConfigToGlobalConfig(LoadStoreOperation const& options, JsonDa
   // std::cout<< "operation_addconfig:: builder=<" <<
   // builder.extract().to_string() << ">builder\n";
 
-  auto update =
-      JsonData{"{\"filter\":{\"$oid\":\"" + builder.extract().deleteChild("_id").value() + "\"},  \"document\":" +
-               builder.extract().to_string() + ", \"collection\":\"" + options.collectionName() + "\"}"};
+  auto update = JsonData{"{\"filter\":{\"$oid\":\"" + builder.extract().deleteChild("_id").value() + "\"},  \"document\":" +
+                         builder.extract().to_string() + ", \"collection\":\"" + options.collectionName() + "\"}"};
 
   // std::cout << "operation_addconfig:: update=<" << update.json_buffer <<
   // ">update\n";
@@ -433,13 +421,11 @@ JsonData prov::listCollectionNames(LoadStoreOperation const& options, JsonData c
   assert(options.operation().compare(literal::operation::listcollections) == 0);
 
   if (options.operation().compare(literal::operation::listcollections) != 0) {
-    throw cet::exception("operation_listcollections") << "Wrong operation option; operation=<" << options.operation()
-                                                      << ">.";
+    throw cet::exception("operation_listcollections") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
   if (options.provider().compare(literal::provider::filesystem) != 0) {
-    throw cet::exception("operation_listcollections") << "Wrong provider option; provider=<" << options.provider()
-                                                      << ">.";
+    throw cet::exception("operation_listcollections") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
   TRACE_(20, "operation_listcollections: begin");
@@ -463,23 +449,23 @@ JsonData prov::listCollectionNames(LoadStoreOperation const& options, JsonData c
     return " ";
   };
 
-  std::stringstream ss;
+  std::ostringstream oss;
 
-  ss << "{ \"search\": [\n";
+  oss << "{ \"search\": [\n";
 
   for (auto const& collection_name : collection_names) {
     auto name = JSONDocument{collection_name.json_buffer}.findChild("collection").value();
     TRACE_(18, "operation_listcollections: collection=<" << name << '>');
 
-    ss << printComma() << "{";
-    ss << "\"name\" :\"" << name << "\",";
-    ss << "\"query\" :" << collection_name.json_buffer;
-    ss << "}\n";
+    oss << printComma() << "{";
+    oss << "\"name\" :\"" << name << "\",";
+    oss << "\"query\" :" << collection_name.json_buffer;
+    oss << "}\n";
   }
 
-  ss << "] }";
+  oss << "] }";
 
-  return {ss.str()};
+  return {oss.str()};
 }
 
 JsonData prov::listDatabaseNames(LoadStoreOperation const& options, JsonData const& search_payload) {
@@ -487,13 +473,11 @@ JsonData prov::listDatabaseNames(LoadStoreOperation const& options, JsonData con
   assert(options.operation().compare(literal::operation::listdatabases) == 0);
 
   if (options.operation().compare(literal::operation::listdatabases) != 0) {
-    throw cet::exception("operation_listdatabases") << "Wrong operation option; operation=<" << options.operation()
-                                                    << ">.";
+    throw cet::exception("operation_listdatabases") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
   if (options.provider().compare(literal::provider::filesystem) != 0) {
-    throw cet::exception("operation_listdatabases") << "Wrong provider option; provider=<" << options.provider()
-                                                    << ">.";
+    throw cet::exception("operation_listdatabases") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
   TRACE_(20, "operation_listdatabases: begin");
@@ -517,23 +501,23 @@ JsonData prov::listDatabaseNames(LoadStoreOperation const& options, JsonData con
     return " ";
   };
 
-  std::stringstream ss;
+  std::ostringstream oss;
 
-  ss << "{ \"search\": [\n";
+  oss << "{ \"search\": [\n";
 
   for (auto const& database_name : database_names) {
     auto name = JSONDocument{database_name.json_buffer}.findChild("database").value();
     TRACE_(18, "operation_listdatabases: database=<" << name << '>');
 
-    ss << printComma() << "{";
-    ss << "\"name\" :\"" << name << "\",";
-    ss << "\"query\" :" << database_name.json_buffer;
-    ss << "}\n";
+    oss << printComma() << "{";
+    oss << "\"name\" :\"" << name << "\",";
+    oss << "\"query\" :" << database_name.json_buffer;
+    oss << "}\n";
   }
 
-  ss << "] }";
+  oss << "] }";
 
-  return {ss.str()};
+  return {oss.str()};
 }
 
 JsonData prov::readDatabaseInfo(LoadStoreOperation const& options, JsonData const& search_payload) {
@@ -541,37 +525,36 @@ JsonData prov::readDatabaseInfo(LoadStoreOperation const& options, JsonData cons
   assert(options.operation().compare(literal::operation::readdbinfo) == 0);
 
   if (options.operation().compare(literal::operation::readdbinfo) != 0) {
-    throw cet::exception("operation_listdatabases") << "Wrong operation option; operation=<" << options.operation()
-                                                    << ">.";
+    throw cet::exception("operation_readdbinfo") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
   if (options.provider().compare(literal::provider::filesystem) != 0) {
-    throw cet::exception("operation_listdatabases") << "Wrong provider option; provider=<" << options.provider()
-                                                    << ">.";
+    throw cet::exception("operation_readdbinfo") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TRACE_(20, "operation_listdatabases: begin");
+  TRACE_(20, "operation_readdbinfo: begin");
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JsonData>::create(database);
 
-  auto database_metadata = provider->databaseMetadata(search_payload);
+  auto search_results = provider->databaseMetadata(search_payload);
 
-  if (database_metadata.empty()) {
+  if (search_results.empty()) {
     return {literal::empty_search_result};
-    // throw cet::exception("operation_listdatabases") << "No configuration
-    // entities were found.";
+    // throw cet::exception("operation_readdbinfo") << "No database info found.";
   }
 
-  auto const database_info = database_metadata.begin();
+  auto const database_metadata = search_results.begin();
 
-  std::stringstream ss;
-  ss << "{ \"search\":\n";
-  ss << database_info->json_buffer;
-  ss << "\n}";
+ TRACE_(20, "operation_readdbinfo: database_metadata =<" << database_metadata->json_buffer << ">");
 
-  return {ss.str()};
+  std::ostringstream oss;
+  oss << "{ \"search\":\n";
+  oss << database_metadata->json_buffer;
+  oss << "\n}";
+
+  return {oss.str()};
 }
 
 void debug::enableDBOperationFileSystem() {

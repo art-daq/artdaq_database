@@ -26,8 +26,7 @@ bool JsonReader::read(std::string const& in, object_t& ast) {
   return result;
 }
 
-std::pair<bool, std::string> artdaq::database::json::compare_json_objects(std::string const& first,
-                                                                          std::string const& second) {
+std::pair<bool, std::string> artdaq::database::json::compare_json_objects(std::string const& first, std::string const& second) {
   assert(!first.empty());
   assert(!second.empty());
 

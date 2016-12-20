@@ -8,7 +8,7 @@ namespace artdaq {
 namespace database {
 namespace configuration {
 namespace options {
-enum struct data_format_t { unknown, origin, json, fhicl, gui, db, xml };
+enum struct data_format_t { unknown, origin, json, fhicl, gui, db, xml, console };
 }
 
 bool equal(std::string const&, std::string const&);

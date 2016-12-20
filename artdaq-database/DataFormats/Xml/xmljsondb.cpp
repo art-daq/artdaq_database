@@ -38,9 +38,7 @@ bool xml_to_json(std::string const& xml, std::string& json) {
   json_root[literal::document_node] = jsn::object_t{};
   json_root[literal::origin_node] = jsn::object_t{};
 
-  auto get_object = [&json_root](std::string const& name) -> auto& {
-    return boost::get<jsn::object_t>(json_root[name]);
-  };
+  auto get_object = [&json_root](std::string const& name) -> auto& { return boost::get<jsn::object_t>(json_root[name]); };
 
   get_object(literal::origin_node)[literal::format] = std::string("xml");
   get_object(literal::origin_node)[literal::source] = std::string("xml_to_json");
@@ -85,9 +83,7 @@ bool json_to_xml(std::string const& json, std::string& xml) {
     return result;
   }
 
-  auto get_object = [&json_root](std::string const& name) -> auto& {
-    return boost::get<jsn::object_t>(json_root.at(name));
-  };
+  auto get_object = [&json_root](std::string const& name) -> auto& { return boost::get<jsn::object_t>(json_root.at(name)); };
 
   auto& json_node = get_object(literal::document_node);
 
@@ -109,7 +105,7 @@ void enableXmlJson() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);
-  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::xmljson trace_enable");
 }

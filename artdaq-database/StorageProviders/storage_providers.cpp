@@ -17,13 +17,13 @@ std::string db::expand_environment_variables(std::string var) {
 
   w = p.we_wordv;
 
-  std::stringstream ss;
+  std::ostringstream oss;
 
-  for (size_t i = 0; i < p.we_wordc; i++) ss << w[i] << "/";
+  for (size_t i = 0; i < p.we_wordc; i++) oss << w[i] << "/";
 
   ::wordfree(&p);
 
-  return ss.str();
+  return oss.str();
 }
 
 db::object_id_t db::generate_oid() {
@@ -42,8 +42,7 @@ db::object_id_t db::extract_oid(std::string const& filter) {
 
   auto results = std::smatch();
 
-  if (!std::regex_search(filter, results, ex))
-    throw std::logic_error(std::string("Regex ouid search failed; JSON buffer:") + filter);
+  if (!std::regex_search(filter, results, ex)) throw std::logic_error(std::string("Regex ouid search failed; JSON buffer:") + filter);
 
   if (results.size() != 2) {
     // we are interested in a second match
@@ -81,24 +80,31 @@ std::string operator"" _quoted(const char* text, std::size_t) { return "\"" + st
 
 std::string quoted_(std::string const& text) { return "\"" + text + "\""; }
 
-std::string db::make_database_metadata() {
+std::string db::make_database_metadata(std::string const& name, std::string const& uri) {
+  assert(!name.empty());
+  assert(!uri.empty());
+
   std::time_t now = std::time(nullptr);
   auto timestamp = std::string(std::asctime(std::localtime(&now)));
   timestamp.pop_back();
 
   // clang-format off
-  std::stringstream ss;
-  ss << "document"_quoted
+  std::ostringstream oss;
+  oss << "document"_quoted
      << ":"
      << "{";
-  ss << "name"_quoted
+  oss << "name"_quoted
      << ":"
-     << "artdaqdb"_quoted
+     << quoted_(name)
      << ",";
-  ss << "create_time"_quoted
+  oss << "uri"_quoted
+     << ":"
+     << quoted_(uri)
+     << ",";
+  oss << "create_time"_quoted
      << ":" << quoted_(timestamp);
-  ss << "}";
+  oss << "}";
   // clang-format on
 
-  return ss.str();
+  return oss.str();
 }

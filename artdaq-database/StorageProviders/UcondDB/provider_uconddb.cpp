@@ -38,6 +38,8 @@ std::list<JsonData> StorageProvider<JsonData, UcondDB>::load(JsonData const& fil
   TRACE_(3, "StorageProvider::UcondDB::load() args search=<" << filter.json_buffer << ">");
   auto returnCollection = std::list<JsonData>();
 
+  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::load() is not implemented";
+
   return returnCollection;
 }
 
@@ -64,6 +66,8 @@ object_id_t StorageProvider<JsonData, UcondDB>::store(JsonData const& data) {
     oid = generate_oid();
   }
 
+  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::store() is not implemented";
+
   return {"{ \"$oid\" : \"" + oid + "\"}"};
 }
 
@@ -75,6 +79,8 @@ std::list<JsonData> StorageProvider<JsonData, UcondDB>::findGlobalConfigs(JsonDa
 
   TRACE_(5, "StorageProvider::FileSystemDB::findGlobalConfigs() begin");
   TRACE_(5, "StorageProvider::FileSystemDB::findGlobalConfigs() args data=<" << search_filter.json_buffer << ">");
+
+  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::findGlobalConfigs() is not implemented";
 
   return returnCollection;
 }
@@ -88,6 +94,8 @@ std::list<JsonData> StorageProvider<JsonData, UcondDB>::buildConfigSearchFilter(
   TRACE_(6, "StorageProvider::UcondDB::buildConfigSearchFilter() begin");
   TRACE_(6, "StorageProvider::UcondDB::buildConfigSearchFilter() args data=<" << search_filter.json_buffer << ">");
 
+  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::buildConfigSearchFilter() is not implemented";
+
   return returnCollection;
 }
 
@@ -99,6 +107,8 @@ std::list<JsonData> StorageProvider<JsonData, UcondDB>::findConfigVersions(JsonD
 
   TRACE_(7, "StorageProvider::UcondDB::findConfigVersions() begin");
   TRACE_(7, "StorageProvider::UcondDB::findConfigVersions() args data=<" << filter.json_buffer << ">");
+
+  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::findConfigVersions() is not implemented";
 
   return returnCollection;
 }
@@ -112,6 +122,8 @@ std::list<JsonData> StorageProvider<JsonData, UcondDB>::findConfigEntities(JsonD
   TRACE_(9, "StorageProvider::UcondDB::findConfigEntities() begin");
   TRACE_(9, "StorageProvider::UcondDB::findConfigEntities() args data=<" << filter.json_buffer << ">");
 
+  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::findConfigEntities() is not implemented";
+
   return returnCollection;
 }
 
@@ -122,6 +134,8 @@ std::list<JsonData> StorageProvider<JsonData, UcondDB>::listCollectionNames(Json
   auto returnCollection = std::list<JsonData>();
   TRACE_(12, "StorageProvider::UcondDB::listCollectionNames() begin");
   TRACE_(12, "StorageProvider::UcondDB::listCollectionNames() args data=<" << search_filter.json_buffer << ">");
+
+  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::listCollectionNames() is not implemented";
 
   return returnCollection;
 }
@@ -135,6 +149,8 @@ std::list<JsonData> StorageProvider<JsonData, UcondDB>::addConfigToGlobalConfig(
   TRACE_(8, "StorageProvider::UcondDB::addConfigToGlobalConfig() begin");
   TRACE_(8, "StorageProvider::UcondDB::addConfigToGlobalConfig() args data=<" << search_filter.json_buffer << ">");
 
+  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::addConfigToGlobalConfig() is not implemented";
+
   return returnCollection;
 }
 
@@ -147,6 +163,8 @@ std::list<JsonData> StorageProvider<JsonData, UcondDB>::listDatabaseNames(JsonDa
   TRACE_(9, "StorageProvider::UcondDB::listDatabaseNames() begin");
   TRACE_(9, "StorageProvider::UcondDB::listDatabaseNames() args data=<" << search_filter.json_buffer << ">");
 
+  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::listDatabaseNames() is not implemented";
+
   return returnCollection;
 }
 
@@ -155,6 +173,9 @@ template <>
 std::list<JsonData> StorageProvider<JsonData, UcondDB>::databaseMetadata(JsonData const& search_filter) {
   assert(!search_filter.json_buffer.empty());
   auto returnCollection = std::list<JsonData>();
+
+  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::databaseMetadata() is not implemented";
+
   return returnCollection;
 }
 
@@ -164,7 +185,7 @@ void enable() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);
-  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::ucond trace_enable");
 }

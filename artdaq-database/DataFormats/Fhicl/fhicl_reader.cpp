@@ -60,10 +60,8 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
 
     auto idx = std::size_t{0};
 
-    std::for_each(std::sregex_iterator(conf.begin(), conf.end(), std::regex{"(#include\\s)([^'\"]*)"}),
-                  std::sregex_iterator(), [&conf, &idx](auto& m) {
-                    conf.replace(m.position(), m.length(), "fhicl_pound_include_" + std::to_string(idx++) + ":");
-                  });
+    std::for_each(std::sregex_iterator(conf.begin(), conf.end(), std::regex{"(#include\\s)([^'\"]*)"}), std::sregex_iterator(),
+                  [&conf, &idx](auto& m) { conf.replace(m.position(), m.length(), "fhicl_pound_include_" + std::to_string(idx++) + ":"); });
 
     ::fhicl::intermediate_table fhicl_table;
 
@@ -164,8 +162,7 @@ bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
       array.push_back(jsn::object_t());
       auto& object = boost::get<jsn::object_t>(array.back());
       object.push_back(jsn::data_t::make(literal::linenum, comment.first));
-      object.push_back(
-          jsn::data_t::make(literal::value, artdaq::database::dataformats::filter_jsonstring(comment.second)));
+      object.push_back(jsn::data_t::make(literal::value, artdaq::database::dataformats::filter_jsonstring(comment.second)));
     }
 
     json_array.swap(array);
@@ -182,7 +179,7 @@ void artdaq::database::fhicl::debug::enableFhiclReader() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);
-  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::fhicl::FhiclReader trace_enable");
 }

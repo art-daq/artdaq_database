@@ -7,7 +7,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "BTYPES:XmlData_H"
+#define TRACE_NAME "BTPS:XmlData_H"
 
 namespace artdaq {
 namespace database {

@@ -21,11 +21,11 @@ using ots::ConfigurationBase;
 template <>
 template <>
 bool MakeSerializable<ConfigurationBase const*>::writeConfigurationImpl<JsonData>(JsonData& data) const {
-  std::stringstream ss;
+  std::ostringstream oss;
 
   _conf->getView().printJSON(ss);
 
-  data.json_buffer = ss.str();
+  data.json_buffer = oss.str();
 
   return true;
 }

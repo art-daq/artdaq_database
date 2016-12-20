@@ -14,7 +14,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "FHJS:fcl2jsondb_C"
+#define TRACE_NAME "FHJS:fcl2jsndb_C"
 
 namespace jsn = artdaq::database::json;
 namespace fcl = artdaq::database::fhicl;
@@ -239,8 +239,7 @@ fcl2jsondb::operator datapair_t() try {
   throw ::fhicl::exception(::fhicl::cant_insert, self.first) << e.what();
 }
 
-json2fcldb::json2fcldb(args_tuple_t args)
-    : self{std::get<0>(args)}, parent{std::get<1>(args)}, opts{std::get<2>(args)} {}
+json2fcldb::json2fcldb(args_tuple_t args) : self{std::get<0>(args)}, parent{std::get<1>(args)}, opts{std::get<2>(args)} {}
 
 json2fcldb::operator fcl::value_t() try {
   auto const& self_value = std::get<1>(self);
@@ -428,7 +427,7 @@ void artdaq::database::fhicljson::debug::enableFCL2JSON() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);
-  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::convertjson::FCL2JSON trace_enable");
 }

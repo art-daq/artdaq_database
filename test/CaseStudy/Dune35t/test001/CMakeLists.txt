@@ -9,6 +9,7 @@ cet_make_exec(ImportDune35tData_t
   artdaq-database_ConfigurationDB
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
+  artdaq-database_StorageProviders_UcondDB
   ${FHICLCPP}
   ${CETLIB}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}  

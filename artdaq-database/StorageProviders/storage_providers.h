@@ -9,7 +9,7 @@ namespace database {
 using object_id_t = std::string;
 
 namespace metadata {
-constexpr auto system_metadata = "system.metadata";
+constexpr auto system_metadata = "metadata";
 }
 
 template <typename TYPE, typename IMPL>
@@ -66,10 +66,10 @@ class StorageProvider final {
 
 constexpr auto ouid_invalid = "000000000000000000000000";
 
-std::string expand_environment_variables(std::string var);
+std::string expand_environment_variables(std::string /*var*/);
 object_id_t generate_oid();
 object_id_t extract_oid(std::string const&);
-std::string make_database_metadata();
+std::string make_database_metadata(std::string const& /*name*/, std::string const& /*uri*/);
 
 }  // namespace database
 }  // namespace artdaq

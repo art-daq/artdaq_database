@@ -1,0 +1,3 @@
+{ "search": [
+ {"name" :"test_db","query" :{"database" : "test_db","dbprovider" : "filesystem","dataformat" : "gui","filter" : {}}}
+] }

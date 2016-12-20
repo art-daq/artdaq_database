@@ -15,7 +15,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "BTYPES:XmlData_C"
+#define TRACE_NAME "BTPS:XmlData_C"
 
 namespace regex {
 constexpr auto parse_base64data = "[\\s\\S]*\"base64\"\\s*:\\s*\"(\\S*?)\"";
@@ -53,8 +53,7 @@ XmlData::XmlData(JsonData const& document) {
   auto results = std::smatch();
 
   if (!std::regex_search(document.json_buffer, results, ex))
-    throw std::runtime_error("JSON to XML convertion error, regex_search()==false; JSON buffer: " +
-                             document.json_buffer);
+    throw std::runtime_error("JSON to XML convertion error, regex_search()==false; JSON buffer: " + document.json_buffer);
 
   if (results.size() != 1)
     throw std::runtime_error(
@@ -80,8 +79,7 @@ XmlData::operator JsonData() const {
 
   auto json = JsonData("");
 
-  if (!json.convert_from(*this))
-    throw std::runtime_error("XML to JSON convertion error; XML buffer: " + this->xml_buffer);
+  if (!json.convert_from(*this)) throw std::runtime_error("XML to JSON convertion error; XML buffer: " + this->xml_buffer);
 
   TRACE_(6, "XML  json=" << json.json_buffer);
 

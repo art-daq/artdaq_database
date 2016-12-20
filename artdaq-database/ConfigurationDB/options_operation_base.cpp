@@ -75,10 +75,9 @@ std::string const& OperationBase::provider() const noexcept {
 std::string const& OperationBase::provider(std::string const& provider) {
   assert(!provider.empty());
 
-  if (cf::not_equal(provider, cfl::database_provider_filesystem) &&
-      cf::not_equal(provider, cfl::database_provider_mongo)) {
-    throw db::invalid_option_exception("OperationBase") << "Invalid database provider; database provider=" << provider
-                                                        << ".";
+  if (cf::not_equal(provider, cfl::provider::filesystem) && cf::not_equal(provider, cfl::provider::mongo) &&
+      cf::not_equal(provider, cfl::provider::ucond)) {
+    throw db::invalid_option_exception("OperationBase") << "Invalid database provider; database provider=" << provider << ".";
   }
 
   TRACE_(12, "Options: Updating provider from " << _provider << " to " << provider << ".");
@@ -96,8 +95,7 @@ data_format_t const& OperationBase::dataFormat() const noexcept {
 data_format_t const& OperationBase::dataFormat(data_format_t const& data_format) {
   assert(data_format != data_format_t::unknown);
 
-  TRACE_(13, "Options: Updating data_format from " << cf::to_string(_data_format) << " to "
-                                                   << cf::to_string(data_format) << ".");
+  TRACE_(13, "Options: Updating data_format from " << cf::to_string(_data_format) << " to " << cf::to_string(data_format) << ".");
 
   _data_format = data_format;
 
@@ -154,35 +152,28 @@ bpo::options_description OperationBase::makeProgramOptions() const {
 
   bpo::options_description opts = descstr.str();
 
-  auto make_opt_name = [](auto& long_name, auto& short_name) {
-    return std::string{long_name}.append(",").append(short_name);
-  };
+  auto make_opt_name = [](auto& long_name, auto& short_name) { return std::string{long_name}.append(",").append(short_name); };
 
   opts.add_options()("help,h", "Produce help message");
 
-  opts.add_options()(make_opt_name(cfl::option::operation, "o").c_str(), bpo::value<std::string>(),
-                     "Database operation name");
+  opts.add_options()(make_opt_name(cfl::option::operation, "o").c_str(), bpo::value<std::string>(), "Database operation name");
   opts.add_options()(make_opt_name(cfl::option::format, "f").c_str(), bpo::value<std::string>(),
-                     "In/Out data format [fhicl, xml, gui, or db]");
-  opts.add_options()(make_opt_name(cfl::option::collection, "c").c_str(), bpo::value<std::string>(),
-                     "Configuration collection name");
+                     "In/Out data format [fhicl, xml, gui, db, or console]");
+  opts.add_options()(make_opt_name(cfl::option::collection, "c").c_str(), bpo::value<std::string>(), "Configuration collection name");
 
-  opts.add_options()(make_opt_name(cfl::option::provider, "d").c_str(), bpo::value<std::string>(),
-                     "Database provider name; depricated");
+  opts.add_options()(make_opt_name(cfl::option::provider, "d").c_str(), bpo::value<std::string>(), "Database provider name; depricated");
 
   opts.add_options()(cfl::option::searchfilter, bpo::value<std::string>(), "Search filter");
 
   opts.add_options()(cfl::option::searchquery, bpo::value<std::string>(), "Search query");
 
-  opts.add_options()(make_opt_name(cfl::option::result, "r").c_str(), bpo::value<std::string>(),
-                     "Expected result file name");
+  opts.add_options()(make_opt_name(cfl::option::result, "r").c_str(), bpo::value<std::string>(), "Expected result file name");
 
   return opts;
 }
 
 std::string OperationBase::_getProviderFromURI() {
-  auto tmpURI =
-      getenv("ARTDAQ_DATABASE_URI") ? db::expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
+  auto tmpURI = getenv("ARTDAQ_DATABASE_URI") ? db::expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
 
   auto tmpDB = std::string(cfl::provider::mongo);
   if (std::equal(std::begin(tmpDB), std::end(tmpDB), tmpURI.begin())) return cfl::provider::mongo;

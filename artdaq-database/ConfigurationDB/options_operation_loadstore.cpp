@@ -85,8 +85,7 @@ std::string const& LoadStoreOperation::globalConfiguration(std::string const& gl
     throw cet::exception("Options") << "Invalid global config; global config is empty.";
   }
 
-  TRACE_(12, "Options: Updating global_configuration from " << _global_configuration << " to " << global_configuration
-                                                            << ".");
+  TRACE_(12, "Options: Updating global_configuration from " << _global_configuration << " to " << global_configuration << ".");
 
   _global_configuration = global_configuration;
 
@@ -202,19 +201,13 @@ int LoadStoreOperation::readProgramOptions(bpo::variables_map const& vm) {
 bpo::options_description LoadStoreOperation::makeProgramOptions() const {
   auto opts = OperationBase::makeProgramOptions();
 
-  auto make_opt_name = [](auto& long_name, auto& short_name) {
-    return std::string{long_name}.append(",").append(short_name);
-  };
+  auto make_opt_name = [](auto& long_name, auto& short_name) { return std::string{long_name}.append(",").append(short_name); };
 
-  opts.add_options()(make_opt_name(cfl::option::version, "v").c_str(), bpo::value<std::string>(),
-                     "Configuration version");
-  opts.add_options()(make_opt_name(cfl::option::entity, "e").c_str(), bpo::value<std::string>(),
-                     "Configurable-entity name");
-  opts.add_options()(make_opt_name(cfl::option::configuration, "g").c_str(), bpo::value<std::string>(),
-                     "Global configuration name");
+  opts.add_options()(make_opt_name(cfl::option::version, "v").c_str(), bpo::value<std::string>(), "Configuration version");
+  opts.add_options()(make_opt_name(cfl::option::entity, "e").c_str(), bpo::value<std::string>(), "Configurable-entity name");
+  opts.add_options()(make_opt_name(cfl::option::configuration, "g").c_str(), bpo::value<std::string>(), "Global configuration name");
 
-  opts.add_options()(make_opt_name(cfl::option::source, "s").c_str(), bpo::value<std::string>(),
-                     "Configuration source file name");
+  opts.add_options()(make_opt_name(cfl::option::source, "s").c_str(), bpo::value<std::string>(), "Configuration source file name");
 
   return opts;
 }

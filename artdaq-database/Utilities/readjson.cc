@@ -21,8 +21,8 @@ int main(int argc, char* argv[]) try {
 
   bpo::options_description desc = descstr.str();
 
-  desc.add_options()("config,c", bpo::value<std::string>(), "Configuration file.")(
-      "outputformat,f", bpo::value<std::string>(), "Output file format.")("help,h", "produce help message");
+  desc.add_options()("config,c", bpo::value<std::string>(), "Configuration file.")("outputformat,f", bpo::value<std::string>(),
+                                                                                   "Output file format.")("help,h", "produce help message");
 
   bpo::variables_map vm;
 

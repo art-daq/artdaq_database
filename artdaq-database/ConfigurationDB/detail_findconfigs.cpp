@@ -67,16 +67,14 @@ void find_global_configurations(Options const& options, std::string& configs) {
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers =
-        std::map<std::string, provider_findglobalconfigs_t>{{cflp::mongo, cf::mongo::findGlobalConfigs},
-                                                            {cflp::filesystem, cf::filesystem::findGlobalConfigs},
-                                                            {cflp::ucond, cf::ucond::findGlobalConfigs}};
+    auto providers = std::map<std::string, provider_findglobalconfigs_t>{{cflp::mongo, cf::mongo::findGlobalConfigs},
+                                                                         {cflp::filesystem, cf::filesystem::findGlobalConfigs},
+                                                                         {cflp::ucond, cf::ucond::findGlobalConfigs}};
 
     return providers.at(name);
   };
 
-  auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
+  auto search_result = dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -115,16 +113,14 @@ void build_global_configuration_search_filter(Options const& options, std::strin
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_buildconfigsearchfilter_t>{
-        {cflp::mongo, cf::mongo::buildConfigSearchFilter},
-        {cflp::filesystem, cf::filesystem::buildConfigSearchFilter},
-        {cflp::ucond, cf::ucond::buildConfigSearchFilter}};
+    auto providers = std::map<std::string, provider_buildconfigsearchfilter_t>{{cflp::mongo, cf::mongo::buildConfigSearchFilter},
+                                                                               {cflp::filesystem, cf::filesystem::buildConfigSearchFilter},
+                                                                               {cflp::ucond, cf::ucond::buildConfigSearchFilter}};
 
     return providers.at(name);
   };
 
-  auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
+  auto search_result = dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};

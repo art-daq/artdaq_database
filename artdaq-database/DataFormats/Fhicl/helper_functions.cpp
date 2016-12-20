@@ -58,8 +58,7 @@ std::string tag_as_string(::fhicl::value_tag tag) {
   else if (str == "tableid")
     return ::fhicl::TABLEID;
 
-  throw ::fhicl::exception(::fhicl::parse_error, literal::data_node)
-      << ("FHiCL atom type \"" + str + "\" is not implemented.");
+  throw ::fhicl::exception(::fhicl::parse_error, literal::data_node) << ("FHiCL atom type \"" + str + "\" is not implemented.");
 }
 }  // namespace fhicl
 }  // namespace database

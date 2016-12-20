@@ -22,8 +22,7 @@ int main(int argc, char* argv[]) try {
 
   bpo::options_description desc = descstr.str();
 
-  desc.add_options()("input,i", bpo::value<std::string>(), "Input JSON file.")("output,o", bpo::value<std::string>(),
-                                                                               "Output JSON file.")(
+  desc.add_options()("input,i", bpo::value<std::string>(), "Input JSON file.")("output,o", bpo::value<std::string>(), "Output JSON file.")(
       "format,f", bpo::value<std::string>(), "JSON format db or gui (default).")("help,h", "produce help message");
 
   bpo::variables_map vm;

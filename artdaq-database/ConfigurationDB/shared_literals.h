@@ -111,8 +111,10 @@ constexpr auto filterx = "filter";
 constexpr auto notprovided = "notprovided";
 constexpr auto unknown = "unknown";
 constexpr auto collection_default = "test_Data_Type001";
-constexpr auto database_provider_mongo = "mongo";
-constexpr auto database_provider_filesystem = "filesystem";
+// constexpr auto database_provider_mongo = "mongo";
+// constexpr auto database_provider_filesystem = "filesystem";
+// constexpr auto database_provider_ucond = "ucond";
+
 constexpr auto colon = ":";
 constexpr auto empty_json = "{ }";
 constexpr auto empty_search_result = "{\"search\":[ ]}";

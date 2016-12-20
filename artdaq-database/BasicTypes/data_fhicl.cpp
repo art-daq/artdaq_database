@@ -17,7 +17,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "BTYPES:FhiclData_C"
+#define TRACE_NAME "BTPS:FhiclData_C"
 
 namespace regex {
 constexpr auto parse_base64data = "[\\s\\S]*\"base64\"\\s*:\\s*\"(\\S*?)\"";
@@ -85,8 +85,7 @@ FhiclData::operator JsonData() const {
   auto json = JsonData("");
 
   if (!json.convert_from(*this))
-    throw ::fhicl::exception(::fhicl::parse_error, literal::data_node)
-        << ("FHICL to JSON convertion error; FHICL buffer: " + this->fhicl_buffer);
+    throw ::fhicl::exception(::fhicl::parse_error, literal::data_node) << ("FHICL to JSON convertion error; FHICL buffer: " + this->fhicl_buffer);
 
   TRACE_(6, "FHICL  json=" << json.json_buffer);
 
