@@ -1,0 +1,261 @@
+{
+"document" : {
+"data" : {
+"prolog" : {
+
+},
+"main" : {
+"lbne_artdaq" : "/home/nfs/dunedaq/lbnedaq/build_lbne-artdaq",
+"PMT_host" : "pdunedaq01.fnal.gov",
+"PMT_port" : 5400,
+"pause_before_initialization" : 5,
+"debug_level" : 1,
+"log_directory" : "/home/nfs/daqoutput/daqlogs",
+"record_directory" : "/home/nfs/daqoutput/run_records",
+"disable_configuration_check" : true,
+"TDU_XMLRPC_port" : 0,
+"EventBuilder_host" : "pdunedaq02.fnal.gov",
+"EventBuilder_port" : 5235,
+"EventBuilder_host" : "pdunedaq01.fnal.gov",
+"EventBuilder_port" : 5236,
+"EventBuilder_host" : "pdunedaq01.fnal.gov",
+"EventBuilder_port" : 5237,
+"EventBuilder_host" : "pdunedaq01.fnal.gov",
+"EventBuilder_port" : 5238,
+"EventBuilder_host" : "pdunedaq01.fnal.gov",
+"EventBuilder_port" : 5239,
+"EventBuilder_host" : "pdunedaq01.fnal.gov",
+"EventBuilder_port" : 5240,
+"EventBuilder_host" : "pdunedaq01.fnal.gov",
+"EventBuilder_port" : 5241,
+"EventBuilder_host" : "pdunedaq01.fnal.gov",
+"EventBuilder_port" : 5242,
+"Aggregator_host" : "pdunedaq01.fnal.gov",
+"Aggregator_port" : 5265,
+"Aggregator_host" : "pdunedaq01.fnal.gov",
+"Aggregator_port" : 5266,
+"max_file_size_MB_" : 5000,
+"max_file_time_min_" : 10
+}
+},
+"metadata" : {
+"prolog" : {
+"type" : "table",
+"comment" : "#prolog",
+"children" : {
+
+}
+},
+"main" : {
+"type" : "table",
+"comment" : "#main",
+"children" : {
+"lbne_artdaq" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"PMT_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"PMT_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"pause_before_initialization" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"debug_level" : {
+"type" : "number",
+"comment" : "# debug level can range from 0 to 3 (increasing order of verbosity)",
+"annotation" : " "
+},
+"log_directory" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"record_directory" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"disable_configuration_check" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : " "
+},
+"TDU_XMLRPC_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"Aggregator_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"Aggregator_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"Aggregator_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"Aggregator_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"max_file_size_MB_" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"max_file_time_min_" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+},
+"search" : [
+{
+"name" : "find any",
+"query" : "not defined"
+}
+]
+},
+"origin" : {
+"format" : "fhicl1",
+"source" : "fhicl_to_json2",
+"timestamp" : "Thu Nov 11 15:24:09 2016"
+},
+"version" : "ver001",
+"configurations" : [
+{
+"name" : "demo1",
+"assigned" : "Thu Nov 10 15:24:09 2016"
+}
+],
+"aliases" : {
+"active" : [
+
+],
+"history" : [
+
+]
+},
+"changelog" : "empty",
+"bookkeeping" : {
+"isdeleted" : false,
+"isreadonly" : false,
+"created" : "Tue Dec 29 18:19:25 2015",
+"updates" : [
+{
+"addToGlobalConfig" : "Thu Nov 10 15:24:09 2016"
+},
+{
+"setVersion" : "Thu Nov 10 15:24:09 2016"
+},
+{
+"setConfigurableEntity" : "Thu Nov 10 15:24:09 2016"
+}
+]
+},
+"configurable_entity" : {
+"name" : "notprovided"
+},
+"_id" : {
+"_oid" : "5a720405791a403e8ad918cf"
+}
+}

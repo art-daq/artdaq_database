@@ -7,6 +7,8 @@
 #include "artdaq-database/DataFormats/Json/json_reader.h"
 #include "artdaq-database/DataFormats/Json/json_writer.h"
 
+#include "artdaq-database/DataFormats/Json/json_types_impl.h"
+
 #include <boost/variant/get.hpp>
 
 #ifdef TRACE_NAME
@@ -14,6 +16,7 @@
 #endif
 
 #define TRACE_NAME "FHJS:json2gui_C"
+
 
 using namespace artdaq::database::sharedtypes;
 using namespace artdaq::database::json;
@@ -26,30 +29,6 @@ using artdaq::database::json::gui2db;
  * For now, to have a "better" compartibilty with FHICL I'll allow duplicate key
  * names in JSON.
 */
-
-template <>
-template <typename T>
-T const& unwrapper<const object_t>::value_as(std::string const& name) {
-  assert(!name.empty());
-
-  using V = typename std::remove_const<T>::type;
-
-  return boost::get<V>(any.at(name));
-}
-
-template <>
-template <typename T>
-T& unwrapper<object_t>::value_as(std::string const& name) {
-  assert(!name.empty());
-
-  return boost::get<T>(any.at(name));
-}
-
-template <>
-template <typename T>
-T& unwrapper<value_t>::value_as() {
-  return boost::get<T>(any);
-}
 
 std::string metadata_node_t::_string_value_of(std::string const& name) const {
   assert(!name.empty());
@@ -435,4 +414,5 @@ void artdaq::database::json::debug::enableJSON2GUIJSON() {
   TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::JSON2GUIJSON trace_enable");
-}
+}  
+

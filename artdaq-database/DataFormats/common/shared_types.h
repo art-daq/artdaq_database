@@ -70,7 +70,11 @@ using any_value_of = boost::variant<VALUE, value_of<VALUE, ANNOTATION>>;
 template <typename TYPE>
 struct vector_of {
   using value_type = TYPE;
-  using collection_type = std::list<value_type>;
+  
+  template<typename... Ts>
+  using container_type= std::list<Ts...>;
+  
+  using collection_type = container_type<value_type>;
 
   using const_iterator = typename collection_type::const_iterator;
   using iterator = typename collection_type::iterator;
@@ -217,6 +221,19 @@ struct unwrapper {
   template <typename T>
   T& value_as(std::string const& /*child*/);
 
+  template <typename O>
+  auto& value(std::string const& key){
+    return  boost::get<O>(any).at(key);
+  } 
+  
+  template <typename O, typename T>
+  auto& value(std::string const& key) try {
+    return  boost::get<O>(any).at(key);
+  }catch(std::out_of_range &){
+    assert(!key.empty());
+    return boost::get<O>(any)[key]=T{};
+  }
+  
   A& any;
 };
 

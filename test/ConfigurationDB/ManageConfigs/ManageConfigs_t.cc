@@ -92,20 +92,20 @@ int main(int argc, char* argv[]) try {
   using namespace artdaq::database::configuration::json;
 
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      "findconfigs", find_global_configurations, options_string);
+      literal::operation::findconfigs, find_global_configurations, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      "buildfilter", build_global_configuration_search_filter, options_string);
+      literal::operation::buildfilter, build_global_configuration_search_filter, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      "addconfig", add_configuration_to_global_configuration, options_string);
+      literal::operation::addconfig, add_configuration_to_global_configuration, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      "findversions", find_configuration_versions, options_string);
+      literal::operation::findversions, find_configuration_versions, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      "findentities", find_configuration_entities, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>("addalias", add_version_alias,
+      literal::operation::findentities, find_configuration_entities, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(literal::operation::addalias, add_version_alias,
                                                                                   options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>("removealias", remove_version_alias,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(literal::operation::rmalias, remove_version_alias,
                                                                                   options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>("findaliases", find_version_aliases,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(literal::operation::findalias, find_version_aliases,
                                                                                   options_string);
 
   std::cout << "Running test:<" << options.operation() << ">\n";

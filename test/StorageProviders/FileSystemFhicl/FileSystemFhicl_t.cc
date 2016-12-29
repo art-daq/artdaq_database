@@ -283,18 +283,18 @@ bool test_search2(std::string const& source_fcl, std::string const& compare_fcl,
 
     auto printComma=bool {false};
 
-    std::stringstream ss;
-    ss << "{\"_id\" : { \"$in\" : [";
+    std::ostringstream oss;
+    oss << "{\"_id\" : { \"$in\" : [";
 
     for (int i=repeatCount; i!=0; i--) {
         auto object_id =  provider->store(json);
         object_ids.push_back(object_id);
-        ss << (printComma?',':' ') << object_id;
+        oss << (printComma?',':' ') << object_id;
         printComma=true;
     }
-    ss << "]} }";
+    oss << "]} }";
 
-    auto filter = ss.str();
+    auto filter = oss.str();
 
     auto search = JsonData {"{\"filter\":" + ( filter.empty()?options:filter)+ ", \"collection\":\"" +colle11ctionName +"\"}"};
 

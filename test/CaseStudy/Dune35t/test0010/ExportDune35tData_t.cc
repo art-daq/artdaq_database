@@ -98,9 +98,9 @@ int main(int argc, char* argv[]) try {
 //  parent = dirname(parent);
 //  names.push_front(basename(parent));
 
-    std::stringstream ss;
-    for (auto const& name : names) ss << name << ".";
-    auto collName = ss.str();
+    std::ostringstream oss;
+    for (auto const& name : names) oss << name << ".";
+    auto collName = oss.str();
     collName.pop_back();
 
     return collName;
