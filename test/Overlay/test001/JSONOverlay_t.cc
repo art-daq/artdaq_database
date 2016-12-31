@@ -12,7 +12,7 @@
 
 namespace bpo = boost::program_options;
 
-namespace ovl = artdaq::database::internals;
+namespace ovl = artdaq::database::overlay;
 
 using artdaq::database::json::JsonReader;
 using artdaq::database::json::JsonWriter;

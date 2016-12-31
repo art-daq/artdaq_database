@@ -6,9 +6,9 @@ using artdaq::database::json::array_t;
 using artdaq::database::json::type_t;
 
 namespace literal = artdaq::database::dataformats::literal;
-
+namespace ovl = artdaq::database::overlay;
 using namespace artdaq::database;
-using namespace artdaq::database::internals;
+using namespace artdaq::database::overlay;
 
 using artdaq::database::sharedtypes::unwrap;
 
@@ -30,7 +30,7 @@ std::string ovlKeyValue::to_string() const noexcept {
   if (JsonWriter().write(tmpAST, retValue))
     return retValue;
   else
-    return "{ \"result\": \"conversion error\"}";
+    return msg_ConvertionError;
 }
 
 value_t& ovlKeyValue::value(object_t::key_type const& key) { return objectValue(key); }
@@ -93,11 +93,11 @@ ovlDocument::ovlDocument(object_t::key_type const& key, value_t& document)
 
 ovlData& ovlDocument::data() { return *_data; }
 
-void ovlDocument::swap_data(std::unique_ptr<ovlData>& data) { std::swap(_data, data); }
+void ovlDocument::swap(ovlDataUPtr_t& data) { std::swap(_data, data); }
 
 ovlMetadata& ovlDocument::metadata() { return *_metadata; }
 
-void ovlDocument::swap_metadata(std::unique_ptr<ovlMetadata>& metadata) { std::swap(_metadata, metadata); }
+void ovlDocument::swap(ovlMetadataUPtr_t& metadata) { std::swap(_metadata, metadata); }
 
 void ovlDocument::make_empty() {
   value_t tmp1 = object_t{};
@@ -118,8 +118,7 @@ std::string ovlDocument::to_string() const noexcept {
   return oss.str();
 }
 
-ovlComment::ovlComment(object_t::key_type const& key, value_t& comment, array_t& parent)
-    : ovlKeyValue(key, comment), _parent(parent) {}
+ovlComment::ovlComment(object_t::key_type const& key, value_t& comment) : ovlKeyValue(key, comment) {}
 
 int& ovlComment::linenum() { return value_as<int>(literal::linenum); }
 
@@ -158,7 +157,7 @@ std::string ovlComments::to_string() const noexcept {
 ovlComments::arrayComments_t ovlComments::make_comments(array_t& comments) {
   auto returnValue = ovlComments::arrayComments_t{};
 
-  for (auto& comment : comments) returnValue.push_back({literal::comment, comment, comments});
+  for (auto& comment : comments) returnValue.push_back({literal::comment, comment});
 
   return returnValue;
 }
@@ -198,8 +197,8 @@ ovlVersion::ovlVersion(object_t::key_type const& key, value_t& version) : ovlKey
 ovlConfigurableEntity::ovlConfigurableEntity(object_t::key_type const& key, value_t& entity)
     : ovlKeyValue(key, entity) {}
 
-ovlConfiguration::ovlConfiguration(object_t::key_type const& key, value_t& configuration, array_t& configurations)
-    : ovlKeyValue(key, configuration), _parent(configurations), _timestamp(map_timestamp(configuration)) {}
+ovlConfiguration::ovlConfiguration(object_t::key_type const& key, value_t& configuration)
+    : ovlKeyValue(key, configuration), _timestamp(map_timestamp(configuration)) {}
 
 std::string& ovlConfiguration::name() { return value_as<std::string>(literal::name); }
 
@@ -225,6 +224,40 @@ std::string ovlConfiguration::to_string() const noexcept {
 }
 
 ovlValueTimeStamp ovlConfiguration::map_timestamp(value_t& value) {
+  assert(type(value) == type_t::OBJECT);
+  auto& obj = object_value();
+  assert(obj.count(literal::assigned) == 1);
+
+  return ovlValueTimeStamp(literal::assigned, obj.at(literal::assigned));
+}
+
+ovlAlias::ovlAlias(object_t::key_type const& key, value_t& alias)
+    : ovlKeyValue(key, alias), _timestamp(map_timestamp(alias)) {}
+
+std::string& ovlAlias::name() { return value_as<std::string>(literal::name); }
+
+std::string const& ovlAlias::name() const { return value_as<std::string>(literal::name); }
+
+std::string& ovlAlias::name(std::string const& name) {
+  assert(!name.empty());
+
+  value() = name;
+  return stringValue();
+}
+
+std::string& ovlAlias::timestamp() { return _timestamp.timestamp(); }
+
+std::string ovlAlias::to_string() const noexcept {
+  std::ostringstream oss;
+  oss << "{";
+  oss << quoted_(literal::name) << ":" << quoted_(name()) << ",";
+  oss << debrace(_timestamp.to_string());
+  oss << "}";
+
+  return oss.str();
+}
+
+ovlValueTimeStamp ovlAlias::map_timestamp(value_t& value) {
   assert(type(value) == type_t::OBJECT);
   auto& obj = object_value();
   assert(obj.count(literal::assigned) == 1);
@@ -265,15 +298,11 @@ std::string ovlConfigurations::to_string() const noexcept {
 }
 
 void ovlConfigurations::wipe() { _configurations = ovlConfigurations::arrayConfigurations_t{}; }
-// bool exists(std::string const& name) {}
-// void add(std::string const& name) {}
-// void remove(std::string name) {}
 
 ovlConfigurations::arrayConfigurations_t ovlConfigurations::make_configurations(array_t& configurations) {
   auto returnValue = ovlConfigurations::arrayConfigurations_t{};
 
-  for (auto& configuration : configurations)
-    returnValue.push_back({literal::configuration, configuration, configurations});
+  for (auto& configuration : configurations) returnValue.push_back({literal::configuration, configuration});
 
   return returnValue;
 }
@@ -288,8 +317,8 @@ std::string& ovlId::oid(std::string const& id) {
   return oid();
 }
 
-ovlUpdate::ovlUpdate(object_t::key_type const& key, value_t& update, array_t& parent)
-    : ovlKeyValue(key, update), _parent(parent), _operation(map_operation(update)) {}
+ovlUpdate::ovlUpdate(object_t::key_type const& key, value_t& update)
+    : ovlKeyValue(key, update), _operation(map_operation(update)) {}
 
 std::string& ovlUpdate::opration() { return _operation.key(); }
 
@@ -335,8 +364,8 @@ bool& ovlBookkeeping::markDeleted(bool const& state) {
 std::string ovlBookkeeping::to_string() const noexcept {
   std::ostringstream oss;
   oss << "{" << quoted_(literal::bookkeeping) << ": {";
-  oss << quoted_(literal::isreadonly) << ":" << (isReadonly() ? "true" : "false") << ",\n";
-  oss << quoted_(literal::isdeleted) << ":" << (isDeleted() ? "true" : "false") << ",\n";
+  oss << quoted_(literal::isreadonly) << ":" << quoted_(isReadonly()) << ",\n";
+  oss << quoted_(literal::isdeleted) << ":" << quoted_(isDeleted()) << ",\n";
   oss << debrace(_created.to_string()) << ",\n";
   oss << quoted_(literal::updates) << ": [";
 
@@ -352,7 +381,7 @@ std::string ovlBookkeeping::to_string() const noexcept {
 ovlBookkeeping::arrayBookkeeping_t ovlBookkeeping::make_updates(array_t& updates) {
   auto returnValue = ovlBookkeeping::arrayBookkeeping_t{};
 
-  for (auto& update : updates) returnValue.push_back({literal::update, update, updates});
+  for (auto& update : updates) returnValue.push_back({literal::update, update});
 
   return returnValue;
 }
@@ -379,41 +408,91 @@ ovlDatabaseRecord::ovlDatabaseRecord(value_t& record)
 
 ovlDocument& ovlDatabaseRecord::document() { return *_document; }
 
-void ovlDatabaseRecord::swap_document(std::unique_ptr<ovlDocument>& document) { std::swap(_document, document); }
+result_t ovlDatabaseRecord::swap(ovlDocumentUPtr_t& document) {
+  if (isReadonly()) return Failure(msg_IsReadonly);
+
+  std::swap(_document, document);
+
+  return Success();
+}
 
 ovlComments& ovlDatabaseRecord::comments() { return *_comments; }
 
-void ovlDatabaseRecord::swap_comments(std::unique_ptr<ovlComments>& comments) { std::swap(_comments, comments); }
+result_t ovlDatabaseRecord::swap(ovlCommentsUPtr_t& comments) {
+  if (isReadonly()) return Failure(msg_IsReadonly);
+
+  std::swap(_comments, comments);
+
+  return Success();
+}
 
 ovlOrigin& ovlDatabaseRecord::origin() { return *_origin; }
 
-void ovlDatabaseRecord::swap_origin(std::unique_ptr<ovlOrigin>& origin) { std::swap(_origin, origin); }
+result_t ovlDatabaseRecord::swap(ovlOriginUPtr_t& origin) {
+  assert(!origin);
+
+  if (isReadonly()) return Failure(msg_IsReadonly);
+
+  std::swap(_origin, origin);
+
+  return Success();
+}
 
 ovlVersion& ovlDatabaseRecord::version() { return *_version; }
 
-void ovlDatabaseRecord::swap_version(std::unique_ptr<ovlVersion>& version) { std::swap(_version, version); }
+result_t ovlDatabaseRecord::swap(ovlVersionUPtr_t& version) {
+  assert(!version);
+
+  if (isReadonly()) return Failure(msg_IsReadonly);
+
+  std::swap(_version, version);
+
+  return Success();
+}
 
 ovlConfigurableEntity& ovlDatabaseRecord::configurableEntity() { return *_configurableEntity; }
 
-void ovlDatabaseRecord::swap_configurableEntity(std::unique_ptr<ovlConfigurableEntity>& configurableEntity) {
-  std::swap(_configurableEntity, configurableEntity);
+result_t ovlDatabaseRecord::swap(ovlConfigurableEntityUPtr_t& entity) {
+  assert(!entity);
+
+  if (isReadonly()) return Failure(msg_IsReadonly);
+
+  std::swap(_configurableEntity, entity);
+
+  return Success();
 }
 
 ovlConfigurations& ovlDatabaseRecord::configurations() { return *_configurations; }
 
-void ovlDatabaseRecord::swap_configurations(std::unique_ptr<ovlConfigurations>& configurations) {
+result_t ovlDatabaseRecord::swap(ovlConfigurationsUPtr_t& configurations) {
+  if (isReadonly()) return Failure(msg_IsReadonly);
+
   std::swap(_configurations, configurations);
+
+  return Success();
 }
 
 ovlBookkeeping& ovlDatabaseRecord::bookkeeping() { return *_bookkeeping; }
 
-void ovlDatabaseRecord::swap_bookkeeping(std::unique_ptr<ovlBookkeeping>& bookkeeping) {
+result_t ovlDatabaseRecord::swap(ovlBookkeepingUPtr_t& bookkeeping) {
+  assert(!bookkeeping);
+
+  if (isReadonly()) return Failure(msg_IsReadonly);
+
   std::swap(_bookkeeping, bookkeeping);
+
+  return Success();
 }
 
 ovlId& ovlDatabaseRecord::id() { return *_id; }
 
-void ovlDatabaseRecord::swap_id(std::unique_ptr<ovlId>& id) { std::swap(_id, id); }
+result_t ovlDatabaseRecord::swap(ovlIdUPtr_t& id) {
+  if (isReadonly()) return Failure(msg_IsReadonly);
+
+  std::swap(_id, id);
+
+  return Success();
+}
 
 std::string ovlDatabaseRecord::to_string() const noexcept {
   std::ostringstream oss;
@@ -432,7 +511,192 @@ std::string ovlDatabaseRecord::to_string() const noexcept {
   return oss.str();
 }
 
+bool& ovlDatabaseRecord::isReadonly() { return _bookkeeping->isReadonly(); }
+bool const& ovlDatabaseRecord::isReadonly() const { return _bookkeeping->isReadonly(); }
+
+result_t ovlDatabaseRecord::markReadonly() {
+  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+
+  _bookkeeping->markReadonly(true);
+
+  return Success();
+}
+result_t ovlDatabaseRecord::markDeleted() {
+  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+
+  _bookkeeping->markDeleted(true);
+
+  return Success();
+}
+
+result_t ovlConfigurations::add(ovlConfigurationUPtr_t& newConfiguration) {
+  assert(!newConfiguration);
+
+  for (auto& configuration : _configurations) {
+    if (configuration.name() == newConfiguration->name()) {
+      // configuration.timestamp().swap(newConfiguration->timestamp());
+      return Success(msg_Ignored);
+    }
+  }
+
+  auto& configurations = ovlKeyValue::array_value();
+  // update AST
+  configurations.push_back(newConfiguration->value());
+  // reattach AST
+  _configurations = make_configurations(configurations);
+
+  return Success(msg_Added);
+}
+
+result_t ovlConfigurations::remove(ovlConfigurationUPtr_t& oldConfiguration) {
+  assert(!oldConfiguration);
+
+  if (_configurations.empty()) Success(msg_Ignored);
+
+  auto& configurations = ovlKeyValue::array_value();
+
+  auto oldCount = configurations.size();
+
+  configurations.erase(std::remove_if(configurations.begin(), configurations.end(),
+                                      [&oldConfiguration](value_t& configuration) -> bool {
+                                        auto newConfiguration =
+                                            overlay<ovlConfiguration>(configuration, literal::configuration);
+                                        return newConfiguration->name() == oldConfiguration->name();
+                                      }),
+                       configurations.end());
+
+  if (oldCount == configurations.size()) return Failure(msg_Missing);
+
+  assert(oldCount == configurations.size() + 1);
+
+  _configurations = make_configurations(configurations);
+
+  return Success(msg_Removed);
+}
+
+result_t ovlDatabaseRecord::addConfiguration(ovlConfigurationUPtr_t& configuration) {
+  assert(!configuration);
+
+  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+
+  auto update = make_update("addConfiguration");
+
+  auto result = _configurations->add(configuration);
+
+  if (!result.first) return result;
+
+  return _bookkeeping->postUpdate(update);
+}
+
+result_t ovlDatabaseRecord::removeConfiguration(ovlConfigurationUPtr_t& configuration) {
+  assert(!configuration);
+
+  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+
+  auto update = make_update("removeConfiguration");
+
+  auto result = _configurations->remove(configuration);
+
+  if (!result.first) return result;
+
+  return _bookkeeping->postUpdate(update);
+}
+
+/*
+result_t ovlDatabaseRecord::addAlias(ovlAliasUPtr_t& alias) {
+      assert(!configuration);
+
+  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+
+
+  auto update= make_update("addAlias");
+
+  auto result= _aliases->add(alias);
+
+  if(!result.first)
+    return result;
+
+  return _bookkeeping->postUpdate(update);
+}
+
+result_t ovlDatabaseRecord::removeAlias(ovlAliasUPtr_t& alias) {
+      assert(!configuration);
+
+  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+
+  auto update= make_update("removeAlias");
+
+  auto result= _aliases->remove(alias);
+
+  if(!result.first)
+    return result;
+
+  return _bookkeeping->postUpdate(update);
+}
+*/
+
+result_t ovlBookkeeping::postUpdate(std::string const& update) {
+  assert(!update.empty());
+
+  if (isReadonly()) return Failure(msg_IsReadonly);
+
+  auto& updates = ovlKeyValue::value_as<array_t>(literal::updates);
+
+  auto newEntry = object_t{};
+  newEntry[update] = artdaq::database::dataformats::timestamp();
+  value_t tmp = newEntry;
+  updates.push_back(tmp);
+
+  // reattach AST
+  _updates = make_updates(updates);
+
+  return Success(msg_Added);
+}
+
+result_t ovlDatabaseRecord::setVersion(ovlVersionUPtr_t& version) {
+  assert(!version);
+
+  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+
+  auto update = make_update("setVersion");
+
+  auto result = swap(version);
+
+  if (!result.first) return result;
+
+  return _bookkeeping->postUpdate(update);
+}
+
+result_t ovlDatabaseRecord::addConfigurableEntity(ovlConfigurableEntityUPtr_t& entity) {
+  assert(!entity);
+
+  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+
+  auto update = make_update("addConfigurableEntity");
+
+  auto result = swap(entity);
+
+  if (!result.first) return result;
+
+  return _bookkeeping->postUpdate(update);
+}
+result_t ovlDatabaseRecord::removeConfigurableEntity(ovlConfigurableEntityUPtr_t& entity) {
+  assert(!entity);
+
+  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+
+  auto update = make_update("removeConfigurableEntity");
+
+  auto result = swap(entity);
+
+  if (!result.first) return result;
+
+  return _bookkeeping->postUpdate(update);
+}
+
 std::string artdaq::database::quoted_(std::string const& text) { return "\"" + text + "\""; }
+
+std::string artdaq::database::quoted_(bool const& value) { return (value ? "true" : "false"); }
 
 std::string artdaq::database::operator"" _quoted(const char* text, std::size_t) {
   return "\"" + std::string(text) + "\"";
@@ -445,14 +709,18 @@ std::string artdaq::database::debrace(std::string s) {
     return s;
 }
 
-std::uint32_t artdaq::database::internals::useCompareMask(std::uint32_t compareMask) {
+result_t ovl::Failure(std::string const& msg) { return {false, msg}; }
+result_t ovl::Success(std::string const& msg) { return {true, msg}; }
+
+result_t ovl::Failure(std::ostringstream const& oss) { return {false, oss.str()}; }
+result_t ovl::Success(std::ostringstream const& oss) { return {true, oss.str()}; }
+
+std::uint32_t artdaq::database::overlay::useCompareMask(std::uint32_t compareMask) {
   static std::uint32_t _compareMask = compareMask;
   return _compareMask;
 }
 
-constexpr auto noerror = "Success";
-
-std::pair<bool, std::string> ovlKeyValue::operator==(ovlKeyValue const& other) const {
+result_t ovlKeyValue::operator==(ovlKeyValue const& other) const {
   if (_key != other._key) return {false, "Keys are different: self,other=" + _key + "," + other._key + "."};
 
   auto result = artdaq::database::json::operator==(_value, other._value);
@@ -467,19 +735,22 @@ std::pair<bool, std::string> ovlKeyValue::operator==(ovlKeyValue const& other) c
   oss << "\n  Self  value: " << to_string();
   oss << "\n  Other value: " << other.to_string();
 
-  return {false, oss.str()};
+  return Failure(oss);
 }
 
-std::pair<bool, std::string> ovlValueTimeStamp::operator==(ovlValueTimeStamp const& other) const {
-  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_TIMESTAMPS)==DOCUMENT_COMPARE_MUTE_TIMESTAMPS) ? std::make_pair(true, noerror) : self() == other.self();
+result_t ovlValueTimeStamp::operator==(ovlValueTimeStamp const& other) const {
+  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_TIMESTAMPS) == DOCUMENT_COMPARE_MUTE_TIMESTAMPS)
+             ? Success()
+             : self() == other.self();
 }
 
-std::pair<bool, std::string> ovlId::operator==(ovlId const& other) const {
-  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_OUIDS)==DOCUMENT_COMPARE_MUTE_OUIDS) ? std::make_pair(true, noerror) : self() == other.self();
+result_t ovlId::operator==(ovlId const& other) const {
+  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_OUIDS) == DOCUMENT_COMPARE_MUTE_OUIDS) ? Success()
+                                                                                           : self() == other.self();
 }
 
-std::pair<bool, std::string> ovlOrigin::operator==(ovlOrigin const& other) const {
-  if ((useCompareMask() & DOCUMENT_COMPARE_MUTE_ORIGIN)==DOCUMENT_COMPARE_MUTE_ORIGIN) return {true, noerror};
+result_t ovlOrigin::operator==(ovlOrigin const& other) const {
+  if ((useCompareMask() & DOCUMENT_COMPARE_MUTE_ORIGIN) == DOCUMENT_COMPARE_MUTE_ORIGIN) return Success();
 
   std::ostringstream oss;
   oss << "\nOrigin nodes disagree.";
@@ -497,29 +768,29 @@ std::pair<bool, std::string> ovlOrigin::operator==(ovlOrigin const& other) const
     oss << "\n  Timestamps are different: self,other=" << quoted_(_timestamp.timestamp()) << ","
         << quoted_(other._timestamp.timestamp());
 
-  if (oss.tellp() == noerror_pos) return {true, noerror};
+  if (oss.tellp() == noerror_pos) return Success();
 
   oss << "\n  Debug info:";
   oss << "\n  Self  value: " << to_string();
   oss << "\n  Other value: " << other.to_string();
 
-  return {false, oss.str()};
+  return Failure(oss);
 }
 
-std::pair<bool, std::string> ovlBookkeeping::operator==(ovlBookkeeping const& other) const {
-  if ( (useCompareMask() & DOCUMENT_COMPARE_MUTE_BOOKKEEPING)==DOCUMENT_COMPARE_MUTE_BOOKKEEPING) return {true, noerror};
+result_t ovlBookkeeping::operator==(ovlBookkeeping const& other) const {
+  if ((useCompareMask() & DOCUMENT_COMPARE_MUTE_BOOKKEEPING) == DOCUMENT_COMPARE_MUTE_BOOKKEEPING) return Success();
 
   std::ostringstream oss;
   oss << "\nBookkeeping nodes disagree.";
   auto noerror_pos = oss.tellp();
 
   if (isDeleted() != other.isDeleted())
-    oss << "\n  isdeleted flags are different: self,other=" << (isDeleted() ? "true" : "false") << ","
-        << (other.isDeleted() ? "true" : "false");
+    oss << "\n  isdeleted flags are different: self,other=" << quoted_(isDeleted()) << ","
+        << quoted_(other.isDeleted());
 
   if (isReadonly() != other.isReadonly())
-    oss << "\n  isreadonly flags are different: self,other=" << (isReadonly() ? "true" : "false") << ","
-        << (other.isReadonly() ? "true" : "false");
+    oss << "\n  isreadonly flags are different: self,other=" << quoted_(isReadonly()) << ","
+        << quoted_(other.isReadonly());
 
   auto result = _created == other._created;
 
@@ -527,7 +798,8 @@ std::pair<bool, std::string> ovlBookkeeping::operator==(ovlBookkeeping const& ot
     oss << "\n  Timestamps are different: self,other=" << quoted_(_created.timestamp()) << ","
         << quoted_(other._created.timestamp());
 
-  if (oss.tellp() == noerror_pos && (useCompareMask() & DOCUMENT_COMPARE_MUTE_UPDATES)==DOCUMENT_COMPARE_MUTE_UPDATES) return {true, noerror};
+  if (oss.tellp() == noerror_pos && (useCompareMask() & DOCUMENT_COMPARE_MUTE_UPDATES) == DOCUMENT_COMPARE_MUTE_UPDATES)
+    return Success();
 
   if (_updates.size() != other._updates.size())
     oss << "\n  Record update histories have different size: self,other=" << _updates.size() << ","
@@ -541,37 +813,44 @@ std::pair<bool, std::string> ovlBookkeeping::operator==(ovlBookkeeping const& ot
                                                      << first.to_string() << "," << second.to_string();
                                                  return false;
                                                }))
-    return {true, noerror};
+    return Success();
 
   oss << "\n  Debug info:";
   oss << "\n  Self  value:\n" << to_string();
   oss << "\n  Other value:\n" << other.to_string();
 
-  return {false, oss.str()};
+  return Failure(oss);
 }
 
-std::pair<bool, std::string> ovlVersion::operator==(ovlVersion const& other) const {
-  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_VERSION)==DOCUMENT_COMPARE_MUTE_VERSION) ? std::make_pair(true, noerror) : self() == other.self();
+result_t ovlVersion::operator==(ovlVersion const& other) const {
+  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_VERSION) == DOCUMENT_COMPARE_MUTE_VERSION) ? Success()
+                                                                                               : self() == other.self();
 }
 
-std::pair<bool, std::string> ovlData::operator==(ovlData const& other) const {
-  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_DATA)==DOCUMENT_COMPARE_MUTE_DATA) ? std::make_pair(true, noerror) : self() == other.self();
+result_t ovlData::operator==(ovlData const& other) const {
+  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_DATA) == DOCUMENT_COMPARE_MUTE_DATA) ? Success()
+                                                                                         : self() == other.self();
 }
 
-std::pair<bool, std::string> ovlMetadata::operator==(ovlMetadata const& other) const {
-  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_METADATA)==DOCUMENT_COMPARE_MUTE_METADATA) ? std::make_pair(true, noerror) : self() == other.self();
+result_t ovlMetadata::operator==(ovlMetadata const& other) const {
+  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_METADATA) == DOCUMENT_COMPARE_MUTE_METADATA)
+             ? Success()
+             : self() == other.self();
 }
 
-std::pair<bool, std::string> ovlChangeLog::operator==(ovlChangeLog const& other) const {
-  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_CHANGELOG)==DOCUMENT_COMPARE_MUTE_CHANGELOG) ? std::make_pair(true, noerror) : self() == other.self();
+result_t ovlChangeLog::operator==(ovlChangeLog const& other) const {
+  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_CHANGELOG) == DOCUMENT_COMPARE_MUTE_CHANGELOG)
+             ? Success()
+             : self() == other.self();
 }
 
-std::pair<bool, std::string> ovlUpdate::operator==(ovlUpdate const& other) const {
-  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_TIMESTAMPS)==DOCUMENT_COMPARE_MUTE_TIMESTAMPS) ? _operation == other._operation
-                                                               : self() == other.self();
+result_t ovlUpdate::operator==(ovlUpdate const& other) const {
+  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_TIMESTAMPS) == DOCUMENT_COMPARE_MUTE_TIMESTAMPS)
+             ? _operation == other._operation
+             : self() == other.self();
 }
 
-std::pair<bool, std::string> ovlDatabaseRecord::operator==(ovlDatabaseRecord const& other) const {
+result_t ovlDatabaseRecord::operator==(ovlDatabaseRecord const& other) const {
   std::ostringstream oss;
   oss << "\nDatabase records disagree.";
   auto noerror_pos = oss.tellp();
@@ -612,16 +891,16 @@ std::pair<bool, std::string> ovlDatabaseRecord::operator==(ovlDatabaseRecord con
 
   if (!result.first) oss << result.second;
 
-  if (oss.tellp() == noerror_pos) return {true, noerror};
+  if (oss.tellp() == noerror_pos) return Success();
 
   // oss << "\n  Debug info:";
   // oss << "\n  Self  value: " << to_string();
   // oss << "\n  Other value: " << other.to_string();
 
-  return {false, oss.str()};
+  return Failure(oss);
 }
 
-std::pair<bool, std::string> ovlDocument::operator==(ovlDocument const& other) const {
+result_t ovlDocument::operator==(ovlDocument const& other) const {
   std::ostringstream oss;
   oss << "\nUser data disagree.";
   auto noerror_pos = oss.tellp();
@@ -634,18 +913,18 @@ std::pair<bool, std::string> ovlDocument::operator==(ovlDocument const& other) c
 
   if (!result.first) oss << "\n  Metadata are different:\n  " << result.second;
 
-  if (oss.tellp() == noerror_pos) return {true, noerror};
+  if (oss.tellp() == noerror_pos) return Success();
 
-//  oss << "\n  Debug info:";
-//  oss << "\n  Self  value: " << to_string();
-//  oss << "\n  Other value: " << other.to_string();
+  //  oss << "\n  Debug info:";
+  //  oss << "\n  Self  value: " << to_string();
+  //  oss << "\n  Other value: " << other.to_string();
 
-  return {false, oss.str()};
+  return Failure(oss);
 }
 
-std::pair<bool, std::string> ovlComment::operator==(ovlComment const& other) const { return self() == other.self(); }
+result_t ovlComment::operator==(ovlComment const& other) const { return self() == other.self(); }
 
-std::pair<bool, std::string> ovlConfiguration::operator==(ovlConfiguration const& other) const {
+result_t ovlConfiguration::operator==(ovlConfiguration const& other) const {
   std::ostringstream oss;
   oss << "\nConfiguration records disagree.";
   auto noerror_pos = oss.tellp();
@@ -657,23 +936,45 @@ std::pair<bool, std::string> ovlConfiguration::operator==(ovlConfiguration const
 
   if (!result.first) oss << "\n  Timestamps are different:\n  " << result.second;
 
-  if (oss.tellp() == noerror_pos) return {true, noerror};
+  if (oss.tellp() == noerror_pos) return Success();
 
   oss << "\n  Debug info:";
   oss << "\n  Self  value: " << to_string();
   oss << "\n  Other value: " << other.to_string();
 
-  return {false, oss.str()};
+  return Failure(oss);
 }
 
-std::pair<bool, std::string> ovlConfigurableEntity::operator==(ovlConfigurableEntity const& other) const {
-  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_CONFIGENTITY)==DOCUMENT_COMPARE_MUTE_CONFIGENTITY) ? std::make_pair(true, noerror)
-                                                                 : self() == other.self();
+result_t ovlAlias::operator==(ovlAlias const& other) const {
+  std::ostringstream oss;
+  oss << "\nAlias records disagree.";
+  auto noerror_pos = oss.tellp();
+
+  if (name() != other.name())
+    oss << "\n  Alias names are different: self,other=" << quoted_(name()) << "," << quoted_(other.name());
+
+  auto result = _timestamp == other._timestamp;
+
+  if (!result.first) oss << "\n  Timestamps are different:\n  " << result.second;
+
+  if (oss.tellp() == noerror_pos) return Success();
+
+  oss << "\n  Debug info:";
+  oss << "\n  Self  value: " << to_string();
+  oss << "\n  Other value: " << other.to_string();
+
+  return Failure(oss);
 }
 
-std::pair<bool, std::string> ovlConfigurations::operator==(ovlConfigurations const& other) const {
-  
-  if ((useCompareMask() & DOCUMENT_COMPARE_MUTE_CONFIGURATIONS)==DOCUMENT_COMPARE_MUTE_CONFIGURATIONS) return std::make_pair(true, noerror);
+result_t ovlConfigurableEntity::operator==(ovlConfigurableEntity const& other) const {
+  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_CONFIGENTITY) == DOCUMENT_COMPARE_MUTE_CONFIGENTITY)
+             ? Success()
+             : self() == other.self();
+}
+
+result_t ovlConfigurations::operator==(ovlConfigurations const& other) const {
+  if ((useCompareMask() & DOCUMENT_COMPARE_MUTE_CONFIGURATIONS) == DOCUMENT_COMPARE_MUTE_CONFIGURATIONS)
+    return Success();
 
   std::ostringstream oss;
   oss << "\nConfiguration lists disagree.";
@@ -691,7 +992,7 @@ std::pair<bool, std::string> ovlConfigurations::operator==(ovlConfigurations con
                    oss << result.second;
                    return false;
                  }))
-    return {true, noerror};
+    return Success();
   else
     oss << "\n  Configuration lists are different";
 
@@ -699,10 +1000,10 @@ std::pair<bool, std::string> ovlConfigurations::operator==(ovlConfigurations con
   oss << "\n  Self  value: " << to_string();
   oss << "\n  Other value: " << other.to_string();
 
-  return {false, oss.str()};
+  return Failure(oss);
 }
 
-std::pair<bool, std::string> ovlComments::operator==(ovlComments const& other) const {
+result_t ovlComments::operator==(ovlComments const& other) const {
   std::ostringstream oss;
   oss << "\nComment lists disagree.";
   auto noerror_pos = oss.tellp();
@@ -717,7 +1018,7 @@ std::pair<bool, std::string> ovlComments::operator==(ovlComments const& other) c
                                                  oss << result.second;
                                                  return false;
                                                }))
-    return {true, noerror};
+    return Success();
   else
     oss << "\n  Comment lists are different";
 
@@ -725,5 +1026,5 @@ std::pair<bool, std::string> ovlComments::operator==(ovlComments const& other) c
   oss << "\n  Self  value: " << to_string();
   oss << "\n  Other value: " << other.to_string();
 
-  return {false, oss.str()};
+  return Failure(oss);
 }

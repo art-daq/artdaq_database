@@ -3,6 +3,7 @@
 
 #include "artdaq-database/DataFormats/Json/json_common.h"
 #include "artdaq-database/DataFormats/Json/json_types_impl.h"
+#include "artdaq-database/DataFormats/common/helper_functions.h"
 #include "artdaq-database/JsonDocument/common.h"
 
 using artdaq::database::json::object_t;
@@ -14,7 +15,26 @@ namespace literal = artdaq::database::dataformats::literal;
 
 namespace artdaq {
 namespace database {
-namespace internals {
+namespace overlay {
+
+constexpr auto msg_IsReadonly = "{\"message\":\"Document is readonly\"}";
+constexpr auto msg_ConvertionError = "{\"message\":\"Conversion error\"}";
+
+constexpr auto msg_Missing = "{\"message\":\"Missing\"}";
+constexpr auto msg_Ignored = "{\"message\":\"Ignored\"}";
+constexpr auto msg_Updated = "{\"message\":\"Updated\"}";
+constexpr auto msg_Added = "{\"message\":\"Added\"}";
+constexpr auto msg_Removed = "{\"message\":\"Removed\"}";
+
+constexpr auto msg_Success = "{\"message\":\"Success\"}";
+constexpr auto msg_Failure = "{\"message\":\"Failure\"}";
+
+using result_t = std::pair<bool, std::string>;
+
+result_t Failure(std::ostringstream const& oss);
+result_t Success(std::ostringstream const& oss);
+result_t Failure(std::string const& msg = msg_Failure);
+result_t Success(std::string const& msg = msg_Success);
 
 template <typename OVL, typename T = object_t>
 std::unique_ptr<OVL> overlay(value_t& /*parent*/, object_t::key_type const& /*self_key*/);
@@ -31,20 +51,20 @@ enum DOCUMENT_COMPARE_FLAGS {
   DOCUMENT_COMPARE_MUTE_CONFIGENTITY = (1 << 8),
   DOCUMENT_COMPARE_MUTE_CONFIGURATIONS = (1 << 9),
 
-  //use with caution
+  // use with caution
   DOCUMENT_COMPARE_MUTE_DATA = (1 << 29),
   DOCUMENT_COMPARE_MUTE_METADATA = (1 << 30)
 };
 
-std::uint32_t useCompareMask(std::uint32_t =0);
+std::uint32_t useCompareMask(std::uint32_t = 0);
 
 class ovlKeyValue {
  public:
   ovlKeyValue(object_t::key_type const& /*key*/, value_t& /*value*/);
-  
+
   // defaults
   ovlKeyValue(ovlKeyValue&&) = default;
-  virtual ~ovlKeyValue()=default;
+  virtual ~ovlKeyValue() = default;
 
   value_t& value(object_t::key_type const& /*key*/);
 
@@ -61,14 +81,14 @@ class ovlKeyValue {
   std::string& stringValue();
   std::string const& stringValue() const;
 
-  ovlKeyValue const& self()const;
-  ovlKeyValue & self();
-  
+  ovlKeyValue const& self() const;
+  ovlKeyValue& self();
+
   // virtuals
   virtual std::string to_string() const noexcept;
-  
-  //ops
-  std::pair<bool, std::string> operator==(ovlKeyValue const&) const;
+
+  // ops
+  result_t operator==(ovlKeyValue const&) const;
 
  private:
   value_t& objectValue(object_t::key_type const& /*key*/);
@@ -89,6 +109,8 @@ class ovlKeyValue {
   value_t& _value;
 };
 
+using ovlKeyValueUPtr_t = std::unique_ptr<ovlKeyValue>;
+
 class ovlValueTimeStamp final : public ovlKeyValue {
  public:
   ovlValueTimeStamp(object_t::key_type const& /*key*/, value_t& /*ts*/);
@@ -105,9 +127,10 @@ class ovlValueTimeStamp final : public ovlKeyValue {
   // overridess
   std::string to_string() const noexcept override;
 
-  //ops
-  std::pair<bool, std::string> operator==(ovlValueTimeStamp const&) const;
+  // ops
+  result_t operator==(ovlValueTimeStamp const&) const;
 };
+using ovlValueTimeStampUPtr_t = std::unique_ptr<ovlValueTimeStamp>;
 
 class ovlData final : public ovlKeyValue {
  public:
@@ -117,9 +140,11 @@ class ovlData final : public ovlKeyValue {
   ovlData(ovlData&&) = default;
   ~ovlData() = default;
 
-  //ops
-  std::pair<bool, std::string> operator==(ovlData const&) const;    
+  // ops
+  result_t operator==(ovlData const&) const;
 };
+
+using ovlDataUPtr_t = std::unique_ptr<ovlData>;
 
 class ovlMetadata final : public ovlKeyValue {
  public:
@@ -129,9 +154,12 @@ class ovlMetadata final : public ovlKeyValue {
   ovlMetadata(ovlMetadata&&) = default;
   ~ovlMetadata() = default;
 
-  //ops
-  std::pair<bool, std::string> operator==(ovlMetadata const&) const;      
+  // ops
+  result_t operator==(ovlMetadata const&) const;
 };
+
+using ovlMetadataUPtr_t = std::unique_ptr<ovlMetadata>;
+
 class ovlDocument final : public ovlKeyValue {
  public:
   ovlDocument(object_t::key_type const& /*key*/, value_t& /*document*/);
@@ -145,24 +173,26 @@ class ovlDocument final : public ovlKeyValue {
   ovlMetadata& metadata();
 
   // utils
-  void swap_data(std::unique_ptr<ovlData>& /*data*/);
-  void swap_metadata(std::unique_ptr<ovlMetadata>& /*metadata*/);
+  void swap(ovlDataUPtr_t& /*data*/);
+  void swap(ovlMetadataUPtr_t& /*metadata*/);
   void make_empty();
 
   // overridess
   std::string to_string() const noexcept override;
 
-  //ops
-  std::pair<bool, std::string> operator==(ovlDocument const&) const;      
+  // ops
+  result_t operator==(ovlDocument const&) const;
 
  private:
-  std::unique_ptr<ovlData> _data;
-  std::unique_ptr<ovlMetadata> _metadata;
+  ovlDataUPtr_t _data;
+  ovlMetadataUPtr_t _metadata;
 };
+
+using ovlDocumentUPtr_t = std::unique_ptr<ovlDocument>;
 
 class ovlComment final : public ovlKeyValue {
  public:
-  ovlComment(object_t::key_type const& /*key*/, value_t& /*comment*/, array_t& /*parent*/);
+  ovlComment(object_t::key_type const& /*key*/, value_t& /*comment*/);
 
   // defaults
   ovlComment(ovlComment&&) = default;
@@ -177,12 +207,11 @@ class ovlComment final : public ovlKeyValue {
   // overridess
   std::string to_string() const noexcept override;
 
-  //ops
-  std::pair<bool, std::string> operator==(ovlComment const&) const;      
-  
- private:
-  array_t& _parent;
+  // ops
+  result_t operator==(ovlComment const&) const;
 };
+
+using ovlCommentUPtr_t = std::unique_ptr<ovlComment>;
 
 class ovlComments final : public ovlKeyValue {
   using arrayComments_t = array_t::container_type<ovlComment>;
@@ -202,15 +231,17 @@ class ovlComments final : public ovlKeyValue {
   // overridess
   std::string to_string() const noexcept override;
 
-  //ops
-  std::pair<bool, std::string> operator==(ovlComments const&) const;      
-  
+  // ops
+  result_t operator==(ovlComments const&) const;
+
  private:
   arrayComments_t make_comments(array_t& /*comments*/);
 
  private:
   arrayComments_t _comments;
 };
+
+using ovlCommentsUPtr_t = std::unique_ptr<ovlComments>;
 
 class ovlOrigin final : public ovlKeyValue {
  public:
@@ -229,15 +260,17 @@ class ovlOrigin final : public ovlKeyValue {
   // overridess
   std::string to_string() const noexcept override;
 
-  //ops
-  std::pair<bool, std::string> operator==(ovlOrigin const&) const;      
-  
+  // ops
+  result_t operator==(ovlOrigin const&) const;
+
  private:
   ovlValueTimeStamp map_timestamp(value_t& /*value*/);
 
  private:
   ovlValueTimeStamp _timestamp;
 };
+
+using ovlOriginUPtr_t = std::unique_ptr<ovlOrigin>;
 
 class ovlVersion final : public ovlKeyValue {
  public:
@@ -246,10 +279,41 @@ class ovlVersion final : public ovlKeyValue {
   // defaults
   ovlVersion(ovlVersion&&) = default;
   ~ovlVersion() = default;
-  
-  //ops
-  std::pair<bool, std::string> operator==(ovlVersion const&) const;        
+
+  // ops
+  result_t operator==(ovlVersion const&) const;
 };
+
+using ovlVersionUPtr_t = std::unique_ptr<ovlVersion>;
+
+class ovlAlias final : public ovlKeyValue {
+ public:
+  ovlAlias(object_t::key_type const& /*key*/, value_t& /*alias*/);
+
+  // defaults
+  ovlAlias(ovlAlias&&) = default;
+  ~ovlAlias() = default;
+
+  // accessors
+  std::string& name();
+  std::string const& name() const;
+  std::string& name(std::string const& /*name*/);
+  std::string& timestamp();
+
+  // overrides
+  std::string to_string() const noexcept override;
+
+  // ops
+  result_t operator==(ovlAlias const&) const;
+
+ private:
+  ovlValueTimeStamp map_timestamp(value_t& /*value*/);
+
+ private:
+  ovlValueTimeStamp _timestamp;
+};
+
+using ovlAliasUPtr_t = std::unique_ptr<ovlAlias>;
 
 class ovlConfigurableEntity final : public ovlKeyValue {
  public:
@@ -258,14 +322,16 @@ class ovlConfigurableEntity final : public ovlKeyValue {
   // defaults
   ovlConfigurableEntity(ovlConfigurableEntity&&) = default;
   ~ovlConfigurableEntity() = default;
-  
-  //ops
-  std::pair<bool, std::string> operator==(ovlConfigurableEntity const&) const;        
+
+  // ops
+  result_t operator==(ovlConfigurableEntity const&) const;
 };
+
+using ovlConfigurableEntityUPtr_t = std::unique_ptr<ovlConfigurableEntity>;
 
 class ovlConfiguration final : public ovlKeyValue {
  public:
-  ovlConfiguration(object_t::key_type const& /*key*/, value_t& /*configuration*/, array_t& /*configurations*/);
+  ovlConfiguration(object_t::key_type const& /*key*/, value_t& /*configuration*/);
 
   // defaults
   ovlConfiguration(ovlConfiguration&&) = default;
@@ -280,16 +346,17 @@ class ovlConfiguration final : public ovlKeyValue {
   // overrides
   std::string to_string() const noexcept override;
 
-  //ops
-  std::pair<bool, std::string> operator==(ovlConfiguration const&) const;        
-  
+  // ops
+  result_t operator==(ovlConfiguration const&) const;
+
  private:
   ovlValueTimeStamp map_timestamp(value_t& /*value*/);
 
  private:
-  array_t& _parent;
   ovlValueTimeStamp _timestamp;
 };
+
+using ovlConfigurationUPtr_t = std::unique_ptr<ovlConfiguration>;
 
 class ovlChangeLog final : public ovlKeyValue {
  public:
@@ -306,10 +373,11 @@ class ovlChangeLog final : public ovlKeyValue {
   // utils
   std::string& append(std::string const& /*changelog*/);
 
-  //ops
-  std::pair<bool, std::string> operator==(ovlChangeLog const&) const;        
-  
+  // ops
+  result_t operator==(ovlChangeLog const&) const;
 };
+
+using ovlChangeLogUPtr_t = std::unique_ptr<ovlChangeLog>;
 
 class ovlConfigurations final : public ovlKeyValue {
   using arrayConfigurations_t = array_t::container_type<ovlConfiguration>;
@@ -324,21 +392,22 @@ class ovlConfigurations final : public ovlKeyValue {
   // utils
   void wipe();
   // bool exists(std::string const& name) {}
-  // void add(std::string const& name) {}
-  // void remove(std::string name) {}
-  
+  result_t add(ovlConfigurationUPtr_t&);
+  result_t remove(ovlConfigurationUPtr_t&);
+
   // overrides
   std::string to_string() const noexcept override;
 
-  //ops
-  std::pair<bool, std::string> operator==(ovlConfigurations const&) const;        
-  
+  // ops
+  result_t operator==(ovlConfigurations const&) const;
+
  private:
   arrayConfigurations_t make_configurations(array_t& /*configurations*/);
 
  private:
   arrayConfigurations_t _configurations;
 };
+using ovlConfigurationsUPtr_t = std::unique_ptr<ovlConfigurations>;
 
 class ovlId final : public ovlKeyValue {
  public:
@@ -351,14 +420,16 @@ class ovlId final : public ovlKeyValue {
   // accessors
   std::string& oid();
   std::string& oid(std::string const& /*id*/);
-  
-  //ops
-  std::pair<bool, std::string> operator==(ovlId const&) const;        
+
+  // ops
+  result_t operator==(ovlId const&) const;
 };
+
+using ovlIdUPtr_t = std::unique_ptr<ovlId>;
 
 class ovlUpdate final : public ovlKeyValue {
  public:
-  ovlUpdate(object_t::key_type const& /*key*/, value_t& /*update*/, array_t& /*parent*/);
+  ovlUpdate(object_t::key_type const& /*key*/, value_t& /*update*/);
 
   // defaults
   ovlUpdate(ovlUpdate&&) = default;
@@ -371,16 +442,17 @@ class ovlUpdate final : public ovlKeyValue {
   // overrides
   std::string to_string() const noexcept override;
 
-  //ops
-  std::pair<bool, std::string> operator==(ovlUpdate const&) const;        
-  
+  // ops
+  result_t operator==(ovlUpdate const&) const;
+
  private:
   ovlValueTimeStamp map_operation(value_t& /*value*/);
 
  private:
-  array_t& _parent;
   ovlValueTimeStamp _operation;
 };
+
+using ovlUpdateUPtr_t = std::unique_ptr<ovlUpdate>;
 
 class ovlBookkeeping final : public ovlKeyValue {
   using arrayBookkeeping_t = array_t::container_type<ovlUpdate>;
@@ -402,12 +474,14 @@ class ovlBookkeeping final : public ovlKeyValue {
   bool& markReadonly(bool const& /*state*/);
   bool& markDeleted(bool const& /*state*/);
 
+  result_t postUpdate(std::string const& /*update*/);
+
   // overrides
   std::string to_string() const noexcept override;
 
-  //ops
-  std::pair<bool, std::string> operator==(ovlBookkeeping const&) const;        
-  
+  // ops
+  result_t operator==(ovlBookkeeping const&) const;
+
  private:
   arrayBookkeeping_t make_updates(array_t& /*updates*/);
   ovlValueTimeStamp map_created(value_t& /*value*/);
@@ -416,6 +490,8 @@ class ovlBookkeeping final : public ovlKeyValue {
   arrayBookkeeping_t _updates;
   ovlValueTimeStamp _created;
 };
+
+using ovlBookkeepingUPtr_t = std::unique_ptr<ovlBookkeeping>;
 
 class ovlDatabaseRecord final : public ovlKeyValue {
  public:
@@ -436,43 +512,64 @@ class ovlDatabaseRecord final : public ovlKeyValue {
   ovlId& id();
 
   // utils
-  void swap_document(std::unique_ptr<ovlDocument>& /*document*/);
-  void swap_comments(std::unique_ptr<ovlComments>& /*comments*/);
-  void swap_origin(std::unique_ptr<ovlOrigin>& /*origin*/);
-  void swap_version(std::unique_ptr<ovlVersion>& /*version*/);
-  void swap_configurations(std::unique_ptr<ovlConfigurations>& /*configurations*/);
-  void swap_bookkeeping(std::unique_ptr<ovlBookkeeping>& /*bookkeeping*/);
-  void swap_id(std::unique_ptr<ovlId>& /*id*/);
-  void swap_configurableEntity(std::unique_ptr<ovlConfigurableEntity>& /*configurableEntity*/);
+  result_t swap(ovlDocumentUPtr_t& /*document*/);
+  result_t swap(ovlCommentsUPtr_t& /*comments*/);
+  result_t swap(ovlOriginUPtr_t& /*origin*/);
+  result_t swap(ovlVersionUPtr_t& /*version*/);
+  result_t swap(ovlConfigurationsUPtr_t& /*configurations*/);
+  result_t swap(ovlBookkeepingUPtr_t& /*bookkeeping*/);
+  result_t swap(ovlIdUPtr_t& /*id*/);
+  result_t swap(ovlConfigurableEntityUPtr_t& /*entity*/);
 
   // overrides
   std::string to_string() const noexcept override;
 
-  //ops
-  std::pair<bool, std::string> operator==(ovlDatabaseRecord const&) const;        
-  
- private:
-  std::unique_ptr<ovlDocument> _document;
-  std::unique_ptr<ovlComments> _comments;
-  std::unique_ptr<ovlOrigin> _origin;
-  std::unique_ptr<ovlVersion> _version;
-  std::unique_ptr<ovlConfigurableEntity> _configurableEntity;
-  std::unique_ptr<ovlConfigurations> _configurations;
-  std::unique_ptr<ovlChangeLog> _changelog;
-  std::unique_ptr<ovlBookkeeping> _bookkeeping;
-  std::unique_ptr<ovlId> _id;
-};
+  // ops
+  result_t operator==(ovlDatabaseRecord const&) const;
 
+  // delegates
+  bool& isReadonly();
+  bool const& isReadonly() const;
+  result_t markReadonly();
+  result_t markDeleted();
+
+  result_t addConfiguration(ovlConfigurationUPtr_t& /*configuration*/);
+  result_t removeConfiguration(ovlConfigurationUPtr_t& /*configuration*/);
+
+  //  result_t addAlias(ovlAliasUPtr_t& /*alias*/);
+  //  result_t removeAlias(ovlAliasUPtr_t& /*alias*/);
+
+  result_t addConfigurableEntity(ovlConfigurableEntityUPtr_t& /*entity*/);
+  result_t removeConfigurableEntity(ovlConfigurableEntityUPtr_t& /*entity*/);
+
+  result_t setVersion(ovlVersionUPtr_t& /*version*/);
+
+ private:
+  std::string make_update(std::string const& update) const { return update; }
+
+ private:
+  ovlDocumentUPtr_t _document;
+  ovlCommentsUPtr_t _comments;
+  ovlOriginUPtr_t _origin;
+  ovlVersionUPtr_t _version;
+  ovlConfigurableEntityUPtr_t _configurableEntity;
+  ovlConfigurationsUPtr_t _configurations;
+  ovlChangeLogUPtr_t _changelog;
+  ovlBookkeepingUPtr_t _bookkeeping;
+  ovlIdUPtr_t _id;
+};
 }
 
 std::string quoted_(std::string const& /*text*/);
+std::string quoted_(bool const& /*bool*/);
+
 std::string operator"" _quoted(const char* /*text*/, std::size_t);
 std::string debrace(std::string /*s*/);
 
 }  // namespace database
 }  // namespace artdaq
 
-namespace ovl = artdaq::database::internals;
+namespace ovl = artdaq::database::overlay;
 
 template <typename OVL, typename T = object_t>
 std::unique_ptr<OVL> ovl::overlay(value_t& parent, object_t::key_type const& self_key) {
