@@ -93,7 +93,6 @@ struct fhicl_includes_parser_grammar : qi::grammar<Iter, includes_t(), qi::blank
   qi::rule<Iter, include_t()> filename_rule;
   qi::rule<Iter, includes_t(), qi::blank_type> includes_rule;
 };
-namespace jsn = artdaq::database::json;
 
 struct FhiclReader final {
   bool read_data(std::string const&, jsn::object_t&);

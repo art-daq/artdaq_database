@@ -74,6 +74,8 @@ data_format_t cf::to_data_format(std::string const& f) {
 }
 
 std::string cf::dequote(std::string s) {
+  assert(!s.empty());
+  
   if (s[0] == '"' && s[s.length() - 1] == '"')
     return s.substr(1, s.length() - 2);
   else
@@ -81,6 +83,8 @@ std::string cf::dequote(std::string s) {
 }
 
 std::vector<std::string> cf::list_files(std::string const& path) {
+  assert(!path.empty());
+  
   auto files = std::vector<std::string>{};
   files.reserve(1024);
 
@@ -116,6 +120,7 @@ std::string cf::collection_name_from_relative_path(std::string const& file_path_
 
 std::string cf::relative_path_from_collection_name(std::string const& collection_name) {
   assert(!collection_name.empty());
+  
   auto retValue = std::string{collection_name};
   auto begin = retValue.begin();
   auto end = retValue.begin();

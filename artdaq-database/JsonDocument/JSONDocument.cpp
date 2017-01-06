@@ -103,13 +103,6 @@ value_t const& JSONDocument::findChildValue(path_t const& path) const try {
   throw;
 }
 
-value_t& JSONDocument::findChildValue(path_t const& path) try {
-  return const_cast<value_t&>(findChildValue(path));
-} catch (std::exception& ex) {
-  TRACE_(5, "findChildValue() Search failed; Error:" << ex.what());
-  throw;
-}
-
 // returns found child
 JSONDocument JSONDocument::findChild(path_t const& path) const try {
   TRACE_(6, "findChild() begin json_buffer=<" << cached_json_buffer() << ">");
@@ -247,7 +240,6 @@ JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t cons
   writeJson();  // update _cached_json_buffer
 
   TRACE_(2, "insertChild() resultDocument=<" << cached_json_buffer() << ">");
-
   TRACE_(2, "insertChild() Insert succeeded.");
 
   return JSONDocument(inserted_value);

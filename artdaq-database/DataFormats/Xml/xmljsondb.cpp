@@ -4,6 +4,7 @@
 #include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
 #include "artdaq-database/DataFormats/Xml/xml_common.h"
+#include "artdaq-database/DataFormats/Xml/xmljsondb.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -11,12 +12,6 @@
 
 #define TRACE_NAME "XML:xmljsondb_C"
 
-namespace artdaq {
-namespace database {
-namespace xmljson {
-
-namespace fcl = artdaq::database::xml;
-namespace jsn = artdaq::database::json;
 
 using artdaq::database::json::JsonReader;
 using artdaq::database::json::JsonWriter;
@@ -26,7 +21,11 @@ using artdaq::database::xml::XmlWriter;
 
 namespace literal = artdaq::database::dataformats::literal;
 
-bool xml_to_json(std::string const& xml, std::string& json) {
+namespace dbxj=artdaq::database::xmljson;
+
+namespace xml = artdaq::database::xml;
+
+bool dbxj::xml_to_json(std::string const& xml, std::string& json) {
   assert(!xml.empty());
   assert(json.empty());
 
@@ -64,7 +63,7 @@ bool xml_to_json(std::string const& xml, std::string& json) {
   return result;
 }
 
-bool json_to_xml(std::string const& json, std::string& xml) {
+bool dbxj::json_to_xml(std::string const& json, std::string& xml) {
   assert(!json.empty());
   assert(xml.empty());
 
@@ -100,8 +99,7 @@ bool json_to_xml(std::string const& json, std::string& xml) {
   return result;
 }
 
-namespace debug {
-void enableXmlJson() {
+void dbxj::debug::enableXmlJson() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);
@@ -109,7 +107,3 @@ void enableXmlJson() {
 
   TRACE_(0, "artdaq::database::xmljson trace_enable");
 }
-}
-}  // namespace fhicljson
-}  // namespace database
-}  // namespace artdaq

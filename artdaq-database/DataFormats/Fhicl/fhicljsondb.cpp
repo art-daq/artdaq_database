@@ -7,6 +7,7 @@
 #include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/DataFormats/Fhicl/fhicl_common.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
+#include "artdaq-database/DataFormats/Fhicl/fhicljsondb.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -14,9 +15,7 @@
 
 #define TRACE_NAME "FHJS:fhcljsndb_C"
 
-namespace artdaq {
-namespace database {
-namespace fhicljson {
+namespace dbfj=artdaq::database::fhicljson;
 
 namespace literal = artdaq::database::dataformats::literal;
 
@@ -29,7 +28,7 @@ using artdaq::database::json::JsonWriter;
 using artdaq::database::fhicl::FhiclReader;
 using artdaq::database::fhicl::FhiclWriter;
 
-bool fhicl_to_json(std::string const& fcl, std::string& json) {
+bool dbfj::fhicl_to_json(std::string const& fcl, std::string& json) {
   assert(!fcl.empty());
   assert(json.empty());
 
@@ -88,7 +87,7 @@ bool fhicl_to_json(std::string const& fcl, std::string& json) {
   return result;
 }
 
-bool json_to_fhicl(std::string const& json, std::string& fcl) {
+bool dbfj::json_to_fhicl(std::string const& json, std::string& fcl) {
   assert(!json.empty());
   assert(fcl.empty());
 
@@ -127,8 +126,7 @@ bool json_to_fhicl(std::string const& json, std::string& fcl) {
   return result;
 }
 
-namespace debug {
-void enableFhiclJson() {
+void dbfj::debug::enableFhiclJson() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);
@@ -136,7 +134,3 @@ void enableFhiclJson() {
 
   TRACE_(0, "artdaq::database::fhicljson trace_enable");
 }
-}
-}  // namespace fhicljson
-}  // namespace database
-}  // namespace artdaq

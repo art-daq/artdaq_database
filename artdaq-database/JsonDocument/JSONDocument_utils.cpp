@@ -259,6 +259,13 @@ std::string JSONDocument::value_at(JSONDocument const& document, std::size_t ind
   throw cet::exception("JSONDocument") << "Failed calling value_at(): Caught exception:" << ex.what();
 }
 
+value_t& JSONDocument::findChildValue(path_t const& path) try {
+  return const_cast<value_t&>(findChildValue(path));
+} catch (std::exception& ex) {
+  TRACE_(5, "findChildValue() Search failed; Error:" << ex.what());
+  throw;
+}
+
 result_t JSONDocumentBuilder::SaveUndo() { return Success(); }
 
 result_t JSONDocumentBuilder::CallUndo() noexcept try { return Success(); } catch (...) {
