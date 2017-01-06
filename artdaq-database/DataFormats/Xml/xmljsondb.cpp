@@ -42,7 +42,7 @@ bool xml_to_json(std::string const& xml, std::string& json) {
 
   get_object(literal::origin_node)[literal::format] = std::string("xml");
   get_object(literal::origin_node)[literal::source] = std::string("xml_to_json");
-  get_object(literal::origin_node)[literal::timestamp] = artdaq::database::dataformats::timestamp();
+  get_object(literal::origin_node)[literal::timestamp] = artdaq::database::timestamp();
 
   auto& json_node = get_object(literal::document_node);
 

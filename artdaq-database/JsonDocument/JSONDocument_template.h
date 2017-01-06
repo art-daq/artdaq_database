@@ -20,6 +20,8 @@ constexpr auto source_rawdata = "origin.rawdata";
 constexpr auto version = "version";
 constexpr auto id = "document._id";
 
+constexpr auto alias = "alias";
+
 constexpr auto aliases = "aliases";
 constexpr auto aliases_active = "aliases.active";
 constexpr auto aliases_history = "aliases.history";

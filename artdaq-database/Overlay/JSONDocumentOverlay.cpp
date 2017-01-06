@@ -7,16 +7,14 @@ using artdaq::database::json::type_t;
 
 namespace literal = artdaq::database::dataformats::literal;
 namespace ovl = artdaq::database::overlay;
+
 using namespace artdaq::database;
 using namespace artdaq::database::overlay;
 
-using artdaq::database::sharedtypes::unwrap;
+using namespace artdaq::database::result;
+using result_t = artdaq::database::result_t;
 
-/*
-using artdaq::database::json::print_visitor;
-using artdaq::database::json::JsonReader;
-using artdaq::database::json::JsonWriter;
-*/
+using artdaq::database::sharedtypes::unwrap;
 
 ovlKeyValue::ovlKeyValue(object_t::key_type const& key, value_t& value) : _key(key), _value(value) {}
 
@@ -44,6 +42,8 @@ object_t::key_type& ovlKeyValue::key() { return _key; }
 object_t::key_type const& ovlKeyValue::key() const { return _key; }
 
 value_t& ovlKeyValue::value() { return _value; }
+
+value_t const& ovlKeyValue::value() const { return _value; }
 
 std::string& ovlKeyValue::stringValue() { return objectStringValue(); }
 
@@ -93,11 +93,17 @@ ovlDocument::ovlDocument(object_t::key_type const& key, value_t& document)
 
 ovlData& ovlDocument::data() { return *_data; }
 
-void ovlDocument::swap(ovlDataUPtr_t& data) { std::swap(_data, data); }
+void ovlDocument::swap(ovlDataUPtr_t& data) {
+  assert(!data);
+  std::swap(_data, data);
+}
 
 ovlMetadata& ovlDocument::metadata() { return *_metadata; }
 
-void ovlDocument::swap(ovlMetadataUPtr_t& metadata) { std::swap(_metadata, metadata); }
+void ovlDocument::swap(ovlMetadataUPtr_t& metadata) {
+  assert(!metadata);
+  std::swap(_metadata, metadata);
+}
 
 void ovlDocument::make_empty() {
   value_t tmp1 = object_t{};
@@ -419,6 +425,8 @@ result_t ovlDatabaseRecord::swap(ovlDocumentUPtr_t& document) {
 ovlComments& ovlDatabaseRecord::comments() { return *_comments; }
 
 result_t ovlDatabaseRecord::swap(ovlCommentsUPtr_t& comments) {
+  assert(!comments);
+
   if (isReadonly()) return Failure(msg_IsReadonly);
 
   std::swap(_comments, comments);
@@ -487,6 +495,8 @@ result_t ovlDatabaseRecord::swap(ovlBookkeepingUPtr_t& bookkeeping) {
 ovlId& ovlDatabaseRecord::id() { return *_id; }
 
 result_t ovlDatabaseRecord::swap(ovlIdUPtr_t& id) {
+  assert(!id);
+
   if (isReadonly()) return Failure(msg_IsReadonly);
 
   std::swap(_id, id);
@@ -574,6 +584,92 @@ result_t ovlConfigurations::remove(ovlConfigurationUPtr_t& oldConfiguration) {
   return Success(msg_Removed);
 }
 
+ovlAliases::ovlAliases(object_t::key_type const& key, value_t& aliases)
+    : ovlKeyValue(key, aliases),
+      _active(make_aliases(ovlKeyValue::value_as<array_t>(literal::active))),
+      _history(make_aliases(ovlKeyValue::value_as<array_t>(literal::history))) {}
+
+void ovlAliases::wipe() {
+  _active = ovlAliases::arrayAliases_t{};
+  _history = ovlAliases::arrayAliases_t{};
+}
+
+result_t ovlAliases::add(ovlAliasUPtr_t& newAlias) {
+  assert(!newAlias);
+
+  for (auto& alias : _active) {
+    if (alias.name() == newAlias->name()) {
+      // alias.timestamp().swap(newAlias->timestamp());
+      return Success(msg_Ignored);
+    }
+  }
+
+  auto& aliases = ovlKeyValue::value_as<array_t>(literal::active);
+  // update AST
+  aliases.push_back(newAlias->value());
+  // reattach AST
+  _active = make_aliases(aliases);
+
+  return Success(msg_Added);
+}
+
+result_t ovlAliases::remove(ovlAliasUPtr_t& oldAlias) {
+  assert(!oldAlias);
+
+  if (_active.empty()) Success(msg_Ignored);
+
+  auto& aliases = ovlKeyValue::value_as<array_t>(literal::active);
+
+  auto oldCount = aliases.size();
+
+  aliases.erase(std::remove_if(aliases.begin(), aliases.end(),
+                               [&oldAlias](value_t& alias) -> bool {
+                                 auto newAlias = overlay<ovlAlias>(alias, literal::alias);
+                                 return newAlias->name() == oldAlias->name();
+                               }),
+                aliases.end());
+
+  if (oldCount == aliases.size()) return Failure(msg_Missing);
+
+  assert(oldCount - 1 == aliases.size());
+
+  _active = make_aliases(aliases);
+
+  auto& history = ovlKeyValue::value_as<array_t>(literal::history);
+
+  oldCount = history.size();
+
+  history.push_back(oldAlias->value());
+
+  assert(oldCount + 1 == history.size());
+
+  _history = make_aliases(history);
+
+  return Success(msg_Removed);
+}
+
+std::string ovlAliases::to_string() const noexcept {
+  std::ostringstream oss;
+  oss << "{" << quoted_(literal::aliases) << ": {";
+  oss << quoted_(literal::active) << ": [";
+  for (auto const& alias : _active) oss << "\n" << alias.to_string() << ",";
+  if (!_active.empty()) oss.seekp(-1, oss.cur);
+  oss << "\n],";
+  oss << quoted_(literal::history) << ": [";
+  for (auto const& alias : _history) oss << "\n" << alias.to_string() << ",";
+  if (!_history.empty()) oss.seekp(-1, oss.cur);
+  oss << "\n]\n}\n}";
+  return oss.str();
+}
+
+ovlAliases::arrayAliases_t ovlAliases::make_aliases(array_t& aliases) {
+  auto returnValue = ovlAliases::arrayAliases_t{};
+
+  for (auto& alias : aliases) returnValue.push_back({literal::alias, alias});
+
+  return returnValue;
+}
+
 result_t ovlDatabaseRecord::addConfiguration(ovlConfigurationUPtr_t& configuration) {
   assert(!configuration);
 
@@ -602,38 +698,33 @@ result_t ovlDatabaseRecord::removeConfiguration(ovlConfigurationUPtr_t& configur
   return _bookkeeping->postUpdate(update);
 }
 
-/*
 result_t ovlDatabaseRecord::addAlias(ovlAliasUPtr_t& alias) {
-      assert(!configuration);
+  assert(!alias);
 
   if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
 
+  auto update = make_update("addAlias");
 
-  auto update= make_update("addAlias");
+  auto result = _aliases->add(alias);
 
-  auto result= _aliases->add(alias);
-
-  if(!result.first)
-    return result;
+  if (!result.first) return result;
 
   return _bookkeeping->postUpdate(update);
 }
 
 result_t ovlDatabaseRecord::removeAlias(ovlAliasUPtr_t& alias) {
-      assert(!configuration);
+  assert(!alias);
 
   if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
 
-  auto update= make_update("removeAlias");
+  auto update = make_update("removeAlias");
 
-  auto result= _aliases->remove(alias);
+  auto result = _aliases->remove(alias);
 
-  if(!result.first)
-    return result;
+  if (!result.first) return result;
 
   return _bookkeeping->postUpdate(update);
 }
-*/
 
 result_t ovlBookkeeping::postUpdate(std::string const& update) {
   assert(!update.empty());
@@ -643,7 +734,7 @@ result_t ovlBookkeeping::postUpdate(std::string const& update) {
   auto& updates = ovlKeyValue::value_as<array_t>(literal::updates);
 
   auto newEntry = object_t{};
-  newEntry[update] = artdaq::database::dataformats::timestamp();
+  newEntry[update] = artdaq::database::timestamp();
   value_t tmp = newEntry;
   updates.push_back(tmp);
 
@@ -693,27 +784,6 @@ result_t ovlDatabaseRecord::removeConfigurableEntity(ovlConfigurableEntityUPtr_t
 
   return _bookkeeping->postUpdate(update);
 }
-
-std::string artdaq::database::quoted_(std::string const& text) { return "\"" + text + "\""; }
-
-std::string artdaq::database::quoted_(bool const& value) { return (value ? "true" : "false"); }
-
-std::string artdaq::database::operator"" _quoted(const char* text, std::size_t) {
-  return "\"" + std::string(text) + "\"";
-}
-
-std::string artdaq::database::debrace(std::string s) {
-  if (s[0] == '{' && s[s.length() - 1] == '}')
-    return s.substr(1, s.length() - 2);
-  else
-    return s;
-}
-
-result_t ovl::Failure(std::string const& msg) { return {false, msg}; }
-result_t ovl::Success(std::string const& msg) { return {true, msg}; }
-
-result_t ovl::Failure(std::ostringstream const& oss) { return {false, oss.str()}; }
-result_t ovl::Success(std::ostringstream const& oss) { return {true, oss.str()}; }
 
 std::uint32_t artdaq::database::overlay::useCompareMask(std::uint32_t compareMask) {
   static std::uint32_t _compareMask = compareMask;
@@ -811,6 +881,33 @@ result_t ovlBookkeeping::operator==(ovlBookkeeping const& other) const {
                                                  if (result.first) return true;
                                                  oss << "\n  Record update histories are different: self,other="
                                                      << first.to_string() << "," << second.to_string();
+                                                 return false;
+                                               }))
+    return Success();
+
+  oss << "\n  Debug info:";
+  oss << "\n  Self  value:\n" << to_string();
+  oss << "\n  Other value:\n" << other.to_string();
+
+  return Failure(oss);
+}
+
+result_t ovlAliases::operator==(ovlAliases const& other) const {
+  if ((useCompareMask() & DOCUMENT_COMPARE_MUTE_ALIASES) == DOCUMENT_COMPARE_MUTE_ALIASES) return Success();
+
+  std::ostringstream oss;
+  oss << "\nAliases nodes disagree.";
+  auto noerror_pos = oss.tellp();
+
+  if (_active.size() != other._active.size())
+    oss << "\n  Different active alias count: self,other=" << _active.size() << "," << other._active.size();
+
+  if (oss.tellp() == noerror_pos && std::equal(_active.cbegin(), _active.end(), other._active.cbegin(),
+                                               [&oss](auto const& first, auto const& second) -> bool {
+                                                 auto result = first == second;
+                                                 if (result.first) return true;
+                                                 oss << "\n  Aliases are different: self,other=" << first.to_string()
+                                                     << "," << second.to_string();
                                                  return false;
                                                }))
     return Success();

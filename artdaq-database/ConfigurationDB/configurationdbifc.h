@@ -30,7 +30,8 @@ struct ConfigurationInterface final {
   //==============================================================================
   // stores configuration version to database
   template <typename CONF, typename TYPE>
-  cf::result_pair_t storeVersion(CONF configuration, std::string const& version, std::string const& entity) const noexcept try {
+  cf::result_pair_t storeVersion(CONF configuration, std::string const& version, std::string const& entity) const
+      noexcept try {
     assert(!version.empty());
 
     constexpr auto apifunctname = "ConfigurationInterface::storeVersion";
@@ -50,8 +51,8 @@ struct ConfigurationInterface final {
     } else if (std::is_same<TYPE, FhiclData>::value) {
       opts.dataFormat(data_format_t::fhicl);
     } else {
-      throw artdaq::database::invalid_option_exception(apifunctname) << "Unsupported storage format " << demangle(typeid(TYPE).name())
-                                                                     << ",  use either JsonData or FhiclData.";
+      throw artdaq::database::invalid_option_exception(apifunctname)
+          << "Unsupported storage format " << demangle(typeid(TYPE).name()) << ",  use either JsonData or FhiclData.";
     }
 
     if (!entity.empty()) opts.configurableEntity(entity);
@@ -81,7 +82,8 @@ struct ConfigurationInterface final {
   //==============================================================================
   // loads configuration version from database
   template <typename CONF, typename TYPE>
-  cf::result_pair_t loadVersion(CONF configuration, std::string const& version, std::string const& entity) const noexcept try {
+  cf::result_pair_t loadVersion(CONF configuration, std::string const& version, std::string const& entity) const
+      noexcept try {
     assert(!version.empty());
 
     constexpr auto apifunctname = "ConfigurationInterface::loadVersion";
@@ -101,8 +103,8 @@ struct ConfigurationInterface final {
     } else if (std::is_same<TYPE, FhiclData>::value) {
       opts.dataFormat(data_format_t::fhicl);
     } else {
-      throw artdaq::database::invalid_option_exception(apifunctname) << "Unsupported storage format " << demangle(typeid(TYPE).name())
-                                                                     << ",  use either JsonData or FhiclData.";
+      throw artdaq::database::invalid_option_exception(apifunctname)
+          << "Unsupported storage format " << demangle(typeid(TYPE).name()) << ",  use either JsonData or FhiclData.";
     }
 
     if (!entity.empty()) opts.configurableEntity(entity);
@@ -166,8 +168,8 @@ struct ConfigurationInterface final {
           returnList.emplace_back(version);
         }
       } catch (std::exception const& e) {
-        throw artdaq::database::runtime_exception(apifunctname) << "Unable to read versions from  JSON:" << apiCallResult.second
-                                                                << "; Exception:" << e.what();
+        throw artdaq::database::runtime_exception(apifunctname)
+            << "Unable to read versions from  JSON:" << apiCallResult.second << "; Exception:" << e.what();
       }
     } catch (std::exception const& e) {
       returnList.clear();
@@ -211,12 +213,13 @@ struct ConfigurationInterface final {
         for (auto const search : searches) {
           auto const& query = boost::get<jsn::object_t>(search).at(cfl::document::query);
           auto const& filter = boost::get<jsn::object_t>(query).at(cfl::filterx);
-          auto const& configuration = boost::get<std::string>(boost::get<jsn::object_t>(filter).at(cfl::filter::configuration));
+          auto const& configuration =
+              boost::get<std::string>(boost::get<jsn::object_t>(filter).at(cfl::filter::configuration));
           returnSet.insert(configuration);
         }
       } catch (std::exception const& e) {
-        throw artdaq::database::runtime_exception(apifunctname) << "Unable to read configuration names from  JSON:" << apiCallResult.second
-                                                                << "; Exception:" << e.what();
+        throw artdaq::database::runtime_exception(apifunctname)
+            << "Unable to read configuration names from  JSON:" << apiCallResult.second << "; Exception:" << e.what();
       }
     } catch (std::exception const& e) {
       returnSet.clear();
@@ -296,8 +299,8 @@ struct ConfigurationInterface final {
           returnList.emplace_back(to_VersionInfo(version_query));
         }
       } catch (std::exception const& e) {
-        throw artdaq::database::runtime_exception(apifunctname) << "Unable to read version info names from  JSON:" << apiCallResult.second
-                                                                << "; Exception:" << e.what();
+        throw artdaq::database::runtime_exception(apifunctname)
+            << "Unable to read version info names from  JSON:" << apiCallResult.second << "; Exception:" << e.what();
       }
 
     } catch (std::exception const& e) {
@@ -314,15 +317,18 @@ struct ConfigurationInterface final {
 
   //==============================================================================
   //
-  cf::result_pair_t storeGlobalConfiguration(VersionInfoList_t const& versionInfoList, std::string const& configuration) const try {
+  cf::result_pair_t storeGlobalConfiguration(VersionInfoList_t const& versionInfoList,
+                                             std::string const& configuration) const try {
     assert(!configuration.empty());
     assert(!versionInfoList.empty());
 
     constexpr auto apifunctname = "ConfigurationInterface::storeGlobalConfiguration";
 
-    if (versionInfoList.empty()) throw artdaq::database::invalid_option_exception(apifunctname) << "Version info list is empty";
+    if (versionInfoList.empty())
+      throw artdaq::database::invalid_option_exception(apifunctname) << "Version info list is empty";
 
-    if (configuration.empty()) throw artdaq::database::invalid_option_exception(apifunctname) << "Global configuration name is empty";
+    if (configuration.empty())
+      throw artdaq::database::invalid_option_exception(apifunctname) << "Global configuration name is empty";
 
     auto payloadAST = jsn::object_t{};
     payloadAST[cfl::operation::operations] = jsn::array_t{};

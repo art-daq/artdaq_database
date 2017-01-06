@@ -41,7 +41,7 @@ bool conf_to_json(std::string const& conf, std::string& json) {
   auto get_object = [&json_root](std::string const& name) -> auto& { return boost::get<jsn::object_t>(json_root[name]); };
   get_object(literal::origin_node)[literal::format] = std::string("conf");
   get_object(literal::origin_node)[literal::source] = std::string("conf_to_json");
-  get_object(literal::origin_node)[literal::timestamp] = artdaq::database::dataformats::timestamp();
+  get_object(literal::origin_node)[literal::timestamp] = artdaq::database::timestamp();
 
   auto& json_node = get_object(literal::document_node);
 

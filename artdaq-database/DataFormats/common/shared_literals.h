@@ -53,6 +53,10 @@ constexpr auto operation = "operation";
 constexpr auto configuration = "configuration";
 constexpr auto assigned = "assigned";
 constexpr auto created = "created";
+constexpr auto aliases = "aliases";
+constexpr auto alias = "alias";
+constexpr auto active = "active";
+constexpr auto history = "history";
 
 constexpr auto gui_data_node = "guidata";
 constexpr auto converted = "converted";

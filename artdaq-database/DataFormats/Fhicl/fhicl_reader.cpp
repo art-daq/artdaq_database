@@ -162,7 +162,7 @@ bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
       array.push_back(jsn::object_t());
       auto& object = boost::get<jsn::object_t>(array.back());
       object.push_back(jsn::data_t::make(literal::linenum, comment.first));
-      object.push_back(jsn::data_t::make(literal::value, artdaq::database::dataformats::filter_jsonstring(comment.second)));
+      object.push_back(jsn::data_t::make(literal::value, artdaq::database::filter_jsonstring(comment.second)));
     }
 
     json_array.swap(array);

@@ -385,7 +385,7 @@ JsonData prov::addConfigToGlobalConfig(LoadStoreOperation const& options, JsonDa
   auto builder = JSONDocumentBuilder{json_document};
   auto globalConfiguration = JSONDocument{new_options.globalConfiguration_to_JsonData().json_buffer};
 
-  builder.addToGlobalConfig(globalConfiguration);
+  builder.addConfiguration(globalConfiguration);
 
   new_options.operation(literal::operation::store);
 

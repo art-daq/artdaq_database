@@ -13,7 +13,7 @@ namespace artdaq {
 namespace database {
 namespace basictypes {
 
-struct JsonData {
+struct JsonData final{
   JsonData(std::string const&);
 
   template <typename TYPE>

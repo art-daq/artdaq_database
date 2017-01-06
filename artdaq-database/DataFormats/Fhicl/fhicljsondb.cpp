@@ -55,7 +55,7 @@ bool fhicl_to_json(std::string const& fcl, std::string& json) {
 
   get_object(literal::origin_node)[literal::format] = std::string("fhicl");
   get_object(literal::origin_node)[literal::source] = std::string("fhicl_to_json");
-  get_object(literal::origin_node)[literal::timestamp] = artdaq::database::dataformats::timestamp();
+  get_object(literal::origin_node)[literal::timestamp] = artdaq::database::timestamp();
 
   get_object(literal::configurable_entity_node)[literal::name] = std::string{literal::notprovided};
 

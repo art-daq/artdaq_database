@@ -4,6 +4,8 @@
 #include "artdaq-database/DataFormats/Json/json_common.h"
 #include "artdaq-database/DataFormats/Json/json_types_impl.h"
 #include "artdaq-database/DataFormats/common/helper_functions.h"
+#include "artdaq-database/DataFormats/common/shared_result.h"
+
 #include "artdaq-database/JsonDocument/common.h"
 
 using artdaq::database::json::object_t;
@@ -11,30 +13,16 @@ using artdaq::database::json::value_t;
 using artdaq::database::json::array_t;
 using artdaq::database::json::type_t;
 
-namespace literal = artdaq::database::dataformats::literal;
-
 namespace artdaq {
 namespace database {
 namespace overlay {
 
+namespace literal = artdaq::database::dataformats::literal;
+
 constexpr auto msg_IsReadonly = "{\"message\":\"Document is readonly\"}";
 constexpr auto msg_ConvertionError = "{\"message\":\"Conversion error\"}";
 
-constexpr auto msg_Missing = "{\"message\":\"Missing\"}";
-constexpr auto msg_Ignored = "{\"message\":\"Ignored\"}";
-constexpr auto msg_Updated = "{\"message\":\"Updated\"}";
-constexpr auto msg_Added = "{\"message\":\"Added\"}";
-constexpr auto msg_Removed = "{\"message\":\"Removed\"}";
-
-constexpr auto msg_Success = "{\"message\":\"Success\"}";
-constexpr auto msg_Failure = "{\"message\":\"Failure\"}";
-
-using result_t = std::pair<bool, std::string>;
-
-result_t Failure(std::ostringstream const& oss);
-result_t Success(std::ostringstream const& oss);
-result_t Failure(std::string const& msg = msg_Failure);
-result_t Success(std::string const& msg = msg_Success);
+using result_t = artdaq::database::result_t;
 
 template <typename OVL, typename T = object_t>
 std::unique_ptr<OVL> overlay(value_t& /*parent*/, object_t::key_type const& /*self_key*/);
@@ -50,7 +38,8 @@ enum DOCUMENT_COMPARE_FLAGS {
   DOCUMENT_COMPARE_MUTE_UPDATES = (1 << 7),
   DOCUMENT_COMPARE_MUTE_CONFIGENTITY = (1 << 8),
   DOCUMENT_COMPARE_MUTE_CONFIGURATIONS = (1 << 9),
-
+  DOCUMENT_COMPARE_MUTE_ALIASES = (1 << 10),
+  DOCUMENT_COMPARE_MUTE_ALIASES_HISTORY = (1 << 11),
   // use with caution
   DOCUMENT_COMPARE_MUTE_DATA = (1 << 29),
   DOCUMENT_COMPARE_MUTE_METADATA = (1 << 30)
@@ -78,6 +67,7 @@ class ovlKeyValue {
   object_t::key_type& key();
   object_t::key_type const& key() const;
   value_t& value();
+  value_t const& value() const;
   std::string& stringValue();
   std::string const& stringValue() const;
 
@@ -145,6 +135,7 @@ class ovlData final : public ovlKeyValue {
 };
 
 using ovlDataUPtr_t = std::unique_ptr<ovlData>;
+using ovlDataUCPtr_t = std::unique_ptr<const ovlData>;
 
 class ovlMetadata final : public ovlKeyValue {
  public:
@@ -175,6 +166,7 @@ class ovlDocument final : public ovlKeyValue {
   // utils
   void swap(ovlDataUPtr_t& /*data*/);
   void swap(ovlMetadataUPtr_t& /*metadata*/);
+
   void make_empty();
 
   // overridess
@@ -407,7 +399,40 @@ class ovlConfigurations final : public ovlKeyValue {
  private:
   arrayConfigurations_t _configurations;
 };
+
 using ovlConfigurationsUPtr_t = std::unique_ptr<ovlConfigurations>;
+
+class ovlAliases final : public ovlKeyValue {
+  using arrayAliases_t = array_t::container_type<ovlAlias>;
+
+ public:
+  ovlAliases(object_t::key_type const& /*key*/, value_t& /*aliases*/);
+
+  // defaults
+  ovlAliases(ovlAliases&&) = default;
+  ~ovlAliases() = default;
+
+  // utils
+  void wipe();
+  // bool exists(std::string const& name) {}
+  result_t add(ovlAliasUPtr_t&);
+  result_t remove(ovlAliasUPtr_t&);
+
+  // overrides
+  std::string to_string() const noexcept override;
+
+  // ops
+  result_t operator==(ovlAliases const&) const;
+
+ private:
+  arrayAliases_t make_aliases(array_t& /*aliases*/);
+
+ private:
+  arrayAliases_t _active;
+  arrayAliases_t _history;
+};
+
+using ovlAliasesUPtr_t = std::unique_ptr<ovlAliases>;
 
 class ovlId final : public ovlKeyValue {
  public:
@@ -536,8 +561,8 @@ class ovlDatabaseRecord final : public ovlKeyValue {
   result_t addConfiguration(ovlConfigurationUPtr_t& /*configuration*/);
   result_t removeConfiguration(ovlConfigurationUPtr_t& /*configuration*/);
 
-  //  result_t addAlias(ovlAliasUPtr_t& /*alias*/);
-  //  result_t removeAlias(ovlAliasUPtr_t& /*alias*/);
+  result_t addAlias(ovlAliasUPtr_t& /*alias*/);
+  result_t removeAlias(ovlAliasUPtr_t& /*alias*/);
 
   result_t addConfigurableEntity(ovlConfigurableEntityUPtr_t& /*entity*/);
   result_t removeConfigurableEntity(ovlConfigurableEntityUPtr_t& /*entity*/);
@@ -557,15 +582,12 @@ class ovlDatabaseRecord final : public ovlKeyValue {
   ovlChangeLogUPtr_t _changelog;
   ovlBookkeepingUPtr_t _bookkeeping;
   ovlIdUPtr_t _id;
+  ovlAliasesUPtr_t _aliases;
 };
-}
 
-std::string quoted_(std::string const& /*text*/);
-std::string quoted_(bool const& /*bool*/);
+using ovlDatabaseRecordUPtr_t = std::unique_ptr<ovlDatabaseRecord>;
 
-std::string operator"" _quoted(const char* /*text*/, std::size_t);
-std::string debrace(std::string /*s*/);
-
+}  // namespace overlay
 }  // namespace database
 }  // namespace artdaq
 

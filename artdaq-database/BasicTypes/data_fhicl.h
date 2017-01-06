@@ -15,7 +15,7 @@ namespace basictypes {
 
 struct JsonData;
 
-struct FhiclData {
+struct FhiclData final {
   FhiclData(std::string const&);
 
   FhiclData() = default;

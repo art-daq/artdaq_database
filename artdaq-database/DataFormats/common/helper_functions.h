@@ -5,13 +5,13 @@
 
 namespace artdaq {
 namespace database {
-namespace dataformats {
-
 std::string filter_jsonstring(std::string const& str);
 std::string timestamp();
 bool useFakeTime(bool);
-
-}  // namespace dataformats
+std::string quoted_(std::string const& /*text*/);
+std::string quoted_(bool const& /*bool*/);
+std::string operator"" _quoted(const char* /*text*/, std::size_t);
+std::string debrace(std::string /*s*/);
 }  // namespace database
 }  // artdaq
 

@@ -155,7 +155,7 @@ void store_configuration(Options const& options, std::string& conf) {
   auto version = JSONDocument{options.version_to_JsonData().json_buffer};
   auto configurableEntity = JSONDocument{options.configurableEntity_to_JsonData().json_buffer};
 
-  builder.addToGlobalConfig(globalConfiguration);
+  builder.addConfiguration(globalConfiguration);
   builder.setVersion(version);
   builder.setConfigurableEntity(configurableEntity);
 
