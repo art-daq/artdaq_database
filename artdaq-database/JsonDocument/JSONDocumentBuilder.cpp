@@ -22,14 +22,7 @@ namespace db = artdaq::database;
 namespace utl = db::jsonutils;
 namespace ovl = db::overlay;
 
-constexpr auto name = "\"name\"";
-constexpr auto assigned = "\"assigned\"";
-constexpr auto colon = ":";
-constexpr auto quote = "\"";
-constexpr auto comma = ",";
-
-JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& document) {
-  
+JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& document) {  
   _overlay.reset(nullptr);
   
   TRACE_(2, "createFrom() args  document=<" << document << ">");

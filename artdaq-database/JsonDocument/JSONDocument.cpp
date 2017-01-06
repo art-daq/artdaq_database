@@ -27,21 +27,37 @@ using namespace artdaq::database::jsonutils;
 
 std::string print_visitor(value_t const&);
 
-value_t const& JSONDocument::findChildValue(path_t const& path) const try {
-  TRACE_(5, "findChildValue() begin _json_buffer=<" << cached_json_buffer() << ">");
-  TRACE_(5, "findChildValue() args  path=<" << path << ">");
-
+void validate(path_t const& path, std::string const& caller) {
   assert(!path.empty());
 
   if (path.empty())
-    throw cet::exception("JSONDocument") << "Failed calling findChildValue(): Invalid path; path is empty";
+    throw cet::exception("JSONDocument") << "Failed calling " << caller << "(): Invalid path; path is empty";
+}
+
+std::vector<path_t> split_path_validate(path_t const& path, std::string const& caller) {
+  auto returnValue = std::vector<path_t>{};
+
+  assert(!caller.empty());
+
+  validate(path, caller);
 
   auto path_tokens = split_path(path);
 
   if (path_tokens.empty())
-    throw cet::exception("JSONDocument") << "Failed calling findChildValue(): Invalid path; path=" << path;
+    throw cet::exception("JSONDocument") << "Failed calling " << caller << "(): Invalid path; path=" << path;
 
   std::reverse(path_tokens.begin(), path_tokens.end());
+
+  std::swap(path_tokens, returnValue);
+
+  return returnValue;
+}
+
+value_t const& JSONDocument::findChildValue(path_t const& path) const try {
+  TRACE_(5, "findChildValue() begin json_buffer=<" << cached_json_buffer() << ">");
+  TRACE_(5, "findChildValue() args  path=<" << path << ">");
+
+  auto path_tokens = split_path_validate(path, "findChildValue");
 
   auto tmpJson = std::string{};
 
@@ -49,9 +65,11 @@ value_t const& JSONDocument::findChildValue(path_t const& path) const try {
                                                                            std::size_t currentDepth) {
     TRACE_(5, "findChildValue() recurse() args currentDepth=" << currentDepth);
 
+    auto const& path_token = path_tokens.at(currentDepth);
+
     if (type(childValue) != type_t::OBJECT) {
       throw notfound_exception("JSONDocument")
-          << "Failed calling findChildValue(): Search failed for JSON element name=" << path_tokens.at(currentDepth)
+          << "Failed calling findChildValue(): Search failed for JSON element name=" << path_token
           << ", findChildValue() recurse() value_t is not object_t; value=" << print_visitor(childValue);
     }
 
@@ -62,13 +80,13 @@ value_t const& JSONDocument::findChildValue(path_t const& path) const try {
     TRACE_(5, "findChildValue() recurse() args currentView=<" << (JsonWriter().write(childDocument, tmpJson), tmpJson)
                                                               << ">");
 
-    if (childDocument.count(path_tokens.at(currentDepth)) == 0) {
+    if (childDocument.count(path_token) == 0) {
       throw notfound_exception("JSONDocument")
-          << "Failed calling findChildValue(): Search failed for JSON element name=" << path_tokens.at(currentDepth)
-          << ", search path =<" << path << ">.";
+          << "Failed calling findChildValue(): Search failed for JSON element name=" << path_token << ", search path =<"
+          << path << ">.";
     }
 
-    auto const& matchedValue = childDocument.at(path_tokens.at(currentDepth));
+    auto const& matchedValue = childDocument.at(path_token);
 
     if (currentDepth == 0) return matchedValue;
 
@@ -94,10 +112,10 @@ value_t& JSONDocument::findChildValue(path_t const& path) try {
 
 // returns found child
 JSONDocument JSONDocument::findChild(path_t const& path) const try {
-  TRACE_(6, "findChild() begin _json_buffer=<" << cached_json_buffer() << ">");
+  TRACE_(6, "findChild() begin json_buffer=<" << cached_json_buffer() << ">");
   TRACE_(6, "findChild() args  path=<" << path << ">");
 
-  assert(!path.empty());
+  validate(path, "findChild");
 
   auto found_value = findChildValue(path);
 
@@ -119,21 +137,11 @@ JSONDocument JSONDocument::findChild(path_t const& path) const try {
 
 // returns old child
 JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t const& path) try {
-  TRACE_(4, "replaceChild() begin _json_buffer=<" << cached_json_buffer() << ">");
+  TRACE_(4, "replaceChild() begin json_buffer=<" << cached_json_buffer() << ">");
   TRACE_(4, "replaceChild() args  newChild=<" << newChild.cached_json_buffer() << ">");
   TRACE_(4, "replaceChild() args  path=<" << path << ">");
 
-  assert(!path.empty());
-
-  if (path.empty())
-    throw cet::exception("JSONDocument") << "Failed calling replaceChild(): Invalid path; path is empty";
-
-  auto path_tokens = split_path(path);
-
-  if (path_tokens.empty())
-    throw cet::exception("JSONDocument") << "Failed calling replaceChild(): Invalid path; path=" << path;
-
-  std::reverse(path_tokens.begin(), path_tokens.end());
+  auto path_tokens = split_path_validate(path, "replaceChild");
 
   auto newValue = newChild.getPayloadValueForKey(path_tokens.at(0));
 
@@ -143,10 +151,11 @@ JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t con
 
   std::function<value_t(value_t&, std::size_t)> recurse = [&](value_t& childValue, std::size_t currentDepth) {
     TRACE_(4, "replaceChild() recurse() args currentDepth=" << currentDepth);
+    auto const& path_token = path_tokens.at(currentDepth);
 
     if (currentDepth == 0 && type(childValue) != type_t::OBJECT) {
       throw notfound_exception("JSONDocument")
-          << "Failed calling replaceChild(): Replace failed for" << path_tokens.at(currentDepth)
+          << "Failed calling replaceChild(): Replace failed for" << path_token
           << ", replaceChild() recurse() value_t is not object_t; value=" << print_visitor(childValue);
     }
 
@@ -156,12 +165,12 @@ JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t con
     TRACE_(4, "replaceChild() recurse() args childValue=<" << (JsonWriter().write(childDocument, tmpJson), tmpJson)
                                                            << ">");
 
-    if (childDocument.count(path_tokens.at(currentDepth)) == 0) {
-      throw notfound_exception("JSONDocument") << "Failed calling replaceChild(): Replace failed for "
-                                               << path_tokens.at(currentDepth) << ", search path =<" << path << ">.";
+    if (childDocument.count(path_token) == 0) {
+      throw notfound_exception("JSONDocument") << "Failed calling replaceChild(): Replace failed for " << path_token
+                                               << ", search path =<" << path << ">.";
     }
 
-    auto& matchedValue = childDocument.at(path_tokens.at(currentDepth));
+    auto& matchedValue = childDocument.at(path_token);
 
     if (currentDepth == 0) {
       matchedValue.swap(newValue);
@@ -186,20 +195,11 @@ JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t con
 
 // returns inserted child
 JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t const& path) try {
-  TRACE_(2, "insertChild() begin _json_buffer=<" << cached_json_buffer() << ">");
+  TRACE_(2, "insertChild() begin json_buffer=<" << cached_json_buffer() << ">");
   TRACE_(2, "insertChild() args  newChild=<" << newChild.cached_json_buffer() << ">");
   TRACE_(2, "insertChild() args  path=<" << path << ">");
 
-  assert(!path.empty());
-
-  if (path.empty()) throw cet::exception("JSONDocument") << "Failed calling insertChild(): Invalid path; path is empty";
-
-  auto path_tokens = split_path(path);
-
-  if (path_tokens.empty())
-    throw cet::exception("JSONDocument") << "Failed calling insertChild(): Invalid path; path=" << path;
-
-  std::reverse(path_tokens.begin(), path_tokens.end());
+  auto path_tokens = split_path_validate(path, "insertChild");
 
   auto const& newValue = newChild.getPayloadValueForKey(path_tokens.at(0));
 
@@ -210,9 +210,11 @@ JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t cons
   std::function<value_t(value_t&, std::size_t)> recurse = [&](value_t& childValue, std::size_t currentDepth) {
     TRACE_(2, "insertChild() recurse() args currentDepth=" << currentDepth);
 
+    auto const& path_token = path_tokens.at(currentDepth);
+
     if (currentDepth == 0 && type(childValue) != type_t::OBJECT) {
       throw notfound_exception("JSONDocument")
-          << "Failed calling insertChild(): Insert failed for" << path_tokens.at(currentDepth)
+          << "Failed calling insertChild(): Insert failed for" << path_token
           << ", insertChild() recurse() value_t is not object_t; value=" << print_visitor(childValue);
     }
 
@@ -222,22 +224,21 @@ JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t cons
     TRACE_(2, "insertChild() recurse() args childValue=<" << (JsonWriter().write(childDocument, tmpJson), tmpJson)
                                                           << ">");
 
-    auto numberOfChildren = childDocument.count(path_tokens.at(currentDepth));
+    auto numberOfChildren = childDocument.count(path_token);
 
     if (currentDepth == 0 && numberOfChildren != 0) {
-      throw notfound_exception("JSONDocument") << "Failed calling insertChild(): Insert failed for"
-                                               << path_tokens.at(currentDepth) << ", search path =<" << path
-                                               << ">; Child exists, call replace instead";
+      throw notfound_exception("JSONDocument") << "Failed calling insertChild(): Insert failed for" << path_token
+                                               << ", search path =<" << path << ">; Child exists, call replace instead";
 
     } else if (currentDepth != 0 && numberOfChildren == 0) {
-      throw notfound_exception("JSONDocument") << "Failed calling insertChild(): Insert failed for"
-                                               << path_tokens.at(currentDepth) << ", search path =<" << path << ">.";
+      throw notfound_exception("JSONDocument") << "Failed calling insertChild(): Insert failed for" << path_token
+                                               << ", search path =<" << path << ">.";
     } else if (currentDepth == 0 && numberOfChildren == 0) {
-      auto const& returnValue = childDocument[path_tokens.at(currentDepth)] = newValue;
+      auto const& returnValue = childDocument[path_token] = newValue;
       return returnValue;
     }
 
-    auto& matchedValue = childDocument.at(path_tokens.at(currentDepth));
+    auto& matchedValue = childDocument.at(path_token);
 
     return recurse(matchedValue, currentDepth - 1);
   };
@@ -257,28 +258,20 @@ JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t cons
 
 // returns old child
 JSONDocument JSONDocument::deleteChild(path_t const& path) try {
-  TRACE_(3, "deleteChild() begin _json_buffer=<" << cached_json_buffer() << ">");
+  TRACE_(3, "deleteChild() begin json_buffer=<" << cached_json_buffer() << ">");
   TRACE_(3, "deleteChild() args  path=<" << path << ">");
 
-  assert(!path.empty());
-
-  if (path.empty()) throw cet::exception("JSONDocument") << "Failed calling deleteChild(): Invalid path; path is empty";
-
-  auto path_tokens = split_path(path);
-
-  if (path_tokens.empty())
-    throw cet::exception("JSONDocument") << "Failed calling deleteChild(): Invalid path; path=" << path;
-
-  std::reverse(path_tokens.begin(), path_tokens.end());
+  auto path_tokens = split_path_validate(path, "deleteChild");
 
   auto tmpJson = std::string{};
 
   std::function<value_t(value_t&, std::size_t)> recurse = [&](value_t& childValue, std::size_t currentDepth) {
     TRACE_(3, "deleteChild() recurse() args currentDepth=" << currentDepth);
 
+    auto const& path_token = path_tokens.at(currentDepth);
+
     if (currentDepth == 0 && type(childValue) != type_t::OBJECT) {
-      throw notfound_exception("JSONDocument") << "Failed calling deleteChild(): Delete failed for "
-                                               << path_tokens.at(currentDepth)
+      throw notfound_exception("JSONDocument") << "Failed calling deleteChild(): Delete failed for " << path_token
                                                << ", deleteChild() recurse() value_t is not object_t;  "
                                                   "value="
                                                << print_visitor(childValue);
@@ -290,15 +283,15 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) try {
     TRACE_(3, "deleteChild() recurse() args childValue=<" << (JsonWriter().write(childDocument, tmpJson), tmpJson)
                                                           << ">");
 
-    if (childDocument.count(path_tokens.at(currentDepth)) == 0) {
-      throw notfound_exception("JSONDocument") << "Failed calling deleteChild(): Delete failed for "
-                                               << path_tokens.at(currentDepth) << ", search path =<" << path << ">.";
+    if (childDocument.count(path_token) == 0) {
+      throw notfound_exception("JSONDocument") << "Failed calling deleteChild(): Delete failed for " << path_token
+                                               << ", search path =<" << path << ">.";
     }
 
-    auto& matchedValue = childDocument.at(path_tokens.at(currentDepth));
+    auto& matchedValue = childDocument.at(path_token);
 
     if (currentDepth == 0) {
-      return childDocument.delete_at(path_tokens.at(currentDepth));
+      return childDocument.delete_at(path_token);
     }
 
     return recurse(matchedValue, currentDepth - 1);
@@ -320,12 +313,10 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) try {
 
 // returns added child
 JSONDocument JSONDocument::appendChild(JSONDocument const& newChild, path_t const& path) try {
-  TRACE_(7, "appendChild() begin _json_buffer=<" << cached_json_buffer() << ">");
+  TRACE_(7, "appendChild() begin json_buffer=<" << cached_json_buffer() << ">");
   TRACE_(7, "appendChild() args  path=<" << path << ">");
 
-  assert(!path.empty());
-
-  if (path.empty()) throw cet::exception("JSONDocument") << "Failed calling appendChild(): Invalid path; path is empty";
+  validate(path, "appendChild");
 
   auto const& newValue = newChild._value;
 
@@ -355,12 +346,10 @@ JSONDocument JSONDocument::appendChild(JSONDocument const& newChild, path_t cons
 bool matches(value_t const&, value_t const&);
 // returns removed child
 JSONDocument JSONDocument::removeChild(JSONDocument const& delChild, path_t const& path) try {
-  TRACE_(7, "removeChild() begin _json_buffer=<" << cached_json_buffer() << ">");
+  TRACE_(7, "removeChild() begin json_buffer=<" << cached_json_buffer() << ">");
   TRACE_(7, "removeChild() args  path=<" << path << ">");
 
-  assert(!path.empty());
-
-  if (path.empty()) throw cet::exception("JSONDocument") << "Failed calling removeChild(): Invalid path; path is empty";
+  validate(path, "removeChild");
 
   auto const& delValue = delChild._value;
 

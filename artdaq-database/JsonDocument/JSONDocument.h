@@ -84,6 +84,7 @@ class JSONDocument final {
  private:
   value_t readJson(std::string const&);
   std::string writeJson() const;
+  
   std::string const& cached_json_buffer() const;
   value_t const& getPayloadValueForKey(object_t::key_type const& key) const;
   value_t& findChildValue(path_t const&);
