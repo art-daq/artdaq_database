@@ -3,7 +3,6 @@
 
 #include "artdaq-database/DataFormats/Json/json_types.h"
 #include "artdaq-database/DataFormats/common.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
 
 #include <boost/spirit/include/qi.hpp>
 

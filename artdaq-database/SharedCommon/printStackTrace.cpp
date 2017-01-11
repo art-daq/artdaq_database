@@ -13,18 +13,24 @@
 #include <string>
 #include <typeinfo>
 
-#include "artdaq-database/BuildInfo/printStackTrace.h"
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
+#include "artdaq-database/SharedCommon/common.h"
+#include "artdaq-database/SharedCommon/printStackTrace.h"
+#include "artdaq-database/SharedCommon/process_exit_codes.h"
 
 #include <boost/exception/diagnostic_information.hpp>
-
-#include <trace.h>
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
 #endif
 
 #define TRACE_NAME "StackTrace_C"
+
+namespace debug {
+namespace stack {
+void* last_frames[1024];
+size_t last_size;
+}
+}
 
 extern "C" {
 void __cxa_throw(void* ex, void* info, void (*dest)(void*)) {

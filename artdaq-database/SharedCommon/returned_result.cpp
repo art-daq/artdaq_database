@@ -1,4 +1,4 @@
-#include "artdaq-database/DataFormats/common/shared_result.h"
+#include "artdaq-database/SharedCommon/returned_result.h"
 
 using namespace artdaq::database;
 namespace db = artdaq::database;

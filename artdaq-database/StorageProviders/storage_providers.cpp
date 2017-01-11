@@ -26,17 +26,6 @@ std::string db::expand_environment_variables(std::string var) {
   return oss.str();
 }
 
-db::object_id_t db::generate_oid() {
-  std::ifstream is("/proc/sys/kernel/random/uuid");
-
-  std::string oid((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-
-  oid.erase(std::remove(oid.begin(), oid.end(), '-'), oid.end());
-  oid.resize(24);
-
-  return oid;
-}
-
 db::object_id_t db::extract_oid(std::string const& filter) {
   auto ex = std::regex("^\\{[^:]+:\\s+([\\s\\S]+)\\}$");
 

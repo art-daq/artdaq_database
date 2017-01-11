@@ -3,7 +3,6 @@
 
 #include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
 #include "artdaq-database/DataFormats/common.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
 
 namespace artdaq {
 namespace database {

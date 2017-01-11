@@ -1,14 +1,13 @@
-#ifndef _ARTDAQ_DATABASE_JSONUTILS_JSONDOCUMENTBUILDER_H_
-#define _ARTDAQ_DATABASE_JSONUTILS_JSONDOCUMENTBUILDER_H_
+#ifndef _ARTDAQ_DATABASE_DOCRECORD_JSONDOCUMENTBUILDER_H_
+#define _ARTDAQ_DATABASE_DOCRECORD_JSONDOCUMENTBUILDER_H_
 
 #include "artdaq-database/JsonDocument/JSONDocument.h"
-#include "artdaq-database/JsonDocument/JSONDocument_template.h"
 #include "artdaq-database/JsonDocument/common.h"
 #include "artdaq-database/Overlay/JSONDocumentOverlay.h"
 
 namespace artdaq {
 namespace database {
-namespace jsonutils {
+namespace docrecord {
 
 using artdaq::database::json::object_t;
 using artdaq::database::json::value_t;
@@ -43,14 +42,20 @@ class JSONDocumentBuilder final {
 
   JSONDocument& extract() { return _document; }
 
+  result_t comapreUsingOverlays(JSONDocumentBuilder const&) const;
+
+  result_t operator==(JSONDocumentBuilder const& other) const { return comapreUsingOverlays(other); };
+
   // defaults
   ~JSONDocumentBuilder() = default;
-  JSONDocumentBuilder(JSONDocumentBuilder&&) = default;
 
   // deleted
   JSONDocumentBuilder(JSONDocumentBuilder const&) = delete;
   JSONDocumentBuilder& operator=(JSONDocumentBuilder const&) = delete;
   JSONDocumentBuilder& operator=(JSONDocumentBuilder&&) = delete;
+  JSONDocumentBuilder(JSONDocumentBuilder&&) = delete;
+
+  std::string to_string() const;
 
  private:
   template <typename OVL>
@@ -59,8 +64,11 @@ class JSONDocumentBuilder final {
   JSONDocumentBuilder& self() { return *this; }
   JSONDocumentBuilder const& self() const { return *this; }
 
+  void _importUserData(JSONDocument const& document);
+
   result_t SaveUndo();
   result_t CallUndo() noexcept;
+
  private:
   JSONDocument _document;
   ovlDatabaseRecordUPtr_t _overlay;
@@ -87,7 +95,10 @@ JSONDocument toJSONDocument(T const& t);
 namespace debug {
 void enableJSONDocumentBuilder();
 }
-}  // namespace jsonutils
+
+std::ostream& operator<<(std::ostream&, JSONDocumentBuilder const&);
+
+}  // namespace jsonrecord
 }  // namespace database
 }  // namespace artdaq
-#endif /* _ARTDAQ_DATABASE_JSONUTILS_JSONDOCUMENTBUILDER_H_ */
+#endif /* _ARTDAQ_DATABASE_DOCRECORD_JSONDOCUMENTBUILDER_H_ */

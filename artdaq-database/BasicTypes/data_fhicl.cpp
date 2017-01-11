@@ -9,7 +9,7 @@
 
 #include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
 
-#include "artdaq-database/DataFormats/common/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 
 #include "artdaq-database/BasicTypes/base64.h"
 

@@ -1,9 +1,7 @@
 #include "artdaq-database/DataFormats/common.h"
 
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/DataFormats/Xml/convertxml2json.h"
 #include "artdaq-database/DataFormats/Xml/xml_writer.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>

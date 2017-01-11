@@ -5,7 +5,8 @@ using artdaq::database::json::value_t;
 using artdaq::database::json::array_t;
 using artdaq::database::json::type_t;
 
-namespace literal = artdaq::database::dataformats::literal;
+namespace jsonliteral = artdaq::database::dataformats::literal;
+
 namespace ovl = artdaq::database::overlay;
 
 using namespace artdaq::database;
@@ -21,6 +22,7 @@ ovlKeyValue::ovlKeyValue(object_t::key_type const& key, value_t& value) : _key(k
 std::string ovlKeyValue::to_string() const noexcept {
   auto retValue = std::string{};
   auto tmpAST = object_t{};
+
   tmpAST[_key] = _value;
 
   using artdaq::database::json::JsonWriter;
@@ -45,9 +47,9 @@ value_t& ovlKeyValue::value() { return _value; }
 
 value_t const& ovlKeyValue::value() const { return _value; }
 
-std::string& ovlKeyValue::stringValue() { return objectStringValue(); }
+std::string& ovlKeyValue::string_value() { return objectStringValue(); }
 
-std::string const& ovlKeyValue::stringValue() const { return objectStringValue(); }
+std::string const& ovlKeyValue::string_value() const { return objectStringValue(); }
 
 value_t& ovlKeyValue::objectValue(object_t::key_type const& key) { return unwrap(_value).value<object_t>(key); }
 
@@ -58,18 +60,19 @@ object_t& ovlKeyValue::objectValue() { return unwrap(_value).value_as<object_t>(
 std::string& ovlKeyValue::objectStringValue() { return unwrap(_value).value_as<std::string>(); }
 
 ovlKeyValue const& ovlKeyValue::self() const { return *this; }
+
 ovlKeyValue& ovlKeyValue::self() { return *this; }
 
 std::string const& ovlKeyValue::objectStringValue() const { return unwrap(_value).value_as<std::string>(); }
 
 ovlValueTimeStamp::ovlValueTimeStamp(object_t::key_type const& key, value_t& ts) : ovlKeyValue(key, ts) {}
 
-std::string& ovlValueTimeStamp::timestamp() { return stringValue(); }
+std::string& ovlValueTimeStamp::timestamp() { return string_value(); }
 
-std::string const& ovlValueTimeStamp::timestamp() const { return stringValue(); }
+std::string const& ovlValueTimeStamp::timestamp() const { return string_value(); }
 
 std::string& ovlValueTimeStamp::timestamp(std::string const& ts) {
-  assert(ts.empty());
+  confirm(!ts.empty());
   timestamp() = ts;
 
   return timestamp();
@@ -88,36 +91,42 @@ ovlMetadata::ovlMetadata(object_t::key_type const& key, value_t& metadata) : ovl
 
 ovlDocument::ovlDocument(object_t::key_type const& key, value_t& document)
     : ovlKeyValue(key, document),
-      _data{overlay<ovlData>(document, literal::data_node)},
-      _metadata{overlay<ovlMetadata>(document, literal::metadata_node)} {}
+      _data{overlay<ovlData>(document, jsonliteral::data_node)},
+      _metadata{overlay<ovlMetadata>(document, jsonliteral::metadata_node)} {}
 
 ovlData& ovlDocument::data() { return *_data; }
 
+ovlData const& ovlDocument::data() const { return *_data; }
+
 void ovlDocument::swap(ovlDataUPtr_t& data) {
-  assert(!data);
+  confirm(data);
+
   std::swap(_data, data);
 }
 
 ovlMetadata& ovlDocument::metadata() { return *_metadata; }
 
+ovlMetadata const& ovlDocument::metadata() const { return *_metadata; }
+
 void ovlDocument::swap(ovlMetadataUPtr_t& metadata) {
-  assert(!metadata);
+  confirm(metadata);
+
   std::swap(_metadata, metadata);
 }
 
 void ovlDocument::make_empty() {
   value_t tmp1 = object_t{};
-  auto data = overlay<ovlData>(tmp1, literal::data_node);
+  auto data = overlay<ovlData>(tmp1, jsonliteral::data_node);
   std::swap(_data, data);
 
   value_t tmp2 = object_t{};
-  auto metadata = overlay<ovlMetadata>(tmp2, literal::metadata_node);
+  auto metadata = overlay<ovlMetadata>(tmp2, jsonliteral::metadata_node);
   std::swap(_metadata, metadata);
 }
 
 std::string ovlDocument::to_string() const noexcept {
   std::ostringstream oss;
-  oss << quoted_(literal::document_node) << ":{\n";
+  oss << quoted_(jsonliteral::document_node) << ":{\n";
   oss << _data->to_string() << ",\n";
   oss << _metadata->to_string() << "}";
 
@@ -126,18 +135,18 @@ std::string ovlDocument::to_string() const noexcept {
 
 ovlComment::ovlComment(object_t::key_type const& key, value_t& comment) : ovlKeyValue(key, comment) {}
 
-int& ovlComment::linenum() { return value_as<int>(literal::linenum); }
+int& ovlComment::linenum() { return value_as<int>(jsonliteral::linenum); }
 
-std::string& ovlComment::text() { return value_as<std::string>(literal::value); }
+std::string& ovlComment::text() { return value_as<std::string>(jsonliteral::value); }
 
-int const& ovlComment::linenum() const { return value_as<int>(literal::linenum); }
+int const& ovlComment::linenum() const { return value_as<int>(jsonliteral::linenum); }
 
-std::string const& ovlComment::text() const { return value_as<std::string>(literal::value); }
+std::string const& ovlComment::text() const { return value_as<std::string>(jsonliteral::value); }
 
 std::string ovlComment::to_string() const noexcept {
   std::ostringstream oss;
-  oss << "{" << quoted_(literal::linenum) << ":" << linenum() << ",";
-  oss << quoted_(literal::value) << ":" << quoted_(text()) << "}";
+  oss << "{" << quoted_(jsonliteral::linenum) << ":" << linenum() << ",";
+  oss << quoted_(jsonliteral::value) << ":" << quoted_(text()) << "}";
 
   return oss.str();
 }
@@ -149,7 +158,7 @@ void ovlComments::wipe() { _comments = ovlComments::arrayComments_t{}; }
 
 std::string ovlComments::to_string() const noexcept {
   std::ostringstream oss;
-  oss << "{" << quoted_(literal::comments_node) << ": [";
+  oss << "{" << quoted_(jsonliteral::comments_node) << ": [";
 
   for (auto const& comment : _comments) oss << "\n" << comment.to_string() << ",";
 
@@ -163,66 +172,117 @@ std::string ovlComments::to_string() const noexcept {
 ovlComments::arrayComments_t ovlComments::make_comments(array_t& comments) {
   auto returnValue = ovlComments::arrayComments_t{};
 
-  for (auto& comment : comments) returnValue.push_back({literal::comment, comment});
+  for (auto& comment : comments) returnValue.push_back({jsonliteral::comment, comment});
 
   return returnValue;
 }
 
 ovlOrigin::ovlOrigin(object_t::key_type const& key, value_t& origin)
-    : ovlKeyValue(key, origin), _timestamp(map_timestamp(origin)) {}
+    : ovlKeyValue(key, origin), _initOK(init(origin)), _timestamp(map_timestamp(origin)) {}
 
-std::string& ovlOrigin::format() { return value_as<std::string>(literal::format); }
+std::string& ovlOrigin::format() { return value_as<std::string>(jsonliteral::format); }
 
-std::string const& ovlOrigin::format() const { return value_as<std::string>(literal::format); }
+std::string const& ovlOrigin::format() const { return value_as<std::string>(jsonliteral::format); }
 
-std::string& ovlOrigin::source() { return value_as<std::string>(literal::source); }
+std::string& ovlOrigin::source() { return value_as<std::string>(jsonliteral::source); }
 
-std::string const& ovlOrigin::source() const { return value_as<std::string>(literal::source); }
+std::string const& ovlOrigin::source() const { return value_as<std::string>(jsonliteral::source); }
 
 std::string ovlOrigin::to_string() const noexcept {
   std::ostringstream oss;
-  oss << "{" << quoted_(literal::origin_node) << ":{\n";
-  oss << quoted_(literal::format) << ":" << quoted_(format()) << ",\n";
-  oss << quoted_(literal::source) << ":" << quoted_(source()) << ",\n";
+  oss << "{" << quoted_(jsonliteral::origin_node) << ":{\n";
+  oss << quoted_(jsonliteral::format) << ":" << quoted_(format()) << ",\n";
+  oss << quoted_(jsonliteral::source) << ":" << quoted_(source()) << ",\n";
   oss << debrace(_timestamp.to_string()) << "\n";
   oss << "}}";
 
   return oss.str();
 }
 
-ovlValueTimeStamp ovlOrigin::map_timestamp(value_t& value) {
-  assert(type(value) == type_t::OBJECT);
-  auto& obj = object_value();
-  assert(obj.count(literal::timestamp) == 1);
+bool ovlOrigin::init(value_t& parent) try {
+  confirm(type(parent) == type_t::OBJECT);
 
-  return ovlValueTimeStamp(literal::timestamp, obj.at(literal::timestamp));
+  auto& obj = object_value();
+
+  if (obj.count(jsonliteral::source) == 0) obj[jsonliteral::source] = std::string{"template"};
+
+  if (obj.count(jsonliteral::format) == 0) obj[jsonliteral::format] = std::string{"json"};
+
+  return true;
+} catch (...) {
+  confirm(false);
+  throw;
 }
 
-ovlVersion::ovlVersion(object_t::key_type const& key, value_t& version) : ovlKeyValue(key, version) {}
+ovlValueTimeStamp ovlOrigin::map_timestamp(value_t& parent) {
+  confirm(type(parent) == type_t::OBJECT);
+
+  auto& obj = object_value();
+
+  if (obj.count(jsonliteral::timestamp) == 0) obj[jsonliteral::timestamp] = timestamp();
+
+  confirm(obj.count(jsonliteral::timestamp) == 1);
+
+  return ovlValueTimeStamp(jsonliteral::timestamp, obj.at(jsonliteral::timestamp));
+}
+
+ovlVersion::ovlVersion(object_t::key_type const& key, value_t& version)
+    : ovlKeyValue(key, version), _initOK(init(version)) {}
+
+bool ovlVersion::init(value_t& parent) try {
+  confirm(type(parent) == type_t::VALUE);
+
+  auto& version = string_value();
+
+  if (version.empty()) version = std::string{jsonliteral::notprovided};
+
+  return true;
+} catch (...) {
+  confirm(false);
+  throw;
+}
 
 ovlConfigurableEntity::ovlConfigurableEntity(object_t::key_type const& key, value_t& entity)
-    : ovlKeyValue(key, entity) {}
+    : ovlKeyValue(key, entity), _initOK(init(entity)) {}
+
+bool ovlConfigurableEntity::init(value_t& parent) try {
+  confirm(type(parent) == type_t::OBJECT);
+
+  auto& obj = object_value();
+
+  if (obj.count(jsonliteral::name) == 0) obj[jsonliteral::name] = std::string{jsonliteral::notprovided};
+
+  confirm(obj.count(jsonliteral::name) == 1);
+
+  return true;
+} catch (...) {
+  confirm(false);
+  throw;
+}
 
 ovlConfiguration::ovlConfiguration(object_t::key_type const& key, value_t& configuration)
     : ovlKeyValue(key, configuration), _timestamp(map_timestamp(configuration)) {}
 
-std::string& ovlConfiguration::name() { return value_as<std::string>(literal::name); }
+std::string& ovlConfiguration::name() { return value_as<std::string>(jsonliteral::name); }
 
-std::string const& ovlConfiguration::name() const { return value_as<std::string>(literal::name); }
+std::string const& ovlConfiguration::name() const { return value_as<std::string>(jsonliteral::name); }
 
 std::string& ovlConfiguration::name(std::string const& name) {
-  assert(!name.empty());
+  confirm(!name.empty());
 
   value() = name;
-  return stringValue();
+
+  return string_value();
 }
 
 std::string& ovlConfiguration::timestamp() { return _timestamp.timestamp(); }
 
+std::string const& ovlConfiguration::timestamp() const { return _timestamp.timestamp(); }
+
 std::string ovlConfiguration::to_string() const noexcept {
   std::ostringstream oss;
   oss << "{";
-  oss << quoted_(literal::name) << ":" << quoted_(name()) << ",";
+  oss << quoted_(jsonliteral::name) << ":" << quoted_(name()) << ",";
   oss << debrace(_timestamp.to_string());
   oss << "}";
 
@@ -230,50 +290,83 @@ std::string ovlConfiguration::to_string() const noexcept {
 }
 
 ovlValueTimeStamp ovlConfiguration::map_timestamp(value_t& value) {
-  assert(type(value) == type_t::OBJECT);
-  auto& obj = object_value();
-  assert(obj.count(literal::assigned) == 1);
+  confirm(type(value) == type_t::OBJECT);
 
-  return ovlValueTimeStamp(literal::assigned, obj.at(literal::assigned));
+  auto& obj = object_value();
+  confirm(obj.count(jsonliteral::assigned) == 1);
+
+  return ovlValueTimeStamp(jsonliteral::assigned, obj.at(jsonliteral::assigned));
 }
 
 ovlAlias::ovlAlias(object_t::key_type const& key, value_t& alias)
-    : ovlKeyValue(key, alias), _timestamp(map_timestamp(alias)) {}
+    : ovlKeyValue(key, alias), _initOK(init(alias)), _assigned(map_assigned(alias)) {}
 
-std::string& ovlAlias::name() { return value_as<std::string>(literal::name); }
+bool ovlAlias::init(value_t& parent) try {
+  confirm(type(parent) == type_t::OBJECT);
 
-std::string const& ovlAlias::name() const { return value_as<std::string>(literal::name); }
+  auto& obj = object_value();
+
+  if (obj.count(jsonliteral::assigned) == 0) obj[jsonliteral::assigned] = timestamp();
+
+  confirm(obj.count(jsonliteral::assigned) == 1);
+  confirm(obj.count(jsonliteral::name) == 1);
+
+  return true;
+} catch (...) {
+  confirm(false);
+  throw;
+}
+std::string& ovlAlias::name() { return value_as<std::string>(jsonliteral::name); }
+
+std::string const& ovlAlias::name() const { return value_as<std::string>(jsonliteral::name); }
 
 std::string& ovlAlias::name(std::string const& name) {
-  assert(!name.empty());
+  confirm(!name.empty());
 
   value() = name;
-  return stringValue();
+
+  return string_value();
 }
 
-std::string& ovlAlias::timestamp() { return _timestamp.timestamp(); }
+std::string& ovlAlias::assigned() { return _assigned.timestamp(); }
 
 std::string ovlAlias::to_string() const noexcept {
   std::ostringstream oss;
   oss << "{";
-  oss << quoted_(literal::name) << ":" << quoted_(name()) << ",";
-  oss << debrace(_timestamp.to_string());
+  oss << quoted_(jsonliteral::name) << ":" << quoted_(name()) << ",";
+  oss << debrace(_assigned.to_string());
   oss << "}";
 
   return oss.str();
 }
 
-ovlValueTimeStamp ovlAlias::map_timestamp(value_t& value) {
-  assert(type(value) == type_t::OBJECT);
+ovlValueTimeStamp ovlAlias::map_assigned(value_t& value) {
+  confirm(type(value) == type_t::OBJECT);
   auto& obj = object_value();
-  assert(obj.count(literal::assigned) == 1);
+  confirm(obj.count(jsonliteral::assigned) == 1);
 
-  return ovlValueTimeStamp(literal::assigned, obj.at(literal::assigned));
+  return ovlValueTimeStamp(jsonliteral::assigned, obj.at(jsonliteral::assigned));
 }
 
-ovlChangeLog::ovlChangeLog(object_t::key_type const& key, value_t& changelog) : ovlKeyValue(key, changelog) {}
+ovlChangeLog::ovlChangeLog(object_t::key_type const& key, value_t& changelog)
+    : ovlKeyValue(key, changelog), _initOK(init(changelog)) {}
 
-std::string& ovlChangeLog::value() { return value_as<std::string>(literal::changelog); }
+bool ovlChangeLog::init(value_t& parent) try {
+  confirm(type(parent) == type_t::VALUE);
+
+  auto& changelog = string_value();
+
+  if (changelog.empty()) changelog = std::string{jsonliteral::empty};
+
+  return true;
+} catch (...) {
+  confirm(false);
+  throw;
+}
+
+std::string& ovlChangeLog::value() { return value_as<std::string>(jsonliteral::changelog); }
+
+std::string const& ovlChangeLog::value() const { return value_as<std::string>(jsonliteral::changelog); }
 
 std::string& ovlChangeLog::value(std::string const& changelog) {
   value() = changelog;
@@ -292,7 +385,7 @@ ovlConfigurations::ovlConfigurations(object_t::key_type const& key, value_t& con
 
 std::string ovlConfigurations::to_string() const noexcept {
   std::ostringstream oss;
-  oss << "{" << quoted_(literal::configurations_node) << ": [";
+  oss << "{" << quoted_(jsonliteral::configurations_node) << ": [";
 
   for (auto const& configuration : _configurations) oss << "\n" << configuration.to_string() << ",";
 
@@ -308,72 +401,116 @@ void ovlConfigurations::wipe() { _configurations = ovlConfigurations::arrayConfi
 ovlConfigurations::arrayConfigurations_t ovlConfigurations::make_configurations(array_t& configurations) {
   auto returnValue = ovlConfigurations::arrayConfigurations_t{};
 
-  for (auto& configuration : configurations) returnValue.push_back({literal::configuration, configuration});
+  for (auto& configuration : configurations) returnValue.push_back({jsonliteral::configuration, configuration});
 
   return returnValue;
 }
 
-ovlId::ovlId(object_t::key_type const& key, value_t& oid) : ovlKeyValue(key, oid) {}
+ovlId::ovlId(object_t::key_type const& key, value_t& oid) : ovlKeyValue(key, oid), _initOK(init(oid)) {}
 
-std::string& ovlId::oid() { return value_as<std::string>(literal::oid); }
+bool ovlId::init(value_t& parent) try {
+  confirm(type(parent) == type_t::OBJECT);
+
+  auto& obj = object_value();
+
+  if (obj.count(jsonliteral::oid) == 0) obj[jsonliteral::oid] = generate_oid();
+
+  confirm(obj.count(jsonliteral::oid) == 1);
+
+  return true;
+} catch (...) {
+  confirm(false);
+  throw;
+}
+
+std::string& ovlId::oid() { return value_as<std::string>(jsonliteral::oid); }
 
 std::string& ovlId::oid(std::string const& id) {
-  assert(id.empty());
+  confirm(id.empty());
+
   oid() = id;
   return oid();
 }
 
 ovlUpdate::ovlUpdate(object_t::key_type const& key, value_t& update)
-    : ovlKeyValue(key, update), _operation(map_operation(update)) {}
+    : ovlKeyValue(key, update), _timestamp(map_timestamp(update)), _what(map_what(update)) {}
 
-std::string& ovlUpdate::opration() { return _operation.key(); }
+std::string& ovlUpdate::name() { return value_as<std::string>(jsonliteral::event); }
 
-std::string& ovlUpdate::timestamp() { return _operation.timestamp(); }
+std::string const& ovlUpdate::name() const { return value_as<std::string>(jsonliteral::event); }
+
+std::string& ovlUpdate::timestamp() { return _timestamp.timestamp(); }
+
+std::string const& ovlUpdate::timestamp() const { return _timestamp.timestamp(); }
+
+ovlKeyValue& ovlUpdate::what() { return _what; }
+
+ovlKeyValue const& ovlUpdate::what() const { return _what; }
 
 std::string ovlUpdate::to_string() const noexcept {
   std::ostringstream oss;
-  oss << _operation.to_string();
+
+  oss << "{";
+  oss << quoted_(jsonliteral::event) << ":" << quoted_(name()) << ",";
+  oss << debrace(_timestamp.to_string()) << ",";
+  oss << debrace(_what.to_string());
+  oss << "}";
 
   return oss.str();
 }
 
-ovlValueTimeStamp ovlUpdate::map_operation(value_t& value) {
-  assert(type(value) == type_t::OBJECT);
+ovlValueTimeStamp ovlUpdate::map_timestamp(value_t& value) {
+  confirm(type(value) == type_t::OBJECT);
+
   auto& obj = object_value();
-  assert(obj.size() == 1);
-  return ovlValueTimeStamp(obj.begin()->key, obj.begin()->value);
+
+  confirm(obj.count(jsonliteral::timestamp) == 1);
+
+  return ovlValueTimeStamp(jsonliteral::timestamp, obj.at(jsonliteral::timestamp));
+}
+
+ovlKeyValue ovlUpdate::map_what(value_t& value) {
+  confirm(type(value) == type_t::OBJECT);
+  auto& obj = object_value();
+
+  confirm(obj.count(jsonliteral::value) == 1);
+
+  return ovlKeyValue(jsonliteral::value, obj.at(jsonliteral::value));
 }
 
 ovlBookkeeping::ovlBookkeeping(object_t::key_type const& key, value_t& bookkeeping)
     : ovlKeyValue(key, bookkeeping),
-      _updates(make_updates(ovlKeyValue::value_as<array_t>(literal::updates))),
+      _initOK(init(bookkeeping)),
+      _updates(make_updates(bookkeeping)),
       _created(map_created(bookkeeping)) {}
 
-bool& ovlBookkeeping::isReadonly() { return value_as<bool>(literal::isreadonly); }
+bool& ovlBookkeeping::isReadonly() { return value_as<bool>(jsonliteral::isreadonly); }
 
-bool const& ovlBookkeeping::isReadonly() const { return value_as<bool>(literal::isreadonly); }
+bool const& ovlBookkeeping::isReadonly() const { return value_as<bool>(jsonliteral::isreadonly); }
 
 bool& ovlBookkeeping::markReadonly(bool const& state) {
-  value_as<bool>(literal::isreadonly) = state;
+  value_as<bool>(jsonliteral::isreadonly) = state;
+
   return isReadonly();
 }
 
-bool& ovlBookkeeping::isDeleted() { return value_as<bool>(literal::isdeleted); }
+bool& ovlBookkeeping::isDeleted() { return value_as<bool>(jsonliteral::isdeleted); }
 
-bool const& ovlBookkeeping::isDeleted() const { return value_as<bool>(literal::isdeleted); }
+bool const& ovlBookkeeping::isDeleted() const { return value_as<bool>(jsonliteral::isdeleted); }
 
 bool& ovlBookkeeping::markDeleted(bool const& state) {
-  value_as<bool>(literal::isdeleted) = state;
+  value_as<bool>(jsonliteral::isdeleted) = state;
+
   return isDeleted();
 }
 
 std::string ovlBookkeeping::to_string() const noexcept {
   std::ostringstream oss;
-  oss << "{" << quoted_(literal::bookkeeping) << ": {";
-  oss << quoted_(literal::isreadonly) << ":" << quoted_(isReadonly()) << ",\n";
-  oss << quoted_(literal::isdeleted) << ":" << quoted_(isDeleted()) << ",\n";
+  oss << "{" << quoted_(jsonliteral::bookkeeping) << ": {";
+  oss << quoted_(jsonliteral::isreadonly) << ":" << bool_(isReadonly()) << ",\n";
+  oss << quoted_(jsonliteral::isdeleted) << ":" << bool_(isDeleted()) << ",\n";
   oss << debrace(_created.to_string()) << ",\n";
-  oss << quoted_(literal::updates) << ": [";
+  oss << quoted_(jsonliteral::updates) << ": [";
 
   for (auto const& update : _updates) oss << "\n" << update.to_string() << ",";
 
@@ -384,33 +521,61 @@ std::string ovlBookkeeping::to_string() const noexcept {
   return oss.str();
 }
 
-ovlBookkeeping::arrayBookkeeping_t ovlBookkeeping::make_updates(array_t& updates) {
+ovlBookkeeping::arrayBookkeeping_t ovlBookkeeping::make_updates(value_t& value) {
+  confirm(type(value) == type_t::OBJECT);
+  auto& obj = object_value();
+
+  if (obj.count(jsonliteral::updates) == 0) obj[jsonliteral::updates] = array_t{};
+
+  confirm(obj.count(jsonliteral::updates) == 1);
+
+  auto& updates = unwrap(obj).value_as<array_t>(jsonliteral::updates);
+
   auto returnValue = ovlBookkeeping::arrayBookkeeping_t{};
 
-  for (auto& update : updates) returnValue.push_back({literal::update, update});
+  for (auto& update : updates) returnValue.push_back({jsonliteral::update, update});
 
   return returnValue;
 }
 
 ovlValueTimeStamp ovlBookkeeping::map_created(value_t& value) {
-  assert(type(value) == type_t::OBJECT);
+  confirm(type(value) == type_t::OBJECT);
   auto& obj = object_value();
-  assert(obj.count(literal::created) == 1);
 
-  return ovlValueTimeStamp(literal::created, obj.at(literal::created));
+  if (obj.count(jsonliteral::created) == 0) obj[jsonliteral::created] = timestamp();
+
+  confirm(obj.count(jsonliteral::created) == 1);
+
+  return ovlValueTimeStamp(jsonliteral::created, obj.at(jsonliteral::created));
+}
+
+bool ovlBookkeeping::init(value_t& parent) try {
+  confirm(type(parent) == type_t::OBJECT);
+
+  auto& obj = object_value();
+
+  if (obj.count(jsonliteral::isdeleted) == 0) obj[jsonliteral::isdeleted] = false;
+
+  if (obj.count(jsonliteral::isreadonly) == 0) obj[jsonliteral::isreadonly] = false;
+
+  return true;
+} catch (...) {
+  confirm(false);
+  throw;
 }
 
 ovlDatabaseRecord::ovlDatabaseRecord(value_t& record)
-    : ovlKeyValue(literal::database_record, record),
-      _document{overlay<ovlDocument>(record, literal::document_node)},
-      _comments{overlay<ovlComments, array_t>(record, literal::comments_node)},
-      _origin{overlay<ovlOrigin>(record, literal::origin_node)},
-      _version{overlay<ovlVersion>(record, literal::version_node)},
-      _configurableEntity{overlay<ovlConfigurableEntity>(record, literal::configurable_entity_node)},
-      _configurations{overlay<ovlConfigurations, array_t>(record, literal::configurations_node)},
-      _changelog{overlay<ovlChangeLog, std::string>(record, literal::changelog)},
-      _bookkeeping{overlay<ovlBookkeeping>(record, literal::bookkeeping)},
-      _id{overlay<ovlId>(record, literal::id_node)} {}
+    : ovlKeyValue(jsonliteral::database_record, record),
+      _document{overlay<ovlDocument>(record, jsonliteral::document_node)},
+      _comments{overlay<ovlComments, array_t>(record, jsonliteral::comments_node)},
+      _origin{overlay<ovlOrigin>(record, jsonliteral::origin_node)},
+      _version{overlay<ovlVersion, std::string>(record, jsonliteral::version_node)},
+      _configurableEntity{overlay<ovlConfigurableEntity>(record, jsonliteral::configurable_entity_node)},
+      _configurations{overlay<ovlConfigurations, array_t>(record, jsonliteral::configurations_node)},
+      _changelog{overlay<ovlChangeLog, std::string>(record, jsonliteral::changelog)},
+      _bookkeeping{overlay<ovlBookkeeping>(record, jsonliteral::bookkeeping)},
+      _id{overlay<ovlId>(record, jsonliteral::id_node)},
+      _aliases{overlay<ovlAliases>(record, jsonliteral::aliases_node)} {}
 
 ovlDocument& ovlDatabaseRecord::document() { return *_document; }
 
@@ -425,7 +590,7 @@ result_t ovlDatabaseRecord::swap(ovlDocumentUPtr_t& document) {
 ovlComments& ovlDatabaseRecord::comments() { return *_comments; }
 
 result_t ovlDatabaseRecord::swap(ovlCommentsUPtr_t& comments) {
-  assert(!comments);
+  confirm(comments);
 
   if (isReadonly()) return Failure(msg_IsReadonly);
 
@@ -437,7 +602,7 @@ result_t ovlDatabaseRecord::swap(ovlCommentsUPtr_t& comments) {
 ovlOrigin& ovlDatabaseRecord::origin() { return *_origin; }
 
 result_t ovlDatabaseRecord::swap(ovlOriginUPtr_t& origin) {
-  assert(!origin);
+  confirm(origin);
 
   if (isReadonly()) return Failure(msg_IsReadonly);
 
@@ -449,7 +614,7 @@ result_t ovlDatabaseRecord::swap(ovlOriginUPtr_t& origin) {
 ovlVersion& ovlDatabaseRecord::version() { return *_version; }
 
 result_t ovlDatabaseRecord::swap(ovlVersionUPtr_t& version) {
-  assert(!version);
+  confirm(version);
 
   if (isReadonly()) return Failure(msg_IsReadonly);
 
@@ -461,7 +626,7 @@ result_t ovlDatabaseRecord::swap(ovlVersionUPtr_t& version) {
 ovlConfigurableEntity& ovlDatabaseRecord::configurableEntity() { return *_configurableEntity; }
 
 result_t ovlDatabaseRecord::swap(ovlConfigurableEntityUPtr_t& entity) {
-  assert(!entity);
+  confirm(entity);
 
   if (isReadonly()) return Failure(msg_IsReadonly);
 
@@ -483,7 +648,7 @@ result_t ovlDatabaseRecord::swap(ovlConfigurationsUPtr_t& configurations) {
 ovlBookkeeping& ovlDatabaseRecord::bookkeeping() { return *_bookkeeping; }
 
 result_t ovlDatabaseRecord::swap(ovlBookkeepingUPtr_t& bookkeeping) {
-  assert(!bookkeeping);
+  confirm(bookkeeping);
 
   if (isReadonly()) return Failure(msg_IsReadonly);
 
@@ -495,7 +660,7 @@ result_t ovlDatabaseRecord::swap(ovlBookkeepingUPtr_t& bookkeeping) {
 ovlId& ovlDatabaseRecord::id() { return *_id; }
 
 result_t ovlDatabaseRecord::swap(ovlIdUPtr_t& id) {
-  assert(!id);
+  confirm(id);
 
   if (isReadonly()) return Failure(msg_IsReadonly);
 
@@ -510,6 +675,7 @@ std::string ovlDatabaseRecord::to_string() const noexcept {
   oss << debrace(_id->to_string()) << ",\n";
   oss << debrace(_version->to_string()) << ",\n";
   oss << debrace(_origin->to_string()) << ",\n";
+  oss << debrace(_aliases->to_string()) << "\n";
   oss << debrace(_bookkeeping->to_string()) << ",\n";
   oss << debrace(_changelog->to_string()) << ",\n";
   oss << debrace(_configurableEntity->to_string()) << ",\n";
@@ -540,7 +706,7 @@ result_t ovlDatabaseRecord::markDeleted() {
 }
 
 result_t ovlConfigurations::add(ovlConfigurationUPtr_t& newConfiguration) {
-  assert(!newConfiguration);
+  confirm(newConfiguration);
 
   for (auto& configuration : _configurations) {
     if (configuration.name() == newConfiguration->name()) {
@@ -559,7 +725,7 @@ result_t ovlConfigurations::add(ovlConfigurationUPtr_t& newConfiguration) {
 }
 
 result_t ovlConfigurations::remove(ovlConfigurationUPtr_t& oldConfiguration) {
-  assert(!oldConfiguration);
+  confirm(oldConfiguration);
 
   if (_configurations.empty()) Success(msg_Ignored);
 
@@ -569,15 +735,17 @@ result_t ovlConfigurations::remove(ovlConfigurationUPtr_t& oldConfiguration) {
 
   configurations.erase(std::remove_if(configurations.begin(), configurations.end(),
                                       [&oldConfiguration](value_t& configuration) -> bool {
-                                        auto newConfiguration =
-                                            overlay<ovlConfiguration>(configuration, literal::configuration);
-                                        return newConfiguration->name() == oldConfiguration->name();
+                                        auto candidateConfiguration = std::make_unique<ovlConfiguration>(
+                                            jsonliteral::configuration, configuration);
+                                        return candidateConfiguration->name() == oldConfiguration->name();
                                       }),
                        configurations.end());
 
   if (oldCount == configurations.size()) return Failure(msg_Missing);
 
-  assert(oldCount == configurations.size() + 1);
+  confirm(oldCount == configurations.size() + 1);
+
+  oldConfiguration->object_value()[jsonliteral::removed] = timestamp();
 
   _configurations = make_configurations(configurations);
 
@@ -586,8 +754,24 @@ result_t ovlConfigurations::remove(ovlConfigurationUPtr_t& oldConfiguration) {
 
 ovlAliases::ovlAliases(object_t::key_type const& key, value_t& aliases)
     : ovlKeyValue(key, aliases),
-      _active(make_aliases(ovlKeyValue::value_as<array_t>(literal::active))),
-      _history(make_aliases(ovlKeyValue::value_as<array_t>(literal::history))) {}
+      _initOK(init(aliases)),
+      _active(make_aliases(ovlKeyValue::value_as<array_t>(jsonliteral::active))),
+      _history(make_aliases(ovlKeyValue::value_as<array_t>(jsonliteral::history))) {}
+
+bool ovlAliases::init(value_t& parent) try {
+  confirm(type(parent) == type_t::OBJECT);
+
+  auto& obj = object_value();
+
+  if (obj.count(jsonliteral::active) == 0) obj[jsonliteral::active] = array_t{};
+
+  if (obj.count(jsonliteral::history) == 0) obj[jsonliteral::history] = array_t{};
+
+  return true;
+} catch (...) {
+  confirm(false);
+  throw;
+}
 
 void ovlAliases::wipe() {
   _active = ovlAliases::arrayAliases_t{};
@@ -595,7 +779,7 @@ void ovlAliases::wipe() {
 }
 
 result_t ovlAliases::add(ovlAliasUPtr_t& newAlias) {
-  assert(!newAlias);
+  confirm(newAlias);
 
   for (auto& alias : _active) {
     if (alias.name() == newAlias->name()) {
@@ -604,7 +788,7 @@ result_t ovlAliases::add(ovlAliasUPtr_t& newAlias) {
     }
   }
 
-  auto& aliases = ovlKeyValue::value_as<array_t>(literal::active);
+  auto& aliases = ovlKeyValue::value_as<array_t>(jsonliteral::active);
   // update AST
   aliases.push_back(newAlias->value());
   // reattach AST
@@ -614,34 +798,36 @@ result_t ovlAliases::add(ovlAliasUPtr_t& newAlias) {
 }
 
 result_t ovlAliases::remove(ovlAliasUPtr_t& oldAlias) {
-  assert(!oldAlias);
+  confirm(oldAlias);
 
   if (_active.empty()) Success(msg_Ignored);
 
-  auto& aliases = ovlKeyValue::value_as<array_t>(literal::active);
+  auto& aliases = ovlKeyValue::value_as<array_t>(jsonliteral::active);
 
   auto oldCount = aliases.size();
 
   aliases.erase(std::remove_if(aliases.begin(), aliases.end(),
                                [&oldAlias](value_t& alias) -> bool {
-                                 auto newAlias = overlay<ovlAlias>(alias, literal::alias);
-                                 return newAlias->name() == oldAlias->name();
+                                 auto candidateAlias = std::make_unique<ovlAlias>(jsonliteral::alias, alias);
+                                 return candidateAlias->name() == oldAlias->name();
                                }),
                 aliases.end());
 
   if (oldCount == aliases.size()) return Failure(msg_Missing);
 
-  assert(oldCount - 1 == aliases.size());
+  confirm(oldCount - 1 == aliases.size());
 
   _active = make_aliases(aliases);
 
-  auto& history = ovlKeyValue::value_as<array_t>(literal::history);
+  auto& history = ovlKeyValue::value_as<array_t>(jsonliteral::history);
 
   oldCount = history.size();
 
+  oldAlias->object_value()[jsonliteral::removed] = timestamp();
+
   history.push_back(oldAlias->value());
 
-  assert(oldCount + 1 == history.size());
+  confirm(oldCount + 1 == history.size());
 
   _history = make_aliases(history);
 
@@ -650,143 +836,127 @@ result_t ovlAliases::remove(ovlAliasUPtr_t& oldAlias) {
 
 std::string ovlAliases::to_string() const noexcept {
   std::ostringstream oss;
-  oss << "{" << quoted_(literal::aliases) << ": {";
-  oss << quoted_(literal::active) << ": [";
+  oss << "{" << quoted_(jsonliteral::aliases) << ": {";
+  oss << quoted_(jsonliteral::active) << ": [";
   for (auto const& alias : _active) oss << "\n" << alias.to_string() << ",";
   if (!_active.empty()) oss.seekp(-1, oss.cur);
   oss << "\n],";
-  oss << quoted_(literal::history) << ": [";
+  oss << quoted_(jsonliteral::history) << ": [";
   for (auto const& alias : _history) oss << "\n" << alias.to_string() << ",";
   if (!_history.empty()) oss.seekp(-1, oss.cur);
   oss << "\n]\n}\n}";
+
   return oss.str();
 }
 
 ovlAliases::arrayAliases_t ovlAliases::make_aliases(array_t& aliases) {
   auto returnValue = ovlAliases::arrayAliases_t{};
 
-  for (auto& alias : aliases) returnValue.push_back({literal::alias, alias});
+  for (auto& alias : aliases) returnValue.push_back({jsonliteral::alias, alias});
 
   return returnValue;
 }
 
 result_t ovlDatabaseRecord::addConfiguration(ovlConfigurationUPtr_t& configuration) {
-  assert(!configuration);
+  confirm(configuration);
 
   if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
 
-  auto update = make_update("addConfiguration");
+  auto update = std::string("addConfiguration");
 
   auto result = _configurations->add(configuration);
 
   if (!result.first) return result;
 
-  return _bookkeeping->postUpdate(update);
+  return _bookkeeping->postUpdate(update, configuration);
 }
 
 result_t ovlDatabaseRecord::removeConfiguration(ovlConfigurationUPtr_t& configuration) {
-  assert(!configuration);
+  confirm(configuration);
 
   if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
 
-  auto update = make_update("removeConfiguration");
+  auto update = std::string("removeConfiguration");
 
   auto result = _configurations->remove(configuration);
 
   if (!result.first) return result;
 
-  return _bookkeeping->postUpdate(update);
+  return _bookkeeping->postUpdate(update, configuration);
 }
 
 result_t ovlDatabaseRecord::addAlias(ovlAliasUPtr_t& alias) {
-  assert(!alias);
+  confirm(alias);
 
   if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
 
-  auto update = make_update("addAlias");
+  auto update = std::string("addAlias");
 
   auto result = _aliases->add(alias);
 
   if (!result.first) return result;
 
-  return _bookkeeping->postUpdate(update);
+  return _bookkeeping->postUpdate(update, alias);
 }
 
 result_t ovlDatabaseRecord::removeAlias(ovlAliasUPtr_t& alias) {
-  assert(!alias);
+  confirm(alias);
 
   if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
 
-  auto update = make_update("removeAlias");
+  auto update = std::string("removeAlias");
 
   auto result = _aliases->remove(alias);
 
   if (!result.first) return result;
 
-  return _bookkeeping->postUpdate(update);
-}
-
-result_t ovlBookkeeping::postUpdate(std::string const& update) {
-  assert(!update.empty());
-
-  if (isReadonly()) return Failure(msg_IsReadonly);
-
-  auto& updates = ovlKeyValue::value_as<array_t>(literal::updates);
-
-  auto newEntry = object_t{};
-  newEntry[update] = artdaq::database::timestamp();
-  value_t tmp = newEntry;
-  updates.push_back(tmp);
-
-  // reattach AST
-  _updates = make_updates(updates);
-
-  return Success(msg_Added);
+  return _bookkeeping->postUpdate(update, alias);
 }
 
 result_t ovlDatabaseRecord::setVersion(ovlVersionUPtr_t& version) {
-  assert(!version);
+  confirm(version);
 
   if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
 
-  auto update = make_update("setVersion");
+  auto update = std::string("setVersion");
 
   auto result = swap(version);
 
   if (!result.first) return result;
 
-  return _bookkeeping->postUpdate(update);
+  return _bookkeeping->postUpdate(update, version);
 }
 
 result_t ovlDatabaseRecord::addConfigurableEntity(ovlConfigurableEntityUPtr_t& entity) {
-  assert(!entity);
+  confirm(entity);
 
   if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
 
-  auto update = make_update("addConfigurableEntity");
+  auto update = std::string("addConfigurableEntity");
 
   auto result = swap(entity);
 
   if (!result.first) return result;
 
-  return _bookkeeping->postUpdate(update);
+  return _bookkeeping->postUpdate(update, entity);
 }
 result_t ovlDatabaseRecord::removeConfigurableEntity(ovlConfigurableEntityUPtr_t& entity) {
-  assert(!entity);
+  confirm(entity);
 
   if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
 
-  auto update = make_update("removeConfigurableEntity");
+  auto update = std::string("removeConfigurableEntity");
 
   auto result = swap(entity);
 
   if (!result.first) return result;
 
-  return _bookkeeping->postUpdate(update);
+  return _bookkeeping->postUpdate(update, entity);
 }
 
 std::uint32_t artdaq::database::overlay::useCompareMask(std::uint32_t compareMask) {
   static std::uint32_t _compareMask = compareMask;
+
   return _compareMask;
 }
 
@@ -855,12 +1025,10 @@ result_t ovlBookkeeping::operator==(ovlBookkeeping const& other) const {
   auto noerror_pos = oss.tellp();
 
   if (isDeleted() != other.isDeleted())
-    oss << "\n  isdeleted flags are different: self,other=" << quoted_(isDeleted()) << ","
-        << quoted_(other.isDeleted());
+    oss << "\n  isdeleted flags are different: self,other=" << bool_(isDeleted()) << "," << bool_(other.isDeleted());
 
   if (isReadonly() != other.isReadonly())
-    oss << "\n  isreadonly flags are different: self,other=" << quoted_(isReadonly()) << ","
-        << quoted_(other.isReadonly());
+    oss << "\n  isreadonly flags are different: self,other=" << bool_(isReadonly()) << "," << bool_(other.isReadonly());
 
   auto result = _created == other._created;
 
@@ -942,9 +1110,35 @@ result_t ovlChangeLog::operator==(ovlChangeLog const& other) const {
 }
 
 result_t ovlUpdate::operator==(ovlUpdate const& other) const {
-  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_TIMESTAMPS) == DOCUMENT_COMPARE_MUTE_TIMESTAMPS)
-             ? _operation == other._operation
-             : self() == other.self();
+  std::ostringstream oss;
+  oss << "\nUpdate events disagree.";
+  auto noerror_pos = oss.tellp();
+
+  auto result = _timestamp == other._timestamp;
+
+  if (!result.first)
+    oss << "\n  Timestamps are different: self,other=" << quoted_(_timestamp.timestamp()) << ","
+        << quoted_(other._timestamp.timestamp());
+
+  if (name() != other.name())
+    oss << "\n  Events are different: self,other=" << quoted_(name()) << "," << quoted_(other.name());
+
+  if ((useCompareMask() & DOCUMENT_COMPARE_MUTE_TIMESTAMPS) == DOCUMENT_COMPARE_MUTE_TIMESTAMPS) {
+    auto const& name = _what.value_as<std::string>(jsonliteral::name);
+    auto const& otherName = other._what.value_as<std::string>(jsonliteral::name);
+
+    if (name != otherName)
+      oss << "\n  Event names are different: self,other=" << quoted_(name) << "," << quoted_(otherName);
+  } else {
+    result = _what == other._what;
+
+    if (!result.first)
+      oss << "\n  Event data are different: self,other=" << what().to_string() << "," << other.what().to_string();
+  }
+
+  if (oss.tellp() == noerror_pos) return Success();
+
+  return Failure(oss);
 }
 
 result_t ovlDatabaseRecord::operator==(ovlDatabaseRecord const& other) const {
@@ -1050,7 +1244,7 @@ result_t ovlAlias::operator==(ovlAlias const& other) const {
   if (name() != other.name())
     oss << "\n  Alias names are different: self,other=" << quoted_(name()) << "," << quoted_(other.name());
 
-  auto result = _timestamp == other._timestamp;
+  auto result = _assigned == other._assigned;
 
   if (!result.first) oss << "\n  Timestamps are different:\n  " << result.second;
 

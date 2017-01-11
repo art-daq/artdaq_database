@@ -67,7 +67,6 @@ class StorageProvider final {
 constexpr auto ouid_invalid = "000000000000000000000000";
 
 std::string expand_environment_variables(std::string /*var*/);
-object_id_t generate_oid();
 object_id_t extract_oid(std::string const&);
 std::string make_database_metadata(std::string const& /*name*/, std::string const& /*uri*/);
 

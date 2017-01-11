@@ -31,7 +31,8 @@
       "rawdata":"as"
    },   
    "configurations":[
-      "config1"
+      {"name":"config1",
+       "assigned":"Tue Dec 29 18:19:25 2015"}
    ],
    "aliases":{
       "active":[
@@ -43,7 +44,7 @@
    },
    "bookkeeping":{
       "isdeleted":false,
-      "isreadonly":true,
+      "isreadonly":false,
       "created":"Tue Dec 29 18:19:25 2015",
       "updates":[
          

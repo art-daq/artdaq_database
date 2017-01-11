@@ -22,7 +22,7 @@
 
 #include "artdaq-database/DataFormats/Json/json_reader.h"
 #include "artdaq-database/DataFormats/common/helper_functions.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 
 struct TestData {
   TestData() {

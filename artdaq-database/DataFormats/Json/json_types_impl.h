@@ -1,7 +1,6 @@
 #ifndef _ARTDAQ_DATABASE_JSONTYPES_IMPL_H_
 #define _ARTDAQ_DATABASE_JSONTYPES_IMPL_H_
 
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/DataFormats/Json/json_types.h"
 
 namespace dbt = artdaq::database::sharedtypes;

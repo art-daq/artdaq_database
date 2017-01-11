@@ -3,7 +3,6 @@
 
 #include <fstream>
 #include "artdaq-database/BasicTypes/data_json.h"
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
 
 #include <boost/exception/diagnostic_information.hpp>

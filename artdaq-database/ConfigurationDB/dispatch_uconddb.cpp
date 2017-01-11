@@ -4,7 +4,7 @@
 #include "artdaq-database/ConfigurationDB/options_operations.h"
 
 #include "artdaq-database/BasicTypes/basictypes.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/StorageProviders/UcondDB/provider_uconddb.h"
@@ -21,8 +21,8 @@ namespace DBI = artdaq::database::ucond;
 namespace prov = artdaq::database::configuration::ucond;
 
 using artdaq::database::basictypes::JsonData;
-using artdaq::database::jsonutils::JSONDocumentBuilder;
-using artdaq::database::jsonutils::JSONDocument;
+using artdaq::database::docrecord::JSONDocumentBuilder;
+using artdaq::database::docrecord::JSONDocument;
 
 void prov::store(LoadStoreOperation const& options, JsonData const& insert_payload) {
   assert(options.provider().compare(literal::provider::ucond) == 0);
@@ -382,7 +382,7 @@ JsonData prov::addConfigToGlobalConfig(LoadStoreOperation const& options, JsonDa
 
   auto document = ucond::load(new_options, search);
   auto json_document = JSONDocument{document.json_buffer};
-  auto builder = JSONDocumentBuilder{json_document};
+  JSONDocumentBuilder builder{json_document};
   auto globalConfiguration = JSONDocument{new_options.globalConfiguration_to_JsonData().json_buffer};
 
   builder.addConfiguration(globalConfiguration);

@@ -1,7 +1,4 @@
-#include "artdaq-database/DataFormats/common/helper_functions.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
-
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
+#include "artdaq-database/DataFormats/common.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
 #include "artdaq-database/DataFormats/Xml/xml_common.h"
 #include "artdaq-database/DataFormats/Xml/xmljsondb.h"

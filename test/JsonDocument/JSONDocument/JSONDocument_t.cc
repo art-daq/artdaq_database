@@ -26,6 +26,7 @@ bool test_removeChild(std::string const& conf);
 int main(int argc, char* argv[]) try
 {
     artdaq::database::jsonutils::debug::enableJSONDocument();
+    artdaq::database::jsonutils::debug::enableJSONDocumentUtils();
 
     debug::registerUngracefullExitHandlers();
 

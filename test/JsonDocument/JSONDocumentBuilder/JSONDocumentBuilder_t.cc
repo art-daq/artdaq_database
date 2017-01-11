@@ -1,18 +1,20 @@
-#include <iostream>
-#include <string>
 #include <fstream>
+#include <iostream>
+#include <memory>
 #include <streambuf>
-#include "boost/program_options.hpp"
+#include <string>
+
 #include "artdaq-database/JsonDocument/JSONDocument.h"
+#include "artdaq-database/Overlay/JSONDocumentOverlay.h"
+
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
+#include "boost/program_options.hpp"
 
-#include "cetlib/coded_exception.h"
-#include "artdaq-database/BuildInfo/printStackTrace.h"
 
-namespace  bpo = boost::program_options;
-using artdaq::database::jsonutils::JSONDocument;
-using artdaq::database::jsonutils::JSONDocumentBuilder;
-
+namespace bpo = boost::program_options;
+using artdaq::database::docrecord::JSONDocument;
+using artdaq::database::docrecord::JSONDocumentBuilder;
+using artdaq::database::overlay::ovlDatabaseRecord;
 
 typedef bool (*test_case)(std::string const&);
 
@@ -26,84 +28,67 @@ bool test_markReadonly(std::string const& conf);
 bool test_setVersion(std::string const& conf);
 bool test_addToGlobalConfig(std::string const& conf);
 
+int main(int argc, char* argv[]) {
+  artdaq::database::docrecord::debug::enableJSONDocument();
+  artdaq::database::docrecord::debug::enableJSONDocumentUtils();
 
+  artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
+  debug::registerUngracefullExitHandlers();
 
-int main(int argc, char* argv[]) 
-{
-    artdaq::database::jsonutils::debug::enableJSONDocument();
-    artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
+  std::ostringstream descstr;
+  descstr << argv[0] << " <-c <config-file>> <other-options>";
 
-    artdaq::database::jsonutils::useFakeTime(true);
-    
-    debug::registerUngracefullExitHandlers();
+  bpo::options_description desc = descstr.str();
 
-    std::ostringstream descstr;
-    descstr << argv[0] << " <-c <config-file>> <other-options>";
+  desc.add_options()("config,c", bpo::value<std::string>(), "Configuration file.")("help,h", "produce help message");
 
-    bpo::options_description desc = descstr.str();
+  bpo::variables_map vm;
 
-    desc.add_options()
-    ("config,c", bpo::value<std::string>(), "Configuration file.")
-    ("help,h", "produce help message");
+  try {
+    bpo::store(bpo::command_line_parser(argc, argv).options(desc).run(), vm);
+    bpo::notify(vm);
+  } catch (bpo::error const& e) {
+    std::cerr << "Exception from command line processing in " << argv[0] << ": " << e.what() << "\n";
+    return -1;
+  }
 
-    bpo::variables_map vm;
+  if (vm.count("help")) {
+    std::cout << desc << std::endl;
+    return 1;
+  }
+  if (!vm.count("config")) {
+    std::cerr << "Exception from command line processing in " << argv[0] << ": no configuration file given.\n"
+              << "For usage and an options list, please do '" << argv[0] << " --help"
+              << "'.\n";
+    return 2;
+  }
 
-    try {
-        bpo::store(bpo::command_line_parser(argc, argv).options(desc).run(), vm);
-        bpo::notify(vm);
-    } catch (bpo::error const& e) {
-        std::cerr << "Exception from command line processing in " << argv[0]
-                  << ": " << e.what() << "\n";
-        return -1;
-    }
+  auto file_name = vm["config"].as<std::string>();
 
-    if (vm.count("help")) {
-        std::cout << desc << std::endl;
-        return 1;
-    }
-    if (!vm.count("config")) {
-        std::cerr << "Exception from command line processing in " << argv[0]
-                  << ": no configuration file given.\n"
-                  << "For usage and an options list, please do '"
-                  << argv[0] <<  " --help"
-                  << "'.\n";
-        return 2;
-    }
+  std::ifstream is(file_name);
 
-    auto file_name = vm["config"].as<std::string>();
+  std::string conf((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
 
-    std::ifstream is(file_name);
+  auto name = [](auto const& conf) { return JSONDocument(conf).value_as<std::string>("operation"); };
 
-    std::string conf((std::istreambuf_iterator<char>(is)),
-                     std::istreambuf_iterator<char>());
+  auto runTest = [](std::string const& name) {
+    auto tests = std::map<std::string, test_case>{
+        {"buildDocument", test_buildDocument}, {"addAlias", test_addAlias},
+        {"removeAlias", test_removeAlias},     {"markDeleted", test_markDeleted},
+        {"markReadonly", test_markReadonly},   {"addToGlobalConfig", test_addToGlobalConfig},
+        {"setVersion", test_setVersion}};
 
-    auto name = [](auto const & conf) {
-        return JSONDocument(conf).value_as<std::string>("operation");
-    };
+    std::cout << "Running test:<" << name << ">\n";
 
-    auto runTest = [](std::string const& name) {
-        auto tests = std::map<std::string,test_case> {
-            {"buildDocument",test_buildDocument},
-            {"addAlias",test_addAlias},
-            {"removeAlias",test_removeAlias},
-	    {"markDeleted",test_markDeleted},
-	    {"markReadonly",test_markReadonly},
-	    {"addToGlobalConfig",test_addToGlobalConfig},
-	    {"setVersion",test_setVersion}
-        };
+    return tests.at(name);
+  };
 
-        std::cout << "Running test:<" << name << ">\n";
+  auto testResult = runTest(name(conf))(conf);
 
-        return tests.at(name);
-    };
-
-    auto testResult= runTest(name(conf))(conf);
-
-    return !testResult;
+  return !testResult;
 }
 
-namespace literal
-{
+namespace literal {
 constexpr auto operation = "operation";
 constexpr auto path = "path";
 constexpr auto beginstate = "begin-state";
@@ -113,206 +98,217 @@ constexpr auto returnedvalue = "returned-value";
 constexpr auto mustsucceed = "must-succeed";
 }
 
+bool test_buildDocument(std::string const& conf) {
+  assert(!conf.empty());
 
-bool test_buildDocument(std::string const& conf)
-{
-    assert(!conf.empty());
+  auto opts = JSONDocument(conf);
+  auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
+  auto end = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::endstate));
 
-    auto opts = JSONDocument(conf);
-    auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
-    auto builder= JSONDocumentBuilder();
-    auto end = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::endstate));
+  auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
 
-    auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
+  try {
+    // createFromData(begin)
+    JSONDocumentBuilder returned{};
+    returned.createFromData(begin);
+    JSONDocumentBuilder expected{end};
 
-    try {
-        auto returned = std::move(builder.createFromData(begin).extract());
+    using namespace artdaq::database::overlay;
+    ovl::useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS);
 
-        if (returned != end && mustsucceed ) {
-            std::cout << "Error returned!=expected.\n";
-            std::cerr << "returned:\n" << returned << "\n";
-            std::cerr << "expected:\n" << end << "\n";
-            return false;
-        }
-        
-    } catch (cet::exception const& e) {
-        if (mustsucceed)
-            throw;
+    auto result = returned == expected;
+
+    if (!result.first && mustsucceed) {
+      std::cout << "Error returned!=expected.\n";
+      std::cerr << "returned:\n" << returned << "\n";
+      std::cerr << "expected:\n" << expected << "\n";
+      std::cerr << "error:\n" << result.second << "\n";
+      return false;
     }
 
-    return true;
+  } catch (cet::exception const& e) {
+    if (mustsucceed) throw;
+  }
+
+  return true;
 }
 
-bool test_addAlias(std::string const& conf)
-{
-    assert(!conf.empty());
+bool test_addAlias(std::string const& conf) {
+  assert(!conf.empty());
 
-    auto opts = JSONDocument(conf);
-    auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
-    auto delta = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::delta));
-    auto end = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::endstate));
+  auto opts = JSONDocument(conf);
+  auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
+  auto delta = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::delta));
+  auto end = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::endstate));
 
-    auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
+  auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
 
-    try {
-        auto builder= JSONDocumentBuilder(begin);
-        auto returned = std::move(builder.addAlias(delta).extract());
+  try {
+    
+    JSONDocumentBuilder returned{begin};
+    returned.addAlias(delta);
+    JSONDocumentBuilder expected{end};
 
-        if (returned != end && mustsucceed ) {
-            std::cout << "Error returned!=expected.\n";
-            std::cerr << "returned:\n" << returned << "\n";
-            std::cerr << "expected:\n" << end << "\n";
-            return false;
-        }
-    } catch (cet::exception const& e) {
-        if (mustsucceed)
-            throw;
+    
+    using namespace artdaq::database::overlay;
+    ovl::useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS);
+
+    auto result = returned == expected;
+
+    if (!result.first && mustsucceed) {
+      std::cout << "Error returned!=expected.\n";
+      std::cerr << "returned:\n" << returned << "\n";
+      std::cerr << "expected:\n" << expected << "\n";
+      std::cerr << "error:\n" << result.second << "\n";
+      return false;
     }
 
-    return true;
+  } catch (cet::exception const& e) {
+    if (mustsucceed) throw;
+  }
+
+  return true;
 }
 
-bool test_removeAlias(std::string const& conf)
-{
-    assert(!conf.empty());
+bool test_removeAlias(std::string const& conf) {
+  assert(!conf.empty());
 
-    auto opts = JSONDocument(conf);
-    auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
-    auto delta = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::delta));
-    auto end = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::endstate));
+  auto opts = JSONDocument(conf);
+  auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
+  auto delta = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::delta));
+  auto end = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::endstate));
 
-    auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
+  auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
 
-    try {
-        auto builder= JSONDocumentBuilder(begin);
-        auto returned = std::move(builder.removeAlias(delta).extract());
+ try {
+    
+    JSONDocumentBuilder returned{begin};
+    returned.removeAlias(delta);
+    JSONDocumentBuilder expected{end};
 
-        if (returned != end && mustsucceed ) {
-            std::cout << "Error returned!=expected.\n";
-            std::cerr << "returned:\n" << returned << "\n";
-            std::cerr << "expected:\n" << end << "\n";
-            return false;
-        }
-    } catch (cet::exception const& e) {
-        if (mustsucceed)
-            throw;
+    
+    using namespace artdaq::database::overlay;
+    ovl::useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS);
+
+    auto result = returned == expected;
+
+    if (!result.first && mustsucceed) {
+      std::cout << "Error returned!=expected.\n";
+      std::cerr << "returned:\n" << returned << "\n";
+      std::cerr << "expected:\n" << expected << "\n";
+      std::cerr << "error:\n" << result.second << "\n";
+      return false;
     }
 
-    return true;
+  } catch (cet::exception const& e) {
+    if (mustsucceed) throw;
+  }
+
+  return true;
 }
 
+bool test_addToGlobalConfig(std::string const& conf) {
+  assert(!conf.empty());
 
-bool test_addToGlobalConfig(std::string const& conf)
-{
-    assert(!conf.empty());
+  auto opts = JSONDocument(conf);
+  auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
+  auto delta = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::delta));
+  auto end = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::endstate));
 
-    auto opts = JSONDocument(conf);
-    auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
-    auto delta = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::delta));
-    auto end = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::endstate));
+  auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
 
-    auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
+  try {
+    JSONDocumentBuilder builder(begin);
+    auto returned = std::move(builder.addConfiguration(delta).extract());
 
-    try {
-        auto builder= JSONDocumentBuilder(begin);
-        auto returned = std::move(builder.addToGlobalConfig(delta).extract());
-
-        if (returned != end && mustsucceed ) {
-            std::cout << "Error returned!=expected.\n";
-            std::cerr << "returned:\n" << returned << "\n";
-            std::cerr << "expected:\n" << end << "\n";
-            return false;
-        }
-    } catch (cet::exception const& e) {
-        if (mustsucceed)
-            throw;
+    if (returned != end && mustsucceed) {
+      std::cout << "Error returned!=expected.\n";
+      std::cerr << "returned:\n" << returned << "\n";
+      std::cerr << "expected:\n" << end << "\n";
+      return false;
     }
+  } catch (cet::exception const& e) {
+    if (mustsucceed) throw;
+  }
 
-    return true;
+  return true;
 }
 
-bool test_setVersion(std::string const& conf)
-{
-    assert(!conf.empty());
+bool test_setVersion(std::string const& conf) {
+  assert(!conf.empty());
 
-    auto opts = JSONDocument(conf);
-    auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
-    auto delta = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::delta));
-    auto end = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::endstate));
+  auto opts = JSONDocument(conf);
+  auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
+  auto delta = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::delta));
+  auto end = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::endstate));
 
-    auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
+  auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
 
-    try {
-        auto builder= JSONDocumentBuilder(begin);
-        auto returned = std::move(builder.setVersion(delta).extract());
+  try {
+    JSONDocumentBuilder builder(begin);
+    auto returned = std::move(builder.setVersion(delta).extract());
 
-        if (returned != end && mustsucceed ) {
-            std::cout << "Error returned!=expected.\n";
-            std::cerr << "returned:\n" << returned << "\n";
-            std::cerr << "expected:\n" << end << "\n";
-            return false;
-        }
-    } catch (cet::exception const& e) {
-        if (mustsucceed)
-            throw;
+    if (returned != end && mustsucceed) {
+      std::cout << "Error returned!=expected.\n";
+      std::cerr << "returned:\n" << returned << "\n";
+      std::cerr << "expected:\n" << end << "\n";
+      return false;
     }
+  } catch (cet::exception const& e) {
+    if (mustsucceed) throw;
+  }
 
-    return true;
+  return true;
 }
 
-bool test_markReadonly(std::string const& conf)
-{
-    assert(!conf.empty());
+bool test_markReadonly(std::string const& conf) {
+  assert(!conf.empty());
 
-    auto opts = JSONDocument(conf);
-    auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
-    auto end = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::endstate));
+  auto opts = JSONDocument(conf);
+  auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
+  auto end = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::endstate));
 
-    auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
+  auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
 
-    try {
-        auto builder= JSONDocumentBuilder(begin);
-        auto returned = std::move(builder.markReadonly().extract());
+  try {
+    JSONDocumentBuilder builder(begin);
+    auto returned = std::move(builder.markReadonly().extract());
 
-        if (returned != end && mustsucceed ) {
-            std::cout << "Error returned!=expected.\n";
-            std::cerr << "returned:\n" << returned << "\n";
-            std::cerr << "expected:\n" << end << "\n";
-            return false;
-        }
-    } catch (cet::exception const& e) {
-        if (mustsucceed)
-            throw;
+    if (returned != end && mustsucceed) {
+      std::cout << "Error returned!=expected.\n";
+      std::cerr << "returned:\n" << returned << "\n";
+      std::cerr << "expected:\n" << end << "\n";
+      return false;
     }
+  } catch (cet::exception const& e) {
+    if (mustsucceed) throw;
+  }
 
-    return true;
+  return true;
 }
 
-bool test_markDeleted(std::string const& conf)
-{
-    assert(!conf.empty());
+bool test_markDeleted(std::string const& conf) {
+  assert(!conf.empty());
 
-    auto opts = JSONDocument(conf);
-    auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
-    auto end = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::endstate));
+  auto opts = JSONDocument(conf);
+  auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
+  auto end = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::endstate));
 
-    auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
+  auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
 
-    try {
-        auto builder= JSONDocumentBuilder(begin);
-        auto returned = std::move(builder.markDeleted().extract());
+  try {
+    JSONDocumentBuilder builder(begin);
+    auto returned = std::move(builder.markDeleted().extract());
 
-        if (returned != end && mustsucceed ) {
-            std::cout << "Error returned!=expected.\n";
-            std::cerr << "returned:\n" << returned << "\n";
-            std::cerr << "expected:\n" << end << "\n";
-            return false;
-        }
-    } catch (cet::exception const& e) {
-        if (mustsucceed)
-            throw;
+    if (returned != end && mustsucceed) {
+      std::cout << "Error returned!=expected.\n";
+      std::cerr << "returned:\n" << returned << "\n";
+      std::cerr << "expected:\n" << end << "\n";
+      return false;
     }
+  } catch (cet::exception const& e) {
+    if (mustsucceed) throw;
+  }
 
-    return true;
+  return true;
 }
-

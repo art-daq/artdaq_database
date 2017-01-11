@@ -4,7 +4,7 @@
 #include "artdaq-database/StorageProviders/storage_providers.h"
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 #include "artdaq-database/JsonDocument/JSONDocument.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 #include "artdaq-database/DataFormats/common/helper_functions.h"
 
 namespace  bpo = boost::program_options;

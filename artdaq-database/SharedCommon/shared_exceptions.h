@@ -1,10 +1,12 @@
-#ifndef _PROCESS_EXCEPTIONS_H_
-#define _PROCESS_EXCEPTIONS_H_
+#ifndef _ARTDAQ_DATABASE_EXCEPTIONS_H_
+#define _ARTDAQ_DATABASE_EXCEPTIONS_H_
+
 #include "cetlib/coded_exception.h"
 
 namespace artdaq {
 namespace database {
-class exception : public cet::exception {
+
+  class exception : public cet::exception {
  public:
   using cet::exception::Category;
 
@@ -17,6 +19,16 @@ class exception : public cet::exception {
     this->append(w);
     return *this;
   }
+};
+
+class invalid_argument : public exception {
+ public:   
+  explicit invalid_argument(std::string const& category_) : exception(category_) {}
+};
+
+class runtime_error : public exception {
+ public:
+  explicit runtime_error(std::string const& category_) : exception(category_) {}
 };
 
 class invalid_option_exception : public exception {
@@ -36,6 +48,7 @@ class runtime_exception : public exception {
 
   runtime_exception(Category const& category, std::string const& message) : exception{category, message} {}
 };
-}
-}
-#endif  // _PROCESS_EXCEPTIONS_H_
+}  // namespace database
+}  // namespace artdaq
+
+#endif /* _ARTDAQ_DATABASE_EXCEPTIONS_H_ */

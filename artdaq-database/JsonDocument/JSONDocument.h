@@ -1,33 +1,14 @@
 #ifndef _ARTDAQ_DATABASE_JSONUTILS_JSONDOCUMENT_H_
 #define _ARTDAQ_DATABASE_JSONUTILS_JSONDOCUMENT_H_
 
-#include "artdaq-database/DataFormats/Json/json_common.h"
 #include "artdaq-database/JsonDocument/common.h"
 
 namespace artdaq {
 namespace database {
-namespace jsonutils {
-
-using path_t = std::string;
-
-using string_pair_t = std::pair<std::string, std::string>;
+namespace docrecord {
 
 using artdaq::database::json::object_t;
 using artdaq::database::json::value_t;
-
-bool isValidJson(std::string const&);
-std::string filterJson(std::string const&);
-std::vector<path_t> split_path(path_t const&);
-
-class notfound_exception : public cet::exception {
- public:
-  explicit notfound_exception(std::string const& category_) : cet::exception(category_) {}
-};
-
-class readonly_exception : public cet::exception {
- public:
-  explicit readonly_exception(std::string const& category_) : cet::exception(category_) {}
-};
 
 class JSONDocumentBuilder;
 
@@ -82,9 +63,11 @@ class JSONDocument final {
   // JSONDocument ( JSONDocument && ) = delete;
 
  private:
+  void update_json_buffer();
+
   value_t readJson(std::string const&);
   std::string writeJson() const;
-  
+
   std::string const& cached_json_buffer() const;
   value_t const& getPayloadValueForKey(object_t::key_type const& key) const;
   value_t& findChildValue(path_t const&);
@@ -95,7 +78,7 @@ class JSONDocument final {
 
  private:
   value_t _value;
-  mutable std::string _cached_json_buffer;
+  std::string _cached_json_buffer;
 };
 
 template <typename T>
@@ -105,10 +88,18 @@ T JSONDocument::value_as(path_t const& path) const {
 
 namespace debug {
 void enableJSONDocument();
+void enableJSONDocumentUtils();
 }
 std::ostream& operator<<(std::ostream&, JSONDocument const&);
 
-}  // namespace jsonutils
+/*
+bool isValidJson(std::string const&);
+std::string filterJson(std::string const&);
+*/
+
+std::vector<path_t> split_path(path_t const&);
+
+}  // namespace docrecord
 }  // namespace database
 }  // namespace artdaq
 #endif /* _ARTDAQ_DATABASE_JSONUTILS_JSONDOCUMENT_H_ */

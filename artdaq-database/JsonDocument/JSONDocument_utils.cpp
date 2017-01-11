@@ -1,17 +1,12 @@
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
-
-#include "artdaq-database/DataFormats/Json/json_common.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
-#include "artdaq-database/DataFormats/common/shared_result.h"
-
 #include "artdaq-database/JsonDocument/common.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "JSNU:Document_C"
+#define TRACE_NAME "JSNU:DocUtils_C"
 
 using artdaq::database::json::object_t;
 using artdaq::database::json::value_t;
@@ -25,10 +20,15 @@ using artdaq::database::Success;
 using artdaq::database::Failure;
 using artdaq::database::result_t;
 
-using namespace artdaq::database::jsonutils;
+using namespace artdaq::database::docrecord;
 
 namespace db = artdaq::database;
-namespace utl = db::jsonutils;
+namespace utl = db::docrecord;
+
+namespace dbdr=artdaq::database::docrecord;
+
+namespace jsonliteral = artdaq::database::dataformats::literal;
+
 
 std::string print_visitor(value_t const& value) { return boost::apply_visitor(jsn::print_visitor(), value); }
 std::string tostring_visitor(value_t const& value) { return boost::apply_visitor(jsn::tostring_visitor(), value); }
@@ -40,8 +40,8 @@ bool matches(value_t const& left, value_t const& right) {
     auto const& leftObj = boost::get<object_t>(left);
     auto const& rightObj = boost::get<object_t>(right);
 
-    // partial elements match
-    if (leftObj.size() != rightObj.size()) return false;
+    // FIXME:GAL partial elements match
+    // if (leftObj.size() != rightObj.size()) return false;
 
     if (leftObj.empty() || rightObj.empty()) return false;
 
@@ -105,7 +105,9 @@ std::vector<std::string> utl::split_path(std::string const& path) {
 
   if (!tokens.empty()) {
     std::ostringstream oss;
+
     for (auto const& token : tokens) oss << "\"" << token << "\",";
+
     TRACE_(1, "split_path() loop token=<" << oss.str() << ">");
   } else {
     TRACE_(1, "split_path() token=<empty> ");
@@ -121,46 +123,51 @@ std::ostream& utl::operator<<(std::ostream& os, JSONDocument const& document) {
 }
 
 value_t JSONDocument::readJson(std::string const& json) {
-  assert(!json.empty());
-
-  if (json.empty()) throw cet::exception("JSONDocument") << "Failed reading JSON: Empty JSON buffer";
+  if (json.empty()) throw invalid_argument("JSONDocument") << "Failed reading JSON: Empty JSON buffer";
 
   auto tmpObject = object_t{};
+
   if (JsonReader().read(json, tmpObject)) return {tmpObject};
 
-  throw cet::exception("JSONDocument") << "Failed reading JSON: Invalid json; json_buffer=" << json;
+  throw invalid_argument("JSONDocument") << "Failed reading JSON: Invalid json; json_buffer=" << json;
 }
 
 std::string JSONDocument::writeJson() const {
-  assert(type(_value) == type_t::OBJECT);
-
   if (type(_value) != type_t::OBJECT)
-    throw cet::exception("JSONDocument") << "Failed writing JSON: Wrong value type: type(_value) != type_t::OBJECT";
-
-  auto json = std::string{};
+    throw invalid_argument("JSONDocument") << "Failed writing JSON: Wrong value type: type(_value) != type_t::OBJECT";
 
   auto const& tmpObject = boost::get<object_t>(_value);
 
-  if (JsonWriter().write(tmpObject, json)) {
-    _cached_json_buffer.swap(json);
-    return _cached_json_buffer;
-  }
+  if (tmpObject.empty()) return "{}";
 
-  throw cet::exception("JSONDocument") << "Failed writing JSON: JSONDocument::_value has invalid AST";
+  auto json = std::string{};
+
+  if (!JsonWriter().write(tmpObject, json))
+    throw invalid_argument("JSONDocument") << "Failed writing JSON: JSONDocument::_value has invalid AST";
+
+  TRACE_(1, "writeJson() json=<" << json << " > ");
+
+  return json;
 }
 
 std::string JSONDocument::to_string() const { return writeJson(); }
 
 std::string const& JSONDocument::cached_json_buffer() const { return _cached_json_buffer; }
 
+void JSONDocument::update_json_buffer() { _cached_json_buffer = std::move(writeJson()); }
+
 value_t const& JSONDocument::getPayloadValueForKey(object_t::key_type const& key) const {
-  assert(!key.empty());
+  confirm(!key.empty());
+
+  TRACE_(15, "getPayloadValueForKey() document=<" << cached_json_buffer() << ">");
 
   if (boost::get<object_t>(_value).count("payload") == 1) {
     auto const& value = boost::get<object_t>(_value).at("payload");
 
     if (type(value) == type_t::OBJECT && boost::get<object_t>(value).count(key) == 1)
       return boost::get<object_t>(value).at(key);
+    else
+      return value;
   } else if (boost::get<object_t>(_value).size() == 1) {
     return boost::get<object_t>(_value).begin()->value;
   }
@@ -183,15 +190,15 @@ bool JSONDocument::equals(JSONDocument const& other) const {
 }
 
 JSONDocument JSONDocument::loadFromFile(std::string const& fileName) try {
-  assert(!fileName.empty());
-  throw cet::exception("JSONDocument") << "Failed calling loadFromFile(): File name is empty.";
+  if (fileName.empty()) throw invalid_argument("JSONDocument") << "Failed calling loadFromFile(): File name is empty.";
 
   std::ifstream is;
   is.open(fileName.c_str());
 
   if (!is.good()) {
     is.close();
-    throw cet::exception("JSONDocument") << "Failed calling loadFromFile(): Failed opening a JSON file=" << fileName;
+
+    throw invalid_argument("JSONDocument") << "Failed calling loadFromFile(): Failed opening a JSON file=" << fileName;
   }
 
   std::string json_buffer((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
@@ -199,33 +206,99 @@ JSONDocument JSONDocument::loadFromFile(std::string const& fileName) try {
   is.close();
 
   if (json_buffer.empty())
-    throw cet::exception("JSONDocument") << "Failed calling loadFromFile(): File is empty; file=" << fileName;
+    throw invalid_argument("JSONDocument") << "Failed calling loadFromFile(): File is empty; file=" << fileName;
 
   return {json_buffer};
 } catch (std::exception& ex) {
-  throw cet::exception("JSONDocument") << "Failed calling loadFromFile(): Caught exception:" << ex.what();
+  throw runtime_error("JSONDocument") << "Failed calling loadFromFile(): Caught exception:" << ex.what();
 }
 
-bool isValidJson(std::string const& json_buffer) try {
-  assert(!json_buffer.empty());
-  throw cet::exception("JSONDocument") << "Failed calling isValidJson(): json_buffer is empty.";
+JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& document) {
+  _overlay.reset(nullptr);
 
-  return JSONDocument{json_buffer}, true;
-} catch (std::exception& ex) {
-  TRACE_(10, "Failed calling isValidJson(): Error:" << ex.what());
-  return false;
+  _createFromTemplate(JSONDocument(std::string(template__empty_document)));
+
+  {  // create a new document template using overlay classes
+    auto ovl = std::make_unique<ovlDatabaseRecord>(_document._value);
+    std::swap(_overlay, ovl);
+  }
+
+  TRACE_(2, "createFrom() args  document=<" << document << ">");
+
+  _importUserData(document);
+
+  {  // refresh overlays
+    auto ovl = std::make_unique<ovlDatabaseRecord>(_document._value);
+    std::swap(_overlay, ovl);
+  }
+  _document.writeJson();
+
+  TRACE_(2, "createFrom() document=<" << _document.cached_json_buffer() << ">");
+
+  return self();
 }
 
-std::string filterJson(std::string const& json_buffer) try {
-  assert(!json_buffer.empty());
-  throw cet::exception("JSONDocument") << "Failed calling filterJson(): json_buffer is empty.";
+void JSONDocumentBuilder::_importUserData(JSONDocument const& document) {
+  // replace metadata if any
+  try {
+    auto metadata = document.findChild(jsonliteral::metadata);
 
-  return JSONDocument{json_buffer}.to_string();
-} catch (std::exception& ex) {
-  throw cet::exception("JSONDocument") << "Failed calling filterJson(): Caught exception:" << ex.what();
+    TRACE_(2, "_importUserData() Found document.metadata=<" << metadata << ">");
+
+    _document.replaceChild(metadata, jsonliteral::metadata);
+
+  } catch (notfound_exception const&) {
+    TRACE_(2, "_importUserData() No document.metadata");
+  }
+
+  // replace data if any
+  try {
+    auto data = document.findChild(jsonliteral::changelog);
+
+    TRACE_(2, "_importUserData() Found converted.changelog=<" << data << ">");
+
+    _document.replaceChild(data, jsonliteral::changelog);
+
+  } catch (notfound_exception const&) {
+    TRACE_(2, "_importUserData() No converted.changelog");
+  }
+
+  // replace data origin if any
+  try {
+    auto data = document.findChild(jsonliteral::origin);
+
+    TRACE_(2, "_importUserData() Found origin=<" << data << ">");
+
+    _document.replaceChild(data, jsonliteral::origin);
+
+  } catch (notfound_exception const&) {
+    TRACE_(2, "_importUserData() No origin");
+  }
+
+  // replace data if any
+  try {
+    auto data = document.findChild(jsonliteral::data);
+
+    TRACE_(2, "_importUserData() Found document.data=<" << data << ">");
+
+    _document.replaceChild(data, jsonliteral::data);
+
+    return;
+  } catch (notfound_exception const&) {
+    TRACE_(2, "_importUserData() No document.data");
+  }
+
+  // document contains data only
+  try {
+    _document.replaceChild(document, jsonliteral::data);
+  } catch (notfound_exception const&) {
+    TRACE_(2, "_importUserData() No document.data");
+    throw;
+  }
 }
 
 std::string JSONDocument::value(JSONDocument const& document) {
+  TRACE_(14, "value() document=<" << document.cached_json_buffer() << ">");
   return tostring_visitor(document.getPayloadValueForKey("null"));
 }
 
@@ -260,7 +333,9 @@ std::string JSONDocument::value_at(JSONDocument const& document, std::size_t ind
 }
 
 value_t& JSONDocument::findChildValue(path_t const& path) try {
-  return const_cast<value_t&>(findChildValue(path));
+  auto const& myslef = self();
+
+  return const_cast<value_t&>(myslef.findChildValue(path));
 } catch (std::exception& ex) {
   TRACE_(5, "findChildValue() Search failed; Error:" << ex.what());
   throw;
@@ -272,9 +347,18 @@ result_t JSONDocumentBuilder::CallUndo() noexcept try { return Success(); } catc
   return Failure();
 }
 
+void dbdr::debug::enableJSONDocumentUtils() {
+  TRACE_CNTL("name", TRACE_NAME);
+  TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
+
+  TRACE_(0, "artdaq::database::JSONDocument trace_enable");
+}
+
 namespace artdaq {
 namespace database {
-namespace jsonutils {
+namespace docrecord {
 template <>
 JSONDocument toJSONDocument<string_pair_t>(string_pair_t const& pair) {
   std::ostringstream oss;

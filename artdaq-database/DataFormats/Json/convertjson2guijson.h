@@ -2,8 +2,6 @@
 #define _ARTDAQ_DATABASE_DATAFORMATS_JSON_CONVERTJSON2JSONGUI_H_
 
 #include "artdaq-database/DataFormats/common.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
-
 #include "artdaq-database/DataFormats/Json/json_types.h"
 
 namespace artdaq {

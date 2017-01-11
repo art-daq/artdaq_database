@@ -2,11 +2,10 @@
 
 #include "artdaq-database/DataFormats/Xml/convertxml2json.h"
 #include "artdaq-database/DataFormats/Xml/xml_reader.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME

@@ -1,7 +1,6 @@
 #ifndef _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_BASE_H_
 #define _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_BASE_H_
 
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
 #include "artdaq-database/ConfigurationDB/shared_literals.h"
 

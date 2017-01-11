@@ -16,11 +16,6 @@ void trace_enable();
 
 std::string current_exception_diagnostic_information();
 
-namespace stack {
-void* last_frames[1024];
-size_t last_size;
-}
-
 std::string demangle(const char*);
 std::string demangle(std::string const&);
 std::string demangleStackTrace(void* const*, int);

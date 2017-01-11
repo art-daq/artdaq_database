@@ -1,5 +1,4 @@
 #include "artdaq-database/BasicTypes/basictypes.h"
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/StorageProviders/MongoDB/mongo_json.h"
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 #include "artdaq-database/StorageProviders/common.h"

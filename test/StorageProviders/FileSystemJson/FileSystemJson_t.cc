@@ -5,7 +5,7 @@
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 
-#include "artdaq-database/DataFormats/common/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 #include "artdaq-database/DataFormats/common/helper_functions.h"
 
 #include <bsoncxx/json.hpp>

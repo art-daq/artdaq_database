@@ -2,13 +2,10 @@
 
 #include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
 
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/DataFormats/Fhicl/convertfhicl2jsondb.h"
 #include "artdaq-database/DataFormats/Fhicl/fhicl_types.h"
 #include "artdaq-database/DataFormats/Fhicl/fhicl_writer.h"
-#include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
 #include "artdaq-database/DataFormats/Json/json_types.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME

@@ -1,10 +1,7 @@
 #ifndef _ARTDAQ_DATABASE_DATAFORMATS_COMMON_RESULT_H_
 #define _ARTDAQ_DATABASE_DATAFORMATS_COMMON_RESULT_H_
 
-#include <utility>
-#include <sstream>
-#include <string>
-#include <stdexcept> 
+#include "artdaq-database/SharedCommon/common.h"
 
 namespace artdaq {
 namespace database {

@@ -1,6 +1,5 @@
 #include "artdaq-database/DataFormats/common.h"
 
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/DataFormats/Xml/convertxml2json.h"
 #include "artdaq-database/DataFormats/Xml/xml_common.h"
 

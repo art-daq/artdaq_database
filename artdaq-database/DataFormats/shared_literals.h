@@ -15,6 +15,7 @@ constexpr auto version_node = "version";
 constexpr auto configurable_entity_node = "configurable_entity";
 constexpr auto configurations_node = "configurations";
 constexpr auto id_node = "_id";
+constexpr auto aliases_node = "aliases";
 
 constexpr auto oid = "_oid";
 
@@ -29,7 +30,7 @@ constexpr auto value = "value";
 constexpr auto string = "string";
 constexpr auto type = "type";
 constexpr auto whitespace = " ";
-constexpr auto empty = "";
+constexpr auto empty = "empty";
 constexpr auto comment = "comment";
 constexpr auto annotation = "annotation";
 constexpr auto children = "children";
@@ -52,11 +53,16 @@ constexpr auto update = "update";
 constexpr auto operation = "operation";
 constexpr auto configuration = "configuration";
 constexpr auto assigned = "assigned";
+constexpr auto removed = "removed";
 constexpr auto created = "created";
 constexpr auto aliases = "aliases";
 constexpr auto alias = "alias";
 constexpr auto active = "active";
 constexpr auto history = "history";
+constexpr auto event = "event";
+constexpr auto metadata = "metadata";
+constexpr auto origin = "origin";
+constexpr auto data = "data";
 
 constexpr auto gui_data_node = "guidata";
 constexpr auto converted = "converted";

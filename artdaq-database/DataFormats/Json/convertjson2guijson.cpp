@@ -1,8 +1,5 @@
 #include "artdaq-database/DataFormats/common.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
-#include "artdaq-database/DataFormats/common/shared_types.h"
 
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/DataFormats/Json/convertjson2guijson.h"
 #include "artdaq-database/DataFormats/Json/json_reader.h"
 #include "artdaq-database/DataFormats/Json/json_writer.h"

@@ -15,6 +15,7 @@
 #define TRACE_NAME "CONF:OpSrch_C"
 
 using namespace artdaq::database::configuration;
+namespace dbcfg=artdaq::database::configuration;
 
 using artdaq::database::configuration::options::data_format_t;
 
@@ -90,7 +91,7 @@ result_pair_t json::build_global_configuration_search_filter(std::string const& 
   }
 }
 
-void debug::enableFindConfigsOperation() {
+void dbcfg::debug::enableFindConfigsOperation() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 

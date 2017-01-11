@@ -1,8 +1,5 @@
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
-#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/JsonDocument/common.h"
-
-#include <ctime>
+#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -15,86 +12,23 @@ using artdaq::database::json::value_t;
 using artdaq::database::json::array_t;
 using artdaq::database::json::type_t;
 using artdaq::database::ThrowOnFailure;
+using artdaq::database::result_t;
 
-using namespace artdaq::database::jsonutils;
+using namespace artdaq::database::docrecord;
 
 namespace db = artdaq::database;
-namespace utl = db::jsonutils;
+namespace utl = db::docrecord;
 namespace ovl = db::overlay;
 
-JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& document) {  
-  _overlay.reset(nullptr);
-  
-  TRACE_(2, "createFrom() args  document=<" << document << ">");
+namespace dbdr=artdaq::database::docrecord;
 
-  _createFromTemplate(JSONDocument(std::string(template__default_document)));
-
-  // replace metadata if any
-  try {
-    auto metadata = document.findChild(literal::metadata);
-
-    TRACE_(2, "createFrom() Found document.metadata=<" << metadata << ">");
-
-    _document.replaceChild(metadata, literal::metadata);
-
-  } catch (notfound_exception const&) {
-    TRACE_(2, "createFrom() No document.metadata");
-  }
-
-  // replace data if any
-  try {
-    auto data = document.findChild(literal::changelog);
-
-    TRACE_(2, "createFrom() Found converted.changelog=<" << data << ">");
-
-    _document.replaceChild(data, literal::changelog);
-
-  } catch (notfound_exception const&) {
-    TRACE_(2, "createFrom() No converted.changelog");
-  }
-
-  // replace data origin if any
-  try {
-    auto data = document.findChild(literal::origin);
-
-    TRACE_(2, "createFrom() Found origin=<" << data << ">");
-
-    _document.replaceChild(data, literal::origin);
-
-  } catch (notfound_exception const&) {
-    TRACE_(2, "createFrom() No origin");
-  }
-
-  // replace data if any
-  try {
-    auto data = document.findChild(literal::data);
-
-    TRACE_(2, "createFrom() Found document.data=<" << data << ">");
-
-    _document.replaceChild(data, literal::data);
-
-    return self();
-  } catch (notfound_exception const&) {
-    TRACE_(2, "createFrom() No document.data");
-  }
-
-  // document contains data only
-  _document.replaceChild(document, literal::data);
-
-  auto ovl = std::make_unique<ovlDatabaseRecord>(_document._value);
-
-  _document.writeJson();
-  
-  std::swap(_overlay,ovl);
-  
-  return self();
-}
+namespace jsonliteral = artdaq::database::dataformats::literal;
 
 JSONDocumentBuilder& JSONDocumentBuilder::addAlias(JSONDocument const& alias) try {
   TRACE_(3, "addAlias() args  alias=<" << alias << ">");
 
   JSONDocument copy(alias);
-  auto ovl = overlay<ovl::ovlAlias>(copy, literal::alias);
+  auto ovl = overlay<ovl::ovlAlias>(copy, jsonliteral::alias);
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->addAlias(ovl));
@@ -112,7 +46,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeAlias(JSONDocument const& alias)
   TRACE_(4, "removeAlias() args  alias=<" << alias << ">");
 
   JSONDocument copy(alias);
-  auto ovl = overlay<ovl::ovlAlias>(copy, literal::alias);
+  auto ovl = overlay<ovl::ovlAlias>(copy, jsonliteral::alias);
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->removeAlias(ovl));
@@ -130,7 +64,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::addConfiguration(JSONDocument const& c
   TRACE_(5, "addConfiguration() args config=<" << config << ">");
 
   JSONDocument copy(config);
-  auto ovl = overlay<ovl::ovlConfiguration>(copy, literal::configuration);
+  auto ovl = overlay<ovl::ovlConfiguration>(copy, jsonliteral::configuration);
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->addConfiguration(ovl));
@@ -148,7 +82,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeConfiguration(JSONDocument const
   TRACE_(5, "removeConfiguration() args  config=<" << config << ">");
 
   JSONDocument copy(config);
-  auto ovl = overlay<ovl::ovlConfiguration>(copy, literal::configuration);
+  auto ovl = overlay<ovl::ovlConfiguration>(copy, jsonliteral::configuration);
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->removeConfiguration(ovl));
@@ -166,7 +100,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::setObjectID(JSONDocument const& object
   TRACE_(8, "setObjectID() args  objectId=<" << objectId << ">");
 
   JSONDocument copy(objectId);
-  auto id = overlay<ovl::ovlId>(copy, literal::id);
+  auto id = overlay<ovl::ovlId>(copy, jsonliteral::id_node);
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->swap(id));
@@ -185,7 +119,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::setVersion(JSONDocument const& version
   TRACE_(6, "setVersion() args  version=<" << version << ">");
 
   JSONDocument copy(version);
-  auto ovl = overlay<ovl::ovlVersion>(copy, literal::version);
+  auto ovl = overlay<ovl::ovlVersion>(copy, jsonliteral::version_node);
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->setVersion(ovl));
@@ -203,7 +137,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::setConfigurableEntity(JSONDocument con
   TRACE_(9, "setConfigurableEntity() args  entity=<" << entity << ">");
 
   JSONDocument copy(entity);
-  auto ovl = overlay<ovl::ovlConfigurableEntity>(copy, literal::configurable_entity);
+  auto ovl = overlay<ovl::ovlConfigurableEntity>(copy, jsonliteral::configurable_entity_node);
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->addConfigurableEntity(ovl));
@@ -250,7 +184,18 @@ JSONDocumentBuilder& JSONDocumentBuilder::markDeleted() try {
   return self();
 }
 
-void debug::enableJSONDocumentBuilder() {
+result_t JSONDocumentBuilder::comapreUsingOverlays(JSONDocumentBuilder const& other) const {
+  return *_overlay == *other._overlay;
+}
+
+std::string JSONDocumentBuilder::to_string() const { return _document.to_string(); }
+
+std::ostream& utl::operator<<(std::ostream& os, JSONDocumentBuilder const& data) {
+  os << data.to_string();
+  return os;
+}
+
+void dbdr::debug::enableJSONDocumentBuilder() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);

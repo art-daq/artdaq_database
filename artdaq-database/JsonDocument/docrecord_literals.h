@@ -1,10 +1,11 @@
-#ifndef _ARTDAQ_DATABASE_JSONUTILS_DOCUMENT_TEMPLATE_H_
-#define _ARTDAQ_DATABASE_JSONUTILS_DOCUMENT_TEMPLATE_H_
+#ifndef _ARTDAQ_DATABASE_DOCRECORD_DOCUMENT_LITERALS_H_
+#define _ARTDAQ_DATABASE_DOCRECORD_DOCUMENT_LITERALS_H_
 
 namespace artdaq {
 namespace database {
-namespace jsonutils {
+namespace docrecord {
 
+#if 0
 namespace literal {
 constexpr auto document = "document";
 constexpr auto data = "document.data";
@@ -43,6 +44,8 @@ constexpr auto configurable_entity_name = "configurable_entity.name";
 constexpr auto document_root = "root";
 }
 
+#endif
+
 namespace actions {
 constexpr auto addAlias = "addAlias";
 constexpr auto setConfigurableEntity = "setConfigurableEntity";
@@ -55,50 +58,10 @@ constexpr auto markReadonly = "markReadonly";
 
 constexpr auto template__empty_document =
     "{\n"
-    "    \"document\": \"empty\" \n"
     "}";
 
-constexpr auto template__default_document =
-    "{\n"
-    "    \"document\": {  \n"
-    "        \"data\": {\n"
-    "        },\n"
-    "\t\"metadata\": {\n"
-    "\t    \"comments\": { \"empty\":\"empty\"\n"
-    "\t\t}\n"
-    "\t    },\n"
-    "\t    \"search\": [\n"
-    "\t\t{\n"
-    "\t\t    \"name\": \"find any\",\n"
-    "\t\t    \"query\": \"not defined\"\n"
-    "\t\t}\n"
-    "\t    ]\n"
-    "\t},\n"
-    "\t\"origin\": {\n"
-    "\t    \"format\": \"json\"\n"
-    "    },\n"
-    "    \n"
-    "    \"version\": \"default\",\n"
-    "    \"configurations\": [\n"
-    "    ],\n"
-    "    \"aliases\": {\n"
-    "        \"active\": [\n"
-    "        ],\n"
-    "        \"history\": [\n"
-    "        ]\n"
-    "    },\n"
-    "    \"changelog\":\"empty\",\n"
-    "    \"bookkeeping\": {\n"
-    "        \"isdeleted\": false,\n"
-    "        \"isreadonly\": true,\n"
-    "        \"created\": \"Tue Dec 29 18:19:25 2015\",\n"
-    "        \"updates\": [\n"
-    "        ]\n"
-    "    }\n"
-    "}";
-
-}  // namespace jsonutils
+}  // namespace docrecord
 }  // namespace database
 }  // namespace artdaq
 
-#endif /* _ARTDAQ_DATABASE_JSONUTILS_DOCUMENT_TEMPLATE_H_ */
+#endif /* _ARTDAQ_DATABASE_DOCRECORD_DOCUMENT_LITERALS_H_ */

@@ -1,11 +1,9 @@
 #include "artdaq-database/DataFormats/common.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
 
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
+
+#include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
 #include "artdaq-database/DataFormats/Fhicl/convertfhicl2jsondb.h"
 #include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
-#include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
 
 #include <boost/variant/get.hpp>
 #include <cmath>

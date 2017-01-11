@@ -6,7 +6,7 @@
 
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
 
-#include "artdaq-database/DataFormats/common/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 
 #include "artdaq-database/BasicTypes/basictypes.h"
 

@@ -1,6 +1,6 @@
 cet_make_exec(ConfToolTest_t
   LIBRARIES
-  artdaq-database_StackTrace  
+    
   artdaq-database_BasicTypes
   artdaq-database_FhiclJson
   artdaq-database_JsonDocument

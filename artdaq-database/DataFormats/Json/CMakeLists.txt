@@ -1,7 +1,6 @@
 cet_make(
   LIBRARIES
-  artdaq-database_DataFormats_common  
-  ${CETLIB}
+  artdaq-database_SharedCommon
   )
 
 install_headers()

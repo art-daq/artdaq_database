@@ -1,4 +1,3 @@
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb_index.h"
 #include "artdaq-database/StorageProviders/common.h"
@@ -27,8 +26,8 @@ using artdaq::database::basictypes::JsonData;
 using artdaq::database::filesystem::FileSystemDB;
 using artdaq::database::filesystem::index::SearchIndex;
 
-using artdaq::database::jsonutils::JSONDocumentBuilder;
-using artdaq::database::jsonutils::JSONDocument;
+using artdaq::database::docrecord::JSONDocumentBuilder;
+using artdaq::database::docrecord::JSONDocument;
 
 std::string mkdir(std::string const&);
 object_id_t generate_oid();
@@ -118,7 +117,7 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::store(JsonData const& data)
   TRACE_(4, "StorageProvider::FileSystemDB::store() begin");
   TRACE_(4, "StorageProvider::FileSystemDB::store() args data=<" << data.json_buffer << ">");
 
-  auto builder = JSONDocumentBuilder{data.json_buffer};
+  JSONDocumentBuilder builder{data.json_buffer};
 
   auto collection_name = builder.extract().findChild("collection").value();
 

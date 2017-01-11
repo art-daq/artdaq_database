@@ -3,10 +3,7 @@
 
 #include "artdaq-database/DataFormats/Json/json_common.h"
 #include "artdaq-database/DataFormats/Json/json_types_impl.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
-#include "artdaq-database/DataFormats/common/shared_result.h"
-
-#include "artdaq-database/JsonDocument/common.h"
+#include "artdaq-database/SharedCommon/sharedcommon_common.h"
 
 using artdaq::database::json::object_t;
 using artdaq::database::json::value_t;
@@ -17,7 +14,7 @@ namespace artdaq {
 namespace database {
 namespace overlay {
 
-namespace literal = artdaq::database::dataformats::literal;
+namespace jsonliteral = artdaq::database::dataformats::literal;
 
 constexpr auto msg_IsReadonly = "{\"message\":\"Document is readonly\"}";
 constexpr auto msg_ConvertionError = "{\"message\":\"Conversion error\"}";
@@ -68,8 +65,8 @@ class ovlKeyValue {
   object_t::key_type const& key() const;
   value_t& value();
   value_t const& value() const;
-  std::string& stringValue();
-  std::string const& stringValue() const;
+  std::string& string_value();
+  std::string const& string_value() const;
 
   ovlKeyValue const& self() const;
   ovlKeyValue& self();
@@ -161,7 +158,10 @@ class ovlDocument final : public ovlKeyValue {
 
   // accessors
   ovlData& data();
+  ovlData const& data() const;
+
   ovlMetadata& metadata();
+  ovlMetadata const& metadata() const;
 
   // utils
   void swap(ovlDataUPtr_t& /*data*/);
@@ -258,7 +258,10 @@ class ovlOrigin final : public ovlKeyValue {
  private:
   ovlValueTimeStamp map_timestamp(value_t& /*value*/);
 
+  bool init(value_t& /*parent*/);
+
  private:
+  bool _initOK;
   ovlValueTimeStamp _timestamp;
 };
 
@@ -274,6 +277,12 @@ class ovlVersion final : public ovlKeyValue {
 
   // ops
   result_t operator==(ovlVersion const&) const;
+
+ private:
+  bool init(value_t& /*parent*/);
+
+ private:
+  bool _initOK;
 };
 
 using ovlVersionUPtr_t = std::unique_ptr<ovlVersion>;
@@ -289,8 +298,9 @@ class ovlAlias final : public ovlKeyValue {
   // accessors
   std::string& name();
   std::string const& name() const;
+
   std::string& name(std::string const& /*name*/);
-  std::string& timestamp();
+  std::string& assigned();
 
   // overrides
   std::string to_string() const noexcept override;
@@ -299,10 +309,12 @@ class ovlAlias final : public ovlKeyValue {
   result_t operator==(ovlAlias const&) const;
 
  private:
-  ovlValueTimeStamp map_timestamp(value_t& /*value*/);
+  ovlValueTimeStamp map_assigned(value_t& /*value*/);
+  bool init(value_t& /*parent*/);
 
  private:
-  ovlValueTimeStamp _timestamp;
+  bool _initOK;
+  ovlValueTimeStamp _assigned;
 };
 
 using ovlAliasUPtr_t = std::unique_ptr<ovlAlias>;
@@ -317,6 +329,12 @@ class ovlConfigurableEntity final : public ovlKeyValue {
 
   // ops
   result_t operator==(ovlConfigurableEntity const&) const;
+
+ private:
+  bool init(value_t& /*parent*/);
+
+ private:
+  bool _initOK;
 };
 
 using ovlConfigurableEntityUPtr_t = std::unique_ptr<ovlConfigurableEntity>;
@@ -333,7 +351,9 @@ class ovlConfiguration final : public ovlKeyValue {
   std::string& name();
   std::string const& name() const;
   std::string& name(std::string const& /*name*/);
+
   std::string& timestamp();
+  std::string const& timestamp() const;
 
   // overrides
   std::string to_string() const noexcept override;
@@ -360,6 +380,8 @@ class ovlChangeLog final : public ovlKeyValue {
 
   // accessors
   std::string& value();
+  std::string const& value() const;
+
   std::string& value(std::string const& /*changelog*/);
 
   // utils
@@ -367,6 +389,12 @@ class ovlChangeLog final : public ovlKeyValue {
 
   // ops
   result_t operator==(ovlChangeLog const&) const;
+
+ private:
+  bool init(value_t& /*parent*/);
+
+ private:
+  bool _initOK;
 };
 
 using ovlChangeLogUPtr_t = std::unique_ptr<ovlChangeLog>;
@@ -426,8 +454,10 @@ class ovlAliases final : public ovlKeyValue {
 
  private:
   arrayAliases_t make_aliases(array_t& /*aliases*/);
+  bool init(value_t& /*parent*/);
 
  private:
+  bool _initOK;
   arrayAliases_t _active;
   arrayAliases_t _history;
 };
@@ -448,6 +478,12 @@ class ovlId final : public ovlKeyValue {
 
   // ops
   result_t operator==(ovlId const&) const;
+
+ private:
+  bool init(value_t& /*parent*/);
+
+ private:
+  bool _initOK;
 };
 
 using ovlIdUPtr_t = std::unique_ptr<ovlId>;
@@ -461,8 +497,14 @@ class ovlUpdate final : public ovlKeyValue {
   ~ovlUpdate() = default;
 
   // accessors
-  std::string& opration();
+  std::string& name();
+  std::string const& name() const;
+
   std::string& timestamp();
+  std::string const& timestamp() const;
+
+  ovlKeyValue& what();
+  ovlKeyValue const& what() const;
 
   // overrides
   std::string to_string() const noexcept override;
@@ -471,10 +513,12 @@ class ovlUpdate final : public ovlKeyValue {
   result_t operator==(ovlUpdate const&) const;
 
  private:
-  ovlValueTimeStamp map_operation(value_t& /*value*/);
+  ovlValueTimeStamp map_timestamp(value_t& /*value*/);
+  ovlKeyValue map_what(value_t& /*value*/);
 
  private:
-  ovlValueTimeStamp _operation;
+  ovlValueTimeStamp _timestamp;
+  ovlKeyValue _what;
 };
 
 using ovlUpdateUPtr_t = std::unique_ptr<ovlUpdate>;
@@ -499,7 +543,8 @@ class ovlBookkeeping final : public ovlKeyValue {
   bool& markReadonly(bool const& /*state*/);
   bool& markDeleted(bool const& /*state*/);
 
-  result_t postUpdate(std::string const& /*update*/);
+  template <typename T>
+  result_t postUpdate(std::string const& /*name*/, T const& /*what*/);
 
   // overrides
   std::string to_string() const noexcept override;
@@ -508,10 +553,12 @@ class ovlBookkeeping final : public ovlKeyValue {
   result_t operator==(ovlBookkeeping const&) const;
 
  private:
-  arrayBookkeeping_t make_updates(array_t& /*updates*/);
+  arrayBookkeeping_t make_updates(value_t& /*value*/);
   ovlValueTimeStamp map_created(value_t& /*value*/);
+  bool init(value_t& /*parent*/);
 
  private:
+  bool _initOK;
   arrayBookkeeping_t _updates;
   ovlValueTimeStamp _created;
 };
@@ -570,9 +617,6 @@ class ovlDatabaseRecord final : public ovlKeyValue {
   result_t setVersion(ovlVersionUPtr_t& /*version*/);
 
  private:
-  std::string make_update(std::string const& update) const { return update; }
-
- private:
   ovlDocumentUPtr_t _document;
   ovlCommentsUPtr_t _comments;
   ovlOriginUPtr_t _origin;
@@ -629,6 +673,34 @@ T const& ovl::ovlKeyValue::objectValue(object_t::key_type const& key) const {
   using artdaq::database::sharedtypes::unwrap;
 
   return unwrap(_value).value_as<T>(key);
+}
+
+using namespace artdaq::database;
+
+template <typename T>
+result_t ovl::ovlBookkeeping::postUpdate(std::string const& name, T const& what) {
+  confirm(!name.empty());
+  confirm(what);
+
+  using namespace artdaq::database::result;
+
+  if (isReadonly()) return Failure(msg_IsReadonly);
+
+  auto& updates = ovlKeyValue::value_as<array_t>(jsonliteral::updates);
+
+  auto newEntry = object_t{};
+  newEntry[jsonliteral::event] = name;
+  newEntry[jsonliteral::timestamp] = artdaq::database::timestamp();
+  newEntry[jsonliteral::value] = what->value();
+
+  value_t tmp = newEntry;
+  
+  updates.push_back(tmp);
+
+  // reattach AST
+  _updates = make_updates(value());
+
+  return Success(msg_Added);
 }
 
 #endif /* _ARTDAQ_DATABASE_JSONUTILS_JSONDOCUMENT_OVERLAY_H_ */

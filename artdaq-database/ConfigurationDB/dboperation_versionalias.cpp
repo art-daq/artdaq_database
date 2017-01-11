@@ -2,7 +2,6 @@
 
 #include <boost/exception/diagnostic_information.hpp>
 #include "artdaq-database/BasicTypes/basictypes.h"
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/ConfigurationDB/dboperation_managealiases.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
@@ -15,6 +14,7 @@
 #define TRACE_NAME "CONF:OpVerAls_C"
 
 using namespace artdaq::database::configuration;
+namespace dbcfg=artdaq::database::configuration;
 
 using artdaq::database::configuration::options::data_format_t;
 
@@ -89,7 +89,7 @@ result_pair_t json::find_version_aliases(std::string const& search_filter) noexc
   }
 }
 
-void debug::enableVersionAliasOperation() {
+void dbcfg::debug::enableVersionAliasOperation() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 

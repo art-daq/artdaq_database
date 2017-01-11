@@ -29,7 +29,7 @@
         "format" : "json" 
          
     }, 
-    "version" : "default", 
+    "version" : "notprovided", 
     "configurations" : [
 
     ], 
@@ -44,7 +44,7 @@
     "changelog" : "empty", 
     "bookkeeping" : {
         "isdeleted" : false, 
-        "isreadonly" : true, 
+        "isreadonly" : false, 
         "created" : "Tue Dec 29 18:19:25 2015", 
         "updates" : [
 

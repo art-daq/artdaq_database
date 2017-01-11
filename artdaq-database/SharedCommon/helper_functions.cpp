@@ -1,9 +1,7 @@
-#include <cassert>
-#include <chrono>
-#include <regex>
-#include <string>
+#include "artdaq-database/SharedCommon/common.h"
+#include "artdaq-database/SharedCommon/helper_functions.h"
 
-#include "artdaq-database/DataFormats/common/helper_functions.h"
+#include <chrono>
 
 namespace db = artdaq::database;
 using namespace artdaq::database;
@@ -40,7 +38,7 @@ std::string db::timestamp() {
 
 std::string db::quoted_(std::string const& text) { return "\"" + text + "\""; }
 
-std::string db::quoted_(bool const& value) { return (value ? "true" : "false"); }
+std::string db::bool_(bool value) { return (value ? "true" : "false"); }
 
 std::string db::operator"" _quoted(const char* text, std::size_t) { return "\"" + std::string(text) + "\""; }
 
@@ -49,4 +47,15 @@ std::string db::debrace(std::string s) {
     return s.substr(1, s.length() - 2);
   else
     return s;
+}
+
+std::string db::generate_oid() {
+  std::ifstream is("/proc/sys/kernel/random/uuid");
+
+  std::string oid((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+
+  oid.erase(std::remove(oid.begin(), oid.end(), '-'), oid.end());
+  oid.resize(24);
+
+  return oid;
 }

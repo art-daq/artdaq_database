@@ -9,9 +9,11 @@ std::string filter_jsonstring(std::string const& str);
 std::string timestamp();
 bool useFakeTime(bool);
 std::string quoted_(std::string const& /*text*/);
-std::string quoted_(bool const& /*bool*/);
+std::string bool_(bool /*bool*/);
 std::string operator"" _quoted(const char* /*text*/, std::size_t);
 std::string debrace(std::string /*s*/);
+
+std::string generate_oid();
 }  // namespace database
 }  // artdaq
 

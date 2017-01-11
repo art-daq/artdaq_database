@@ -1,6 +1,5 @@
 #include "artdaq-database/DataFormats/Json/json_writer.h"
 #include "artdaq-database/DataFormats/common.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
 
 using namespace boost::spirit;
 using namespace artdaq::database;

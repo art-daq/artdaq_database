@@ -1,5 +1,6 @@
 cet_make(
   LIBRARIES
+  artdaq-database_SharedCommon
 )
 
 

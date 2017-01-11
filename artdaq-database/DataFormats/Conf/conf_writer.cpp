@@ -1,9 +1,7 @@
 #include "artdaq-database/DataFormats/common.h"
 
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/DataFormats/Conf/conf_writer.h"
 #include "artdaq-database/DataFormats/Conf/convertconf2json.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME

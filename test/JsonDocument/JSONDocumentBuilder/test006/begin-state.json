@@ -60,12 +60,24 @@
         "isreadonly" : false, 
         "created" : "Tue Dec 29 18:19:25 2015", 
         "updates" : [
-            {
-                "addAlias" : "Mon Feb  8 14:00:30 2016"
-            }, 
-            {
-                "removeAlias" : "Mon Feb  8 14:00:30 2016"
-            }
+	{
+	 "event" : "addAlias",
+	 "timestamp":"Mon Feb  8 14:00:30 2016",
+	 "value": 
+	       {
+                "name" : "alias01", 
+                "assigned" : "Mon Feb  8 14:00:30 2016"
+               } 
+        },
+	{
+	 "event" : "removeAlias",
+	 "timestamp":"Mon Feb  8 14:00:30 2016",
+	 "value": 
+	       {
+                "name" : "alias01", 
+                "assigned" : "Mon Feb  8 14:00:30 2016"
+               } 
+        }
         ]
     }
 }

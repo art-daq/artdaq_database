@@ -2,7 +2,6 @@
 
 #include <boost/exception/diagnostic_information.hpp>
 #include "artdaq-database/BasicTypes/basictypes.h"
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/ConfigurationDB/dboperation_metadata.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
@@ -15,6 +14,7 @@
 #define TRACE_NAME "CONF:OpMDA_C"
 
 using namespace artdaq::database::configuration;
+namespace dbcfg=artdaq::database::configuration;
 
 using artdaq::database::configuration::options::data_format_t;
 
@@ -82,7 +82,7 @@ result_pair_t json::read_database_info(std::string const& search_filter) noexcep
   }
 }
 
-void debug::enableMetadataOperation() {
+void dbcfg::debug::enableMetadataOperation() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 

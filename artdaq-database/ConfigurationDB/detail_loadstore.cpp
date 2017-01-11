@@ -9,7 +9,7 @@
 
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/JsonDocument/JSONDocument_template.h"
@@ -147,7 +147,7 @@ void store_configuration(Options const& options, std::string& conf) {
   TRACE_(15, "store_configuration: json_buffer=<" << data.json_buffer << ">");
 
   // create a json document to be inserted into the database
-  auto builder = JSONDocumentBuilder{};
+  JSONDocumentBuilder builder{};
 
   builder.createFromData(data.json_buffer);
 

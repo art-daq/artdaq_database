@@ -1,5 +1,7 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+add_subdirectory(SharedCommon)
+
 add_subdirectory(BuildInfo)
 add_subdirectory(DataFormats)
 

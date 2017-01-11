@@ -9,14 +9,13 @@
 
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
-#include "artdaq-database/JsonDocument/JSONDocument_template.h"
+#include "artdaq-database/JsonDocument/docrecord_literals.h"
 
 #include <boost/exception/diagnostic_information.hpp>
 
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
 
 #ifdef TRACE_NAME
@@ -39,8 +38,8 @@ using Options = cf::LoadStoreOperation;
 
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::basictypes::FhiclData;
-using artdaq::database::jsonutils::JSONDocument;
-using artdaq::database::jsonutils::JSONDocumentBuilder;
+using artdaq::database::docrecord::JSONDocument;
+using artdaq::database::docrecord::JSONDocumentBuilder;
 
 namespace artdaq {
 namespace database {

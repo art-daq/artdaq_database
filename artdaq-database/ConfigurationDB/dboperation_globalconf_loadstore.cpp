@@ -2,8 +2,6 @@
 
 #include <boost/exception/diagnostic_information.hpp>
 #include "artdaq-database/BasicTypes/basictypes.h"
-#include "artdaq-database/BuildInfo/process_exceptions.h"
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/ConfigurationDB/dboperation_globalconf_loadstore.h"
 #include "artdaq-database/ConfigurationDB/dboperation_loadstore.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
@@ -19,6 +17,7 @@
 #define TRACE_NAME "CONF:OpldStr_C"
 
 using namespace artdaq::database::configuration;
+namespace dbcfg=artdaq::database::configuration;
 
 using artdaq::database::configuration::options::data_format_t;
 
@@ -275,7 +274,7 @@ result_pair_t store_configuration_file(LoadStoreOperation const& options, std::s
 }  // namespace database
 }  // namespace artdaq
 
-void debug::enableGlobalConfLoadStoreOperation() {
+void dbcfg::debug::enableGlobalConfLoadStoreOperation() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
