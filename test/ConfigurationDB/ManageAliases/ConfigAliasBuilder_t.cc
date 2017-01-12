@@ -25,7 +25,7 @@ namespace cfol = cfo::literal;
 
 using Options = cfo::LoadStoreOperation;
 
-using artdaq::database::jsonutils::JSONDocument;
+using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::basictypes::JsonData;
 
 typedef bool (*test_case)(Options const& /*options*/, std::string const& /*file_name*/);
@@ -167,7 +167,7 @@ int main(int argc, char* argv[]) try {
 
 bool test_addalias(Options const& options, std::string const& file_name)
 {
-  assert(!file_name.empty());
+  confirm(!file_name.empty());
 
   std::ifstream is(file_name);
 
@@ -198,7 +198,7 @@ bool test_addalias(Options const& options, std::string const& file_name)
 
 bool test_removealias(Options const& options, std::string const& file_name)
 {
-  assert(!file_name.empty());
+  confirm(!file_name.empty());
 
   std::ifstream is(file_name);
 
@@ -228,7 +228,7 @@ bool test_removealias(Options const& options, std::string const& file_name)
 }
 
 bool test_findaliases(Options const& options, std::string const& file_name){
-  assert(!file_name.empty());
+  confirm(!file_name.empty());
 
   std::ifstream is(file_name);
 

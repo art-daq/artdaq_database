@@ -5,7 +5,8 @@
 #include "artdaq-database/ConfigurationDB/dboperation_managealiases.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
-#include "artdaq-database/ConfigurationDB/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
+#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -14,7 +15,10 @@
 #define TRACE_NAME "CONF:OpVerAls_C"
 
 using namespace artdaq::database::configuration;
-namespace dbcfg=artdaq::database::configuration;
+namespace dbcfg = artdaq::database::configuration;
+
+namespace jsonliteral = artdaq::database::dataformats::literal;
+namespace apiliteral = artdaq::database::configapi::literal;
 
 using artdaq::database::configuration::options::data_format_t;
 
@@ -36,56 +40,56 @@ namespace detail {
 }  // namespace database
 }  // namespace artdaq
 
-auto make_error_msg = [](auto msg) { return std::string("{error:\"").append(msg).append(".\"}"); };
+using namespace artdaq::database::result;
 
 result_pair_t json::add_version_alias(std::string const& search_filter) noexcept {
   try {
-    if (search_filter.empty()) return std::make_pair(false, make_error_msg(literal::msg::empty_filter));
+    if (search_filter.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = LoadStoreOperation{literal::operation::addalias};
+    auto options = LoadStoreOperation{apiliteral::operation::addalias};
     options.readJsonData({search_filter});
 
     auto returnValue = std::string{};
 
     // detail::add_version_alias(options, returnValue);
 
-    return result_pair_t{true, returnValue};
+    return Success(returnValue);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
 result_pair_t json::remove_version_alias(std::string const& search_filter) noexcept {
   try {
-    if (search_filter.empty()) return std::make_pair(false, make_error_msg(literal::msg::empty_filter));
+    if (search_filter.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = LoadStoreOperation{literal::operation::rmalias};
+    auto options = LoadStoreOperation{apiliteral::operation::rmalias};
     options.readJsonData({search_filter});
 
     auto returnValue = std::string{};
 
     // detail::remove_version_alias(options, returnValue);
 
-    return result_pair_t{true, returnValue};
+    return Success(returnValue);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
 result_pair_t json::find_version_aliases(std::string const& search_filter) noexcept {
   try {
-    if (search_filter.empty()) return std::make_pair(false, make_error_msg(literal::msg::empty_filter));
+    if (search_filter.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = LoadStoreOperation{literal::operation::rmalias};
+    auto options = LoadStoreOperation{apiliteral::operation::rmalias};
     options.readJsonData({search_filter});
 
     auto returnValue = std::string{};
 
     // detail::find_version_aliases(options, returnValue);
 
-    return result_pair_t{true, returnValue};
+    return Success(returnValue);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 

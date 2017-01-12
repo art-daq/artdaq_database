@@ -20,7 +20,6 @@
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
-namespace cfl = cf::literal;
 namespace dbbt = db::basictypes;
 
 using dbbt::JsonData;
@@ -32,16 +31,16 @@ using cf::options::data_format_t;
 LoadStoreOperation::LoadStoreOperation(std::string const& process_name) : OperationBase{process_name} {}
 
 std::string const& LoadStoreOperation::version() const noexcept {
-  assert(!_version.empty());
+  confirm(!_version.empty());
 
   return _version;
 }
 
 std::string const& LoadStoreOperation::version(std::string const& version) {
-  assert(!version.empty());
+  confirm(!version.empty());
 
   if (version.empty()) {
-    throw cet::exception("Options") << "Invalid version; version is empty.";
+    throw runtime_error("Options") << "Invalid version; version is empty.";
   }
 
   TRACE_(10, "Options: Updating version from " << _version << " to " << version << ".");
@@ -52,16 +51,16 @@ std::string const& LoadStoreOperation::version(std::string const& version) {
 }
 
 std::string const& LoadStoreOperation::configurableEntity() const noexcept {
-  assert(!_configurable_entity.empty());
+  confirm(!_configurable_entity.empty());
 
   return _configurable_entity;
 }
 
 std::string const& LoadStoreOperation::configurableEntity(std::string const& entity) {
-  assert(!entity.empty());
+  confirm(!entity.empty());
 
   if (entity.empty()) {
-    throw cet::exception("Options") << "Invalid configurable entity; entity is empty.";
+    throw runtime_error("Options") << "Invalid configurable entity; entity is empty.";
   }
 
   TRACE_(11, "Options: Updating entity from " << _configurable_entity << " to " << entity << ".");
@@ -72,19 +71,20 @@ std::string const& LoadStoreOperation::configurableEntity(std::string const& ent
 }
 
 std::string const& LoadStoreOperation::globalConfiguration() const noexcept {
-  assert(!_global_configuration.empty());
+  confirm(!_global_configuration.empty());
 
   return _global_configuration;
 }
 
 std::string const& LoadStoreOperation::globalConfiguration(std::string const& global_configuration) {
-  assert(!global_configuration.empty());
+  confirm(!global_configuration.empty());
 
   if (global_configuration.empty()) {
-    throw cet::exception("Options") << "Invalid global config; global config is empty.";
+    throw runtime_error("Options") << "Invalid global config; global config is empty.";
   }
 
-  TRACE_(12, "Options: Updating global_configuration from " << _global_configuration << " to " << global_configuration << ".");
+  TRACE_(12, "Options: Updating global_configuration from " << _global_configuration << " to " << global_configuration
+                                                            << ".");
 
   _global_configuration = global_configuration;
 
@@ -92,16 +92,16 @@ std::string const& LoadStoreOperation::globalConfiguration(std::string const& gl
 }
 
 std::string const& LoadStoreOperation::sourceFileName() const noexcept {
-  assert(!_source_file_name.empty());
+  confirm(!_source_file_name.empty());
 
   return _source_file_name;
 }
 
 std::string const& LoadStoreOperation::sourceFileName(std::string const& source_file_name) {
-  assert(!source_file_name.empty());
+  confirm(!source_file_name.empty());
 
   if (source_file_name.empty()) {
-    throw cet::exception("Options") << "Invalid source file name; source file name is empty.";
+    throw runtime_error("Options") << "Invalid source file name; source file name is empty.";
   }
 
   TRACE_(12, "Options: Updating source_file_name from " << _source_file_name << " to " << source_file_name << ".");
@@ -112,7 +112,7 @@ std::string const& LoadStoreOperation::sourceFileName(std::string const& source_
 }
 
 void LoadStoreOperation::readJsonData(JsonData const& data) {
-  assert(!data.json_buffer.empty());
+  confirm(!data.json_buffer.empty());
 
   OperationBase::readJsonData(data);
 
@@ -124,47 +124,47 @@ void LoadStoreOperation::readJsonData(JsonData const& data) {
   }
 
   try {
-    globalConfiguration(boost::get<std::string>(dataAST.at(cfl::option::configuration)));
+    globalConfiguration(boost::get<std::string>(dataAST.at(apiliteral::option::configuration)));
   } catch (...) {
   }
 
   try {
-    version(boost::get<std::string>(dataAST.at(cfl::option::version)));
+    version(boost::get<std::string>(dataAST.at(apiliteral::option::version)));
   } catch (...) {
   }
 
   try {
-    configurableEntity(boost::get<std::string>(dataAST.at(cfl::gui::configurable_entity)));
+    configurableEntity(boost::get<std::string>(dataAST.at(apiliteral::gui::configurable_entity)));
   } catch (...) {
   }
 
   try {
-    sourceFileName(boost::get<std::string>(dataAST.at(cfl::option::source)));
+    sourceFileName(boost::get<std::string>(dataAST.at(apiliteral::option::source)));
   } catch (...) {
   }
 
   try {
-    auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(cfl::option::searchfilter));
+    auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(apiliteral::option::searchfilter));
 
-    if (filterAST.empty()) searchFilter(cfl::notprovided);
+    if (filterAST.empty()) searchFilter(jsonliteral::notprovided);
 
     try {
-      version(boost::get<std::string>(filterAST.at(cfl::filter::version)));
+      version(boost::get<std::string>(filterAST.at(apiliteral::filter::version)));
     } catch (...) {
     }
 
     try {
-      configurableEntity(boost::get<std::string>(filterAST.at(cfl::filter::entity)));
+      configurableEntity(boost::get<std::string>(filterAST.at(apiliteral::filter::entity)));
     } catch (...) {
     }
 
     try {
-      globalConfiguration(boost::get<std::string>(filterAST.at(cfl::filter::configuration)));
+      globalConfiguration(boost::get<std::string>(filterAST.at(apiliteral::filter::configuration)));
     } catch (...) {
     }
 
     try {
-      sourceFileName(boost::get<std::string>(dataAST.at(cfl::option::source)));
+      sourceFileName(boost::get<std::string>(dataAST.at(apiliteral::option::source)));
     } catch (...) {
     }
 
@@ -178,20 +178,20 @@ int LoadStoreOperation::readProgramOptions(bpo::variables_map const& vm) {
 
   if (result != process_exit_code::SUCCESS) return result;
 
-  if (vm.count(cfl::option::version)) {
-    version(vm[cfl::option::version].as<std::string>());
+  if (vm.count(apiliteral::option::version)) {
+    version(vm[apiliteral::option::version].as<std::string>());
   }
 
-  if (vm.count(cfl::option::entity)) {
-    configurableEntity(vm[cfl::option::entity].as<std::string>());
+  if (vm.count(apiliteral::option::entity)) {
+    configurableEntity(vm[apiliteral::option::entity].as<std::string>());
   }
 
-  if (vm.count(cfl::option::configuration)) {
-    globalConfiguration(vm[cfl::option::configuration].as<std::string>());
+  if (vm.count(apiliteral::option::configuration)) {
+    globalConfiguration(vm[apiliteral::option::configuration].as<std::string>());
   }
 
-  if (vm.count(cfl::option::source)) {
-    sourceFileName(vm[cfl::option::source].as<std::string>());
+  if (vm.count(apiliteral::option::source)) {
+    sourceFileName(vm[apiliteral::option::source].as<std::string>());
   }
 
   return process_exit_code::SUCCESS;
@@ -200,13 +200,19 @@ int LoadStoreOperation::readProgramOptions(bpo::variables_map const& vm) {
 bpo::options_description LoadStoreOperation::makeProgramOptions() const {
   auto opts = OperationBase::makeProgramOptions();
 
-  auto make_opt_name = [](auto& long_name, auto& short_name) { return std::string{long_name}.append(",").append(short_name); };
+  auto make_opt_name = [](auto& long_name, auto& short_name) {
+    return std::string{long_name}.append(",").append(short_name);
+  };
 
-  opts.add_options()(make_opt_name(cfl::option::version, "v").c_str(), bpo::value<std::string>(), "Configuration version");
-  opts.add_options()(make_opt_name(cfl::option::entity, "e").c_str(), bpo::value<std::string>(), "Configurable-entity name");
-  opts.add_options()(make_opt_name(cfl::option::configuration, "g").c_str(), bpo::value<std::string>(), "Global configuration name");
+  opts.add_options()(make_opt_name(apiliteral::option::version, "v").c_str(), bpo::value<std::string>(),
+                     "Configuration version");
+  opts.add_options()(make_opt_name(apiliteral::option::entity, "e").c_str(), bpo::value<std::string>(),
+                     "Configurable-entity name");
+  opts.add_options()(make_opt_name(apiliteral::option::configuration, "g").c_str(), bpo::value<std::string>(),
+                     "Global configuration name");
 
-  opts.add_options()(make_opt_name(cfl::option::source, "s").c_str(), bpo::value<std::string>(), "Configuration source file name");
+  opts.add_options()(make_opt_name(apiliteral::option::source, "s").c_str(), bpo::value<std::string>(),
+                     "Configuration source file name");
 
   return opts;
 }
@@ -220,9 +226,10 @@ JsonData LoadStoreOperation::writeJsonData() const {
     throw db::invalid_option_exception("LoadStoreOperation") << "Unable to readsearch_filter_to_JsonData().";
   }
 
-  if (globalConfiguration() != cfl::notprovided) docAST[cfl::option::configuration] = globalConfiguration();
+  if (globalConfiguration() != jsonliteral::notprovided)
+    docAST[apiliteral::option::configuration] = globalConfiguration();
 
-  if (sourceFileName() != cfl::notprovided) docAST[cfl::option::source] = sourceFileName();
+  if (sourceFileName() != jsonliteral::notprovided) docAST[apiliteral::option::source] = sourceFileName();
 
   auto json_buffer = std::string{};
 
@@ -233,7 +240,7 @@ JsonData LoadStoreOperation::writeJsonData() const {
 }
 
 JsonData LoadStoreOperation::search_filter_to_JsonData() const {
-  if (searchFilter() != cfl::notprovided) {
+  if (searchFilter() != jsonliteral::notprovided) {
     return {searchFilter()};
   }
 
@@ -245,15 +252,15 @@ JsonData LoadStoreOperation::search_filter_to_JsonData() const {
     throw db::invalid_option_exception("LoadStoreOperation") << "Unable to search_filter_to_JsonData().";
   }
 
-  if (version() != cfl::notprovided) docAST[cfl::filter::version] = version();
+  if (version() != jsonliteral::notprovided) docAST[apiliteral::filter::version] = version();
 
-  if (configurableEntity() != cfl::notprovided) docAST[cfl::filter::entity] = configurableEntity();
+  if (configurableEntity() != jsonliteral::notprovided) docAST[apiliteral::filter::entity] = configurableEntity();
 
-  if (globalConfiguration() != cfl::notprovided && operation() != cfl::operation::addconfig)
-    docAST[cfl::filter::configuration] = globalConfiguration();
+  if (globalConfiguration() != jsonliteral::notprovided && operation() != apiliteral::operation::addconfig)
+    docAST[apiliteral::filter::configuration] = globalConfiguration();
 
   if (docAST.empty()) {
-    return {cfl::empty_json};
+    return {apiliteral::empty_json};
   }
 
   auto json_buffer = std::string{};
@@ -268,7 +275,7 @@ JsonData LoadStoreOperation::globalConfiguration_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[cfl::filter::configuration] = globalConfiguration();
+  docAST[apiliteral::filter::configuration] = globalConfiguration();
 
   auto json_buffer = std::string{};
 
@@ -283,7 +290,7 @@ JsonData LoadStoreOperation::collectionName_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[cfl::option::collection] = collectionName();
+  docAST[apiliteral::option::collection] = collectionName();
 
   auto json_buffer = std::string{};
 
@@ -298,7 +305,7 @@ JsonData LoadStoreOperation::version_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[cfl::filter::version] = version();
+  docAST[apiliteral::filter::version] = version();
 
   auto json_buffer = std::string{};
 
@@ -312,7 +319,7 @@ JsonData LoadStoreOperation::configurableEntity_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[cfl::name] = configurableEntity();
+  docAST[apiliteral::name] = configurableEntity();
 
   auto json_buffer = std::string{};
 

@@ -19,8 +19,8 @@ namespace literal = artdaq::database::dataformats::literal;
 using artdaq::database::fhicl::FhiclReader;
 
 bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
-  assert(!in.empty());
-  assert(json_object.empty());
+  confirm(!in.empty());
+  confirm(json_object.empty());
 
   TRACE_(2, "read_data() begin");
 
@@ -128,8 +128,8 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
 }
 
 bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array) {
-  assert(!in.empty());
-  assert(json_array.empty());
+  confirm(!in.empty());
+  confirm(json_array.empty());
 
   try {
     using boost::spirit::qi::phrase_parse;

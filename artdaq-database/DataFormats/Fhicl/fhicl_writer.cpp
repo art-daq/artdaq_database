@@ -22,8 +22,8 @@ using artdaq::database::fhicljson::json2fcldb;
 using artdaq::database::fhicljson::extra_opts;
 
 bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out) {
-  assert(out.empty());
-  assert(!json_object.empty());
+  confirm(out.empty());
+  confirm(!json_object.empty());
 
   TRACE_(2, "write_data() begin");
 

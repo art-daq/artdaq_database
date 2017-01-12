@@ -5,7 +5,8 @@
 #include "artdaq-database/ConfigurationDB/dboperation_manageconfigs.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
-#include "artdaq-database/ConfigurationDB/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
+#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -14,7 +15,7 @@
 #define TRACE_NAME "CONF:OpCrtCfs_C"
 
 using namespace artdaq::database::configuration;
-namespace dbcfg=artdaq::database::configuration;
+namespace dbcfg = artdaq::database::configuration;
 
 using artdaq::database::configuration::options::data_format_t;
 
@@ -40,21 +41,21 @@ void list_collection_names(LoadStoreOperation const&, std::string&);
 }  // namespace database
 }  // namespace artdaq
 
-auto make_error_msg = [](auto msg) { return std::string("{error:\"").append(msg).append(".\"}"); };
+using namespace artdaq::database::result;
 
 result_pair_t opts::add_configuration_to_global_configuration(LoadStoreOperation const& options) noexcept {
   try {
     auto returnValue = std::string{};
 
     detail::add_configuration_to_global_configuration(options, returnValue);
-    return result_pair_t{true, returnValue};
+    return Success(returnValue);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
 result_pair_t opts::create_new_global_configuration(LoadStoreOperation const& /*options*/) noexcept {
-  return result_pair_t{false, "Not Implemented"};
+  return Failure("Not Implemented");
 }
 
 result_pair_t opts::list_collection_names(LoadStoreOperation const& options) noexcept {
@@ -63,9 +64,9 @@ result_pair_t opts::list_collection_names(LoadStoreOperation const& options) noe
 
     detail::list_collection_names(options, returnValue);
 
-    return result_pair_t{true, returnValue};
+    return Success(returnValue);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
@@ -75,9 +76,9 @@ result_pair_t opts::find_configuration_versions(LoadStoreOperation const& option
 
     detail::find_configuration_versions(options, returnValue);
 
-    return result_pair_t{true, returnValue};
+    return Success(returnValue);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
@@ -87,89 +88,89 @@ result_pair_t opts::find_configuration_entities(LoadStoreOperation const& option
 
     detail::find_configuration_entities(options, returnValue);
 
-    return result_pair_t{true, returnValue};
+    return Success(returnValue);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
 result_pair_t json::add_configuration_to_global_configuration(std::string const& search_filter) noexcept {
   try {
-    if (search_filter.empty()) return std::make_pair(false, make_error_msg(literal::msg::empty_filter));
+    if (search_filter.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = LoadStoreOperation{literal::operation::addconfig};
+    auto options = LoadStoreOperation{apiliteral::operation::addconfig};
     options.readJsonData({search_filter});
 
     auto returnValue = std::string{};
 
     detail::add_configuration_to_global_configuration(options, returnValue);
-    return result_pair_t{true, returnValue};
+    return Success(returnValue);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
 result_pair_t json::create_new_global_configuration(std::string const& operations) noexcept {
   try {
-    if (operations.empty()) return std::make_pair(false, make_error_msg(literal::msg::empty_filter));
+    if (operations.empty()) return Failure(msg_EmptyFilter);
 
     auto returnValue = std::string{};
 
     detail::create_new_global_configuration(operations, returnValue);
 
-    return result_pair_t{true, returnValue};
+    return Success(returnValue);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
 result_pair_t json::list_collection_names(std::string const& search_filter) noexcept {
   try {
-    if (search_filter.empty()) return std::make_pair(false, make_error_msg(literal::msg::empty_filter));
+    if (search_filter.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = LoadStoreOperation{literal::operation::listcollections};
+    auto options = LoadStoreOperation{apiliteral::operation::listcollections};
     options.readJsonData({search_filter});
 
     auto returnValue = std::string{};
 
     detail::list_collection_names(options, returnValue);
-    return result_pair_t{true, returnValue};
+    return Success(returnValue);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
 result_pair_t json::find_configuration_versions(std::string const& search_filter) noexcept {
   try {
-    if (search_filter.empty()) return std::make_pair(false, make_error_msg(literal::msg::empty_filter));
+    if (search_filter.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = LoadStoreOperation{literal::operation::findversions};
+    auto options = LoadStoreOperation{apiliteral::operation::findversions};
     options.readJsonData({search_filter});
 
     auto returnValue = std::string{};
 
     detail::find_configuration_versions(options, returnValue);
 
-    return result_pair_t{true, returnValue};
+    return Success(returnValue);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
 result_pair_t json::find_configuration_entities(std::string const& search_filter) noexcept {
   try {
-    if (search_filter.empty()) return std::make_pair(false, make_error_msg(literal::msg::empty_filter));
+    if (search_filter.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = LoadStoreOperation{literal::operation::findentities};
+    auto options = LoadStoreOperation{apiliteral::operation::findentities};
     options.readJsonData({search_filter});
 
     auto returnValue = std::string{};
 
     detail::find_configuration_entities(options, returnValue);
 
-    return result_pair_t{true, returnValue};
+    return Success(returnValue);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 

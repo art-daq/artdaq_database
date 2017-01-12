@@ -19,8 +19,10 @@
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
-namespace cfl = cf::literal;
 namespace dbbt = db::basictypes;
+
+namespace jsonliteral = artdaq::database::dataformats::literal;
+namespace apiliteral = artdaq::database::configapi::literal;
 
 using dbbt::JsonData;
 using cf::BulkOperations;
@@ -29,7 +31,7 @@ using cf::options::data_format_t;
 BulkOperations::BulkOperations(std::string const& process_name) : _process_name{process_name} {}
 
 std::string const& BulkOperations::bulkOperations() const noexcept {
-  assert(!_bulk_operations.empty());
+  confirm(!_bulk_operations.empty());
 
   return _bulk_operations;
 }
@@ -37,9 +39,9 @@ std::string const& BulkOperations::bulkOperations() const noexcept {
 data_format_t const& BulkOperations::dataFormat() const noexcept { return _data_format; }
 
 std::string const& BulkOperations::bulkOperations(std::string const& search_filter) {
-  assert(!search_filter.empty());
+  confirm(!search_filter.empty());
 
-  auto tmp = cf::dequote(search_filter);
+  auto tmp = db::dequote(search_filter);
   TRACE_(15, "Options: bulkOperations args search_filter=<" << tmp << ">.");
 
   _bulk_operations = tmp;
@@ -50,19 +52,22 @@ std::string const& BulkOperations::bulkOperations(std::string const& search_filt
 bpo::options_description BulkOperations::makeProgramOptions() const {
   std::ostringstream descstr;
   descstr << _process_name;
-  descstr << " <" << cfl::option::bulkoperations << ">";
+  descstr << " <" << apiliteral::option::bulkoperations << ">";
 
-  descstr << "  <-r <" << cfl::option::result << ">>";
+  descstr << "  <-r <" << apiliteral::option::result << ">>";
 
   bpo::options_description opts = descstr.str();
 
-  auto make_opt_name = [](auto& long_name, auto& short_name) { return std::string{long_name}.append(",").append(short_name); };
+  auto make_opt_name = [](auto& long_name, auto& short_name) {
+    return std::string{long_name}.append(",").append(short_name);
+  };
 
   opts.add_options()("help,h", "Produce help message");
 
-  opts.add_options()(cfl::option::bulkoperations, bpo::value<std::string>(), "BulkOperations json");
+  opts.add_options()(apiliteral::option::bulkoperations, bpo::value<std::string>(), "BulkOperations json");
 
-  opts.add_options()(make_opt_name(cfl::option::result, "r").c_str(), bpo::value<std::string>(), "Expected result file name");
+  opts.add_options()(make_opt_name(apiliteral::option::result, "r").c_str(), bpo::value<std::string>(),
+                     "Expected result file name");
 
   return opts;
 }
@@ -73,8 +78,8 @@ int BulkOperations::readProgramOptions(bpo::variables_map const& vm) {
     return process_exit_code::HELP;
   }
 
-  if (vm.count(cfl::option::bulkoperations)) {
-    auto json = vm[cfl::option::bulkoperations].as<std::string>();
+  if (vm.count(apiliteral::option::bulkoperations)) {
+    auto json = vm[apiliteral::option::bulkoperations].as<std::string>();
     std::ifstream is(json.c_str());
     if (is.good()) {
       json = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
@@ -91,7 +96,7 @@ int BulkOperations::readProgramOptions(bpo::variables_map const& vm) {
 }
 
 void BulkOperations::readJsonData(JsonData const& data) {
-  assert(!data.json_buffer.empty());
+  confirm(!data.json_buffer.empty());
 
   using cf::ManageConfigsOperation;
   using namespace artdaq::database::json;
@@ -103,11 +108,11 @@ void BulkOperations::readJsonData(JsonData const& data) {
 
   bulkOperations(data.json_buffer);
 
-  auto const& operations = boost::get<jsn::array_t>(dataAST.at(cfl::operation::operations));
+  auto const& operations = boost::get<jsn::array_t>(dataAST.at(jsonliteral::operations));
 
   for (auto& operation : operations) {
     auto const& tmp_op_object = boost::get<jsn::object_t>(operation);
-    auto const& opname = boost::get<std::string>(tmp_op_object.at(cfl::option::operation));
+    auto const& opname = boost::get<std::string>(tmp_op_object.at(apiliteral::option::operation));
 
     std::string buffer = std::string{};
 

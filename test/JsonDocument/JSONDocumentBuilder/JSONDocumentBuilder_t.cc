@@ -99,7 +99,7 @@ constexpr auto mustsucceed = "must-succeed";
 }
 
 bool test_buildDocument(std::string const& conf) {
-  assert(!conf.empty());
+  confirm(!conf.empty());
 
   auto opts = JSONDocument(conf);
   auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
@@ -134,7 +134,7 @@ bool test_buildDocument(std::string const& conf) {
 }
 
 bool test_addAlias(std::string const& conf) {
-  assert(!conf.empty());
+  confirm(!conf.empty());
 
   auto opts = JSONDocument(conf);
   auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
@@ -171,7 +171,7 @@ bool test_addAlias(std::string const& conf) {
 }
 
 bool test_removeAlias(std::string const& conf) {
-  assert(!conf.empty());
+  confirm(!conf.empty());
 
   auto opts = JSONDocument(conf);
   auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
@@ -208,7 +208,7 @@ bool test_removeAlias(std::string const& conf) {
 }
 
 bool test_addToGlobalConfig(std::string const& conf) {
-  assert(!conf.empty());
+  confirm(!conf.empty());
 
   auto opts = JSONDocument(conf);
   auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
@@ -235,7 +235,7 @@ bool test_addToGlobalConfig(std::string const& conf) {
 }
 
 bool test_setVersion(std::string const& conf) {
-  assert(!conf.empty());
+  confirm(!conf.empty());
 
   auto opts = JSONDocument(conf);
   auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
@@ -262,7 +262,7 @@ bool test_setVersion(std::string const& conf) {
 }
 
 bool test_markReadonly(std::string const& conf) {
-  assert(!conf.empty());
+  confirm(!conf.empty());
 
   auto opts = JSONDocument(conf);
   auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
@@ -288,7 +288,7 @@ bool test_markReadonly(std::string const& conf) {
 }
 
 bool test_markDeleted(std::string const& conf) {
-  assert(!conf.empty());
+  confirm(!conf.empty());
 
   auto opts = JSONDocument(conf);
   auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));

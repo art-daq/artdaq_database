@@ -2,7 +2,8 @@
 #define _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_BASE_H_
 
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
-#include "artdaq-database/ConfigurationDB/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
+#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 
 #include <boost/program_options.hpp>
 
@@ -18,6 +19,9 @@ namespace configuration {
 
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::configuration::options::data_format_t;
+
+namespace jsonliteral = artdaq::database::dataformats::literal;
+namespace apiliteral = artdaq::database::configapi::literal;
 
 class OperationBase {
  public:
@@ -54,13 +58,13 @@ class OperationBase {
   std::string _getProviderFromURI();
 
  private:
-  std::string _process_name = {literal::notprovided};
+  std::string _process_name = {jsonliteral::notprovided};
 
-  std::string _provider = {literal::provider::filesystem};
-  std::string _operation = {literal::operation::load};
+  std::string _provider = {apiliteral::provider::filesystem};
+  std::string _operation = {apiliteral::operation::load};
   data_format_t _data_format = {data_format_t::unknown};
-  std::string _collection_name = {literal::notprovided};
-  std::string _search_filter = {literal::notprovided};
+  std::string _collection_name = {jsonliteral::notprovided};
+  std::string _search_filter = {jsonliteral::notprovided};
 };
 
 namespace debug {

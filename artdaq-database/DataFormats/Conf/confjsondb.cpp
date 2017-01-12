@@ -25,8 +25,8 @@ using artdaq::database::conf::ConfWriter;
 namespace literal = artdaq::database::dataformats::literal;
 
 bool conf_to_json(std::string const& conf, std::string& json) {
-  assert(!conf.empty());
-  assert(json.empty());
+  confirm(!conf.empty());
+  confirm(json.empty());
 
   TRACE_(2, "conf_to_json: begin");
 
@@ -62,8 +62,8 @@ bool conf_to_json(std::string const& conf, std::string& json) {
 }
 
 bool json_to_conf(std::string const& json, std::string& conf) {
-  assert(!json.empty());
-  assert(conf.empty());
+  confirm(!json.empty());
+  confirm(conf.empty());
 
   TRACE_(3, "json_to_conf: begin");
 

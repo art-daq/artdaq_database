@@ -2,7 +2,6 @@
 #define _ARTDAQ_DATABASE_COMMON_H_
 
 #include <algorithm>
-#include <cassert>
 #include <cstddef>
 #include <cstdio>
 #include <ctime>
@@ -25,5 +24,4 @@
 
 #include "trace.h"
 
-# define confirm(expr) assert(expr)
 #endif /* _ARTDAQ_DATABASE_COMMON_H_ */

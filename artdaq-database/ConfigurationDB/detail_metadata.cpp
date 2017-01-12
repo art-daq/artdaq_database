@@ -3,13 +3,13 @@
 #include "artdaq-database/ConfigurationDB/dboperation_metadata.h"
 
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
-#include "artdaq-database/ConfigurationDB/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
+#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 
 #include "artdaq-database/ConfigurationDB/configuration_dbproviders.h"
 
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
-#include "artdaq-database/DataFormats/shared_literals.h"
 
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/JsonDocument/docrecord_literals.h"
@@ -26,10 +26,9 @@
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
-namespace cfl = cf::literal;
-namespace cflo = cfl::operation;
-namespace cflp = cfl::provider;
 namespace cftd = cf::debug::detail;
+namespace jsonliteral = db::dataformats::literal;
+namespace apiliteral = db::configapi::literal;
 
 using cf::LoadStoreOperation;
 using cf::options::data_format_t;
@@ -58,8 +57,8 @@ typedef JsonData (*provider_listcollections_t)(Options const& /*options*/, JsonD
 typedef JsonData (*provider_readdbinfo_t)(Options const& /*options*/, JsonData const& /*search_filter*/);
 
 void list_database_names(Options const& options, std::string& configs) {
-  assert(configs.empty());
-  assert(options.operation().compare(cflo::listdatabases) == 0);
+  confirm(configs.empty());
+  confirm(options.operation().compare(apiliteral::operation::listdatabases) == 0);
 
   TRACE_(11, "list_database_names: begin");
   TRACE_(11, "list_database_names args options=<" << options.to_string() << ">");
@@ -67,14 +66,16 @@ void list_database_names(Options const& options, std::string& configs) {
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_listdatabases_t>{{cflp::mongo, cf::mongo::listDatabaseNames},
-                                                                     {cflp::filesystem, cf::filesystem::listDatabaseNames},
-                                                                     {cflp::ucond, cf::ucond::listDatabaseNames}};
+    auto providers = std::map<std::string, provider_listdatabases_t>{
+        {apiliteral::provider::mongo, cf::mongo::listDatabaseNames},
+        {apiliteral::provider::filesystem, cf::filesystem::listDatabaseNames},
+        {apiliteral::provider::ucond, cf::ucond::listDatabaseNames}};
 
     return providers.at(name);
   };
 
-  auto search_result = dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
+  auto search_result =
+      dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -87,7 +88,7 @@ void list_database_names(Options const& options, std::string& configs) {
     case data_format_t::fhicl:
     case data_format_t::xml: {
       if (!db::json_db_to_gui(search_result.json_buffer, returnValue)) {
-        throw cet::exception("list_database_names") << "Unsupported data format.";
+        throw runtime_error("list_database_names") << "Unsupported data format.";
       }
       break;
     }
@@ -98,7 +99,7 @@ void list_database_names(Options const& options, std::string& configs) {
       break;
     }
 
-    case data_format_t::console: {
+    case data_format_t::csv: {
       using namespace artdaq::database::json;
       auto reader = JsonReader{};
       object_t results_ast;
@@ -106,17 +107,17 @@ void list_database_names(Options const& options, std::string& configs) {
       if (!reader.read(search_result.json_buffer, results_ast)) {
         TRACE_(11, "list_database_names() Failed to create an AST from search results JSON.");
 
-        throw cet::exception("list_database_names") << "Failed to create an AST from search results JSON.";
+        throw runtime_error("list_database_names") << "Failed to create an AST from search results JSON.";
       }
 
-      auto const& results_list = boost::get<array_t>(results_ast.at(cfl::document::search));
+      auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
 
       TRACE_(11, "list_database_names: found " << results_list.size() << " results.");
 
       std::ostringstream os;
 
       for (auto const& result_entry : results_list) {
-        auto const& buff = boost::get<object_t>(result_entry).at(cfl::name);
+        auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
         auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
 
         TRACE_(11, "list_database_names() Found database=<" << value << ">.");
@@ -134,8 +135,8 @@ void list_database_names(Options const& options, std::string& configs) {
   TRACE_(11, "list_database_names: end");
 }
 void read_database_info(Options const& options, std::string& filters) {
-  assert(filters.empty());
-  assert(options.operation().compare(cflo::readdbinfo) == 0);
+  confirm(filters.empty());
+  confirm(options.operation().compare(apiliteral::operation::readdbinfo) == 0);
 
   TRACE_(12, "read_database_info: begin");
   TRACE_(11, "read_database_info args options=<" << options.to_string() << ">");
@@ -144,12 +145,15 @@ void read_database_info(Options const& options, std::string& filters) {
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers = std::map<std::string, provider_readdbinfo_t>{
-        {cflp::mongo, cf::mongo::readDatabaseInfo}, {cflp::filesystem, cf::filesystem::readDatabaseInfo}, {cflp::ucond, cf::ucond::readDatabaseInfo}};
+        {apiliteral::provider::mongo, cf::mongo::readDatabaseInfo},
+        {apiliteral::provider::filesystem, cf::filesystem::readDatabaseInfo},
+        {apiliteral::provider::ucond, cf::ucond::readDatabaseInfo}};
 
     return providers.at(name);
   };
 
-  auto search_result = dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
+  auto search_result =
+      dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -162,7 +166,7 @@ void read_database_info(Options const& options, std::string& filters) {
     case data_format_t::fhicl:
     case data_format_t::xml: {
       if (!db::json_db_to_gui(search_result.json_buffer, returnValue)) {
-        throw cet::exception("read_database_info") << "Unsupported data format.";
+        throw runtime_error("read_database_info") << "Unsupported data format.";
       }
       break;
     }
@@ -180,8 +184,8 @@ void read_database_info(Options const& options, std::string& filters) {
 }
 
 void list_collection_names(Options const& options, std::string& collections) {
-  assert(collections.empty());
-  assert(options.operation().compare(cflo::listcollections) == 0);
+  confirm(collections.empty());
+  confirm(options.operation().compare(apiliteral::operation::listcollections) == 0);
 
   TRACE_(13, "list_collection_names: begin");
   TRACE_(13, "list_collection_names args search_filter=<" << options.to_string() << ">");
@@ -189,14 +193,16 @@ void list_collection_names(Options const& options, std::string& collections) {
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_listcollections_t>{{cflp::mongo, cf::mongo::listCollectionNames},
-                                                                       {cflp::filesystem, cf::filesystem::listCollectionNames},
-                                                                       {cflp::ucond, cf::ucond::listCollectionNames}};
+    auto providers = std::map<std::string, provider_listcollections_t>{
+        {apiliteral::provider::mongo, cf::mongo::listCollectionNames},
+        {apiliteral::provider::filesystem, cf::filesystem::listCollectionNames},
+        {apiliteral::provider::ucond, cf::ucond::listCollectionNames}};
 
     return providers.at(name);
   };
 
-  auto search_result = dispatch_persistence_provider(options.provider())(options, options.collectionName_to_JsonData().json_buffer);
+  auto search_result =
+      dispatch_persistence_provider(options.provider())(options, options.collectionName_to_JsonData().json_buffer);
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -208,7 +214,7 @@ void list_collection_names(Options const& options, std::string& collections) {
     case data_format_t::unknown:
     case data_format_t::fhicl:
     case data_format_t::xml: {
-      throw cet::exception("list_collection_names") << "Unsupported data format.";
+      throw runtime_error("list_collection_names") << "Unsupported data format.";
       break;
     }
 
@@ -217,7 +223,7 @@ void list_collection_names(Options const& options, std::string& collections) {
       returnValueChanged = true;
       break;
     }
-    case data_format_t::console: {
+    case data_format_t::csv: {
       using namespace artdaq::database::json;
       auto reader = JsonReader{};
       object_t results_ast;
@@ -225,17 +231,17 @@ void list_collection_names(Options const& options, std::string& collections) {
       if (!reader.read(search_result.json_buffer, results_ast)) {
         TRACE_(11, "list_collection_names() Failed to create an AST from search results JSON.");
 
-        throw cet::exception("list_collection_names") << "Failed to create an AST from search results JSON.";
+        throw runtime_error("list_collection_names") << "Failed to create an AST from search results JSON.";
       }
 
-      auto const& results_list = boost::get<array_t>(results_ast.at(cfl::document::search));
+      auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
 
       TRACE_(11, "list_collection_names: found " << results_list.size() << " results.");
 
       std::ostringstream os;
 
       for (auto const& result_entry : results_list) {
-        auto const& buff = boost::get<object_t>(result_entry).at(cfl::name);
+        auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
         auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
 
         TRACE_(11, "list_collection_names() Found collection=<" << value << ">.");

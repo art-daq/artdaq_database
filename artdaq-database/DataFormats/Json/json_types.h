@@ -2,7 +2,11 @@
 #define _ARTDAQ_DATABASE_JSONTYPES_H_
 
 #include "artdaq-database/DataFormats/common.h"
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
 #include "artdaq-database/DataFormats/shared_types.h"
+#pragma GCC diagnostic pop
 
 #include <boost/fusion/adapted/struct/adapt_struct.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
@@ -67,7 +71,7 @@ struct type_visitor : public boost::static_visitor<type_t> {
 
 template <typename T>
 type_t type(T& var) {
-  assert(!var.empty());
+  confirm(!var.empty());
   return boost::apply_visitor(type_visitor(), var);
 }
 

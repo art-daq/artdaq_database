@@ -2,6 +2,7 @@
 #define _ARTDAQ_DATABASE_JSON_READER_H_
 
 #include "artdaq-database/JsonConvert/common.h"
+#include "artdaq-database/SharedCommon/helper_functions.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -20,13 +21,13 @@ struct JsonDeserializer {
   explicit JsonDeserializer(std::istream& is) : doc{std::move(read_json(is))} { path.reserve(100); }
 
   void start_member(std::string const& name[[gnu::unused]]) {
-    assert(!name.empty());
+    confirm(!name.empty());
 
     path.push_back(name);
   }
 
   void finish_member(std::string const& name[[gnu::unused]]) {
-    assert(!name.empty());
+    confirm(!name.empty());
 
     path.pop_back();
   }

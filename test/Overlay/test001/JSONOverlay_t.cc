@@ -1,14 +1,6 @@
-#include <boost/exception/diagnostic_information.hpp>
-#include <fstream>
-#include <iostream>
-#include <streambuf>
-#include <string>
-#include <bitset>
-#include "artdaq-database/BuildInfo/printStackTrace.h"
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
+#include "test/common.h"
+
 #include "artdaq-database/Overlay/JSONDocumentOverlay.h"
-#include "boost/program_options.hpp"
-#include "cetlib/coded_exception.h"
 
 namespace bpo = boost::program_options;
 

@@ -6,6 +6,9 @@
 #undef TRACE_NAME
 #endif
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
+
 #define TRACE_NAME "JSNU:DocUtils_C"
 
 using artdaq::database::json::object_t;
@@ -313,11 +316,11 @@ std::string JSONDocument::value_at(JSONDocument const& document, std::size_t ind
   auto const& valueArray = boost::get<jsn::array_t>(docValue);
 
   if (valueArray.empty())
-    throw cet::exception("JSONDocument") << "Failed calling value_at(): valueArray is empty, document=<"
+    throw runtime_error("JSONDocument") << "Failed calling value_at(): valueArray is empty, document=<"
                                          << document.cached_json_buffer() << ">";
 
   if (valueArray.size() < index)
-    throw cet::exception("JSONDocument") << "Failed to call value_at(); not enough elements, document=<"
+    throw runtime_error("JSONDocument") << "Failed to call value_at(); not enough elements, document=<"
                                          << document.cached_json_buffer() << ">";
 
   auto pos = valueArray.begin();
@@ -329,7 +332,7 @@ std::string JSONDocument::value_at(JSONDocument const& document, std::size_t ind
   else
     return tostring_visitor(*pos);
 } catch (std::exception& ex) {
-  throw cet::exception("JSONDocument") << "Failed calling value_at(): Caught exception:" << ex.what();
+  throw runtime_error("JSONDocument") << "Failed calling value_at(): Caught exception:" << ex.what();
 }
 
 value_t& JSONDocument::findChildValue(path_t const& path) try {
@@ -346,6 +349,8 @@ result_t JSONDocumentBuilder::SaveUndo() { return Success(); }
 result_t JSONDocumentBuilder::CallUndo() noexcept try { return Success(); } catch (...) {
   return Failure();
 }
+
+#pragma GCC diagnostic pop
 
 void dbdr::debug::enableJSONDocumentUtils() {
   TRACE_CNTL("name", TRACE_NAME);

@@ -2,7 +2,9 @@
 #define _ARTDAQ_DATABASE_JSONUTILS_JSONDOCUMENT_OVERLAY_H_
 
 #include "artdaq-database/DataFormats/Json/json_common.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 #include "artdaq-database/DataFormats/Json/json_types_impl.h"
+
 #include "artdaq-database/SharedCommon/sharedcommon_common.h"
 
 using artdaq::database::json::object_t;
@@ -639,8 +641,8 @@ namespace ovl = artdaq::database::overlay;
 
 template <typename OVL, typename T = object_t>
 std::unique_ptr<OVL> ovl::overlay(value_t& parent, object_t::key_type const& self_key) {
-  assert(!self_key.empty());
-  assert(type(parent) == type_t::OBJECT);
+  confirm(!self_key.empty());
+  confirm(type(parent) == type_t::OBJECT);
 
   using artdaq::database::sharedtypes::unwrap;
 

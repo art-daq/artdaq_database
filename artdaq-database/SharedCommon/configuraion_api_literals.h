@@ -1,10 +1,13 @@
 #ifndef _ARTDAQ_DATABASE_CONFIGURATIONAPI_LITERALS_H_
 #define _ARTDAQ_DATABASE_CONFIGURATIONAPI_LITERALS_H_
 
-#include "artdaq-database/SharedCommon/common.h"
-
 namespace artdaq {
 namespace database {
+namespace result {
+constexpr auto msg_EmptyFilter = "{\"message\":\"empty_filter\"}";
+constexpr auto msg_EmptyDocument = "{\"message\":\"Json document is empty\"}";
+constexpr auto msg_SystemCallFailed = "{\"message\":\"Unable to call system() from this API; check if either set-user-ID or set-group-ID check if either set-user-ID or set-group-ID \"}";
+}
 namespace configapi {
 namespace literal {
 
@@ -30,18 +33,12 @@ constexpr auto newconfig = "newconfig";
 constexpr auto addalias = "addalias";
 constexpr auto rmalias = "rmalias";
 constexpr auto findalias = "findalias";
-constexpr auto operations = "operations";
 }
 
 namespace provider {
 constexpr auto mongo = "mongo";
 constexpr auto filesystem = "filesystem";
 constexpr auto ucond = "ucond";
-}
-
-namespace result {
-constexpr auto SUCCESS = "Success";
-constexpr auto FAILURE = "Failure";
 }
 
 namespace option {
@@ -83,29 +80,14 @@ constexpr auto empty_document = "Json document is empty";
 constexpr auto cant_call_system =
     "Unable to call system() from this API; "
     "check if either set-user-ID or set-group-ID "
-    "are used in the program execution context.";
+    "check if either set-user-ID or set-group-ID ";
 }
 
 namespace search {
 constexpr auto default_filter = "{\"configurable_entity\":\"any\"}";
 }
 
-namespace document {
-constexpr auto document = "document";
-constexpr auto data = "data";
-constexpr auto metadata = "metadata";
-constexpr auto search = "search";
-constexpr auto query = "query";
-}
 
-namespace origin {
-constexpr auto origin = "origin";
-constexpr auto source = "source";
-constexpr auto timestamp = "timestamp";
-constexpr auto format = "format";
-constexpr auto rawdata = "rawdata";
-constexpr auto filename = "filename";
-}
 
 constexpr auto name = "name";
 

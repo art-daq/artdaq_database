@@ -3,6 +3,8 @@
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 #include "artdaq-database/StorageProviders/common.h"
 
+#include "artdaq-database/SharedCommon/sharedcommon_common.h"
+
 #include <bsoncxx/builder/basic/helpers.hpp>
 #include <bsoncxx/builder/stream/array.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
@@ -25,21 +27,11 @@
 
 #define TRACE_NAME "PRVDR:MongoDB_C"
 
+using namespace artdaq::database;
 namespace db = artdaq::database;
-namespace dbmgl = db::mongo::literal;
 
+namespace literal = db::mongo::literal;
 namespace bbs = bsoncxx::builder::stream;
-
-namespace artdaq {
-namespace database {
-
-namespace detail {
-template <typename T>
-constexpr std::uint8_t static_cast_as_uint8_t(T const& t) {
-  return static_cast<std::uint8_t>(t);
-}
-
-}  // namespace detail
 
 using bsoncxx::builder::stream::document;
 using bsoncxx::builder::stream::open_document;
@@ -48,20 +40,46 @@ using bsoncxx::builder::stream::open_array;
 using bsoncxx::builder::stream::close_array;
 using bsoncxx::builder::stream::finalize;
 using bsoncxx::builder::concatenate_doc;
-using artdaq::database::basictypes::JsonData;
-using artdaq::database::mongo::MongoDB;
 
-std::string dequote(std::string);
+using artdaq::database::mongo::DBConfig;
+using artdaq::database::mongo::MongoDB;
+using artdaq::database::basictypes::JsonData;
+
+DBConfig::DBConfig()
+    : uri{std::string{literal::MONGOURI} + literal::hostname + ":" + literal::port + "/" + literal::db_name} {
+  auto tmpURI =
+      getenv("ARTDAQ_DATABASE_URI") ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
+
+  if (tmpURI.back() == '/') tmpURI.pop_back();  // remove trailing slash
+
+  auto prefixURI = std::string{literal::MONGOURI};
+  if (tmpURI.length() > prefixURI.length() && std::equal(prefixURI.begin(), prefixURI.end(), tmpURI.begin()))
+    uri = tmpURI;
+}
+
+DBConfig::DBConfig(std::string uri_) : uri{uri_} { confirm(!uri_.empty()); }
+
+MongoDB::MongoDB(DBConfig const& config, PassKeyIdiom const&)
+    : _config{config},
+      _instance{},
+      _client{mongocxx::uri{_config.connectionURI()}},
+      _connection{_client[_client.uri().database()]} {}
+
+mongocxx::cursor MongoDB::list_databases() {
+  connection();
+  return _client.list_databases();
+}
 
 mongocxx::database& MongoDB::connection() {
-  // if (_connection.has_collection(db::metadata::system_metadata)) return _connection;
+  // if (_connection.has_collection(system_metadata)) return _connection;
 
-  auto collection = _connection.collection(db::metadata::system_metadata);
+  auto collection = _connection.collection(system_metadata);
   auto filter = bsoncxx::builder::core(false);
 
   if (collection.count(filter.view_document()) > 0) return _connection;
 
-  auto bson_document = bsoncxx::from_json("{" + make_database_metadata("artdaq", expand_environment_variables(_config.connectionURI())) + "}");
+  auto bson_document = bsoncxx::from_json(
+      "{" + make_database_metadata("artdaq", expand_environment_variables(_config.connectionURI())) + "}");
 
   auto result = collection.insert_one(bson_document.view());
 
@@ -72,6 +90,8 @@ mongocxx::database& MongoDB::connection() {
   return _connection;
 }
 
+namespace artdaq {
+namespace database {
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::load(JsonData const& search) {
@@ -86,7 +106,8 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::load(JsonData const& sea
     auto view = bson_document.view();
     auto element = view.find(name);
 
-    if (element == view.end()) throw cet::exception("MongoDB") << "Search JsonData is missing the \"" << name << "\" element.";
+    if (element == view.end())
+      throw runtime_error("MongoDB") << "Search JsonData is missing the \"" << name << "\" element.";
 
     return element->get_value();
   };
@@ -102,7 +123,6 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::load(JsonData const& sea
 
     TRACE_(3, "StorageProvider::MongoDB::load() user provided filter=<" << bsoncxx::to_json(tmp) << ">");
 
-    using detail::static_cast_as_uint8_t;
     using value_type_t = bsoncxx::type;
     using namespace bsoncxx::builder::stream;
 
@@ -126,13 +146,14 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::load(JsonData const& sea
         break;
       }
     }
-    TRACE_(2, "collection_name=\"" << collection_name << "\", search filter=<" << bsoncxx::to_json(filter.view_document()) << ">");
+    TRACE_(2, "collection_name=\"" << collection_name << "\", search filter=<"
+                                   << bsoncxx::to_json(filter.view_document()) << ">");
 
   } catch (cet::exception const&) {
     TRACE_(2, "search filter is missing");
   } catch (std::exception const& e) {
     TRACE_(2, "Caught exception:" << e.what());
-    throw cet::exception("MongoDB") << "Caught exception:" << e.what();
+    throw runtime_error("MongoDB") << "Caught exception:" << e.what();
   }
 
   auto size = collection.count(filter.view_document());
@@ -158,7 +179,8 @@ object_id_t StorageProvider<JsonData, MongoDB>::store(JsonData const& data) {
     auto view = bson_document.view();
     auto element = view.find(name);
 
-    if (element == view.end()) throw cet::exception("MongoDB") << "Search JsonData is missing the \"" << name << "\" element.";
+    if (element == view.end())
+      throw runtime_error("MongoDB") << "Search JsonData is missing the \"" << name << "\" element.";
 
     return element->get_value();
   };
@@ -177,7 +199,7 @@ object_id_t StorageProvider<JsonData, MongoDB>::store(JsonData const& data) {
 
     TRACE_(3, "StorageProvider::MongoDB::load() user provided filter=<" << bsoncxx::to_json(tmp) << ">");
 
-    using detail::static_cast_as_uint8_t;
+    
     using value_type_t = bsoncxx::type;
     using namespace bsoncxx::builder::stream;
 
@@ -202,7 +224,8 @@ object_id_t StorageProvider<JsonData, MongoDB>::store(JsonData const& data) {
         break;
       }
     }
-    TRACE_(2, "collection_name=\"" << collection_name << "\", search filter=<" << bsoncxx::to_json(filter.view_document()) << ">");
+    TRACE_(2, "collection_name=\"" << collection_name << "\", search filter=<"
+                                   << bsoncxx::to_json(filter.view_document()) << ">");
 
     isNew = false;
   } catch (cet::exception const&) {
@@ -242,7 +265,7 @@ object_id_t StorageProvider<JsonData, MongoDB>::store(JsonData const& data) {
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::findGlobalConfigs(JsonData const& search) {
-  assert(!search.json_buffer.empty());
+  confirm(!search.json_buffer.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(4, "StorageProvider::MongoDB::findGlobalConfigs() begin");
@@ -257,17 +280,19 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findGlobalConfigs(JsonDa
   auto collectionDescriptors = _provider->connection().list_collections(filter.view_document());
 
   for (auto const& collectionDescriptor : collectionDescriptors) {
-    TRACE_(4, "StorageProvider::MongoDB::findGlobalConfigs() found collection=<" << bsoncxx::to_json(collectionDescriptor) << ">");
+    TRACE_(4, "StorageProvider::MongoDB::findGlobalConfigs() found collection=<"
+                  << bsoncxx::to_json(collectionDescriptor) << ">");
 
     auto element_name = collectionDescriptor.find("name");
 
-    if (element_name == collectionDescriptor.end()) throw cet::exception("MongoDB") << "MongoDB returned invalid database collection descriptor.";
+    if (element_name == collectionDescriptor.end())
+      throw runtime_error("MongoDB") << "MongoDB returned invalid database collection descriptor.";
 
     auto string_value = element_name->get_value();
 
     auto collection_name = dequote(bsoncxx::to_json(string_value));
 
-    if (collection_name == "system.indexes" || collection_name == metadata::system_metadata) continue;
+    if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
 
     TRACE_(4,
            "StorageProvider::MongoDB::findGlobalConfigs() querying "
@@ -283,11 +308,13 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findGlobalConfigs(JsonDa
     auto cursor = collection.distinct("configurations.name", configuration_filter.view_document());
 
     for (auto const& view : cursor) {
-      TRACE_(4, "StorageProvider::MongoDB::findGlobalConfigs() looping over cursor =<" << bsoncxx::to_json(view) << ">");
+      TRACE_(4, "StorageProvider::MongoDB::findGlobalConfigs() looping over cursor =<" << bsoncxx::to_json(view)
+                                                                                       << ">");
 
       auto element_values = view.find("values");
 
-      if (element_values == collectionDescriptor.end()) throw cet::exception("MongoDB") << "MongoDB returned invalid database search.";
+      if (element_values == collectionDescriptor.end())
+        throw runtime_error("MongoDB") << "MongoDB returned invalid database search.";
 
       auto configuration_name_array = element_values->get_array();
 
@@ -318,7 +345,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findGlobalConfigs(JsonDa
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::buildConfigSearchFilter(JsonData const& search) {
-  assert(!search.json_buffer.empty());
+  confirm(!search.json_buffer.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(5, "StorageProvider::MongoDB::buildConfigSearchFilter() begin");
@@ -333,18 +360,20 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::buildConfigSearchFilter(
   auto collectionDescriptors = _provider->connection().list_collections(filter.view_document());
 
   for (auto const& collectionDescriptor : collectionDescriptors) {
-    TRACE_(5, "StorageProvider::MongoDB::buildConfigSearchFilter() found collection=<" << bsoncxx::to_json(collectionDescriptor) << ">");
+    TRACE_(5, "StorageProvider::MongoDB::buildConfigSearchFilter() found collection=<"
+                  << bsoncxx::to_json(collectionDescriptor) << ">");
 
     // auto view = collectionDescriptor.view();
     auto element_name = collectionDescriptor.find("name");
 
-    if (element_name == collectionDescriptor.end()) throw cet::exception("MongoDB") << "MongoDB returned invalid database collection descriptor.";
+    if (element_name == collectionDescriptor.end())
+      throw runtime_error("MongoDB") << "MongoDB returned invalid database collection descriptor.";
 
     auto string_value = element_name->get_value();
 
     auto collection_name = dequote(bsoncxx::to_json(string_value));
 
-    if (collection_name == "system.indexes" || collection_name == metadata::system_metadata) continue;
+    if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
 
     TRACE_(5,
            "StorageProvider::MongoDB::buildConfigSearchFilter() querying "
@@ -370,7 +399,8 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::buildConfigSearchFilter(
 
     stages.match(match_stage.view_document()).project(project_stage.view());  //.sort(sort_stage.view());
 
-    TRACE_(5, "StorageProvider::MongoDB::buildConfigSearchFilter()  search_filter=<" << bsoncxx::to_json(stages.view()) << ">");
+    TRACE_(5, "StorageProvider::MongoDB::buildConfigSearchFilter()  search_filter=<" << bsoncxx::to_json(stages.view())
+                                                                                     << ">");
 
     auto cursor = collection.aggregate(stages);
 
@@ -382,7 +412,8 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::buildConfigSearchFilter(
 
       auto element_values = view.find("configurations");
 
-      if (element_values == collectionDescriptor.end()) throw cet::exception("MongoDB") << "MongoDB returned invalid database search.";
+      if (element_values == collectionDescriptor.end())
+        throw runtime_error("MongoDB") << "MongoDB returned invalid database search.";
 
       auto configuration_name_array = element_values->get_array();
       for (auto const& configuration_name_element[[gnu::unused]] : configuration_name_array.value) {
@@ -406,7 +437,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::buildConfigSearchFilter(
         oss << "}";
         oss << "}";
 
-        TRACE_(4,"StorageProvider::MongoDB::buildConfigSearchFilter() found document=<" << oss.str() << ">");
+        TRACE_(4, "StorageProvider::MongoDB::buildConfigSearchFilter() found document=<" << oss.str() << ">");
 
         returnCollection.emplace_back(oss.str());
 
@@ -421,7 +452,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::buildConfigSearchFilter(
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigVersions(JsonData const& search_filter) {
-  assert(!search_filter.json_buffer.empty());
+  confirm(!search_filter.json_buffer.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(7, "StorageProvider::MongoDB::findConfigVersions() begin");
@@ -433,7 +464,8 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigVersions(JsonD
     auto view = bson_document.view();
     auto element = view.find(name);
 
-    if (element == view.end()) throw cet::exception("MongoDB") << "Search JsonData is missing the \"" << name << "\" element.";
+    if (element == view.end())
+      throw runtime_error("MongoDB") << "Search JsonData is missing the \"" << name << "\" element.";
 
     return element->get_value();
   };
@@ -454,7 +486,8 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigVersions(JsonD
 
   stages.match(match_stage.view_document()).project(project_stage.view());
 
-  TRACE_(5, "StorageProvider::MongoDB::findConfigVersions()  search_filter=<" << bsoncxx::to_json(stages.view()) << ">");
+  TRACE_(5, "StorageProvider::MongoDB::findConfigVersions()  search_filter=<" << bsoncxx::to_json(stages.view())
+                                                                              << ">");
 
   auto cursor = collection.aggregate(stages);
 
@@ -487,7 +520,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigVersions(JsonD
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigEntities(JsonData const& search) {
-  assert(!search.json_buffer.empty());
+  confirm(!search.json_buffer.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(9, "StorageProvider::MongoDB::findConfigEntities() begin");
@@ -499,7 +532,8 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigEntities(JsonD
     auto view = bson_document.view();
     auto element = view.find(name);
 
-    if (element == view.end()) throw cet::exception("MongoDB") << "Search JsonData is missing the \"" << name << "\" element.";
+    if (element == view.end())
+      throw runtime_error("MongoDB") << "Search JsonData is missing the \"" << name << "\" element.";
 
     return element->get_value();
   };
@@ -511,17 +545,19 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigEntities(JsonD
   auto collectionDescriptors = _provider->connection().list_collections(filter.view_document());
 
   for (auto const& collectionDescriptor : collectionDescriptors) {
-    TRACE_(9, "StorageProvider::MongoDB::findConfigEntities() found collection=<" << bsoncxx::to_json(collectionDescriptor) << ">");
+    TRACE_(9, "StorageProvider::MongoDB::findConfigEntities() found collection=<"
+                  << bsoncxx::to_json(collectionDescriptor) << ">");
 
     auto element_name = collectionDescriptor.find("name");
 
-    if (element_name == collectionDescriptor.end()) throw cet::exception("MongoDB") << "MongoDB returned invalid database collection descriptor.";
+    if (element_name == collectionDescriptor.end())
+      throw runtime_error("MongoDB") << "MongoDB returned invalid database collection descriptor.";
 
     auto string_value = element_name->get_value();
 
     auto collection_name = dequote(bsoncxx::to_json(string_value));
 
-    if (collection_name == "system.indexes" || collection_name == metadata::system_metadata) continue;
+    if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
 
     TRACE_(9,
            "StorageProvider::MongoDB::findConfigEntities() querying "
@@ -542,13 +578,14 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigEntities(JsonD
 
     stages.match(match_stage.view_document()).project(project_stage.view());
 
-    TRACE_(9, "StorageProvider::MongoDB::findConfigEntities()  search_filter=<" << bsoncxx::to_json(stages.view()) << ">");
+    TRACE_(9, "StorageProvider::MongoDB::findConfigEntities()  search_filter=<" << bsoncxx::to_json(stages.view())
+                                                                                << ">");
     auto cursor = collection.aggregate(stages);
 
     auto seenValues = std::list<std::string>{};
 
     auto isNew = [& v = seenValues](auto const& name) {
-      assert(!name.empty());
+      confirm(!name.empty());
       if (std::find(v.begin(), v.end(), name) != v.end()) return false;
 
       v.emplace_back(name);
@@ -585,7 +622,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigEntities(JsonD
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::addConfigToGlobalConfig(JsonData const& search_filter) {
-  assert(!search_filter.json_buffer.empty());
+  confirm(!search_filter.json_buffer.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(8, "StorageProvider::MongoDB::addConfigToGlobalConfig() begin");
@@ -597,7 +634,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::addConfigToGlobalConfig(
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::listCollectionNames(JsonData const& search_filter) {
-  assert(!search_filter.json_buffer.empty());
+  confirm(!search_filter.json_buffer.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(9, "StorageProvider::MongoDB::listCollectionNames() begin");
@@ -610,17 +647,19 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listCollectionNames(Json
   auto collectionDescriptors = _provider->connection().list_collections(filter.view_document());
 
   for (auto const& collectionDescriptor : collectionDescriptors) {
-    TRACE_(9, "StorageProvider::MongoDB::listCollectionNames() found collection=<" << bsoncxx::to_json(collectionDescriptor) << ">");
+    TRACE_(9, "StorageProvider::MongoDB::listCollectionNames() found collection=<"
+                  << bsoncxx::to_json(collectionDescriptor) << ">");
 
     auto element_name = collectionDescriptor.find("name");
 
-    if (element_name == collectionDescriptor.end()) throw cet::exception("MongoDB") << "MongoDB returned invalid database collection descriptor.";
+    if (element_name == collectionDescriptor.end())
+      throw runtime_error("MongoDB") << "MongoDB returned invalid database collection descriptor.";
 
     auto string_value = element_name->get_value();
 
     auto collection_name = dequote(bsoncxx::to_json(string_value));
 
-    if (collection_name == "system.indexes" || collection_name == metadata::system_metadata) continue;
+    if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
 
     TRACE_(9,
            "StorageProvider::MongoDB::listCollectionNames() found "
@@ -646,7 +685,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listCollectionNames(Json
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::listDatabaseNames(JsonData const& search_filter) {
-  assert(!search_filter.json_buffer.empty());
+  confirm(!search_filter.json_buffer.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(9, "StorageProvider::MongoDB::listDatabaseNames() begin");
@@ -655,11 +694,13 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listDatabaseNames(JsonDa
   mongocxx::cursor databaseDescriptors = _provider->list_databases();
 
   for (auto const& databaseDescriptor : databaseDescriptors) {
-    TRACE_(9, "StorageProvider::MongoDB::listDatabaseNames() found databases=<" << bsoncxx::to_json(databaseDescriptor) << ">");
+    TRACE_(9, "StorageProvider::MongoDB::listDatabaseNames() found databases=<" << bsoncxx::to_json(databaseDescriptor)
+                                                                                << ">");
 
     auto element_name = databaseDescriptor.find("name");
 
-    if (element_name == databaseDescriptor.end()) throw cet::exception("MongoDB") << "MongoDB returned invalid database descriptor.";
+    if (element_name == databaseDescriptor.end())
+      throw runtime_error("MongoDB") << "MongoDB returned invalid database descriptor.";
 
     auto string_value = element_name->get_value();
 
@@ -686,22 +727,15 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listDatabaseNames(JsonDa
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, MongoDB>::databaseMetadata(JsonData const& search_filter) {
-  assert(!search_filter.json_buffer.empty());
+std::list<JsonData> StorageProvider<JsonData, MongoDB>::databaseMetadata(JsonData const& search_filter [[gnu::unused]]) {
+  confirm(!search_filter.json_buffer.empty());
 
   std::ostringstream oss;
   oss << "{";
-  oss << "\"collection\":\"" << db::metadata::system_metadata << "\",";
+  oss << "\"collection\":\"" << system_metadata << "\",";
   oss << "\"filter\":{}";
   oss << "}";
   return load(JsonData{oss.str()});
-}
-
-std::string dequote(std::string s) {
-  if (s[0] == '"' && s[s.length() - 1] == '"')
-    return s.substr(1, s.length() - 2);
-  else
-    return s;
 }
 
 namespace mongo {
@@ -716,5 +750,6 @@ void enable() {
 }
 }
 }  // namespace mongo
+
 }  // namespace database
 }  // namespace artdaq

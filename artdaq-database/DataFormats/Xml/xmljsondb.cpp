@@ -1,4 +1,7 @@
 #include "artdaq-database/DataFormats/common.h"
+
+#include "artdaq-database/DataFormats/shared_literals.h"
+
 #include "artdaq-database/DataFormats/Json/json_common.h"
 #include "artdaq-database/DataFormats/Xml/xml_common.h"
 #include "artdaq-database/DataFormats/Xml/xmljsondb.h"
@@ -23,8 +26,8 @@ namespace dbxj=artdaq::database::xmljson;
 namespace xml = artdaq::database::xml;
 
 bool dbxj::xml_to_json(std::string const& xml, std::string& json) {
-  assert(!xml.empty());
-  assert(json.empty());
+  confirm(!xml.empty());
+  confirm(json.empty());
 
   TRACE_(2, "xml_to_json: begin");
 
@@ -61,8 +64,8 @@ bool dbxj::xml_to_json(std::string const& xml, std::string& json) {
 }
 
 bool dbxj::json_to_xml(std::string const& json, std::string& xml) {
-  assert(!json.empty());
-  assert(xml.empty());
+  confirm(!json.empty());
+  confirm(xml.empty());
 
   TRACE_(3, "json_to_xml: begin");
 

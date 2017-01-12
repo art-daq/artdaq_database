@@ -7,8 +7,6 @@
 #include "artdaq-database/DataFormats/Json/convertjson2guijson.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
 
-#include "artdaq-database/DataFormats/common/helper_functions.h"
-
 namespace bpo = boost::program_options;
 using namespace artdaq::database;
 
@@ -26,7 +24,7 @@ int main(int argc, char* argv[]) try {
   artdaq::database::fhicljson::debug::enableFCL2JSON();
 
   debug::registerUngracefullExitHandlers();
-  artdaq::database::dataformats::useFakeTime(true);
+  artdaq::database::useFakeTime(true);
 
   std::ostringstream descstr;
   descstr << argv[0] << " <-s <source-file>> <-c <compare-with-file>> <-t <test-name>> (available test names: "
@@ -111,8 +109,8 @@ int main(int argc, char* argv[]) try {
 }
 
 bool test_convert2fcl(std::string const& input, std::string const& compare) {
-  assert(!input.empty());
-  assert(!compare.empty());
+  confirm(!input.empty());
+  confirm(!compare.empty());
 
   auto output = std::string();
 
@@ -130,8 +128,8 @@ bool test_convert2fcl(std::string const& input, std::string const& compare) {
 }
 
 bool test_convert2json(std::string const& input, std::string const& compare) {
-  assert(!input.empty());
-  assert(!compare.empty());
+  confirm(!input.empty());
+  confirm(!compare.empty());
 
   auto output = std::string();
 
@@ -155,8 +153,8 @@ bool test_convert2json(std::string const& input, std::string const& compare) {
 }
 
 bool test_roundconvertfcl(std::string const& input, std::string const& compare) {
-  assert(!input.empty());
-  assert(!compare.empty());
+  confirm(!input.empty());
+  confirm(!compare.empty());
 
   auto tmp = std::string();
   auto output = std::string();
@@ -191,8 +189,8 @@ bool test_roundconvertfcl(std::string const& input, std::string const& compare) 
 }
 
 bool test_roundconvertjson(std::string const& input, std::string const& compare) {
-  assert(!input.empty());
-  assert(!compare.empty());
+  confirm(!input.empty());
+  confirm(!compare.empty());
 
   auto tmp = std::string();
   auto output = std::string();

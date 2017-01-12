@@ -199,7 +199,7 @@ std::string ovlOrigin::to_string() const noexcept {
   return oss.str();
 }
 
-bool ovlOrigin::init(value_t& parent) try {
+bool ovlOrigin::init(value_t& parent [[gnu::unused]]) try {
   confirm(type(parent) == type_t::OBJECT);
 
   auto& obj = object_value();
@@ -214,7 +214,7 @@ bool ovlOrigin::init(value_t& parent) try {
   throw;
 }
 
-ovlValueTimeStamp ovlOrigin::map_timestamp(value_t& parent) {
+ovlValueTimeStamp ovlOrigin::map_timestamp(value_t& parent [[gnu::unused]]) {
   confirm(type(parent) == type_t::OBJECT);
 
   auto& obj = object_value();
@@ -229,7 +229,7 @@ ovlValueTimeStamp ovlOrigin::map_timestamp(value_t& parent) {
 ovlVersion::ovlVersion(object_t::key_type const& key, value_t& version)
     : ovlKeyValue(key, version), _initOK(init(version)) {}
 
-bool ovlVersion::init(value_t& parent) try {
+bool ovlVersion::init(value_t& parent [[gnu::unused]]) try {
   confirm(type(parent) == type_t::VALUE);
 
   auto& version = string_value();
@@ -245,7 +245,7 @@ bool ovlVersion::init(value_t& parent) try {
 ovlConfigurableEntity::ovlConfigurableEntity(object_t::key_type const& key, value_t& entity)
     : ovlKeyValue(key, entity), _initOK(init(entity)) {}
 
-bool ovlConfigurableEntity::init(value_t& parent) try {
+bool ovlConfigurableEntity::init(value_t& parent [[gnu::unused]]) try {
   confirm(type(parent) == type_t::OBJECT);
 
   auto& obj = object_value();
@@ -289,7 +289,7 @@ std::string ovlConfiguration::to_string() const noexcept {
   return oss.str();
 }
 
-ovlValueTimeStamp ovlConfiguration::map_timestamp(value_t& value) {
+ovlValueTimeStamp ovlConfiguration::map_timestamp(value_t& value [[gnu::unused]]) {
   confirm(type(value) == type_t::OBJECT);
 
   auto& obj = object_value();
@@ -301,7 +301,7 @@ ovlValueTimeStamp ovlConfiguration::map_timestamp(value_t& value) {
 ovlAlias::ovlAlias(object_t::key_type const& key, value_t& alias)
     : ovlKeyValue(key, alias), _initOK(init(alias)), _assigned(map_assigned(alias)) {}
 
-bool ovlAlias::init(value_t& parent) try {
+bool ovlAlias::init(value_t& parent [[gnu::unused]]) try {
   confirm(type(parent) == type_t::OBJECT);
 
   auto& obj = object_value();
@@ -340,7 +340,7 @@ std::string ovlAlias::to_string() const noexcept {
   return oss.str();
 }
 
-ovlValueTimeStamp ovlAlias::map_assigned(value_t& value) {
+ovlValueTimeStamp ovlAlias::map_assigned(value_t& value [[gnu::unused]]) {
   confirm(type(value) == type_t::OBJECT);
   auto& obj = object_value();
   confirm(obj.count(jsonliteral::assigned) == 1);
@@ -351,7 +351,7 @@ ovlValueTimeStamp ovlAlias::map_assigned(value_t& value) {
 ovlChangeLog::ovlChangeLog(object_t::key_type const& key, value_t& changelog)
     : ovlKeyValue(key, changelog), _initOK(init(changelog)) {}
 
-bool ovlChangeLog::init(value_t& parent) try {
+bool ovlChangeLog::init(value_t& parent [[gnu::unused]]) try {
   confirm(type(parent) == type_t::VALUE);
 
   auto& changelog = string_value();
@@ -408,7 +408,7 @@ ovlConfigurations::arrayConfigurations_t ovlConfigurations::make_configurations(
 
 ovlId::ovlId(object_t::key_type const& key, value_t& oid) : ovlKeyValue(key, oid), _initOK(init(oid)) {}
 
-bool ovlId::init(value_t& parent) try {
+bool ovlId::init(value_t& parent [[gnu::unused]]) try {
   confirm(type(parent) == type_t::OBJECT);
 
   auto& obj = object_value();
@@ -459,7 +459,7 @@ std::string ovlUpdate::to_string() const noexcept {
   return oss.str();
 }
 
-ovlValueTimeStamp ovlUpdate::map_timestamp(value_t& value) {
+ovlValueTimeStamp ovlUpdate::map_timestamp(value_t& value [[gnu::unused]]) {
   confirm(type(value) == type_t::OBJECT);
 
   auto& obj = object_value();
@@ -469,7 +469,7 @@ ovlValueTimeStamp ovlUpdate::map_timestamp(value_t& value) {
   return ovlValueTimeStamp(jsonliteral::timestamp, obj.at(jsonliteral::timestamp));
 }
 
-ovlKeyValue ovlUpdate::map_what(value_t& value) {
+ovlKeyValue ovlUpdate::map_what(value_t& value [[gnu::unused]]) {
   confirm(type(value) == type_t::OBJECT);
   auto& obj = object_value();
 
@@ -521,7 +521,7 @@ std::string ovlBookkeeping::to_string() const noexcept {
   return oss.str();
 }
 
-ovlBookkeeping::arrayBookkeeping_t ovlBookkeeping::make_updates(value_t& value) {
+ovlBookkeeping::arrayBookkeeping_t ovlBookkeeping::make_updates(value_t& value [[gnu::unused]]) {
   confirm(type(value) == type_t::OBJECT);
   auto& obj = object_value();
 
@@ -538,7 +538,7 @@ ovlBookkeeping::arrayBookkeeping_t ovlBookkeeping::make_updates(value_t& value) 
   return returnValue;
 }
 
-ovlValueTimeStamp ovlBookkeeping::map_created(value_t& value) {
+ovlValueTimeStamp ovlBookkeeping::map_created(value_t& value [[gnu::unused]]) {
   confirm(type(value) == type_t::OBJECT);
   auto& obj = object_value();
 
@@ -549,7 +549,7 @@ ovlValueTimeStamp ovlBookkeeping::map_created(value_t& value) {
   return ovlValueTimeStamp(jsonliteral::created, obj.at(jsonliteral::created));
 }
 
-bool ovlBookkeeping::init(value_t& parent) try {
+bool ovlBookkeeping::init(value_t& parent [[gnu::unused]]) try {
   confirm(type(parent) == type_t::OBJECT);
 
   auto& obj = object_value();
@@ -758,7 +758,7 @@ ovlAliases::ovlAliases(object_t::key_type const& key, value_t& aliases)
       _active(make_aliases(ovlKeyValue::value_as<array_t>(jsonliteral::active))),
       _history(make_aliases(ovlKeyValue::value_as<array_t>(jsonliteral::history))) {}
 
-bool ovlAliases::init(value_t& parent) try {
+bool ovlAliases::init(value_t& parent [[gnu::unused]]) try {
   confirm(type(parent) == type_t::OBJECT);
 
   auto& obj = object_value();

@@ -17,8 +17,8 @@ using artdaq::database::conf::ConfWriter;
 namespace literal = artdaq::database::dataformats::literal;
 
 bool ConfWriter::write(jsn::object_t const& json_object, std::string& out) {
-  assert(out.empty());
-  assert(!json_object.empty());
+  confirm(out.empty());
+  confirm(!json_object.empty());
 
   TRACE_(2, "write() begin");
 

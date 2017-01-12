@@ -1,32 +1,17 @@
 #ifndef _ARTDAQ_DATABASE_TEST_COMMON_H_
 #define _ARTDAQ_DATABASE_TEST_COMMON_H_
 
-#include <cassert>
-#include <ctime>
-#include <iostream>
-#include <memory>
-#include <tuple>
-#include <type_traits>
-#include <vector>
+#include "artdaq-database/SharedCommon/sharedcommon_common.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
+#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
+#include "artdaq-database/SharedCommon/helper_functions.h"
 
-
-#include <fstream>
-#include <iostream>
-#include <streambuf>
-#include <string>
-#include  <cstdio>
-#include <libgen.h>
-#include "artdaq-database/BuildInfo/printStackTrace.h"
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "boost/program_options.hpp"
-#include <boost/exception/diagnostic_information.hpp>
-#include <boost/core/demangle.hpp>
-#include "trace.h"
 
 constexpr auto tmpdir = "/tmp/artdaqtest/";
 
-namespace artdaq {
-namespace database {
-std::string mkdir(std::string const&);
-}}
+namespace db = artdaq::database;
+namespace jsonliteral = db::dataformats::literal;
+namespace apiliteral = db::configapi::literal;
+
 #endif /* _ARTDAQ_DATABASE_TEST_COMMON_H_ */

@@ -1,12 +1,13 @@
 #ifndef _ARTDAQ_DATABASE_EXCEPTIONS_H_
 #define _ARTDAQ_DATABASE_EXCEPTIONS_H_
 
+#include <exception>
 #include "cetlib/coded_exception.h"
 
 namespace artdaq {
 namespace database {
 
-  class exception : public cet::exception {
+class exception : public cet::exception {
  public:
   using cet::exception::Category;
 
@@ -22,7 +23,7 @@ namespace database {
 };
 
 class invalid_argument : public exception {
- public:   
+ public:
   explicit invalid_argument(std::string const& category_) : exception(category_) {}
 };
 

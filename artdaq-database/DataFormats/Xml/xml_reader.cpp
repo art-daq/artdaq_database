@@ -23,8 +23,8 @@ using artdaq::database::xml::XmlReader;
 namespace literal = artdaq::database::dataformats::literal;
 
 bool XmlReader::read(std::string const& in, jsn::object_t& json_object) {
-  assert(!in.empty());
-  assert(json_object.empty());
+  confirm(!in.empty());
+  confirm(json_object.empty());
 
   TRACE_(2, "read() begin");
 

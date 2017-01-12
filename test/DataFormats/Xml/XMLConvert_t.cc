@@ -6,7 +6,6 @@
 #include "artdaq-database/DataFormats/Xml/convertxml2json.h"
 #include "artdaq-database/DataFormats/Xml/xml_common.h"
 #include "artdaq-database/DataFormats/Xml/xmljsondb.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
 
 namespace bpo = boost::program_options;
 using namespace artdaq::database;
@@ -23,7 +22,7 @@ int main(int argc, char* argv[]) {
   artdaq::database::xmljson::debug::enableXmlJson();
 
   debug::registerUngracefullExitHandlers();
-  artdaq::database::dataformats::useFakeTime(true);
+  artdaq::database::useFakeTime(true);
 
   std::ostringstream descstr;
   descstr << argv[0]
@@ -98,8 +97,8 @@ int main(int argc, char* argv[]) {
 }
 
 bool test_convertxml2json(std::string const& input, std::string const& compare) {
-  assert(!input.empty());
-  assert(!compare.empty());
+  confirm(!input.empty());
+  confirm(!compare.empty());
 
   auto output = std::string();
 
@@ -118,8 +117,8 @@ bool test_convertxml2json(std::string const& input, std::string const& compare) 
 }
 
 bool test_convertjson2xml(std::string const& input, std::string const& compare) {
-  assert(!input.empty());
-  assert(!compare.empty());
+  confirm(!input.empty());
+  confirm(!compare.empty());
 
   auto output = std::string();
 

@@ -1,16 +1,16 @@
 #ifndef _ARTDAQ_DATABASE_PROVIDERS_H_
 #define _ARTDAQ_DATABASE_PROVIDERS_H_
 
-#include "artdaq-database/StorageProviders/common.h"
+#include <list>
+#include <memory>
+#include <string>
+
+#include "artdaq-database/SharedCommon/shared_datatypes.h"
 
 namespace artdaq {
 namespace database {
 
-using object_id_t = std::string;
-
-namespace metadata {
-constexpr auto system_metadata = "metadata";
-}
+constexpr auto system_metadata = "SystemMetadata";
 
 template <typename TYPE, typename IMPL>
 class StorageProvider final {
@@ -66,8 +66,6 @@ class StorageProvider final {
 
 constexpr auto ouid_invalid = "000000000000000000000000";
 
-std::string expand_environment_variables(std::string /*var*/);
-object_id_t extract_oid(std::string const&);
 std::string make_database_metadata(std::string const& /*name*/, std::string const& /*uri*/);
 
 }  // namespace database

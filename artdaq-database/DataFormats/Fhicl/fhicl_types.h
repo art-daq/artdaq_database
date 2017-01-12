@@ -2,7 +2,10 @@
 #define _ARTDAQ_DATABASE_FHICLTYPES_H_
 
 #include "artdaq-database/DataFormats/common.h"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
 #include "artdaq-database/DataFormats/shared_types.h"
+#pragma GCC diagnostic pop
 
 #include <boost/fusion/adapted/struct/adapt_struct.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>

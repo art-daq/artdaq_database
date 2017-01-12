@@ -16,6 +16,8 @@ class JsonData;
 }
 
 namespace configuration {
+namespace jsonliteral = artdaq::database::dataformats::literal;
+namespace apiliteral = artdaq::database::configapi::literal;
 
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::configuration::options::data_format_t;
@@ -50,9 +52,9 @@ class BulkOperations final {
   const_iterator end() const { return _operations_list.cend(); }
 
  private:
-  std::string _process_name = {literal::notprovided};
+  std::string _process_name = {jsonliteral::notprovided};
 
-  std::string _bulk_operations = {literal::notprovided};
+  std::string _bulk_operations = {jsonliteral::notprovided};
 
   data_format_t _data_format = {data_format_t::gui};
 

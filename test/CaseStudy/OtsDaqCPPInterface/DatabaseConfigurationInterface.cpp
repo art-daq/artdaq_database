@@ -34,7 +34,7 @@ int DatabaseConfigurationInterface::fill(ConfigurationBase* configuration, int v
 
   std::cout << "DBI Error:" << result.second << "\n";
 
-  assert(result.first);
+  confirm(result.first);
 
   return -1;
 }
@@ -52,7 +52,7 @@ int DatabaseConfigurationInterface::saveActiveVersion(const ConfigurationBase* c
 
   std::cout << "DBI Error:" << result.second << "\n";
 
-  assert(result.first);
+  confirm(result.first);
 
   return -1;
 }

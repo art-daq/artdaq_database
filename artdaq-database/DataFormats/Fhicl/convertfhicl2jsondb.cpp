@@ -14,6 +14,9 @@
 
 #define TRACE_NAME "FHJS:fcl2jsndb_C"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
+
 namespace jsn = artdaq::database::json;
 namespace fcl = artdaq::database::fhicl;
 
@@ -40,8 +43,8 @@ fcl2jsondb::operator datapair_t() try {
 
   using artdaq::database::fhicljson::return_pair;
 
-  assert(!key.empty());
-  assert(!comments.empty());
+  confirm(!key.empty());
+  confirm(!comments.empty());
 
   auto returnValue = datapair_t();
   auto pair = return_pair{returnValue};
@@ -62,7 +65,7 @@ fcl2jsondb::operator datapair_t() try {
   };
 
   auto annotation_at = [this](int linenum) -> std::string {
-    assert(linenum > -1);
+    confirm(linenum > -1);
 
     if (comments.empty() || linenum < 1) return literal::whitespace;
 
@@ -73,7 +76,7 @@ fcl2jsondb::operator datapair_t() try {
   };
 
   auto comment_at = [&annotation_at](int linenum) -> std::string {
-    assert(linenum > -1);
+    confirm(linenum > -1);
 
     auto comment = annotation_at(linenum);
     if (!comment.empty() && comment.at(0) != '/') return comment;
@@ -82,7 +85,7 @@ fcl2jsondb::operator datapair_t() try {
   };
 
   auto add_comment = [&object](auto& func, std::string field, int linenum) {
-    assert(linenum > -1);
+    confirm(linenum > -1);
 
     auto result = func(linenum);
 
@@ -420,6 +423,8 @@ template <typename T>
 T& unwrapper<fcl::value_t>::value_as() {
   return boost::get<T>(any.value);
 }
+
+#pragma GCC diagnostic pop
 
 void artdaq::database::fhicljson::debug::enableFCL2JSON() {
   TRACE_CNTL("name", TRACE_NAME);

@@ -9,19 +9,16 @@
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 
 #include "artdaq-database/DataFormats/Json/json_reader.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
-#include "artdaq-database/DataFormats/shared_literals.h"
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
 namespace cfo = cf::options;
 
-namespace literal = artdaq::database::configuration::literal;
 namespace bpo = boost::program_options;
 
 using Options = cf::LoadStoreOperation;
 
-using artdaq::database::jsonutils::JSONDocument;
+using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::basictypes::JsonData;
 
 typedef bool (*test_case)(Options const& /*options*/, std::string const& /*file_name*/);
@@ -32,8 +29,8 @@ bool test_buildfilter(Options const&, std::string const&);
 int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
-  //artdaq::database::jsonutils::debug::enableJSONDocument();
-  //artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
+  //artdaq::database::docrecord::debug::enableJSONDocument();
+  //artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
 
   artdaq::database::configuration::debug::enableLoadStoreOperation();
   artdaq::database::configuration::debug::options::enableOperationBase();
@@ -41,7 +38,7 @@ int main(int argc, char* argv[]) try {
   artdaq::database::configuration::debug::detail::enableLoadStoreOperation();
 
   debug::registerUngracefullExitHandlers();
-  artdaq::database::dataformats::useFakeTime(true);
+  artdaq::database::useFakeTime(true);
 
   auto options = Options{argv[0]};
   auto desc = options.makeProgramOptions();
@@ -67,7 +64,7 @@ int main(int argc, char* argv[]) try {
     return exit_code;
   }
 
-  if (!vm.count(literal::option::result)) {
+  if (!vm.count(apiliteral::option::result)) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no result file name given.\n"
               << "For usage and an options list, please do '" << argv[0] << " --help"
               << "'.\n";
@@ -75,12 +72,12 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::INVALID_ARGUMENT | 1;
   }
 
-  auto file_res_name = vm[literal::option::result].as<std::string>();
+  auto file_res_name = vm[apiliteral::option::result].as<std::string>();
 
   auto file_src_name = file_res_name;
 
-  if (vm.count(literal::option::source)) {
-    file_src_name = vm[literal::option::source].as<std::string>();
+  if (vm.count(apiliteral::option::source)) {
+    file_src_name = vm[apiliteral::option::source].as<std::string>();
   }
 
   auto options_string = options.to_string();
@@ -92,14 +89,14 @@ int main(int argc, char* argv[]) try {
   auto test_document = std::string{};
 
   cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP, std::string const&, std::string&>(
-      literal::operation::load, load_configuration, options_string, test_document);
+      apiliteral::operation::load, load_configuration, options_string, test_document);
 
   try {
     std::ifstream is(file_src_name);
     test_document = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
     is.close();
     cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
-        literal::operation::store, store_configuration, options_string, test_document);
+        apiliteral::operation::store, store_configuration, options_string, test_document);
   } catch (...) {
   }
 
@@ -152,7 +149,7 @@ int main(int argc, char* argv[]) try {
   std::cout << "First mismatch at position " << std::distance(expected.begin(), mismatch.first) << ", (exp,ret)=(0x"
             << std::hex << (unsigned int)*mismatch.first << ",0x" << (unsigned int)*mismatch.second << ")\n";
 
-  auto file_out_name = std::string(artdaq::database::mkdir(tmpdir))
+  auto file_out_name = std::string(db::filesystem::mkdir(tmpdir))
                            .append(argv[0])
                            .append("-")
                            .append(options.operation())

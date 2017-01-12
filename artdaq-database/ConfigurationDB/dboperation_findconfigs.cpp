@@ -2,11 +2,11 @@
 
 #include <boost/exception/diagnostic_information.hpp>
 #include "artdaq-database/BasicTypes/basictypes.h"
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/ConfigurationDB/dboperation_manageconfigs.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
-#include "artdaq-database/ConfigurationDB/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
+#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -15,7 +15,7 @@
 #define TRACE_NAME "CONF:OpSrch_C"
 
 using namespace artdaq::database::configuration;
-namespace dbcfg=artdaq::database::configuration;
+namespace dbcfg = artdaq::database::configuration;
 
 using artdaq::database::configuration::options::data_format_t;
 
@@ -37,16 +37,14 @@ void build_global_configuration_search_filter(ManageConfigsOperation const&, std
 }  // namespace database
 }  // namespace artdaq
 
-auto make_error_msg = [](auto msg) { return std::string("{error:\"").append(msg).append(".\"}"); };
-
 result_pair_t opts::find_global_configurations(ManageConfigsOperation const& options) noexcept {
   try {
     auto returnValue = std::string{};
 
     detail::find_global_configurations(options, returnValue);
-    return result_pair_t{true, returnValue};
+    return Success(returnValue);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
@@ -56,38 +54,38 @@ result_pair_t opts::build_global_configuration_search_filter(ManageConfigsOperat
 
     detail::build_global_configuration_search_filter(options, returnValue);
 
-    return result_pair_t{true, returnValue};
+    return Success(returnValue);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
 result_pair_t json::find_global_configurations(std::string const& search_filter) noexcept {
   try {
-    auto options = ManageConfigsOperation{literal::operation::findconfigs};
+    auto options = ManageConfigsOperation{apiliteral::operation::findconfigs};
     options.readJsonData({search_filter});
 
     auto returnValue = std::string{};
 
     detail::find_global_configurations(options, returnValue);
-    return result_pair_t{true, returnValue};
+    return Success(returnValue);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
 result_pair_t json::build_global_configuration_search_filter(std::string const& search_filter) noexcept {
   try {
-    auto options = ManageConfigsOperation{literal::operation::buildfilter};
+    auto options = ManageConfigsOperation{apiliteral::operation::buildfilter};
     options.readJsonData({search_filter});
 
     auto returnValue = std::string{};
 
     detail::build_global_configuration_search_filter(options, returnValue);
 
-    return result_pair_t{true, returnValue};
+    return Success(returnValue);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 

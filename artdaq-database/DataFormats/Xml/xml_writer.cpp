@@ -1,4 +1,5 @@
 #include "artdaq-database/DataFormats/common.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 
 #include "artdaq-database/DataFormats/Xml/convertxml2json.h"
 #include "artdaq-database/DataFormats/Xml/xml_writer.h"
@@ -22,19 +23,19 @@ namespace literal = artdaq::database::dataformats::literal;
 
 template <typename T>
 bool is_leaf_type(T& leaf) {
-  assert(!leaf.value.empty());
+  confirm(!leaf.value.empty());
   return jsn::type(leaf.value) == jsn::type_t::VALUE;
 }
 
 template <typename T>
 std::string leaf_string_value(T& leaf) {
-  assert(!leaf.value.empty());
+  confirm(!leaf.value.empty());
   return boost::apply_visitor(jsn::tostring_visitor(), leaf.value);
 }
 
 bool XmlWriter::write(jsn::object_t const& json_object, std::string& out) {
-  assert(out.empty());
-  assert(!json_object.empty());
+  confirm(out.empty());
+  confirm(!json_object.empty());
 
   TRACE_(2, "write() begin");
 

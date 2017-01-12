@@ -20,8 +20,10 @@
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
-namespace cfl = cf::literal;
 namespace dbbt = db::basictypes;
+
+namespace jsonliteral = artdaq::database::dataformats::literal;
+namespace apiliteral = artdaq::database::configapi::literal;
 
 using dbbt::JsonData;
 using cf::OperationBase;
@@ -32,16 +34,16 @@ using cf::options::data_format_t;
 ManageConfigsOperation::ManageConfigsOperation(std::string const& process_name) : OperationBase{process_name} {}
 
 std::string const& ManageConfigsOperation::version() const noexcept {
-  assert(!_version.empty());
+  confirm(!_version.empty());
 
   return _version;
 }
 
 std::string const& ManageConfigsOperation::version(std::string const& version) {
-  assert(!version.empty());
+  confirm(!version.empty());
 
   if (version.empty()) {
-    throw cet::exception("Options") << "Invalid version; version is empty.";
+    throw runtime_error("Options") << "Invalid version; version is empty.";
   }
 
   TRACE_(10, "Options: Updating version from " << _version << " to " << version << ".");
@@ -52,16 +54,16 @@ std::string const& ManageConfigsOperation::version(std::string const& version) {
 }
 
 std::string const& ManageConfigsOperation::configurableEntity() const noexcept {
-  assert(!_configurable_entity.empty());
+  confirm(!_configurable_entity.empty());
 
   return _configurable_entity;
 }
 
 std::string const& ManageConfigsOperation::configurableEntity(std::string const& entity) {
-  assert(!entity.empty());
+  confirm(!entity.empty());
 
   if (entity.empty()) {
-    throw cet::exception("Options") << "Invalid configurable entity; entity is empty.";
+    throw runtime_error("Options") << "Invalid configurable entity; entity is empty.";
   }
 
   TRACE_(11, "Options: Updating entity from " << _configurable_entity << " to " << entity << ".");
@@ -72,19 +74,20 @@ std::string const& ManageConfigsOperation::configurableEntity(std::string const&
 }
 
 std::string const& ManageConfigsOperation::globalConfiguration() const noexcept {
-  assert(!_global_configuration.empty());
+  confirm(!_global_configuration.empty());
 
   return _global_configuration;
 }
 
 std::string const& ManageConfigsOperation::globalConfiguration(std::string const& global_configuration) {
-  assert(!global_configuration.empty());
+  confirm(!global_configuration.empty());
 
   if (global_configuration.empty()) {
-    throw cet::exception("Options") << "Invalid global config; global config is empty.";
+    throw runtime_error("Options") << "Invalid global config; global config is empty.";
   }
 
-  TRACE_(12, "Options: Updating global_configuration from " << _global_configuration << " to " << global_configuration << ".");
+  TRACE_(12, "Options: Updating global_configuration from " << _global_configuration << " to " << global_configuration
+                                                            << ".");
 
   _global_configuration = global_configuration;
 
@@ -92,7 +95,7 @@ std::string const& ManageConfigsOperation::globalConfiguration(std::string const
 }
 
 void ManageConfigsOperation::readJsonData(JsonData const& data) {
-  assert(!data.json_buffer.empty());
+  confirm(!data.json_buffer.empty());
 
   OperationBase::readJsonData(data);
 
@@ -100,31 +103,32 @@ void ManageConfigsOperation::readJsonData(JsonData const& data) {
   auto dataAST = object_t{};
 
   if (!JsonReader{}.read(data.json_buffer, dataAST)) {
-    throw db::invalid_option_exception("ManageConfigsOperation") << "ManageConfigsOperation: Unable to read JSON buffer.";
+    throw db::invalid_option_exception("ManageConfigsOperation")
+        << "ManageConfigsOperation: Unable to read JSON buffer.";
   }
 
   try {
-    globalConfiguration(boost::get<std::string>(dataAST.at(cfl::option::configuration)));
+    globalConfiguration(boost::get<std::string>(dataAST.at(apiliteral::option::configuration)));
   } catch (...) {
   }
 
   try {
-    auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(cfl::option::searchfilter));
+    auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(apiliteral::option::searchfilter));
 
-    if (filterAST.empty()) searchFilter(cfl::notprovided);
+    if (filterAST.empty()) searchFilter(jsonliteral::notprovided);
 
     try {
-      version(boost::get<std::string>(filterAST.at(cfl::filter::version)));
+      version(boost::get<std::string>(filterAST.at(apiliteral::filter::version)));
     } catch (...) {
     }
 
     try {
-      configurableEntity(boost::get<std::string>(filterAST.at(cfl::filter::entity)));
+      configurableEntity(boost::get<std::string>(filterAST.at(apiliteral::filter::entity)));
     } catch (...) {
     }
 
     try {
-      globalConfiguration(boost::get<std::string>(filterAST.at(cfl::filter::configuration)));
+      globalConfiguration(boost::get<std::string>(filterAST.at(apiliteral::filter::configuration)));
     } catch (...) {
     }
 
@@ -138,16 +142,16 @@ int ManageConfigsOperation::readProgramOptions(bpo::variables_map const& vm) {
 
   if (result != process_exit_code::SUCCESS) return result;
 
-  if (vm.count(cfl::option::version)) {
-    version(vm[cfl::option::version].as<std::string>());
+  if (vm.count(apiliteral::option::version)) {
+    version(vm[apiliteral::option::version].as<std::string>());
   }
 
-  if (vm.count(cfl::option::entity)) {
-    configurableEntity(vm[cfl::option::entity].as<std::string>());
+  if (vm.count(apiliteral::option::entity)) {
+    configurableEntity(vm[apiliteral::option::entity].as<std::string>());
   }
 
-  if (vm.count(cfl::option::configuration)) {
-    globalConfiguration(vm[cfl::option::configuration].as<std::string>());
+  if (vm.count(apiliteral::option::configuration)) {
+    globalConfiguration(vm[apiliteral::option::configuration].as<std::string>());
   }
 
   return process_exit_code::SUCCESS;
@@ -156,13 +160,19 @@ int ManageConfigsOperation::readProgramOptions(bpo::variables_map const& vm) {
 bpo::options_description ManageConfigsOperation::makeProgramOptions() const {
   auto opts = OperationBase::makeProgramOptions();
 
-  auto make_opt_name = [](auto& long_name, auto& short_name) { return std::string{long_name}.append(",").append(short_name); };
+  auto make_opt_name = [](auto& long_name, auto& short_name) {
+    return std::string{long_name}.append(",").append(short_name);
+  };
 
-  opts.add_options()(make_opt_name(cfl::option::version, "v").c_str(), bpo::value<std::string>(), "Configuration version");
-  opts.add_options()(make_opt_name(cfl::option::entity, "e").c_str(), bpo::value<std::string>(), "Configurable-entity name");
-  opts.add_options()(make_opt_name(cfl::option::configuration, "g").c_str(), bpo::value<std::string>(), "Global configuration name");
+  opts.add_options()(make_opt_name(apiliteral::option::version, "v").c_str(), bpo::value<std::string>(),
+                     "Configuration version");
+  opts.add_options()(make_opt_name(apiliteral::option::entity, "e").c_str(), bpo::value<std::string>(),
+                     "Configurable-entity name");
+  opts.add_options()(make_opt_name(apiliteral::option::configuration, "g").c_str(), bpo::value<std::string>(),
+                     "Global configuration name");
 
-  opts.add_options()(make_opt_name(cfl::option::source, "s").c_str(), bpo::value<std::string>(), "Configuration source file name");
+  opts.add_options()(make_opt_name(apiliteral::option::source, "s").c_str(), bpo::value<std::string>(),
+                     "Configuration source file name");
 
   return opts;
 }
@@ -176,7 +186,8 @@ JsonData ManageConfigsOperation::writeJsonData() const {
     throw db::invalid_option_exception("ManageConfigsOperation") << "Unable to readsearch_filter_to_JsonData().";
   }
 
-  if (globalConfiguration() != cfl::notprovided) docAST[cfl::option::configuration] = globalConfiguration();
+  if (globalConfiguration() != jsonliteral::notprovided)
+    docAST[apiliteral::option::configuration] = globalConfiguration();
 
   auto json_buffer = std::string{};
 
@@ -187,7 +198,7 @@ JsonData ManageConfigsOperation::writeJsonData() const {
 }
 
 JsonData ManageConfigsOperation::search_filter_to_JsonData() const {
-  if (searchFilter() != cfl::notprovided) {
+  if (searchFilter() != jsonliteral::notprovided) {
     return {searchFilter()};
   }
 
@@ -199,15 +210,15 @@ JsonData ManageConfigsOperation::search_filter_to_JsonData() const {
     throw db::invalid_option_exception("ManageConfigsOperation") << "Unable to search_filter_to_JsonData().";
   }
 
-  if (version() != cfl::notprovided) docAST[cfl::filter::version] = version();
+  if (version() != jsonliteral::notprovided) docAST[apiliteral::filter::version] = version();
 
-  if (configurableEntity() != cfl::notprovided) docAST[cfl::filter::entity] = configurableEntity();
+  if (configurableEntity() != jsonliteral::notprovided) docAST[apiliteral::filter::entity] = configurableEntity();
 
-  if (globalConfiguration() != cfl::notprovided && operation() != cfl::operation::addconfig)
-    docAST[cfl::filter::configuration] = globalConfiguration();
+  if (globalConfiguration() != jsonliteral::notprovided && operation() != apiliteral::operation::addconfig)
+    docAST[apiliteral::filter::configuration] = globalConfiguration();
 
   if (docAST.empty()) {
-    return {cfl::empty_json};
+    return {apiliteral::empty_json};
   }
 
   auto json_buffer = std::string{};
@@ -222,7 +233,7 @@ JsonData ManageConfigsOperation::globalConfiguration_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[cfl::filter::configuration] = globalConfiguration();
+  docAST[apiliteral::filter::configuration] = globalConfiguration();
 
   auto json_buffer = std::string{};
 
@@ -237,7 +248,7 @@ JsonData ManageConfigsOperation::version_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[cfl::filter::version] = version();
+  docAST[apiliteral::filter::version] = version();
 
   auto json_buffer = std::string{};
 
@@ -252,7 +263,7 @@ JsonData ManageConfigsOperation::configurableEntity_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[cfl::name] = configurableEntity();
+  docAST[apiliteral::name] = configurableEntity();
 
   auto json_buffer = std::string{};
 

@@ -3,7 +3,8 @@
 #include "artdaq-database/ConfigurationDB/dboperation_manageconfigs.h"
 
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
-#include "artdaq-database/ConfigurationDB/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
+#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 
 #include "artdaq-database/ConfigurationDB/configuration_dbproviders.h"
 
@@ -11,13 +12,8 @@
 #include "artdaq-database/DataFormats/Json/json_common.h"
 #include "artdaq-database/DataFormats/shared_literals.h"
 
-#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
-#include "artdaq-database/JsonDocument/JSONDocument_template.h"
-
-#include <boost/exception/diagnostic_information.hpp>
-
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
+#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -27,10 +23,9 @@
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
-namespace cfl = cf::literal;
-namespace cflo = cfl::operation;
-namespace cflp = cfl::provider;
 namespace cftd = cf::debug::detail;
+namespace jsonliteral = db::dataformats::literal;
+namespace apiliteral = db::configapi::literal;
 
 using cf::ManageConfigsOperation;
 using cf::options::data_format_t;
@@ -39,8 +34,8 @@ using Options = cf::ManageConfigsOperation;
 
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::basictypes::FhiclData;
-using artdaq::database::jsonutils::JSONDocument;
-using artdaq::database::jsonutils::JSONDocumentBuilder;
+using artdaq::database::docrecord::JSONDocument;
+using artdaq::database::docrecord::JSONDocumentBuilder;
 
 namespace artdaq {
 namespace database {
@@ -58,8 +53,8 @@ typedef JsonData (*provider_findglobalconfigs_t)(Options const& /*options*/, Jso
 typedef JsonData (*provider_buildconfigsearchfilter_t)(Options const& /*options*/, JsonData const& /*search_filter*/);
 
 void find_global_configurations(Options const& options, std::string& configs) {
-  assert(configs.empty());
-  assert(options.operation().compare(cflo::findconfigs) == 0);
+  confirm(configs.empty());
+  confirm(options.operation().compare(apiliteral::operation::findconfigs) == 0);
 
   TRACE_(11, "find_global_configurations: begin");
   TRACE_(11, "find_global_configurations args options=<" << options.to_string() << ">");
@@ -67,14 +62,16 @@ void find_global_configurations(Options const& options, std::string& configs) {
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_findglobalconfigs_t>{{cflp::mongo, cf::mongo::findGlobalConfigs},
-                                                                         {cflp::filesystem, cf::filesystem::findGlobalConfigs},
-                                                                         {cflp::ucond, cf::ucond::findGlobalConfigs}};
+    auto providers = std::map<std::string, provider_findglobalconfigs_t>{
+        {apiliteral::provider::mongo, cf::mongo::findGlobalConfigs},
+        {apiliteral::provider::filesystem, cf::filesystem::findGlobalConfigs},
+        {apiliteral::provider::ucond, cf::ucond::findGlobalConfigs}};
 
     return providers.at(name);
   };
 
-  auto search_result = dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
+  auto search_result =
+      dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -87,7 +84,7 @@ void find_global_configurations(Options const& options, std::string& configs) {
     case data_format_t::fhicl:
     case data_format_t::xml: {
       if (!db::json_db_to_gui(search_result.json_buffer, returnValue)) {
-        throw cet::exception("find_global_configurations") << "Unsupported data format.";
+        throw runtime_error("find_global_configurations") << "Unsupported data format.";
       }
       break;
     }
@@ -104,8 +101,8 @@ void find_global_configurations(Options const& options, std::string& configs) {
   TRACE_(11, "find_global_configurations: end");
 }
 void build_global_configuration_search_filter(Options const& options, std::string& filters) {
-  assert(filters.empty());
-  assert(options.operation().compare(cflo::buildfilter) == 0);
+  confirm(filters.empty());
+  confirm(options.operation().compare(apiliteral::operation::buildfilter) == 0);
 
   TRACE_(12, "build_global_configuration_search_filter: begin");
   TRACE_(11, "build_global_configuration_search_filter args options=<" << options.to_string() << ">");
@@ -113,14 +110,16 @@ void build_global_configuration_search_filter(Options const& options, std::strin
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_buildconfigsearchfilter_t>{{cflp::mongo, cf::mongo::buildConfigSearchFilter},
-                                                                               {cflp::filesystem, cf::filesystem::buildConfigSearchFilter},
-                                                                               {cflp::ucond, cf::ucond::buildConfigSearchFilter}};
+    auto providers = std::map<std::string, provider_buildconfigsearchfilter_t>{
+        {apiliteral::provider::mongo, cf::mongo::buildConfigSearchFilter},
+        {apiliteral::provider::filesystem, cf::filesystem::buildConfigSearchFilter},
+        {apiliteral::provider::ucond, cf::ucond::buildConfigSearchFilter}};
 
     return providers.at(name);
   };
 
-  auto search_result = dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
+  auto search_result =
+      dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -133,7 +132,7 @@ void build_global_configuration_search_filter(Options const& options, std::strin
     case data_format_t::fhicl:
     case data_format_t::xml: {
       if (!db::json_db_to_gui(search_result.json_buffer, returnValue)) {
-        throw cet::exception("build_global_configuration_search_filter") << "Unsupported data format.";
+        throw runtime_error("build_global_configuration_search_filter") << "Unsupported data format.";
       }
       break;
     }

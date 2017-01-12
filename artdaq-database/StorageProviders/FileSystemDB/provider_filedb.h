@@ -1,12 +1,21 @@
 #ifndef _ARTDAQ_DATABASE_PROVIDER_FILESYSTEM_H_
 #define _ARTDAQ_DATABASE_PROVIDER_FILESYSTEM_H_
 
-#include "artdaq-database/StorageProviders/common.h"
 #include "artdaq-database/StorageProviders/storage_providers.h"
+
+#include <vector>
+#include <boost/filesystem.hpp>
 
 namespace artdaq {
 namespace database {
 namespace filesystem {
+std::list<std::string> find_subdirs(std::string const&);
+std::list<std::string> find_siblingdirs(std::string const& d);
+std::list<object_id_t> find_documents(std::string const& d);
+std::string mkdir(std::string const& d);
+
+using file_paths_t = std::vector<boost::filesystem::path>;
+file_paths_t list_files_in_directory(boost::filesystem::path const& path, std::string const& ext);
 namespace debug {
 void enable();
 }
@@ -18,25 +27,15 @@ constexpr auto db_name = "test_configuration_db";
 }
 
 struct DBConfig final {
-  DBConfig() : uri{std::string{literal::FILEURI} + "${ARTDAQ_DATABASE_DATADIR}/filesystemdb" + "/" + literal::db_name} {
-    auto tmpURI = getenv("ARTDAQ_DATABASE_URI") ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
+  DBConfig();
+  DBConfig(std::string uri_);
 
-    if (tmpURI.back() == '/') tmpURI.pop_back();  // remove trailing slash
-
-    auto prefixURI = std::string{literal::FILEURI};
-
-    if (tmpURI.length() > prefixURI.length() && std::equal(prefixURI.begin(), prefixURI.end(), tmpURI.begin())) uri = tmpURI;
-  }
-
-  DBConfig(std::string uri_) : uri{uri_} { assert(!uri_.empty()); }
   std::string uri;
   const std::string connectionURI() const { return uri; };
 };
 
 class FileSystemDB final {
  public:
-  std::string& connection();
-
   static std::shared_ptr<FileSystemDB> create(DBConfig const& config) {
     return std::make_shared<FileSystemDB, DBConfig const&, PassKeyIdiom const&>(config, {});
   }
@@ -47,8 +46,9 @@ class FileSystemDB final {
     PassKeyIdiom() {}
   };
 
-  explicit FileSystemDB(DBConfig const& config, PassKeyIdiom const&)
-      : _config{config}, _client{_config.connectionURI()}, _connection{_config.connectionURI() + "/"} {}
+  explicit FileSystemDB(DBConfig const& config, PassKeyIdiom const&);
+
+  std::string& connection();
 
  private:
   DBConfig _config;

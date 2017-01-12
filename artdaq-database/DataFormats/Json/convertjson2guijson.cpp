@@ -1,9 +1,12 @@
 #include "artdaq-database/DataFormats/common.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
 #include "artdaq-database/DataFormats/Json/convertjson2guijson.h"
+#pragma GCC diagnostic pop
+ 
 #include "artdaq-database/DataFormats/Json/json_reader.h"
 #include "artdaq-database/DataFormats/Json/json_writer.h"
-
 #include "artdaq-database/DataFormats/Json/json_types_impl.h"
 
 #include <boost/variant/get.hpp>
@@ -28,8 +31,8 @@ using artdaq::database::json::gui2db;
 */
 
 std::string metadata_node_t::_string_value_of(std::string const& name) const {
-  assert(!name.empty());
-  assert(_node.type() == type_t::OBJECT);
+  confirm(!name.empty());
+  confirm(_node.type() == type_t::OBJECT);
 
   TRACE_(12, "json_db_to_gui() _string_value_of args name <" << name << ">");
 
@@ -40,8 +43,8 @@ std::string metadata_node_t::_string_value_of(std::string const& name) const {
 }
 
 json_node_t metadata_node_t::child(std::string const& name) const {
-  assert(!name.empty());
-  assert(_node.type() == type_t::OBJECT);
+  confirm(!name.empty());
+  confirm(_node.type() == type_t::OBJECT);
 
   TRACE_(13, "json_db_to_gui() child args name <" << name << ">");
 
@@ -58,11 +61,13 @@ json_node_t metadata_node_t::child(std::string const& name) const {
     object_t const& children = jcunwrap(value_table.at(literal::children));
     object_t const& child = jcunwrap(children.at(name));
     TRACE_(13, "json_db_to_gui() metadata node was found, name=<" << name << ">");
+    
     return {child};
   } catch (...) {
   }
 
   TRACE_(13, "json_db_to_gui() metadata node was not found, name=<" << name << ">");
+  
   return {false};
 }
 
@@ -71,13 +76,13 @@ bool metadata_node_t::hasMetadata() const { return _node.type() != type_t::NOTSE
 bool artdaq::database::json_db_to_gui(std::string const& db_json, std::string& gui_json) {
   TRACE_(10, "json_db_to_gui() begin");
 
-  assert(!db_json.empty());
-  assert(gui_json.empty());
+  confirm(!db_json.empty());
+  confirm(gui_json.empty());
 
   auto dbAST = object_t{};
 
   if (!JsonReader{}.read(db_json, dbAST)) {
-    throw cet::exception("json_db_to_gui") << "json_db_to_gui: Unable to read JSON buffer.";
+    throw runtime_error("json_db_to_gui") << "json_db_to_gui: Unable to read JSON buffer.";
   }
 
   TRACE_(10, "json_db_to_gui() read dbAST");
@@ -104,6 +109,7 @@ bool artdaq::database::json_db_to_gui(std::string const& db_json, std::string& g
     unwrap(doc_node).value_as<object_t>(literal::converted).swap(guiAST);
   } catch (...) {
     TRACE_(10, "json_db_to_gui() Uncaught exception:" << boost::current_exception_diagnostic_information());
+    
     throw;
   }
 
@@ -112,7 +118,7 @@ bool artdaq::database::json_db_to_gui(std::string const& db_json, std::string& g
   auto json = std::string();
 
   if (!JsonWriter{}.write(dbAST, json)) {
-    throw cet::exception("json_db_to_gui") << "Unable to write JSON buffer.";
+    throw runtime_error("json_db_to_gui") << "Unable to write JSON buffer.";
   }
 
   TRACE_(10, "json_db_to_gui() created gui_json");
@@ -247,13 +253,13 @@ void db2gui::operator()(json_node_t& gui_node) const {
 bool artdaq::database::json_gui_to_db(std::string const& gui_json, std::string& db_json) {
   TRACE_(14, "json_gui_to_db() begin");
 
-  assert(!gui_json.empty());
-  assert(db_json.empty());
+  confirm(!gui_json.empty());
+  confirm(db_json.empty());
 
   auto guiAST = object_t{};
 
   if (!JsonReader{}.read(gui_json, guiAST)) {
-    throw cet::exception("json_gui_to_db") << "json_db_to_gui: Unable to read JSON buffer.";
+    throw runtime_error("json_gui_to_db") << "json_db_to_gui: Unable to read JSON buffer.";
   }
 
   auto& gui_document = unwrap(guiAST).value_as<object_t>(literal::document_node);
@@ -303,7 +309,7 @@ bool artdaq::database::json_gui_to_db(std::string const& gui_json, std::string& 
   auto json = std::string();
 
   if (!JsonWriter{}.write(guiAST, json)) {
-    throw cet::exception("json_gui_to_db") << "Unable to write JSON buffer.";
+    throw runtime_error("json_gui_to_db") << "Unable to write JSON buffer.";
   }
 
   TRACE_(14, "json_gui_to_db() created db_json");

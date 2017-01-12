@@ -230,7 +230,7 @@ struct unwrapper {
   auto& value(std::string const& key) try {
     return  boost::get<O>(any).at(key);
   }catch(std::out_of_range &){
-    assert(!key.empty());
+    confirm(!key.empty());
     return boost::get<O>(any)[key]=T{};
   }
   

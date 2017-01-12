@@ -3,7 +3,7 @@
 #include "boost/test/auto_unit_test.hpp"
 
 #include <time.h> /* time */
-#include <cassert>
+#include <cconfirm>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
@@ -29,8 +29,8 @@ struct TestData {
     /*
     artdaq::database::filesystem::debug::enable();
     artdaq::database::mongo::debug::enable();
-    // artdaq::database::jsonutils::debug::enableJSONDocument();
-    // artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
+    // artdaq::database::docrecord::debug::enableJSONDocument();
+    // artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
 
     artdaq::database::configuration::debug::enableFindConfigsOperation();
     artdaq::database::configuration::debug::enableCreateConfigsOperation();
@@ -44,7 +44,7 @@ struct TestData {
     artdaq::database::configuration::debug::enableDBOperationFileSystem();
 
 //    debug::registerUngracefullExitHandlers();
-    artdaq::database::dataformats::useFakeTime(true);
+    artdaq::database::useFakeTime(true);
     */
     std::cout << "setup fixture\n";
   }

@@ -3,6 +3,7 @@
 
 #include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
 #include "artdaq-database/DataFormats/common.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 
 #include "artdaq-database/DataFormats/Fhicl/fhicl_types.h"
 #include "artdaq-database/DataFormats/Json/json_types.h"
@@ -13,6 +14,9 @@ namespace fhicljson {
 
 namespace fcl = artdaq::database::fhicl;
 namespace jsn = artdaq::database::json;
+
+namespace literal = artdaq::database::dataformats::literal;
+
 
 using comment_t = std::string;
 using linenum_t = int;

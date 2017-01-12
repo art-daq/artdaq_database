@@ -27,7 +27,7 @@ namespace bpo = boost::program_options;
 
 using Options = cf::LoadStoreOperation;
 
-using artdaq::database::jsonutils::JSONDocument;
+using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::basictypes::JsonData;
 
 namespace option {
@@ -41,8 +41,8 @@ std::vector<std::string> list_files(std::string const&);
 int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
-  // artdaq::database::jsonutils::debug::enableJSONDocument();
-  // artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
+  // artdaq::database::docrecord::debug::enableJSONDocument();
+  // artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
 
   artdaq::database::configuration::debug::enableFindConfigsOperation();
   artdaq::database::configuration::debug::enableCreateConfigsOperation();
@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) try {
   artdaq::database::configuration::debug::enableDBOperationFileSystem();
 
   debug::registerUngracefullExitHandlers();
-  artdaq::database::dataformats::useFakeTime(true);
+  artdaq::database::useFakeTime(true);
 
   auto options = Options{argv[0]};
   auto desc = options.makeProgramOptions();
@@ -84,8 +84,8 @@ int main(int argc, char* argv[]) try {
 
   using cfo::data_format_t;
   options.dataFormat(data_format_t::fhicl);
-  options.operation(literal::operation::store);
-  auto path_to_config_dir = vm[literal::option::source].as<std::string>();
+  options.operation(apiliteral::operation::store);
+  auto path_to_config_dir = vm[apiliteral::option::source].as<std::string>();
 
   auto to_collection_name = [](std::string const& file_path_str) ->std::string {
     auto  file_path_copy= std::string{file_path_str.c_str()};
@@ -117,7 +117,7 @@ int main(int argc, char* argv[]) try {
 }
 
 int store_configuration_file(Options const& options, std::string const& file_src_name) try {
-  assert(!file_src_name.empty());
+  confirm(!file_src_name.empty());
   
   std::cout << "store_configuration_file file name=<" << file_src_name << ">\n";
   std::cout << "store_configuration_file operation=<" << options.operation() << ">\n";
@@ -131,7 +131,7 @@ int store_configuration_file(Options const& options, std::string const& file_src
   using namespace artdaq::database::configuration::json;
 
   cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string&>(
-      literal::operation::store, store_configuration, options_string, test_document);
+      apiliteral::operation::store, store_configuration, options_string, test_document);
 
 
   auto result = cf::getOperations().at(options.operation())->invoke();
@@ -140,7 +140,7 @@ int store_configuration_file(Options const& options, std::string const& file_src
 
   std::cout << "Returned buffer:\n" << result.second << "\n";
 
-  auto file_out_name = std::string(artdaq::database::mkdir(tmpdir))
+  auto file_out_name = std::string(db::filesystem::mkdir(tmpdir))
                            .append(option::appname)
                            .append("-")
                            .append(options.operation())

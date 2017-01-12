@@ -1,4 +1,5 @@
 #include "artdaq-database/DataFormats/common.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 
 #include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
 #include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
@@ -27,8 +28,8 @@ using artdaq::database::fhicl::FhiclReader;
 using artdaq::database::fhicl::FhiclWriter;
 
 bool dbfj::fhicl_to_json(std::string const& fcl, std::string& json) {
-  assert(!fcl.empty());
-  assert(json.empty());
+  confirm(!fcl.empty());
+  confirm(json.empty());
 
   TRACE_(2, "fhicl_to_json: begin");
 
@@ -86,8 +87,8 @@ bool dbfj::fhicl_to_json(std::string const& fcl, std::string& json) {
 }
 
 bool dbfj::json_to_fhicl(std::string const& json, std::string& fcl) {
-  assert(!json.empty());
-  assert(fcl.empty());
+  confirm(!json.empty());
+  confirm(fcl.empty());
 
   TRACE_(3, "json_to_fhicl: begin");
 

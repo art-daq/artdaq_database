@@ -15,6 +15,7 @@
 #define TRACE_NAME "COFS:DpFle_C"
 
 using namespace artdaq::database::configuration;
+namespace cf = artdaq::database::configuration;
 
 namespace DBI = artdaq::database::filesystem;
 namespace prov = artdaq::database::configuration::filesystem;
@@ -24,15 +25,15 @@ using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocument;
 
 void prov::store(LoadStoreOperation const& options, JsonData const& insert_payload) {
-  assert(options.provider().compare(literal::provider::filesystem) == 0);
-  assert(options.operation().compare(literal::operation::store) == 0);
+  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
+  confirm(options.operation().compare(apiliteral::operation::store) == 0);
 
-  if (options.operation().compare(literal::operation::store) != 0) {
-    throw cet::exception("store_configuration") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  if (options.operation().compare(apiliteral::operation::store) != 0) {
+    throw runtime_error("store_configuration") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
-  if (options.provider().compare(literal::provider::filesystem) != 0) {
-    throw cet::exception("store_configuration") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+    throw runtime_error("store_configuration") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
   TRACE_(15, "store: begin");
@@ -48,15 +49,15 @@ void prov::store(LoadStoreOperation const& options, JsonData const& insert_paylo
 }
 
 JsonData prov::load(LoadStoreOperation const& options, JsonData const& search_payload) {
-  assert(options.provider().compare(literal::provider::filesystem) == 0);
-  assert(options.operation().compare(literal::operation::load) == 0);
+  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
+  confirm(options.operation().compare(apiliteral::operation::load) == 0);
 
-  if (options.operation().compare(literal::operation::load) != 0) {
-    throw cet::exception("load_configuration") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  if (options.operation().compare(apiliteral::operation::load) != 0) {
+    throw runtime_error("load_configuration") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
-  if (options.provider().compare(literal::provider::filesystem) != 0) {
-    throw cet::exception("load_configuration") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+    throw runtime_error("load_configuration") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
   TRACE_(16, "load: begin");
@@ -71,7 +72,7 @@ JsonData prov::load(LoadStoreOperation const& options, JsonData const& search_pa
                  << "Search returned " << collection.size() << " results.");
 
   if (collection.size() != 1) {
-    throw cet::exception("load_configuration") << "Search returned " << collection.size() << " results.";
+    throw runtime_error("load_configuration") << "Search returned " << collection.size() << " results.";
   }
 
   auto data = JsonData(collection.begin()->json_buffer);
@@ -82,15 +83,16 @@ JsonData prov::load(LoadStoreOperation const& options, JsonData const& search_pa
 }
 
 JsonData prov::findGlobalConfigs(ManageConfigsOperation const& options, JsonData const& search_payload) {
-  assert(options.provider().compare(literal::provider::filesystem) == 0);
-  assert(options.operation().compare(literal::operation::findconfigs) == 0);
+  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
+  confirm(options.operation().compare(apiliteral::operation::findconfigs) == 0);
 
-  if (options.operation().compare(literal::operation::findconfigs) != 0) {
-    throw cet::exception("operation_findconfigs") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  if (options.operation().compare(apiliteral::operation::findconfigs) != 0) {
+    throw runtime_error("operation_findconfigs") << "Wrong operation option; operation=<" << options.operation()
+                                                 << ">.";
   }
 
-  if (options.provider().compare(literal::provider::filesystem) != 0) {
-    throw cet::exception("operation_findconfigs") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+    throw runtime_error("operation_findconfigs") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
   TRACE_(17, "operation_findconfigs: begin");
@@ -103,8 +105,8 @@ JsonData prov::findGlobalConfigs(ManageConfigsOperation const& options, JsonData
   auto global_configs = provider->findGlobalConfigs(search_payload);
 
   if (global_configs.empty()) {
-    return {literal::empty_search_result};
-    // throw cet::exception("operation_findconfigs") << "No global
+    return {apiliteral::empty_search_result};
+    // throw runtime_error("operation_findconfigs") << "No global
     // configurations were found.";
   }
 
@@ -118,10 +120,10 @@ JsonData prov::findGlobalConfigs(ManageConfigsOperation const& options, JsonData
   std::ostringstream oss;
 
   auto seenValues = std::list<std::string>{};
-  seenValues.push_back(literal::notprovided);
+  seenValues.push_back(jsonliteral::notprovided);
 
   auto isNew = [& v = seenValues](auto const& name) {
-    assert(!name.empty());
+    confirm(!name.empty());
     if (std::find(v.begin(), v.end(), name) != v.end()) return false;
 
     v.emplace_back(name);
@@ -149,15 +151,16 @@ JsonData prov::findGlobalConfigs(ManageConfigsOperation const& options, JsonData
 }
 
 JsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, JsonData const& search_payload) {
-  assert(options.provider().compare(literal::provider::filesystem) == 0);
-  assert(options.operation().compare(literal::operation::buildfilter) == 0);
+  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
+  confirm(options.operation().compare(apiliteral::operation::buildfilter) == 0);
 
-  if (options.operation().compare(literal::operation::buildfilter) != 0) {
-    throw cet::exception("operation_buildfilter") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  if (options.operation().compare(apiliteral::operation::buildfilter) != 0) {
+    throw runtime_error("operation_buildfilter") << "Wrong operation option; operation=<" << options.operation()
+                                                 << ">.";
   }
 
-  if (options.provider().compare(literal::provider::filesystem) != 0) {
-    throw cet::exception("operation_buildfilter") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+    throw runtime_error("operation_buildfilter") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
   TRACE_(18, "operation_buildfilter: begin");
@@ -170,7 +173,7 @@ JsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, Js
   auto search_filters = provider->buildConfigSearchFilter(search_payload);
 
   if (search_filters.empty()) {
-    throw cet::exception("operation_buildfilter") << "No search filters were found.";
+    throw runtime_error("operation_buildfilter") << "No search filters were found.";
   }
 
   auto ex = std::regex(
@@ -194,7 +197,8 @@ JsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, Js
 
     auto results = std::smatch();
 
-    if (!std::regex_search(filter_json, results, ex)) throw cet::exception("operation_buildfilter") << "Unsupported filter string, no match";
+    if (!std::regex_search(filter_json, results, ex))
+      throw runtime_error("operation_buildfilter") << "Unsupported filter string, no match";
 
     /*
         for (size_t i = 0; i < results.size(); ++i) {
@@ -204,7 +208,8 @@ JsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, Js
        " << piece << '\n';
         }
     */
-    if (results.size() != 5) throw cet::exception("operation_buildfilter") << "Unsupported filter string, wrong result count";
+    if (results.size() != 5)
+      throw runtime_error("operation_buildfilter") << "Unsupported filter string, wrong result count";
 
     oss << printComma() << "{";
     oss << "\"name\" :\"" << results[1].str() << ":" << results[3].str() << "\",";
@@ -218,15 +223,16 @@ JsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, Js
 }
 
 JsonData prov::findConfigVersions(LoadStoreOperation const& options, JsonData const& /*not used*/) {
-  assert(options.provider().compare(literal::provider::filesystem) == 0);
-  assert(options.operation().compare(literal::operation::findversions) == 0);
+  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
+  confirm(options.operation().compare(apiliteral::operation::findversions) == 0);
 
-  if (options.operation().compare(literal::operation::findversions) != 0) {
-    throw cet::exception("operation_findversions") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  if (options.operation().compare(apiliteral::operation::findversions) != 0) {
+    throw runtime_error("operation_findversions") << "Wrong operation option; operation=<" << options.operation()
+                                                  << ">.";
   }
 
-  if (options.provider().compare(literal::provider::filesystem) != 0) {
-    throw cet::exception("operation_findversions") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+    throw runtime_error("operation_findversions") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
   TRACE_(19, "operation_findversions: begin");
@@ -239,8 +245,8 @@ JsonData prov::findConfigVersions(LoadStoreOperation const& options, JsonData co
   auto config_versions = provider->findConfigVersions(search_filter);
 
   if (config_versions.empty()) {
-    return {literal::empty_search_result};
-    //    throw cet::exception("operation_findversions") << "No configuration
+    return {apiliteral::empty_search_result};
+    //    throw runtime_error("operation_findversions") << "No configuration
     //    versions were found.";
   }
 
@@ -265,7 +271,8 @@ JsonData prov::findConfigVersions(LoadStoreOperation const& options, JsonData co
 
     auto results = std::smatch();
 
-    if (!std::regex_search(filter_json, results, ex)) throw cet::exception("operation_findversions") << "Unsupported filter string, no match";
+    if (!std::regex_search(filter_json, results, ex))
+      throw runtime_error("operation_findversions") << "Unsupported filter string, no match";
 
     /*
             for (size_t i = 0; i < results.size(); ++i) {
@@ -275,11 +282,12 @@ JsonData prov::findConfigVersions(LoadStoreOperation const& options, JsonData co
        << ": " << piece << '\n');
             }
     */
-    if (results.size() != 5) throw cet::exception("operation_findversions") << "Unsupported filter string, wrong result count";
+    if (results.size() != 5)
+      throw runtime_error("operation_findversions") << "Unsupported filter string, wrong result count";
 
     oss << printComma() << "{";
     oss << "\"name\" :\"" << results[1].str() /*<< ":" << results[3].str()*/
-       << "\",";
+        << "\",";
     oss << "\"query\" :" << config_version.json_buffer;
     oss << "}";
   }
@@ -290,15 +298,16 @@ JsonData prov::findConfigVersions(LoadStoreOperation const& options, JsonData co
 }
 
 JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData const& /*not used*/) {
-  assert(options.provider().compare(literal::provider::filesystem) == 0);
-  assert(options.operation().compare(literal::operation::findentities) == 0);
+  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
+  confirm(options.operation().compare(apiliteral::operation::findentities) == 0);
 
-  if (options.operation().compare(literal::operation::findentities) != 0) {
-    throw cet::exception("operation_findentities") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  if (options.operation().compare(apiliteral::operation::findentities) != 0) {
+    throw runtime_error("operation_findentities") << "Wrong operation option; operation=<" << options.operation()
+                                                  << ">.";
   }
 
-  if (options.provider().compare(literal::provider::filesystem) != 0) {
-    throw cet::exception("operation_findentities") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+    throw runtime_error("operation_findentities") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
   TRACE_(19, "operation_findentities: begin");
@@ -311,8 +320,8 @@ JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData co
   auto config_entities = provider->findConfigEntities(search_filter);
 
   if (config_entities.empty()) {
-    return {literal::empty_search_result};
-    // throw cet::exception("operation_findentities") << "No configuration
+    return {apiliteral::empty_search_result};
+    // throw runtime_error("operation_findentities") << "No configuration
     // entities were found.";
   }
 
@@ -335,7 +344,8 @@ JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData co
 
     auto results = std::smatch();
 
-    if (!std::regex_search(filter_json, results, ex)) throw cet::exception("operation_findentities") << "Unsupported filter string, no match";
+    if (!std::regex_search(filter_json, results, ex))
+      throw runtime_error("operation_findentities") << "Unsupported filter string, no match";
 
     /*
             for (size_t i = 0; i < results.size(); ++i) {
@@ -346,11 +356,12 @@ JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData co
             }
     */
 
-    if (results.size() != 4) throw cet::exception("operation_findentities") << "Unsupported filter string, wrong result count";
+    if (results.size() != 4)
+      throw runtime_error("operation_findentities") << "Unsupported filter string, wrong result count";
 
     oss << printComma() << "{";
     oss << "\"name\" :\"" << results[2].str() /*<< ":" << results[3].str()*/
-       << "\",";
+        << "\",";
     oss << "\"query\" :" << config_entity.json_buffer;
     oss << "}\n";
   }
@@ -361,23 +372,24 @@ JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData co
 }
 
 JsonData prov::addConfigToGlobalConfig(LoadStoreOperation const& options, JsonData const& search_payload) {
-  assert(options.provider().compare(literal::provider::filesystem) == 0);
-  assert(options.operation().compare(literal::operation::addconfig) == 0);
+  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
+  confirm(options.operation().compare(apiliteral::operation::addconfig) == 0);
 
-  if (options.operation().compare(literal::operation::addconfig) != 0) {
-    throw cet::exception("operation_addconfig") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  if (options.operation().compare(apiliteral::operation::addconfig) != 0) {
+    throw runtime_error("operation_addconfig") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
-  if (options.provider().compare(literal::provider::filesystem) != 0) {
-    throw cet::exception("operation_addconfig") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+    throw runtime_error("operation_addconfig") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
   TRACE_(20, "operation_addconfig: begin");
 
   auto new_options = options;
-  new_options.operation(literal::operation::load);
+  new_options.operation(apiliteral::operation::load);
 
-  auto search = JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collectionName() + "\"}"};
+  auto search =
+      JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collectionName() + "\"}"};
   TRACE_(20, "operation_addconfig: args search_payload=<" << search.json_buffer << ">");
 
   auto document = filesystem::load(new_options, search);
@@ -386,15 +398,16 @@ JsonData prov::addConfigToGlobalConfig(LoadStoreOperation const& options, JsonDa
   auto globalConfiguration = JSONDocument{new_options.globalConfiguration_to_JsonData().json_buffer};
   builder.addConfiguration(globalConfiguration);
 
-  new_options.operation(literal::operation::store);
+  new_options.operation(apiliteral::operation::store);
 
   TRACE_(20, "operation_addconfig: store()");
 
   // std::cout<< "operation_addconfig:: builder=<" <<
   // builder.extract().to_string() << ">builder\n";
 
-  auto update = JsonData{"{\"filter\":{\"$oid\":\"" + builder.extract().deleteChild("_id").value() + "\"},  \"document\":" +
-                         builder.extract().to_string() + ", \"collection\":\"" + options.collectionName() + "\"}"};
+  auto update =
+      JsonData{"{\"filter\":{\"$oid\":\"" + builder.extract().deleteChild("_id").value() + "\"},  \"document\":" +
+               builder.extract().to_string() + ", \"collection\":\"" + options.collectionName() + "\"}"};
 
   // std::cout << "operation_addconfig:: update=<" << update.json_buffer <<
   // ">update\n";
@@ -404,28 +417,30 @@ JsonData prov::addConfigToGlobalConfig(LoadStoreOperation const& options, JsonDa
 
   TRACE_(20, "operation_addconfig: store() done");
 
-  new_options.operation(literal::operation::buildfilter);
+  new_options.operation(apiliteral::operation::buildfilter);
 
-  auto find_options = ManageConfigsOperation{literal::operation::addconfig};
+  auto find_options = ManageConfigsOperation{apiliteral::operation::addconfig};
 
-  find_options.operation(literal::operation::buildfilter);
+  find_options.operation(apiliteral::operation::buildfilter);
   find_options.dataFormat(options::data_format_t::gui);
-  find_options.provider(literal::provider::filesystem);
+  find_options.provider(apiliteral::provider::filesystem);
   find_options.globalConfiguration(new_options.globalConfiguration());
 
   return filesystem::buildConfigSearchFilter(find_options, find_options.globalConfiguration_to_JsonData().json_buffer);
 }
 
 JsonData prov::listCollectionNames(LoadStoreOperation const& options, JsonData const& search_payload) {
-  assert(options.provider().compare(literal::provider::filesystem) == 0);
-  assert(options.operation().compare(literal::operation::listcollections) == 0);
+  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
+  confirm(options.operation().compare(apiliteral::operation::listcollections) == 0);
 
-  if (options.operation().compare(literal::operation::listcollections) != 0) {
-    throw cet::exception("operation_listcollections") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  if (options.operation().compare(apiliteral::operation::listcollections) != 0) {
+    throw runtime_error("operation_listcollections") << "Wrong operation option; operation=<" << options.operation()
+                                                     << ">.";
   }
 
-  if (options.provider().compare(literal::provider::filesystem) != 0) {
-    throw cet::exception("operation_listcollections") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+    throw runtime_error("operation_listcollections") << "Wrong provider option; provider=<" << options.provider()
+                                                     << ">.";
   }
 
   TRACE_(20, "operation_listcollections: begin");
@@ -437,8 +452,8 @@ JsonData prov::listCollectionNames(LoadStoreOperation const& options, JsonData c
   auto collection_names = provider->listCollectionNames(search_payload);
 
   if (collection_names.empty()) {
-    return {literal::empty_search_result};
-    // throw cet::exception("operation_listcollections") << "No configuration
+    return {apiliteral::empty_search_result};
+    // throw runtime_error("operation_listcollections") << "No configuration
     // entities were found.";
   }
 
@@ -469,15 +484,16 @@ JsonData prov::listCollectionNames(LoadStoreOperation const& options, JsonData c
 }
 
 JsonData prov::listDatabaseNames(LoadStoreOperation const& options, JsonData const& search_payload) {
-  assert(options.provider().compare(literal::provider::filesystem) == 0);
-  assert(options.operation().compare(literal::operation::listdatabases) == 0);
+  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
+  confirm(options.operation().compare(apiliteral::operation::listdatabases) == 0);
 
-  if (options.operation().compare(literal::operation::listdatabases) != 0) {
-    throw cet::exception("operation_listdatabases") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  if (options.operation().compare(apiliteral::operation::listdatabases) != 0) {
+    throw runtime_error("operation_listdatabases") << "Wrong operation option; operation=<" << options.operation()
+                                                   << ">.";
   }
 
-  if (options.provider().compare(literal::provider::filesystem) != 0) {
-    throw cet::exception("operation_listdatabases") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+    throw runtime_error("operation_listdatabases") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
   TRACE_(20, "operation_listdatabases: begin");
@@ -489,8 +505,8 @@ JsonData prov::listDatabaseNames(LoadStoreOperation const& options, JsonData con
   auto database_names = provider->listDatabaseNames(search_payload);
 
   if (database_names.empty()) {
-    return {literal::empty_search_result};
-    // throw cet::exception("operation_listdatabases") << "No configuration
+    return {apiliteral::empty_search_result};
+    // throw runtime_error("operation_listdatabases") << "No configuration
     // entities were found.";
   }
 
@@ -521,15 +537,15 @@ JsonData prov::listDatabaseNames(LoadStoreOperation const& options, JsonData con
 }
 
 JsonData prov::readDatabaseInfo(LoadStoreOperation const& options, JsonData const& search_payload) {
-  assert(options.provider().compare(literal::provider::filesystem) == 0);
-  assert(options.operation().compare(literal::operation::readdbinfo) == 0);
+  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
+  confirm(options.operation().compare(apiliteral::operation::readdbinfo) == 0);
 
-  if (options.operation().compare(literal::operation::readdbinfo) != 0) {
-    throw cet::exception("operation_readdbinfo") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  if (options.operation().compare(apiliteral::operation::readdbinfo) != 0) {
+    throw runtime_error("operation_readdbinfo") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
-  if (options.provider().compare(literal::provider::filesystem) != 0) {
-    throw cet::exception("operation_readdbinfo") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+    throw runtime_error("operation_readdbinfo") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
   TRACE_(20, "operation_readdbinfo: begin");
@@ -541,13 +557,13 @@ JsonData prov::readDatabaseInfo(LoadStoreOperation const& options, JsonData cons
   auto search_results = provider->databaseMetadata(search_payload);
 
   if (search_results.empty()) {
-    return {literal::empty_search_result};
-    // throw cet::exception("operation_readdbinfo") << "No database info found.";
+    return {apiliteral::empty_search_result};
+    // throw runtime_error("operation_readdbinfo") << "No database info found.";
   }
 
   auto const database_metadata = search_results.begin();
 
- TRACE_(20, "operation_readdbinfo: database_metadata =<" << database_metadata->json_buffer << ">");
+  TRACE_(20, "operation_readdbinfo: database_metadata =<" << database_metadata->json_buffer << ">");
 
   std::ostringstream oss;
   oss << "{ \"search\":\n";
@@ -557,7 +573,7 @@ JsonData prov::readDatabaseInfo(LoadStoreOperation const& options, JsonData cons
   return {oss.str()};
 }
 
-void debug::enableDBOperationFileSystem() {
+void cf::debug::enableDBOperationFileSystem() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 

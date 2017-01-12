@@ -1,5 +1,6 @@
 #include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
 #include "artdaq-database/DataFormats/common.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 
 namespace artdaq {
 namespace database {

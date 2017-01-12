@@ -4,13 +4,11 @@
 #include "artdaq-database/StorageProviders/storage_providers.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
 #include "artdaq-database/JsonDocument/JSONDocument.h"
-#include "artdaq-database/DataFormats/shared_literals.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
 
 namespace  bpo = boost::program_options;
 using namespace artdaq::database;
 
-using artdaq::database::jsonutils::JSONDocument;
+using artdaq::database::docrecord::JSONDocument;
 using  artdaq::database::basictypes::JsonData;
 using  artdaq::database::basictypes::FhiclData;
 
@@ -26,11 +24,11 @@ bool test_update(std::string const&, std::string const&,std::string const&);
 int main(int argc, char* argv[])try
 {
     artdaq::database::filesystem::debug::enable();
-    artdaq::database::jsonutils::debug::enableJSONDocument();
+    artdaq::database::docrecord::debug::enableJSONDocument();
 
 
     debug::registerUngracefullExitHandlers();
-    artdaq::database::dataformats::useFakeTime(true);
+    artdaq::database::useFakeTime(true);
 
     std::ostringstream descstr;
     descstr << argv[0] << " <-s <source-file>> <-c <compare-with-file>> <-t <test-name>> [<-o <options file>>] (available test names: insert,search1,search1,update)";
@@ -145,8 +143,8 @@ catch(...)
 
 bool test_insert(std::string const& source_fcl, std::string const& compare_fcl,std::string const& filter)
 {
-    assert(!source_fcl.empty());
-    assert(!compare_fcl.empty());
+    confirm(!source_fcl.empty());
+    confirm(!compare_fcl.empty());
 
     JsonData source = FhiclData(source_fcl);
     JsonData compare = FhiclData(compare_fcl);
@@ -202,8 +200,8 @@ bool test_insert(std::string const& source_fcl, std::string const& compare_fcl,s
 
 bool test_search1(std::string const& source_fcl, std::string const& compare_fcl,std::string const& filter)
 {
-    assert(!source_fcl.empty());
-    assert(!compare_fcl.empty());
+    confirm(!source_fcl.empty());
+    confirm(!compare_fcl.empty());
 
     JsonData source = FhiclData(source_fcl);
     JsonData compare = FhiclData(compare_fcl);
@@ -260,8 +258,8 @@ bool test_search1(std::string const& source_fcl, std::string const& compare_fcl,
 
 bool test_search2(std::string const& source_fcl, std::string const& compare_fcl, std::string const& options[[gnu::unused]])
 {
-    assert(!source_fcl.empty());
-    assert(!compare_fcl.empty());
+    confirm(!source_fcl.empty());
+    confirm(!compare_fcl.empty());
 
     JsonData source = FhiclData(source_fcl);
     JsonData compare = FhiclData(compare_fcl);
@@ -316,8 +314,8 @@ bool test_search2(std::string const& source_fcl, std::string const& compare_fcl,
 
 bool test_update(std::string const& source_fcl, std::string const& compare_fcl,std::string const& update_fcl)
 {
-    assert(!source_fcl.empty());
-    assert(!compare_fcl.empty());
+    confirm(!source_fcl.empty());
+    confirm(!compare_fcl.empty());
 
     JsonData source = FhiclData(source_fcl);
     JsonData compare = FhiclData(compare_fcl);

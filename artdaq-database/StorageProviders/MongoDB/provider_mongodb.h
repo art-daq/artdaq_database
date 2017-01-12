@@ -1,7 +1,6 @@
 #ifndef _ARTDAQ_DATABASE_PROVIDER_MONGO_H_
 #define _ARTDAQ_DATABASE_PROVIDER_MONGO_H_
 
-#include "artdaq-database/StorageProviders/common.h"
 #include "artdaq-database/StorageProviders/storage_providers.h"
 
 #include <mongocxx/client.hpp>
@@ -22,27 +21,15 @@ constexpr auto db_name = "test_configuration_db";
 }
 
 struct DBConfig final {
-  DBConfig() : uri{std::string{literal::MONGOURI} + literal::hostname + ":" + literal::port + "/" + literal::db_name} {
-    auto tmpURI = getenv("ARTDAQ_DATABASE_URI") ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
+  DBConfig();
+  DBConfig(std::string uri_);
 
-    if (tmpURI.back() == '/') tmpURI.pop_back();  // remove trailing slash
-
-    auto prefixURI = std::string{literal::MONGOURI};
-    if (tmpURI.length() > prefixURI.length() && std::equal(prefixURI.begin(), prefixURI.end(), tmpURI.begin())) uri = tmpURI;
-  }
-  DBConfig(std::string uri_) : uri{uri_} { assert(!uri_.empty()); }
   std::string uri;
   const std::string connectionURI() const { return uri; };
 };
 
 class MongoDB final {
  public:
-  mongocxx::database& connection();
-  mongocxx::cursor list_databases() {
-    connection();
-    return _client.list_databases();
-  }
-
   static std::shared_ptr<MongoDB> create(DBConfig const& config) {
     return std::make_shared<MongoDB, DBConfig const&, PassKeyIdiom const&>(config, {});
   }
@@ -53,8 +40,10 @@ class MongoDB final {
     PassKeyIdiom() = default;
   };
 
-  explicit MongoDB(DBConfig const& config, PassKeyIdiom const&)
-      : _config{config}, _instance{}, _client{mongocxx::uri{_config.connectionURI()}}, _connection{_client[_client.uri().database()]} {}
+  explicit MongoDB(DBConfig const& config, PassKeyIdiom const&);
+
+  mongocxx::database& connection();
+  mongocxx::cursor list_databases();
 
  private:
   DBConfig _config;

@@ -5,7 +5,8 @@
 #include "artdaq-database/ConfigurationDB/dboperation_loadstore.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
-#include "artdaq-database/ConfigurationDB/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
+#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -14,9 +15,12 @@
 #define TRACE_NAME "CONF:OpldStr_C"
 
 using namespace artdaq::database::configuration;
-namespace dbcfg=artdaq::database::configuration;
+namespace dbcfg = artdaq::database::configuration;
 
 using artdaq::database::configuration::options::data_format_t;
+
+namespace jsonliteral = artdaq::database::dataformats::literal;
+namespace apiliteral = artdaq::database::configapi::literal;
 
 namespace artdaq {
 namespace database {
@@ -36,49 +40,49 @@ void load_configuration(LoadStoreOperation const&, std::string&);
 }  // namespace database
 }  // namespace artdaq
 
-auto make_error_msg = [](auto msg) { return std::string("{error:\"").append(msg).append(".\"}"); };
+using namespace artdaq::database::result;
 
 result_pair_t opts::store_configuration(LoadStoreOperation const& options, std::string& conf) noexcept {
   try {
     detail::store_configuration(options, conf);
-    return result_pair_t{true, conf};
+    return Success(conf);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
 result_pair_t opts::load_configuration(LoadStoreOperation const& options, std::string& conf) noexcept {
   try {
     detail::load_configuration(options, conf);
-    return result_pair_t{true, conf};
+    return Success(conf);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
 result_pair_t json::store_configuration(std::string const& search_filter, std::string const& conf) noexcept {
   try {
-    if (search_filter.empty()) return std::make_pair(false, make_error_msg(literal::msg::empty_filter));
-    if (conf.empty()) return std::make_pair(false, make_error_msg(literal::msg::empty_document));
+    if (search_filter.empty()) return Failure(msg_EmptyFilter);
+    if (conf.empty()) return Failure(msg_EmptyDocument);
 
-    auto options = LoadStoreOperation{literal::operation::store};
+    auto options = LoadStoreOperation{apiliteral::operation::store};
     options.readJsonData({search_filter});
 
     // convert to database_format
     auto database_format = std::string(conf);
 
     detail::store_configuration(options, database_format);
-    return result_pair_t{true, database_format};
+    return Success(database_format);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
 result_pair_t json::load_configuration(std::string const& search_filter, std::string& conf) noexcept {
   try {
-    if (search_filter.empty()) return std::make_pair(false, make_error_msg(literal::msg::empty_filter));
+    if (search_filter.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = LoadStoreOperation{literal::operation::load};
+    auto options = LoadStoreOperation{apiliteral::operation::load};
     options.readJsonData({search_filter});
 
     auto database_format = std::string{};
@@ -88,9 +92,9 @@ result_pair_t json::load_configuration(std::string const& search_filter, std::st
     // convert to gui
     conf = database_format;
 
-    return result_pair_t{true, conf};
+    return Success(conf);
   } catch (...) {
-    return result_pair_t{false, boost::current_exception_diagnostic_information()};
+    return Failure(boost::current_exception_diagnostic_information());
   }
 }
 

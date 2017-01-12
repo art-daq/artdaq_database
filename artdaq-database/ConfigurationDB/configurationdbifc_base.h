@@ -7,7 +7,6 @@
 #include <utility>
 
 #include "artdaq-database/BasicTypes/basictypes.h"
-#include "artdaq-database/BuildInfo/process_exceptions.h"
 
 #include "artdaq-database/ConfigurationDB/configurationdb.h"
 #include "artdaq-database/DataFormats/Json/json_reader.h"
@@ -27,7 +26,6 @@ namespace configuration {
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
-namespace cfl = cf::literal;
 namespace impl = cf::opts;
 
 using artdaq::database::basictypes::JsonData;
@@ -38,7 +36,8 @@ auto make_error_msg = [](const char* msg) { return std::string("{error:\"").appe
 
 template <typename CONF>
 class MakeSerializable final {
-  static_assert(std::is_pointer<CONF>::value || std::is_reference<CONF>::value, "Template parameter must be either a pointer or reference type");
+  static_confirm(std::is_pointer<CONF>::value || std::is_reference<CONF>::value,
+                 "Template parameter must be either a pointer or reference type");
 
  public:
   template <class TYPE>
@@ -46,10 +45,11 @@ class MakeSerializable final {
     return writeConfigurationImpl(data);
   } catch (std::exception const& e) {
     throw artdaq::database::exception("MakeSerializable::writeConfiguration")
-        << "Unable to write " << demangle(typeid(CONF).name()) << " into " << demangle(typeid(TYPE).name()) << "; Exception msg:" << e.what() << ".";
+        << "Unable to write " << demangle(typeid(CONF).name()) << " into " << demangle(typeid(TYPE).name())
+        << "; Exception msg:" << e.what() << ".";
   } catch (...) {
-    throw artdaq::database::exception("MakeSerializable::writeConfiguration") << "Unable to write " << demangle(typeid(CONF).name()) << " into "
-                                                                              << demangle(typeid(TYPE).name()) << ".";
+    throw artdaq::database::exception("MakeSerializable::writeConfiguration")
+        << "Unable to write " << demangle(typeid(CONF).name()) << " into " << demangle(typeid(TYPE).name()) << ".";
   }
 
   template <class TYPE>
@@ -57,18 +57,21 @@ class MakeSerializable final {
     return readConfigurationImpl(data);
   } catch (std::exception const& e) {
     throw artdaq::database::exception("MakeSerializable::readConfiguration")
-        << "Unable to read " << demangle(typeid(CONF).name()) << " from " << demangle(typeid(TYPE).name()) << "; Exception msg:" << e.what() << ".";
+        << "Unable to read " << demangle(typeid(CONF).name()) << " from " << demangle(typeid(TYPE).name())
+        << "; Exception msg:" << e.what() << ".";
   } catch (...) {
-    throw artdaq::database::exception("MakeSerializable::readConfiguration") << "Unable to read " << demangle(typeid(CONF).name()) << " from "
-                                                                             << demangle(typeid(TYPE).name()) << ".";
+    throw artdaq::database::exception("MakeSerializable::readConfiguration")
+        << "Unable to read " << demangle(typeid(CONF).name()) << " from " << demangle(typeid(TYPE).name()) << ".";
   }
 
-  std::string configurationName() const throw(artdaq::database::exception) try { return configurationNameImpl(); } catch (std::exception const& e) {
-    throw artdaq::database::exception("MakeSerializable::configurationName") << "Unable to get configuration name" << demangle(typeid(CONF).name())
-                                                                             << "; Exception msg:" << e.what() << ".";
+  std::string configurationName() const throw(artdaq::database::exception) try {
+    return configurationNameImpl();
+  } catch (std::exception const& e) {
+    throw artdaq::database::exception("MakeSerializable::configurationName")
+        << "Unable to get configuration name" << demangle(typeid(CONF).name()) << "; Exception msg:" << e.what() << ".";
   } catch (...) {
-    throw artdaq::database::exception("MakeSerializable::configurationName") << "Unable to to get configuration name" << demangle(typeid(CONF).name())
-                                                                             << ".";
+    throw artdaq::database::exception("MakeSerializable::configurationName") << "Unable to to get configuration name"
+                                                                             << demangle(typeid(CONF).name()) << ".";
   }
 
   MakeSerializable(CONF conf) : _conf(conf){};
@@ -100,7 +103,8 @@ class MakeSerializable final {
 
 template <typename CONF, template <typename CONF> class SERIALIZABLE>
 class ConfigurationSerializer final {
-  static_assert(std::is_pointer<CONF>::value || std::is_reference<CONF>::value, "Template parameter must be either a pointer or reference type");
+  static_confirm(std::is_pointer<CONF>::value || std::is_reference<CONF>::value,
+                 "Template parameter must be either a pointer or reference type");
 
  public:
   using Serializable_t = SERIALIZABLE<CONF>;
@@ -108,7 +112,8 @@ class ConfigurationSerializer final {
   static ConfigurationSerializer<CONF, SERIALIZABLE> wrap(CONF conf) { return {conf}; }
 
   template <class TYPE>
-  typename std::enable_if<std::is_same<TYPE, FhiclData>::value, cf::result_pair_t>::type writeConfiguration(TYPE& data) const noexcept try {
+  typename std::enable_if<std::is_same<TYPE, FhiclData>::value, cf::result_pair_t>::type writeConfiguration(
+      TYPE& data) const noexcept try {
     auto tmp = TYPE{""};
     auto result = Serializable_t{_conf}.template writeConfiguration<TYPE>(tmp);
 
@@ -120,7 +125,8 @@ class ConfigurationSerializer final {
   }
 
   template <class TYPE>
-  typename std::enable_if<std::is_same<TYPE, JsonData>::value, cf::result_pair_t>::type writeConfiguration(TYPE& data) const noexcept try {
+  typename std::enable_if<std::is_same<TYPE, JsonData>::value, cf::result_pair_t>::type writeConfiguration(
+      TYPE& data) const noexcept try {
     auto tmp = TYPE{"{}"};
     auto result = Serializable_t{_conf}.template writeConfiguration<TYPE>(tmp);
 
@@ -132,7 +138,8 @@ class ConfigurationSerializer final {
   }
 
   template <class TYPE>
-  typename std::enable_if<std::is_same<TYPE, FhiclData>::value, cf::result_pair_t>::type readConfiguration(TYPE const& data) noexcept try {
+  typename std::enable_if<std::is_same<TYPE, FhiclData>::value, cf::result_pair_t>::type readConfiguration(
+      TYPE const& data) noexcept try {
     auto result = Serializable_t{_conf}.template readConfiguration<TYPE>(data);
 
     return {result, {make_error_msg(result ? "Success" : "Failure")}};
@@ -141,7 +148,8 @@ class ConfigurationSerializer final {
   }
 
   template <class TYPE>
-  typename std::enable_if<std::is_same<TYPE, JsonData>::value, cf::result_pair_t>::type readConfiguration(TYPE const& data) noexcept try {
+  typename std::enable_if<std::is_same<TYPE, JsonData>::value, cf::result_pair_t>::type readConfiguration(
+      TYPE const& data) noexcept try {
     auto result = Serializable_t{_conf}.template readConfiguration<TYPE>(data);
 
     return {result, {make_error_msg(result ? "Success" : "Failure")}};
@@ -149,7 +157,9 @@ class ConfigurationSerializer final {
     return {false, {make_error_msg(e.what())}};
   }
 
-  std::string configurationName() const noexcept try { return Serializable_t{_conf}.configurationName(); } catch (std::exception const&) {
+  std::string configurationName() const noexcept try {
+    return Serializable_t{_conf}.configurationName();
+  } catch (std::exception const&) {
     using configurationClazz = typename std::remove_pointer<typename std::remove_reference<CONF>::type>::type;
 
     auto name = demangle(typeid(configurationClazz).name());
@@ -184,15 +194,16 @@ struct VersionInfo {
   std::string entity;
 
   void validate() const {
-    assert(!configuration.empty());
+    confirm(!configuration.empty());
 
-    if (configuration.empty()) throw artdaq::database::invalid_option_exception("VersionInfo") << "Configuration name is empty";
+    if (configuration.empty())
+      throw artdaq::database::invalid_option_exception("VersionInfo") << "Configuration name is empty";
 
-    assert(!version.empty());
+    confirm(!version.empty());
 
     if (version.empty()) throw artdaq::database::invalid_option_exception("VersionInfo") << "Version is empty";
 
-    assert(!entity.empty());
+    confirm(!entity.empty());
 
     if (entity.empty()) throw artdaq::database::invalid_option_exception("VersionInfo") << "Entity is empty";
   }

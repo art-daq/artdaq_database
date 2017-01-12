@@ -1,9 +1,7 @@
-#include "artdaq-database/StorageProviders/UcondDB/provider_uconddb.h"
-#include "artdaq-database/StorageProviders/common.h"
-
-#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
-
 #include "artdaq-database/BasicTypes/basictypes.h"
+#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
+#include "artdaq-database/SharedCommon/common.h"
+#include "artdaq-database/StorageProviders/UcondDB/provider_uconddb.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -19,17 +17,31 @@ namespace database {
 
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::ucond::UcondDB;
+using artdaq::database::ucond::DBConfig;
 
 using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocument;
 
-object_id_t generate_oid();
-object_id_t extract_oid(std::string const&);
+DBConfig::DBConfig() : uri{std::string{dbfsl::FILEURI} + "${ARTDAQ_DATABASE_DATADIR}/uconddb" + "/" + dbfsl::db_name} {
+  auto tmpURI =
+      getenv("ARTDAQ_DATABASE_URI") ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
 
-std::string expand_environment_variables(std::string var);
+  if (tmpURI.back() == '/') tmpURI.pop_back();  // remove trailing slash
+
+  auto prefixURI = std::string{dbfsl::FILEURI};
+
+  if (tmpURI.length() > prefixURI.length() && std::equal(prefixURI.begin(), prefixURI.end(), tmpURI.begin()))
+    uri = tmpURI;
+}
+
+DBConfig::DBConfig(std::string uri_) : uri{uri_} { confirm(!uri_.empty()); }
 
 std::string& UcondDB::connection() { return _connection; }
 
+   UcondDB::UcondDB(DBConfig const& config, PassKeyIdiom const&)
+      : _config{config}, _client{_config.connectionURI()}, _connection{_config.connectionURI() + "/"} {}
+
+      
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, UcondDB>::load(JsonData const& filter) {
@@ -37,7 +49,7 @@ std::list<JsonData> StorageProvider<JsonData, UcondDB>::load(JsonData const& fil
   TRACE_(3, "StorageProvider::UcondDB::load() args search=<" << filter.json_buffer << ">");
   auto returnCollection = std::list<JsonData>();
 
-  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::load() is not implemented";
+  throw runtime_error("UcondDB") << "StorageProvider::UcondDB::load() is not implemented";
 
   return returnCollection;
 }
@@ -65,7 +77,7 @@ object_id_t StorageProvider<JsonData, UcondDB>::store(JsonData const& data) {
     oid = generate_oid();
   }
 
-  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::store() is not implemented";
+  throw runtime_error("UcondDB") << "StorageProvider::UcondDB::store() is not implemented";
 
   return {"{ \"$oid\" : \"" + oid + "\"}"};
 }
@@ -73,13 +85,13 @@ object_id_t StorageProvider<JsonData, UcondDB>::store(JsonData const& data) {
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, UcondDB>::findGlobalConfigs(JsonData const& search_filter) {
-  assert(!search_filter.json_buffer.empty());
+  confirm(!search_filter.json_buffer.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(5, "StorageProvider::FileSystemDB::findGlobalConfigs() begin");
   TRACE_(5, "StorageProvider::FileSystemDB::findGlobalConfigs() args data=<" << search_filter.json_buffer << ">");
 
-  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::findGlobalConfigs() is not implemented";
+  throw runtime_error("UcondDB") << "StorageProvider::UcondDB::findGlobalConfigs() is not implemented";
 
   return returnCollection;
 }
@@ -87,13 +99,14 @@ std::list<JsonData> StorageProvider<JsonData, UcondDB>::findGlobalConfigs(JsonDa
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, UcondDB>::buildConfigSearchFilter(JsonData const& search_filter) {
-  assert(!search_filter.json_buffer.empty());
+  confirm(!search_filter.json_buffer.empty());
+  
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(6, "StorageProvider::UcondDB::buildConfigSearchFilter() begin");
   TRACE_(6, "StorageProvider::UcondDB::buildConfigSearchFilter() args data=<" << search_filter.json_buffer << ">");
 
-  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::buildConfigSearchFilter() is not implemented";
+  throw runtime_error("UcondDB") << "StorageProvider::UcondDB::buildConfigSearchFilter() is not implemented";
 
   return returnCollection;
 }
@@ -101,13 +114,14 @@ std::list<JsonData> StorageProvider<JsonData, UcondDB>::buildConfigSearchFilter(
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, UcondDB>::findConfigVersions(JsonData const& filter) {
-  assert(!filter.json_buffer.empty());
+  confirm(!filter.json_buffer.empty());
+  
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(7, "StorageProvider::UcondDB::findConfigVersions() begin");
   TRACE_(7, "StorageProvider::UcondDB::findConfigVersions() args data=<" << filter.json_buffer << ">");
 
-  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::findConfigVersions() is not implemented";
+  throw runtime_error("UcondDB") << "StorageProvider::UcondDB::findConfigVersions() is not implemented";
 
   return returnCollection;
 }
@@ -115,13 +129,13 @@ std::list<JsonData> StorageProvider<JsonData, UcondDB>::findConfigVersions(JsonD
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, UcondDB>::findConfigEntities(JsonData const& filter) {
-  assert(!filter.json_buffer.empty());
+  confirm(!filter.json_buffer.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(9, "StorageProvider::UcondDB::findConfigEntities() begin");
   TRACE_(9, "StorageProvider::UcondDB::findConfigEntities() args data=<" << filter.json_buffer << ">");
 
-  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::findConfigEntities() is not implemented";
+  throw runtime_error("UcondDB") << "StorageProvider::UcondDB::findConfigEntities() is not implemented";
 
   return returnCollection;
 }
@@ -129,12 +143,13 @@ std::list<JsonData> StorageProvider<JsonData, UcondDB>::findConfigEntities(JsonD
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, UcondDB>::listCollectionNames(JsonData const& search_filter) {
-  assert(!search_filter.json_buffer.empty());
+  confirm(!search_filter.json_buffer.empty());
+
   auto returnCollection = std::list<JsonData>();
   TRACE_(12, "StorageProvider::UcondDB::listCollectionNames() begin");
   TRACE_(12, "StorageProvider::UcondDB::listCollectionNames() args data=<" << search_filter.json_buffer << ">");
 
-  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::listCollectionNames() is not implemented";
+  throw runtime_error("UcondDB") << "StorageProvider::UcondDB::listCollectionNames() is not implemented";
 
   return returnCollection;
 }
@@ -142,13 +157,13 @@ std::list<JsonData> StorageProvider<JsonData, UcondDB>::listCollectionNames(Json
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, UcondDB>::addConfigToGlobalConfig(JsonData const& search_filter) {
-  assert(!search_filter.json_buffer.empty());
+  confirm(!search_filter.json_buffer.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(8, "StorageProvider::UcondDB::addConfigToGlobalConfig() begin");
   TRACE_(8, "StorageProvider::UcondDB::addConfigToGlobalConfig() args data=<" << search_filter.json_buffer << ">");
 
-  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::addConfigToGlobalConfig() is not implemented";
+  throw runtime_error("UcondDB") << "StorageProvider::UcondDB::addConfigToGlobalConfig() is not implemented";
 
   return returnCollection;
 }
@@ -156,24 +171,24 @@ std::list<JsonData> StorageProvider<JsonData, UcondDB>::addConfigToGlobalConfig(
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, UcondDB>::listDatabaseNames(JsonData const& search_filter) {
-  assert(!search_filter.json_buffer.empty());
+  confirm(!search_filter.json_buffer.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(9, "StorageProvider::UcondDB::listDatabaseNames() begin");
   TRACE_(9, "StorageProvider::UcondDB::listDatabaseNames() args data=<" << search_filter.json_buffer << ">");
 
-  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::listDatabaseNames() is not implemented";
+  throw runtime_error("UcondDB") << "StorageProvider::UcondDB::listDatabaseNames() is not implemented";
 
   return returnCollection;
 }
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, UcondDB>::databaseMetadata(JsonData const& search_filter) {
-  assert(!search_filter.json_buffer.empty());
+std::list<JsonData> StorageProvider<JsonData, UcondDB>::databaseMetadata(JsonData const& search_filter [[gnu::unused]]) {
+  confirm(!search_filter.json_buffer.empty());
   auto returnCollection = std::list<JsonData>();
 
-  throw cet::exception("UcondDB") << "StorageProvider::UcondDB::databaseMetadata() is not implemented";
+  throw runtime_error("UcondDB") << "StorageProvider::UcondDB::databaseMetadata() is not implemented";
 
   return returnCollection;
 }

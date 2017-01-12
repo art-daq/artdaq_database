@@ -44,7 +44,7 @@ XmlData::XmlData(std::string const& buffer) : xml_buffer{buffer} {}
 XmlData::XmlData(JsonData const& document) {
   namespace literal = artdaq::database::dataformats::literal;
 
-  assert(!document.json_buffer.empty());
+  confirm(!document.json_buffer.empty());
 
   TRACE_(1, "XML document=" << document.json_buffer);
 

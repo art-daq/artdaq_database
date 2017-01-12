@@ -10,26 +10,23 @@
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 
 #include "artdaq-database/DataFormats/Json/json_reader.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
-#include "artdaq-database/DataFormats/shared_literals.h"
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
 namespace cfo = cf::options;
 
-namespace literal = artdaq::database::configuration::literal;
 namespace bpo = boost::program_options;
 
 using Options = cf::ManageConfigsOperation;
 
-using artdaq::database::jsonutils::JSONDocument;
+using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::basictypes::JsonData;
 
 int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
-  // artdaq::database::jsonutils::debug::enableJSONDocument();
-  //artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
+  // artdaq::database::docrecord::debug::enableJSONDocument();
+  //artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
 
   artdaq::database::configuration::debug::enableFindConfigsOperation();
   artdaq::database::configuration::debug::enableCreateConfigsOperation();
@@ -43,7 +40,7 @@ int main(int argc, char* argv[]) try {
   artdaq::database::configuration::debug::enableDBOperationFileSystem();
 
   debug::registerUngracefullExitHandlers();
-  artdaq::database::dataformats::useFakeTime(true);
+  artdaq::database::useFakeTime(true);
 
   auto options = Options{argv[0]};
   auto desc = options.makeProgramOptions();
@@ -69,7 +66,7 @@ int main(int argc, char* argv[]) try {
     return exit_code;
   }
 
-  if (!vm.count(literal::option::result)) {
+  if (!vm.count(apiliteral::option::result)) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no result file name given.\n"
               << "For usage and an options list, please do '" << argv[0] << " --help"
               << "'.\n";
@@ -77,12 +74,12 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::INVALID_ARGUMENT | 1;
   }
 
-  auto file_res_name = vm[literal::option::result].as<std::string>();
+  auto file_res_name = vm[apiliteral::option::result].as<std::string>();
 
   auto file_src_name = file_res_name;
 
-  if (vm.count(literal::option::source)) {
-    file_src_name = vm[literal::option::source].as<std::string>();
+  if (vm.count(apiliteral::option::source)) {
+    file_src_name = vm[apiliteral::option::source].as<std::string>();
   }
 
   auto options_string = options.to_string();
@@ -92,20 +89,20 @@ int main(int argc, char* argv[]) try {
   using namespace artdaq::database::configuration::json;
 
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      literal::operation::findconfigs, find_global_configurations, options_string);
+      apiliteral::operation::findconfigs, find_global_configurations, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      literal::operation::buildfilter, build_global_configuration_search_filter, options_string);
+      apiliteral::operation::buildfilter, build_global_configuration_search_filter, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      literal::operation::addconfig, add_configuration_to_global_configuration, options_string);
+      apiliteral::operation::addconfig, add_configuration_to_global_configuration, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      literal::operation::findversions, find_configuration_versions, options_string);
+      apiliteral::operation::findversions, find_configuration_versions, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      literal::operation::findentities, find_configuration_entities, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(literal::operation::addalias, add_version_alias,
+      apiliteral::operation::findentities, find_configuration_entities, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::addalias, add_version_alias,
                                                                                   options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(literal::operation::rmalias, remove_version_alias,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::rmalias, remove_version_alias,
                                                                                   options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(literal::operation::findalias, find_version_aliases,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findalias, find_version_aliases,
                                                                                   options_string);
 
   std::cout << "Running test:<" << options.operation() << ">\n";
@@ -157,7 +154,7 @@ int main(int argc, char* argv[]) try {
   std::cout << "First mismatch at position " << std::distance(expected.begin(), mismatch.first) << ", (exp,ret)=(0x"
             << std::hex << (unsigned int)*mismatch.first << ",0x" << (unsigned int)*mismatch.second << ")\n";
 
-  auto file_out_name = std::string(artdaq::database::mkdir(tmpdir))
+  auto file_out_name = std::string(db::filesystem::mkdir(tmpdir))
                            .append(argv[0])
                            .append("-")
                            .append(options.operation())

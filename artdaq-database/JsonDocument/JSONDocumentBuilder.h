@@ -76,8 +76,8 @@ class JSONDocumentBuilder final {
 
 template <typename OVL>
 std::unique_ptr<OVL> JSONDocumentBuilder::overlay(JSONDocument& document, object_t::key_type const& self_key) {
-  assert(!self_key.empty());
-  assert(type(document._value) == type_t::OBJECT);
+  confirm(!self_key.empty());
+  confirm(type(document._value) == type_t::OBJECT);
 
   if (self_key.empty()) throw std::runtime_error("Errror: self_key is empty");
 

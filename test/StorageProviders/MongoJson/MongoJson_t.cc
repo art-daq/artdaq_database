@@ -4,13 +4,11 @@
 #include "artdaq-database/StorageProviders/storage_providers.h"
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 #include "artdaq-database/JsonDocument/JSONDocument.h"
-#include "artdaq-database/DataFormats/shared_literals.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
 
 namespace  bpo = boost::program_options;
 using namespace artdaq::database;
 
-using artdaq::database::jsonutils::JSONDocument;
+using artdaq::database::docrecord::JSONDocument;
 
 namespace literal = artdaq::database::dataformats::literal;
 
@@ -24,10 +22,10 @@ bool test_update(std::string const&, std::string const&,std::string const&);
 int main(int argc, char* argv[])try
 {
     artdaq::database::mongo::debug::enable();
-    artdaq::database::jsonutils::debug::enableJSONDocument();
+    artdaq::database::docrecord::debug::enableJSONDocument();
 
     debug::registerUngracefullExitHandlers();
-    artdaq::database::dataformats::useFakeTime(true);
+    artdaq::database::useFakeTime(true);
 
     std::ostringstream descstr;
     descstr << argv[0] << " <-s <source-file>> <-c <compare-with-file>> <-t <test-name>> [<-o <options file>>] (available test names: insert,search1,search1,update)";
@@ -142,8 +140,8 @@ catch(...)
 
 bool test_insert(std::string const& source, std::string const& compare,std::string const& filter)
 {
-  assert(!source.empty());
-  assert(!compare.empty());
+  confirm(!source.empty());
+  confirm(!compare.empty());
   
   //validate source
   auto insert = JSONDocument(source);
@@ -197,8 +195,8 @@ bool test_insert(std::string const& source, std::string const& compare,std::stri
 
 bool test_search1(std::string const& source, std::string const& compare,std::string const& filter)
 {
-  assert(!source.empty());
-  assert(!compare.empty());
+  confirm(!source.empty());
+  confirm(!compare.empty());
   
   //validate source
   auto insert = JSONDocument(source);
@@ -251,8 +249,8 @@ bool test_search1(std::string const& source, std::string const& compare,std::str
 
 bool test_search2(std::string const& source, std::string const& compare,std::string const& options[[gnu::unused]])
 {
-  assert(!source.empty());
-  assert(!compare.empty());
+  confirm(!source.empty());
+  confirm(!compare.empty());
     
   using  artdaq::database::basictypes::JsonData;
   
@@ -305,8 +303,8 @@ bool test_search2(std::string const& source, std::string const& compare,std::str
 
 bool test_update(std::string const& source, std::string const& compare,std::string const& update)
 {
-  assert(!source.empty());
-  assert(!compare.empty());
+  confirm(!source.empty());
+  confirm(!compare.empty());
   
   //validate source
   auto insert = JSONDocument(source);

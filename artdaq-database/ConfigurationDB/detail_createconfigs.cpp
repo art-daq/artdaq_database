@@ -3,7 +3,8 @@
 #include "artdaq-database/ConfigurationDB/dboperation_manageconfigs.h"
 
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
-#include "artdaq-database/ConfigurationDB/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
+#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 
 #include "artdaq-database/ConfigurationDB/configuration_dbproviders.h"
 
@@ -24,10 +25,9 @@
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
-namespace cfl = cf::literal;
-namespace cflo = cfl::operation;
-namespace cflp = cfl::provider;
 namespace cftd = cf::debug::detail;
+namespace jsonliteral = db::dataformats::literal;
+namespace apiliteral = db::configapi::literal;
 
 using cf::LoadStoreOperation;
 using cf::options::data_format_t;
@@ -56,8 +56,8 @@ typedef JsonData (*provider_findentities_t)(Options const& /*options*/, JsonData
 typedef JsonData (*provider_addtoglobalconfig_t)(Options const& /*options*/, JsonData const& /*search_filter*/);
 
 void add_configuration_to_global_configuration(Options const& options, std::string& configs) {
-  assert(configs.empty());
-  assert(options.operation().compare(cflo::addconfig) == 0);
+  confirm(configs.empty());
+  confirm(options.operation().compare(apiliteral::operation::addconfig) == 0);
 
   TRACE_(11, "add_configuration_to_global_configuration: begin");
   TRACE_(11, "add_configuration_to_global_configuration args options=<" << options.to_string() << ">");
@@ -65,14 +65,16 @@ void add_configuration_to_global_configuration(Options const& options, std::stri
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_addtoglobalconfig_t>{{cflp::mongo, cf::mongo::addConfigToGlobalConfig},
-                                                                         {cflp::filesystem, cf::filesystem::addConfigToGlobalConfig},
-                                                                         {cflp::ucond, cf::ucond::addConfigToGlobalConfig}};
+    auto providers = std::map<std::string, provider_addtoglobalconfig_t>{
+        {apiliteral::provider::mongo, cf::mongo::addConfigToGlobalConfig},
+        {apiliteral::provider::filesystem, cf::filesystem::addConfigToGlobalConfig},
+        {apiliteral::provider::ucond, cf::ucond::addConfigToGlobalConfig}};
 
     return providers.at(name);
   };
 
-  auto search_result = dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
+  auto search_result =
+      dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -83,7 +85,7 @@ void add_configuration_to_global_configuration(Options const& options, std::stri
     case data_format_t::json:
     case data_format_t::unknown:
     case data_format_t::fhicl: {
-      throw cet::exception("find_configuration_versions") << "Unsupported data format.";
+      throw runtime_error("find_configuration_versions") << "Unsupported data format.";
       break;
     }
 
@@ -100,8 +102,8 @@ void add_configuration_to_global_configuration(Options const& options, std::stri
 }
 
 void create_new_global_configuration(std::string const& operations, std::string& configs) {
-  assert(!operations.empty());
-  assert(configs.empty());
+  confirm(!operations.empty());
+  confirm(configs.empty());
 
   using namespace artdaq::database::json;
 
@@ -116,10 +118,10 @@ void create_new_global_configuration(std::string const& operations, std::string&
            "create_new_global_configuration() Failed to create an AST from "
            "operations JSON.");
 
-    throw cet::exception("create_new_global_configuration") << "Failed to create an AST from operations JSON.";
+    throw runtime_error("create_new_global_configuration") << "Failed to create an AST from operations JSON.";
   }
 
-  auto const& operations_list = boost::get<array_t>(operations_ast.at(cfl::gui::operations));
+  auto const& operations_list = boost::get<array_t>(operations_ast.at(apiliteral::gui::operations));
 
   TRACE_(11, "create_new_global_configuration: found " << operations_list.size() << " operations.");
 
@@ -129,7 +131,7 @@ void create_new_global_configuration(std::string const& operations, std::string&
 
     TRACE_(11, "create_new_global_configuration() Found operation=<" << buff << ">.");
 
-    auto addconfig = Options{cfl::gui::operations};
+    auto addconfig = Options{apiliteral::gui::operations};
     addconfig.readJsonData(buff);
 
     configs.clear();
@@ -141,8 +143,8 @@ void create_new_global_configuration(std::string const& operations, std::string&
 }
 
 void find_configuration_versions(Options const& options, std::string& versions) {
-  assert(versions.empty());
-  assert(options.operation().compare(cflo::findversions) == 0);
+  confirm(versions.empty());
+  confirm(options.operation().compare(apiliteral::operation::findversions) == 0);
 
   TRACE_(12, "find_configuration_versions: begin");
   TRACE_(12, "find_configuration_versions args options=<" << options.to_string() << ">");
@@ -150,14 +152,16 @@ void find_configuration_versions(Options const& options, std::string& versions) 
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_findversions_t>{{cflp::mongo, cf::mongo::findConfigVersions},
-                                                                    {cflp::filesystem, cf::filesystem::findConfigVersions},
-                                                                    {cflp::ucond, cf::ucond::findConfigVersions}};
+    auto providers = std::map<std::string, provider_findversions_t>{
+        {apiliteral::provider::mongo, cf::mongo::findConfigVersions},
+        {apiliteral::provider::filesystem, cf::filesystem::findConfigVersions},
+        {apiliteral::provider::ucond, cf::ucond::findConfigVersions}};
 
     return providers.at(name);
   };
 
-  auto search_result = dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
+  auto search_result =
+      dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -168,7 +172,7 @@ void find_configuration_versions(Options const& options, std::string& versions) 
     case data_format_t::json:
     case data_format_t::unknown:
     case data_format_t::fhicl: {
-      throw cet::exception("find_configuration_versions") << "Unsupported data format.";
+      throw runtime_error("find_configuration_versions") << "Unsupported data format.";
       break;
     }
 
@@ -178,7 +182,7 @@ void find_configuration_versions(Options const& options, std::string& versions) 
       break;
     }
 
-    case data_format_t::console: {
+    case data_format_t::csv: {
       returnValue = search_result.json_buffer;
       returnValueChanged = true;
       break;
@@ -191,8 +195,8 @@ void find_configuration_versions(Options const& options, std::string& versions) 
 }
 
 void find_configuration_entities(Options const& options, std::string& entities) {
-  assert(entities.empty());
-  assert(options.operation().compare(cflo::findentities) == 0);
+  confirm(entities.empty());
+  confirm(options.operation().compare(apiliteral::operation::findentities) == 0);
 
   TRACE_(13, "find_configuration_entities: begin");
   TRACE_(13, "find_configuration_entities args options=<" << options.to_string() << ">");
@@ -200,14 +204,16 @@ void find_configuration_entities(Options const& options, std::string& entities) 
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_findentities_t>{{cflp::mongo, cf::mongo::findConfigEntities},
-                                                                    {cflp::filesystem, cf::filesystem::findConfigEntities},
-                                                                    {cflp::ucond, cf::ucond::findConfigEntities}};
+    auto providers = std::map<std::string, provider_findentities_t>{
+        {apiliteral::provider::mongo, cf::mongo::findConfigEntities},
+        {apiliteral::provider::filesystem, cf::filesystem::findConfigEntities},
+        {apiliteral::provider::ucond, cf::ucond::findConfigEntities}};
 
     return providers.at(name);
   };
 
-  auto search_result = dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
+  auto search_result =
+      dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -218,7 +224,7 @@ void find_configuration_entities(Options const& options, std::string& entities) 
     case data_format_t::json:
     case data_format_t::unknown:
     case data_format_t::fhicl: {
-      throw cet::exception("find_configuration_entities") << "Unsupported data format.";
+      throw runtime_error("find_configuration_entities") << "Unsupported data format.";
       break;
     }
 
@@ -228,7 +234,7 @@ void find_configuration_entities(Options const& options, std::string& entities) 
       break;
     }
 
-    case data_format_t::console: {
+    case data_format_t::csv: {
       returnValue = search_result.json_buffer;
       returnValueChanged = true;
       break;

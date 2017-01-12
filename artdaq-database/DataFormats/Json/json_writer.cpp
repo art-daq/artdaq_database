@@ -8,8 +8,8 @@ using artdaq::database::json::object_t;
 using artdaq::database::json::JsonWriter;
 
 bool JsonWriter::write(object_t const& ast, std::string& out) {
-  assert(out.empty());
-  assert(!ast.empty());
+  confirm(out.empty());
+  confirm(!ast.empty());
 
   auto result = bool(false);
   auto buffer = std::string();

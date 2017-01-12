@@ -63,6 +63,10 @@ constexpr auto event = "event";
 constexpr auto metadata = "metadata";
 constexpr auto origin = "origin";
 constexpr auto data = "data";
+constexpr auto search = "search";
+constexpr auto query = "query";
+constexpr auto operations = "operations";
+constexpr auto document="document";
 
 constexpr auto gui_data_node = "guidata";
 constexpr auto converted = "converted";

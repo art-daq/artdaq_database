@@ -17,7 +17,7 @@
 #include "artdaq-database/SharedCommon/printStackTrace.h"
 #include "artdaq-database/SharedCommon/process_exit_codes.h"
 
-#include <boost/exception/diagnostic_information.hpp>
+#include <boost/exception/diagnostic_information.hpp> 
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -156,8 +156,8 @@ void terminateHandler() {
       char funcname[1024];
       int status = 0;
 
-      TRACE_(1, "Terminate called after throwing an instance of \'" << abi::__cxa_demangle(typeid(ex).name(), funcname, &funcnamesize, &status)
-                                                                    << "\'");
+      TRACE_(1, "Terminate called after throwing an instance of \'"
+                    << abi::__cxa_demangle(typeid(ex).name(), funcname, &funcnamesize, &status) << "\'");
 
       TRACE_(1, " what(): " << ex.what());
 
@@ -215,9 +215,7 @@ std::string current_exception_diagnostic_information() {
   std::ostringstream os;
 
   os << "Process exited";
-
   os << getCxaThrowStack();
-
   os << "Error: " << boost::current_exception_diagnostic_information();
 
   return os.str();
