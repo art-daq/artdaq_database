@@ -15,6 +15,7 @@ namespace bpo = boost::program_options;
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::overlay::ovlDatabaseRecord;
+namespace ovl = artdaq::database::overlay;
 
 typedef bool (*test_case)(std::string const&);
 
@@ -218,15 +219,24 @@ bool test_addToGlobalConfig(std::string const& conf) {
   auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
 
   try {
-    JSONDocumentBuilder builder(begin);
-    auto returned = std::move(builder.addConfiguration(delta).extract());
+    JSONDocumentBuilder returned{begin};
+    returned.addConfiguration(delta);
+    JSONDocumentBuilder expected{end};
 
-    if (returned != end && mustsucceed) {
+    
+    using namespace artdaq::database::overlay;
+    ovl::useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS);
+
+    auto result = returned == expected;
+
+    if (!result.first && mustsucceed) {
       std::cout << "Error returned!=expected.\n";
       std::cerr << "returned:\n" << returned << "\n";
-      std::cerr << "expected:\n" << end << "\n";
+      std::cerr << "expected:\n" << expected << "\n";
+      std::cerr << "error:\n" << result.second << "\n";
       return false;
     }
+
   } catch (cet::exception const& e) {
     if (mustsucceed) throw;
   }
@@ -245,15 +255,24 @@ bool test_setVersion(std::string const& conf) {
   auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
 
   try {
-    JSONDocumentBuilder builder(begin);
-    auto returned = std::move(builder.setVersion(delta).extract());
+    JSONDocumentBuilder returned{begin};
+    returned.setVersion(delta);
+    JSONDocumentBuilder expected{end};
 
-    if (returned != end && mustsucceed) {
+    
+    using namespace artdaq::database::overlay;
+    ovl::useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS);
+
+    auto result = returned == expected;
+
+    if (!result.first && mustsucceed) {
       std::cout << "Error returned!=expected.\n";
       std::cerr << "returned:\n" << returned << "\n";
-      std::cerr << "expected:\n" << end << "\n";
+      std::cerr << "expected:\n" << expected << "\n";
+      std::cerr << "error:\n" << result.second << "\n";
       return false;
     }
+
   } catch (cet::exception const& e) {
     if (mustsucceed) throw;
   }
@@ -271,21 +290,31 @@ bool test_markReadonly(std::string const& conf) {
   auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
 
   try {
-    JSONDocumentBuilder builder(begin);
-    auto returned = std::move(builder.markReadonly().extract());
+    JSONDocumentBuilder returned{begin};
+    returned.markReadonly();
+    JSONDocumentBuilder expected{end};
 
-    if (returned != end && mustsucceed) {
+    
+    using namespace artdaq::database::overlay;
+    ovl::useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS);
+
+    auto result = returned == expected;
+
+    if (!result.first && mustsucceed) {
       std::cout << "Error returned!=expected.\n";
       std::cerr << "returned:\n" << returned << "\n";
-      std::cerr << "expected:\n" << end << "\n";
+      std::cerr << "expected:\n" << expected << "\n";
+      std::cerr << "error:\n" << result.second << "\n";
       return false;
     }
+
   } catch (cet::exception const& e) {
     if (mustsucceed) throw;
   }
 
   return true;
 }
+
 
 bool test_markDeleted(std::string const& conf) {
   confirm(!conf.empty());
@@ -297,18 +326,28 @@ bool test_markDeleted(std::string const& conf) {
   auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
 
   try {
-    JSONDocumentBuilder builder(begin);
-    auto returned = std::move(builder.markDeleted().extract());
+    JSONDocumentBuilder returned{begin};
+    returned.markDeleted();
+    JSONDocumentBuilder expected{end};
 
-    if (returned != end && mustsucceed) {
+    
+    using namespace artdaq::database::overlay;
+    ovl::useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS);
+
+    auto result = returned == expected;
+
+    if (!result.first && mustsucceed) {
       std::cout << "Error returned!=expected.\n";
       std::cerr << "returned:\n" << returned << "\n";
-      std::cerr << "expected:\n" << end << "\n";
+      std::cerr << "expected:\n" << expected << "\n";
+      std::cerr << "error:\n" << result.second << "\n";
       return false;
     }
+
   } catch (cet::exception const& e) {
     if (mustsucceed) throw;
   }
 
   return true;
 }
+

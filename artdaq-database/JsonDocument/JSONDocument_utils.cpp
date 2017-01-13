@@ -28,10 +28,9 @@ using namespace artdaq::database::docrecord;
 namespace db = artdaq::database;
 namespace utl = db::docrecord;
 
-namespace dbdr=artdaq::database::docrecord;
+namespace dbdr = artdaq::database::docrecord;
 
 namespace jsonliteral = artdaq::database::dataformats::literal;
-
 
 std::string print_visitor(value_t const& value) { return boost::apply_visitor(jsn::print_visitor(), value); }
 std::string tostring_visitor(value_t const& value) { return boost::apply_visitor(jsn::tostring_visitor(), value); }
@@ -244,11 +243,12 @@ JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& doc
 void JSONDocumentBuilder::_importUserData(JSONDocument const& document) {
   // replace metadata if any
   try {
-    auto metadata = document.findChild(jsonliteral::metadata);
+    auto path = ""s + jsonliteral::document + jsonliteral::dot + jsonliteral::metadata;
+    auto metadata = document.findChild(path);
 
     TRACE_(2, "_importUserData() Found document.metadata=<" << metadata << ">");
 
-    _document.replaceChild(metadata, jsonliteral::metadata);
+    _document.replaceChild(metadata,path);
 
   } catch (notfound_exception const&) {
     TRACE_(2, "_importUserData() No document.metadata");
@@ -280,11 +280,12 @@ void JSONDocumentBuilder::_importUserData(JSONDocument const& document) {
 
   // replace data if any
   try {
-    auto data = document.findChild(jsonliteral::data);
+    auto path = ""s + jsonliteral::document + jsonliteral::dot + jsonliteral::data;
+    auto data = document.findChild(path);
 
     TRACE_(2, "_importUserData() Found document.data=<" << data << ">");
 
-    _document.replaceChild(data, jsonliteral::data);
+    _document.replaceChild(data, path);
 
     return;
   } catch (notfound_exception const&) {
@@ -293,7 +294,8 @@ void JSONDocumentBuilder::_importUserData(JSONDocument const& document) {
 
   // document contains data only
   try {
-    _document.replaceChild(document, jsonliteral::data);
+    auto path = ""s + jsonliteral::document + jsonliteral::dot + jsonliteral::data;
+    _document.replaceChild(document, path);
   } catch (notfound_exception const&) {
     TRACE_(2, "_importUserData() No document.data");
     throw;
@@ -317,11 +319,11 @@ std::string JSONDocument::value_at(JSONDocument const& document, std::size_t ind
 
   if (valueArray.empty())
     throw runtime_error("JSONDocument") << "Failed calling value_at(): valueArray is empty, document=<"
-                                         << document.cached_json_buffer() << ">";
+                                        << document.cached_json_buffer() << ">";
 
   if (valueArray.size() < index)
     throw runtime_error("JSONDocument") << "Failed to call value_at(); not enough elements, document=<"
-                                         << document.cached_json_buffer() << ">";
+                                        << document.cached_json_buffer() << ">";
 
   auto pos = valueArray.begin();
 

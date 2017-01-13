@@ -1,10 +1,17 @@
 #ifndef _ARTDAQ_DATABASE_SHAREDLITERALS_H_
 #define _ARTDAQ_DATABASE_SHAREDLITERALS_H_
 
+#include <string>
+
+using namespace std::string_literals;
+
 namespace artdaq {
 namespace database {
 namespace dataformats {
 namespace literal {
+
+constexpr auto dot = ".";
+
 constexpr auto database_record = "record";
 constexpr auto document_node = "document";
 constexpr auto data_node = "data";

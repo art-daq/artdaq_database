@@ -1,5 +1,5 @@
-#include "artdaq-database/JsonDocument/common.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
+#include "artdaq-database/JsonDocument/common.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -20,9 +20,23 @@ namespace db = artdaq::database;
 namespace utl = db::docrecord;
 namespace ovl = db::overlay;
 
-namespace dbdr=artdaq::database::docrecord;
+namespace dbdr = artdaq::database::docrecord;
 
 namespace jsonliteral = artdaq::database::dataformats::literal;
+
+JSONDocumentBuilder::JSONDocumentBuilder()
+    : _document(std::string(template__empty_document)),
+      _overlay(std::make_unique<ovlDatabaseRecord>(_document._value)),
+      _initOK(init()) {}
+
+JSONDocumentBuilder::JSONDocumentBuilder(JSONDocument const& document)
+    : _document(document), _overlay(std::make_unique<ovlDatabaseRecord>(_document._value)), _initOK(init()) {}
+
+bool JSONDocumentBuilder::init() {
+  auto buff[[gnu::unused]] = _document.writeJson();
+  TRACE_(3, "JSONDocumentBuilder::init() new document=<" << buff << ">");
+  return true;
+}
 
 JSONDocumentBuilder& JSONDocumentBuilder::addAlias(JSONDocument const& alias) try {
   TRACE_(3, "addAlias() args  alias=<" << alias << ">");
@@ -119,7 +133,8 @@ JSONDocumentBuilder& JSONDocumentBuilder::setVersion(JSONDocument const& version
   TRACE_(6, "setVersion() args  version=<" << version << ">");
 
   JSONDocument copy(version);
-  auto ovl = overlay<ovl::ovlVersion>(copy, jsonliteral::version_node);
+
+  auto ovl = std::make_unique<ovl::ovlVersion>(jsonliteral::version_node, copy.findChildValue(jsonliteral::name));
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->setVersion(ovl));

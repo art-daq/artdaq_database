@@ -19,10 +19,10 @@ cet_make_exec(JSONDocumentBuilder_t
 #add_subdirectory(test005)
 
 #add to global configuration
-add_subdirectory(test006)
+#add_subdirectory(test006)
 
-#add to global configuration
-#add_subdirectory(test007)
+#set version
+add_subdirectory(test007)
 
 #mark readonly and deleted
 #add_subdirectory(test008)

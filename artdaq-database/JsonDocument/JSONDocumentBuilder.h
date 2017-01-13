@@ -19,12 +19,8 @@ using artdaq::database::overlay::ovlDatabaseRecordUPtr_t;
 
 class JSONDocumentBuilder final {
  public:
-  JSONDocumentBuilder()
-      : _document(std::string(template__empty_document)),
-        _overlay(std::make_unique<ovlDatabaseRecord>(_document._value)) {}
-
-  JSONDocumentBuilder(JSONDocument const& document)
-      : _document(document), _overlay(std::make_unique<ovlDatabaseRecord>(_document._value)) {}
+  JSONDocumentBuilder();
+  JSONDocumentBuilder(JSONDocument const&);
 
   JSONDocumentBuilder& createFromData(JSONDocument const&);
   JSONDocumentBuilder& addAlias(JSONDocument const&);
@@ -64,6 +60,7 @@ class JSONDocumentBuilder final {
   JSONDocumentBuilder& self() { return *this; }
   JSONDocumentBuilder const& self() const { return *this; }
 
+  bool init();
   void _importUserData(JSONDocument const& document);
 
   result_t SaveUndo();
@@ -72,6 +69,7 @@ class JSONDocumentBuilder final {
  private:
   JSONDocument _document;
   ovlDatabaseRecordUPtr_t _overlay;
+  bool _initOK;
 };
 
 template <typename OVL>

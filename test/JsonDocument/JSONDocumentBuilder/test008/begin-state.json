@@ -31,8 +31,11 @@
          
     }, 
     "configurations" : [
-        "config1"
-    ], 
+            {
+                "name" : "config001", 
+                "assigned" : "Mon Feb  8 14:00:30 2016"
+            }
+            ], 
     "aliases" : {
         "active" : [
             {
