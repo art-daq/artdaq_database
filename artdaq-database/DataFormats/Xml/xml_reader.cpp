@@ -30,9 +30,9 @@ bool XmlReader::read(std::string const& in, jsn::object_t& json_object) {
 
   try {
     auto object = jsn::object_t();
-    object[literal::data_node] = jsn::object_t();
+    object[literal::data] = jsn::object_t();
 
-    auto& json_tree = boost::get<jsn::object_t>(object.at(literal::data_node));
+    auto& json_tree = boost::get<jsn::object_t>(object.at(literal::data));
 
     pt::ptree xml_tree;
     std::istringstream sin(in);

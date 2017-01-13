@@ -90,13 +90,13 @@ bool artdaq::database::json_db_to_gui(std::string const& db_json, std::string& g
   auto guiAST = object_t{};
   auto gui_node = json_node_t{guiAST};
 
-  auto& document = unwrap(dbAST).value_as<const object_t>(literal::document_node);
+  auto& document = unwrap(dbAST).value_as<const object_t>(literal::document);
 
   try {
-    db2gui{{unwrap(document).value_as<const object_t>(literal::data_node)},
-           {unwrap(document).value_as<const object_t>(literal::metadata_node)}}(gui_node);
+    db2gui{{unwrap(document).value_as<const object_t>(literal::data)},
+           {unwrap(document).value_as<const object_t>(literal::metadata)}}(gui_node);
 
-    guiAST.back().key = literal::gui_data_node;
+    guiAST.back().key = literal::gui_data;
 
     try {
       guiAST[literal::changelog] = unwrap(dbAST).value_as<std::string>(literal::changelog);
@@ -104,7 +104,7 @@ bool artdaq::database::json_db_to_gui(std::string const& db_json, std::string& g
       TRACE_(10, "json_db_to_gui() No changelog in dbAST");
     }
 
-    auto& doc_node = unwrap(dbAST).value_as<object_t>(literal::document_node);
+    auto& doc_node = unwrap(dbAST).value_as<object_t>(literal::document);
     doc_node[literal::converted] = object_t{};
     unwrap(doc_node).value_as<object_t>(literal::converted).swap(guiAST);
   } catch (...) {
@@ -262,21 +262,21 @@ bool artdaq::database::json_gui_to_db(std::string const& gui_json, std::string& 
     throw runtime_error("json_gui_to_db") << "json_db_to_gui: Unable to read JSON buffer.";
   }
 
-  auto& gui_document = unwrap(guiAST).value_as<object_t>(literal::document_node);
+  auto& gui_document = unwrap(guiAST).value_as<object_t>(literal::document);
   auto& converted = unwrap(gui_document).value_as<object_t>(literal::converted);
 
   TRACE_(14, "json_gui_to_db() read guiAST");
 
   auto dbAST = object_t{};
 
-  dbAST[literal::document_node] = object_t{};
-  auto& db_document = unwrap(dbAST).value_as<object_t>(literal::document_node);
+  dbAST[literal::document] = object_t{};
+  auto& db_document = unwrap(dbAST).value_as<object_t>(literal::document);
 
-  db_document[literal::data_node] = object_t{};
-  auto& data = unwrap(db_document).value_as<object_t>(literal::data_node);
+  db_document[literal::data] = object_t{};
+  auto& data = unwrap(db_document).value_as<object_t>(literal::data);
 
-  db_document[literal::metadata_node] = object_t{};
-  auto& metadata = unwrap(db_document).value_as<object_t>(literal::metadata_node);
+  db_document[literal::metadata] = object_t{};
+  auto& metadata = unwrap(db_document).value_as<object_t>(literal::metadata);
 
   auto data_node = json_node_t(data);
   auto metadata_node = json_node_t(metadata);
@@ -284,7 +284,7 @@ bool artdaq::database::json_gui_to_db(std::string const& gui_json, std::string& 
   TRACE_(14, "json_gui_to_db() created dbAST");
 
   try {
-    auto const& gui_node = unwrap(converted.at(literal::gui_data_node)).value_as<array_t>();
+    auto const& gui_node = unwrap(converted.at(literal::gui_data)).value_as<array_t>();
     gui2db{gui_node}(data_node, metadata_node);
 
     try {
@@ -295,8 +295,8 @@ bool artdaq::database::json_gui_to_db(std::string const& gui_json, std::string& 
       TRACE_(14, "json_gui_to_db() No changelog in guiAST");
     }
 
-    unwrap(gui_document).value_as<object_t>(literal::data_node).swap(data);
-    unwrap(gui_document).value_as<object_t>(literal::metadata_node).swap(metadata);
+    unwrap(gui_document).value_as<object_t>(literal::data).swap(data);
+    unwrap(gui_document).value_as<object_t>(literal::metadata).swap(metadata);
     unwrap(gui_document).value_as<object_t>(literal::converted) = object_t{};
 
   } catch (...) {

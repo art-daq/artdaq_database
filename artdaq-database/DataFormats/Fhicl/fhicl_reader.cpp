@@ -48,8 +48,8 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
       return boost::get<jsn::object_t>(parent[child_name]);
     };
 
-    auto& data_node = make_SubNode(object, literal::data_node);
-    auto& metadata_node = make_SubNode(object, literal::metadata_node);
+    auto& data_node = make_SubNode(object, literal::data);
+    auto& metadata_node = make_SubNode(object, literal::metadata);
 
     auto conf = std::string{in};
     conf.reserve(conf.size() + 1024);
@@ -71,13 +71,13 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
       auto opts = extra_opts{};
       opts.enablePrologMode();
 
-      auto& data = make_SubNode(data_node, literal::prolog_node);
+      auto& data = make_SubNode(data_node, literal::prolog);
 
-      auto& prolog = make_SubNode(metadata_node, literal::prolog_node);
+      auto& prolog = make_SubNode(metadata_node, literal::prolog);
       prolog[literal::type] = std::string{literal::table};
-      prolog[literal::comment] = std::string{"#"}.append(literal::prolog_node);
+      prolog[literal::comment] = std::string{"#"}.append(literal::prolog);
       //      prolog[literal::annotation] = std::string{"//Auto generated
-      //      "}.append(literal::prolog_node);
+      //      "}.append(literal::prolog);
 
       auto& metadata = make_SubNode(prolog, literal::children);
 
@@ -94,13 +94,13 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
       auto opts = extra_opts{};
       opts.enableDefaultMode();
 
-      auto& data = make_SubNode(data_node, literal::main_node);
+      auto& data = make_SubNode(data_node, literal::main);
 
-      auto& main = make_SubNode(metadata_node, literal::main_node);
+      auto& main = make_SubNode(metadata_node, literal::main);
       main[literal::type] = std::string{literal::table};
-      main[literal::comment] = std::string{"#"}.append(literal::main_node);
+      main[literal::comment] = std::string{"#"}.append(literal::main);
       //      main[literal::annotation] = std::string{"//Auto generated
-      //      "}.append(literal::main_node);
+      //      "}.append(literal::main);
 
       auto& metadata = make_SubNode(main, literal::children);
 

@@ -22,7 +22,7 @@ bool ConfWriter::write(jsn::object_t const& json_object, std::string& out) {
 
   TRACE_(2, "write() begin");
 
-  auto const& data_node = boost::get<jsn::object_t>(json_object.at(literal::data_node));
+  auto const& data_node = boost::get<jsn::object_t>(json_object.at(literal::data));
 
   auto result = bool(false);
   auto buffer = std::string();

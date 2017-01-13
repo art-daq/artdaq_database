@@ -80,14 +80,13 @@ result_t ovlKeyValue::operator==(ovlKeyValue const& other) const {
   return Failure(oss);
 }
 
-result_t ovlKeyValue::swap(ovlKeyValue* other) try{
-  if(other==nullptr)
-    return Failure(msg_InvalidArgument);
-  
+result_t ovlKeyValue::swap(ovlKeyValue* other) try {
+  if (other == nullptr) return Failure(msg_InvalidArgument);
+
   _key.swap(other->_key);
   _value.swap(other->_value);
-  
+
   return Success();
-}catch(...){
+} catch (...) {
   return Failure();
 }

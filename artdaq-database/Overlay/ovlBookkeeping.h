@@ -67,17 +67,17 @@ result_t ovlBookkeeping::postUpdate(std::string const& name, T const& what) {
   auto newEntry = object_t{};
   newEntry[jsonliteral::event] = name;
   newEntry[jsonliteral::timestamp] = artdaq::database::timestamp();
-  
+
   auto const& refvalue = what->value();
-  
-  if(type(refvalue) == type_t::OBJECT) {
+
+  if (type(refvalue) == type_t::OBJECT) {
     newEntry[jsonliteral::value] = refvalue;
   } else {
-    auto obj= object_t{};
-    obj[what->key()]=refvalue;
+    auto obj = object_t{};
+    obj[what->key()] = refvalue;
     newEntry[jsonliteral::value] = obj;
   }
-  
+
   value_t tmp = newEntry;
 
   updates.push_back(tmp);

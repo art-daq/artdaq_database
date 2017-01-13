@@ -33,15 +33,15 @@ bool conf_to_json(std::string const& conf, std::string& json) {
   auto result = bool{false};
 
   auto json_root = jsn::object_t{};
-  json_root[literal::document_node] = jsn::object_t{};
-  json_root[literal::origin_node] = jsn::object_t{};
+  json_root[literal::document] = jsn::object_t{};
+  json_root[literal::origin] = jsn::object_t{};
 
   auto get_object = [&json_root](std::string const& name) -> auto& { return boost::get<jsn::object_t>(json_root[name]); };
-  get_object(literal::origin_node)[literal::format] = std::string("conf");
-  get_object(literal::origin_node)[literal::source] = std::string("conf_to_json");
-  get_object(literal::origin_node)[literal::timestamp] = artdaq::database::timestamp();
+  get_object(literal::origin)[literal::format] = std::string("conf");
+  get_object(literal::origin)[literal::source] = std::string("conf_to_json");
+  get_object(literal::origin)[literal::timestamp] = artdaq::database::timestamp();
 
-  auto& json_node = get_object(literal::document_node);
+  auto& json_node = get_object(literal::document);
 
   auto reader = conf::ConfReader{};
   result = reader.read(conf, json_node);
@@ -82,7 +82,7 @@ bool json_to_conf(std::string const& json, std::string& conf) {
 
   auto get_object = [&json_root](std::string const& name) -> auto& { return boost::get<jsn::object_t>(json_root.at(name)); };
 
-  auto& json_node = get_object(literal::document_node);
+  auto& json_node = get_object(literal::document);
 
   auto conf1 = std::string{};
 

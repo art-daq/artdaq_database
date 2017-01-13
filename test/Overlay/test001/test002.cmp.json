@@ -1,4 +1,50 @@
 {
+"_id" : {
+"_oid" : "cafe6a7a44f3445d9dd813a4"
+}
+,
+
+"collection" : "myfhicldocuments"
+,
+
+"version" : "version001"
+,
+"origin":{
+"format":"json",
+"name":"notprovided",
+"source":"template",
+"created":"Fri Jan 13 16:01:37 2017",
+"rawdata": [
+]
+},
+"aliases": {"active": [
+],"history": [
+]
+}
+,
+"bookkeeping": {
+"isreadonly":false,
+"isdeleted":false,
+"created":"Fri Jan 12 16:01:37 2017",
+"updates": [
+]
+}
+,
+
+"changelog" : "notprovided"
+,
+"entities": [
+],
+"runs": [
+],
+"attachments": [
+],
+"configurations": [
+],
+"comments": [
+],
+
+
 "document" : {
 "data" : {
 "prolog" : {
@@ -214,48 +260,5 @@
 "query" : "not defined"
 }
 ]
-},
-"origin" : {
-"format" : "fhicl",
-"source" : "fhicl_to_json",
-"timestamp" : "Thu Nov 10 15:24:09 2016"
-},
-"version" : "ver001",
-"configurations" : [
-{
-"name" : "demo1",
-"assigned" : "Thu Nov 10 15:24:09 2016"
-}
-],
-"aliases" : {
-"active" : [
-
-],
-"history" : [
-
-]
-},
-"changelog" : "empty",
-"bookkeeping" : {
-"isdeleted" : false,
-"isreadonly" : true,
-"created" : "Tue Dec 30 18:19:25 2015",
-"updates" : [
-{
-"addToGlobalConfig" : "Thu Nov 10 15:24:09 2016"
-},
-{
-"setVersion" : "Thu Nov 10 15:24:09 2016"
-},
-{
-"setConfigurableEntity" : "Thu Nov 10 15:24:09 2016"
-}
-]
-},
-"configurable_entity" : {
-"name" : "notprovided"
-},
-"_id" : {
-"_oid" : "5a720405791a403e8ad918cf"
 }
 }

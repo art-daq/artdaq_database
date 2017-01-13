@@ -4,11 +4,11 @@
 #include "artdaq-database/Overlay/common.h"
 #include "artdaq-database/Overlay/ovlBookkeeping.h"
 #include "artdaq-database/Overlay/ovlChangeLog.h"
+#include "artdaq-database/Overlay/ovlComment.h"
 #include "artdaq-database/Overlay/ovlDocument.h"
 #include "artdaq-database/Overlay/ovlId.h"
 #include "artdaq-database/Overlay/ovlKeyValue.h"
 #include "artdaq-database/Overlay/ovlOrigin.h"
-#include "artdaq-database/Overlay/ovlComment.h"
 
 #include "artdaq-database/Overlay/ovlKeyValueTimeStamp.h"
 #include "artdaq-database/Overlay/ovlKeyValueWithDefault.h"
@@ -25,7 +25,10 @@ using namespace artdaq::database::result;
 using ovlVersion = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_VERSION>;
 using ovlVersionUPtr_t = std::unique_ptr<ovlVersion>;
 
-using ovlAlias = ovlKeyValueTimeStamp<DOCUMENT_COMPARE_MUTE_ALIAS,true,true>;
+using ovlCollection = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_COLLECTION>;
+using ovlCollectionUPtr_t = std::unique_ptr<ovlCollection>;
+
+using ovlAlias = ovlKeyValueTimeStamp<DOCUMENT_COMPARE_MUTE_ALIAS, true, true>;
 using ovlAliasUPtr_t = std::unique_ptr<ovlAlias>;
 
 using ovlConfiguration = ovlKeyValueTimeStamp<DOCUMENT_COMPARE_MUTE_CONFIGURATION>;
@@ -34,7 +37,7 @@ using ovlConfigurationUPtr_t = std::unique_ptr<ovlConfiguration>;
 using ovlRun = ovlKeyValueTimeStamp<DOCUMENT_COMPARE_MUTE_RUN>;
 using ovlRunUPtr_t = std::unique_ptr<ovlRun>;
 
-using ovlAttachment = ovlKeyValue;
+using ovlAttachment =ovlKeyValue;
 using ovlAttachmentUPtr_t = std::unique_ptr<ovlAttachment>;
 
 using ovlConfigurableEntity = ovlKeyValueTimeStamp<DOCUMENT_COMPARE_MUTE_CONFIGENTITY>;
@@ -116,6 +119,7 @@ class ovlDatabaseRecord final : public ovlKeyValue {
   ovlChangeLogUPtr_t _changelog;
   ovlBookkeepingUPtr_t _bookkeeping;
   ovlIdUPtr_t _id;
+  ovlCollectionUPtr_t _collection;
   ovlAliasesUPtr_t _aliases;
   ovlRunsUPtr_t _runs;
   ovlAttachmentsUPtr_t _attachments;

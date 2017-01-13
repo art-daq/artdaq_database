@@ -11,16 +11,19 @@ using artdaq::database::sharedtypes::unwrap;
 
 ovlDatabaseRecord::ovlDatabaseRecord(value_t& record)
     : ovlKeyValue(jsonliteral::database_record, record),
-      _document{overlay<ovlDocument>(record, jsonliteral::document_node)},
-      _comments{overlay<ovlComments, array_t>(record, jsonliteral::comments_node)},
-      _origin{overlay<ovlOrigin>(record, jsonliteral::origin_node)},
-      _version{overlay<ovlVersion, std::string>(record, jsonliteral::version_node)},
-      _entities{overlay<ovlConfigurableEntities>(record, jsonliteral::configurable_entity_node)},
-      _configurations{overlay<ovlConfigurations, array_t>(record, jsonliteral::configurations_node)},
+      _document{overlay<ovlDocument>(record, jsonliteral::document)},
+      _comments{overlay<ovlComments, array_t>(record, jsonliteral::comments)},
+      _origin{overlay<ovlOrigin>(record, jsonliteral::origin)},
+      _version{overlay<ovlVersion, std::string>(record, jsonliteral::version)},
+      _entities{overlay<ovlConfigurableEntities, array_t>(record, jsonliteral::entities)},
+      _configurations{overlay<ovlConfigurations, array_t>(record, jsonliteral::configurations)},
       _changelog{overlay<ovlChangeLog, std::string>(record, jsonliteral::changelog)},
       _bookkeeping{overlay<ovlBookkeeping>(record, jsonliteral::bookkeeping)},
-      _id{overlay<ovlId>(record, jsonliteral::id_node)},
-      _aliases{overlay<ovlAliases>(record, jsonliteral::aliases_node)} {}
+      _id{overlay<ovlId>(record, jsonliteral::id)},
+      _collection{overlay<ovlCollection, std::string>(record, jsonliteral::collection)},
+      _aliases{overlay<ovlAliases>(record, jsonliteral::aliases)},
+      _runs{overlay<ovlRuns, array_t>(record, jsonliteral::runs)},
+      _attachments{overlay<ovlAttachments, array_t>(record, jsonliteral::attachments)} {}
 
 ovlDocument& ovlDatabaseRecord::document() { return *_document; }
 
@@ -100,12 +103,15 @@ std::string ovlDatabaseRecord::to_string() const noexcept {
   std::ostringstream oss;
   oss << "{";
   oss << debrace(_id->to_string()) << ",\n";
-  oss << debrace(_version->to_string()) << ",\n";
+  oss << debrace(_collection->to_string()) << ",\n";
+  oss << debrace(_version->to_string()) << ",\n";  
   oss << debrace(_origin->to_string()) << ",\n";
-  oss << debrace(_aliases->to_string()) << "\n";
+  oss << debrace(_aliases->to_string()) << ",\n";
   oss << debrace(_bookkeeping->to_string()) << ",\n";
   oss << debrace(_changelog->to_string()) << ",\n";
   oss << debrace(_entities->to_string()) << ",\n";
+  oss << debrace(_runs->to_string()) << ",\n";
+  oss << debrace(_attachments->to_string()) << ",\n";
   oss << debrace(_configurations->to_string()) << ",\n";
   oss << debrace(_comments->to_string()) << ",\n";
   oss << debrace(_document->to_string()) << "\n";
@@ -215,6 +221,7 @@ result_t ovlDatabaseRecord::addConfigurableEntity(ovlConfigurableEntityUPtr_t& e
 
   return _bookkeeping->postUpdate(update, entity);
 }
+
 result_t ovlDatabaseRecord::removeConfigurableEntity(ovlConfigurableEntityUPtr_t& entity) {
   confirm(entity);
 
@@ -250,6 +257,10 @@ result_t ovlDatabaseRecord::operator==(ovlDatabaseRecord const& other) const {
 
   if (!result.first) oss << result.second;
 
+  result = *_collection == *other._collection;
+
+  if (!result.first) oss << result.second;
+  
   result = *_configurations == *other._configurations;
 
   if (!result.first) oss << result.second;
@@ -267,6 +278,18 @@ result_t ovlDatabaseRecord::operator==(ovlDatabaseRecord const& other) const {
   if (!result.first) oss << result.second;
 
   result = *_entities == *other._entities;
+
+  if (!result.first) oss << result.second;
+
+  result = *_runs == *other._runs;
+
+  if (!result.first) oss << result.second;
+
+  result = *_aliases == *other._aliases;
+
+  if (!result.first) oss << result.second;
+  
+  result = *_attachments == *other._attachments;
 
   if (!result.first) oss << result.second;
 

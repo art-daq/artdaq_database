@@ -41,32 +41,32 @@ bool dbfj::fhicl_to_json(std::string const& fcl, std::string& json) {
 
   auto get_object = [&json_root](std::string const& name) -> auto& { return boost::get<jsn::object_t>(json_root[name]); };
 
-  json_root[literal::document_node] = jsn::object_t();
-  json_root[literal::comments_node] = jsn::array_t();
-  json_root[literal::origin_node] = jsn::object_t();
+  json_root[literal::document] = jsn::object_t();
+  json_root[literal::comments] = jsn::array_t();
+  json_root[literal::origin] = jsn::object_t();
 
-  json_root[literal::version_node] = std::string{literal::notprovided};
-  json_root[literal::configurable_entity_node] = jsn::object_t();
-  json_root[literal::configurations_node] = jsn::array_t();
+  json_root[literal::version] = std::string{literal::notprovided};
+  json_root[literal::entities] = jsn::object_t();
+  json_root[literal::configurations] = jsn::array_t();
 
   TRACE_(2, "fhicl_to_json: Created root nodes");
 
-  get_object(literal::origin_node)[literal::format] = std::string("fhicl");
-  get_object(literal::origin_node)[literal::source] = std::string("fhicl_to_json");
-  get_object(literal::origin_node)[literal::timestamp] = artdaq::database::timestamp();
+  get_object(literal::origin)[literal::format] = std::string("fhicl");
+  get_object(literal::origin)[literal::source] = std::string("fhicl_to_json");
+  get_object(literal::origin)[literal::timestamp] = artdaq::database::timestamp();
 
-  get_object(literal::configurable_entity_node)[literal::name] = std::string{literal::notprovided};
+  get_object(literal::entities)[literal::name] = std::string{literal::notprovided};
 
   auto reader = FhiclReader();
 
   TRACE_(2, "read_comments begin");
-  result = reader.read_comments(fcl, boost::get<jsn::array_t>(json_root[literal::comments_node]));
+  result = reader.read_comments(fcl, boost::get<jsn::array_t>(json_root[literal::comments]));
   TRACE_(2, "read_comments end result=" << std::to_string(result));
 
   if (!result) return result;
 
   TRACE_(2, "read_data begin");
-  result = reader.read_data(fcl, boost::get<jsn::object_t>(json_root[literal::document_node]));
+  result = reader.read_data(fcl, boost::get<jsn::object_t>(json_root[literal::document]));
   TRACE_(2, "read_data end result=" << std::to_string(result));
 
   if (!result) return result;
@@ -110,7 +110,7 @@ bool dbfj::json_to_fhicl(std::string const& json, std::string& fcl) {
   auto writer = FhiclWriter();
 
   auto fcl_data = std::string();
-  auto const& document_object = boost::get<jsn::object_t>(json_root[literal::document_node]);
+  auto const& document_object = boost::get<jsn::object_t>(json_root[literal::document]);
 
   result = writer.write_data(document_object, fcl_data);
 

@@ -11,8 +11,9 @@ using artdaq::database::sharedtypes::unwrap;
 
 ovlDocument::ovlDocument(object_t::key_type const& key, value_t& document)
     : ovlKeyValue(key, document),
-      _data{overlay<ovlData>(document, jsonliteral::data_node)},
-      _metadata{overlay<ovlMetadata>(document, jsonliteral::metadata_node)} {}
+      _data{overlay<ovlData>(document, jsonliteral::data)},
+      _metadata{overlay<ovlMetadata>(document, jsonliteral::metadata)},
+      _search{overlay<ovlSearches, array_t>(document, jsonliteral::search)} {}
 
 ovlData& ovlDocument::data() { return *_data; }
 
@@ -36,19 +37,25 @@ void ovlDocument::swap(ovlMetadataUPtr_t& metadata) {
 
 void ovlDocument::make_empty() {
   value_t tmp1 = object_t{};
-  auto data = overlay<ovlData>(tmp1, jsonliteral::data_node);
+  auto data = overlay<ovlData>(tmp1, jsonliteral::data);
   std::swap(_data, data);
 
   value_t tmp2 = object_t{};
-  auto metadata = overlay<ovlMetadata>(tmp2, jsonliteral::metadata_node);
+  auto metadata = overlay<ovlMetadata>(tmp2, jsonliteral::metadata);
   std::swap(_metadata, metadata);
+
+  value_t tmp3 = array_t{};
+  auto search = overlay<ovlSearches, array_t>(tmp3, jsonliteral::metadata);
+  std::swap(_search, search);
 }
 
 std::string ovlDocument::to_string() const noexcept {
   std::ostringstream oss;
-  oss << quoted_(jsonliteral::document_node) << ":{\n";
-  oss << _data->to_string() << ",\n";
-  oss << _metadata->to_string() << "}";
+  oss << quoted_(jsonliteral::document) << ":{\n";
+  oss << debrace(_data->to_string()) << ",\n";
+  oss << debrace(_metadata->to_string()) << ",\n";
+  oss << debrace(_search->to_string()) << "\n";
+  oss << "}";
 
   return oss.str();
 }

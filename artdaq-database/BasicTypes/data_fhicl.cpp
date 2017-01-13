@@ -55,13 +55,13 @@ FhiclData::FhiclData(JsonData const& document) {
   auto results = std::smatch();
 
   if (!std::regex_search(document.json_buffer, results, ex))
-    throw ::fhicl::exception(::fhicl::parse_error, literal::document_node)
+    throw ::fhicl::exception(::fhicl::parse_error, literal::document)
         << ("JSON to FHICL convertion error, regex_search()==false; JSON "
             "buffer: " +
             document.json_buffer);
 
   if (results.size() != 1)
-    throw ::fhicl::exception(::fhicl::parse_error, literal::document_node)
+    throw ::fhicl::exception(::fhicl::parse_error, literal::document)
         << ("JSON to FHICL convertion error, regex_search().size()!=1; JSON "
             "buffer: " +
             document.json_buffer);
@@ -85,7 +85,7 @@ FhiclData::operator JsonData() const {
   auto json = JsonData("");
 
   if (!json.convert_from(*this))
-    throw ::fhicl::exception(::fhicl::parse_error, literal::data_node) << ("FHICL to JSON convertion error; FHICL buffer: " + this->fhicl_buffer);
+    throw ::fhicl::exception(::fhicl::parse_error, literal::data) << ("FHICL to JSON convertion error; FHICL buffer: " + this->fhicl_buffer);
 
   TRACE_(6, "FHICL  json=" << json.json_buffer);
 

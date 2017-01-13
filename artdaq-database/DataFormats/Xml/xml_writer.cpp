@@ -40,7 +40,7 @@ bool XmlWriter::write(jsn::object_t const& json_object, std::string& out) {
   TRACE_(2, "write() begin");
 
   try {
-    auto const& json_tree = boost::get<jsn::object_t>(json_object.at(literal::data_node));
+    auto const& json_tree = boost::get<jsn::object_t>(json_object.at(literal::data));
 
     pt::ptree xml_tree;
 

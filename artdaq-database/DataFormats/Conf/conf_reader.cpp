@@ -24,7 +24,7 @@ bool ConfReader::read(std::string const& in[[gnu::unused]], jsn::object_t& json_
 
   try {
     auto object = jsn::object_t();
-    object[literal::data_node] = jsn::object_t();
+    object[literal::data] = jsn::object_t();
 
     // TODO: convert CONF into Json AST
 

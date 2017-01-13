@@ -32,8 +32,8 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
 
   auto get_SubNode = [](auto& parent, auto const& child_name) -> auto const& { return boost::get<jsn::object_t>(parent.at(child_name)); };
 
-  auto const& data_node = get_SubNode(json_object, literal::data_node);
-  auto const& metadata_node = get_SubNode(json_object, literal::metadata_node);
+  auto const& data_node = get_SubNode(json_object, literal::data);
+  auto const& metadata_node = get_SubNode(json_object, literal::metadata);
 
   auto buffer = std::string();
 
@@ -45,9 +45,9 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
     auto opts = extra_opts{};
     opts.enablePrologMode();
 
-    auto& data = get_SubNode(data_node, literal::prolog_node);
+    auto& data = get_SubNode(data_node, literal::prolog);
 
-    auto& prolog = get_SubNode(metadata_node, literal::prolog_node);
+    auto& prolog = get_SubNode(metadata_node, literal::prolog);
     auto& metadata = get_SubNode(prolog, literal::children);
 
     for (auto const& element : data) {
@@ -72,9 +72,9 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
     auto opts = extra_opts{};
     opts.enableDefaultMode();
 
-    auto& data = get_SubNode(data_node, literal::main_node);
+    auto& data = get_SubNode(data_node, literal::main);
 
-    auto& main = get_SubNode(metadata_node, literal::main_node);
+    auto& main = get_SubNode(metadata_node, literal::main);
     auto& metadata = get_SubNode(main, literal::children);
 
     for (auto const& element : data) {

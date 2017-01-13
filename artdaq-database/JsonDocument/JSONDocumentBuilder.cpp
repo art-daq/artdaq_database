@@ -114,7 +114,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::setObjectID(JSONDocument const& object
   TRACE_(8, "setObjectID() args  objectId=<" << objectId << ">");
 
   JSONDocument copy(objectId);
-  auto id = overlay<ovl::ovlId>(copy, jsonliteral::id_node);
+  auto id = overlay<ovl::ovlId>(copy, jsonliteral::id);
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->swap(id));
@@ -134,7 +134,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::setVersion(JSONDocument const& version
 
   JSONDocument copy(version);
 
-  auto ovl = std::make_unique<ovl::ovlVersion>(jsonliteral::version_node, copy.findChildValue(jsonliteral::name));
+  auto ovl = std::make_unique<ovl::ovlVersion>(jsonliteral::version, copy.findChildValue(jsonliteral::name));
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->setVersion(ovl));
@@ -152,7 +152,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::setConfigurableEntity(JSONDocument con
   TRACE_(9, "setConfigurableEntity() args  entity=<" << entity << ">");
 
   JSONDocument copy(entity);
-  auto ovl = overlay<ovl::ovlConfigurableEntity>(copy, jsonliteral::configurable_entity_node);
+  auto ovl = overlay<ovl::ovlConfigurableEntity>(copy, jsonliteral::entities);
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->addConfigurableEntity(ovl));

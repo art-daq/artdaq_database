@@ -86,8 +86,11 @@ int main(int argc, char* argv[]) try {
   value_t value1 = ast1;
   value_t value2 = ast2;
 
-  ovl::ovlDatabaseRecord record1(value1);
+  ovl::ovlDatabaseRecord record1(value1);  
+  //std::cout << "record1 =<" << record1.to_string() << ">" ;
+  
   ovl::ovlDatabaseRecord record2(value2);
+  //std::cout << "record2 =<" << record2.to_string() << ">" ; 
 
   auto result = record1 == record2;
 

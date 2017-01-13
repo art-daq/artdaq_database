@@ -2,8 +2,9 @@
 #define _ARTDAQ_DATABASE_OVERLAY_OVLDOCUMENT_H_
 
 #include "artdaq-database/Overlay/common.h"
+#include "artdaq-database/Overlay/ovlFixedList.h"
 #include "artdaq-database/Overlay/ovlKeyValue.h"
-#include "artdaq-database/Overlay/ovlKeyValueWithDefault.h"
+#include "artdaq-database/Overlay/ovlKeyValueWithMask.h"
 
 namespace artdaq {
 namespace database {
@@ -11,11 +12,17 @@ namespace overlay {
 namespace jsonliteral = artdaq::database::dataformats::literal;
 using namespace artdaq::database::result;
 
-using ovlData = ovlKeyValueWithDefault<DOCUMENT_COMPARE_MUTE_DATA>;
+using ovlData = ovlKeyValueWithMask<DOCUMENT_COMPARE_MUTE_DATA>;
 using ovlDataUPtr_t = std::unique_ptr<ovlData>;
 
-using ovlMetadata = ovlKeyValueWithDefault<DOCUMENT_COMPARE_MUTE_METADATA>;
+using ovlMetadata = ovlKeyValueWithMask<DOCUMENT_COMPARE_MUTE_METADATA>;
 using ovlMetadataUPtr_t = std::unique_ptr<ovlMetadata>;
+
+using ovlSearch = ovlKeyValue;
+using ovlSearchUPtr_t = std::unique_ptr<ovlSearch>;
+
+using ovlSearches = ovlFixedList<ovlSearch, DOCUMENT_COMPARE_MUTE_SEARCH>;
+using ovlSearchesUPtr_t = std::unique_ptr<ovlSearches>;
 
 class ovlDocument final : public ovlKeyValue {
  public:
@@ -47,6 +54,7 @@ class ovlDocument final : public ovlKeyValue {
  private:
   ovlDataUPtr_t _data;
   ovlMetadataUPtr_t _metadata;
+  ovlSearchesUPtr_t _search;
 };
 
 using ovlDocumentUPtr_t = std::unique_ptr<ovlDocument>;

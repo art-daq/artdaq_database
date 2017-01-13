@@ -37,7 +37,7 @@ bool& ovlBookkeeping::markDeleted(bool const& state) {
 
 std::string ovlBookkeeping::to_string() const noexcept {
   std::ostringstream oss;
-  oss << "{" << quoted_(jsonliteral::bookkeeping) << ": {";
+  oss << "{" << quoted_(jsonliteral::bookkeeping) << ": {\n";
   oss << quoted_(jsonliteral::isreadonly) << ":" << bool_(isReadonly()) << ",\n";
   oss << quoted_(jsonliteral::isdeleted) << ":" << bool_(isDeleted()) << ",\n";
   oss << debrace(_created.to_string()) << ",\n";
@@ -94,7 +94,6 @@ bool ovlBookkeeping::init(value_t& parent) try {
   confirm(false);
   throw;
 }
-
 
 result_t ovlBookkeeping::operator==(ovlBookkeeping const& other) const {
   if ((useCompareMask() & DOCUMENT_COMPARE_MUTE_BOOKKEEPING) == DOCUMENT_COMPARE_MUTE_BOOKKEEPING) return Success();

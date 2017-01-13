@@ -13,22 +13,13 @@ namespace literal {
 constexpr auto dot = ".";
 
 constexpr auto database_record = "record";
-constexpr auto document_node = "document";
-constexpr auto data_node = "data";
-constexpr auto prolog_node = "prolog";
-constexpr auto main_node = "main";
-
-constexpr auto version_node = "version";
-constexpr auto configurable_entity_node = "configurable_entity";
-constexpr auto configurations_node = "configurations";
-constexpr auto id_node = "_id";
-constexpr auto aliases_node = "aliases";
-
+constexpr auto main = "main";
+constexpr auto prolog = "prolog";
+constexpr auto entities = "entities";
+constexpr auto configurations = "configurations";
+constexpr auto id = "_id";
 constexpr auto oid = "_oid";
-
-constexpr auto comments_node = "comments";
-constexpr auto origin_node = "origin";
-constexpr auto includes_node = "includes";
+constexpr auto includes = "includes";
 constexpr auto timestamp = "timestamp";
 constexpr auto source = "source";
 constexpr auto format = "format";
@@ -46,7 +37,6 @@ constexpr auto values = "values";
 constexpr auto unknown = "unknown";
 constexpr auto include = "#include";
 constexpr auto linenum = "linenum";
-constexpr auto metadata_node = "metadata";
 constexpr auto changelog = "changelog";
 constexpr auto object = "object";
 constexpr auto table = "table";
@@ -55,6 +45,11 @@ constexpr auto sequence = "sequence";
 constexpr auto isdeleted = "isdeleted";
 constexpr auto isreadonly = "isreadonly";
 constexpr auto bookkeeping = "bookkeeping";
+constexpr auto collection = "collection";
+constexpr auto runs = "runs";
+constexpr auto attachments = "attachments";
+constexpr auto comments = "comments";
+constexpr auto version = "version";
 constexpr auto updates = "updates";
 constexpr auto update = "update";
 constexpr auto operation = "operation";
@@ -62,6 +57,7 @@ constexpr auto configuration = "configuration";
 constexpr auto assigned = "assigned";
 constexpr auto removed = "removed";
 constexpr auto created = "created";
+constexpr auto rawdatalist = "rawdata";
 constexpr auto aliases = "aliases";
 constexpr auto alias = "alias";
 constexpr auto active = "active";
@@ -75,7 +71,7 @@ constexpr auto query = "query";
 constexpr auto operations = "operations";
 constexpr auto document="document";
 
-constexpr auto gui_data_node = "guidata";
+constexpr auto gui_data = "guidata";
 constexpr auto converted = "converted";
 constexpr auto notprovided = "notprovided";
 

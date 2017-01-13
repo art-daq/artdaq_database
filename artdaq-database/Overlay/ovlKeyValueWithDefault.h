@@ -9,6 +9,7 @@ namespace database {
 namespace overlay {
 namespace jsonliteral = artdaq::database::dataformats::literal;
 using namespace artdaq::database::result;
+using artdaq::database::sharedtypes::unwrap;
 
 template <int mask>
 class ovlKeyValueWithDefault : public ovlKeyValue {
@@ -37,7 +38,7 @@ template <int mask>
 bool ovlKeyValueWithDefault<mask>::init(value_t& parent) try {
   confirm(type(parent) == type_t::OBJECT);
 
-  auto& obj = object_value();
+  auto& obj = unwrap(parent).value_as<object_t>();
 
   if (obj.count(key()) == 0) obj[key()] = object_t{};
   confirm(obj.count(key()) == 1);

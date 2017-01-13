@@ -11,9 +11,16 @@ using result_t = artdaq::database::result_t;
 using artdaq::database::sharedtypes::unwrap;
 
 ovlOrigin::ovlOrigin(object_t::key_type const& key, value_t& origin)
-    : ovlKeyValue(key, origin), _initOK(init(origin)), _created(map_created(origin)) {}
+    : ovlKeyValue(key, origin),
+      _initOK(init(origin)),
+      _created(map_created(origin)),
+      _rawdatalist{overlay<ovlRawDataList, array_t>(origin, jsonliteral::rawdatalist)} {}
 
 std::string& ovlOrigin::format() { return value_as<std::string>(jsonliteral::format); }
+
+std::string const& ovlOrigin::name() const { return value_as<std::string>(jsonliteral::name); }
+
+std::string& ovlOrigin::name() { return value_as<std::string>(jsonliteral::name); }
 
 std::string const& ovlOrigin::format() const { return value_as<std::string>(jsonliteral::format); }
 
@@ -23,10 +30,12 @@ std::string const& ovlOrigin::source() const { return value_as<std::string>(json
 
 std::string ovlOrigin::to_string() const noexcept {
   std::ostringstream oss;
-  oss << "{" << quoted_(jsonliteral::origin_node) << ":{\n";
+  oss << "{" << quoted_(jsonliteral::origin) << ":{\n";
   oss << quoted_(jsonliteral::format) << ":" << quoted_(format()) << ",\n";
+  oss << quoted_(jsonliteral::name) << ":" << quoted_(name()) << ",\n";
   oss << quoted_(jsonliteral::source) << ":" << quoted_(source()) << ",\n";
-  oss << debrace(_created.to_string()) << "\n";
+  oss << debrace(_created.to_string()) << ",\n";
+  oss << debrace(_rawdatalist->to_string()) << "\n";
   oss << "}}";
 
   return oss.str();
@@ -37,14 +46,20 @@ bool ovlOrigin::init(value_t& parent) try {
 
   auto& obj = object_value();
 
-  if (obj.count(jsonliteral::source) == 0) obj[jsonliteral::source] = std::string{"template"};
+  if (obj.count(jsonliteral::source) == 0) obj[jsonliteral::source] = "template"s;
   confirm(obj.count(jsonliteral::source) == 1);
 
-  if (obj.count(jsonliteral::format) == 0) obj[jsonliteral::format] = std::string{"json"};
+  if (obj.count(jsonliteral::name) == 0) obj[jsonliteral::name] = std::string{jsonliteral::notprovided};
+  confirm(obj.count(jsonliteral::name) == 1);
+  
+  if (obj.count(jsonliteral::format) == 0) obj[jsonliteral::format] = "json"s;
   confirm(obj.count(jsonliteral::format) == 1);
 
   if (obj.count(jsonliteral::created) == 0) obj[jsonliteral::created] = timestamp();
   confirm(obj.count(jsonliteral::created) == 1);
+
+  if (obj.count(jsonliteral::rawdatalist) == 0) obj[jsonliteral::rawdatalist] = array_t{};
+  confirm(obj.count(jsonliteral::rawdatalist) == 1);
 
   return true;
 } catch (...) {
@@ -62,6 +77,9 @@ result_t ovlOrigin::operator==(ovlOrigin const& other) const {
   if (format() != other.format())
     oss << "\n  Formats are different: self,other=" << quoted_(format()) << "," << quoted_(other.format());
 
+  if (name() != other.name())
+    oss << "\n  File names are different: self,other=" << quoted_(name()) << "," << quoted_(other.name());
+  
   if (source() != other.source())
     oss << "\n  Sources are different: self,other=" << quoted_(source()) << "," << quoted_(other.source());
 
@@ -70,6 +88,10 @@ result_t ovlOrigin::operator==(ovlOrigin const& other) const {
   if (!result.first)
     oss << "\n  Timestamps are different: self,other=" << quoted_(_created.timestamp()) << ","
         << quoted_(other._created.timestamp());
+
+  result = *_rawdatalist == *other._rawdatalist;
+
+  if (!result.first) oss << result.second;
 
   if (oss.tellp() == noerror_pos) return Success();
 
@@ -84,7 +106,7 @@ ovlTimeStamp ovlOrigin::map_created(value_t& parent) {
 
   auto& obj = object_value();
 
-  confirm(obj.count(jsonliteral::timestamp) == 1);
+  confirm(obj.count(jsonliteral::created) == 1);
 
-  return ovlTimeStamp(jsonliteral::timestamp, obj.at(jsonliteral::timestamp));
+  return ovlTimeStamp(jsonliteral::created, obj.at(jsonliteral::created));
 }

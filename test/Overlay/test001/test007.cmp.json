@@ -1,4 +1,86 @@
 {
+"_id" : {
+"_oid" : "cafe6a7a44f3445d9dd813a4"
+}
+,
+
+"collection" : "myfhicldocuments"
+,
+
+"version" : "version001"
+,
+"origin":{
+"format":"json",
+"name":"notprovided",
+"source":"template",
+"created":"Fri Jan 13 16:01:37 2017",
+"rawdata": [
+]
+},
+"aliases": {
+        "active" : [
+            {
+                "name" : "alias012", 
+                "assigned" : "Mon Feb  8 14:00:30 2016"
+            }, 
+            {
+                "name" : "alias02", 
+                "assigned" : "Mon Feb  8 14:00:30 2016"
+            }
+        ], 
+        "history" : [
+            {
+                "name" : "alias01", 
+                "assigned" : "Mon Feb  8 14:00:30 2016", 
+                "removed" : "Mon Feb  8 14:00:30 2016"
+            }
+        ]
+
+}
+,
+"bookkeeping": {
+"isreadonly":false,
+"isdeleted":false,
+"created":"Fri Jan 13 16:01:37 2017",
+"updates": [
+{
+"event" : "addAlias",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "alias01",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+},
+{
+"event" : "removeAlias",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "alias01",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+}
+]
+}
+,
+
+"changelog" : "notprovided"
+,
+"entities": [
+],
+"runs": [
+],
+"attachments": [
+],
+"configurations": [
+        {
+            "name" : "test", 
+            "assigned" : "Mon Feb  8 14:00:30 2016"
+        }
+],
+"comments": [
+],
+
+
 "document" : {
 "data" : {
 "prolog" : {
@@ -56,12 +138,11 @@
 "annotation" : " "
 },
 "PMT_host" : {
-"type" : "string1",
+"type" : "string",
 "comment" : " ",
 "annotation" : " "
 },
 "PMT_port" : {
-"type" : "number",
 "comment" : " ",
 "annotation" : " "
 },
@@ -214,48 +295,5 @@
 "query" : "not defined"
 }
 ]
-},
-"origin" : {
-"format" : "fhicl",
-"source" : "fhicl_to_json",
-"timestamp" : "Thu Nov 10 15:24:09 2016"
-},
-"version" : "ver001",
-"configurations" : [
-{
-"name" : "demo1",
-"assigned" : "Thu Nov 10 15:24:09 2016"
-}
-],
-"aliases" : {
-"active" : [
-
-],
-"history" : [
-
-]
-},
-"changelog" : "empty",
-"bookkeeping" : {
-"isdeleted" : false,
-"isreadonly" : false,
-"created" : "Tue Dec 29 18:19:25 2015",
-"updates" : [
-{
-"addToGlobalConfig" : "Thu Nov 10 15:24:09 2016"
-},
-{
-"setVersion" : "Thu Nov 10 15:24:09 2016"
-},
-{
-"setConfigurableEntity" : "Thu Nov 10 15:24:09 2016"
-}
-]
-},
-"configurable_entity" : {
-"name" : "notprovided"
-},
-"_id" : {
-"_oid" : "5a720405791a403e8ad918cf"
 }
 }
