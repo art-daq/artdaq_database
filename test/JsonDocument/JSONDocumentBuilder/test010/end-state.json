@@ -18,17 +18,12 @@
 {
 "name" : "alias012",
 "assigned" : "Mon Feb  8 14:00:30 2016",
-"removed" : "Sat Jan 14 01:43:22 2017"
+"removed" : "Sat Jan 14 02:19:39 2017"
 },
 {
 "name" : "alias02",
 "assigned" : "Mon Feb  8 14:00:30 2016",
-"removed" : "Sat Jan 14 01:43:22 2017"
-},
-{
-"name" : "alias0444",
-"assigned" : "Sat Jan 14 01:43:22 2017",
-"removed" : "Sat Jan 14 01:43:22 2017"
+"removed" : "Sat Jan 14 02:19:39 2017"
 }
 ],
 "history" : [
@@ -41,7 +36,7 @@
 },
 "bookkeeping" : {
 "isreadonly" : false,
-"isdeleted" : true,
+"isdeleted" : false,
 "created" : "Fri Jan 13 16:01:37 2017",
 "updates" : [
 {
@@ -61,12 +56,11 @@
 }
 },
 {
-"event" : "addAlias",
-"timestamp" : "Sat Jan 14 01:43:22 2017",
+"event" : "addEntity",
+"timestamp" : "Sat Jan 14 02:19:39 2017",
 "value" : {
-"name" : "alias0444",
-"assigned" : "Sat Jan 14 01:43:22 2017",
-"removed" : "Sat Jan 14 01:43:22 2017"
+"name" : "boardreader01101",
+"assigned" : "Sat Jan 14 02:19:39 2017"
 }
 }
 ]
@@ -80,6 +74,10 @@
 {
 "name" : "boardreader02",
 "assigned" : "Mon Feb  8 14:00:30 2016"
+},
+{
+"name" : "boardreader01101",
+"assigned" : "Sat Jan 14 02:19:39 2017"
 }
 ],
 "runs" : [
@@ -335,12 +333,12 @@ expected:
 {
 "name" : "alias012",
 "assigned" : "Mon Feb  8 14:00:30 2016",
-"removed" : "Sat Jan 14 01:40:24 2017"
+"removed" : "Sat Jan 14 02:19:39 2017"
 },
 {
 "name" : "alias02",
 "assigned" : "Mon Feb  8 14:00:30 2016",
-"removed" : "Sat Jan 14 01:40:24 2017"
+"removed" : "Sat Jan 14 02:19:39 2017"
 }
 ],
 "history" : [
@@ -370,15 +368,6 @@ expected:
 "value" : {
 "name" : "alias01",
 "assigned" : "Mon Feb  8 14:00:30 2016"
-}
-},
-{
-"event" : "addAlias",
-"timestamp" : "Sat Jan 14 01:40:24 2017",
-"value" : {
-"name" : "alias02",
-"assigned" : "Sat Jan 14 01:40:24 2017",
-"removed" : "Sat Jan 14 01:40:24 2017"
 }
 }
 ]

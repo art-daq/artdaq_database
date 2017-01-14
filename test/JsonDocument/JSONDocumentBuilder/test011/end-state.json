@@ -18,17 +18,12 @@
 {
 "name" : "alias012",
 "assigned" : "Mon Feb  8 14:00:30 2016",
-"removed" : "Sat Jan 14 01:43:22 2017"
+"removed" : "Sat Jan 14 02:19:39 2017"
 },
 {
 "name" : "alias02",
 "assigned" : "Mon Feb  8 14:00:30 2016",
-"removed" : "Sat Jan 14 01:43:22 2017"
-},
-{
-"name" : "alias0444",
-"assigned" : "Sat Jan 14 01:43:22 2017",
-"removed" : "Sat Jan 14 01:43:22 2017"
+"removed" : "Sat Jan 14 02:19:39 2017"
 }
 ],
 "history" : [
@@ -61,20 +56,20 @@
 }
 },
 {
-"event" : "addAlias",
-"timestamp" : "Sat Jan 14 01:43:22 2017",
+"event" : "addEntity",
+"timestamp" : "Sat Jan 14 02:19:39 2017",
 "value" : {
-"name" : "alias0444",
-"assigned" : "Sat Jan 14 01:43:22 2017",
-"removed" : "Sat Jan 14 01:43:22 2017"
+"name" : "boardreader01101",
+"assigned" : "Sat Jan 14 02:19:39 2017"
 }
 },
 {
-"event" : "addConfiguration",
-"timestamp" : "Sat Jan 14 01:47:51 2017",
+"event" : "removeEntity",
+"timestamp" : "Sat Jan 14 02:22:26 2017",
 "value" : {
-"name" : "globalconfig01",
-"assigned" : "Sat Jan 14 01:47:51 2017"
+"name" : "boardreader01101",
+"assigned" : "Sat Jan 14 02:22:26 2017",
+"removed" : "Sat Jan 14 02:22:26 2017"
 }
 }
 ]
@@ -100,10 +95,6 @@
 {
 "name" : "test",
 "assigned" : "Mon Feb  8 14:00:30 2016"
-},
-{
-"name" : "globalconfig01",
-"assigned" : "Sat Jan 14 01:47:51 2017"
 }
 ],
 "comments" : [
@@ -326,3 +317,4 @@
 ]
 }
 }
+

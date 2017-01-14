@@ -104,8 +104,8 @@ class ovlDatabaseRecord final : public ovlKeyValue {
   result_t addAlias(ovlAliasUPtr_t& /*alias*/);
   result_t removeAlias(ovlAliasUPtr_t& /*alias*/);
 
-  result_t addConfigurableEntity(ovlConfigurableEntityUPtr_t& /*entity*/);
-  result_t removeConfigurableEntity(ovlConfigurableEntityUPtr_t& /*entity*/);
+  result_t addEntity(ovlConfigurableEntityUPtr_t& /*entity*/);
+  result_t removeEntity(ovlConfigurableEntityUPtr_t& /*entity*/);
 
   result_t setVersion(ovlVersionUPtr_t& /*version*/);
 

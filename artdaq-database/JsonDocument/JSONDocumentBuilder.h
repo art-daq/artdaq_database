@@ -25,12 +25,13 @@ class JSONDocumentBuilder final {
   JSONDocumentBuilder& createFromData(JSONDocument const&);
   JSONDocumentBuilder& addAlias(JSONDocument const&);
   JSONDocumentBuilder& addConfiguration(JSONDocument const&);
+  JSONDocumentBuilder& addEntity(JSONDocument const&);
 
   JSONDocumentBuilder& setVersion(JSONDocument const&);
-  JSONDocumentBuilder& setConfigurableEntity(JSONDocument const&);
 
   JSONDocumentBuilder& removeAlias(JSONDocument const&);
   JSONDocumentBuilder& removeConfiguration(JSONDocument const&);
+  JSONDocumentBuilder& removeEntity(JSONDocument const&);
 
   JSONDocumentBuilder& markReadonly();
   JSONDocumentBuilder& markDeleted();

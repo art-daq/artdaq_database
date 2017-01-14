@@ -208,12 +208,12 @@ result_t ovlDatabaseRecord::setVersion(ovlVersionUPtr_t& version) {
   return _bookkeeping->postUpdate(update, _version);
 }
 
-result_t ovlDatabaseRecord::addConfigurableEntity(ovlConfigurableEntityUPtr_t& entity) {
+result_t ovlDatabaseRecord::addEntity(ovlConfigurableEntityUPtr_t& entity) {
   confirm(entity);
 
   if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
 
-  auto update = std::string("addConfigurableEntity");
+  auto update = std::string("addEntity");
 
   auto result = _entities->add(entity);
 
@@ -222,12 +222,12 @@ result_t ovlDatabaseRecord::addConfigurableEntity(ovlConfigurableEntityUPtr_t& e
   return _bookkeeping->postUpdate(update, entity);
 }
 
-result_t ovlDatabaseRecord::removeConfigurableEntity(ovlConfigurableEntityUPtr_t& entity) {
+result_t ovlDatabaseRecord::removeEntity(ovlConfigurableEntityUPtr_t& entity) {
   confirm(entity);
 
   if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
 
-  auto update = std::string("removeConfigurableEntity");
+  auto update = std::string("removeEntity");
 
   auto result = _entities->remove(entity);
 

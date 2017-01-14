@@ -14,33 +14,55 @@
 },
 "metadata" : {
 
-}
+},
+"search" : [
+
+]
 },
 "comments" : [
 
 ],
 "origin" : {
 "source" : "template",
+"name" : "notprovided",
 "format" : "json",
-"timestamp" : "Mon Feb  8 14:00:30 2016"
+"created" : "Fri Jan 13 18:28:16 2017",
+"rawdata" : [
+
+]
 },
 "version" : "notprovided",
-"configurable_entity" : {
-"name" : "notprovided"
-},
+"entities" : [
+
+],
 "configurations" : [
 
 ],
-"changelog" : "",
+"changelog" : "notprovided",
 "bookkeeping" : {
 "isdeleted" : false,
 "isreadonly" : false,
 "updates" : [
 
 ],
-"created" : "Mon Feb  8 14:00:30 2016"
+"created" : "Fri Jan 13 18:28:16 2017"
 },
 "_id" : {
-"_oid" : "f5570c598d3e4efd8194a460"
-}
+"_oid" : "ee9ae91817d84c268e071e39"
+},
+"collection" : "notprovided",
+"aliases" : {
+"active" : [
+
+],
+"history" : [
+
+]
+},
+"runs" : [
+
+],
+"attachments" : [
+
+]
 }

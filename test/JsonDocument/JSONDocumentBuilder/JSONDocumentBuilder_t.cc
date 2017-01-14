@@ -10,7 +10,6 @@
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "boost/program_options.hpp"
 
-
 namespace bpo = boost::program_options;
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
@@ -28,6 +27,9 @@ bool test_markDeleted(std::string const& conf);
 bool test_markReadonly(std::string const& conf);
 bool test_setVersion(std::string const& conf);
 bool test_addToGlobalConfig(std::string const& conf);
+
+bool test_addEntity(std::string const& conf);
+bool test_removeEntity(std::string const& conf);
 
 int main(int argc, char* argv[]) {
   artdaq::database::docrecord::debug::enableJSONDocument();
@@ -75,7 +77,8 @@ int main(int argc, char* argv[]) {
   auto runTest = [](std::string const& name) {
     auto tests = std::map<std::string, test_case>{
         {"buildDocument", test_buildDocument}, {"addAlias", test_addAlias},
-        {"removeAlias", test_removeAlias},     {"markDeleted", test_markDeleted},
+        {"addEntity", test_addEntity},         {"removeAlias", test_removeAlias},
+        {"removeEntity", test_removeEntity},   {"markDeleted", test_markDeleted},
         {"markReadonly", test_markReadonly},   {"addToGlobalConfig", test_addToGlobalConfig},
         {"setVersion", test_setVersion}};
 
@@ -119,6 +122,9 @@ bool test_buildDocument(std::string const& conf) {
 
     auto result = returned == expected;
 
+    std::cerr << "returned:\n" << returned << "\n";
+    std::cerr << "expected:\n" << expected << "\n";
+
     if (!result.first && mustsucceed) {
       std::cout << "Error returned!=expected.\n";
       std::cerr << "returned:\n" << returned << "\n";
@@ -145,12 +151,10 @@ bool test_addAlias(std::string const& conf) {
   auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
 
   try {
-    
     JSONDocumentBuilder returned{begin};
     returned.addAlias(delta);
     JSONDocumentBuilder expected{end};
 
-    
     using namespace artdaq::database::overlay;
     ovl::useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS);
 
@@ -181,13 +185,11 @@ bool test_removeAlias(std::string const& conf) {
 
   auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
 
- try {
-    
+  try {
     JSONDocumentBuilder returned{begin};
     returned.removeAlias(delta);
     JSONDocumentBuilder expected{end};
 
-    
     using namespace artdaq::database::overlay;
     ovl::useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS);
 
@@ -223,7 +225,6 @@ bool test_addToGlobalConfig(std::string const& conf) {
     returned.addConfiguration(delta);
     JSONDocumentBuilder expected{end};
 
-    
     using namespace artdaq::database::overlay;
     ovl::useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS);
 
@@ -259,7 +260,6 @@ bool test_setVersion(std::string const& conf) {
     returned.setVersion(delta);
     JSONDocumentBuilder expected{end};
 
-    
     using namespace artdaq::database::overlay;
     ovl::useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS);
 
@@ -294,7 +294,6 @@ bool test_markReadonly(std::string const& conf) {
     returned.markReadonly();
     JSONDocumentBuilder expected{end};
 
-    
     using namespace artdaq::database::overlay;
     ovl::useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS);
 
@@ -314,7 +313,6 @@ bool test_markReadonly(std::string const& conf) {
 
   return true;
 }
-
 
 bool test_markDeleted(std::string const& conf) {
   confirm(!conf.empty());
@@ -330,7 +328,6 @@ bool test_markDeleted(std::string const& conf) {
     returned.markDeleted();
     JSONDocumentBuilder expected{end};
 
-    
     using namespace artdaq::database::overlay;
     ovl::useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS);
 
@@ -351,3 +348,72 @@ bool test_markDeleted(std::string const& conf) {
   return true;
 }
 
+bool test_addEntity(std::string const& conf) {
+  confirm(!conf.empty());
+
+  auto opts = JSONDocument(conf);
+  auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
+  auto delta = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::delta));
+  auto end = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::endstate));
+
+  auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
+
+  try {
+    JSONDocumentBuilder returned{begin};
+    returned.addEntity(delta);
+    JSONDocumentBuilder expected{end};
+
+    using namespace artdaq::database::overlay;
+    ovl::useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS);
+
+    auto result = returned == expected;
+
+    if (!result.first && mustsucceed) {
+      std::cout << "Error returned!=expected.\n";
+      std::cerr << "returned:\n" << returned << "\n";
+      std::cerr << "expected:\n" << expected << "\n";
+      std::cerr << "error:\n" << result.second << "\n";
+      return false;
+    }
+
+  } catch (cet::exception const& e) {
+    if (mustsucceed) throw;
+  }
+
+  return true;
+}
+
+bool test_removeEntity(std::string const& conf) {
+  confirm(!conf.empty());
+
+  auto opts = JSONDocument(conf);
+  auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
+  auto delta = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::delta));
+  auto end = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::endstate));
+
+  auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
+
+  try {
+    JSONDocumentBuilder returned{begin};
+    returned.removeEntity(delta);
+    JSONDocumentBuilder expected{end};
+
+    using namespace artdaq::database::overlay;
+    ovl::useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS);
+
+    auto result = returned == expected;
+
+    if (!result.first && mustsucceed) {
+      std::cout << "Error returned!=expected.\n";
+      std::cerr << "returned:\n" << returned << "\n";
+      std::cerr << "expected:\n" << expected << "\n";
+      std::cerr << "error:\n" << result.second << "\n";
+      return false;
+    }
+
+  } catch (cet::exception const& e) {
+    if (mustsucceed) throw;
+  }
+
+  return true;
+}

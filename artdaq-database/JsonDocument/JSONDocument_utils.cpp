@@ -147,7 +147,7 @@ std::string JSONDocument::writeJson() const {
   if (!JsonWriter().write(tmpObject, json))
     throw invalid_argument("JSONDocument") << "Failed writing JSON: JSONDocument::_value has invalid AST";
 
-  TRACE_(1, "writeJson() json=<" << json << " > ");
+  //TRACE_(1, "writeJson() json=<" << json << " > ");
 
   return json;
 }
@@ -235,7 +235,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& doc
   }
   _document.writeJson();
 
-  TRACE_(2, "createFrom() document=<" << _document.cached_json_buffer() << ">");
+  TRACE_(2, "createFrom() imported document=<" << _document.cached_json_buffer() << ">");
 
   return self();
 }
@@ -278,6 +278,30 @@ void JSONDocumentBuilder::_importUserData(JSONDocument const& document) {
     TRACE_(2, "_importUserData() No origin");
   }
 
+  // replace data origin if any
+  try {
+    auto collection = document.findChild(jsonliteral::collection);
+
+    TRACE_(2, "_importUserData() Found origin=<" << collection << ">");
+
+    _document.replaceChild(collection, jsonliteral::collection);
+
+  } catch (notfound_exception const&) {
+    TRACE_(2, "_importUserData() No collection");
+  }
+  
+  // replace data attachments if any
+  try {
+    auto attachments = document.findChild(jsonliteral::attachments);
+
+    TRACE_(2, "_importUserData() Found origin=<" << attachments << ">");
+
+    _document.replaceChild(attachments, jsonliteral::attachments);
+
+  } catch (notfound_exception const&) {
+    TRACE_(2, "_importUserData() No attachments");
+  }
+  
   // replace data if any
   try {
     auto path = ""s + jsonliteral::document + jsonliteral::dot + jsonliteral::data;
@@ -298,7 +322,6 @@ void JSONDocumentBuilder::_importUserData(JSONDocument const& document) {
     _document.replaceChild(document, path);
   } catch (notfound_exception const&) {
     TRACE_(2, "_importUserData() No document.data");
-    throw;
   }
 }
 

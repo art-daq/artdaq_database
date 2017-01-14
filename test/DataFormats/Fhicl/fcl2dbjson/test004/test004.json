@@ -398,13 +398,14 @@
 ],
 "origin" : {
 "format" : "fhicl",
-"origin" : "fhicl_to_json",
+"name" : "notprovided",
+"source" : "fhicl_to_json",
 "timestamp" : "Mon Feb  8 14:00:30 2016"
 },
 "version" : "notprovided",
-"configurable_entity" : {
-"name" : "notprovided"
-},
+"entities" : [
+
+],
 "configurations" : [
 
 ]

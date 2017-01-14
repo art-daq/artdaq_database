@@ -170,8 +170,12 @@ JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t con
   TRACE_(4, "replaceChild() old child value=" << print_visitor(replaced_value));
   TRACE_(4, "replaceChild() resultDocument=<" << cached_json_buffer() << ">");
   TRACE_(4, "replaceChild() Replace succeeded.");
-
-  return JSONDocument(replaced_value);
+  
+  auto obj = object_t{};
+  obj[path]=replaced_value;
+  value_t returnValue = obj;
+  
+  return JSONDocument(returnValue);
 } catch (std::exception& ex) {
   TRACE_(4, "replaceChild() Replace failed; Error:" << ex.what());
   throw;

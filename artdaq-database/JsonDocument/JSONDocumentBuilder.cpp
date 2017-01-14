@@ -148,14 +148,33 @@ JSONDocumentBuilder& JSONDocumentBuilder::setVersion(JSONDocument const& version
   return self();
 }
 
-JSONDocumentBuilder& JSONDocumentBuilder::setConfigurableEntity(JSONDocument const& entity) try {
-  TRACE_(9, "setConfigurableEntity() args  entity=<" << entity << ">");
+JSONDocumentBuilder& JSONDocumentBuilder::addEntity(JSONDocument const& entity) try {
+  TRACE_(9, "addEntity() args  entity=<" << entity << ">");
 
   JSONDocument copy(entity);
   auto ovl = overlay<ovl::ovlConfigurableEntity>(copy, jsonliteral::entities);
 
   ThrowOnFailure(SaveUndo());
-  ThrowOnFailure(_overlay->addConfigurableEntity(ovl));
+  ThrowOnFailure(_overlay->addEntity(ovl));
+
+  _document.writeJson();
+
+  return self();
+} catch (std::exception const& ex) {
+  TRACE_(9, "setVersion() Exception:" << ex.what());
+  ThrowOnFailure(CallUndo());
+
+  return self();
+}
+
+JSONDocumentBuilder& JSONDocumentBuilder::removeEntity(JSONDocument const& entity) try {
+  TRACE_(9, "addEntity() args  entity=<" << entity << ">");
+
+  JSONDocument copy(entity);
+  auto ovl = overlay<ovl::ovlConfigurableEntity>(copy, jsonliteral::entities);
+
+  ThrowOnFailure(SaveUndo());
+  ThrowOnFailure(_overlay->removeEntity(ovl));
 
   _document.writeJson();
 

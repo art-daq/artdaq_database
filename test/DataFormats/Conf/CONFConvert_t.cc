@@ -6,7 +6,6 @@
 #include "artdaq-database/DataFormats/Conf/convertconf2json.h"
 #include "artdaq-database/DataFormats/Conf/conf_common.h"
 #include "artdaq-database/DataFormats/Conf/confjsondb.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
 
 namespace bpo = boost::program_options;
 using namespace artdaq::database;

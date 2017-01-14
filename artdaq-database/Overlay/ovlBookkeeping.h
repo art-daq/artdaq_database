@@ -74,7 +74,8 @@ result_t ovlBookkeeping::postUpdate(std::string const& name, T const& what) {
     newEntry[jsonliteral::value] = refvalue;
   } else {
     auto obj = object_t{};
-    obj[what->key()] = refvalue;
+    obj[jsonliteral::name] = refvalue;
+    obj[jsonliteral::assigned] = artdaq::database::timestamp();
     newEntry[jsonliteral::value] = obj;
   }
 

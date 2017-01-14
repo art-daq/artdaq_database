@@ -25,7 +25,9 @@ struct FhiclData final {
 
   static constexpr auto type_version() { return "V100"; }
 
-  std::string fhicl_buffer;
+  std::string fhicl_buffer="";
+  std::string fhicl_file_name="notprovided";
+
 };
 
 std::istream& operator>>(std::istream&, artdaq::database::basictypes::FhiclData&);
