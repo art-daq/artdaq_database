@@ -18,7 +18,6 @@ T const& dbt::unwrapper<const object_t>::value_as(std::string const& name) try {
 
   return boost::get<V>(any.at(name));
 } catch (...) {
-  confirm(false);
   throw;
 }
 
@@ -28,8 +27,7 @@ T& dbt::unwrapper<object_t>::value_as(std::string const& name) try {
   confirm(!name.empty());
 
   return boost::get<T>(any.at(name));
-} catch (...) {
-  confirm(false);
+} catch (std::exception &e) {
   throw;
 }
 
@@ -39,7 +37,6 @@ T& dbt::unwrapper<value_t>::value_as(std::string const& name) try {
   confirm(!name.empty());
   return boost::get<T>(boost::get<object_t>(any).at(name));
 } catch (...) {
-  confirm(false);
   throw;
 }
 
@@ -52,7 +49,6 @@ T const& dbt::unwrapper<const value_t>::value_as(std::string const& name) try {
 
   return boost::get<V>(boost::get<object_t>(any).at(name));
 } catch (...) {
-  confirm(false);
   throw;
 }
 
@@ -61,7 +57,6 @@ template <typename T>
 T& dbt::unwrapper<value_t>::value_as() try {
   return boost::get<T>(any);
 } catch (...) {
-  confirm(false);
   throw;
 }
 
