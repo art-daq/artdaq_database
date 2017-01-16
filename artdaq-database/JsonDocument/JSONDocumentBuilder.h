@@ -28,6 +28,8 @@ class JSONDocumentBuilder final {
   JSONDocumentBuilder& addEntity(JSONDocument const&);
 
   JSONDocumentBuilder& setVersion(JSONDocument const&);
+  JSONDocumentBuilder& setCollection(JSONDocument const&);
+
 
   JSONDocumentBuilder& removeAlias(JSONDocument const&);
   JSONDocumentBuilder& removeConfiguration(JSONDocument const&);

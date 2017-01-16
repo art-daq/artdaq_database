@@ -157,13 +157,13 @@ bool test_insert(std::string const& source, std::string const& compare,std::stri
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JsonData>::create(database);
   
-  auto colle11ctionName=std::string("testJSON_V001");
+  auto collectionName=std::string("testJSON_V001");
   
-  auto json = JsonData{"{\"document\":" + insert.to_string() + ", \"collection\":\"" +colle11ctionName +"\"}"};
+  auto json = JsonData{"{\"document\":" + insert.to_string() + ", \"collection\":\"" +collectionName +"\"}"};
 
   auto object_id =  provider->store(json);
   
-  auto search = JsonData{"{\"filter\":" + ( filter.empty()?object_id:filter)+ ", \"collection\":\"" +colle11ctionName +"\"}"};
+  auto search = JsonData{"{\"filter\":" + ( filter.empty()?object_id:filter)+ ", \"collection\":\"" +collectionName +"\"}"};
   
   std::cout << "Search criteria " <<  search.json_buffer << "\n";
 
@@ -212,13 +212,13 @@ bool test_search1(std::string const& source, std::string const& compare,std::str
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JsonData>::create(database);
   
-  auto colle11ctionName=std::string("testJSON_V001");
+  auto collectionName=std::string("testJSON_V001");
   
-  auto json = JsonData{"{\"document\":" + insert.to_string() + ", \"collection\":\"" +colle11ctionName +"\"}"};
+  auto json = JsonData{"{\"document\":" + insert.to_string() + ", \"collection\":\"" +collectionName +"\"}"};
 
   auto object_id =  provider->store(json);
   
-  auto search = JsonData{"{\"filter\":" + ( filter.empty()?object_id:filter)+ ", \"collection\":\"" +colle11ctionName +"\"}"};
+  auto search = JsonData{"{\"filter\":" + ( filter.empty()?object_id:filter)+ ", \"collection\":\"" +collectionName +"\"}"};
   
   std::cout << "Search criteria " <<  search.json_buffer << "\n";
 
@@ -260,9 +260,9 @@ bool test_search2(std::string const& source, std::string const& compare,std::str
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JsonData>::create(database);
   
-  auto colle11ctionName=std::string("testJSON_V001");
+  auto collectionName=std::string("testJSON_V001");
   
-  auto json = JsonData{"{\"document\":" + source + ", \"collection\":\"" +colle11ctionName +"\"}"};
+  auto json = JsonData{"{\"document\":" + source + ", \"collection\":\"" +collectionName +"\"}"};
 
   auto repeatCount = std::size_t{10};
   
@@ -283,7 +283,7 @@ bool test_search2(std::string const& source, std::string const& compare,std::str
   
   auto filter = oss.str();
     
-  auto search = JsonData{"{\"filter\":" + ( filter.empty()?options:filter)+ ", \"collection\":\"" +colle11ctionName +"\"}"};
+  auto search = JsonData{"{\"filter\":" + ( filter.empty()?options:filter)+ ", \"collection\":\"" +collectionName +"\"}"};
   
   std::cout << "Search criteria " <<  search.json_buffer << "\n";
 
@@ -322,13 +322,13 @@ bool test_update(std::string const& source, std::string const& compare,std::stri
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JsonData>::create(database);
   
-  auto colle11ctionName=std::string("testJSON_V001");
+  auto collectionName=std::string("testJSON_V001");
   
-  auto json = JsonData{"{\"document\":" + insert.to_string() + ", \"collection\":\"" +colle11ctionName +"\"}"};
+  auto json = JsonData{"{\"document\":" + insert.to_string() + ", \"collection\":\"" +collectionName +"\"}"};
 
   auto object_id =  provider->store(json);
   
-  auto search = JsonData{"{\"filter\":" + object_id + ", \"collection\":\"" +colle11ctionName +"\"}"};
+  auto search = JsonData{"{\"filter\":" + object_id + ", \"collection\":\"" +collectionName +"\"}"};
   
   std::cout << "Search criteria " <<  search.json_buffer << "\n";
 
@@ -347,7 +347,7 @@ bool test_update(std::string const& source, std::string const& compare,std::stri
   result.deleteChild("_id");
   result.replaceChild(changes,"document");
   
-  json = JsonData{"{\"document\":" + result.to_string() + ", \"filter\":" + object_id +  ",\"collection\":\"" +colle11ctionName +"\"}"};
+  json = JsonData{"{\"document\":" + result.to_string() + ", \"filter\":" + object_id +  ",\"collection\":\"" +collectionName +"\"}"};
 
   object_id =  provider->store(json);
 

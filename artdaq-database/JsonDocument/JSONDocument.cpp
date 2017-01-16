@@ -120,6 +120,32 @@ JSONDocument JSONDocument::findChild(path_t const& path) const try {
   throw;
 }
 
+//returns found child value as a document
+JSONDocument JSONDocument::findChildDocument(path_t const& path) const try {
+  TRACE_(6, "findChildDocument() begin json_buffer=<" << cached_json_buffer() << ">");
+  TRACE_(6, "findChildDocument() args  path=<" << path << ">");
+
+  validate(path, "findChildDocument");
+
+  auto const& found_value = findChildValue(path);
+
+  if(type(found_value) != type_t::OBJECT) {
+      throw notfound_exception("JSONDocument")
+          << "Failed calling findChildDocument(): Search failed for" << path
+          << ", value_t is not object_t; value=" << print_visitor(found_value);    
+  }    
+    
+  auto returnValue = JSONDocument(found_value);
+
+  TRACE_(6, "findChildDocument() resultDocument=<" << returnValue.cached_json_buffer() << ">");
+  TRACE_(6, "findChildDocument() Find succeeded.");
+
+  return returnValue;
+} catch (std::exception& ex) {
+  TRACE_(6, "findChildDocument() Search failed; Error:" << ex.what());
+  throw;
+}
+
 // returns old child
 JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t const& path) try {
   TRACE_(4, "replaceChild() begin json_buffer=<" << cached_json_buffer() << ">");

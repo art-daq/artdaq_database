@@ -45,51 +45,6 @@ using artdaq::database::mongo::DBConfig;
 using artdaq::database::mongo::MongoDB;
 using artdaq::database::basictypes::JsonData;
 
-DBConfig::DBConfig()
-    : uri{std::string{literal::MONGOURI} + literal::hostname + ":" + literal::port + "/" + literal::db_name} {
-  auto tmpURI =
-      getenv("ARTDAQ_DATABASE_URI") ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
-
-  if (tmpURI.back() == '/') tmpURI.pop_back();  // remove trailing slash
-
-  auto prefixURI = std::string{literal::MONGOURI};
-  if (tmpURI.length() > prefixURI.length() && std::equal(prefixURI.begin(), prefixURI.end(), tmpURI.begin()))
-    uri = tmpURI;
-}
-
-DBConfig::DBConfig(std::string uri_) : uri{uri_} { confirm(!uri_.empty()); }
-
-MongoDB::MongoDB(DBConfig const& config, PassKeyIdiom const&)
-    : _config{config},
-      _instance{},
-      _client{mongocxx::uri{_config.connectionURI()}},
-      _connection{_client[_client.uri().database()]} {}
-
-mongocxx::cursor MongoDB::list_databases() {
-  connection();
-  return _client.list_databases();
-}
-
-mongocxx::database& MongoDB::connection() {
-  // if (_connection.has_collection(system_metadata)) return _connection;
-
-  auto collection = _connection.collection(system_metadata);
-  auto filter = bsoncxx::builder::core(false);
-
-  if (collection.count(filter.view_document()) > 0) return _connection;
-
-  auto bson_document = bsoncxx::from_json(
-      "{" + make_database_metadata("artdaq", expand_environment_variables(_config.connectionURI())) + "}");
-
-  auto result = collection.insert_one(bson_document.view());
-
-  auto object_id = object_id_t(bsoncxx::to_json(result->inserted_id()));
-
-  TRACE_(5, "StorageProvider::MongoDB::connection created metadata record id=" << object_id);
-
-  return _connection;
-}
-
 namespace artdaq {
 namespace database {
 template <>

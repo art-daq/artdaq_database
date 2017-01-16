@@ -161,13 +161,13 @@ bool test_insert(std::string const& source_fcl, std::string const& compare_fcl,s
     auto database = DBI::DB::create(config);
     auto provider = DBI::DBProvider<JsonData>::create(database);
 
-    auto colle11ctionName=std::string("testFHICL_V001");
+    auto collectionName=std::string("testFHICL_V001");
 
-    auto json = JsonData {"{\"document\":" + insert.to_string() + ", \"collection\":\"" +colle11ctionName +"\"}"};
+    auto json = JsonData {"{\"document\":" + insert.to_string() + ", \"collection\":\"" +collectionName +"\"}"};
 
     auto object_id =  provider->store(json);
 
-    auto search = JsonData {"{\"filter\":" + ( filter.empty()?object_id:filter)+ ", \"collection\":\"" +colle11ctionName +"\"}"};
+    auto search = JsonData {"{\"filter\":" + ( filter.empty()?object_id:filter)+ ", \"collection\":\"" +collectionName +"\"}"};
 
     std::cout << "Search criteria " <<  search.json_buffer << "\n";
 
@@ -220,13 +220,13 @@ bool test_search1(std::string const& source_fcl, std::string const& compare_fcl,
     auto database = DBI::DB::create(config);
     auto provider = DBI::DBProvider<JsonData>::create(database);
 
-    auto colle11ctionName=std::string("testFHICL_V001");
+    auto collectionName=std::string("testFHICL_V001");
 
-    auto json = JsonData {"{\"document\":" + insert.to_string() + ", \"collection\":\"" +colle11ctionName +"\"}"};
+    auto json = JsonData {"{\"document\":" + insert.to_string() + ", \"collection\":\"" +collectionName +"\"}"};
 
     auto object_id =  provider->store(json);
 
-    auto search = JsonData {"{\"filter\":" + ( filter.empty()?object_id:filter)+ ", \"collection\":\"" +colle11ctionName +"\"}"};
+    auto search = JsonData {"{\"filter\":" + ( filter.empty()?object_id:filter)+ ", \"collection\":\"" +collectionName +"\"}"};
 
     std::cout << "Search criteria " <<  search.json_buffer << "\n";
 
@@ -270,9 +270,9 @@ bool test_search2(std::string const& source_fcl, std::string const& compare_fcl,
     auto database = DBI::DB::create(config);
     auto provider = DBI::DBProvider<JsonData>::create(database);
 
-    auto colle11ctionName=std::string("testFHICL_V001");
+    auto collectionName=std::string("testFHICL_V001");
 
-    auto json = JsonData {"{\"document\":" + source.json_buffer + ", \"collection\":\"" +colle11ctionName +"\"}"};
+    auto json = JsonData {"{\"document\":" + source.json_buffer + ", \"collection\":\"" +collectionName +"\"}"};
 
     auto repeatCount = std::size_t {10};
 
@@ -293,7 +293,7 @@ bool test_search2(std::string const& source_fcl, std::string const& compare_fcl,
 
     auto filter = oss.str();
 
-    auto search = JsonData {"{\"filter\":" + ( filter.empty()?options:filter)+ ", \"collection\":\"" +colle11ctionName +"\"}"};
+    auto search = JsonData {"{\"filter\":" + ( filter.empty()?options:filter)+ ", \"collection\":\"" +collectionName +"\"}"};
 
     std::cout << "Search criteria " <<  search.json_buffer << "\n";
 
@@ -322,14 +322,14 @@ bool test_update(std::string const& source_fcl, std::string const& compare_fcl,s
 
     //validate source
     auto insert = JSONDocument(source.json_buffer);
-    insert.deleteChild(literal::comments_node);
+    insert.deleteChild(literal::comments);
 
     //validate compare
     auto expected = JSONDocument(compare.json_buffer);
-    expected.deleteChild(literal::comments_node);
+    expected.deleteChild(literal::comments);
 
     auto changes = JSONDocument(update.json_buffer);
-    changes.deleteChild(literal::comments_node);
+    changes.deleteChild(literal::comments);
 
     namespace DBI= artdaq::database::mongo;
 
@@ -337,13 +337,13 @@ bool test_update(std::string const& source_fcl, std::string const& compare_fcl,s
     auto database = DBI::DB::create(config);
     auto provider = DBI::DBProvider<JsonData>::create(database);
 
-    auto colle11ctionName=std::string("testFHICL_V001");
+    auto collectionName=std::string("testFHICL_V001");
 
-    auto json = JsonData {"{\"document\":" + insert.to_string() + ", \"collection\":\"" +colle11ctionName +"\"}"};
+    auto json = JsonData {"{\"document\":" + insert.to_string() + ", \"collection\":\"" +collectionName +"\"}"};
 
     auto object_id =  provider->store(json);
 
-    auto search = JsonData {"{\"filter\":" + object_id + ", \"collection\":\"" +colle11ctionName +"\"}"};
+    auto search = JsonData {"{\"filter\":" + object_id + ", \"collection\":\"" +collectionName +"\"}"};
 
     std::cout << "Search criteria " <<  search.json_buffer << "\n";
 
@@ -363,7 +363,7 @@ bool test_update(std::string const& source_fcl, std::string const& compare_fcl,s
     auto payload = changes.findChild("document");
     result.replaceChild(payload,"document");
 
-    json = JsonData {"{\"document\":" + result.to_string() + ", \"filter\":" + object_id +  ",\"collection\":\"" +colle11ctionName +"\"}"};
+    json = JsonData {"{\"document\":" + result.to_string() + ", \"filter\":" + object_id +  ",\"collection\":\"" +collectionName +"\"}"};
 
     object_id =  provider->store(json);
 

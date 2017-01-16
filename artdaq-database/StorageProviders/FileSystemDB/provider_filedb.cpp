@@ -32,51 +32,6 @@ using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocument;
 
 
-  DBConfig::DBConfig() : uri{std::string{literal::FILEURI} + "${ARTDAQ_DATABASE_DATADIR}/filesystemdb" + "/" + literal::db_name} {
-    auto tmpURI = getenv("ARTDAQ_DATABASE_URI") ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
-
-    if (tmpURI.back() == '/') tmpURI.pop_back();  // remove trailing slash
-
-    auto prefixURI = std::string{literal::FILEURI};
-
-    if (tmpURI.length() > prefixURI.length() && std::equal(prefixURI.begin(), prefixURI.end(), tmpURI.begin())) uri = tmpURI;
-  }
-
-  DBConfig::DBConfig(std::string uri_) : uri{uri_} { confirm(!uri_.empty()); }
-
-   FileSystemDB::FileSystemDB(DBConfig const& config, PassKeyIdiom const&)
-      : _config{config}, _client{_config.connectionURI()}, _connection{_config.connectionURI() + "/"} {}
-  
-std::string& FileSystemDB::connection() {
-  auto collection = _connection + system_metadata;
-  collection = expand_environment_variables(collection);
-
-  if (collection.find(dbfsl::FILEURI) == 0) collection = collection.substr(strlen(dbfsl::FILEURI));
-
-  auto path = boost::filesystem::path(collection.c_str());
-
-  if (boost::filesystem::is_directory(path)) return _connection;
-
-  auto oid = generate_oid();
-
-  std::ostringstream oss;
-  oss << "{";
-  oss << make_database_metadata("artdaq", expand_environment_variables(_config.connectionURI())) << ",";
-  oss << "\"_id\": { \"_oid\":\"" << oid << "\"}";
-  oss << "}";
-
-  auto filename = mkdir(collection) + oid + ".json";
-
-  std::ofstream os(filename);
-  auto json = oss.str();
-  std::copy(json.begin(), json.end(), std::ostream_iterator<char>(os));
-  os.close();
-
-  TRACE_(5, "StorageProvider::FileSystemDB::connection created metadata record id=" << oid << ", path=" << path.c_str());
-
-  return _connection;
-}
-
 namespace artdaq {
 namespace database {  
 template <>
@@ -100,6 +55,8 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::load(JsonData const
   auto index_path = boost::filesystem::path(dir_name.c_str()).append(dbfsl::search_index);
 
   SearchIndex search_index(index_path);
+
+  TRACE_(3, "StorageProvider::FileSystemDB::load() search_filter=<" << search_filter << ">.");
 
   auto oids = search_index.findDocumentIDs(search_filter);
 
@@ -128,14 +85,13 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::store(JsonData const& data)
   TRACE_(4, "StorageProvider::FileSystemDB::store() begin");
   TRACE_(4, "StorageProvider::FileSystemDB::store() args data=<" << data.json_buffer << ">");
 
-  JSONDocumentBuilder builder{data.json_buffer};
-
-  auto collection_name = builder.extract().findChild("collection").value();
+  auto task_document = JSONDocument{data.json_buffer};
+  auto collection_name = task_document.findChild("collection").value();
 
   auto oid = object_id_t{ouid_invalid};
 
   try {
-    auto filter = builder.extract().findChild("filter").value();
+    auto filter = task_document.findChild("filter").value();
     TRACE_(4, "StorageProvider::FileSystemDB::store() found filter=<" << filter << ">.");
     oid = extract_oid(filter);
     TRACE_(4, "StorageProvider::FileSystemDB::store() using provided oid=<" << oid << ">.");
@@ -148,7 +104,12 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::store(JsonData const& data)
 
   std::ostringstream oss;
   oss << "{ \"_id\":\"" << oid << "\"}";
+  
+  
+  auto document= task_document.findChildDocument("document");  
+  JSONDocumentBuilder builder(document);
   builder.setObjectID({oss.str()});
+  builder.setCollection(task_document);
 
   TRACE_(4, "StorageProvider::FileSystemDB::store() using generated oid=<" << oid << ">.");
 
@@ -164,7 +125,7 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::store(JsonData const& data)
 
   std::ofstream os(filename);
 
-  auto json = builder.extract().findChild("document").value();
+  auto json = builder.to_string();
 
   std::copy(json.begin(), json.end(), std::ostream_iterator<char>(os));
 

@@ -327,7 +327,13 @@ void JSONDocumentBuilder::_importUserData(JSONDocument const& document) {
 
 std::string JSONDocument::value(JSONDocument const& document) {
   TRACE_(14, "value() document=<" << document.cached_json_buffer() << ">");
-  return tostring_visitor(document.getPayloadValueForKey("null"));
+  
+  auto docValue = document.getPayloadValueForKey("null");
+
+  if (type(docValue) == type_t::OBJECT)
+    return JSONDocument{docValue}.to_string();
+  else
+    return tostring_visitor(docValue);
 }
 
 std::string JSONDocument::value_at(JSONDocument const& document, std::size_t index) try {

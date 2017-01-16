@@ -148,6 +148,24 @@ JSONDocumentBuilder& JSONDocumentBuilder::setVersion(JSONDocument const& version
   return self();
 }
 
+JSONDocumentBuilder& JSONDocumentBuilder::setCollection(JSONDocument const& collection) try {
+  TRACE_(6, "collection() args  collection=<" << collection << ">");
+
+  auto copy =collection.findChild(jsonliteral::collection);
+  auto ovl = std::make_unique<ovl::ovlCollection>(jsonliteral::collection, copy.findChildValue(jsonliteral::collection));
+
+  ThrowOnFailure(SaveUndo());
+  ThrowOnFailure(_overlay->setCollection(ovl));
+  _document.writeJson();
+
+  return self();
+} catch (std::exception const& ex) {
+  TRACE_(6, "collection() Exception:" << ex.what());
+  ThrowOnFailure(CallUndo());
+
+  return self();
+}
+
 JSONDocumentBuilder& JSONDocumentBuilder::addEntity(JSONDocument const& entity) try {
   TRACE_(9, "addEntity() args  entity=<" << entity << ">");
 

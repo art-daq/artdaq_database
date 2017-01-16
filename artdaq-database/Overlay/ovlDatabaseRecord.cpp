@@ -69,6 +69,14 @@ result_t ovlDatabaseRecord::swap(ovlVersionUPtr_t& version) {
   return _version->ovlKeyValue::swap(version.get());
 }
 
+result_t ovlDatabaseRecord::swap(ovlCollectionUPtr_t& collection) {
+  confirm(collection);
+
+  if (isReadonly()) return Failure(msg_IsReadonly);
+
+  return _collection->ovlKeyValue::swap(collection.get());
+}
+
 /*
 ovlConfigurableEntity& ovlDatabaseRecord::configurableEntity() { return _entities; }
 
@@ -206,6 +214,20 @@ result_t ovlDatabaseRecord::setVersion(ovlVersionUPtr_t& version) {
   auto update = std::string("setVersion");
 
   return _bookkeeping->postUpdate(update, _version);
+}
+
+result_t ovlDatabaseRecord::setCollection(ovlCollectionUPtr_t& collection) {
+  confirm(collection);
+
+  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+
+  auto result = swap(collection);
+
+  if (!result.first) return result;
+
+  auto update = std::string("setCollection");
+
+  return _bookkeeping->postUpdate(update, _collection);
 }
 
 result_t ovlDatabaseRecord::addEntity(ovlConfigurableEntityUPtr_t& entity) {

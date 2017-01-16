@@ -84,6 +84,8 @@ class ovlDatabaseRecord final : public ovlKeyValue {
   result_t swap(ovlCommentsUPtr_t& /*comments*/);
   result_t swap(ovlOriginUPtr_t& /*origin*/);
   result_t swap(ovlVersionUPtr_t& /*version*/);
+  result_t swap(ovlCollectionUPtr_t& /*collection*/);
+
   result_t swap(ovlIdUPtr_t& /*id*/);
 
   // overrides
@@ -108,6 +110,7 @@ class ovlDatabaseRecord final : public ovlKeyValue {
   result_t removeEntity(ovlConfigurableEntityUPtr_t& /*entity*/);
 
   result_t setVersion(ovlVersionUPtr_t& /*version*/);
+  result_t setCollection(ovlCollectionUPtr_t& /*version*/);
 
  private:
   ovlDocumentUPtr_t _document;

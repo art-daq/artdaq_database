@@ -28,7 +28,9 @@ class JSONDocument final {
   JSONDocument deleteChild(path_t const&);
   // returns found child
   JSONDocument findChild(path_t const&) const;
-
+  //returns found child value as a document
+  JSONDocument findChildDocument(path_t const&) const;
+  
   // returns added child
   JSONDocument appendChild(JSONDocument const&, path_t const&);
   // returns removed child
