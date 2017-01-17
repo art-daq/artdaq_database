@@ -23,7 +23,8 @@ ovlDatabaseRecord::ovlDatabaseRecord(value_t& record)
       _collection{overlay<ovlCollection, std::string>(record, jsonliteral::collection)},
       _aliases{overlay<ovlAliases>(record, jsonliteral::aliases)},
       _runs{overlay<ovlRuns, array_t>(record, jsonliteral::runs)},
-      _attachments{overlay<ovlAttachments, array_t>(record, jsonliteral::attachments)} {}
+      _attachments{overlay<ovlAttachments, array_t>(record, jsonliteral::attachments)},
+      _configurationtype{overlay<ovlConfigurationType, std::string>(record, jsonliteral::configurationtype)} {}
 
 ovlDocument& ovlDatabaseRecord::document() { return *_document; }
 
@@ -120,6 +121,7 @@ std::string ovlDatabaseRecord::to_string() const noexcept {
   oss << debrace(_entities->to_string()) << ",\n";
   oss << debrace(_runs->to_string()) << ",\n";
   oss << debrace(_attachments->to_string()) << ",\n";
+  oss << debrace(_configurationtype->to_string()) << ",\n";
   oss << debrace(_configurations->to_string()) << ",\n";
   oss << debrace(_comments->to_string()) << ",\n";
   oss << debrace(_document->to_string()) << "\n";
@@ -216,6 +218,20 @@ result_t ovlDatabaseRecord::setVersion(ovlVersionUPtr_t& version) {
   return _bookkeeping->postUpdate(update, _version);
 }
 
+result_t ovlDatabaseRecord::setConfigurationType(ovlConfigurationTypeUPtr_t& configtype) {
+  confirm(configtype);
+
+  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+
+  auto result = swap(configtype);
+
+  if (!result.first) return result;
+
+  auto update = std::string("setConfigurationType");
+
+  return _bookkeeping->postUpdate(update, _configurationtype);
+}
+
 result_t ovlDatabaseRecord::setCollection(ovlCollectionUPtr_t& collection) {
   confirm(collection);
 
@@ -280,6 +296,10 @@ result_t ovlDatabaseRecord::operator==(ovlDatabaseRecord const& other) const {
   if (!result.first) oss << result.second;
 
   result = *_collection == *other._collection;
+
+  if (!result.first) oss << result.second;
+
+  result = *_configurationtype == *other._configurationtype;
 
   if (!result.first) oss << result.second;
   

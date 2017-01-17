@@ -70,7 +70,7 @@ constexpr auto search = "search";
 constexpr auto query = "query";
 constexpr auto operations = "operations";
 constexpr auto document="document";
-
+constexpr auto configurationtype="configtype";
 constexpr auto gui_data = "guidata";
 constexpr auto converted = "converted";
 constexpr auto notprovided = "notprovided";
