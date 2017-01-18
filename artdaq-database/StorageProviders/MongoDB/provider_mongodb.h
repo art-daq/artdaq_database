@@ -11,6 +11,7 @@ namespace database {
 namespace mongo {
 namespace debug {
 void enable();
+void enableReadWrite();
 }
 
 namespace literal {

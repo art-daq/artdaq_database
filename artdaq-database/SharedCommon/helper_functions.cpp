@@ -71,6 +71,28 @@ std::string db::generate_oid() {
   return oid;
 }
 
+
+std::string db::to_id(std::string const& oid) {
+  confirm(!oid.empty());
+  
+  std::ostringstream oss;
+  oss << "{" << "_id"_quoted << ":{";
+  oss << "$oid"_quoted << ":" << quoted_(oid);
+  oss << "} }";
+  
+  return oss.str();
+}
+
+std::string db::to_json(std::string const& key,std::string const& value ) {
+  confirm(!key.empty());
+  confirm(!value.empty());
+  
+  std::ostringstream oss;
+  oss << "{" << quoted_(key) << ":" << quoted_(value) << "}"; 
+  return oss.str();
+}
+
+
 std::string db::expand_environment_variables(std::string var) {
   wordexp_t p;
   char** w;

@@ -42,7 +42,7 @@ void prov::store(LoadStoreOperation const& options, JsonData const& insert_paylo
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JsonData>::create(database);
-  auto object_id = provider->store(insert_payload);
+  auto object_id = provider->writeConfiguration(insert_payload);
 
   TRACE_(15, "store: object_id=<" << object_id << ">");
 
@@ -67,7 +67,7 @@ JsonData prov::load(LoadStoreOperation const& options, JsonData const& search_pa
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JsonData>::create(database);
 
-  auto collection = provider->load(search_payload);
+  auto collection = provider->readConfiguration(search_payload);
 
   TRACE_(16, "load_configuration: "
                  << "Search returned " << collection.size() << " results.");

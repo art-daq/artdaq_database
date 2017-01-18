@@ -93,6 +93,8 @@ std::vector<object_id_t> SearchIndex::findDocumentIDs(JsonData const& search) {
                                                 "to write an AST to json.";
       }
 
+      TRACE_(5,"StorageProvider::FileSystemDB::index::findDocumentIDs() search_criterion.value.type() == typeid(jsn::object_t)," <<" key=<" << search_criterion.key <<">");
+      
       auto matches = (this->*runMatchingFunction(search_criterion.key))(json);
 
       ouids.insert(ouids.end(), matches.begin(), matches.end());
@@ -320,11 +322,12 @@ bool SearchIndex::addDocument(JsonData const& document, object_id_t const& ouid)
     }
 
     try {
-      auto configurable_entity = boost::get<object_t>(doc_ast.at("configurable_entity"));
-      auto entity_name = boost::get<std::string>(configurable_entity.at("name"));
+      auto entities = boost::get<jsn::array_t>(doc_ast.at("entities"));
 
+    for (auto const& entity : entities) {
+      auto entity_name = boost::get<std::string>(boost::get<jsn::object_t>(entity).at("name"));
       _addConfigurableEntity(ouid, entity_name);
-
+    }
     } catch (...) {
       TRACE_(5,
              "StorageProvider::FileSystemDB::index::addDocument() Failed to "
@@ -770,6 +773,8 @@ std::vector<object_id_t> SearchIndex::_matchObjectIds(std::string const& objecti
     return ouids;
   }
 
+  
+  try {
   auto ouid_list = boost::get<jsn::array_t>(objectids_ast.at("$in"));
 
   TRACE_(5, "StorageProvider::FileSystemDB::index::_matchObjectIds() found " << ouid_list.size() << " ouids.");
@@ -779,7 +784,18 @@ std::vector<object_id_t> SearchIndex::_matchObjectIds(std::string const& objecti
     TRACE_(16, "StorageProvider::FileSystemDB::index::_matchObjectIds() found ouid=<" << ouid << ">.");
     ouids.push_back(ouid);
   }
-
+  }catch(...){
+    TRACE_(16, "StorageProvider::FileSystemDB::index::_matchObjectIds() has no $in");
+  }
+  
+  try {
+    auto const& ouid = boost::get<std::string>(boost::get<jsn::object_t>(objectids_ast).at("$oid"));
+    TRACE_(16, "StorageProvider::FileSystemDB::index::_matchObjectIds() found ouid=<" << ouid << ">.");
+    ouids.push_back(ouid);
+  }catch(...){
+    TRACE_(16, "StorageProvider::FileSystemDB::index::_matchObjectIds() has no $oid");
+  }
+  
   TRACE_(15, "StorageProvider::FileSystemDB::index::_matchObjectIds() Found " << ouids.size() << " documents");
 
   return ouids;

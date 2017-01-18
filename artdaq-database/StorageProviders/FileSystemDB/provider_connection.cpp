@@ -31,6 +31,8 @@ using artdaq::database::basictypes::JsonData;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocument;
 
+namespace jsonliteral = artdaq::database::dataformats::literal;
+
 
   DBConfig::DBConfig() : uri{std::string{literal::FILEURI} + "${ARTDAQ_DATABASE_DATADIR}/filesystemdb" + "/" + literal::db_name} {
     auto tmpURI = getenv("ARTDAQ_DATABASE_URI") ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
@@ -62,7 +64,8 @@ std::string& FileSystemDB::connection() {
   std::ostringstream oss;
   oss << "{";
   oss << make_database_metadata("artdaq", expand_environment_variables(_config.connectionURI())) << ",";
-  oss << "\"_id\": { \"_oid\":\"" << oid << "\"}";
+  oss <<  db::quoted_(jsonliteral::id) << ": { ";
+  oss <<  db::quoted_(jsonliteral::oid) << ":" << db::quoted_(oid) << "}";
   oss << "}";
 
   auto filename = mkdir(collection) + oid + ".json";

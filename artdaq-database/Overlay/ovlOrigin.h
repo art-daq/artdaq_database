@@ -30,7 +30,7 @@ class ovlOrigin final : public ovlKeyValue {
   // accessors
   std::string& format();
   std::string const& format() const;
-  
+
   std::string& name();
   std::string const& name() const;
 

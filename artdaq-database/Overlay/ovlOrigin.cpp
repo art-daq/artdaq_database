@@ -51,7 +51,7 @@ bool ovlOrigin::init(value_t& parent) try {
 
   if (obj.count(jsonliteral::name) == 0) obj[jsonliteral::name] = std::string{jsonliteral::notprovided};
   confirm(obj.count(jsonliteral::name) == 1);
-  
+
   if (obj.count(jsonliteral::format) == 0) obj[jsonliteral::format] = "json"s;
   confirm(obj.count(jsonliteral::format) == 1);
 
@@ -79,7 +79,7 @@ result_t ovlOrigin::operator==(ovlOrigin const& other) const {
 
   if (name() != other.name())
     oss << "\n  File names are different: self,other=" << quoted_(name()) << "," << quoted_(other.name());
-  
+
   if (source() != other.source())
     oss << "\n  Sources are different: self,other=" << quoted_(source()) << "," << quoted_(other.source());
 

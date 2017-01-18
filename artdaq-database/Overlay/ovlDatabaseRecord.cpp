@@ -31,9 +31,7 @@ ovlDocument& ovlDatabaseRecord::document() { return *_document; }
 result_t ovlDatabaseRecord::swap(ovlDocumentUPtr_t& document) {
   if (isReadonly()) return Failure(msg_IsReadonly);
 
-  std::swap(_document, document);
-
-  return Success();
+  return _document->ovlKeyValue::swap(document.get());
 }
 
 ovlComments& ovlDatabaseRecord::comments() { return *_comments; }
@@ -43,9 +41,7 @@ result_t ovlDatabaseRecord::swap(ovlCommentsUPtr_t& comments) {
 
   if (isReadonly()) return Failure(msg_IsReadonly);
 
-  std::swap(_comments, comments);
-
-  return Success();
+  return _comments->ovlKeyValue::swap(comments.get());
 }
 
 ovlOrigin& ovlDatabaseRecord::origin() { return *_origin; }
@@ -55,9 +51,7 @@ result_t ovlDatabaseRecord::swap(ovlOriginUPtr_t& origin) {
 
   if (isReadonly()) return Failure(msg_IsReadonly);
 
-  std::swap(_origin, origin);
-
-  return Success();
+  return _origin->ovlKeyValue::swap(origin.get());
 }
 
 ovlVersion& ovlDatabaseRecord::version() { return *_version; }
@@ -68,6 +62,14 @@ result_t ovlDatabaseRecord::swap(ovlVersionUPtr_t& version) {
   if (isReadonly()) return Failure(msg_IsReadonly);
 
   return _version->ovlKeyValue::swap(version.get());
+}
+
+result_t ovlDatabaseRecord::swap(ovlConfigurationTypeUPtr_t& configtype) {
+  confirm(configtype);
+
+  if (isReadonly()) return Failure(msg_IsReadonly);
+
+  return _configurationtype->ovlKeyValue::swap(configtype.get());
 }
 
 result_t ovlDatabaseRecord::swap(ovlCollectionUPtr_t& collection) {
@@ -103,9 +105,7 @@ result_t ovlDatabaseRecord::swap(ovlIdUPtr_t& id) {
 
   if (isReadonly()) return Failure(msg_IsReadonly);
 
-  std::swap(_id, id);
-
-  return Success();
+  return _id->ovlKeyValue::swap(id.get());
 }
 
 std::string ovlDatabaseRecord::to_string() const noexcept {
@@ -113,7 +113,7 @@ std::string ovlDatabaseRecord::to_string() const noexcept {
   oss << "{";
   oss << debrace(_id->to_string()) << ",\n";
   oss << debrace(_collection->to_string()) << ",\n";
-  oss << debrace(_version->to_string()) << ",\n";  
+  oss << debrace(_version->to_string()) << ",\n";
   oss << debrace(_origin->to_string()) << ",\n";
   oss << debrace(_aliases->to_string()) << ",\n";
   oss << debrace(_bookkeeping->to_string()) << ",\n";
@@ -302,7 +302,7 @@ result_t ovlDatabaseRecord::operator==(ovlDatabaseRecord const& other) const {
   result = *_configurationtype == *other._configurationtype;
 
   if (!result.first) oss << result.second;
-  
+
   result = *_configurations == *other._configurations;
 
   if (!result.first) oss << result.second;
@@ -330,7 +330,7 @@ result_t ovlDatabaseRecord::operator==(ovlDatabaseRecord const& other) const {
   result = *_aliases == *other._aliases;
 
   if (!result.first) oss << result.second;
-  
+
   result = *_attachments == *other._attachments;
 
   if (!result.first) oss << result.second;

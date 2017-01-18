@@ -33,8 +33,8 @@ class StorageProvider final {
   StorageProvider(std::shared_ptr<IMPL> const& provider, PassKeyIdiom const&) : _provider(provider) {}
 
   template <typename FILTER>
-  std::list<TYPE> load(FILTER const&);
-  object_id_t store(TYPE const&);
+  std::list<TYPE> readConfiguration(FILTER const&);
+  object_id_t writeConfiguration(TYPE const&);
 
   template <typename FILTER>
   std::list<FILTER> findGlobalConfigs(FILTER const&);

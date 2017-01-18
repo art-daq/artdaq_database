@@ -34,13 +34,13 @@ using ovlAliasUPtr_t = std::unique_ptr<ovlAlias>;
 using ovlConfiguration = ovlKeyValueTimeStamp<DOCUMENT_COMPARE_MUTE_CONFIGURATION>;
 using ovlConfigurationUPtr_t = std::unique_ptr<ovlConfiguration>;
 
-using ovlConfigurationType = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_VERSION>;
+using ovlConfigurationType = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_CONFIGURATION>;
 using ovlConfigurationTypeUPtr_t = std::unique_ptr<ovlConfigurationType>;
 
 using ovlRun = ovlKeyValueTimeStamp<DOCUMENT_COMPARE_MUTE_RUN>;
 using ovlRunUPtr_t = std::unique_ptr<ovlRun>;
 
-using ovlAttachment =ovlKeyValue;
+using ovlAttachment = ovlKeyValue;
 using ovlAttachmentUPtr_t = std::unique_ptr<ovlAttachment>;
 
 using ovlConfigurableEntity = ovlKeyValueTimeStamp<DOCUMENT_COMPARE_MUTE_CONFIGENTITY>;
@@ -87,6 +87,7 @@ class ovlDatabaseRecord final : public ovlKeyValue {
   result_t swap(ovlCommentsUPtr_t& /*comments*/);
   result_t swap(ovlOriginUPtr_t& /*origin*/);
   result_t swap(ovlVersionUPtr_t& /*version*/);
+  result_t swap(ovlConfigurationTypeUPtr_t& /*configtype*/);
   result_t swap(ovlCollectionUPtr_t& /*collection*/);
 
   result_t swap(ovlIdUPtr_t& /*id*/);
@@ -115,7 +116,7 @@ class ovlDatabaseRecord final : public ovlKeyValue {
   result_t setVersion(ovlVersionUPtr_t& /*version*/);
   result_t setCollection(ovlCollectionUPtr_t& /*version*/);
   result_t setConfigurationType(ovlConfigurationTypeUPtr_t& /*configtype*/);
-    
+
  private:
   ovlDocumentUPtr_t _document;
   ovlCommentsUPtr_t _comments;

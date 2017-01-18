@@ -27,7 +27,9 @@ std::string expand_environment_variables(std::string /*var*/);
 object_id_t extract_oid(std::string const&);
 
 std::string generate_oid();
-
+std::string to_id(std::string const& /*oid*/);
+std::string to_json(std::string const& /*key*/,std::string const& /*value*/ );
+  
 template <typename T>
 constexpr std::uint8_t static_cast_as_uint8_t(T const& t) {
   return static_cast<std::uint8_t>(t);

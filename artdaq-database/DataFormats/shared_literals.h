@@ -18,7 +18,7 @@ constexpr auto prolog = "prolog";
 constexpr auto entities = "entities";
 constexpr auto configurations = "configurations";
 constexpr auto id = "_id";
-constexpr auto oid = "_oid";
+constexpr auto oid = "$oid";
 constexpr auto includes = "includes";
 constexpr auto timestamp = "timestamp";
 constexpr auto source = "source";
@@ -74,6 +74,8 @@ constexpr auto configurationtype="configtype";
 constexpr auto gui_data = "guidata";
 constexpr auto converted = "converted";
 constexpr auto notprovided = "notprovided";
+
+constexpr auto filter = "filter";
 
 namespace regex {
 constexpr auto parse_double = "-?\\d*\\.?\\d+e[+-]?\\d+";

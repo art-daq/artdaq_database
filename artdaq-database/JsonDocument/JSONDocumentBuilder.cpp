@@ -114,8 +114,8 @@ JSONDocumentBuilder& JSONDocumentBuilder::setObjectID(JSONDocument const& object
   TRACE_(8, "setObjectID() args  objectId=<" << objectId << ">");
 
   JSONDocument copy(objectId);
-  auto id = overlay<ovl::ovlId>(copy, jsonliteral::id);
-
+  auto id = std::make_unique<ovl::ovlId>(jsonliteral::id, copy.findChildValue(jsonliteral::id));
+  
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->swap(id));
 

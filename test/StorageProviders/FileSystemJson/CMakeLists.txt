@@ -1,14 +1,10 @@
 cet_make_exec(FileSystemJson_t
   LIBRARIES
-    
+  artdaq-database_SharedCommon
   artdaq-database_BasicTypes
-  artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
   artdaq-database_StorageProviders_FileSystemDB
-  ${FHICLCPP}
-  ${SQLITE3}
-  ${CETLIB}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}  
 ) 
 

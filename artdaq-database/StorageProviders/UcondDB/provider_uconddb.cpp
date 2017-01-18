@@ -11,6 +11,7 @@
 
 namespace db = artdaq::database;
 namespace dbfsl = db::ucond::literal;
+namespace jsonliteral = artdaq::database::dataformats::literal;
 
 namespace artdaq {
 namespace database {
@@ -44,20 +45,20 @@ std::string& UcondDB::connection() { return _connection; }
       
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, UcondDB>::load(JsonData const& filter) {
-  TRACE_(3, "StorageProvider::UcondDB::load() begin");
-  TRACE_(3, "StorageProvider::UcondDB::load() args search=<" << filter.json_buffer << ">");
+std::list<JsonData> StorageProvider<JsonData, UcondDB>::readConfiguration(JsonData const& filter) {
+  TRACE_(3, "StorageProvider::UcondDB::readConfiguration() begin");
+  TRACE_(3, "StorageProvider::UcondDB::readConfiguration() args search=<" << filter.json_buffer << ">");
   auto returnCollection = std::list<JsonData>();
 
-  throw runtime_error("UcondDB") << "StorageProvider::UcondDB::load() is not implemented";
+  throw runtime_error("UcondDB") << "StorageProvider::UcondDB::readConfiguration() is not implemented";
 
   return returnCollection;
 }
 
 template <>
-object_id_t StorageProvider<JsonData, UcondDB>::store(JsonData const& data) {
-  TRACE_(4, "StorageProvider::FileSystemDB::store() begin");
-  TRACE_(4, "StorageProvider::FileSystemDB::store() args data=<" << data.json_buffer << ">");
+object_id_t StorageProvider<JsonData, UcondDB>::writeConfiguration(JsonData const& data) {
+  TRACE_(4, "StorageProvider::FileSystemDB::writeConfiguration() begin");
+  TRACE_(4, "StorageProvider::FileSystemDB::writeConfiguration() args data=<" << data.json_buffer << ">");
 
   JSONDocumentBuilder builder{data.json_buffer};
 
@@ -67,9 +68,9 @@ object_id_t StorageProvider<JsonData, UcondDB>::store(JsonData const& data) {
 
   try {
     auto filter = builder.extract().findChild("filter").value();
-    TRACE_(4, "StorageProvider::FileSystemDB::store() found filter=<" << filter << ">.");
+    TRACE_(4, "StorageProvider::FileSystemDB::writeConfiguration() found filter=<" << filter << ">.");
     oid = extract_oid(filter);
-    TRACE_(4, "StorageProvider::FileSystemDB::store() using provided oid=<" << oid << ">.");
+    TRACE_(4, "StorageProvider::FileSystemDB::writeConfiguration() using provided oid=<" << oid << ">.");
   } catch (...) {
   }
 
@@ -77,9 +78,14 @@ object_id_t StorageProvider<JsonData, UcondDB>::store(JsonData const& data) {
     oid = generate_oid();
   }
 
-  throw runtime_error("UcondDB") << "StorageProvider::UcondDB::store() is not implemented";
+  throw runtime_error("UcondDB") << "StorageProvider::UcondDB::writeConfiguration() is not implemented";
 
-  return {"{ \"$oid\" : \"" + oid + "\"}"};
+  std::ostringstream oss;
+  oss << "{ ";
+  oss << db::quoted_(jsonliteral::oid) << ":" << db::quoted_(oid);
+  oss << "}";
+
+  return {oss.str()};
 }
 
 template <>

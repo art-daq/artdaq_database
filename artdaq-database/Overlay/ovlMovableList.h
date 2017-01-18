@@ -170,10 +170,10 @@ result_t ovlMovableList<T, mask>::operator==(ovlMovableList const& other) const 
   if (_active.size() != other._active.size())
     oss << "\n  Different active " << key() << " count: self,other=" << _active.size() << "," << other._active.size();
 
-  auto key_name= key();
-  
+  auto key_name = key();
+
   if (oss.tellp() == noerror_pos && std::equal(_active.cbegin(), _active.end(), other._active.cbegin(),
-                                               [&oss,&key_name](auto const& first, auto const& second) -> bool {
+                                               [&oss, &key_name](auto const& first, auto const& second) -> bool {
                                                  auto result = first == second;
                                                  if (result.first) return true;
                                                  oss << "\n  " << key_name

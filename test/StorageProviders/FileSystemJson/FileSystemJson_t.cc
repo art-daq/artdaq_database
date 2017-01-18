@@ -27,8 +27,8 @@ bool test_update(std::string const&, std::string const&, std::string const&);
 
 int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
-  artdaq::database::docrecord::debug::enableJSONDocument();
-
+//  artdaq::database::docrecord::debug::enableJSONDocument();
+    artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
   debug::registerUngracefullExitHandlers();
   artdaq::database::useFakeTime(true);
 
@@ -146,14 +146,14 @@ bool test_insert(std::string const& source, std::string const& compare, std::str
 
   auto json = JsonData{"{\"document\":" + insert.to_string() + ", \"collection\":\"" + collectionName + "\"}"};
 
-  auto object_id = provider->store(json);
+  auto object_id = provider->writeConfiguration(json);
 
   auto search = JsonData{"{\"filter\":" + (filter.empty() ? object_id : filter) + ", \"collection\":\"" +
                          collectionName + "\"}"};
 
   std::cout << "Search criteria " << search.json_buffer << "\n";
 
-  auto collection = provider->load(search);
+  auto collection = provider->readConfiguration(search);
 
   if (collection.size() != 1) {
     std::cout << "Search returned " << collection.size() << " results.\n";
@@ -205,14 +205,14 @@ bool test_search1(std::string const& source, std::string const& compare, std::st
 
   auto json = JsonData{"{\"document\":" + insert.to_string() + ", \"collection\":\"" + collectionName + "\"}"};
 
-  auto object_id = provider->store(json);
+  auto object_id = provider->writeConfiguration(json);
 
   auto search = JsonData{"{\"filter\":" + (filter.empty() ? object_id : filter) + ", \"collection\":\"" +
                          collectionName + "\"}"};
 
   std::cout << "Search criteria " << search.json_buffer << "\n";
 
-  auto collection = provider->load(search);
+  auto collection = provider->readConfiguration(search);
 
   if (collection.size() != 1) {
     std::cout << "Search returned " << collection.size() << " results.\n";
@@ -262,17 +262,21 @@ bool test_search2(std::string const& source, std::string const& compare, std::st
 
   auto object_ids = std::vector<std::string>();
 
-  auto printComma = bool{false};
 
   std::ostringstream oss;
   oss << "{\"_id\" : { \"$in\" : [";
 
+  auto nodata_pos = oss.tellp();
+
   for (int i = repeatCount; i != 0; i--) {
-    auto object_id = provider->store(json);
+    auto object_id = provider->writeConfiguration(json);
     object_ids.push_back(object_id);
-    oss << (printComma ? ',' : ' ') << object_id;
-    printComma = true;
+    oss << JSONDocument(object_id).findChildDocument("_id").to_string() << ",";
   }
+  
+  if (oss.tellp() != nodata_pos) 
+    oss.seekp(-1, oss.cur);
+  
   oss << "]} }";
 
   auto filter = oss.str();
@@ -282,7 +286,7 @@ bool test_search2(std::string const& source, std::string const& compare, std::st
 
   std::cout << "Search criteria " << search.json_buffer << "\n";
 
-  auto collection = provider->load(search);
+  auto collection = provider->readConfiguration(search);
 
   if (collection.size() != repeatCount) {
     std::cout << "Search returned " << collection.size() << " results.\n";
@@ -320,13 +324,13 @@ bool test_update(std::string const& source, std::string const& compare, std::str
 
   auto json = JsonData{"{\"document\":" + insert.to_string() + ", \"collection\":\"" + collectionName + "\"}"};
 
-  auto object_id = provider->store(json);
+  auto object_id = provider->writeConfiguration(json);
 
   auto search = JsonData{"{\"filter\":" + object_id + ", \"collection\":\"" + collectionName + "\"}"};
 
   std::cout << "Search criteria " << search.json_buffer << "\n";
 
-  auto collection = provider->load(search);
+  auto collection = provider->readConfiguration(search);
 
   if (collection.size() != 1) {
     std::cout << "Search returned " << collection.size() << " results.\n";
@@ -338,15 +342,18 @@ bool test_update(std::string const& source, std::string const& compare, std::str
   }
 
   auto found = JSONDocument(collection.begin()->json_buffer);
-  found.deleteChild("_id");
-  found.replaceChild(updates, "document");
-
+  
+  std::cout << "Update candidate=<" << found.to_string() << ">\n";
+  auto displaced=found.replaceChild(updates, "document");
+  std::cout << "Update result=<" << found.to_string() << ">\n";
+  std::cout << "Displaced value=<" << displaced.to_string() << ">\n";
+  
   json = JsonData{"{\"document\":" + found.to_string() + ", \"filter\":" + object_id + ",\"collection\":\"" +
                   collectionName + "\"}"};
 
-  object_id = provider->store(json);
+  object_id = provider->writeConfiguration(json);
 
-  collection = provider->load(search);
+  collection = provider->readConfiguration(search);
 
   if (collection.size() != 1) {
     std::cout << "Search returned " << collection.size() << " results.\n";

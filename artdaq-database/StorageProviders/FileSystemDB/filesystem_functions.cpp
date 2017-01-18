@@ -186,3 +186,11 @@ file_paths_t dbfs::list_files_in_directory(boost::filesystem::path const& path, 
   }
   return result;
 }
+
+
+bool dbfs::check_if_file_exists(std::string const& f){
+    confirm(!f.empty());
+
+    std::ifstream in(f.c_str());
+    return in.good();
+}

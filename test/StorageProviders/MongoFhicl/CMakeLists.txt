@@ -1,6 +1,6 @@
 cet_make_exec(MongoFhicl_t
   LIBRARIES
-    
+  artdaq-database_SharedCommon
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json

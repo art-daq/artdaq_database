@@ -13,11 +13,13 @@ std::list<std::string> find_subdirs(std::string const&);
 std::list<std::string> find_siblingdirs(std::string const& d);
 std::list<object_id_t> find_documents(std::string const& d);
 std::string mkdir(std::string const& d);
+bool check_if_file_exists(std::string const& f);
 
 using file_paths_t = std::vector<boost::filesystem::path>;
 file_paths_t list_files_in_directory(boost::filesystem::path const& path, std::string const& ext);
 namespace debug {
 void enable();
+void enableReadWrite();
 }
 
 namespace literal {
