@@ -23,20 +23,21 @@ using artdaq::database::configuration::options::data_format_t;
 class ManageConfigsOperation final : public OperationBase {
  public:
   ManageConfigsOperation(std::string const&);
+
   std::string const& version() const noexcept;
   std::string const& version(std::string const&);
 
-  std::string const& configurableEntity() const noexcept;
-  std::string const& configurableEntity(std::string const&);
+  std::string const& entity() const noexcept;
+  std::string const& entity(std::string const&);
 
-  std::string const& globalConfiguration() const noexcept;
-  std::string const& globalConfiguration(std::string const&);
+  std::string const& configuration() const noexcept;
+  std::string const& configuration(std::string const&);
 
-  JsonData search_filter_to_JsonData() const override;
+  JsonData query_filter_to_JsonData() const override;
 
-  JsonData globalConfiguration_to_JsonData() const;
+  JsonData configuration_to_JsonData() const;
   JsonData version_to_JsonData() const;
-  JsonData configurableEntity_to_JsonData() const;
+  JsonData entity_to_JsonData() const;
 
   bpo::options_description makeProgramOptions() const override;
 
@@ -47,8 +48,8 @@ class ManageConfigsOperation final : public OperationBase {
 
  private:
   std::string _version = {jsonliteral::notprovided};
-  std::string _configurable_entity = {jsonliteral::notprovided};
-  std::string _global_configuration = {jsonliteral::notprovided};
+  std::string _entity = {jsonliteral::notprovided};
+  std::string _configuration = {jsonliteral::notprovided};
 };
 
 namespace debug {

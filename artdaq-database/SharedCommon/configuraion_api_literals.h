@@ -15,8 +15,8 @@ namespace operation {
 constexpr auto globalconfstore = "globalconfstore";
 constexpr auto globalconfload = "globalconfload";
 
-constexpr auto store = "store";
-constexpr auto load = "load";
+constexpr auto writedocument = "store";
+constexpr auto readdocument = "load";
 
 constexpr auto listcollections = "listcollections";
 constexpr auto listdatabases = "listdatabases";
@@ -24,10 +24,14 @@ constexpr auto readdbinfo = "readdbinfo";
 
 constexpr auto findconfigs = "findconfigs";
 constexpr auto findversions = "findversions";
-constexpr auto findentities = "findentities";
 
-constexpr auto buildfilter = "buildfilter";
+constexpr auto findentities = "findentities";
+constexpr auto addentity = "addentity";
+constexpr auto rmentity = "rmentity";
+
+constexpr auto confcomposition = "buildfilter";
 constexpr auto addconfig = "addconfig";
+constexpr auto rmconfig = "rmconfig";
 constexpr auto newconfig = "newconfig";
 
 constexpr auto addalias = "addalias";
@@ -38,7 +42,7 @@ constexpr auto findalias = "findalias";
 namespace provider {
 constexpr auto mongo = "mongo";
 constexpr auto filesystem = "filesystem";
-constexpr auto ucond = "ucond";
+constexpr auto ucon = "ucon";
 }
 
 namespace option {

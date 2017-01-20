@@ -170,7 +170,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::addEntity(JSONDocument const& entity) 
   TRACE_(9, "addEntity() args  entity=<" << entity << ">");
 
   JSONDocument copy(entity);
-  auto ovl = overlay<ovl::ovlConfigurableEntity>(copy, jsonliteral::entities);
+  auto ovl = overlay<ovl::ovlentity>(copy, jsonliteral::entities);
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->addEntity(ovl));
@@ -189,7 +189,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeEntity(JSONDocument const& entit
   TRACE_(9, "addEntity() args  entity=<" << entity << ">");
 
   JSONDocument copy(entity);
-  auto ovl = overlay<ovl::ovlConfigurableEntity>(copy, jsonliteral::entities);
+  auto ovl = overlay<ovl::ovlentity>(copy, jsonliteral::entities);
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->removeEntity(ovl));

@@ -1,25 +1,25 @@
 #ifndef _ARTDAQ_DATABASE_CONFIGURATIONDB_METADATA_H_
 #define _ARTDAQ_DATABASE_CONFIGURATIONDB_METADATA_H_
 
-#include <string>
-#include <utility>
+#include "artdaq-database/SharedCommon/returned_result.h"
 
 namespace artdaq {
 namespace database {
 namespace configuration {
-class LoadStoreOperation;
+class ManageDocumentOperation;
 
-using result_pair_t = std::pair<bool, std::string>;
+using artdaq::database::result_t;
 
 namespace opts {
-using artdaq::database::configuration::LoadStoreOperation;
-result_pair_t list_database_names(LoadStoreOperation const& /*options*/, std::string& /*conf*/) noexcept;
-result_pair_t read_database_info(LoadStoreOperation const& /*options*/, std::string& /*conf*/) noexcept;
+using artdaq::database::configuration::ManageDocumentOperation;
+
+result_t list_databases(ManageDocumentOperation const& /*options*/, std::string& /*conf*/) noexcept;
+result_t read_dbinfo(ManageDocumentOperation const& /*options*/, std::string& /*conf*/) noexcept;
 }
 
 namespace json {
-result_pair_t list_database_names(std::string const& /*search_filter*/) noexcept;
-result_pair_t read_database_info(std::string const& /*search_filter*/) noexcept;
+result_t list_databases(std::string const& /*task_payload*/) noexcept;
+result_t read_dbinfo(std::string const& /*task_payload*/) noexcept;
 }
 
 namespace debug {

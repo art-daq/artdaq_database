@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) try {
 
   auto file_res_name = std::string{"${HOME}/${0}.result.out"};
 
-  if (options.operation().compare(apiliteral::operation::load) == 0 || options.operation().compare(apiliteral::operation::globalconfload) == 0) {
+  if (options.operation().compare(apiliteral::operation::readdocument) == 0 || options.operation().compare(apiliteral::operation::globalconfload) == 0) {
     if (!vm.count(apiliteral::option::result)) {
       std::cerr << "Exception from command line processing in " << argv[0] << ": no result file name given.\n"
                 << "For usage and an options list, please do '" << argv[0] << " --help"
@@ -110,43 +110,43 @@ int main(int argc, char* argv[]) try {
   using namespace artdaq::database::configuration::json;
 
   cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP, std::string const&, std::string&>(
-      apiliteral::operation::load, load_configuration, options_string, test_document);
+      apiliteral::operation::readdocument, read_document, options_string, test_document);
 
   cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP, std::string const&, std::string&>(
-      apiliteral::operation::globalconfload, load_globalconfiguration, options_string, test_document);
+      apiliteral::operation::globalconfload, read_configuration, options_string, test_document);
 
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findconfigs, find_global_configurations,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findconfigs, find_configurations,
                                                                                   options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::buildfilter,
-                                                                                  build_global_configuration_search_filter, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::confcomposition,
+                                                                                  configuration_composition, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::addconfig,
-                                                                                  add_configuration_to_global_configuration, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findversions, find_configuration_versions,
+                                                                                  assign_configuration, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findversions, find_versions,
                                                                                   options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findentities, find_configuration_entities,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findentities, find_entities,
                                                                                   options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::addalias, add_version_alias, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::rmalias, remove_version_alias, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findalias, find_version_aliases,
                                                                                   options_string);
 
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::listdatabases, list_database_names,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::listdatabases, list_databases,
                                                                                   options_string);
 
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::listcollections, list_collection_names,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::listcollections, list_collections,
                                                                                   options_string);
 
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::readdbinfo, read_database_info, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::readdbinfo, read_dbinfo, options_string);
 
   try {
     std::ifstream is(file_src_name);
     test_document = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
     is.close();
     cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
-        apiliteral::operation::store, store_configuration, options_string, test_document);
+        apiliteral::operation::writedocument, write_document, options_string, test_document);
 
     cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
-        apiliteral::operation::globalconfstore, store_globalconfiguration, options_string, test_document);
+        apiliteral::operation::globalconfstore, write_configuration, options_string, test_document);
 
   } catch (...) {
   }
@@ -163,7 +163,7 @@ int main(int argc, char* argv[]) try {
 
   auto returned = std::string{result.second};
 
-  if (options.operation().compare(apiliteral::operation::load) == 0 || options.operation().compare(apiliteral::operation::globalconfload) == 0) {
+  if (options.operation().compare(apiliteral::operation::readdocument) == 0 || options.operation().compare(apiliteral::operation::globalconfload) == 0) {
     std::ofstream os(file_res_name.c_str());
     std::copy(returned.begin(), returned.end(), std::ostream_iterator<char>(os));
     os.close();
@@ -171,7 +171,7 @@ int main(int argc, char* argv[]) try {
     std::cout << "Wrote file:" << file_res_name << "\n";
 
     return process_exit_code::SUCCESS;
-  } else if (options.operation().compare(apiliteral::operation::store) == 0 || options.operation().compare(apiliteral::operation::globalconfstore) == 0) {
+  } else if (options.operation().compare(apiliteral::operation::writedocument) == 0 || options.operation().compare(apiliteral::operation::globalconfstore) == 0) {
     /* std::ofstream os(file_res_name.c_str());
      std::copy(returned.begin(), returned.end(),
              std::ostream_iterator<char>(os));

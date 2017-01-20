@@ -17,7 +17,7 @@ void enableReadWrite();
 namespace literal {
 constexpr auto MONGOURI = "mongodb://";
 constexpr auto hostname = "127.0.0.1";
-constexpr auto port = "27017";
+constexpr auto port = 27017;
 constexpr auto db_name = "test_configuration_db";
 }
 

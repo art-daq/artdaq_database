@@ -1,6 +1,6 @@
 {
 "_id" : {
-"_oid" : "cafe-test"
+"$oid" : "cafe-test"
 }
 ,
 

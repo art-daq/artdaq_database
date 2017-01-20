@@ -1,66 +1,6 @@
 {
 "_id" : {
-"_oid" : "a8e56a7a44f3445d9dd813a4"
-}
-,
-
-"collection" : "notprovided"
-,
-
-"version" : "notprovided"
-,
-"origin":{
-"format":"json",
-"name":"notprovided",
-"source":"template",
-"created":"Fri Jan 13 16:01:37 2017",
-"rawdata": [
-]
-},
-"aliases": {"active": [
-],"history": [
-]
-}
-,
-"bookkeeping": {
-"isreadonly":false,
-"isdeleted":false,
-"created":"Fri Jan 13 16:01:37 2017",
-"updates": [
-]
-}
-,
-
-"changelog" : "notprovided"
-,
-"entities": [
-],
-"runs": [
-],
-"attachments": [
-],
-"configurations": [
-],
-"comments": [
-],
-"document":{
-
-"data" : {
-
-}
-,
-
-"metadata" : {
-
-}
-,
-"search": [
-]
-}
-}>updates cont=0
-record2 =<{
-"_id" : {
-"_oid" : "d3fc1d0497594540b9506f47"
+"$oid" : "a8e56a7a44f3445d9dd813a4"
 }
 ,
 

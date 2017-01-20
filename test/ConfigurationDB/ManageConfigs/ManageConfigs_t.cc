@@ -89,15 +89,15 @@ int main(int argc, char* argv[]) try {
   using namespace artdaq::database::configuration::json;
 
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      apiliteral::operation::findconfigs, find_global_configurations, options_string);
+      apiliteral::operation::findconfigs, find_configurations, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      apiliteral::operation::buildfilter, build_global_configuration_search_filter, options_string);
+      apiliteral::operation::confcomposition, configuration_composition, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      apiliteral::operation::addconfig, add_configuration_to_global_configuration, options_string);
+      apiliteral::operation::addconfig, assign_configuration, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      apiliteral::operation::findversions, find_configuration_versions, options_string);
+      apiliteral::operation::findversions, find_versions, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      apiliteral::operation::findentities, find_configuration_entities, options_string);
+      apiliteral::operation::findentities, find_entities, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::addalias, add_version_alias,
                                                                                   options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::rmalias, remove_version_alias,
@@ -123,8 +123,8 @@ int main(int argc, char* argv[]) try {
 
   using cfo::data_format_t;
 
-  if (options.dataFormat() == data_format_t::gui || options.dataFormat() == data_format_t::db ||
-      options.dataFormat() == data_format_t::json) {
+  if (options.format() == data_format_t::gui || options.format() == data_format_t::db ||
+      options.format() == data_format_t::json) {
     auto compare_result = artdaq::database::json::compare_json_objects(returned, expected);
     if (compare_result.first) {
       std::cout << "returned:\n" << returned << "\n";

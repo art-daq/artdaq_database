@@ -49,34 +49,34 @@ namespace database {
 namespace configuration {
 namespace detail {
 
-typedef JsonData (*provider_findglobalconfigs_t)(Options const& /*options*/, JsonData const& /*search_filter*/);
-typedef JsonData (*provider_buildconfigsearchfilter_t)(Options const& /*options*/, JsonData const& /*search_filter*/);
+typedef JsonData (*provider_findglobalconfigs_t)(Options const& /*options*/, JsonData const& /*task_payload*/);
+typedef JsonData (*provider_buildconfigsearchfilter_t)(Options const& /*options*/, JsonData const& /*task_payload*/);
 
-void find_global_configurations(Options const& options, std::string& configs) {
+void find_configurations(Options const& options, std::string& configs) {
   confirm(configs.empty());
   confirm(options.operation().compare(apiliteral::operation::findconfigs) == 0);
 
-  TRACE_(11, "find_global_configurations: begin");
-  TRACE_(11, "find_global_configurations args options=<" << options.to_string() << ">");
+  TRACE_(11, "find_configurations: begin");
+  TRACE_(11, "find_configurations args options=<" << options.to_string() << ">");
 
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers = std::map<std::string, provider_findglobalconfigs_t>{
-        {apiliteral::provider::mongo, cf::mongo::findGlobalConfigs},
-        {apiliteral::provider::filesystem, cf::filesystem::findGlobalConfigs},
-        {apiliteral::provider::ucond, cf::ucond::findGlobalConfigs}};
+        {apiliteral::provider::mongo, cf::mongo::findConfigurations},
+        {apiliteral::provider::filesystem, cf::filesystem::findConfigurations},
+        {apiliteral::provider::ucon, cf::ucon::findConfigurations}};
 
     return providers.at(name);
   };
 
   auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
+      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData().json_buffer);
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
 
-  switch (options.dataFormat()) {
+  switch (options.format()) {
     default:
     case data_format_t::db:
     case data_format_t::json:
@@ -84,7 +84,7 @@ void find_global_configurations(Options const& options, std::string& configs) {
     case data_format_t::fhicl:
     case data_format_t::xml: {
       if (!db::json_db_to_gui(search_result.json_buffer, returnValue)) {
-        throw runtime_error("find_global_configurations") << "Unsupported data format.";
+        throw runtime_error("find_configurations") << "Unsupported data format.";
       }
       break;
     }
@@ -98,33 +98,33 @@ void find_global_configurations(Options const& options, std::string& configs) {
 
   if (returnValueChanged) configs.swap(returnValue);
 
-  TRACE_(11, "find_global_configurations: end");
+  TRACE_(11, "find_configurations: end");
 }
-void build_global_configuration_search_filter(Options const& options, std::string& filters) {
+void configuration_composition(Options const& options, std::string& filters) {
   confirm(filters.empty());
-  confirm(options.operation().compare(apiliteral::operation::buildfilter) == 0);
+  confirm(options.operation().compare(apiliteral::operation::confcomposition) == 0);
 
-  TRACE_(12, "build_global_configuration_search_filter: begin");
-  TRACE_(11, "build_global_configuration_search_filter args options=<" << options.to_string() << ">");
+  TRACE_(12, "configuration_composition: begin");
+  TRACE_(11, "configuration_composition args options=<" << options.to_string() << ">");
 
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers = std::map<std::string, provider_buildconfigsearchfilter_t>{
-        {apiliteral::provider::mongo, cf::mongo::buildConfigSearchFilter},
-        {apiliteral::provider::filesystem, cf::filesystem::buildConfigSearchFilter},
-        {apiliteral::provider::ucond, cf::ucond::buildConfigSearchFilter}};
+        {apiliteral::provider::mongo, cf::mongo::configurationComposition},
+        {apiliteral::provider::filesystem, cf::filesystem::configurationComposition},
+        {apiliteral::provider::ucon, cf::ucon::configurationComposition}};
 
     return providers.at(name);
   };
 
   auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
+      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData().json_buffer);
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
 
-  switch (options.dataFormat()) {
+  switch (options.format()) {
     default:
     case data_format_t::db:
     case data_format_t::json:
@@ -132,7 +132,7 @@ void build_global_configuration_search_filter(Options const& options, std::strin
     case data_format_t::fhicl:
     case data_format_t::xml: {
       if (!db::json_db_to_gui(search_result.json_buffer, returnValue)) {
-        throw runtime_error("build_global_configuration_search_filter") << "Unsupported data format.";
+        throw runtime_error("configuration_composition") << "Unsupported data format.";
       }
       break;
     }
@@ -146,7 +146,7 @@ void build_global_configuration_search_filter(Options const& options, std::strin
 
   if (returnValueChanged) filters.swap(returnValue);
 
-  TRACE_(11, "build_global_configuration_search_filter: end");
+  TRACE_(11, "configuration_composition: end");
 }
 }  // namespace detail
 }  // namespace configuration

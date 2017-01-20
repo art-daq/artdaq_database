@@ -29,7 +29,7 @@ struct ConfigurationInterface final {
   //==============================================================================
   // stores configuration version to database
   template <typename CONF, typename TYPE>
-  cf::result_pair_t storeVersion(CONF configuration, std::string const& version, std::string const& entity) const
+  cf::result_t storeVersion(CONF configuration, std::string const& version, std::string const& entity) const
       noexcept try {
     confirm(!version.empty());
 
@@ -39,28 +39,28 @@ struct ConfigurationInterface final {
 
     auto serializer = ConfigurationSerializer<CONF, MakeSerializable>::wrap(configuration);
 
-    auto opts = LoadStoreOperation{apiname};
+    auto opts = ManageDocumentOperation{apiname};
 
-    opts.operation(apiliteral::operation::store);
-    opts.collectionName(serializer.configurationName());
+    opts.operation(apiliteral::operation::writedocument);
+    opts.collection(serializer.configurationName());
     opts.version(version);
 
     if (std::is_same<TYPE, JsonData>::value) {
-      opts.dataFormat(data_format_t::json);
+      opts.format(data_format_t::json);
     } else if (std::is_same<TYPE, FhiclData>::value) {
-      opts.dataFormat(data_format_t::fhicl);
+      opts.format(data_format_t::fhicl);
     } else {
       throw artdaq::database::invalid_option_exception(apifunctname)
           << "Unsupported storage format " << demangle(typeid(TYPE).name()) << ",  use either JsonData or FhiclData.";
     }
 
-    if (!entity.empty()) opts.configurableEntity(entity);
+    if (!entity.empty()) opts.entity(entity);
 
     opts.provider(_database_provider);
 
     auto data = TYPE{"{}"};
 
-    auto writeResult = serializer.template writeConfiguration<TYPE>(data);
+    auto writeResult = serializer.template writeDocument<TYPE>(data);
 
     if (!writeResult.first) throw artdaq::database::runtime_exception(apifunctname) << writeResult.second;
 
@@ -69,7 +69,7 @@ struct ConfigurationInterface final {
 
     auto buffer = oss.str();
 
-    auto apiCallResult = impl::store_configuration(opts, buffer);
+    auto apiCallResult = impl::write_document(opts, buffer);
 
     if (!apiCallResult.first) throw artdaq::database::runtime_exception(apifunctname) << apiCallResult.second;
 
@@ -81,7 +81,7 @@ struct ConfigurationInterface final {
   //==============================================================================
   // loads configuration version from database
   template <typename CONF, typename TYPE>
-  cf::result_pair_t loadVersion(CONF configuration, std::string const& version, std::string const& entity) const
+  cf::result_t loadVersion(CONF configuration, std::string const& version, std::string const& entity) const
       noexcept try {
     confirm(!version.empty());
 
@@ -91,34 +91,34 @@ struct ConfigurationInterface final {
 
     auto serializer = ConfigurationSerializer<CONF, MakeSerializable>::wrap(configuration);
 
-    auto opts = LoadStoreOperation{apiname};
+    auto opts = ManageDocumentOperation{apiname};
 
-    opts.operation(apiliteral::operation::load);
-    opts.collectionName(serializer.configurationName());
+    opts.operation(apiliteral::operation::readdocument);
+    opts.collection(serializer.configurationName());
     opts.version(version);
 
     if (std::is_same<TYPE, JsonData>::value) {
-      opts.dataFormat(data_format_t::json);
+      opts.format(data_format_t::json);
     } else if (std::is_same<TYPE, FhiclData>::value) {
-      opts.dataFormat(data_format_t::fhicl);
+      opts.format(data_format_t::fhicl);
     } else {
       throw artdaq::database::invalid_option_exception(apifunctname)
           << "Unsupported storage format " << demangle(typeid(TYPE).name()) << ",  use either JsonData or FhiclData.";
     }
 
-    if (!entity.empty()) opts.configurableEntity(entity);
+    if (!entity.empty()) opts.entity(entity);
 
     opts.provider(_database_provider);
 
     auto buffer = std::string{};
 
-    auto apiCallResult = impl::load_configuration(opts, buffer);
+    auto apiCallResult = impl::read_document(opts, buffer);
 
     if (!apiCallResult.first) throw artdaq::database::runtime_exception(apifunctname) << apiCallResult.second;
 
     auto data = TYPE{buffer};
 
-    auto readResult = serializer.template readConfiguration<TYPE>(data);
+    auto readResult = serializer.template readDocument<TYPE>(data);
 
     if (!readResult.first) throw artdaq::database::runtime_exception(apifunctname) << readResult.second;
 
@@ -139,17 +139,17 @@ struct ConfigurationInterface final {
     try {
       auto serializer = ConfigurationSerializer<CONF, MakeSerializable>::wrap(configuration);
 
-      auto opts = LoadStoreOperation{apiname};
+      auto opts = ManageDocumentOperation{apiname};
 
       opts.operation(apiliteral::operation::findversions);
-      opts.collectionName(serializer.configurationName());
-      opts.dataFormat(data_format_t::gui);
+      opts.collection(serializer.configurationName());
+      opts.format(data_format_t::gui);
 
-      if (!entity.empty()) opts.configurableEntity(entity);
+      if (!entity.empty()) opts.entity(entity);
 
       opts.provider(_database_provider);
 
-      auto apiCallResult = impl::find_configuration_versions(opts);
+      auto apiCallResult = impl::find_versions(opts);
 
       if (!apiCallResult.first) throw artdaq::database::runtime_exception(apifunctname) << apiCallResult.second;
 
@@ -193,12 +193,12 @@ struct ConfigurationInterface final {
     try {
       auto opts = ManageConfigsOperation{apiname};
       opts.operation(apiliteral::operation::findconfigs);
-      opts.dataFormat(data_format_t::gui);
+      opts.format(data_format_t::gui);
       opts.provider(_database_provider);
 
-      if (!mongosearch.empty()) opts.globalConfiguration(mongosearch);
+      if (!mongosearch.empty()) opts.configuration(mongosearch);
 
-      auto apiCallResult = impl::find_global_configurations(opts);
+      auto apiCallResult = impl::find_configurations(opts);
 
       if (!apiCallResult.first) throw artdaq::database::runtime_exception(apifunctname) << apiCallResult.second;
 
@@ -252,13 +252,13 @@ struct ConfigurationInterface final {
 
     try {
       auto opts = ManageConfigsOperation{apiname};
-      opts.operation(apiliteral::operation::buildfilter);
-      opts.dataFormat(data_format_t::gui);
+      opts.operation(apiliteral::operation::confcomposition);
+      opts.format(data_format_t::gui);
       opts.provider(_database_provider);
 
-      if (!configuration.empty()) opts.globalConfiguration(configuration);
+      if (!configuration.empty()) opts.configuration(configuration);
 
-      auto apiCallResult = impl::build_global_configuration_search_filter(opts);
+      auto apiCallResult = impl::configuration_composition(opts);
 
       if (!apiCallResult.first) throw artdaq::database::runtime_exception(apifunctname) << apiCallResult.second;
 
@@ -280,7 +280,7 @@ struct ConfigurationInterface final {
               throw artdaq::database::runtime_exception(apifunctname) << "Invalid JSON:" << apiCallResult.second;
           }
 
-          auto apiCall2Result = cf::json::find_configuration_versions(buffer);
+          auto apiCall2Result = cf::json::find_versions(buffer);
 
           if (!apiCall2Result.first) throw artdaq::database::runtime_exception(apifunctname) << apiCall2Result.second;
 
@@ -318,8 +318,8 @@ struct ConfigurationInterface final {
 
   //==============================================================================
   //
-  cf::result_pair_t storeGlobalConfiguration(VersionInfoList_t const& versionInfoList,
-                                             std::string const& configuration) const try {
+  cf::result_t storeGlobalConfiguration(VersionInfoList_t const& versionInfoList,
+                                        std::string const& configuration) const try {
     confirm(!configuration.empty());
     confirm(!versionInfoList.empty());
 
@@ -359,7 +359,7 @@ struct ConfigurationInterface final {
     if (!jsn::JsonWriter().write(payloadAST, buffer))
       throw artdaq::database::runtime_exception(apifunctname) << "JsonWriter failed, invalid payloadAST.";
 
-    auto apiCallResult = cf::json::create_new_global_configuration(buffer);
+    auto apiCallResult = cf::json::create_configuration(buffer);
 
     if (!apiCallResult.first) throw artdaq::database::runtime_exception(apifunctname) << apiCallResult.second;
 
@@ -371,20 +371,20 @@ struct ConfigurationInterface final {
   }
 
   // returns a set of configuration collection names
-  std::set<std::string> listCollectionNames(std::string const& name_prefix) const {
+  std::set<std::string> listCollections(std::string const& name_prefix) const {
     auto returnSet = std::set<std::string>{};  // RVO
 
-    constexpr auto apifunctname = "ConfigurationInterface::listCollectionNames";
+    constexpr auto apifunctname = "ConfigurationInterface::listCollections";
 
-    auto opts = LoadStoreOperation{apiname};
+    auto opts = ManageDocumentOperation{apiname};
 
     opts.operation(apiliteral::operation::listcollections);
-    opts.dataFormat(data_format_t::gui);
+    opts.format(data_format_t::gui);
     opts.provider(_database_provider);
 
-    if (!name_prefix.empty()) opts.collectionName(name_prefix);
+    if (!name_prefix.empty()) opts.collection(name_prefix);
 
-    auto apiCallResult = cf::impl::list_collection_names(opts);
+    auto apiCallResult = cf::impl::list_collections(opts);
 
     if (!apiCallResult.first) throw artdaq::database::runtime_exception(apifunctname) << apiCallResult.second;
 
@@ -397,8 +397,8 @@ struct ConfigurationInterface final {
 
     for (auto const& searchResult : searchResults) {
       auto const& query = boost::get<jsn::object_t>(searchResult).at(jsonliteral::query);
-      auto const& collectionName = boost::get<jsn::object_t>(query).at(apiliteral::option::collection);
-      returnSet.insert(boost::get<std::string>(collectionName));
+      auto const& collection = boost::get<jsn::object_t>(query).at(apiliteral::option::collection);
+      returnSet.insert(boost::get<std::string>(collection));
     }
 
     return returnSet;

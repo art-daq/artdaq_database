@@ -20,7 +20,7 @@ using ots::ConfigurationBase;
 
 template <>
 template <>
-bool MakeSerializable<ConfigurationBase const*>::writeConfigurationImpl<JsonData>(JsonData& data) const {
+bool MakeSerializable<ConfigurationBase const*>::writeDocumentImpl<JsonData>(JsonData& data) const {
   std::ostringstream oss;
 
   _conf->getView().printJSON(ss);
@@ -37,7 +37,7 @@ std::string MakeSerializable<ConfigurationBase const*>::configurationNameImpl() 
 
 template <>
 template <>
-bool MakeSerializable<ConfigurationBase*>::readConfigurationImpl<JsonData>(JsonData const& data) {
+bool MakeSerializable<ConfigurationBase*>::readDocumentImpl<JsonData>(JsonData const& data) {
   int retVal = _conf->getViewP()->fillFromJSON(data.json_buffer);
 
   return (retVal >= 0);

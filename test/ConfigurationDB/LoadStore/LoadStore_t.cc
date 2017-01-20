@@ -16,7 +16,7 @@ namespace cfo = cf::options;
 
 namespace bpo = boost::program_options;
 
-using Options = cf::LoadStoreOperation;
+using Options = cf::ManageDocumentOperation;
 
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::basictypes::JsonData;
@@ -32,10 +32,10 @@ int main(int argc, char* argv[]) try {
   //artdaq::database::docrecord::debug::enableJSONDocument();
   //artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
 
-  artdaq::database::configuration::debug::enableLoadStoreOperation();
+  artdaq::database::configuration::debug::enableManageDocumentOperation();
   artdaq::database::configuration::debug::options::enableOperationBase();
-  artdaq::database::configuration::debug::options::enableLoadStoreOperation();
-  artdaq::database::configuration::debug::detail::enableLoadStoreOperation();
+  artdaq::database::configuration::debug::options::enableManageDocumentOperation();
+  artdaq::database::configuration::debug::detail::enableManageDocumentOperation();
 
   debug::registerUngracefullExitHandlers();
   artdaq::database::useFakeTime(true);
@@ -89,14 +89,14 @@ int main(int argc, char* argv[]) try {
   auto test_document = std::string{};
 
   cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP, std::string const&, std::string&>(
-      apiliteral::operation::load, load_configuration, options_string, test_document);
+      apiliteral::operation::readdocument, read_document, options_string, test_document);
 
   try {
     std::ifstream is(file_src_name);
     test_document = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
     is.close();
     cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
-        apiliteral::operation::store, store_configuration, options_string, test_document);
+        apiliteral::operation::writedocument, write_document, options_string, test_document);
   } catch (...) {
   }
 
@@ -118,8 +118,8 @@ int main(int argc, char* argv[]) try {
 
   using cfo::data_format_t;
 
-  if (options.dataFormat() == data_format_t::gui || options.dataFormat() == data_format_t::db ||
-      options.dataFormat() == data_format_t::json) {
+  if (options.format() == data_format_t::gui || options.format() == data_format_t::db ||
+      options.format() == data_format_t::json) {
     auto compare_result = artdaq::database::json::compare_json_objects(returned, expected);
     if (compare_result.first) {
       std::cout << "returned:\n" << returned << "\n";

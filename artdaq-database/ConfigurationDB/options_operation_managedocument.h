@@ -1,5 +1,5 @@
-#ifndef _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_LOADSTORE_H_
-#define _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_LOADSTORE_H_
+#ifndef _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_READWRITE_H_
+#define _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_READWRITE_H_
 
 #include "artdaq-database/ConfigurationDB/options_operation_base.h"
 
@@ -20,9 +20,9 @@ namespace apiliteral = artdaq::database::configapi::literal;
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::configuration::options::data_format_t;
 
-class LoadStoreOperation final : public OperationBase {
+class ManageDocumentOperation final : public OperationBase {
  public:
-  LoadStoreOperation(std::string const&);
+  ManageDocumentOperation(std::string const&);
 
   std::string const& version() const noexcept;
   std::string const& version(std::string const&);
@@ -30,18 +30,18 @@ class LoadStoreOperation final : public OperationBase {
   std::string const& sourceFileName() const noexcept;
   std::string const& sourceFileName(std::string const&);
 
-  std::string const& configurableEntity() const noexcept;
-  std::string const& configurableEntity(std::string const&);
+  std::string const& entity() const noexcept;
+  std::string const& entity(std::string const&);
 
-  std::string const& globalConfiguration() const noexcept;
-  std::string const& globalConfiguration(std::string const&);
+  std::string const& configuration() const noexcept;
+  std::string const& configuration(std::string const&);
 
-  JsonData search_filter_to_JsonData() const override;
+  JsonData query_filter_to_JsonData() const override;
 
-  JsonData globalConfiguration_to_JsonData() const;
+  JsonData configuration_to_JsonData() const;
   JsonData version_to_JsonData() const;
-  JsonData configurableEntity_to_JsonData() const;
-  JsonData collectionName_to_JsonData() const;
+  JsonData entity_to_JsonData() const;
+  JsonData collection_to_JsonData() const;
 
   bpo::options_description makeProgramOptions() const override;
 
@@ -52,18 +52,18 @@ class LoadStoreOperation final : public OperationBase {
 
  private:
   std::string _version = {jsonliteral::notprovided};
-  std::string _configurable_entity = {jsonliteral::notprovided};
-  std::string _global_configuration = {jsonliteral::notprovided};
+  std::string _entity = {jsonliteral::notprovided};
+  std::string _configuration = {jsonliteral::notprovided};
   std::string _source_file_name = {jsonliteral::notprovided};
 };
 
 namespace debug {
 namespace options {
-void enableLoadStoreOperation();
+void enableManageDocumentOperation();
 }
 }
 }  // namespace configuration
 }  // namespace database
 }  // namespace artdaq
 
-#endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_LOADSTORE_H_ */
+#endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_READWRITE_H_ */

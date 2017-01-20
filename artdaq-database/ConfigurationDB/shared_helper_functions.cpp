@@ -55,7 +55,7 @@ data_format_t cf::to_data_format(std::string const& f) {
     return data_format_t::origin;
   } else if (f.compare("csv") == 0) {
     return data_format_t::csv;
-  } else {
-    return data_format_t::unknown;
   }
+
+  return data_format_t::unknown;
 }

@@ -50,45 +50,44 @@ std::string const& ManageAliasesOperation::version(std::string const& version) {
   return _version;
 }
 
-std::string const& ManageAliasesOperation::configurableEntity() const noexcept {
-  confirm(!_configurable_entity.empty());
+std::string const& ManageAliasesOperation::entity() const noexcept {
+  confirm(!_entity.empty());
 
-  return _configurable_entity;
+  return _entity;
 }
 
-std::string const& ManageAliasesOperation::configurableEntity(std::string const& entity) {
+std::string const& ManageAliasesOperation::entity(std::string const& entity) {
   confirm(!entity.empty());
 
   if (entity.empty()) {
     throw runtime_error("Options") << "Invalid configurable entity; entity is empty.";
   }
 
-  TRACE_(11, "Options: Updating entity from " << _configurable_entity << " to " << entity << ".");
+  TRACE_(11, "Options: Updating entity from " << _entity << " to " << entity << ".");
 
-  _configurable_entity = entity;
+  _entity = entity;
 
-  return _configurable_entity;
+  return _entity;
 }
 
-std::string const& ManageAliasesOperation::globalConfiguration() const noexcept {
-  confirm(!_global_configuration.empty());
+std::string const& ManageAliasesOperation::configuration() const noexcept {
+  confirm(!_configuration.empty());
 
-  return _global_configuration;
+  return _configuration;
 }
 
-std::string const& ManageAliasesOperation::globalConfiguration(std::string const& global_configuration) {
+std::string const& ManageAliasesOperation::configuration(std::string const& global_configuration) {
   confirm(!global_configuration.empty());
 
   if (global_configuration.empty()) {
     throw runtime_error("Options") << "Invalid global config; global config is empty.";
   }
 
-  TRACE_(12, "Options: Updating global_configuration from " << _global_configuration << " to " << global_configuration
-                                                            << ".");
+  TRACE_(12, "Options: Updating global_configuration from " << _configuration << " to " << global_configuration << ".");
 
-  _global_configuration = global_configuration;
+  _configuration = global_configuration;
 
-  return _global_configuration;
+  return _configuration;
 }
 
 std::string const& ManageAliasesOperation::versionAlias() const noexcept {
@@ -111,13 +110,13 @@ std::string const& ManageAliasesOperation::versionAlias(std::string const& alias
   return _version_alias;
 }
 
-std::string const& ManageAliasesOperation::globalConfigurationAlias() const noexcept {
-  confirm(!_global_configuration_alias.empty());
+std::string const& ManageAliasesOperation::configurationAlias() const noexcept {
+  confirm(!_configuration_alias.empty());
 
-  return _global_configuration_alias;
+  return _configuration_alias;
 }
 
-std::string const& ManageAliasesOperation::globalConfigurationAlias(std::string const& global_configuration_alias) {
+std::string const& ManageAliasesOperation::configurationAlias(std::string const& global_configuration_alias) {
   confirm(!global_configuration_alias.empty());
 
   if (global_configuration_alias.empty()) {
@@ -125,12 +124,12 @@ std::string const& ManageAliasesOperation::globalConfigurationAlias(std::string 
                                       "global configuration alias is empty.";
   }
 
-  TRACE_(10, "Options: Updating global configuration alias from " << _global_configuration_alias << " to "
+  TRACE_(10, "Options: Updating global configuration alias from " << _configuration_alias << " to "
                                                                   << global_configuration_alias << ".");
 
-  _global_configuration_alias = global_configuration_alias;
+  _configuration_alias = global_configuration_alias;
 
-  return _global_configuration_alias;
+  return _configuration_alias;
 }
 
 void ManageAliasesOperation::readJsonData(JsonData const& data) {
@@ -149,10 +148,10 @@ void ManageAliasesOperation::readJsonData(JsonData const& data) {
   try {
     auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(apiliteral::option::searchfilter));
 
-    if (filterAST.empty()) searchFilter(jsonliteral::notprovided);
+    if (filterAST.empty()) queryFilter(jsonliteral::notprovided);
 
     try {
-      configurableEntity(boost::get<std::string>(filterAST.at(apiliteral::option::entity)));
+      entity(boost::get<std::string>(filterAST.at(apiliteral::option::entity)));
     } catch (...) {
     }
 
@@ -162,7 +161,7 @@ void ManageAliasesOperation::readJsonData(JsonData const& data) {
     }
 
     try {
-      globalConfigurationAlias(boost::get<std::string>(filterAST.at(apiliteral::option::configuration_alias)));
+      configurationAlias(boost::get<std::string>(filterAST.at(apiliteral::option::configuration_alias)));
     } catch (...) {
     }
 
@@ -172,7 +171,7 @@ void ManageAliasesOperation::readJsonData(JsonData const& data) {
     }
 
     try {
-      globalConfiguration(boost::get<std::string>(filterAST.at(apiliteral::option::configuration)));
+      configuration(boost::get<std::string>(filterAST.at(apiliteral::option::configuration)));
     } catch (...) {
     }
 
@@ -187,11 +186,11 @@ int ManageAliasesOperation::readProgramOptions(bpo::variables_map const& vm) {
   if (result != process_exit_code::SUCCESS) return result;
 
   if (vm.count(apiliteral::option::entity)) {
-    configurableEntity(vm[apiliteral::option::entity].as<std::string>());
+    entity(vm[apiliteral::option::entity].as<std::string>());
   }
 
   if (vm.count(apiliteral::option::configuration)) {
-    globalConfiguration(vm[apiliteral::option::configuration].as<std::string>());
+    configuration(vm[apiliteral::option::configuration].as<std::string>());
   }
 
   if (vm.count(apiliteral::option::version)) {
@@ -203,7 +202,7 @@ int ManageAliasesOperation::readProgramOptions(bpo::variables_map const& vm) {
   }
 
   if (vm.count(apiliteral::option::configuration_alias)) {
-    globalConfigurationAlias(vm[apiliteral::option::configuration_alias].as<std::string>());
+    configurationAlias(vm[apiliteral::option::configuration_alias].as<std::string>());
   }
 
   return process_exit_code::SUCCESS;
@@ -239,14 +238,13 @@ JsonData ManageAliasesOperation::writeJsonData() const {
   auto docAST = object_t{};
 
   if (!JsonReader{}.read(OperationBase::writeJsonData().json_buffer, docAST)) {
-    throw db::invalid_option_exception("ManageAliasesOperation") << "Unable to readsearch_filter_to_JsonData().";
+    throw db::invalid_option_exception("ManageAliasesOperation") << "Unable to readquery_filter_to_JsonData().";
   }
 
-  if (globalConfiguration() != jsonliteral::notprovided)
-    docAST[apiliteral::option::configuration] = globalConfiguration();
+  if (configuration() != jsonliteral::notprovided) docAST[apiliteral::option::configuration] = configuration();
   if (versionAlias() != jsonliteral::notprovided) docAST[apiliteral::option::version_alias] = versionAlias();
-  if (globalConfigurationAlias() != jsonliteral::notprovided)
-    docAST[apiliteral::option::configuration_alias] = globalConfigurationAlias();
+  if (configurationAlias() != jsonliteral::notprovided)
+    docAST[apiliteral::option::configuration_alias] = configurationAlias();
   if (version() != jsonliteral::notprovided) docAST[apiliteral::option::version] = version();
 
   auto json_buffer = std::string{};
@@ -257,23 +255,23 @@ JsonData ManageAliasesOperation::writeJsonData() const {
   return {json_buffer};
 }
 
-JsonData ManageAliasesOperation::search_filter_to_JsonData() const {
-  if (searchFilter() != jsonliteral::notprovided) {
-    return {searchFilter()};
+JsonData ManageAliasesOperation::query_filter_to_JsonData() const {
+  if (queryFilter() != jsonliteral::notprovided) {
+    return {queryFilter()};
   }
 
   using namespace artdaq::database::json;
 
   auto docAST = object_t{};
 
-  if (!JsonReader{}.read(OperationBase::search_filter_to_JsonData().json_buffer, docAST)) {
-    throw db::invalid_option_exception("ManageAliasesOperation") << "Unable to search_filter_to_JsonData().";
+  if (!JsonReader{}.read(OperationBase::query_filter_to_JsonData().json_buffer, docAST)) {
+    throw db::invalid_option_exception("ManageAliasesOperation") << "Unable to query_filter_to_JsonData().";
   }
 
-  if (configurableEntity() != jsonliteral::notprovided) docAST[apiliteral::filter::entity] = configurableEntity();
+  if (entity() != jsonliteral::notprovided) docAST[apiliteral::filter::entity] = entity();
 
-  if (globalConfiguration() != jsonliteral::notprovided && operation() != apiliteral::operation::addconfig)
-    docAST[apiliteral::filter::configuration] = globalConfiguration();
+  if (configuration() != jsonliteral::notprovided && operation() != apiliteral::operation::addconfig)
+    docAST[apiliteral::filter::configuration] = configuration();
 
   if (docAST.empty()) {
     return {apiliteral::empty_json};

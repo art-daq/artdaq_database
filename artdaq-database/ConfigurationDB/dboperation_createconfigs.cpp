@@ -30,11 +30,12 @@ namespace artdaq {
 namespace database {
 namespace configuration {
 namespace detail {
-void add_configuration_to_global_configuration(LoadStoreOperation const&, std::string&);
-void create_new_global_configuration(std::string const&, std::string&);
-void find_configuration_versions(LoadStoreOperation const&, std::string&);
-void find_configuration_entities(LoadStoreOperation const&, std::string&);
-void list_collection_names(LoadStoreOperation const&, std::string&);
+void assign_configuration(ManageDocumentOperation const&, std::string&);
+void remove_configuration(ManageDocumentOperation const&, std::string&);
+void create_configuration(std::string const&, std::string&);
+void find_versions(ManageDocumentOperation const&, std::string&);
+void find_entities(ManageDocumentOperation const&, std::string&);
+void list_collections(ManageDocumentOperation const&, std::string&);
 
 }  // namespace detail
 }  // namespace configuration
@@ -42,27 +43,39 @@ void list_collection_names(LoadStoreOperation const&, std::string&);
 }  // namespace artdaq
 
 using namespace artdaq::database::result;
+using artdaq::database::result_t;
 
-result_pair_t opts::add_configuration_to_global_configuration(LoadStoreOperation const& options) noexcept {
+result_t opts::assign_configuration(ManageDocumentOperation const& options) noexcept {
   try {
     auto returnValue = std::string{};
 
-    detail::add_configuration_to_global_configuration(options, returnValue);
+    detail::assign_configuration(options, returnValue);
     return Success(returnValue);
   } catch (...) {
     return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
-result_pair_t opts::create_new_global_configuration(LoadStoreOperation const& /*options*/) noexcept {
+result_t opts::remove_configuration(ManageDocumentOperation const& options) noexcept {
+  try {
+    auto returnValue = std::string{};
+
+    detail::remove_configuration(options, returnValue);
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(boost::current_exception_diagnostic_information());
+  }
+}
+
+result_t opts::create_configuration(ManageDocumentOperation const& /*options*/) noexcept {
   return Failure("Not Implemented");
 }
 
-result_pair_t opts::list_collection_names(LoadStoreOperation const& options) noexcept {
+result_t opts::list_collections(ManageDocumentOperation const& options) noexcept {
   try {
     auto returnValue = std::string{};
 
-    detail::list_collection_names(options, returnValue);
+    detail::list_collections(options, returnValue);
 
     return Success(returnValue);
   } catch (...) {
@@ -70,11 +83,11 @@ result_pair_t opts::list_collection_names(LoadStoreOperation const& options) noe
   }
 }
 
-result_pair_t opts::find_configuration_versions(LoadStoreOperation const& options) noexcept {
+result_t opts::find_versions(ManageDocumentOperation const& options) noexcept {
   try {
     auto returnValue = std::string{};
 
-    detail::find_configuration_versions(options, returnValue);
+    detail::find_versions(options, returnValue);
 
     return Success(returnValue);
   } catch (...) {
@@ -82,11 +95,11 @@ result_pair_t opts::find_configuration_versions(LoadStoreOperation const& option
   }
 }
 
-result_pair_t opts::find_configuration_entities(LoadStoreOperation const& options) noexcept {
+result_t opts::find_entities(ManageDocumentOperation const& options) noexcept {
   try {
     auto returnValue = std::string{};
 
-    detail::find_configuration_entities(options, returnValue);
+    detail::find_entities(options, returnValue);
 
     return Success(returnValue);
   } catch (...) {
@@ -94,29 +107,45 @@ result_pair_t opts::find_configuration_entities(LoadStoreOperation const& option
   }
 }
 
-result_pair_t json::add_configuration_to_global_configuration(std::string const& search_filter) noexcept {
+result_t json::assign_configuration(std::string const& query_payload) noexcept {
   try {
-    if (search_filter.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = LoadStoreOperation{apiliteral::operation::addconfig};
-    options.readJsonData({search_filter});
+    auto options = ManageDocumentOperation{apiliteral::operation::addconfig};
+    options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
 
-    detail::add_configuration_to_global_configuration(options, returnValue);
+    detail::assign_configuration(options, returnValue);
     return Success(returnValue);
   } catch (...) {
     return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
-result_pair_t json::create_new_global_configuration(std::string const& operations) noexcept {
+result_t json::remove_configuration(std::string const& query_payload) noexcept {
+  try {
+    if (query_payload.empty()) return Failure(msg_EmptyFilter);
+
+    auto options = ManageDocumentOperation{apiliteral::operation::rmconfig};
+    options.readJsonData({query_payload});
+
+    auto returnValue = std::string{};
+
+    detail::remove_configuration(options, returnValue);
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(boost::current_exception_diagnostic_information());
+  }
+}
+
+result_t json::create_configuration(std::string const& operations) noexcept {
   try {
     if (operations.empty()) return Failure(msg_EmptyFilter);
 
     auto returnValue = std::string{};
 
-    detail::create_new_global_configuration(operations, returnValue);
+    detail::create_configuration(operations, returnValue);
 
     return Success(returnValue);
   } catch (...) {
@@ -124,32 +153,32 @@ result_pair_t json::create_new_global_configuration(std::string const& operation
   }
 }
 
-result_pair_t json::list_collection_names(std::string const& search_filter) noexcept {
+result_t json::list_collections(std::string const& query_payload) noexcept {
   try {
-    if (search_filter.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = LoadStoreOperation{apiliteral::operation::listcollections};
-    options.readJsonData({search_filter});
+    auto options = ManageDocumentOperation{apiliteral::operation::listcollections};
+    options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
 
-    detail::list_collection_names(options, returnValue);
+    detail::list_collections(options, returnValue);
     return Success(returnValue);
   } catch (...) {
     return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
-result_pair_t json::find_configuration_versions(std::string const& search_filter) noexcept {
+result_t json::find_versions(std::string const& query_payload) noexcept {
   try {
-    if (search_filter.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = LoadStoreOperation{apiliteral::operation::findversions};
-    options.readJsonData({search_filter});
+    auto options = ManageDocumentOperation{apiliteral::operation::findversions};
+    options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
 
-    detail::find_configuration_versions(options, returnValue);
+    detail::find_versions(options, returnValue);
 
     return Success(returnValue);
   } catch (...) {
@@ -157,16 +186,16 @@ result_pair_t json::find_configuration_versions(std::string const& search_filter
   }
 }
 
-result_pair_t json::find_configuration_entities(std::string const& search_filter) noexcept {
+result_t json::find_entities(std::string const& query_payload) noexcept {
   try {
-    if (search_filter.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = LoadStoreOperation{apiliteral::operation::findentities};
-    options.readJsonData({search_filter});
+    auto options = ManageDocumentOperation{apiliteral::operation::findentities};
+    options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
 
-    detail::find_configuration_entities(options, returnValue);
+    detail::find_entities(options, returnValue);
 
     return Success(returnValue);
   } catch (...) {

@@ -23,7 +23,7 @@ namespace cf = db::configuration;
 namespace cfo = cf::options;
 namespace cfol = cfo::literal;
 
-using Options = cfo::LoadStoreOperation;
+using Options = cfo::ManageDocumentOperation;
 
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::basictypes::JsonData;
@@ -120,7 +120,7 @@ int main(int argc, char* argv[]) try {
   }
 
   if (vm.count("globalid")) {
-    options.globalConfiguration(vm["globalid"].as<std::string>());
+    options.configuration(vm["globalid"].as<std::string>());
   }
 
   if (vm.count("version")) {
@@ -136,10 +136,10 @@ int main(int argc, char* argv[]) try {
   }
   
   if (vm.count("entity")) {
-    options.configurableEntity(vm["entity"].as<std::string>());
+    options.entity(vm["entity"].as<std::string>());
   }
   
-  options.dataFormat("gui");
+  options.format("gui");
 
   auto file_name = vm["compare"].as<std::string>();
 

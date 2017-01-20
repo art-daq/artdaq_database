@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(configure_tests) {
   return;
 }
 
-BOOST_AUTO_TEST_CASE(store_configuration) {
+BOOST_AUTO_TEST_CASE(write_document) {
   std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();
   auto ifc = DatabaseConfigurationInterface();
 
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(store_configuration) {
   return;
 }
 
-BOOST_AUTO_TEST_CASE(load_configuration) {
+BOOST_AUTO_TEST_CASE(read_document) {
   std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();
   auto ifc = DatabaseConfigurationInterface();
 
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(load_configuration) {
   return;
 }
 
-BOOST_AUTO_TEST_CASE(store_global_configuration) {
+BOOST_AUTO_TEST_CASE(store_configuration) {
   std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();
   std::shared_ptr<ConfigurationBase> cfg2 = std::make_shared<TestConfiguration002>();
 
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(store_global_configuration) {
   return;
 }
 
-BOOST_AUTO_TEST_CASE(load_global_configuration) {
+BOOST_AUTO_TEST_CASE(load_configuration) {
   auto ifc = DatabaseConfigurationInterface();
 
   auto configName = std::string{"config"} + std::to_string(fixture.version());
@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_CASE(load_global_configuration) {
   return;
 }
 
-BOOST_AUTO_TEST_CASE(find_all_global_configurations) {
+BOOST_AUTO_TEST_CASE(find_all_configurations) {
   auto ifc = DatabaseConfigurationInterface();
 
   auto list = ifc.findAllGlobalConfigurations();

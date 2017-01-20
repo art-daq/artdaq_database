@@ -30,29 +30,31 @@ namespace artdaq {
 namespace database {
 namespace configuration {
 namespace detail {
-void find_global_configurations(ManageConfigsOperation const&, std::string&);
-void build_global_configuration_search_filter(ManageConfigsOperation const&, std::string&);
+void find_configurations(ManageConfigsOperation const&, std::string&);
+void configuration_composition(ManageConfigsOperation const&, std::string&);
 }  // namespace detail
 }  // namespace configuration
 }  // namespace database
 }  // namespace artdaq
 
-result_pair_t opts::find_global_configurations(ManageConfigsOperation const& options) noexcept {
+using artdaq::database::result_t;
+
+result_t opts::find_configurations(ManageConfigsOperation const& options) noexcept {
   try {
     auto returnValue = std::string{};
 
-    detail::find_global_configurations(options, returnValue);
+    detail::find_configurations(options, returnValue);
     return Success(returnValue);
   } catch (...) {
     return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
-result_pair_t opts::build_global_configuration_search_filter(ManageConfigsOperation const& options) noexcept {
+result_t opts::configuration_composition(ManageConfigsOperation const& options) noexcept {
   try {
     auto returnValue = std::string{};
 
-    detail::build_global_configuration_search_filter(options, returnValue);
+    detail::configuration_composition(options, returnValue);
 
     return Success(returnValue);
   } catch (...) {
@@ -60,28 +62,28 @@ result_pair_t opts::build_global_configuration_search_filter(ManageConfigsOperat
   }
 }
 
-result_pair_t json::find_global_configurations(std::string const& search_filter) noexcept {
+result_t json::find_configurations(std::string const& query_payload) noexcept {
   try {
     auto options = ManageConfigsOperation{apiliteral::operation::findconfigs};
-    options.readJsonData({search_filter});
+    options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
 
-    detail::find_global_configurations(options, returnValue);
+    detail::find_configurations(options, returnValue);
     return Success(returnValue);
   } catch (...) {
     return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
-result_pair_t json::build_global_configuration_search_filter(std::string const& search_filter) noexcept {
+result_t json::configuration_composition(std::string const& query_payload) noexcept {
   try {
-    auto options = ManageConfigsOperation{apiliteral::operation::buildfilter};
-    options.readJsonData({search_filter});
+    auto options = ManageConfigsOperation{apiliteral::operation::confcomposition};
+    options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
 
-    detail::build_global_configuration_search_filter(options, returnValue);
+    detail::configuration_composition(options, returnValue);
 
     return Success(returnValue);
   } catch (...) {

@@ -3,7 +3,7 @@
 
 #include "artdaq-database/ConfigurationDB/dispatch_filedb.h"
 #include "artdaq-database/ConfigurationDB/dispatch_mongodb.h"
-#include "artdaq-database/ConfigurationDB/dispatch_uconddb.h"
+#include "artdaq-database/ConfigurationDB/dispatch_ucondb.h"
 
 namespace artdaq {
 namespace database {

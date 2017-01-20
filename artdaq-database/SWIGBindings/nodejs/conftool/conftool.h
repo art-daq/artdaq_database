@@ -1,17 +1,17 @@
 #include <string>
 #include <utility>
 
-typedef std::pair<bool, std::string> result_pair_t;
+typedef std::pair<bool, std::string> result_t;
 
-result_pair_t load_configuration_ui(std::string const& search_filter);
-result_pair_t store_configuration_ui(std::string const& search_filter, std::string const& json_document);
-result_pair_t find_global_configurations_ui(std::string const& search_filter);
-result_pair_t build_global_configuration_search_filter_ui(std::string const& search_filter);
-result_pair_t add_configuration_to_global_configuration_ui(std::string const& search_filter);
-result_pair_t create_new_global_configuration_ui(std::string const& search_filter);
-result_pair_t find_configuration_versions_ui(std::string const& search_filter);
-result_pair_t find_configuration_entities_ui(std::string const& search_filter);
-result_pair_t load_globalconfiguration_ui(std::string const& search_filter);
-result_pair_t store_globalconfiguration_ui(std::string const& search_filter, std::string const& tarbz2base64);
-result_pair_t list_database_names(std::string const& search_filter);
-result_pair_t read_database_info(std::string const& search_filter);
+result_t read_document_ui(std::string const& query_payload);
+result_t write_document_ui(std::string const& query_payload, std::string const& json_document);
+result_t find_configurations_ui(std::string const& query_payload);
+result_t configuration_composition_ui(std::string const& query_payload);
+result_t assign_configuration_ui(std::string const& query_payload);
+result_t create_configuration_ui(std::string const& query_payload);
+result_t find_versions_ui(std::string const& query_payload);
+result_t find_entities_ui(std::string const& query_payload);
+result_t read_configuration_ui(std::string const& query_payload);
+result_t write_configuration_ui(std::string const& query_payload, std::string const& tarbz2base64);
+result_t list_databases(std::string const& query_payload);
+result_t read_dbinfo(std::string const& query_payload);

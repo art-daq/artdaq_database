@@ -1,7 +1,7 @@
 #include "artdaq-database/ConfigurationDB/common.h"
 
 #include "artdaq-database/ConfigurationDB/options_operation_base.h"
-#include "artdaq-database/ConfigurationDB/options_operation_loadstore.h"
+#include "artdaq-database/ConfigurationDB/options_operation_managedocument.h"
 
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
 
@@ -24,19 +24,19 @@ namespace dbbt = db::basictypes;
 
 using dbbt::JsonData;
 using cf::OperationBase;
-using cf::LoadStoreOperation;
+using cf::ManageDocumentOperation;
 
 using cf::options::data_format_t;
 
-LoadStoreOperation::LoadStoreOperation(std::string const& process_name) : OperationBase{process_name} {}
+ManageDocumentOperation::ManageDocumentOperation(std::string const& process_name) : OperationBase{process_name} {}
 
-std::string const& LoadStoreOperation::version() const noexcept {
+std::string const& ManageDocumentOperation::version() const noexcept {
   confirm(!_version.empty());
 
   return _version;
 }
 
-std::string const& LoadStoreOperation::version(std::string const& version) {
+std::string const& ManageDocumentOperation::version(std::string const& version) {
   confirm(!version.empty());
 
   if (version.empty()) {
@@ -50,54 +50,53 @@ std::string const& LoadStoreOperation::version(std::string const& version) {
   return _version;
 }
 
-std::string const& LoadStoreOperation::configurableEntity() const noexcept {
-  confirm(!_configurable_entity.empty());
+std::string const& ManageDocumentOperation::entity() const noexcept {
+  confirm(!_entity.empty());
 
-  return _configurable_entity;
+  return _entity;
 }
 
-std::string const& LoadStoreOperation::configurableEntity(std::string const& entity) {
+std::string const& ManageDocumentOperation::entity(std::string const& entity) {
   confirm(!entity.empty());
 
   if (entity.empty()) {
     throw runtime_error("Options") << "Invalid configurable entity; entity is empty.";
   }
 
-  TRACE_(11, "Options: Updating entity from " << _configurable_entity << " to " << entity << ".");
+  TRACE_(11, "Options: Updating entity from " << _entity << " to " << entity << ".");
 
-  _configurable_entity = entity;
+  _entity = entity;
 
-  return _configurable_entity;
+  return _entity;
 }
 
-std::string const& LoadStoreOperation::globalConfiguration() const noexcept {
-  confirm(!_global_configuration.empty());
+std::string const& ManageDocumentOperation::configuration() const noexcept {
+  confirm(!_configuration.empty());
 
-  return _global_configuration;
+  return _configuration;
 }
 
-std::string const& LoadStoreOperation::globalConfiguration(std::string const& global_configuration) {
+std::string const& ManageDocumentOperation::configuration(std::string const& global_configuration) {
   confirm(!global_configuration.empty());
 
   if (global_configuration.empty()) {
     throw runtime_error("Options") << "Invalid global config; global config is empty.";
   }
 
-  TRACE_(12, "Options: Updating global_configuration from " << _global_configuration << " to " << global_configuration
-                                                            << ".");
+  TRACE_(12, "Options: Updating global_configuration from " << _configuration << " to " << global_configuration << ".");
 
-  _global_configuration = global_configuration;
+  _configuration = global_configuration;
 
-  return _global_configuration;
+  return _configuration;
 }
 
-std::string const& LoadStoreOperation::sourceFileName() const noexcept {
+std::string const& ManageDocumentOperation::sourceFileName() const noexcept {
   confirm(!_source_file_name.empty());
 
   return _source_file_name;
 }
 
-std::string const& LoadStoreOperation::sourceFileName(std::string const& source_file_name) {
+std::string const& ManageDocumentOperation::sourceFileName(std::string const& source_file_name) {
   confirm(!source_file_name.empty());
 
   if (source_file_name.empty()) {
@@ -111,7 +110,7 @@ std::string const& LoadStoreOperation::sourceFileName(std::string const& source_
   return _source_file_name;
 }
 
-void LoadStoreOperation::readJsonData(JsonData const& data) {
+void ManageDocumentOperation::readJsonData(JsonData const& data) {
   confirm(!data.json_buffer.empty());
 
   OperationBase::readJsonData(data);
@@ -120,11 +119,12 @@ void LoadStoreOperation::readJsonData(JsonData const& data) {
   auto dataAST = object_t{};
 
   if (!JsonReader{}.read(data.json_buffer, dataAST)) {
-    throw db::invalid_option_exception("LoadStoreOperation") << "LoadStoreOperation: Unable to read JSON buffer.";
+    throw db::invalid_option_exception("ManageDocumentOperation")
+        << "ManageDocumentOperation: Unable to read JSON buffer.";
   }
 
   try {
-    globalConfiguration(boost::get<std::string>(dataAST.at(apiliteral::option::configuration)));
+    configuration(boost::get<std::string>(dataAST.at(apiliteral::option::configuration)));
   } catch (...) {
   }
 
@@ -134,7 +134,7 @@ void LoadStoreOperation::readJsonData(JsonData const& data) {
   }
 
   try {
-    configurableEntity(boost::get<std::string>(dataAST.at(apiliteral::gui::configurable_entity)));
+    entity(boost::get<std::string>(dataAST.at(apiliteral::gui::configurable_entity)));
   } catch (...) {
   }
 
@@ -146,7 +146,7 @@ void LoadStoreOperation::readJsonData(JsonData const& data) {
   try {
     auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(apiliteral::option::searchfilter));
 
-    if (filterAST.empty()) searchFilter(jsonliteral::notprovided);
+    if (filterAST.empty()) queryFilter(jsonliteral::notprovided);
 
     try {
       version(boost::get<std::string>(filterAST.at(apiliteral::filter::version)));
@@ -154,12 +154,12 @@ void LoadStoreOperation::readJsonData(JsonData const& data) {
     }
 
     try {
-      configurableEntity(boost::get<std::string>(filterAST.at(apiliteral::filter::entity)));
+      entity(boost::get<std::string>(filterAST.at(apiliteral::filter::entity)));
     } catch (...) {
     }
 
     try {
-      globalConfiguration(boost::get<std::string>(filterAST.at(apiliteral::filter::configuration)));
+      configuration(boost::get<std::string>(filterAST.at(apiliteral::filter::configuration)));
     } catch (...) {
     }
 
@@ -173,7 +173,7 @@ void LoadStoreOperation::readJsonData(JsonData const& data) {
   }
 }
 
-int LoadStoreOperation::readProgramOptions(bpo::variables_map const& vm) {
+int ManageDocumentOperation::readProgramOptions(bpo::variables_map const& vm) {
   auto result = OperationBase::readProgramOptions(vm);
 
   if (result != process_exit_code::SUCCESS) return result;
@@ -183,11 +183,11 @@ int LoadStoreOperation::readProgramOptions(bpo::variables_map const& vm) {
   }
 
   if (vm.count(apiliteral::option::entity)) {
-    configurableEntity(vm[apiliteral::option::entity].as<std::string>());
+    entity(vm[apiliteral::option::entity].as<std::string>());
   }
 
   if (vm.count(apiliteral::option::configuration)) {
-    globalConfiguration(vm[apiliteral::option::configuration].as<std::string>());
+    configuration(vm[apiliteral::option::configuration].as<std::string>());
   }
 
   if (vm.count(apiliteral::option::source)) {
@@ -197,7 +197,7 @@ int LoadStoreOperation::readProgramOptions(bpo::variables_map const& vm) {
   return process_exit_code::SUCCESS;
 }
 
-bpo::options_description LoadStoreOperation::makeProgramOptions() const {
+bpo::options_description ManageDocumentOperation::makeProgramOptions() const {
   auto opts = OperationBase::makeProgramOptions();
 
   auto make_opt_name = [](auto& long_name, auto& short_name) {
@@ -217,47 +217,46 @@ bpo::options_description LoadStoreOperation::makeProgramOptions() const {
   return opts;
 }
 
-JsonData LoadStoreOperation::writeJsonData() const {
+JsonData ManageDocumentOperation::writeJsonData() const {
   using namespace artdaq::database::json;
 
   auto docAST = object_t{};
 
   if (!JsonReader{}.read(OperationBase::writeJsonData().json_buffer, docAST)) {
-    throw db::invalid_option_exception("LoadStoreOperation") << "Unable to readsearch_filter_to_JsonData().";
+    throw db::invalid_option_exception("ManageDocumentOperation") << "Unable to readquery_filter_to_JsonData().";
   }
 
-  if (globalConfiguration() != jsonliteral::notprovided)
-    docAST[apiliteral::option::configuration] = globalConfiguration();
+  if (configuration() != jsonliteral::notprovided) docAST[apiliteral::option::configuration] = configuration();
 
   if (sourceFileName() != jsonliteral::notprovided) docAST[apiliteral::option::source] = sourceFileName();
 
   auto json_buffer = std::string{};
 
   if (!JsonWriter{}.write(docAST, json_buffer)) {
-    throw db::invalid_option_exception("LoadStoreOperation") << "Unable to write JSON buffer.";
+    throw db::invalid_option_exception("ManageDocumentOperation") << "Unable to write JSON buffer.";
   }
   return {json_buffer};
 }
 
-JsonData LoadStoreOperation::search_filter_to_JsonData() const {
-  if (searchFilter() != jsonliteral::notprovided) {
-    return {searchFilter()};
+JsonData ManageDocumentOperation::query_filter_to_JsonData() const {
+  if (queryFilter() != jsonliteral::notprovided) {
+    return {queryFilter()};
   }
 
   using namespace artdaq::database::json;
 
   auto docAST = object_t{};
 
-  if (!JsonReader{}.read(OperationBase::search_filter_to_JsonData().json_buffer, docAST)) {
-    throw db::invalid_option_exception("LoadStoreOperation") << "Unable to search_filter_to_JsonData().";
+  if (!JsonReader{}.read(OperationBase::query_filter_to_JsonData().json_buffer, docAST)) {
+    throw db::invalid_option_exception("ManageDocumentOperation") << "Unable to query_filter_to_JsonData().";
   }
 
   if (version() != jsonliteral::notprovided) docAST[apiliteral::filter::version] = version();
 
-  if (configurableEntity() != jsonliteral::notprovided) docAST[apiliteral::filter::entity] = configurableEntity();
+  if (entity() != jsonliteral::notprovided) docAST[apiliteral::filter::entity] = entity();
 
-  if (globalConfiguration() != jsonliteral::notprovided && operation() != apiliteral::operation::addconfig)
-    docAST[apiliteral::filter::configuration] = globalConfiguration();
+  if (configuration() != jsonliteral::notprovided && operation() != apiliteral::operation::addconfig)
+    docAST[apiliteral::filter::configuration] = configuration();
 
   if (docAST.empty()) {
     return {apiliteral::empty_json};
@@ -266,42 +265,42 @@ JsonData LoadStoreOperation::search_filter_to_JsonData() const {
   auto json_buffer = std::string{};
 
   if (!JsonWriter{}.write(docAST, json_buffer)) {
-    throw db::invalid_option_exception("LoadStoreOperation") << "Unable to write JSON buffer.";
+    throw db::invalid_option_exception("ManageDocumentOperation") << "Unable to write JSON buffer.";
   }
   return {json_buffer};
 }
 
-JsonData LoadStoreOperation::globalConfiguration_to_JsonData() const {
+JsonData ManageDocumentOperation::configuration_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[apiliteral::filter::configuration] = globalConfiguration();
+  docAST[apiliteral::filter::configuration] = configuration();
 
   auto json_buffer = std::string{};
 
   if (!JsonWriter{}.write(docAST, json_buffer)) {
-    throw db::invalid_option_exception("LoadStoreOperation") << "Unable to write JSON buffer.";
+    throw db::invalid_option_exception("ManageDocumentOperation") << "Unable to write JSON buffer.";
   }
 
   return {json_buffer};
 }
 
-JsonData LoadStoreOperation::collectionName_to_JsonData() const {
+JsonData ManageDocumentOperation::collection_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[apiliteral::option::collection] = collectionName();
+  docAST[apiliteral::option::collection] = collection();
 
   auto json_buffer = std::string{};
 
   if (!JsonWriter{}.write(docAST, json_buffer)) {
-    throw db::invalid_option_exception("LoadStoreOperation") << "Unable to write JSON buffer.";
+    throw db::invalid_option_exception("ManageDocumentOperation") << "Unable to write JSON buffer.";
   }
 
   return {json_buffer};
 }
 
-JsonData LoadStoreOperation::version_to_JsonData() const {
+JsonData ManageDocumentOperation::version_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
@@ -310,28 +309,28 @@ JsonData LoadStoreOperation::version_to_JsonData() const {
   auto json_buffer = std::string{};
 
   if (!JsonWriter{}.write(docAST, json_buffer)) {
-    throw db::invalid_option_exception("LoadStoreOperation") << "Unable to write JSON buffer.";
+    throw db::invalid_option_exception("ManageDocumentOperation") << "Unable to write JSON buffer.";
   }
 
   return {json_buffer};
 }
-JsonData LoadStoreOperation::configurableEntity_to_JsonData() const {
+JsonData ManageDocumentOperation::entity_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[apiliteral::name] = configurableEntity();
+  docAST[apiliteral::name] = entity();
 
   auto json_buffer = std::string{};
 
   if (!JsonWriter{}.write(docAST, json_buffer)) {
-    throw db::invalid_option_exception("LoadStoreOperation") << "Unable to write JSON buffer.";
+    throw db::invalid_option_exception("ManageDocumentOperation") << "Unable to write JSON buffer.";
   }
 
   return {json_buffer};
 }
 
 //
-void cf::debug::options::enableLoadStoreOperation() {
+void cf::debug::options::enableManageDocumentOperation() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 

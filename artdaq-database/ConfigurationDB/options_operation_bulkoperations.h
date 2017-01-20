@@ -35,7 +35,7 @@ class BulkOperations final {
   std::string const& bulkOperations() const noexcept;
   std::string const& bulkOperations(std::string const&);
 
-  data_format_t const& dataFormat() const noexcept;
+  data_format_t const& format() const noexcept;
 
   JsonData to_JsonData() const;
   std::string to_string() const;

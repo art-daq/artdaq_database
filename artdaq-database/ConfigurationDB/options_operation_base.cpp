@@ -48,13 +48,13 @@ std::string const& OperationBase::operation(std::string const& operation) {
   return _operation;
 }
 
-std::string const& OperationBase::collectionName() const noexcept {
+std::string const& OperationBase::collection() const noexcept {
   confirm(!_collection_name.empty());
 
   return _collection_name;
 }
 
-std::string const& OperationBase::collectionName(std::string const& collection_name) {
+std::string const& OperationBase::collection(std::string const& collection_name) {
   confirm(!collection_name.empty());
 
   TRACE_(11, "Options: Updating collection_name from " << _collection_name << " to " << collection_name << ".");
@@ -74,7 +74,7 @@ std::string const& OperationBase::provider(std::string const& provider) {
   confirm(!provider.empty());
 
   if (db::not_equal(provider, apiliteral::provider::filesystem) &&
-      db::not_equal(provider, apiliteral::provider::mongo) && db::not_equal(provider, apiliteral::provider::ucond)) {
+      db::not_equal(provider, apiliteral::provider::mongo) && db::not_equal(provider, apiliteral::provider::ucon)) {
     throw db::invalid_option_exception("OperationBase") << "Invalid database provider; database provider=" << provider
                                                         << ".";
   }
@@ -86,12 +86,12 @@ std::string const& OperationBase::provider(std::string const& provider) {
   return _provider;
 }
 
-data_format_t const& OperationBase::dataFormat() const noexcept {
+data_format_t const& OperationBase::format() const noexcept {
   confirm(_data_format != data_format_t::unknown);
   return _data_format;
 }
 
-data_format_t const& OperationBase::dataFormat(data_format_t const& data_format) {
+data_format_t const& OperationBase::format(data_format_t const& data_format) {
   confirm(data_format != data_format_t::unknown);
 
   TRACE_(13, "Options: Updating data_format from " << cf::to_string(_data_format) << " to "
@@ -102,36 +102,36 @@ data_format_t const& OperationBase::dataFormat(data_format_t const& data_format)
   return _data_format;
 }
 
-data_format_t const& OperationBase::dataFormat(std::string const& format) {
+data_format_t const& OperationBase::format(std::string const& format) {
   confirm(!format.empty());
 
-  TRACE_(14, "Options: dataFormat args format=<" << format << ">.");
+  TRACE_(14, "Options: format args format=<" << format << ">.");
 
   _data_format = cf::to_data_format(format);
 
   return _data_format;
 }
 
-std::string const& OperationBase::searchFilter() const noexcept {
-  confirm(!_search_filter.empty());
+std::string const& OperationBase::queryFilter() const noexcept {
+  confirm(!_query_payload.empty());
 
-  return _search_filter;
+  return _query_payload;
 }
 
-std::string const& OperationBase::searchFilter(std::string const& search_filter) {
-  confirm(!search_filter.empty());
+std::string const& OperationBase::queryFilter(std::string const& query_payload) {
+  confirm(!query_payload.empty());
 
-  auto tmp = db::dequote(search_filter);
-  TRACE_(15, "Options: searchFilter args search_filter=<" << tmp << ">.");
+  auto tmp = db::dequote(query_payload);
+  TRACE_(15, "Options: queryFilter args query_payload=<" << tmp << ">.");
 
-  _search_filter = tmp;
+  _query_payload = tmp;
 
-  return _search_filter;
+  return _query_payload;
 }
 
-JsonData OperationBase::search_filter_to_JsonData() const {
-  if (searchFilter() != jsonliteral::notprovided) {
-    return {searchFilter()};
+JsonData OperationBase::query_filter_to_JsonData() const {
+  if (queryFilter() != jsonliteral::notprovided) {
+    return {queryFilter()};
   }
 
   return {apiliteral::empty_json};
@@ -233,15 +233,15 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
   }
 
   if (vm.count(apiliteral::option::format)) {
-    dataFormat(vm[apiliteral::option::format].as<std::string>());
+    format(vm[apiliteral::option::format].as<std::string>());
   }
 
   if (vm.count(apiliteral::option::collection)) {
-    collectionName(vm[apiliteral::option::collection].as<std::string>());
+    collection(vm[apiliteral::option::collection].as<std::string>());
   }
 
   if (vm.count(apiliteral::option::searchfilter)) {
-    searchFilter(vm[apiliteral::option::searchfilter].as<std::string>());
+    queryFilter(vm[apiliteral::option::searchfilter].as<std::string>());
   }
   return process_exit_code::SUCCESS;
 }
@@ -272,19 +272,19 @@ void OperationBase::readJsonData(JsonData const& data) {
   }
 
   try {
-    dataFormat(boost::get<std::string>(filterAST.at(apiliteral::option::format)));
+    format(boost::get<std::string>(filterAST.at(apiliteral::option::format)));
   } catch (...) {
   }
 
   try {
-    collectionName(boost::get<std::string>(filterAST.at(apiliteral::option::collection)));
+    collection(boost::get<std::string>(filterAST.at(apiliteral::option::collection)));
   } catch (...) {
   }
 
   try {
     auto const& filter_object = boost::get<jsn::object_t>(filterAST.at(apiliteral::option::searchfilter));
     auto filter_string = std::string{};
-    if (!filter_object.empty() && JsonWriter{}.write(filter_object, filter_string)) searchFilter(filter_string);
+    if (!filter_object.empty() && JsonWriter{}.write(filter_object, filter_string)) queryFilter(filter_string);
   } catch (...) {
   }
 }
@@ -292,19 +292,19 @@ void OperationBase::readJsonData(JsonData const& data) {
 JsonData OperationBase::writeJsonData() const {
   using namespace artdaq::database::json;
 
-  auto searchFilterAST = object_t{};
+  auto queryFilterAST = object_t{};
 
-  if (!JsonReader{}.read(search_filter_to_JsonData().json_buffer, searchFilterAST)) {
-    throw db::invalid_option_exception("OperationBase") << "Unable to readsearch_filter_to_JsonData().";
+  if (!JsonReader{}.read(query_filter_to_JsonData().json_buffer, queryFilterAST)) {
+    throw db::invalid_option_exception("OperationBase") << "Unable to readquery_filter_to_JsonData().";
   }
 
   auto docAST = object_t{};
 
-  docAST[apiliteral::option::searchfilter] = searchFilterAST;
+  docAST[apiliteral::option::searchfilter] = queryFilterAST;
   // docAST[apiliteral::option::provider] = provider();
   docAST[apiliteral::option::operation] = operation();
-  docAST[apiliteral::option::collection] = collectionName();
-  docAST[apiliteral::option::format] = cf::to_string(dataFormat());
+  docAST[apiliteral::option::collection] = collection();
+  docAST[apiliteral::option::format] = cf::to_string(format());
 
   auto json_buffer = std::string{};
 

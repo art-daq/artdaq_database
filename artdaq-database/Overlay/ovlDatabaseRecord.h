@@ -43,13 +43,13 @@ using ovlRunUPtr_t = std::unique_ptr<ovlRun>;
 using ovlAttachment = ovlKeyValue;
 using ovlAttachmentUPtr_t = std::unique_ptr<ovlAttachment>;
 
-using ovlConfigurableEntity = ovlKeyValueTimeStamp<DOCUMENT_COMPARE_MUTE_CONFIGENTITY>;
-using ovlConfigurableEntityUPtr_t = std::unique_ptr<ovlConfigurableEntity>;
+using ovlentity = ovlKeyValueTimeStamp<DOCUMENT_COMPARE_MUTE_CONFIGENTITY>;
+using ovlentityUPtr_t = std::unique_ptr<ovlentity>;
 
 using ovlConfigurations = ovlFixedList<ovlConfiguration, DOCUMENT_COMPARE_MUTE_CONFIGURATION>;
 using ovlConfigurationsUPtr_t = std::unique_ptr<ovlConfigurations>;
 
-using ovlConfigurableEntities = ovlFixedList<ovlConfigurableEntity, DOCUMENT_COMPARE_MUTE_CONFIGENTITY>;
+using ovlConfigurableEntities = ovlFixedList<ovlentity, DOCUMENT_COMPARE_MUTE_CONFIGENTITY>;
 using ovlConfigurableEntitiesUPtr_t = std::unique_ptr<ovlConfigurableEntities>;
 
 using ovlAliases = ovlMovableList<ovlAlias, DOCUMENT_COMPARE_MUTE_ALIAS>;
@@ -77,7 +77,7 @@ class ovlDatabaseRecord final : public ovlKeyValue {
   ovlComments& comments();
   ovlOrigin& origin();
   ovlVersion& version();
-  ovlConfigurableEntity& configurableEntity();
+  ovlentity& entity();
   ovlConfigurations& configurations();
   ovlBookkeeping& bookkeeping();
   ovlId& id();
@@ -110,8 +110,8 @@ class ovlDatabaseRecord final : public ovlKeyValue {
   result_t addAlias(ovlAliasUPtr_t& /*alias*/);
   result_t removeAlias(ovlAliasUPtr_t& /*alias*/);
 
-  result_t addEntity(ovlConfigurableEntityUPtr_t& /*entity*/);
-  result_t removeEntity(ovlConfigurableEntityUPtr_t& /*entity*/);
+  result_t addEntity(ovlentityUPtr_t& /*entity*/);
+  result_t removeEntity(ovlentityUPtr_t& /*entity*/);
 
   result_t setVersion(ovlVersionUPtr_t& /*version*/);
   result_t setCollection(ovlCollectionUPtr_t& /*version*/);

@@ -81,9 +81,9 @@ result_t ovlDatabaseRecord::swap(ovlCollectionUPtr_t& collection) {
 }
 
 /*
-ovlConfigurableEntity& ovlDatabaseRecord::configurableEntity() { return _entities; }
+ovlentity& ovlDatabaseRecord::entity() { return _entities; }
 
-result_t ovlDatabaseRecord::swap(ovlConfigurableEntityUPtr_t& entity) {
+result_t ovlDatabaseRecord::swap(ovlentityUPtr_t& entity) {
   confirm(entity);
 
   if (isReadonly()) return Failure(msg_IsReadonly);
@@ -246,7 +246,7 @@ result_t ovlDatabaseRecord::setCollection(ovlCollectionUPtr_t& collection) {
   return _bookkeeping->postUpdate(update, _collection);
 }
 
-result_t ovlDatabaseRecord::addEntity(ovlConfigurableEntityUPtr_t& entity) {
+result_t ovlDatabaseRecord::addEntity(ovlentityUPtr_t& entity) {
   confirm(entity);
 
   if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
@@ -260,7 +260,7 @@ result_t ovlDatabaseRecord::addEntity(ovlConfigurableEntityUPtr_t& entity) {
   return _bookkeeping->postUpdate(update, entity);
 }
 
-result_t ovlDatabaseRecord::removeEntity(ovlConfigurableEntityUPtr_t& entity) {
+result_t ovlDatabaseRecord::removeEntity(ovlentityUPtr_t& entity) {
   confirm(entity);
 
   if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);

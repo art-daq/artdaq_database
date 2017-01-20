@@ -3,6 +3,8 @@
 
 #include <string>
 #include <cassert>
+#include <sstream> 
+#include <iterator>
 
 #include "artdaq-database/SharedCommon/shared_datatypes.h"
 
@@ -19,6 +21,7 @@ std::string bool_(bool /*bool*/);
 std::string operator"" _quoted(const char* /*text*/, std::size_t);
 std::string debrace(std::string /*s*/);
 std::string dequote(std::string /*s*/);
+std::string debracket(std::string /*s*/);
 
 bool equal(std::string const&, std::string const&);
 bool not_equal(std::string const&, std::string const&);
@@ -29,6 +32,13 @@ object_id_t extract_oid(std::string const&);
 std::string generate_oid();
 std::string to_id(std::string const& /*oid*/);
 std::string to_json(std::string const& /*key*/,std::string const& /*value*/ );
+
+template <typename T>
+std::string to_csv(T const& data){
+  std::ostringstream oss;
+  std::copy(data.begin(), data.end(), std::ostream_iterator<std::string>(oss, ", "));
+  return oss.str();
+}
   
 template <typename T>
 constexpr std::uint8_t static_cast_as_uint8_t(T const& t) {

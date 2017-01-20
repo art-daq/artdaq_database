@@ -9,7 +9,7 @@ namespace basictypes {
 class JsonData;
 }  // namespace basictypes
 namespace configuration {
-class LoadStoreOperation;
+class ManageDocumentOperation;
 class ManageConfigsOperation;
 class ManageAliasesOperation;
 
@@ -18,21 +18,21 @@ using artdaq::database::basictypes::JsonData;
 
 namespace cf = artdaq::database::configuration;
 
-void store(cf::LoadStoreOperation const& /*options*/, JsonData const& /*insert_payload*/);
-JsonData load(cf::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
+void store(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*insert_payload*/);
+JsonData load(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
 
-JsonData findGlobalConfigs(cf::ManageConfigsOperation const& /*options*/, JsonData const& /*search_payload*/);
-JsonData buildConfigSearchFilter(cf::ManageConfigsOperation const& /*options*/, JsonData const& /*search_payload*/);
+JsonData findConfigurations(cf::ManageConfigsOperation const& /*options*/, JsonData const& /*query_payload*/);
+JsonData configurationComposition(cf::ManageConfigsOperation const& /*options*/, JsonData const& /*query_payload*/);
 
-JsonData findConfigVersions(cf::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
-JsonData addConfigToGlobalConfig(cf::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
+JsonData findVersions(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
+JsonData addConfiguration(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
 
-JsonData findConfigEntities(cf::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
+JsonData findEntities(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
 
-JsonData listCollectionNames(cf::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
+JsonData listCollections(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
 
-JsonData listDatabaseNames(cf::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
-JsonData readDatabaseInfo(cf::LoadStoreOperation const& /*options*/, JsonData const& /*search_payload*/);
+JsonData listDatabases(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
+JsonData readDbInfo(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
 }  // namespace filesystem
 
 namespace debug {

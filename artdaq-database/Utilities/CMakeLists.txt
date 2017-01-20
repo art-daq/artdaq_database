@@ -8,7 +8,7 @@ cet_make_exec(conftool
   artdaq-database_ConfigurationDB
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
-  artdaq-database_StorageProviders_UcondDB
+  artdaq-database_StorageProviders_UconDB
   ${Boost_PROGRAM_OPTIONS_LIBRARY}  
 ) 
 

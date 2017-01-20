@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) try {
 
   artdaq::database::configuration::debug::enableFindConfigsOperation();
   artdaq::database::configuration::debug::enableCreateConfigsOperation();
-  artdaq::database::configuration::debug::enableGlobalConfLoadStoreOperation();
+  artdaq::database::configuration::debug::enableConfigurationManageDocumentOperation();
 
   artdaq::database::configuration::debug::options::enableOperationBase();
   artdaq::database::configuration::debug::options::enableOperationManageConfigs();
@@ -95,21 +95,21 @@ int main(int argc, char* argv[]) try {
   using namespace artdaq::database::configuration::json;
 
   cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP, std::string const&, std::string&>(
-      apiliteral::operation::load, load_configuration, options_string, test_document);
+      apiliteral::operation::readdocument, read_document, options_string, test_document);
 
   cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP, std::string const&, std::string&>(
-      apiliteral::operation::globalconfload, load_globalconfiguration, options_string, test_document);
+      apiliteral::operation::globalconfload, read_configuration, options_string, test_document);
   
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      apiliteral::operation::findconfigs, find_global_configurations, options_string);
+      apiliteral::operation::findconfigs, find_configurations, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      apiliteral::operation::buildfilter, build_global_configuration_search_filter, options_string);
+      apiliteral::operation::confcomposition, configuration_composition, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      apiliteral::operation::addconfig, add_configuration_to_global_configuration, options_string);
+      apiliteral::operation::addconfig, assign_configuration, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      apiliteral::operation::findversions, find_configuration_versions, options_string);
+      apiliteral::operation::findversions, find_versions, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      apiliteral::operation::findentities, find_configuration_entities, options_string);
+      apiliteral::operation::findentities, find_entities, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::addalias, add_version_alias,
                                                                                   options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::rmalias, remove_version_alias,
@@ -121,10 +121,10 @@ int main(int argc, char* argv[]) try {
     test_document = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
     is.close();
     cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
-        apiliteral::operation::store, store_configuration, options_string, test_document);
+        apiliteral::operation::writedocument, write_document, options_string, test_document);
 
     cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
-        apiliteral::operation::globalconfstore, store_globalconfiguration, options_string, test_document);
+        apiliteral::operation::globalconfstore, write_configuration, options_string, test_document);
 
   } catch (...) {
   }
@@ -152,8 +152,8 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::SUCCESS;
   }
     
-  if (options.dataFormat() == data_format_t::gui || options.dataFormat() == data_format_t::db ||
-      options.dataFormat() == data_format_t::json) {
+  if (options.format() == data_format_t::gui || options.format() == data_format_t::db ||
+      options.format() == data_format_t::json) {
     auto compare_result = artdaq::database::json::compare_json_objects(returned, expected);
     if (compare_result.first) {
       std::cout << "returned:\n" << returned << "\n";

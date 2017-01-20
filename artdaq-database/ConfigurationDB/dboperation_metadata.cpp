@@ -23,8 +23,8 @@ namespace artdaq {
 namespace database {
 namespace configuration {
 namespace detail {
-void list_database_names(LoadStoreOperation const&, std::string&);
-void read_database_info(LoadStoreOperation const&, std::string&);
+void list_databases(ManageDocumentOperation const&, std::string&);
+void read_dbinfo(ManageDocumentOperation const&, std::string&);
 
 }  // namespace detail
 }  // namespace configuration
@@ -32,51 +32,52 @@ void read_database_info(LoadStoreOperation const&, std::string&);
 }  // namespace artdaq
 
 using namespace artdaq::database::result;
+using artdaq::database::result_t;
 
-result_pair_t opts::list_database_names(LoadStoreOperation const& options, std::string& conf) noexcept {
+result_t opts::list_databases(ManageDocumentOperation const& options, std::string& conf) noexcept {
   try {
-    detail::list_database_names(options, conf);
+    detail::list_databases(options, conf);
     return Success(conf);
   } catch (...) {
     return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
-result_pair_t opts::read_database_info(LoadStoreOperation const& options, std::string& conf) noexcept {
+result_t opts::read_dbinfo(ManageDocumentOperation const& options, std::string& conf) noexcept {
   try {
-    detail::read_database_info(options, conf);
+    detail::read_dbinfo(options, conf);
     return Success(conf);
   } catch (...) {
     return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
-result_pair_t json::list_database_names(std::string const& search_filter) noexcept {
+result_t json::list_databases(std::string const& query_payload) noexcept {
   try {
-    if (search_filter.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = LoadStoreOperation{apiliteral::operation::listdatabases};
-    options.readJsonData({search_filter});
+    auto options = ManageDocumentOperation{apiliteral::operation::listdatabases};
+    options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
 
-    detail::list_database_names(options, returnValue);
+    detail::list_databases(options, returnValue);
     return Success(returnValue);
   } catch (...) {
     return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
-result_pair_t json::read_database_info(std::string const& search_filter) noexcept {
+result_t json::read_dbinfo(std::string const& query_payload) noexcept {
   try {
-    if (search_filter.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = LoadStoreOperation{apiliteral::operation::readdbinfo};
-    options.readJsonData({search_filter});
+    auto options = ManageDocumentOperation{apiliteral::operation::readdbinfo};
+    options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
 
-    detail::read_database_info(options, returnValue);
+    detail::read_dbinfo(options, returnValue);
     return Success(returnValue);
   } catch (...) {
     return Failure(boost::current_exception_diagnostic_information());

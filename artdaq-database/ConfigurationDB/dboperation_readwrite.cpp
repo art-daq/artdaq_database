@@ -2,7 +2,7 @@
 
 #include <boost/exception/diagnostic_information.hpp>
 #include "artdaq-database/BasicTypes/basictypes.h"
-#include "artdaq-database/ConfigurationDB/dboperation_loadstore.h"
+#include "artdaq-database/ConfigurationDB/dboperation_readwrite.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
 #include "artdaq-database/DataFormats/shared_literals.h"
@@ -33,61 +33,62 @@ namespace artdaq {
 namespace database {
 namespace configuration {
 namespace detail {
-void store_configuration(LoadStoreOperation const&, std::string&);
-void load_configuration(LoadStoreOperation const&, std::string&);
+void write_document(ManageDocumentOperation const&, std::string&);
+void read_document(ManageDocumentOperation const&, std::string&);
 }  // namespace detail
 }  // namespace configuration
 }  // namespace database
 }  // namespace artdaq
 
 using namespace artdaq::database::result;
+using artdaq::database::result_t;
 
-result_pair_t opts::store_configuration(LoadStoreOperation const& options, std::string& conf) noexcept {
+result_t opts::write_document(ManageDocumentOperation const& options, std::string& conf) noexcept {
   try {
-    detail::store_configuration(options, conf);
+    detail::write_document(options, conf);
     return Success(conf);
   } catch (...) {
     return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
-result_pair_t opts::load_configuration(LoadStoreOperation const& options, std::string& conf) noexcept {
+result_t opts::read_document(ManageDocumentOperation const& options, std::string& conf) noexcept {
   try {
-    detail::load_configuration(options, conf);
+    detail::read_document(options, conf);
     return Success(conf);
   } catch (...) {
     return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
-result_pair_t json::store_configuration(std::string const& search_filter, std::string const& conf) noexcept {
+result_t json::write_document(std::string const& query_payload, std::string const& conf) noexcept {
   try {
-    if (search_filter.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) return Failure(msg_EmptyFilter);
     if (conf.empty()) return Failure(msg_EmptyDocument);
 
-    auto options = LoadStoreOperation{apiliteral::operation::store};
-    options.readJsonData({search_filter});
+    auto options = ManageDocumentOperation{apiliteral::operation::writedocument};
+    options.readJsonData({query_payload});
 
     // convert to database_format
     auto database_format = std::string(conf);
 
-    detail::store_configuration(options, database_format);
+    detail::write_document(options, database_format);
     return Success(database_format);
   } catch (...) {
     return Failure(boost::current_exception_diagnostic_information());
   }
 }
 
-result_pair_t json::load_configuration(std::string const& search_filter, std::string& conf) noexcept {
+result_t json::read_document(std::string const& query_payload, std::string& conf) noexcept {
   try {
-    if (search_filter.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = LoadStoreOperation{apiliteral::operation::load};
-    options.readJsonData({search_filter});
+    auto options = ManageDocumentOperation{apiliteral::operation::readdocument};
+    options.readJsonData({query_payload});
 
     auto database_format = std::string{};
 
-    detail::load_configuration(options, database_format);
+    detail::read_document(options, database_format);
 
     // convert to gui
     conf = database_format;
@@ -98,12 +99,12 @@ result_pair_t json::load_configuration(std::string const& search_filter, std::st
   }
 }
 
-void dbcfg::debug::enableLoadStoreOperation() {
+void dbcfg::debug::enableManageDocumentOperation() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::LoadStoreOperation trace_enable");
+  TRACE_(0, "artdaq::database::configuration::ManageDocumentOperation trace_enable");
 }

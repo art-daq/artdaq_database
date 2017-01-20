@@ -42,12 +42,12 @@ namespace detail {
 
 using namespace artdaq::database::result;
 
-result_pair_t json::add_version_alias(std::string const& search_filter) noexcept {
+result_t json::add_version_alias(std::string const& query_payload) noexcept {
   try {
-    if (search_filter.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = LoadStoreOperation{apiliteral::operation::addalias};
-    options.readJsonData({search_filter});
+    auto options = ManageDocumentOperation{apiliteral::operation::addalias};
+    options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
 
@@ -59,12 +59,12 @@ result_pair_t json::add_version_alias(std::string const& search_filter) noexcept
   }
 }
 
-result_pair_t json::remove_version_alias(std::string const& search_filter) noexcept {
+result_t json::remove_version_alias(std::string const& query_payload) noexcept {
   try {
-    if (search_filter.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = LoadStoreOperation{apiliteral::operation::rmalias};
-    options.readJsonData({search_filter});
+    auto options = ManageDocumentOperation{apiliteral::operation::rmalias};
+    options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
 
@@ -76,12 +76,12 @@ result_pair_t json::remove_version_alias(std::string const& search_filter) noexc
   }
 }
 
-result_pair_t json::find_version_aliases(std::string const& search_filter) noexcept {
+result_t json::find_version_aliases(std::string const& query_payload) noexcept {
   try {
-    if (search_filter.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = LoadStoreOperation{apiliteral::operation::rmalias};
-    options.readJsonData({search_filter});
+    auto options = ManageDocumentOperation{apiliteral::operation::rmalias};
+    options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
 

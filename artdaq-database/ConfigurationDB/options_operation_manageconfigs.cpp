@@ -53,45 +53,44 @@ std::string const& ManageConfigsOperation::version(std::string const& version) {
   return _version;
 }
 
-std::string const& ManageConfigsOperation::configurableEntity() const noexcept {
-  confirm(!_configurable_entity.empty());
+std::string const& ManageConfigsOperation::entity() const noexcept {
+  confirm(!_entity.empty());
 
-  return _configurable_entity;
+  return _entity;
 }
 
-std::string const& ManageConfigsOperation::configurableEntity(std::string const& entity) {
+std::string const& ManageConfigsOperation::entity(std::string const& entity) {
   confirm(!entity.empty());
 
   if (entity.empty()) {
     throw runtime_error("Options") << "Invalid configurable entity; entity is empty.";
   }
 
-  TRACE_(11, "Options: Updating entity from " << _configurable_entity << " to " << entity << ".");
+  TRACE_(11, "Options: Updating entity from " << _entity << " to " << entity << ".");
 
-  _configurable_entity = entity;
+  _entity = entity;
 
-  return _configurable_entity;
+  return _entity;
 }
 
-std::string const& ManageConfigsOperation::globalConfiguration() const noexcept {
-  confirm(!_global_configuration.empty());
+std::string const& ManageConfigsOperation::configuration() const noexcept {
+  confirm(!_configuration.empty());
 
-  return _global_configuration;
+  return _configuration;
 }
 
-std::string const& ManageConfigsOperation::globalConfiguration(std::string const& global_configuration) {
+std::string const& ManageConfigsOperation::configuration(std::string const& global_configuration) {
   confirm(!global_configuration.empty());
 
   if (global_configuration.empty()) {
     throw runtime_error("Options") << "Invalid global config; global config is empty.";
   }
 
-  TRACE_(12, "Options: Updating global_configuration from " << _global_configuration << " to " << global_configuration
-                                                            << ".");
+  TRACE_(12, "Options: Updating global_configuration from " << _configuration << " to " << global_configuration << ".");
 
-  _global_configuration = global_configuration;
+  _configuration = global_configuration;
 
-  return _global_configuration;
+  return _configuration;
 }
 
 void ManageConfigsOperation::readJsonData(JsonData const& data) {
@@ -108,14 +107,14 @@ void ManageConfigsOperation::readJsonData(JsonData const& data) {
   }
 
   try {
-    globalConfiguration(boost::get<std::string>(dataAST.at(apiliteral::option::configuration)));
+    configuration(boost::get<std::string>(dataAST.at(apiliteral::option::configuration)));
   } catch (...) {
   }
 
   try {
     auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(apiliteral::option::searchfilter));
 
-    if (filterAST.empty()) searchFilter(jsonliteral::notprovided);
+    if (filterAST.empty()) queryFilter(jsonliteral::notprovided);
 
     try {
       version(boost::get<std::string>(filterAST.at(apiliteral::filter::version)));
@@ -123,12 +122,12 @@ void ManageConfigsOperation::readJsonData(JsonData const& data) {
     }
 
     try {
-      configurableEntity(boost::get<std::string>(filterAST.at(apiliteral::filter::entity)));
+      entity(boost::get<std::string>(filterAST.at(apiliteral::filter::entity)));
     } catch (...) {
     }
 
     try {
-      globalConfiguration(boost::get<std::string>(filterAST.at(apiliteral::filter::configuration)));
+      configuration(boost::get<std::string>(filterAST.at(apiliteral::filter::configuration)));
     } catch (...) {
     }
 
@@ -147,11 +146,11 @@ int ManageConfigsOperation::readProgramOptions(bpo::variables_map const& vm) {
   }
 
   if (vm.count(apiliteral::option::entity)) {
-    configurableEntity(vm[apiliteral::option::entity].as<std::string>());
+    entity(vm[apiliteral::option::entity].as<std::string>());
   }
 
   if (vm.count(apiliteral::option::configuration)) {
-    globalConfiguration(vm[apiliteral::option::configuration].as<std::string>());
+    configuration(vm[apiliteral::option::configuration].as<std::string>());
   }
 
   return process_exit_code::SUCCESS;
@@ -183,11 +182,10 @@ JsonData ManageConfigsOperation::writeJsonData() const {
   auto docAST = object_t{};
 
   if (!JsonReader{}.read(OperationBase::writeJsonData().json_buffer, docAST)) {
-    throw db::invalid_option_exception("ManageConfigsOperation") << "Unable to readsearch_filter_to_JsonData().";
+    throw db::invalid_option_exception("ManageConfigsOperation") << "Unable to readquery_filter_to_JsonData().";
   }
 
-  if (globalConfiguration() != jsonliteral::notprovided)
-    docAST[apiliteral::option::configuration] = globalConfiguration();
+  if (configuration() != jsonliteral::notprovided) docAST[apiliteral::option::configuration] = configuration();
 
   auto json_buffer = std::string{};
 
@@ -197,25 +195,25 @@ JsonData ManageConfigsOperation::writeJsonData() const {
   return {json_buffer};
 }
 
-JsonData ManageConfigsOperation::search_filter_to_JsonData() const {
-  if (searchFilter() != jsonliteral::notprovided) {
-    return {searchFilter()};
+JsonData ManageConfigsOperation::query_filter_to_JsonData() const {
+  if (queryFilter() != jsonliteral::notprovided) {
+    return {queryFilter()};
   }
 
   using namespace artdaq::database::json;
 
   auto docAST = object_t{};
 
-  if (!JsonReader{}.read(OperationBase::search_filter_to_JsonData().json_buffer, docAST)) {
-    throw db::invalid_option_exception("ManageConfigsOperation") << "Unable to search_filter_to_JsonData().";
+  if (!JsonReader{}.read(OperationBase::query_filter_to_JsonData().json_buffer, docAST)) {
+    throw db::invalid_option_exception("ManageConfigsOperation") << "Unable to query_filter_to_JsonData().";
   }
 
   if (version() != jsonliteral::notprovided) docAST[apiliteral::filter::version] = version();
 
-  if (configurableEntity() != jsonliteral::notprovided) docAST[apiliteral::filter::entity] = configurableEntity();
+  if (entity() != jsonliteral::notprovided) docAST[apiliteral::filter::entity] = entity();
 
-  if (globalConfiguration() != jsonliteral::notprovided && operation() != apiliteral::operation::addconfig)
-    docAST[apiliteral::filter::configuration] = globalConfiguration();
+  if (configuration() != jsonliteral::notprovided && operation() != apiliteral::operation::addconfig)
+    docAST[apiliteral::filter::configuration] = configuration();
 
   if (docAST.empty()) {
     return {apiliteral::empty_json};
@@ -229,11 +227,11 @@ JsonData ManageConfigsOperation::search_filter_to_JsonData() const {
   return {json_buffer};
 }
 
-JsonData ManageConfigsOperation::globalConfiguration_to_JsonData() const {
+JsonData ManageConfigsOperation::configuration_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[apiliteral::filter::configuration] = globalConfiguration();
+  docAST[apiliteral::filter::configuration] = configuration();
 
   auto json_buffer = std::string{};
 
@@ -259,11 +257,11 @@ JsonData ManageConfigsOperation::version_to_JsonData() const {
   return {json_buffer};
 }
 
-JsonData ManageConfigsOperation::configurableEntity_to_JsonData() const {
+JsonData ManageConfigsOperation::entity_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[apiliteral::name] = configurableEntity();
+  docAST[apiliteral::name] = entity();
 
   auto json_buffer = std::string{};
 

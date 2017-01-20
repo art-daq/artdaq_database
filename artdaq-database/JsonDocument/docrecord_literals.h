@@ -48,7 +48,7 @@ constexpr auto document_root = "root";
 
 namespace actions {
 constexpr auto addAlias = "addAlias";
-constexpr auto setConfigurableEntity = "setConfigurableEntity";
+constexpr auto setentity = "setentity";
 constexpr auto removeAlias = "removeAlias";
 constexpr auto addToGlobalConfig = "addToGlobalConfig";
 constexpr auto setVersion = "setVersion";

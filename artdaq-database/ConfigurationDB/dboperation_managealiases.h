@@ -1,27 +1,27 @@
 #ifndef _ARTDAQ_DATABASE_CONFIGURATIONDB_MANAGEALIAS_H_
 #define _ARTDAQ_DATABASE_CONFIGURATIONDB_MANAGEALIAS_H_
 
-#include <string>
-#include <utility>
+#include "artdaq-database/SharedCommon/returned_result.h"
 
 namespace artdaq {
 namespace database {
 namespace configuration {
-class LoadStoreOperation;
+class ManageDocumentOperation;
 
-using result_pair_t = std::pair<bool, std::string>;
+using artdaq::database::result_t;
 
 namespace opts {
-using artdaq::database::configuration::LoadStoreOperation;
-result_pair_t add_version_alias(LoadStoreOperation const& /*options*/) noexcept;
-result_pair_t remove_version_alias(LoadStoreOperation const& /*options*/) noexcept;
-result_pair_t find_version_aliases(LoadStoreOperation const& /*options*/) noexcept;
+using artdaq::database::configuration::ManageDocumentOperation;
+
+result_t add_version_alias(ManageDocumentOperation const& /*options*/) noexcept;
+result_t remove_version_alias(ManageDocumentOperation const& /*options*/) noexcept;
+result_t find_version_aliases(ManageDocumentOperation const& /*options*/) noexcept;
 }
 
 namespace json {
-result_pair_t add_version_alias(std::string const& /*search_filter*/) noexcept;
-result_pair_t remove_version_alias(std::string const& /*search_filter*/) noexcept;
-result_pair_t find_version_aliases(std::string const& /*search_filter*/) noexcept;
+result_t add_version_alias(std::string const& /*task_payload*/) noexcept;
+result_t remove_version_alias(std::string const& /*task_payload*/) noexcept;
+result_t find_version_aliases(std::string const& /*task_payload*/) noexcept;
 }
 
 namespace debug {

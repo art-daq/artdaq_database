@@ -1,13 +1,13 @@
 #include "artdaq-database/ConfigurationDB/common.h"
 
-#include "artdaq-database/ConfigurationDB/dispatch_uconddb.h"
+#include "artdaq-database/ConfigurationDB/dispatch_ucondb.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
 
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/DataFormats/shared_literals.h"
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
-#include "artdaq-database/StorageProviders/UcondDB/provider_uconddb.h"
+#include "artdaq-database/StorageProviders/UconDB/provider_ucondb.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -18,23 +18,23 @@
 using namespace artdaq::database::configuration;
 namespace cf = artdaq::database::configuration;
 
-namespace DBI = artdaq::database::ucond;
-namespace prov = artdaq::database::configuration::ucond;
+namespace DBI = artdaq::database::ucon;
+namespace prov = artdaq::database::configuration::ucon;
 
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocument;
 
-void prov::store(LoadStoreOperation const& options, JsonData const& insert_payload) {
-  confirm(options.provider().compare(apiliteral::provider::ucond) == 0);
-  confirm(options.operation().compare(apiliteral::operation::store) == 0);
+void prov::store(ManageDocumentOperation const& options, JsonData const& insert_payload) {
+  confirm(options.provider().compare(apiliteral::provider::ucon) == 0);
+  confirm(options.operation().compare(apiliteral::operation::writedocument) == 0);
 
-  if (options.operation().compare(apiliteral::operation::store) != 0) {
-    throw runtime_error("store_configuration") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  if (options.operation().compare(apiliteral::operation::writedocument) != 0) {
+    throw runtime_error("write_document") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::ucond) != 0) {
-    throw runtime_error("store_configuration") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  if (options.provider().compare(apiliteral::provider::ucon) != 0) {
+    throw runtime_error("write_document") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
   TRACE_(15, "store: begin");
@@ -42,23 +42,23 @@ void prov::store(LoadStoreOperation const& options, JsonData const& insert_paylo
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JsonData>::create(database);
-  auto object_id = provider->writeConfiguration(insert_payload);
+  auto object_id = provider->writeDocument(insert_payload);
 
   TRACE_(15, "store: object_id=<" << object_id << ">");
 
   TRACE_(15, "store: end");
 }
 
-JsonData prov::load(LoadStoreOperation const& options, JsonData const& search_payload) {
-  confirm(options.provider().compare(apiliteral::provider::ucond) == 0);
-  confirm(options.operation().compare(apiliteral::operation::load) == 0);
+JsonData prov::load(ManageDocumentOperation const& options, JsonData const& search_payload) {
+  confirm(options.provider().compare(apiliteral::provider::ucon) == 0);
+  confirm(options.operation().compare(apiliteral::operation::readdocument) == 0);
 
-  if (options.operation().compare(apiliteral::operation::load) != 0) {
-    throw runtime_error("load_configuration") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  if (options.operation().compare(apiliteral::operation::readdocument) != 0) {
+    throw runtime_error("read_document") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::ucond) != 0) {
-    throw runtime_error("load_configuration") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  if (options.provider().compare(apiliteral::provider::ucon) != 0) {
+    throw runtime_error("read_document") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
   TRACE_(16, "load: begin");
@@ -67,13 +67,13 @@ JsonData prov::load(LoadStoreOperation const& options, JsonData const& search_pa
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JsonData>::create(database);
 
-  auto collection = provider->readConfiguration(search_payload);
+  auto collection = provider->readDocument(search_payload);
 
-  TRACE_(16, "load_configuration: "
+  TRACE_(16, "read_document: "
                  << "Search returned " << collection.size() << " results.");
 
   if (collection.size() != 1) {
-    throw runtime_error("load_configuration") << "Search returned " << collection.size() << " results.";
+    throw runtime_error("read_document") << "Search returned " << collection.size() << " results.";
   }
 
   auto data = JsonData{collection.begin()->json_buffer};
@@ -83,8 +83,8 @@ JsonData prov::load(LoadStoreOperation const& options, JsonData const& search_pa
   return data;
 }
 
-JsonData prov::findGlobalConfigs(ManageConfigsOperation const& options, JsonData const& search_payload) {
-  confirm(options.provider().compare(apiliteral::provider::ucond) == 0);
+JsonData prov::findConfigurations(ManageConfigsOperation const& options, JsonData const& search_payload) {
+  confirm(options.provider().compare(apiliteral::provider::ucon) == 0);
   confirm(options.operation().compare(apiliteral::operation::findconfigs) == 0);
 
   if (options.operation().compare(apiliteral::operation::findconfigs) != 0) {
@@ -92,7 +92,7 @@ JsonData prov::findGlobalConfigs(ManageConfigsOperation const& options, JsonData
                                                  << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::ucond) != 0) {
+  if (options.provider().compare(apiliteral::provider::ucon) != 0) {
     throw runtime_error("operation_findconfigs") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
@@ -102,7 +102,7 @@ JsonData prov::findGlobalConfigs(ManageConfigsOperation const& options, JsonData
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JsonData>::create(database);
 
-  auto global_configs = provider->findGlobalConfigs(search_payload);
+  auto global_configs = provider->findConfigurations(search_payload);
 
   if (global_configs.empty()) {
     return {apiliteral::empty_search_result};
@@ -150,16 +150,16 @@ JsonData prov::findGlobalConfigs(ManageConfigsOperation const& options, JsonData
   return {oss.str()};
 }
 
-JsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, JsonData const& search_payload) {
-  confirm(options.provider().compare(apiliteral::provider::ucond) == 0);
-  confirm(options.operation().compare(apiliteral::operation::buildfilter) == 0);
+JsonData prov::configurationComposition(ManageConfigsOperation const& options, JsonData const& search_payload) {
+  confirm(options.provider().compare(apiliteral::provider::ucon) == 0);
+  confirm(options.operation().compare(apiliteral::operation::confcomposition) == 0);
 
-  if (options.operation().compare(apiliteral::operation::buildfilter) != 0) {
+  if (options.operation().compare(apiliteral::operation::confcomposition) != 0) {
     throw runtime_error("operation_buildfilter") << "Wrong operation option; operation=<" << options.operation()
                                                  << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::ucond) != 0) {
+  if (options.provider().compare(apiliteral::provider::ucon) != 0) {
     throw runtime_error("operation_buildfilter") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
@@ -169,9 +169,9 @@ JsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, Js
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JsonData>::create(database);
 
-  auto search_filters = provider->buildConfigSearchFilter(search_payload);
+  auto query_payloads = provider->configurationComposition(search_payload);
 
-  if (search_filters.empty()) {
+  if (query_payloads.empty()) {
     throw runtime_error("operation_buildfilter") << "No search filters were found.";
   }
 
@@ -191,8 +191,8 @@ JsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, Js
 
   oss << "{ \"search\": [\n";
 
-  for (auto const& search_filter : search_filters) {
-    auto filter_json = JSONDocument{search_filter.json_buffer}.findChild("filter").value();
+  for (auto const& query_payload : query_payloads) {
+    auto filter_json = JSONDocument{query_payload.json_buffer}.findChild("filter").value();
 
     auto results = std::smatch();
 
@@ -212,7 +212,7 @@ JsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, Js
 
     oss << printComma() << "{";
     oss << "\"name\" :\"" << results[1].str() << ":" << results[3].str() << "\",";
-    oss << "\"query\" :" << search_filter.json_buffer;
+    oss << "\"query\" :" << query_payload.json_buffer;
     oss << "}\n";
   }
 
@@ -221,8 +221,8 @@ JsonData prov::buildConfigSearchFilter(ManageConfigsOperation const& options, Js
   return {oss.str()};
 }
 
-JsonData prov::findConfigVersions(LoadStoreOperation const& options, JsonData const&) {
-  confirm(options.provider().compare(apiliteral::provider::ucond) == 0);
+JsonData prov::findVersions(ManageDocumentOperation const& options, JsonData const&) {
+  confirm(options.provider().compare(apiliteral::provider::ucon) == 0);
   confirm(options.operation().compare(apiliteral::operation::findversions) == 0);
 
   if (options.operation().compare(apiliteral::operation::findversions) != 0) {
@@ -230,7 +230,7 @@ JsonData prov::findConfigVersions(LoadStoreOperation const& options, JsonData co
                                                   << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::ucond) != 0) {
+  if (options.provider().compare(apiliteral::provider::ucon) != 0) {
     throw runtime_error("operation_findversions") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
@@ -240,8 +240,8 @@ JsonData prov::findConfigVersions(LoadStoreOperation const& options, JsonData co
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JsonData>::create(database);
 
-  auto search_filter = options.to_JsonData();
-  auto config_versions = provider->findConfigVersions(search_filter);
+  auto query_payload = options.to_JsonData();
+  auto config_versions = provider->findVersions(query_payload);
 
   if (config_versions.empty()) {
     return {apiliteral::empty_search_result};
@@ -296,8 +296,8 @@ JsonData prov::findConfigVersions(LoadStoreOperation const& options, JsonData co
   return {oss.str()};
 }
 
-JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData const&) {
-  confirm(options.provider().compare(apiliteral::provider::ucond) == 0);
+JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData const&) {
+  confirm(options.provider().compare(apiliteral::provider::ucon) == 0);
   confirm(options.operation().compare(apiliteral::operation::findentities) == 0);
 
   if (options.operation().compare(apiliteral::operation::findentities) != 0) {
@@ -305,7 +305,7 @@ JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData co
                                                   << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::ucond) != 0) {
+  if (options.provider().compare(apiliteral::provider::ucon) != 0) {
     throw runtime_error("operation_findentities") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
@@ -315,8 +315,8 @@ JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData co
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JsonData>::create(database);
 
-  auto search_filter = options.to_JsonData();
-  auto config_entities = provider->findConfigEntities(search_filter);
+  auto query_payload = options.to_JsonData();
+  auto config_entities = provider->findEntities(query_payload);
 
   if (config_entities.empty()) {
     return {apiliteral::empty_search_result};
@@ -371,56 +371,56 @@ JsonData prov::findConfigEntities(LoadStoreOperation const& options, JsonData co
   return {oss.str()};
 }
 
-JsonData prov::addConfigToGlobalConfig(LoadStoreOperation const& options, JsonData const& search_payload) {
-  confirm(options.provider().compare(apiliteral::provider::ucond) == 0);
+JsonData prov::addConfiguration(ManageDocumentOperation const& options, JsonData const& search_payload) {
+  confirm(options.provider().compare(apiliteral::provider::ucon) == 0);
   confirm(options.operation().compare(apiliteral::operation::addconfig) == 0);
 
   if (options.operation().compare(apiliteral::operation::addconfig) != 0) {
     throw runtime_error("operation_addconfig") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::ucond) != 0) {
+  if (options.provider().compare(apiliteral::provider::ucon) != 0) {
     throw runtime_error("operation_addconfig") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
   TRACE_(20, "operation_addconfig: begin");
 
   auto new_options = options;
-  new_options.operation(apiliteral::operation::load);
+  new_options.operation(apiliteral::operation::readdocument);
 
   auto search =
-      JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collectionName() + "\"}"};
+      JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collection() + "\"}"};
   TRACE_(20, "operation_addconfig: args search_payload=<" << search.json_buffer << ">");
 
-  auto document = ucond::load(new_options, search);
+  auto document = ucon::load(new_options, search);
   auto json_document = JSONDocument{document.json_buffer};
   JSONDocumentBuilder builder{json_document};
-  auto globalConfiguration = JSONDocument{new_options.globalConfiguration_to_JsonData().json_buffer};
+  auto configuration = JSONDocument{new_options.configuration_to_JsonData().json_buffer};
 
-  builder.addConfiguration(globalConfiguration);
+  builder.addConfiguration(configuration);
 
-  new_options.operation(apiliteral::operation::store);
+  new_options.operation(apiliteral::operation::writedocument);
 
   auto update =
       JsonData{"{\"filter\":{\"$oid\":\"" + builder.extract().deleteChild("_id").value() + "\"},  \"document\":" +
-               builder.extract().to_string() + ", \"collection\":\"" + options.collectionName() + "\"}"};
+               builder.extract().to_string() + ", \"collection\":\"" + options.collection() + "\"}"};
 
-  ucond::store(new_options, update.json_buffer);
+  ucon::store(new_options, update.json_buffer);
 
-  new_options.operation(apiliteral::operation::buildfilter);
+  new_options.operation(apiliteral::operation::confcomposition);
 
   auto find_options = ManageConfigsOperation{apiliteral::operation::addconfig};
 
-  find_options.operation(apiliteral::operation::buildfilter);
-  find_options.dataFormat(options::data_format_t::gui);
-  find_options.provider(apiliteral::provider::ucond);
-  find_options.globalConfiguration(new_options.globalConfiguration());
+  find_options.operation(apiliteral::operation::confcomposition);
+  find_options.format(options::data_format_t::gui);
+  find_options.provider(apiliteral::provider::ucon);
+  find_options.configuration(new_options.configuration());
 
-  return ucond::buildConfigSearchFilter(find_options, options.globalConfiguration_to_JsonData().json_buffer);
+  return ucon::configurationComposition(find_options, options.configuration_to_JsonData().json_buffer);
 }
 
-JsonData prov::listCollectionNames(LoadStoreOperation const& options, JsonData const& search_payload) {
-  confirm(options.provider().compare(apiliteral::provider::ucond) == 0);
+JsonData prov::listCollections(ManageDocumentOperation const& options, JsonData const& search_payload) {
+  confirm(options.provider().compare(apiliteral::provider::ucon) == 0);
   confirm(options.operation().compare(apiliteral::operation::listcollections) == 0);
 
   if (options.operation().compare(apiliteral::operation::listcollections) != 0) {
@@ -428,7 +428,7 @@ JsonData prov::listCollectionNames(LoadStoreOperation const& options, JsonData c
                                                      << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::ucond) != 0) {
+  if (options.provider().compare(apiliteral::provider::ucon) != 0) {
     throw runtime_error("operation_listcollections") << "Wrong provider option; provider=<" << options.provider()
                                                      << ">.";
   }
@@ -439,7 +439,7 @@ JsonData prov::listCollectionNames(LoadStoreOperation const& options, JsonData c
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JsonData>::create(database);
 
-  auto collection_names = provider->listCollectionNames(search_payload);
+  auto collection_names = provider->listCollections(search_payload);
 
   if (collection_names.empty()) {
     return {apiliteral::empty_search_result};
@@ -473,8 +473,8 @@ JsonData prov::listCollectionNames(LoadStoreOperation const& options, JsonData c
   return {oss.str()};
 }
 
-JsonData prov::listDatabaseNames(LoadStoreOperation const& options, JsonData const& search_payload) {
-  confirm(options.provider().compare(apiliteral::provider::ucond) == 0);
+JsonData prov::listDatabases(ManageDocumentOperation const& options, JsonData const& search_payload) {
+  confirm(options.provider().compare(apiliteral::provider::ucon) == 0);
   confirm(options.operation().compare(apiliteral::operation::listdatabases) == 0);
 
   if (options.operation().compare(apiliteral::operation::listdatabases) != 0) {
@@ -482,7 +482,7 @@ JsonData prov::listDatabaseNames(LoadStoreOperation const& options, JsonData con
                                                    << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::ucond) != 0) {
+  if (options.provider().compare(apiliteral::provider::ucon) != 0) {
     throw runtime_error("operation_listdatabases") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
@@ -492,7 +492,7 @@ JsonData prov::listDatabaseNames(LoadStoreOperation const& options, JsonData con
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JsonData>::create(database);
 
-  auto database_names = provider->listDatabaseNames(search_payload);
+  auto database_names = provider->listDatabases(search_payload);
 
   if (database_names.empty()) {
     return {apiliteral::empty_search_result};
@@ -526,15 +526,15 @@ JsonData prov::listDatabaseNames(LoadStoreOperation const& options, JsonData con
   return {oss.str()};
 }
 
-JsonData prov::readDatabaseInfo(LoadStoreOperation const& options, JsonData const& search_payload) {
-  confirm(options.provider().compare(apiliteral::provider::ucond) == 0);
+JsonData prov::readDbInfo(ManageDocumentOperation const& options, JsonData const& search_payload) {
+  confirm(options.provider().compare(apiliteral::provider::ucon) == 0);
   confirm(options.operation().compare(apiliteral::operation::readdbinfo) == 0);
 
   if (options.operation().compare(apiliteral::operation::readdbinfo) != 0) {
     throw runtime_error("operation_readdbinfo") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::ucond) != 0) {
+  if (options.provider().compare(apiliteral::provider::ucon) != 0) {
     throw runtime_error("operation_readdbinfo") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 

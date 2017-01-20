@@ -29,20 +29,20 @@ class OperationBase {
   std::string const& operation() const noexcept;
   std::string const& operation(std::string const&);
 
-  std::string const& collectionName() const noexcept;
-  std::string const& collectionName(std::string const&);
+  std::string const& collection() const noexcept;
+  std::string const& collection(std::string const&);
 
   std::string const& provider() const noexcept;
   std::string const& provider(std::string const&);
 
-  data_format_t const& dataFormat() const noexcept;
-  data_format_t const& dataFormat(data_format_t const&);
-  data_format_t const& dataFormat(std::string const&);
+  data_format_t const& format() const noexcept;
+  data_format_t const& format(data_format_t const&);
+  data_format_t const& format(std::string const&);
 
-  std::string const& searchFilter() const noexcept;
-  std::string const& searchFilter(std::string const&);
+  std::string const& queryFilter() const noexcept;
+  std::string const& queryFilter(std::string const&);
 
-  virtual JsonData search_filter_to_JsonData() const;
+  virtual JsonData query_filter_to_JsonData() const;
 
   JsonData to_JsonData() const;
   std::string to_string() const;
@@ -61,10 +61,10 @@ class OperationBase {
   std::string _process_name = {jsonliteral::notprovided};
 
   std::string _provider = {apiliteral::provider::filesystem};
-  std::string _operation = {apiliteral::operation::load};
+  std::string _operation = {apiliteral::operation::readdocument};
   data_format_t _data_format = {data_format_t::unknown};
   std::string _collection_name = {jsonliteral::notprovided};
-  std::string _search_filter = {jsonliteral::notprovided};
+  std::string _query_payload = {jsonliteral::notprovided};
 };
 
 namespace debug {

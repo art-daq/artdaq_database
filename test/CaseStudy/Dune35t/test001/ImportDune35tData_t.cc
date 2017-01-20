@@ -25,7 +25,7 @@ namespace cfo = cf::options;
 namespace literal = artdaq::database::configuration::literal;
 namespace bpo = boost::program_options;
 
-using Options = cf::LoadStoreOperation;
+using Options = cf::ManageDocumentOperation;
 
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::basictypes::JsonData;
@@ -35,7 +35,7 @@ constexpr auto path = "path";
 constexpr auto appname = "ImportDune35tData_t";
 }
 
-int store_configuration_file(Options const&, std::string const&);
+int write_document_file(Options const&, std::string const&);
 std::vector<std::string> list_files(std::string const&);
 
 int main(int argc, char* argv[]) try {
@@ -83,8 +83,8 @@ int main(int argc, char* argv[]) try {
   }
 
   using cfo::data_format_t;
-  options.dataFormat(data_format_t::fhicl);
-  options.operation(apiliteral::operation::store);
+  options.format(data_format_t::fhicl);
+  options.operation(apiliteral::operation::writedocument);
   auto path_to_config_dir = vm[apiliteral::option::source].as<std::string>();
 
   auto to_collection_name = [](std::string const& file_path_str) ->std::string {
@@ -107,20 +107,20 @@ int main(int argc, char* argv[]) try {
   };
 
   for (auto const& file_name : list_files(path_to_config_dir)) {
-    options.collectionName(to_collection_name(file_name));    
+    options.collection(to_collection_name(file_name));    
     if(file_name.rfind(".fcl")!=std::string::npos)
-     store_configuration_file(options,file_name);
+     write_document_file(options,file_name);
   }
 } catch (...) {
   std::cout << "Process exited with error: " << boost::current_exception_diagnostic_information();
   return process_exit_code::UNCAUGHT_EXCEPTION;
 }
 
-int store_configuration_file(Options const& options, std::string const& file_src_name) try {
+int write_document_file(Options const& options, std::string const& file_src_name) try {
   confirm(!file_src_name.empty());
   
-  std::cout << "store_configuration_file file name=<" << file_src_name << ">\n";
-  std::cout << "store_configuration_file operation=<" << options.operation() << ">\n";
+  std::cout << "write_document_file file name=<" << file_src_name << ">\n";
+  std::cout << "write_document_file operation=<" << options.operation() << ">\n";
 
   std::ifstream is(file_src_name);
   auto test_document = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
@@ -131,7 +131,7 @@ int store_configuration_file(Options const& options, std::string const& file_src
   using namespace artdaq::database::configuration::json;
 
   cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string&>(
-      apiliteral::operation::store, store_configuration, options_string, test_document);
+      apiliteral::operation::writedocument, write_document, options_string, test_document);
 
 
   auto result = cf::getOperations().at(options.operation())->invoke();

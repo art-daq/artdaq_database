@@ -88,13 +88,13 @@ int main(int argc, char* argv[]) try {
 
   using namespace artdaq::database::configuration::json;
 
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::listdatabases, list_database_names,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::listdatabases, list_databases,
                                                                                   options_string);
   
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::listcollections, list_collection_names,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::listcollections, list_collections,
                                                                                   options_string);
 
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::readdbinfo, read_database_info,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::readdbinfo, read_dbinfo,
                                                                                   options_string);
   
   std::cout << "Running test:<" << options.operation() << ">\n";
@@ -115,8 +115,8 @@ int main(int argc, char* argv[]) try {
 
   using cfo::data_format_t;
 
-  if (options.dataFormat() == data_format_t::gui || options.dataFormat() == data_format_t::db ||
-      options.dataFormat() == data_format_t::json) {
+  if (options.format() == data_format_t::gui || options.format() == data_format_t::db ||
+      options.format() == data_format_t::json) {
     auto compare_result = artdaq::database::json::compare_json_objects(returned, expected);
     if (compare_result.first) {
       std::cout << "returned:\n" << returned << "\n";

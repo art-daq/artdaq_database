@@ -10,9 +10,9 @@ namespace artdaq {
 namespace database {
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readConfiguration(JsonData const& arg) {
-  TRACE_(3, "FileSystemDB::readConfiguration() begin");
-  TRACE_(3, "FileSystemDB::readConfiguration() args=<" << arg.json_buffer << ">");
+std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonData const& arg) {
+  TRACE_(3, "FileSystemDB::readDocument() begin");
+  TRACE_(3, "FileSystemDB::readDocument() args=<" << arg.json_buffer << ">");
 
   auto returnCollection = std::list<JsonData>();
 
@@ -23,7 +23,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readConfiguration(J
   try {
     filter_document = arg_document.findChildDocument(jsonliteral::filter);
   } catch (...) {
-    TRACE_(3, "FileSystemDB::readConfiguration() No filter was found.");
+    TRACE_(3, "FileSystemDB::readDocument() No filter was found.");
   }
 
   auto collection_name = std::string{};
@@ -31,18 +31,18 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readConfiguration(J
   try {
     collection_name = filter_document.findChild(jsonliteral::collection).value();
   } catch (...) {
-    TRACE_(3, "FileSystemDB::readConfiguration() Filter must have the collection element.");
+    TRACE_(3, "FileSystemDB::readDocument() Filter must have the collection element.");
   }
 
   if (collection_name.empty()) collection_name = arg_document.findChild(jsonliteral::collection).value();
 
   confirm(!collection_name.empty());
 
-  TRACE_(3, "FileSystemDB::readConfiguration() collection_name=<" << collection_name << ">");
+  TRACE_(3, "FileSystemDB::readDocument() collection_name=<" << collection_name << ">");
 
   auto collection = _provider->connection() + collection_name;
 
-  TRACE_(3, "FileSystemDB::readConfiguration() collection_path=<" << collection << ">");
+  TRACE_(3, "FileSystemDB::readDocument() collection_path=<" << collection << ">");
 
   collection = expand_environment_variables(collection);
 
@@ -54,11 +54,11 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readConfiguration(J
 
   SearchIndex search_index(index_path);
 
-  TRACE_(3, "FileSystemDB::readConfiguration() filter_json=<" << filter_json << ">.");
+  TRACE_(3, "FileSystemDB::readDocument() filter_json=<" << filter_json << ">.");
 
   auto oids = search_index.findDocumentIDs(filter_json);
 
-  TRACE_(3, "FileSystemDB::readConfiguration() search returned " << oids.size() << " documents.");
+  TRACE_(3, "FileSystemDB::readDocument() search returned " << oids.size() << " documents.");
 
   for (auto const& oid : oids) {
     auto doc_path = boost::filesystem::path(dir_name.c_str()).append(oid).replace_extension(".json");
@@ -68,7 +68,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readConfiguration(J
 
     is.close();
 
-    TRACE_(3, "FileSystemDB::readConfiguration() found_document=<" << json << ">");
+    TRACE_(3, "FileSystemDB::readDocument() found_document=<" << json << ">");
 
     returnCollection.emplace_back(json);
   }
@@ -77,9 +77,9 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readConfiguration(J
 }
 
 template <>
-object_id_t StorageProvider<JsonData, FileSystemDB>::writeConfiguration(JsonData const& arg) {
-  TRACE_(4, "FileSystemDB::writeConfiguration() begin");
-  TRACE_(4, "FileSystemDB::writeConfiguration() args=<" << arg.json_buffer << ">");
+object_id_t StorageProvider<JsonData, FileSystemDB>::writeDocument(JsonData const& arg) {
+  TRACE_(4, "FileSystemDB::writeDocument() begin");
+  TRACE_(4, "FileSystemDB::writeDocument() args=<" << arg.json_buffer << ">");
 
   auto arg_document = JSONDocument{arg.json_buffer};
 
@@ -90,7 +90,7 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeConfiguration(JsonData
   try {
     filter_document = arg_document.findChildDocument(jsonliteral::filter);
   } catch (...) {
-    TRACE_(4, "FileSystemDB::writeConfiguration() No filter was found.");
+    TRACE_(4, "FileSystemDB::writeDocument() No filter was found.");
   }
 
   auto collection_name = std::string{};
@@ -98,20 +98,20 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeConfiguration(JsonData
   try {
     collection_name = user_document.findChild(jsonliteral::collection).value();
   } catch (...) {
-    TRACE_(4, "FileSystemDB::writeConfiguration() User document must have the collection element.");
+    TRACE_(4, "FileSystemDB::writeDocument() User document must have the collection element.");
   }
 
   if (collection_name.empty()) try {
       collection_name = filter_document.findChild(jsonliteral::collection).value();
     } catch (...) {
-      TRACE_(4, "FileSystemDB::writeConfiguration() Filter should have the collection element.");
+      TRACE_(4, "FileSystemDB::writeDocument() Filter should have the collection element.");
     }
 
   if (collection_name.empty()) collection_name = arg_document.findChild(jsonliteral::collection).value();
 
   confirm(!collection_name.empty());
 
-  TRACE_(4, "FileSystemDB::writeConfiguration() collection_name=<" << collection_name << ">");
+  TRACE_(4, "FileSystemDB::writeDocument() collection_name=<" << collection_name << ">");
 
   auto oid = object_id_t{ouid_invalid};
 
@@ -119,16 +119,16 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeConfiguration(JsonData
 
   try {
     auto oid_json = filter_document.findChild(jsonliteral::id).value();
-    TRACE_(4, "FileSystemDB::writeConfiguration() Found filter=<" << oid_json << ">");
+    TRACE_(4, "FileSystemDB::writeDocument() Found filter=<" << oid_json << ">");
     oid = extract_oid(oid_json);
     isNew = false;
-    TRACE_(4, "FileSystemDB::writeConfiguration() Using provided oid=<" << oid << ">");
+    TRACE_(4, "FileSystemDB::writeDocument() Using provided oid=<" << oid << ">");
   } catch (...) {
   }
 
   if (oid == object_id_t{ouid_invalid}) {
     oid = generate_oid();
-    TRACE_(4, "FileSystemDB::writeConfiguration() Using generated oid=<" << oid << ">");    
+    TRACE_(4, "FileSystemDB::writeDocument() Using generated oid=<" << oid << ">");    
   }
 
 
@@ -142,11 +142,11 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeConfiguration(JsonData
 
   collection = expand_environment_variables(collection);
 
-  TRACE_(4, "FileSystemDB::writeConfiguration() collection_path=<" << collection << ">");
+  TRACE_(4, "FileSystemDB::writeDocument() collection_path=<" << collection << ">");
 
   auto filename = dbfs::mkdir(collection) + oid + ".json";
 
-  TRACE_(4, "FileSystemDB::writeConfiguration() filename=<" << filename << ">.");
+  TRACE_(4, "FileSystemDB::writeDocument() filename=<" << filename << ">.");
 
   if (isNew) {
     if (dbfs::check_if_file_exists(filename))
@@ -158,7 +158,7 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeConfiguration(JsonData
 
   auto json = builder.to_string();
 
-  TRACE_(4, "FileSystemDB::writeConfiguration() json=<" << json << ">.");
+  TRACE_(4, "FileSystemDB::writeDocument() json=<" << json << ">.");
   
   std::copy(json.begin(), json.end(), std::ostream_iterator<char>(os));
 
@@ -169,7 +169,7 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeConfiguration(JsonData
   SearchIndex search_index(index_path);
 
   if (!search_index.addDocument(json, oid)) {
-    TRACE_(4, "FileSystemDB::writeConfiguration() Failed updating SearchIndex.");
+    TRACE_(4, "FileSystemDB::writeDocument() Failed updating SearchIndex.");
   }
 
   return {id};

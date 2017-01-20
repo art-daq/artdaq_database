@@ -166,28 +166,28 @@ bool test_insert(std::string const& source_xml, std::string const& compare_xml,s
     auto database = DBI::DB::create(config);
     auto provider = DBI::DBProvider<JsonData>::create(database);
 
-    auto collectionName=std::string("testXML_V001");
+    auto collection=std::string("testXML_V001");
 
-    auto json = JsonData {"{\"document\":" + insert.to_string() + ", \"collection\":\"" +collectionName +"\"}"};
+    auto json = JsonData {"{\"document\":" + insert.to_string() + ", \"collection\":\"" +collection +"\"}"};
 
-    auto object_id =  provider->writeConfiguration(json);
+    auto object_id =  provider->writeDocument(json);
 
-    auto search = JsonData {"{\"filter\":" + ( filter.empty()?object_id:filter)+ ", \"collection\":\"" +collectionName +"\"}"};
+    auto search = JsonData {"{\"filter\":" + ( filter.empty()?object_id:filter)+ ", \"collection\":\"" +collection +"\"}"};
 
     std::cout << "Search criteria " <<  search.json_buffer << "\n";
 
-    auto collection = provider->readConfiguration(search);
+    auto results = provider->readDocument(search);
 
-    if(collection.size()!=1) {
-        std::cout << "Search returned " << collection.size() << " results.\n";
+    if(results.size()!=1) {
+        std::cout << "Search returned " << results.size() << " results.\n";
 
-        for (auto&& element : collection) {
+        for (auto&& element : results) {
             std::cout << element.json_buffer  << "\n";
         }
         return false;
     }
 
-  auto retdoc = JSONDocument(collection.begin()->json_buffer);
+  auto retdoc = JSONDocument(results.begin()->json_buffer);
 
   JSONDocumentBuilder returned{retdoc};
   JSONDocumentBuilder expected{cmpdoc};
@@ -230,28 +230,28 @@ bool test_search1(std::string const& source_xml, std::string const& compare_xml,
     auto database = DBI::DB::create(config);
     auto provider = DBI::DBProvider<JsonData>::create(database);
 
-    auto collectionName=std::string("testXML_V001");
+    auto collection=std::string("testXML_V001");
 
-    auto json = JsonData {"{\"document\":" + insert.to_string() + ", \"collection\":\"" +collectionName +"\"}"};
+    auto json = JsonData {"{\"document\":" + insert.to_string() + ", \"collection\":\"" +collection +"\"}"};
 
-    auto object_id =  provider->writeConfiguration(json);
+    auto object_id =  provider->writeDocument(json);
 
-    auto search = JsonData {"{\"filter\":" + ( filter.empty()?object_id:filter)+ ", \"collection\":\"" +collectionName +"\"}"};
+    auto search = JsonData {"{\"filter\":" + ( filter.empty()?object_id:filter)+ ", \"collection\":\"" +collection +"\"}"};
 
     std::cout << "Search criteria " <<  search.json_buffer << "\n";
 
-    auto collection = provider->readConfiguration(search);
+    auto results = provider->readDocument(search);
 
-    if(collection.size()!=1) {
-        std::cout << "Search returned " << collection.size() << " results.\n";
+    if(results.size()!=1) {
+        std::cout << "Search returned " << results.size() << " results.\n";
 
-        for (auto&& element : collection) {
+        for (auto&& element : results) {
             std::cout << element.json_buffer  << "\n";
         }
         return false;
     }
 
-  auto retdoc = JSONDocument(collection.begin()->json_buffer);
+  auto retdoc = JSONDocument(results.begin()->json_buffer);
   JSONDocumentBuilder returned{retdoc};
   JSONDocumentBuilder expected{cmpdoc};
 
@@ -284,9 +284,9 @@ bool test_search2(std::string const& source_xml, std::string const& compare_xml,
     auto database = DBI::DB::create(config);
     auto provider = DBI::DBProvider<JsonData>::create(database);
 
-    auto collectionName=std::string("testXML_V001");
+    auto collection=std::string("testXML_V001");
 
-  auto json = JsonData{"{\"document\":" + source.json_buffer + ", \"collection\":\"" + collectionName + "\"}"};
+  auto json = JsonData{"{\"document\":" + source.json_buffer + ", \"collection\":\"" + collection + "\"}"};
 
   auto repeatCount = std::size_t{10};
 
@@ -298,7 +298,7 @@ bool test_search2(std::string const& source_xml, std::string const& compare_xml,
   auto nodata_pos = oss.tellp();
 
   for (int i = repeatCount; i != 0; i--) {
-    auto object_id = provider->writeConfiguration(json);
+    auto object_id = provider->writeDocument(json);
     object_ids.push_back(object_id);
     oss << JSONDocument(object_id).findChildDocument("_id").to_string() << ",";
   }
@@ -311,16 +311,16 @@ bool test_search2(std::string const& source_xml, std::string const& compare_xml,
   auto filter = oss.str();
 
   auto search =
-      JsonData{"{\"filter\":" + (filter.empty() ? options : filter) + ", \"collection\":\"" + collectionName + "\"}"};
+      JsonData{"{\"filter\":" + (filter.empty() ? options : filter) + ", \"collection\":\"" + collection + "\"}"};
 
   std::cout << "Search criteria " << search.json_buffer << "\n";
 
-  auto collection = provider->readConfiguration(search);
+  auto results = provider->readDocument(search);
 
-  if (collection.size() != repeatCount) {
-    std::cout << "Search returned " << collection.size() << " results.\n";
+  if (results.size() != repeatCount) {
+    std::cout << "Search returned " << results.size() << " results.\n";
 
-    for (auto&& element : collection) {
+    for (auto&& element : results) {
       std::cout << element.json_buffer << "\n";
     }
     return false;
@@ -355,48 +355,48 @@ bool test_update(std::string const& source_xml, std::string const& compare_xml,s
     auto database = DBI::DB::create(config);
     auto provider = DBI::DBProvider<JsonData>::create(database);
 
-    auto collectionName=std::string("testXML_V001");
+    auto collection=std::string("testXML_V001");
 
-  auto json = JsonData{"{\"document\":" + insert.to_string() + ", \"collection\":\"" + collectionName + "\"}"};
+  auto json = JsonData{"{\"document\":" + insert.to_string() + ", \"collection\":\"" + collection + "\"}"};
 
-  auto object_id = provider->writeConfiguration(json);
+  auto object_id = provider->writeDocument(json);
 
-  auto search = JsonData{"{\"filter\":" + object_id + ", \"collection\":\"" + collectionName + "\"}"};
+  auto search = JsonData{"{\"filter\":" + object_id + ", \"collection\":\"" + collection + "\"}"};
 
   std::cout << "Search criteria " << search.json_buffer << "\n";
 
-  auto collection = provider->readConfiguration(search);
+  auto results = provider->readDocument(search);
 
-  if (collection.size() != 1) {
-    std::cout << "Search returned " << collection.size() << " results.\n";
+  if (results.size() != 1) {
+    std::cout << "Search returned " << results.size() << " results.\n";
 
-    for (auto&& element : collection) {
+    for (auto&& element : results) {
       std::cout << element.json_buffer << "\n";
     }
     return false;
   }
 
-  auto found = JSONDocument(collection.begin()->json_buffer);
+  auto found = JSONDocument(results.begin()->json_buffer);
   auto payload = changes.findChild("document");
   found.replaceChild(payload, "document");
 
   json = JsonData{"{\"document\":" + found.to_string() + ", \"filter\":" + object_id + ",\"collection\":\"" +
-                  collectionName + "\"}"};
+                  collection + "\"}"};
 
-  object_id = provider->writeConfiguration(json);
+  object_id = provider->writeDocument(json);
 
-  collection = provider->readConfiguration(search);
+  results = provider->readDocument(search);
 
-  if (collection.size() != 1) {
-    std::cout << "Search returned " << collection.size() << " results.\n";
+  if (results.size() != 1) {
+    std::cout << "Search returned " << results.size() << " results.\n";
 
-    for (auto&& element : collection) {
+    for (auto&& element : results) {
       std::cout << element.json_buffer << "\n";
     }
     return false;
   }
 
-  auto retdoc = JSONDocument(collection.begin()->json_buffer);
+  auto retdoc = JSONDocument(results.begin()->json_buffer);
   JSONDocumentBuilder returned{retdoc};
   JSONDocumentBuilder expected{cmpdoc};
 

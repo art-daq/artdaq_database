@@ -33,29 +33,29 @@ class StorageProvider final {
   StorageProvider(std::shared_ptr<IMPL> const& provider, PassKeyIdiom const&) : _provider(provider) {}
 
   template <typename FILTER>
-  std::list<TYPE> readConfiguration(FILTER const&);
-  object_id_t writeConfiguration(TYPE const&);
+  std::list<TYPE> readDocument(FILTER const&);
+  object_id_t writeDocument(TYPE const&);
 
   template <typename FILTER>
-  std::list<FILTER> findGlobalConfigs(FILTER const&);
+  std::list<FILTER> findConfigurations(FILTER const&);
 
   template <typename FILTER>
-  std::list<FILTER> addConfigToGlobalConfig(FILTER const&);
+  std::list<FILTER> addConfiguration(FILTER const&);
 
   template <typename FILTER>
-  std::list<FILTER> findConfigVersions(FILTER const&);
+  std::list<FILTER> findVersions(FILTER const&);
 
   template <typename FILTER>
-  std::list<FILTER> findConfigEntities(FILTER const&);
+  std::list<FILTER> findEntities(FILTER const&);
 
   template <typename FILTER>
-  std::list<FILTER> buildConfigSearchFilter(FILTER const&);
+  std::list<FILTER> configurationComposition(FILTER const&);
 
   template <typename FILTER>
-  std::list<FILTER> listCollectionNames(FILTER const&);
+  std::list<FILTER> listCollections(FILTER const&);
 
   template <typename FILTER>
-  std::list<FILTER> listDatabaseNames(FILTER const&);
+  std::list<FILTER> listDatabases(FILTER const&);
 
   template <typename FILTER>
   std::list<FILTER> databaseMetadata(FILTER const&);

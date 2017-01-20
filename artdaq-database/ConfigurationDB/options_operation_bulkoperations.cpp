@@ -36,13 +36,13 @@ std::string const& BulkOperations::bulkOperations() const noexcept {
   return _bulk_operations;
 }
 
-data_format_t const& BulkOperations::dataFormat() const noexcept { return _data_format; }
+data_format_t const& BulkOperations::format() const noexcept { return _data_format; }
 
-std::string const& BulkOperations::bulkOperations(std::string const& search_filter) {
-  confirm(!search_filter.empty());
+std::string const& BulkOperations::bulkOperations(std::string const& query_payload) {
+  confirm(!query_payload.empty());
 
-  auto tmp = db::dequote(search_filter);
-  TRACE_(15, "Options: bulkOperations args search_filter=<" << tmp << ">.");
+  auto tmp = db::dequote(query_payload);
+  TRACE_(15, "Options: bulkOperations args query_payload=<" << tmp << ">.");
 
   _bulk_operations = tmp;
 

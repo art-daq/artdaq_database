@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) try {
   using namespace artdaq::database::configuration::json;
 
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      operation_name, create_new_global_configuration, options_string);
+      operation_name, create_configuration, options_string);
 
   std::cout << "Running test:<" << operation_name << ">\n";
 
@@ -106,8 +106,8 @@ int main(int argc, char* argv[]) try {
 
   using cfo::data_format_t;
 
-  if (options.dataFormat() == data_format_t::gui || options.dataFormat() == data_format_t::db ||
-      options.dataFormat() == data_format_t::json) {
+  if (options.format() == data_format_t::gui || options.format() == data_format_t::db ||
+      options.format() == data_format_t::json) {
     auto compare_result = artdaq::database::json::compare_json_objects(returned, expected);
     if (compare_result.first) {
       std::cout << "returned:\n" << returned << "\n";

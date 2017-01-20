@@ -10,9 +10,9 @@ namespace database {
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, MongoDB>::readConfiguration(JsonData const& arg) {
-  TRACE_(3, "MongoDB::readConfiguration() begin");
-  TRACE_(3, "MongoDB::readConfiguration() args=<" << arg.json_buffer << ">");
+std::list<JsonData> StorageProvider<JsonData, MongoDB>::readDocument(JsonData const& arg) {
+  TRACE_(3, "MongoDB::readDocument() begin");
+  TRACE_(3, "MongoDB::readDocument() args=<" << arg.json_buffer << ">");
 
   auto returnCollection = std::list<JsonData>();
 
@@ -25,31 +25,31 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::readConfiguration(JsonDa
   try {
     collection_name = filter_document.findChild(jsonliteral::collection).value();
   } catch (...) {
-    TRACE_(3, "MongoDB::readConfiguration() Filter must have the collection element.");
+    TRACE_(3, "MongoDB::readDocument() Filter must have the collection element.");
   }
 
   if (collection_name.empty()) collection_name = arg_document.findChild(jsonliteral::collection).value();
 
   confirm(!collection_name.empty());
 
-  TRACE_(3, "MongoDB::readConfiguration() collection_name=<" << collection_name << ">");
+  TRACE_(3, "MongoDB::readDocument() collection_name=<" << collection_name << ">");
 
   auto collection = _provider->connection().collection(collection_name);
 
   auto filter_json = filter_document.to_string();
 
-  TRACE_(3, "MongoDB::readConfiguration() search_filter=<" << filter_json << ">");
+  TRACE_(3, "MongoDB::readDocument() query_payload=<" << filter_json << ">");
 
   auto filter_bsondoc = bsoncxx::from_json(filter_json);
 
   auto size = collection.count(filter_bsondoc.view());
 
-  TRACE_(3, "MongoDB::readConfiguration() Found " << size << " document(s).");
+  TRACE_(3, "MongoDB::readDocument() Found " << size << " document(s).");
 
   auto cursor = collection.find(filter_bsondoc.view());
 
   for (auto& doc : cursor) {
-    TRACE_(3, "MongoDB::readConfiguration() found_document=<" << artdaq::database::mongo::to_json(doc) << ">");
+    TRACE_(3, "MongoDB::readDocument() found_document=<" << artdaq::database::mongo::to_json(doc) << ">");
 
     returnCollection.emplace_back(artdaq::database::mongo::to_json(doc));
   }
@@ -57,9 +57,9 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::readConfiguration(JsonDa
 }
 
 template <>
-object_id_t StorageProvider<JsonData, MongoDB>::writeConfiguration(JsonData const& arg) {
-  TRACE_(4, "MongoDB::writeConfiguration() begin");
-  TRACE_(4, "MongoDB::writeConfiguration() args=<" << arg.json_buffer << ">");
+object_id_t StorageProvider<JsonData, MongoDB>::writeDocument(JsonData const& arg) {
+  TRACE_(4, "MongoDB::writeDocument() begin");
+  TRACE_(4, "MongoDB::writeDocument() args=<" << arg.json_buffer << ">");
 
   auto arg_document = JSONDocument{arg.json_buffer};
 
@@ -70,7 +70,7 @@ object_id_t StorageProvider<JsonData, MongoDB>::writeConfiguration(JsonData cons
   try {
     filter_document = arg_document.findChildDocument(jsonliteral::filter);
   } catch (...) {
-    TRACE_(4, "MongoDB::writeConfiguration() No filter was found.");
+    TRACE_(4, "MongoDB::writeDocument() No filter was found.");
   }
 
   auto collection_name = std::string{};
@@ -78,20 +78,20 @@ object_id_t StorageProvider<JsonData, MongoDB>::writeConfiguration(JsonData cons
   try {
     collection_name = user_document.findChild(jsonliteral::collection).value();
   } catch (...) {
-    TRACE_(4, "MongoDB::writeConfiguration() User document must have the collection element.");
+    TRACE_(4, "MongoDB::writeDocument() User document must have the collection element.");
   }
 
   if (collection_name.empty()) try {
       collection_name = filter_document.findChild(jsonliteral::collection).value();
     } catch (...) {
-      TRACE_(4, "MongoDB::writeConfiguration() Filter should have the collection element.");
+      TRACE_(4, "MongoDB::writeDocument() Filter should have the collection element.");
     }
 
   if (collection_name.empty()) collection_name = arg_document.findChild(jsonliteral::collection).value();
 
   confirm(!collection_name.empty());
 
-  TRACE_(4, "MongoDB::writeConfiguration() collection_name=<" << collection_name << ">");
+  TRACE_(4, "MongoDB::writeDocument() collection_name=<" << collection_name << ">");
 
   auto oid = object_id_t{ouid_invalid};
 
@@ -99,17 +99,17 @@ object_id_t StorageProvider<JsonData, MongoDB>::writeConfiguration(JsonData cons
 
   try {
     auto oid_json = filter_document.findChild(jsonliteral::id).value();
-    TRACE_(4, "MongoDB::writeConfiguration() Found filter=<" << oid_json << ">");
+    TRACE_(4, "MongoDB::writeDocument() Found filter=<" << oid_json << ">");
     oid = extract_oid(oid_json);
     isNew = false;
-    TRACE_(4, "MongoDB::writeConfiguration() Using provided oid=<" << oid << ">");
+    TRACE_(4, "MongoDB::writeDocument() Using provided oid=<" << oid << ">");
   } catch (...) {
-        TRACE_(4, "MongoDB::writeConfiguration() No filter found; filter_document =<" << filter_document << ">");
+        TRACE_(4, "MongoDB::writeDocument() No filter found; filter_document =<" << filter_document << ">");
   }
 
   if (oid == object_id_t{ouid_invalid}) {
     oid = generate_oid();
-    TRACE_(4, "MongoDB::writeConfiguration() Using generated oid=<" << oid << ">");    
+    TRACE_(4, "MongoDB::writeDocument() Using generated oid=<" << oid << ">");    
   }
 
   auto id = to_id(oid);
@@ -133,13 +133,13 @@ object_id_t StorageProvider<JsonData, MongoDB>::writeConfiguration(JsonData cons
 
     id = to_id(oid);
 
-    TRACE_(4, "MongoDB::writeConfiguration() Inserted _id=<" << id << ">");
+    TRACE_(4, "MongoDB::writeDocument() Inserted _id=<" << id << ">");
 
     return id;
   }
 
   auto size = collection.count(filter_bsondoc.view());
-  TRACE_(4, "MongoDB::writeConfiguration() Found " << size << " document(s).");
+  TRACE_(4, "MongoDB::writeDocument() Found " << size << " document(s).");
 
   if (size > 1)
     throw runtime_error("MongoDB") << "MongoDB failed inserting data, search filter is too wide; filter= <"
@@ -147,7 +147,7 @@ object_id_t StorageProvider<JsonData, MongoDB>::writeConfiguration(JsonData cons
 
   auto result = collection.replace_one(filter_bsondoc.view(), user_bsondoc.view());
 
-  TRACE_(4, "MongoDB::writeConfiguration() Modified " << result->modified_count() << "document.");
+  TRACE_(4, "MongoDB::writeDocument() Modified " << result->modified_count() << "document.");
 
   return id;
 }

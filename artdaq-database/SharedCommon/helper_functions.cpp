@@ -60,6 +60,13 @@ std::string db::dequote(std::string s){
     return s;
 }
 
+std::string db::debracket(std::string s){
+  if (s[0] == '[' && s[s.length() - 1] == ']')
+    return s.substr(1, s.length() - 2);
+  else
+    return s;
+}
+
 std::string db::generate_oid() {
   std::ifstream is("/proc/sys/kernel/random/uuid");
 

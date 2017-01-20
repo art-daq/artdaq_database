@@ -6,7 +6,7 @@ cet_make(
 
 add_subdirectory(MongoDB)
 add_subdirectory(FileSystemDB)
-add_subdirectory(UcondDB)
+add_subdirectory(UconDB)
 
 install_headers()
 install_source()
