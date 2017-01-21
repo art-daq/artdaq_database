@@ -39,6 +39,8 @@ class JSONDocumentBuilder final {
   JSONDocumentBuilder& markDeleted();
   JSONDocumentBuilder& setObjectID(JSONDocument const&);
 
+  std::list<std::string> extractTags() const;
+  
   JSONDocument& extract() { return _document; }
 
   result_t comapreUsingOverlays(JSONDocumentBuilder const&) const;

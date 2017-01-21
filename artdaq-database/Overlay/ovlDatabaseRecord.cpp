@@ -15,7 +15,7 @@ ovlDatabaseRecord::ovlDatabaseRecord(value_t& record)
       _comments{overlay<ovlComments, array_t>(record, jsonliteral::comments)},
       _origin{overlay<ovlOrigin>(record, jsonliteral::origin)},
       _version{overlay<ovlVersion, std::string>(record, jsonliteral::version)},
-      _entities{overlay<ovlConfigurableEntities, array_t>(record, jsonliteral::entities)},
+      _entities{overlay<ovlEntities, array_t>(record, jsonliteral::entities)},
       _configurations{overlay<ovlConfigurations, array_t>(record, jsonliteral::configurations)},
       _changelog{overlay<ovlChangeLog, std::string>(record, jsonliteral::changelog)},
       _bookkeeping{overlay<ovlBookkeeping>(record, jsonliteral::bookkeeping)},
@@ -80,19 +80,7 @@ result_t ovlDatabaseRecord::swap(ovlCollectionUPtr_t& collection) {
   return _collection->ovlKeyValue::swap(collection.get());
 }
 
-/*
-ovlentity& ovlDatabaseRecord::entity() { return _entities; }
-
-result_t ovlDatabaseRecord::swap(ovlentityUPtr_t& entity) {
-  confirm(entity);
-
-  if (isReadonly()) return Failure(msg_IsReadonly);
-
-  std::swap(_entities, entity);
-
-  return Success();
-}
-*/
+ovlEntities& ovlDatabaseRecord::entities() { return *_entities; }
 
 ovlConfigurations& ovlDatabaseRecord::configurations() { return *_configurations; }
 
@@ -246,7 +234,7 @@ result_t ovlDatabaseRecord::setCollection(ovlCollectionUPtr_t& collection) {
   return _bookkeeping->postUpdate(update, _collection);
 }
 
-result_t ovlDatabaseRecord::addEntity(ovlentityUPtr_t& entity) {
+result_t ovlDatabaseRecord::addEntity(ovlEntityUPtr_t& entity) {
   confirm(entity);
 
   if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
@@ -260,7 +248,7 @@ result_t ovlDatabaseRecord::addEntity(ovlentityUPtr_t& entity) {
   return _bookkeeping->postUpdate(update, entity);
 }
 
-result_t ovlDatabaseRecord::removeEntity(ovlentityUPtr_t& entity) {
+result_t ovlDatabaseRecord::removeEntity(ovlEntityUPtr_t& entity) {
   confirm(entity);
 
   if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);

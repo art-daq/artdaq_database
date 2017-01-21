@@ -1,5 +1,8 @@
 #include "artdaq-database/StorageProviders/UconDB/provider_ucondb_headers.h"
 
+#include "artdaq-database/BasicTypes/data_json.h"
+#include "artdaq-database/DataFormats/Json/json_common.h"
+
 #ifdef TRACE_NAME
 #undef TRACE_NAME
 #endif
@@ -8,6 +11,14 @@
 
 namespace artdaq {
 namespace database {
+
+using artdaq::database::json::object_t;
+using artdaq::database::json::value_t;
+using artdaq::database::json::array_t;
+using artdaq::database::json::type;
+using artdaq::database::json::JsonReader;
+using artdaq::database::sharedtypes::unwrap;
+
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, UconDB>::readDocument(JsonData const& arg) {
@@ -40,11 +51,45 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::readDocument(JsonData con
 
   TRACE_(3, "UconDB::readDocument() collection_name=<" << collection_name << ">");
 
+  auto fl = folders(_provider);
 
-  auto filter_json = filter_document.to_string();
+  bool found = (std::find(fl.begin(), fl.end(), to_lower(collection_name)) != fl.end());
 
-  TRACE_(3, "UconDB::readDocument() filter_json=<" << filter_json << ">.");
+  if (!found) throw runtime_error("UconDB") << "UconDB Missing collection; collection_name=" << collection_name;
 
+  auto oids = std::list<object_id_t>{};
+
+  try {
+    auto id_json = filter_document.findChild(jsonliteral::id).to_string();
+
+    auto idAST = object_t{};
+
+    if (!JsonReader().read(id_json, idAST))
+      throw runtime_error("UconDB") << "UconDB::readDocument() Unabe to read JSON, json=<" << id_json << ">";
+
+    auto& id = unwrap(idAST).value_as<object_t>(jsonliteral::id);
+
+    try {
+      oids.push_back(unwrap(id).value_as<std::string>(jsonliteral::oid));
+    } catch (...) {}
+
+    try {
+      auto& oidvals = unwrap(id).value_as<array_t>(jsonliteral::in);
+      for (auto& oidval : oidvals) oids.push_back(unwrap(oidval).value_as<std::string>(jsonliteral::oid));
+    } catch (...) {}
+
+  } catch (...) {
+    auto filter_json = filter_document.to_string();
+    TRACE_(3, "UconDB::readDocument() invalid filter_json=<" << filter_json << ">.");
+  }
+
+  for (auto const& oid : oids) {
+    auto result = get_object(_provider, collection_name, oid);
+
+    if (!result.first) throw runtime_error("UconDB") << "UconDB search failed, error=" << result.second;
+
+    returnCollection.push_back({result.second});
+  }
 
   return returnCollection;
 }
@@ -86,49 +131,56 @@ object_id_t StorageProvider<JsonData, UconDB>::writeDocument(JsonData const& arg
 
   TRACE_(4, "UconDB::writeDocument() collection_name=<" << collection_name << ">");
 
+  auto result = create_folder(_provider, collection_name);
+
+  if (!result.first) {
+    throw runtime_error("UconDB") << "UconDB failed creating a new folder; folder name=" << collection_name
+                                  << ", error=" << result.second;
+  }
+
   auto oid = object_id_t{ouid_invalid};
 
-  auto isNew = bool{true};
+#if 0  
+  //auto isNew = bool{true};
 
   try {
     auto oid_json = filter_document.findChild(jsonliteral::id).value();
     TRACE_(4, "UconDB::writeDocument() Found filter=<" << oid_json << ">");
     oid = extract_oid(oid_json);
-    isNew = false;
+  //  isNew = false;
     TRACE_(4, "UconDB::writeDocument() Using provided oid=<" << oid << ">");
   } catch (...) {
   }
+#endif
 
   if (oid == object_id_t{ouid_invalid}) {
     oid = generate_oid();
-    TRACE_(4, "UconDB::writeDocument() Using generated oid=<" << oid << ">");    
+    TRACE_(4, "UconDB::writeDocument() Using generated oid=<" << oid << ">");
   }
-
 
   auto id = to_id(oid);
 
   JSONDocumentBuilder builder(user_document);
   builder.setObjectID({id});
   builder.setCollection({to_json(jsonliteral::collection, collection_name)});
+  builder.markReadonly();
 
   auto json = builder.to_string();
 
   TRACE_(4, "UconDB::writeDocument() json=<" << json << ">.");
-  
-  auto res= folders(_provider);
 
-  for( auto & c:res) {
-    tags(_provider,c);
-    auto objs=objects(_provider,c);
-    for( auto & o:objs) {
-      get_object(_provider,c,o);
-    }
+  auto tags = builder.extractTags();
+
+  auto key = std::string{};
+
+  result = put_object(_provider, collection_name, json, oid, 0, tags, key);
+
+  if (!result.first) {
+    throw runtime_error("UconDB") << "UconDB failed inserting data, error=" << result.second;
   }
-  
-  if(isNew) {
-    TRACE_(4, "UconDB::writeDocument() isnew");
-  }
-  
+
+  TRACE_(4, "UconDB::writeDocument() Created document with oid=<" << oid << ">.");
+
   return {id};
 }
 

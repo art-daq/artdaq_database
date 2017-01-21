@@ -2,8 +2,8 @@
 #include "artdaq-database/SharedCommon/helper_functions.h"
 #include "artdaq-database/SharedCommon/shared_exceptions.h"
 
-#include <chrono>
 #include <wordexp.h>
+#include <chrono>
 #include <fstream>
 #include <regex>
 
@@ -53,14 +53,14 @@ std::string db::debrace(std::string s) {
     return s;
 }
 
-std::string db::dequote(std::string s){
+std::string db::dequote(std::string s) {
   if (s[0] == '\"' && s[s.length() - 1] == '\"')
     return s.substr(1, s.length() - 2);
   else
     return s;
 }
 
-std::string db::debracket(std::string s){
+std::string db::debracket(std::string s) {
   if (s[0] == '[' && s[s.length() - 1] == ']')
     return s.substr(1, s.length() - 2);
   else
@@ -78,27 +78,28 @@ std::string db::generate_oid() {
   return oid;
 }
 
-
 std::string db::to_id(std::string const& oid) {
   confirm(!oid.empty());
-  
+
   std::ostringstream oss;
-  oss << "{" << "_id"_quoted << ":{";
-  oss << "$oid"_quoted << ":" << quoted_(oid);
+  oss << "{"
+      << "_id"_quoted
+      << ":{";
+  oss << "$oid"_quoted
+      << ":" << quoted_(oid);
   oss << "} }";
-  
+
   return oss.str();
 }
 
-std::string db::to_json(std::string const& key,std::string const& value ) {
+std::string db::to_json(std::string const& key, std::string const& value) {
   confirm(!key.empty());
   confirm(!value.empty());
-  
+
   std::ostringstream oss;
-  oss << "{" << quoted_(key) << ":" << quoted_(value) << "}"; 
+  oss << "{" << quoted_(key) << ":" << quoted_(value) << "}";
   return oss.str();
 }
-
 
 std::string db::expand_environment_variables(std::string var) {
   wordexp_t p;
@@ -131,7 +132,8 @@ db::object_id_t db::extract_oid(std::string const& filter) {
 
   auto results = std::smatch();
 
-  if (!std::regex_search(filter, results, ex)) throw std::logic_error(std::string("Regex ouid search failed; JSON buffer:") + filter);
+  if (!std::regex_search(filter, results, ex))
+    throw std::logic_error(std::string("Regex ouid search failed; JSON buffer:") + filter);
 
   if (results.size() != 2) {
     // we are interested in a second match
@@ -163,4 +165,23 @@ db::object_id_t db::extract_oid(std::string const& filter) {
                  << "JSON regex_search() result=" << match);
 
   return match;
+}
+
+std::string db::trim(std::string const& s) {
+  auto wsfront = std::find_if_not(s.begin(), s.end(), [](int c) { return std::isspace(c); });
+  return std::string(wsfront, std::find_if_not(s.rbegin(), std::string::const_reverse_iterator(wsfront), [](int c) {
+                                return std::isspace(c);
+                              }).base());
+}
+
+std::string db::to_lower(std::string const& c) {
+  auto s = c;
+  std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+  return s;
+}
+
+std::string db::to_upper(std::string const& c) {
+  auto s = c;
+  std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+  return s;
 }

@@ -16,6 +16,7 @@ constexpr auto msg_Added = "{\"message\":\"Added\"}";
 constexpr auto msg_Removed = "{\"message\":\"Removed\"}";
 constexpr auto msg_Success = "{\"message\":\"Success\"}";
 constexpr auto msg_Failure = "{\"message\":\"Failure\"}";
+constexpr auto msg_AlreadyExist = "{\"message\":\"AlreadyExist\"}";
 }
 
 using result_t = std::pair<bool, std::string>;

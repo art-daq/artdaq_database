@@ -43,14 +43,14 @@ using ovlRunUPtr_t = std::unique_ptr<ovlRun>;
 using ovlAttachment = ovlKeyValue;
 using ovlAttachmentUPtr_t = std::unique_ptr<ovlAttachment>;
 
-using ovlentity = ovlKeyValueTimeStamp<DOCUMENT_COMPARE_MUTE_CONFIGENTITY>;
-using ovlentityUPtr_t = std::unique_ptr<ovlentity>;
+using ovlEntity = ovlKeyValueTimeStamp<DOCUMENT_COMPARE_MUTE_CONFIGENTITY>;
+using ovlEntityUPtr_t = std::unique_ptr<ovlEntity>;
 
 using ovlConfigurations = ovlFixedList<ovlConfiguration, DOCUMENT_COMPARE_MUTE_CONFIGURATION>;
 using ovlConfigurationsUPtr_t = std::unique_ptr<ovlConfigurations>;
 
-using ovlConfigurableEntities = ovlFixedList<ovlentity, DOCUMENT_COMPARE_MUTE_CONFIGENTITY>;
-using ovlConfigurableEntitiesUPtr_t = std::unique_ptr<ovlConfigurableEntities>;
+using ovlEntities = ovlFixedList<ovlEntity, DOCUMENT_COMPARE_MUTE_CONFIGENTITY>;
+using ovlEntitiesUPtr_t = std::unique_ptr<ovlEntities>;
 
 using ovlAliases = ovlMovableList<ovlAlias, DOCUMENT_COMPARE_MUTE_ALIAS>;
 using ovlAliasesUPtr_t = std::unique_ptr<ovlAliases>;
@@ -77,7 +77,7 @@ class ovlDatabaseRecord final : public ovlKeyValue {
   ovlComments& comments();
   ovlOrigin& origin();
   ovlVersion& version();
-  ovlentity& entity();
+  ovlEntities& entities();
   ovlConfigurations& configurations();
   ovlBookkeeping& bookkeeping();
   ovlId& id();
@@ -110,8 +110,8 @@ class ovlDatabaseRecord final : public ovlKeyValue {
   result_t addAlias(ovlAliasUPtr_t& /*alias*/);
   result_t removeAlias(ovlAliasUPtr_t& /*alias*/);
 
-  result_t addEntity(ovlentityUPtr_t& /*entity*/);
-  result_t removeEntity(ovlentityUPtr_t& /*entity*/);
+  result_t addEntity(ovlEntityUPtr_t& /*entity*/);
+  result_t removeEntity(ovlEntityUPtr_t& /*entity*/);
 
   result_t setVersion(ovlVersionUPtr_t& /*version*/);
   result_t setCollection(ovlCollectionUPtr_t& /*version*/);
@@ -122,7 +122,7 @@ class ovlDatabaseRecord final : public ovlKeyValue {
   ovlCommentsUPtr_t _comments;
   ovlOriginUPtr_t _origin;
   ovlVersionUPtr_t _version;
-  ovlConfigurableEntitiesUPtr_t _entities;
+  ovlEntitiesUPtr_t _entities;
   ovlConfigurationsUPtr_t _configurations;
   ovlChangeLogUPtr_t _changelog;
   ovlBookkeepingUPtr_t _bookkeeping;

@@ -1,15 +1,14 @@
 #ifndef _ARTDAQ_DATABASE_DATAFORMATS_COMMON_HEALPERFUNCTIONS_H_
 #define _ARTDAQ_DATABASE_DATAFORMATS_COMMON_HEALPERFUNCTIONS_H_
 
-#include <string>
 #include <cassert>
-#include <sstream> 
 #include <iterator>
+#include <sstream>
+#include <string>
 
 #include "artdaq-database/SharedCommon/shared_datatypes.h"
 
-# define confirm(expr) assert(expr)
-
+#define confirm(expr) assert(expr)
 
 namespace artdaq {
 namespace database {
@@ -31,15 +30,27 @@ object_id_t extract_oid(std::string const&);
 
 std::string generate_oid();
 std::string to_id(std::string const& /*oid*/);
-std::string to_json(std::string const& /*key*/,std::string const& /*value*/ );
+std::string to_json(std::string const& /*key*/, std::string const& /*value*/);
+
+std::string trim(std::string const& s);
+std::string to_lower(std::string const& s);
+std::string to_upper(std::string const& s);
 
 template <typename T>
-std::string to_csv(T const& data){
+std::string to_csv(T const& data) {
+  auto retvalue = std::string{};
+
+  if (data.empty()) return retvalue;
+
   std::ostringstream oss;
-  std::copy(data.begin(), data.end(), std::ostream_iterator<std::string>(oss, ", "));
-  return oss.str();
+  std::copy(data.begin(), data.end(), std::ostream_iterator<std::string>(oss, ","));
+
+  retvalue = oss.str();
+  retvalue.pop_back();
+
+  return retvalue;
 }
-  
+
 template <typename T>
 constexpr std::uint8_t static_cast_as_uint8_t(T const& t) {
   return static_cast<std::uint8_t>(t);

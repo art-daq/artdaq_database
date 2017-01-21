@@ -21,8 +21,8 @@ using artdaq::database::docrecord::JSONDocument;
 
 namespace jsonliteral = artdaq::database::dataformats::literal;
 
-
-DBConfig::DBConfig() : uri{std::string{dbucl::UCONURI} + dbucl::hostname +":"+ std::to_string(dbucl::port) +"/"+ dbucl::db_name} {
+DBConfig::DBConfig()
+    : uri{std::string{dbucl::UCONURI} + dbucl::hostname + ":" + std::to_string(dbucl::port) + "/" + dbucl::db_name} {
   auto tmpURI =
       getenv("ARTDAQ_DATABASE_URI") ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
 
@@ -38,8 +38,10 @@ DBConfig::DBConfig(std::string uri_) : uri{uri_} { confirm(!uri_.empty()); }
 
 std::string& UconDB::connection() { return _connection; }
 
-long UconDB::timeout() const { return 10;}
-std::string const& UconDB::authentication() const { return _userpass;}
+long UconDB::timeout() const { return 5; }
+std::string const& UconDB::authentication() const { return _userpass; }
 
-   UconDB::UconDB(DBConfig const& config, PassKeyIdiom const&)
-      : _config{config}, _client{_config.connectionURI()}, _connection{_config.connectionURI()}, _userpass{"daq_access:Kb/Vay8T"} {}
+UconDB::UconDB(DBConfig const& config, PassKeyIdiom const&)
+    : _config{config}, _client{_config.connectionURI()}, _connection{_config.connectionURI()}, _userpass{"user:pass"} {
+  _userpass = getenv("ARTDAQ_DATABASE_AUTH") ? getenv("ARTDAQ_DATABASE_AUTH") : std::string("user:pass");
+}

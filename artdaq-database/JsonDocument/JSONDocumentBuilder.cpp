@@ -170,7 +170,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::addEntity(JSONDocument const& entity) 
   TRACE_(9, "addEntity() args  entity=<" << entity << ">");
 
   JSONDocument copy(entity);
-  auto ovl = overlay<ovl::ovlentity>(copy, jsonliteral::entities);
+  auto ovl = overlay<ovl::ovlEntity>(copy, jsonliteral::entities);
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->addEntity(ovl));
@@ -189,7 +189,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeEntity(JSONDocument const& entit
   TRACE_(9, "addEntity() args  entity=<" << entity << ">");
 
   JSONDocument copy(entity);
-  auto ovl = overlay<ovl::ovlentity>(copy, jsonliteral::entities);
+  auto ovl = overlay<ovl::ovlEntity>(copy, jsonliteral::entities);
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->removeEntity(ovl));
@@ -234,6 +234,26 @@ JSONDocumentBuilder& JSONDocumentBuilder::markDeleted() try {
   ThrowOnFailure(CallUndo());
 
   return self();
+}
+
+std::list<std::string> JSONDocumentBuilder::extractTags() const {
+  auto retValue =std::list<std::string>{};
+  
+  retValue.push_back( std::string(jsonliteral::version).append(":").append(_overlay->version().string_value()));
+
+  auto const& configurations = _overlay->configurations();
+  
+  for(auto const& configuration:configurations){
+    retValue.push_back( std::string(jsonliteral::configuration).append(":").append(configuration.name()));
+  }
+
+  auto const& entities = _overlay->entities();
+  
+  for(auto const& entity:entities){
+    retValue.push_back( std::string(jsonliteral::entity).append(":").append(entity.name()));
+  }
+
+  return retValue;
 }
 
 result_t JSONDocumentBuilder::comapreUsingOverlays(JSONDocumentBuilder const& other) const {

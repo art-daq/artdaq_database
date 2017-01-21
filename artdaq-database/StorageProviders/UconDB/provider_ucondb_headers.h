@@ -4,6 +4,7 @@
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/SharedCommon/common.h"
+#include "artdaq-database/SharedCommon/returned_result.h"
 #include "artdaq-database/StorageProviders/UconDB/provider_ucondb.h"
 #include "artdaq-database/StorageProviders/UconDB/ucondb_api.h"
 

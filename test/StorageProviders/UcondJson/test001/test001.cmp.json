@@ -12,7 +12,66 @@
 "verbose" : false
 }
 }
-}
 },
-"version" : "\n AA \""
+"metadata" : {
+
+},
+"search" : [
+
+]
+},
+"version" : "ver001",
+"comments" : [
+
+],
+"origin" : {
+"source" : "template",
+"name" : "notprovided",
+"format" : "json",
+"created" : "Mon Feb  8 14:00:30 2016",
+"rawdata" : [
+
+]
+},
+"entities" : [
+
+],
+"configurations" : [
+
+],
+"changelog" : "notprovided",
+"bookkeeping" : {
+"isdeleted" : false,
+"isreadonly" : true,
+"updates" : [
+{
+"event" : "setCollection",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "testJSON_V001",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+}
+],
+"created" : "Mon Feb  8 14:00:30 2016"
+},
+"_id" : {
+"$oid" : "300e5432e543451e9012be1c"
+},
+"collection" : "testJSON_V001",
+"aliases" : {
+"active" : [
+
+],
+"history" : [
+
+]
+},
+"runs" : [
+
+],
+"attachments" : [
+
+],
+"configtype" : "notprovided"
 }

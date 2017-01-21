@@ -353,6 +353,8 @@ bool test_update(std::string const& source, std::string const& compare, std::str
 
   object_id = provider->writeDocument(json);
 
+  search = JsonData{"{\"filter\":" + object_id + ", \"collection\":\"" + collection + "\"}"};
+
   results = provider->readDocument(search);
 
   if (results.size() != 1) {
@@ -368,6 +370,7 @@ bool test_update(std::string const& source, std::string const& compare, std::str
 
   JSONDocumentBuilder returned{retdoc};
   JSONDocumentBuilder expected{cmpdoc};
+  expected.markReadonly();
 
   using namespace artdaq::database::overlay;
   ovl::useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS | DOCUMENT_COMPARE_MUTE_UPDATES |
