@@ -23,14 +23,11 @@ using artdaq::database::basictypes::JsonData;
 
 typedef bool (*test_case)(Options const& /*options*/, std::string const& /*file_name*/);
 
-bool test_findconfigs(Options const&, std::string const&);
-bool test_buildfilter(Options const&, std::string const&);
-
 int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
   //artdaq::database::docrecord::debug::enableJSONDocument();
-  //artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
+  artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
 
   artdaq::database::configuration::debug::enableManageDocumentOperation();
   artdaq::database::configuration::debug::options::enableOperationBase();

@@ -180,11 +180,11 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
 
     project_stage << "_id" << 0 << "configurations"
                   << "$configurations.name"
-                  << "configurable_entity"
-                  << "$configurable_entity.name";
+                  << "entities"
+                  << "$entities.name";
 
     bbs::document sort_stage;
-    sort_stage << "configurations.name" << 1 << "configurable_entity.name" << 1;
+    sort_stage << "configurations.name" << 1 << "entities.name" << 1;
 
     stages.match(match_stage.view_document()).project(project_stage.view());  //.sort(sort_stage.view());
 
@@ -195,8 +195,8 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
     for (auto const& view : cursor) {
       TRACE_(5, "MongoDB::configurationComposition()  value=<" << bsoncxx::to_json(view) << ">");
 
-      auto configurable_entity = view.find("configurable_entity");
-      auto configurable_entity_name = bsoncxx::to_json(configurable_entity->get_value());
+      auto entities = view.find("entities");
+      auto entities_name = bsoncxx::to_json(entities->get_value());
 
       auto element_values = view.find("configurations");
 
@@ -221,7 +221,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
         oss << "\"operation\" : \"load\",";
         oss << "\"filter\" : {";
         oss << "\"configurations.name\" : " << configuration_name;
-        oss << ", \"configurable_entity.name\" : " << configurable_entity_name;
+        oss << ", \"entities.name\" : " << entities_name;
         oss << "}";
         oss << "}";
 
@@ -269,8 +269,8 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
 
   project_stage << "_id" << 0 << "version"
                 << "$version"
-                << "configurable_entity"
-                << "$configurable_entity.name";
+                << "entities"
+                << "$entities.name";
 
   stages.match(match_stage.view_document()).project(project_stage.view());
 
@@ -279,8 +279,8 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
   auto cursor = collection.aggregate(stages);
 
   for (auto const& view : cursor) {
-    auto configurable_entity = view.find("configurable_entity");
-    auto configurable_entity_name = bsoncxx::to_json(configurable_entity->get_value());
+    auto entities = view.find("entities");
+    auto entities_name = bsoncxx::to_json(entities->get_value());
     auto version = view.find("version");
     auto version_name = bsoncxx::to_json(version->get_value());
 
@@ -292,7 +292,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
     oss << "\"operation\" : \"load\",";
     oss << "\"filter\" : {";
     oss << "\"version\" : " << version_name;
-    oss << ", \"configurable_entity.name\" : " << configurable_entity_name;
+    oss << ", \"entities.name\" : " << entities_name;
     oss << "}";
     oss << "}";
 
@@ -359,8 +359,8 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
 
     match_stage.concatenate(extract_value("filter").get_document().value);
 
-    project_stage << "_id" << 0 << "configurable_entity"
-                  << "$configurable_entity.name";
+    project_stage << "_id" << 0 << "entities"
+                  << "$entities.name";
 
     stages.match(match_stage.view_document()).project(project_stage.view());
 
@@ -380,10 +380,10 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
     for (auto const& view : cursor) {
       TRACE_(9, "MongoDB::findEntities()  value=<" << bsoncxx::to_json(view) << ">");
 
-      auto configurable_entity = view.find("configurable_entity");
-      auto configurable_entity_name = bsoncxx::to_json(configurable_entity->get_value());
+      auto entities = view.find("entities");
+      auto entities_name = bsoncxx::to_json(entities->get_value());
 
-      if (!isNew(configurable_entity_name)) continue;
+      if (!isNew(entities_name)) continue;
 
       std::ostringstream oss;
       oss << "{";
@@ -392,7 +392,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
       oss << "\"dataformat\" : \"gui\",";
       oss << "\"operation\" : \"findversions\",";
       oss << "\"filter\" : {";
-      oss << "\"configurable_entity.name\" : " << configurable_entity_name;
+      oss << "\"entities.name\" : " << entities_name;
       oss << "}";
       oss << "}";
 

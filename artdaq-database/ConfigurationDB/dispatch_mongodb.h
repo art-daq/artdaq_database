@@ -18,8 +18,8 @@ using artdaq::database::basictypes::JsonData;
 
 namespace cf = artdaq::database::configuration;
 
-void store(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*insert_payload*/);
-JsonData load(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
+void writeDocument(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*insert_payload*/);
+JsonData readDocument(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
 
 JsonData findConfigurations(cf::ManageConfigsOperation const& /*options*/, JsonData const& /*query_payload*/);
 JsonData configurationComposition(cf::ManageConfigsOperation const& /*options*/, JsonData const& /*query_payload*/);

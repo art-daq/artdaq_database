@@ -60,9 +60,7 @@ void write_document(Options const& options, std::string& conf) {
   TRACE_(15, "write_document: begin");
 
   if (conf.empty()) {
-    TRACE_(15,
-           "Error in write_document: Invalid configuration document; "
-           "configuration document is empty.");
+    TRACE_(15, "Error in write_document: Invalid configuration document; configuration document is empty.");
 
     throw runtime_error("write_document") << "Invalid configuration document; configuration document is empty.";
   }
@@ -148,21 +146,22 @@ void write_document(Options const& options, std::string& conf) {
   auto configuration = JSONDocument{options.configuration_to_JsonData().json_buffer};
   auto version = JSONDocument{options.version_to_JsonData().json_buffer};
   auto entity = JSONDocument{options.entity_to_JsonData().json_buffer};
-
+  auto collection = JSONDocument{options.collection_to_JsonData().json_buffer};
+  
   builder.addConfiguration(configuration);
   builder.setVersion(version);
+  builder.setCollection(collection);
   builder.addEntity(entity);
 
-  auto document = std::move(builder.extract());
   auto insert_payload =
-      JsonData{"{\"document\":" + document.to_string() + ", \"collection\":\"" + options.collection() + "\"}"};
+      JsonData{"{\"document\":" + builder.to_string() + ", \"collection\":\"" + options.collection() + "\"}"};
 
   TRACE_(15, "write_document: insert_payload=<" << insert_payload.json_buffer << ">");
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_store_t>{{apiliteral::provider::mongo, cf::mongo::store},
-                                                             {apiliteral::provider::filesystem, cf::filesystem::store},
-                                                             {apiliteral::provider::ucon, cf::ucon::store}};
+    auto providers = std::map<std::string, provider_store_t>{{apiliteral::provider::mongo, cf::mongo::writeDocument},
+                                                             {apiliteral::provider::filesystem, cf::filesystem::writeDocument},
+                                                             {apiliteral::provider::ucon, cf::ucon::writeDocument}};
 
     return providers.at(name);
   };
@@ -192,9 +191,9 @@ void read_document(Options const& options, std::string& conf) {
   TRACE_(16, "read_document: search_payload=<" << search_payload.json_buffer << ">");
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_load_t>{{apiliteral::provider::mongo, cf::mongo::load},
-                                                            {apiliteral::provider::filesystem, cf::filesystem::load},
-                                                            {apiliteral::provider::ucon, cf::ucon::load}};
+    auto providers = std::map<std::string, provider_load_t>{{apiliteral::provider::mongo, cf::mongo::readDocument},
+                                                            {apiliteral::provider::filesystem, cf::filesystem::readDocument},
+                                                            {apiliteral::provider::ucon, cf::ucon::readDocument}};
 
     return providers.at(name);
   };

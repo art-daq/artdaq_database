@@ -12,8 +12,8 @@ namespace configapi {
 namespace literal {
 
 namespace operation {
-constexpr auto globalconfstore = "globalconfstore";
-constexpr auto globalconfload = "globalconfload";
+constexpr auto writeconfiguration = "globalconfstore";
+constexpr auto readconfiguration = "globalconfload";
 
 constexpr auto writedocument = "store";
 constexpr auto readdocument = "load";
@@ -66,7 +66,7 @@ constexpr auto configuration_alias = "configurationalias";
 }
 
 namespace filter {
-constexpr auto entity = "configurable_entity.name";
+constexpr auto entity = "entities.name";
 constexpr auto version = "version";
 constexpr auto version_alias = "alias";
 constexpr auto configuration = "configurations.name";
@@ -74,7 +74,7 @@ constexpr auto configuration_alias = "configuration_alias";
 }
 
 namespace gui {
-constexpr auto configurable_entity = "configurable_entity";
+constexpr auto entity = "entities";
 constexpr auto operations = "operations";
 }
 
@@ -88,7 +88,7 @@ constexpr auto cant_call_system =
 }
 
 namespace search {
-constexpr auto default_filter = "{\"configurable_entity\":\"any\"}";
+constexpr auto default_filter = "{\"entities\":\"any\"}";
 }
 
 

@@ -134,7 +134,7 @@ void ManageDocumentOperation::readJsonData(JsonData const& data) {
   }
 
   try {
-    entity(boost::get<std::string>(dataAST.at(apiliteral::gui::configurable_entity)));
+    entity(boost::get<std::string>(dataAST.at(apiliteral::gui::entity)));
   } catch (...) {
   }
 
@@ -274,7 +274,7 @@ JsonData ManageDocumentOperation::configuration_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[apiliteral::filter::configuration] = configuration();
+  docAST[jsonliteral::name] = configuration();
 
   auto json_buffer = std::string{};
 
@@ -289,7 +289,7 @@ JsonData ManageDocumentOperation::collection_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[apiliteral::option::collection] = collection();
+  docAST[jsonliteral::collection] = collection();
 
   auto json_buffer = std::string{};
 
@@ -304,7 +304,7 @@ JsonData ManageDocumentOperation::version_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[apiliteral::filter::version] = version();
+  docAST[jsonliteral::name] = version();
 
   auto json_buffer = std::string{};
 
@@ -318,7 +318,7 @@ JsonData ManageDocumentOperation::entity_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[apiliteral::name] = entity();
+  docAST[jsonliteral::name] = entity();
 
   auto json_buffer = std::string{};
 

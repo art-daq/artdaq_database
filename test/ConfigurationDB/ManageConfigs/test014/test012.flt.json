@@ -1,5 +1,5 @@
 {
-  "filter":{"configurable_entity.name":{"$regex":"^@TEST_COLLECTION_NAME_QUAL@-@CONFIG_NUMBER@-*"}},
+  "filter":{"entities.name":{"$regex":"^@TEST_COLLECTION_NAME_QUAL@-@CONFIG_NUMBER@-*"}},
   "dbprovider":"@TEST_DBPROVIDER@",
   "operation":"findentities",
   "dataformat":"gui"

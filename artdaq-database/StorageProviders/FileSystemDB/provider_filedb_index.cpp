@@ -63,7 +63,7 @@ std::vector<object_id_t> SearchIndex::findDocumentIDs(JsonData const& search) {
   auto runMatchingFunction = [](std::string const& name) {
     auto matching_function_map = std::map<std::string, matching_function_t>{{"version", &SearchIndex::_matchVersion},
                                                                             {"configurations.name", &SearchIndex::_matchConfiguration},
-                                                                            {"configurable_entity.name", &SearchIndex::_matchentity},
+                                                                            {"entities.name", &SearchIndex::_matchentity},
                                                                             {"$oid", &SearchIndex::_matchObjectId},
                                                                             {"_id", &SearchIndex::_matchObjectIds}};
 
@@ -212,7 +212,7 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByEnti
   auto entityNameFilter = std::string{};
 
   try {
-    entityNameFilter = boost::get<std::string>(search_ast.at("configurable_entity.name"));
+    entityNameFilter = boost::get<std::string>(search_ast.at("entities.name"));
 
     TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByEntityName()"
                   << " Found entity filter=<" << entityNameFilter << ">.");
@@ -220,7 +220,7 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByEnti
   } catch (...) {
   }
 
-  return _indexed_filtered_innerjoin_over_ouid("version", "configurable_entity.name", entityNameFilter);
+  return _indexed_filtered_innerjoin_over_ouid("version", "entities.name", entityNameFilter);
 }
 
 std::vector<std::string> SearchIndex::findEntities(JsonData const& search) {
@@ -242,7 +242,7 @@ std::vector<std::string> SearchIndex::findEntities(JsonData const& search) {
   auto entityNameFilter = std::string{};
 
   try {
-    entityNameFilter = boost::get<std::string>(search_ast.at("configurable_entity.name"));
+    entityNameFilter = boost::get<std::string>(search_ast.at("entities.name"));
 
     TRACE_(5, "StorageProvider::FileSystemDB::index::findEntities()"
                   << " Found filter=<" << entityNameFilter << ">.");
@@ -250,7 +250,7 @@ std::vector<std::string> SearchIndex::findEntities(JsonData const& search) {
   } catch (...) {
   }
 
-  return _filtered_attribute_list("configurable_entity.name", entityNameFilter);
+  return _filtered_attribute_list("entities.name", entityNameFilter);
 }
 
 std::vector<std::pair<std::string, std::string>> SearchIndex::findAllGlobalConfigurations(JsonData const& search) {
@@ -283,7 +283,7 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findAllGlobalConfi
   } catch (...) {
   }
 
-  return _indexed_filtered_innerjoin_over_ouid("configurable_entity.name", "configurations.name", configFilter);
+  return _indexed_filtered_innerjoin_over_ouid("entities.name", "configurations.name", configFilter);
 }
 
 bool SearchIndex::addDocument(JsonData const& document, object_id_t const& ouid) {
@@ -326,12 +326,12 @@ bool SearchIndex::addDocument(JsonData const& document, object_id_t const& ouid)
 
     for (auto const& entity : entities) {
       auto entity_name = boost::get<std::string>(boost::get<jsn::object_t>(entity).at("name"));
-      _addentity(ouid, entity_name);
+      _addEntity(ouid, entity_name);
     }
     } catch (...) {
       TRACE_(5,
              "StorageProvider::FileSystemDB::index::addDocument() Failed to "
-             "add configurable_entity.");
+             "add entities.");
     }
 
     return true;
@@ -401,7 +401,7 @@ bool SearchIndex::_create(boost::filesystem::path const& index_path) {
 
     auto json = std::string{
         "{\"version\":{},\"configurations.name\":{}, "
-        "\"configurable_entity.name\":{} }"};
+        "\"entities.name\":{} }"};
 
     std::copy(json.begin(), json.end(), std::ostream_iterator<char>(os));
 
@@ -583,21 +583,21 @@ void SearchIndex::_addConfiguration(object_id_t const& ouid, std::string const& 
   _make_unique_sorted<std::string>(ouids);
 }
 
-void SearchIndex::_addentity(object_id_t const& ouid, std::string const& entity) {
+void SearchIndex::_addEntity(object_id_t const& ouid, std::string const& entity) {
   confirm(!ouid.empty());
   confirm(!entity.empty());
 
-  TRACE_(7, "StorageProvider::FileSystemDB::index::_addentity() begin");
+  TRACE_(7, "StorageProvider::FileSystemDB::index::_addEntity() begin");
   TRACE_(7,
-         "StorageProvider::FileSystemDB::index::_addentity() "
+         "StorageProvider::FileSystemDB::index::_addEntity() "
          "args ouid=<"
              << ouid << ">.");
   TRACE_(7,
-         "StorageProvider::FileSystemDB::index::_addentity() "
+         "StorageProvider::FileSystemDB::index::_addEntity() "
          "args entity=<"
              << entity << ">.");
 
-  auto& entities = boost::get<jsn::object_t>(_index.at("configurable_entity.name"));
+  auto& entities = boost::get<jsn::object_t>(_index.at("entities.name"));
   auto& entity_ouid_list = entities[entity];
 
   if (entity_ouid_list.type() == typeid(bool)) entity_ouid_list = jsn::array_t{};
@@ -680,10 +680,10 @@ std::vector<object_id_t> SearchIndex::_matchentity(std::string const& entity) co
   TRACE_(15, "StorageProvider::FileSystemDB::index::_matchentity() begin");
   TRACE_(15,
          "StorageProvider::FileSystemDB::index::_matchentity() "
-         "args configurable_entity=<"
+         "args entities=<"
              << entity << ">.");
 
-  auto const& entities = boost::get<jsn::object_t>(_index.at("configurable_entity.name"));
+  auto const& entities = boost::get<jsn::object_t>(_index.at("entities.name"));
 
   try {
     auto const& entity_ouid_list = boost::get<jsn::array_t>(entities.at(entity));
@@ -853,7 +853,7 @@ void SearchIndex::_removeentity(object_id_t const& ouid, std::string const& enti
          "args entity=<"
              << entity << ">.");
 
-  auto& entities = boost::get<jsn::object_t>(_index.at("configurable_entity.name"));
+  auto& entities = boost::get<jsn::object_t>(_index.at("entities.name"));
 
   try {
     auto& entity_ouid_list = boost::get<jsn::array_t>(entities.at(entity));

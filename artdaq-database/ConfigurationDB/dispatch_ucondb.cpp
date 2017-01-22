@@ -25,7 +25,7 @@ using artdaq::database::basictypes::JsonData;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocument;
 
-void prov::store(ManageDocumentOperation const& options, JsonData const& insert_payload) {
+void prov::writeDocument(ManageDocumentOperation const& options, JsonData const& insert_payload) {
   confirm(options.provider().compare(apiliteral::provider::ucon) == 0);
   confirm(options.operation().compare(apiliteral::operation::writedocument) == 0);
 
@@ -49,7 +49,7 @@ void prov::store(ManageDocumentOperation const& options, JsonData const& insert_
   TRACE_(15, "store: end");
 }
 
-JsonData prov::load(ManageDocumentOperation const& options, JsonData const& search_payload) {
+JsonData prov::readDocument(ManageDocumentOperation const& options, JsonData const& search_payload) {
   confirm(options.provider().compare(apiliteral::provider::ucon) == 0);
   confirm(options.operation().compare(apiliteral::operation::readdocument) == 0);
 
@@ -177,7 +177,7 @@ JsonData prov::configurationComposition(ManageConfigsOperation const& options, J
 
   auto ex = std::regex(
       "\"configurations\\.name\"\\s*:\\s*\"((\\\\\"|[^\"])*)\"\\,"
-      "\\s*\"configurable_entity\\.name\"\\s*:\\s*\"((\\\\\"|"
+      "\\s*\"entities\\.name\"\\s*:\\s*\"((\\\\\"|"
       "[^\"])*)\"");
 
   auto needComma = bool{false};
@@ -251,7 +251,7 @@ JsonData prov::findVersions(ManageDocumentOperation const& options, JsonData con
 
   auto ex = std::regex(
       "\"version\"\\s*:\\s*\"((\\\\\"|[^\"])*)\"\\,\\s*"
-      "\"configurable_entity\\.name\"\\s*:\\s*\"((\\\\\"|"
+      "\"entities\\.name\"\\s*:\\s*\"((\\\\\"|"
       "[^\"])*)\"");
 
   auto needComma = bool{false};
@@ -324,7 +324,7 @@ JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData con
     // entities were found.";
   }
 
-  auto ex = std::regex("\\s\"(configurable_entity\\.name)\"\\s:\\s\"((\\\\\"|[^\"])*)\"");
+  auto ex = std::regex("\\s\"(entities\\.name)\"\\s:\\s\"((\\\\\"|[^\"])*)\"");
 
   auto needComma = bool{false};
   auto printComma = [&needComma]() {
@@ -392,7 +392,7 @@ JsonData prov::addConfiguration(ManageDocumentOperation const& options, JsonData
       JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collection() + "\"}"};
   TRACE_(20, "operation_addconfig: args search_payload=<" << search.json_buffer << ">");
 
-  auto document = ucon::load(new_options, search);
+  auto document = ucon::readDocument(new_options, search);
   auto json_document = JSONDocument{document.json_buffer};
   JSONDocumentBuilder builder{json_document};
   auto configuration = JSONDocument{new_options.configuration_to_JsonData().json_buffer};
@@ -405,7 +405,7 @@ JsonData prov::addConfiguration(ManageDocumentOperation const& options, JsonData
       JsonData{"{\"filter\":{\"$oid\":\"" + builder.extract().deleteChild("_id").value() + "\"},  \"document\":" +
                builder.extract().to_string() + ", \"collection\":\"" + options.collection() + "\"}"};
 
-  ucon::store(new_options, update.json_buffer);
+  ucon::writeDocument(new_options, update.json_buffer);
 
   new_options.operation(apiliteral::operation::confcomposition);
 

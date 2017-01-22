@@ -9,7 +9,7 @@
             "operation":"load",
             "filter":{
                "version":"@TEST_VERSION_NAME@-007",
-               "configurable_entity.name":"test@CONFIG_NUMBER@"
+               "entities.name":"test@CONFIG_NUMBER@"
             }
          }
       },
@@ -22,7 +22,7 @@
             "operation":"load",
             "filter":{
                "version":"@TEST_VERSION_NAME@-008",
-               "configurable_entity.name":"test@CONFIG_NUMBER@"
+               "entities.name":"test@CONFIG_NUMBER@"
             }
          }
       },
@@ -35,7 +35,7 @@
             "operation":"load",
             "filter":{
                "version":"@TEST_VERSION_NAME@-009",
-               "configurable_entity.name":"test@CONFIG_NUMBER@"
+               "entities.name":"test@CONFIG_NUMBER@"
             }
          }
       },
@@ -48,7 +48,7 @@
             "operation":"load",
             "filter":{
                "version":"@TEST_VERSION_NAME@-010",
-               "configurable_entity.name":"test@CONFIG_NUMBER@"
+               "entities.name":"test@CONFIG_NUMBER@"
             }
          }
       }

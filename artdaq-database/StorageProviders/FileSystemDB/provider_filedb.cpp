@@ -128,7 +128,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::configurationCompos
       oss << "\"operation\" : \"load\",";
       oss << "\"filter\" : {";
       oss << "\"configurations.name\" : \"" << configentityname_pair.first << "\"";
-      oss << ", \"configurable_entity.name\" : \"" << configentityname_pair.second << "\"";
+      oss << ", \"entities.name\" : \"" << configentityname_pair.second << "\"";
       oss << "}";
       oss << "}";
 
@@ -195,7 +195,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findVersions(JsonDa
       oss << "\"operation\" : \"load\",";
       oss << "\"filter\" : {";
       oss << "\"version\" : \"" << versionentityname_pair.second << "\"";
-      oss << ", \"configurable_entity.name\" : \"" << versionentityname_pair.first << "\"";
+      oss << ", \"entities.name\" : \"" << versionentityname_pair.first << "\"";
       oss << "}";
       oss << "}";
 
@@ -207,7 +207,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findVersions(JsonDa
     auto entityName = std::string{"notprovided"};
 
     try {
-      entityName = boost::get<std::string>(search_ast.at("configurable_entity.name"));
+      entityName = boost::get<std::string>(search_ast.at("entities.name"));
 
       TRACE_(7, "FileSystemDB::findVersionsByGlobalConfigName"
                     << " Found entity filter=<" << entityName << ">.");
@@ -232,7 +232,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findVersions(JsonDa
       oss << "\"operation\" : \"load\",";
       oss << "\"filter\" : {";
       oss << "\"version\" : \"" << versionentityname_pair.second << "\"";
-      oss << ", \"configurable_entity.name\" : \"" << entityName << "\"";
+      oss << ", \"entities.name\" : \"" << entityName << "\"";
       oss << "}";
       oss << "}";
 
@@ -293,7 +293,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findEntities(JsonDa
       oss << "\"dataformat\" : \"gui\",";
       oss << "\"operation\" : \"findversions\",";
       oss << "\"filter\" : {";
-      oss << "\"configurable_entity.name\" : \"" << configentity_name << "\"";
+      oss << "\"entities.name\" : \"" << configentity_name << "\"";
       oss << "}";
       oss << "}";
 

@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) try {
       apiliteral::operation::readdocument, read_document, options_string, test_document);
 
   cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP, std::string const&, std::string&>(
-      apiliteral::operation::globalconfload, read_configuration, options_string, test_document);
+      apiliteral::operation::readconfiguration, read_configuration, options_string, test_document);
   
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
       apiliteral::operation::findconfigs, find_configurations, options_string);
@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) try {
         apiliteral::operation::writedocument, write_document, options_string, test_document);
 
     cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
-        apiliteral::operation::globalconfstore, write_configuration, options_string, test_document);
+        apiliteral::operation::writeconfiguration, write_configuration, options_string, test_document);
 
   } catch (...) {
   }
@@ -147,7 +147,7 @@ int main(int argc, char* argv[]) try {
 
   using cfo::data_format_t;
 
-  if(options.operation().compare(apiliteral::operation::globalconfload) || options.operation().compare(apiliteral::operation::globalconfstore)){
+  if(options.operation().compare(apiliteral::operation::readconfiguration) || options.operation().compare(apiliteral::operation::writeconfiguration)){
     //TODO: compare the contents of tar.bz2.base64
     return process_exit_code::SUCCESS;
   }

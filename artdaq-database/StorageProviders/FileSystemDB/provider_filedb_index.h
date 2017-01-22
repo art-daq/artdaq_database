@@ -44,7 +44,7 @@ class SearchIndex final {
  private:
   void _addVersion(object_id_t const&, std::string const&);
   void _addConfiguration(object_id_t const&, std::string const&);
-  void _addentity(object_id_t const&, std::string const&);
+  void _addEntity(object_id_t const&, std::string const&);
 
   void _removeVersion(object_id_t const&, std::string const&);
   void _removeConfiguration(object_id_t const&, std::string const&);

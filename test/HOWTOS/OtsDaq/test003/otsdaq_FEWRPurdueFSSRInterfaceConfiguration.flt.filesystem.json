@@ -1,5 +1,5 @@
 {"filter":{
- "configurable_entity.name":"CMSROOT",
+ "entities.name":"CMSROOT",
  "configurations.name":"otsdaqC001"
 }, 
 "collection":"otsdaq_FEWRPurdueFSSRInterfaceConfiguration",

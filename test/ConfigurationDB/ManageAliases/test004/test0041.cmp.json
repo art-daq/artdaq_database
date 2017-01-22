@@ -4,7 +4,7 @@
   "name" : "configA003:@TEST_ENTITY_NAME@",
   "query" : 
   {
-    "filter":{"configurations.name":"configA003", "configurable_entity.name":"@TEST_ENTITY_NAME@"},
+    "filter":{"configurations.name":"configA003", "entities.name":"@TEST_ENTITY_NAME@"},
     "collection":"artdaq_Aggregator",
     "dbprovider":"mongo",
     "operation":"load",

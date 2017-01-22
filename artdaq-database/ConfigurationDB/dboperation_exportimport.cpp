@@ -50,12 +50,12 @@ result_t json::write_configuration(std::string const& query_payload, std::string
 
     if (!system(NULL)) return Failure(msg_SystemCallFailed);
 
-    auto options = ManageDocumentOperation{apiliteral::operation::globalconfstore};
+    auto options = ManageDocumentOperation{apiliteral::operation::writeconfiguration};
     options.readJsonData({query_payload});
 
     TRACE_(10, "write_configuration: operation=<" << options.to_string() << ">");
 
-    confirm(options.operation().compare(apiliteral::operation::globalconfstore) == 0);
+    confirm(options.operation().compare(apiliteral::operation::writeconfiguration) == 0);
 
     options.operation(apiliteral::operation::writedocument);
 
@@ -129,12 +129,12 @@ result_t json::read_configuration(std::string const& query_payload, std::string&
     if (query_payload.empty()) return Failure(msg_EmptyFilter);
     if (!system(NULL)) return Failure(msg_SystemCallFailed);
 
-    auto options = ManageConfigsOperation{apiliteral::operation::globalconfload};
+    auto options = ManageConfigsOperation{apiliteral::operation::readconfiguration};
     options.readJsonData({query_payload});
 
     TRACE_(10, "read_configuration: operation=<" << options.to_string() << ">");
 
-    confirm(options.operation().compare(apiliteral::operation::globalconfload) == 0);
+    confirm(options.operation().compare(apiliteral::operation::readconfiguration) == 0);
 
     options.operation(apiliteral::operation::confcomposition);
 
@@ -172,7 +172,7 @@ result_t json::read_configuration(std::string const& query_payload, std::string&
               boost::get<jsn::object_t>(boost::get<jsn::object_t>(confElement).at(jsonliteral::query)), configuration))
         throw runtime_error("read_configuration") << "read_configuration: Unable to write configuration";
 
-      auto tmpOpts = ManageDocumentOperation{apiliteral::operation::globalconfload};
+      auto tmpOpts = ManageDocumentOperation{apiliteral::operation::readconfiguration};
       tmpOpts.readJsonData({configuration});
 
       tmpOpts.format(options::data_format_t::origin);

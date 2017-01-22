@@ -38,8 +38,8 @@ constexpr auto configurations = "configurations";
 constexpr auto configurations_name = "configurations.name";
 
 constexpr auto name = "name";
-constexpr auto configurable_entity = "configurable_entity";
-constexpr auto configurable_entity_name = "configurable_entity.name";
+constexpr auto entities = "entities";
+constexpr auto entities_name = "entities.name";
 
 constexpr auto document_root = "root";
 }

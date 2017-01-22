@@ -1,4 +1,4 @@
-cet_make_exec(LoadStore_t
+cet_make_exec(ReadWrite_t
   LIBRARIES
     
   artdaq-database_BasicTypes
@@ -16,7 +16,7 @@ cet_make_exec(LoadStore_t
   ${Boost_PROGRAM_OPTIONS_LIBRARY}  
 ) 
 
-SET (TEST_COLLECTION_NAME "testLoadStore" )
+SET (TEST_COLLECTION_NAME "testReadWrite" )
 
 
 execute_process( COMMAND "date" "-u" "+%m%d%Y-%H%M%S" OUTPUT_VARIABLE CONFIG_NUMBER )

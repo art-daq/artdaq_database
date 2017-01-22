@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) try {
 
   auto file_res_name = std::string{"${HOME}/${0}.result.out"};
 
-  if (options.operation().compare(apiliteral::operation::readdocument) == 0 || options.operation().compare(apiliteral::operation::globalconfload) == 0) {
+  if (options.operation().compare(apiliteral::operation::readdocument) == 0 || options.operation().compare(apiliteral::operation::readconfiguration) == 0) {
     if (!vm.count(apiliteral::option::result)) {
       std::cerr << "Exception from command line processing in " << argv[0] << ": no result file name given.\n"
                 << "For usage and an options list, please do '" << argv[0] << " --help"
@@ -113,7 +113,7 @@ int main(int argc, char* argv[]) try {
       apiliteral::operation::readdocument, read_document, options_string, test_document);
 
   cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP, std::string const&, std::string&>(
-      apiliteral::operation::globalconfload, read_configuration, options_string, test_document);
+      apiliteral::operation::readconfiguration, read_configuration, options_string, test_document);
 
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findconfigs, find_configurations,
                                                                                   options_string);
@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) try {
         apiliteral::operation::writedocument, write_document, options_string, test_document);
 
     cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
-        apiliteral::operation::globalconfstore, write_configuration, options_string, test_document);
+        apiliteral::operation::writeconfiguration, write_configuration, options_string, test_document);
 
   } catch (...) {
   }
@@ -163,7 +163,7 @@ int main(int argc, char* argv[]) try {
 
   auto returned = std::string{result.second};
 
-  if (options.operation().compare(apiliteral::operation::readdocument) == 0 || options.operation().compare(apiliteral::operation::globalconfload) == 0) {
+  if (options.operation().compare(apiliteral::operation::readdocument) == 0 || options.operation().compare(apiliteral::operation::readconfiguration) == 0) {
     std::ofstream os(file_res_name.c_str());
     std::copy(returned.begin(), returned.end(), std::ostream_iterator<char>(os));
     os.close();
@@ -171,7 +171,7 @@ int main(int argc, char* argv[]) try {
     std::cout << "Wrote file:" << file_res_name << "\n";
 
     return process_exit_code::SUCCESS;
-  } else if (options.operation().compare(apiliteral::operation::writedocument) == 0 || options.operation().compare(apiliteral::operation::globalconfstore) == 0) {
+  } else if (options.operation().compare(apiliteral::operation::writedocument) == 0 || options.operation().compare(apiliteral::operation::writeconfiguration) == 0) {
     /* std::ofstream os(file_res_name.c_str());
      std::copy(returned.begin(), returned.end(),
              std::ostream_iterator<char>(os));
