@@ -59,8 +59,9 @@ result_t json::write_configuration(std::string const& query_payload, std::string
 
     options.operation(apiliteral::operation::writedocument);
 
-    auto tmp_dir_name = std::string{std::tmpnam(nullptr)};
-
+    auto tmp_dir_name = std::string{"/tmp/adb"};
+    tmp_dir_name.append(std::to_string(rand() % 9000000 + 1000000));
+    
     auto system_cmd = std::string{"mkdir -p "};
     system_cmd += tmp_dir_name;
 
@@ -151,7 +152,8 @@ result_t json::read_configuration(std::string const& query_payload, std::string&
     if (!jsn::JsonReader{}.read(configuration_list, resultAST))
       throw runtime_error("read_configuration") << "read_configuration: Unable to read configuration_list";
 
-    auto tmp_dir_name = std::string{std::tmpnam(nullptr)};
+    auto tmp_dir_name = std::string{"/tmp/adb"};
+    tmp_dir_name.append(std::to_string(rand() % 9000000 + 1000000));
 
     auto system_cmd = std::string{"mkdir -p "};
     system_cmd += tmp_dir_name;

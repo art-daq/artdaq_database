@@ -8,7 +8,12 @@
 
 #include "artdaq-database/SharedCommon/shared_datatypes.h"
 
+#ifndef NDEBUG
 #define confirm(expr) assert(expr)
+#else
+#include "artdaq-database/SharedCommon/shared_exceptions.h"
+#define confirm(expr) if((expr) ==false) throw artdaq::database::runtime_exception("Failed assertion");
+#endif
 
 namespace artdaq {
 namespace database {
