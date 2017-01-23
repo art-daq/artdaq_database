@@ -1,3 +1,4 @@
 { "search": [
- {"name" :"test_db","query" :{"database" : "test_db","dbprovider" : "filesystem","dataformat" : "gui","filter" : {}}}
+ {"name" :"test_dba","query" :{"database" : "test_dba","dbprovider" : "filesystem","dataformat" : "gui","filter" : {}}}
+, {"name" :"test_db","query" :{"database" : "test_db","dbprovider" : "filesystem","dataformat" : "gui","filter" : {}}}
 ] }
