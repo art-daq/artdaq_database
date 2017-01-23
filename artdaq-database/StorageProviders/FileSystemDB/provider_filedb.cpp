@@ -4,8 +4,8 @@
 
 #include "artdaq-database/SharedCommon/sharedcommon_common.h"
 
-#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/BasicTypes/basictypes.h"
+#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 
 /*
 #include <wordexp.h>
@@ -62,7 +62,8 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigurations(
 
     auto configentityname_pairs = search_index.findAllGlobalConfigurations(query_payload);
 
-    TRACE_(5, "FileSystemDB::findConfigurations() search returned " << configentityname_pairs.size() << " configurations.");
+    TRACE_(5, "FileSystemDB::findConfigurations() search returned " << configentityname_pairs.size()
+                                                                    << " configurations.");
 
     for (auto const& configentityname_pair : configentityname_pairs) {
       std::ostringstream oss;
@@ -321,6 +322,8 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listCollections(Jso
   auto collection_names = dbfs::find_subdirs(dir_name);
 
   for (auto const& collection_name : collection_names) {
+    if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
+
     TRACE_(12,
            "FileSystemDB::listCollections() found "
            "collection_name=<"
@@ -396,7 +399,8 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listDatabases(JsonD
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::databaseMetadata(JsonData const& query_payload [[gnu::unused]]) {
+std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::databaseMetadata(
+    JsonData const& query_payload[[gnu::unused]]) {
   confirm(!query_payload.json_buffer.empty());
   auto returnCollection = std::list<JsonData>();
 
@@ -429,7 +433,6 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::databaseMetadata(Js
   return returnCollection;
 }
 
-
 namespace filesystem {
 namespace debug {
 void enable() {
@@ -444,7 +447,6 @@ void enable() {
 }
 }
 }  // namespace filesystem
-
 
 }  // namespace database
 }  // namespace artdaq

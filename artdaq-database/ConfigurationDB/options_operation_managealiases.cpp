@@ -270,7 +270,7 @@ JsonData ManageAliasesOperation::query_filter_to_JsonData() const {
 
   if (entity() != jsonliteral::notprovided) docAST[apiliteral::filter::entity] = entity();
 
-  if (configuration() != jsonliteral::notprovided && operation() != apiliteral::operation::addconfig)
+  if (configuration() != jsonliteral::notprovided && operation() != apiliteral::operation::assignconfig)
     docAST[apiliteral::filter::configuration] = configuration();
 
   if (docAST.empty()) {

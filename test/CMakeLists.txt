@@ -12,10 +12,10 @@ set(ARTDAQ_DATABASE_URI_UCOND "http://127.0.0.1:27017/test_db")
 cet_test_env("FHICL_FILE_PATH=.")
 
 #test order is important
-#add_subdirectory(JsonDocument)
-#add_subdirectory(Overlay)
-#add_subdirectory(DataFormats)
-#add_subdirectory(StorageProviders)
+add_subdirectory(JsonDocument)
+add_subdirectory(Overlay)
+add_subdirectory(DataFormats)
+add_subdirectory(StorageProviders)
 
 add_subdirectory(ConfigurationDB)
 #add_subdirectory(CaseStudy)

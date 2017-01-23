@@ -37,16 +37,16 @@ void prov::writeDocument(ManageDocumentOperation const& options, JsonData const&
     throw runtime_error("write_document") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TRACE_(15, "store: begin");
+  TRACE_(15, "writeDocument(): begin");
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JsonData>::create(database);
   auto object_id = provider->writeDocument(insert_payload);
 
-  TRACE_(15, "store: object_id=<" << object_id << ">");
+  TRACE_(15, "writeDocument(): object_id=<" << object_id << ">");
 
-  TRACE_(15, "store: end");
+  TRACE_(15, "writeDocument(): end");
 }
 
 JsonData prov::readDocument(ManageDocumentOperation const& options, JsonData const& search_payload) {
@@ -61,7 +61,7 @@ JsonData prov::readDocument(ManageDocumentOperation const& options, JsonData con
     throw runtime_error("read_document") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TRACE_(16, "load: begin");
+  TRACE_(16, "readDocument(): begin");
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
@@ -78,7 +78,7 @@ JsonData prov::readDocument(ManageDocumentOperation const& options, JsonData con
 
   auto data = JsonData{collection.begin()->json_buffer};
 
-  TRACE_(16, "load: end");
+  TRACE_(16, "readDocument(): end");
 
   return data;
 }
@@ -155,15 +155,15 @@ JsonData prov::configurationComposition(ManageConfigsOperation const& options, J
   confirm(options.operation().compare(apiliteral::operation::confcomposition) == 0);
 
   if (options.operation().compare(apiliteral::operation::confcomposition) != 0) {
-    throw runtime_error("operation_buildfilter") << "Wrong operation option; operation=<" << options.operation()
+    throw runtime_error("operation_confcomposition") << "Wrong operation option; operation=<" << options.operation()
                                                  << ">.";
   }
 
   if (options.provider().compare(apiliteral::provider::ucon) != 0) {
-    throw runtime_error("operation_buildfilter") << "Wrong provider option; provider=<" << options.provider() << ">.";
+    throw runtime_error("operation_confcomposition") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TRACE_(18, "operation_buildfilter: begin");
+  TRACE_(18, "operation_confcomposition: begin");
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
@@ -172,7 +172,7 @@ JsonData prov::configurationComposition(ManageConfigsOperation const& options, J
   auto query_payloads = provider->configurationComposition(search_payload);
 
   if (query_payloads.empty()) {
-    throw runtime_error("operation_buildfilter") << "No search filters were found.";
+    throw runtime_error("operation_confcomposition") << "No search filters were found.";
   }
 
   auto ex = std::regex(
@@ -197,18 +197,18 @@ JsonData prov::configurationComposition(ManageConfigsOperation const& options, J
     auto results = std::smatch();
 
     if (!std::regex_search(filter_json, results, ex))
-      throw runtime_error("operation_buildfilter") << "Unsupported filter string, no match";
+      throw runtime_error("operation_confcomposition") << "Unsupported filter string, no match";
 
     /*
         for (size_t i = 0; i < results.size(); ++i) {
           std::ssub_match sub_match = results[i];
           std::string piece = sub_match.str();
-                     TRACE_(18, "operation_buildfilter: submatch*** " << i << ":
+                     TRACE_(18, "operation_confcomposition: submatch*** " << i << ":
        " << piece << '\n');
         }
     */
     if (results.size() != 5)
-      throw runtime_error("operation_buildfilter") << "Unsupported filter string, wrong result count";
+      throw runtime_error("operation_confcomposition") << "Unsupported filter string, wrong result count";
 
     oss << printComma() << "{";
     oss << "\"name\" :\"" << results[1].str() << ":" << results[3].str() << "\",";
@@ -373,9 +373,9 @@ JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData con
 
 JsonData prov::addConfiguration(ManageDocumentOperation const& options, JsonData const& search_payload) {
   confirm(options.provider().compare(apiliteral::provider::ucon) == 0);
-  confirm(options.operation().compare(apiliteral::operation::addconfig) == 0);
+  confirm(options.operation().compare(apiliteral::operation::assignconfig) == 0);
 
-  if (options.operation().compare(apiliteral::operation::addconfig) != 0) {
+  if (options.operation().compare(apiliteral::operation::assignconfig) != 0) {
     throw runtime_error("operation_addconfig") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
@@ -409,7 +409,7 @@ JsonData prov::addConfiguration(ManageDocumentOperation const& options, JsonData
 
   new_options.operation(apiliteral::operation::confcomposition);
 
-  auto find_options = ManageConfigsOperation{apiliteral::operation::addconfig};
+  auto find_options = ManageConfigsOperation{apiliteral::operation::assignconfig};
 
   find_options.operation(apiliteral::operation::confcomposition);
   find_options.format(options::data_format_t::gui);

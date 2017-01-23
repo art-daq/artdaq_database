@@ -30,8 +30,8 @@ constexpr auto addentity = "addentity";
 constexpr auto rmentity = "rmentity";
 
 constexpr auto confcomposition = "buildfilter";
-constexpr auto addconfig = "addconfig";
-constexpr auto rmconfig = "rmconfig";
+constexpr auto assignconfig = "addconfig";
+constexpr auto removeconfig = "rmconfig";
 constexpr auto newconfig = "newconfig";
 
 constexpr auto addalias = "addalias";

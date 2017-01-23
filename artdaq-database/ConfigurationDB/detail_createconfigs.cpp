@@ -57,7 +57,7 @@ typedef JsonData (*provider_addtoglobalconfig_t)(Options const& /*options*/, Jso
 
 void assign_configuration(Options const& options, std::string& configs) {
   confirm(configs.empty());
-  confirm(options.operation().compare(apiliteral::operation::addconfig) == 0);
+  confirm(options.operation().compare(apiliteral::operation::assignconfig) == 0);
 
   TRACE_(11, "assign_configuration: begin");
   TRACE_(11, "assign_configuration args options=<" << options.to_string() << ">");
@@ -104,7 +104,7 @@ void assign_configuration(Options const& options, std::string& configs) {
 
 void remove_configuration(Options const& options, std::string& configs) {
   confirm(configs.empty());
-  confirm(options.operation().compare(apiliteral::operation::rmconfig) == 0);
+  confirm(options.operation().compare(apiliteral::operation::removeconfig) == 0);
 
   TRACE_(11, "remove_configuration: begin");
   TRACE_(11, "remove_configuration args options=<" << options.to_string() << ">");

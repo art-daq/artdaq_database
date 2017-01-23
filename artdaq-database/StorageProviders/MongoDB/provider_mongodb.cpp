@@ -50,10 +50,10 @@ using artdaq::database::docrecord::JSONDocument;
 
 namespace jsonliteral = artdaq::database::dataformats::literal;
 
-//bsoncxx::types::value extract_value_from_document(bsoncxx::document::value const& document, std::string const& key);
+// bsoncxx::types::value extract_value_from_document(bsoncxx::document::value const& document, std::string const& key);
 namespace artdaq {
-namespace database { 
-  
+namespace database {
+
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonData const& search) {
@@ -150,7 +150,8 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
   auto collectionDescriptors = _provider->connection().list_collections(filter.view_document());
 
   for (auto const& collectionDescriptor : collectionDescriptors) {
-    TRACE_(5, "MongoDB::configurationComposition() found collection=<" << bsoncxx::to_json(collectionDescriptor) << ">");
+    TRACE_(5, "MongoDB::configurationComposition() found collection=<" << bsoncxx::to_json(collectionDescriptor)
+                                                                       << ">");
 
     // auto view = collectionDescriptor.view();
     auto element_name = collectionDescriptor.find("name");
@@ -171,6 +172,19 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
 
     auto collection = _provider->connection().collection(collection_name);
     auto bson_document = bsoncxx::from_json(search.json_buffer);
+
+    auto extract_value = [&bson_document](auto const& name) {
+      auto view = bson_document.view();
+      auto element = view.find(name);
+
+      if (element == view.end())
+        throw runtime_error("MongoDB") << "Search JsonData is missing the \"" << name << "\" element.";
+
+      return element->get_value();
+    };
+
+    auto configuration_name_expected = bsoncxx::to_json(extract_value("configurations.name"));
+    TRACE_(5, "MongoDB::configurationComposition()  configuration_name_expected=<" << configuration_name_expected << ">");
 
     mongocxx::pipeline stages;
     bbs::document project_stage;
@@ -195,43 +209,44 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
     for (auto const& view : cursor) {
       TRACE_(5, "MongoDB::configurationComposition()  value=<" << bsoncxx::to_json(view) << ">");
 
-      auto entities = view.find("entities");
-      auto entities_name = bsoncxx::to_json(entities->get_value());
+      auto configurations_value = view.find("configurations");
+      auto entities_value = view.find("entities");
 
-      auto element_values = view.find("configurations");
-
-      if (element_values == collectionDescriptor.end())
+      if (configurations_value == collectionDescriptor.end() || entities_value == collectionDescriptor.end())
         throw runtime_error("MongoDB") << "MongoDB returned invalid database search.";
 
-      auto configuration_name_array = element_values->get_array();
-      for (auto const& configuration_name_element[[gnu::unused]] : configuration_name_array.value) {
-        //        auto configuration_name =
-        //        bsoncxx::to_json(configuration_name_element.get_value());
+      auto configurations = configurations_value->get_array();
+      auto entities = entities_value->get_array();
 
-        //	if(configuration_name=="notprovided")
-        //	  continue;
+      for (auto const& configuration : configurations.value) {
+        for (auto const& entity : entities.value) {
+          auto configuration_name = bsoncxx::to_json(configuration.get_value());
+          auto entity_name = bsoncxx::to_json(entity.get_value());
 
-        auto configuration_name = bsoncxx::to_json(bson_document.view()["configurations.name"].get_value());
+          if (configuration_name != configuration_name_expected) continue;
 
-        std::ostringstream oss;
-        oss << "{";
-        oss << "\"collection\" : \"" << collection_name << "\",";
-        oss << "\"dbprovider\" : \"mongo\",";
-        oss << "\"dataformat\" : \"gui\",";
-        oss << "\"operation\" : \"load\",";
-        oss << "\"filter\" : {";
-        oss << "\"configurations.name\" : " << configuration_name;
-        oss << ", \"entities.name\" : " << entities_name;
-        oss << "}";
-        oss << "}";
+          std::ostringstream oss;
+          oss << "{";
+          oss << "\"collection\" : \"" << collection_name << "\",";
+          oss << "\"dbprovider\" : \"mongo\",";
+          oss << "\"dataformat\" : \"gui\",";
+          oss << "\"operation\" : \"load\",";
+          oss << "\"filter\" : {";
+          oss << "\"configurations.name\" : " << configuration_name;
+          oss << ", \"entities.name\" : " << entity_name;
+          oss << "}";
+          oss << "}";
 
-        TRACE_(4, "MongoDB::configurationComposition() found document=<" << oss.str() << ">");
+          TRACE_(4, "MongoDB::configurationComposition() found document=<" << oss.str() << ">");
 
-        returnCollection.emplace_back(oss.str());
-
-        break;
+          returnCollection.emplace_back(oss.str());
+        }
       }
     }
+  }
+
+  if (returnCollection.empty()) {
+    TRACE_(4, "MongoDB::configurationComposition() No data found for json=<" << search.json_buffer << ">");
   }
 
   return returnCollection;
@@ -279,26 +294,30 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
   auto cursor = collection.aggregate(stages);
 
   for (auto const& view : cursor) {
-    auto entities = view.find("entities");
-    auto entities_name = bsoncxx::to_json(entities->get_value());
     auto version = view.find("version");
     auto version_name = bsoncxx::to_json(version->get_value());
 
-    std::ostringstream oss;
-    oss << "{";
-    oss << "\"collection\" : \"" << collection_name << "\",";
-    oss << "\"dbprovider\" : \"mongo\",";
-    oss << "\"dataformat\" : \"gui\",";
-    oss << "\"operation\" : \"load\",";
-    oss << "\"filter\" : {";
-    oss << "\"version\" : " << version_name;
-    oss << ", \"entities.name\" : " << entities_name;
-    oss << "}";
-    oss << "}";
+    auto entities = view.find("entities")->get_array();
 
-    TRACE_(4, "MongoDB::findVersions() found document=<" << oss.str() << ">");
+    for (auto const& entity : entities.value) {
+      auto entity_name = bsoncxx::to_json(entity.get_value());
 
-    returnCollection.emplace_back(oss.str());
+      std::ostringstream oss;
+      oss << "{";
+      oss << "\"collection\" : \"" << collection_name << "\",";
+      oss << "\"dbprovider\" : \"mongo\",";
+      oss << "\"dataformat\" : \"gui\",";
+      oss << "\"operation\" : \"load\",";
+      oss << "\"filter\" : {";
+      oss << "\"version\" : " << version_name;
+      oss << ", \"entities.name\" : " << entity_name;
+      oss << "}";
+      oss << "}";
+
+      TRACE_(4, "MongoDB::findVersions() found document=<" << oss.str() << ">");
+
+      returnCollection.emplace_back(oss.str());
+    }
   }
 
   return returnCollection;
@@ -380,25 +399,28 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
     for (auto const& view : cursor) {
       TRACE_(9, "MongoDB::findEntities()  value=<" << bsoncxx::to_json(view) << ">");
 
-      auto entities = view.find("entities");
-      auto entities_name = bsoncxx::to_json(entities->get_value());
+      auto entities = view.find("entities")->get_array();
 
-      if (!isNew(entities_name)) continue;
+      for (auto const& entity : entities.value) {
+        auto entity_name = bsoncxx::to_json(entity.get_value());
 
-      std::ostringstream oss;
-      oss << "{";
-      oss << "\"collection\" : \"" << collection_name << "\",";
-      oss << "\"dbprovider\" : \"mongo\",";
-      oss << "\"dataformat\" : \"gui\",";
-      oss << "\"operation\" : \"findversions\",";
-      oss << "\"filter\" : {";
-      oss << "\"entities.name\" : " << entities_name;
-      oss << "}";
-      oss << "}";
+        if (!isNew(entity_name)) continue;
 
-      TRACE_(9, "MongoDB::findEntities() found document=<" << oss.str() << ">");
+        std::ostringstream oss;
+        oss << "{";
+        oss << "\"collection\" : \"" << collection_name << "\",";
+        oss << "\"dbprovider\" : \"mongo\",";
+        oss << "\"dataformat\" : \"gui\",";
+        oss << "\"operation\" : \"findversions\",";
+        oss << "\"filter\" : {";
+        oss << "\"entities.name\" : " << entity_name;
+        oss << "}";
+        oss << "}";
 
-      returnCollection.emplace_back(oss.str());
+        TRACE_(9, "MongoDB::findEntities() found document=<" << oss.str() << ">");
+
+        returnCollection.emplace_back(oss.str());
+      }
     }
   }
   return returnCollection;

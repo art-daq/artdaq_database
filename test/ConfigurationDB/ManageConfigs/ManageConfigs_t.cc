@@ -93,7 +93,7 @@ int main(int argc, char* argv[]) try {
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
       apiliteral::operation::confcomposition, configuration_composition, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      apiliteral::operation::addconfig, assign_configuration, options_string);
+      apiliteral::operation::assignconfig, assign_configuration, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
       apiliteral::operation::findversions, find_versions, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(

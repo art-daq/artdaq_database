@@ -255,7 +255,7 @@ JsonData ManageDocumentOperation::query_filter_to_JsonData() const {
 
   if (entity() != jsonliteral::notprovided) docAST[apiliteral::filter::entity] = entity();
 
-  if (configuration() != jsonliteral::notprovided && operation() != apiliteral::operation::addconfig)
+  if (configuration() != jsonliteral::notprovided && operation() != apiliteral::operation::assignconfig)
     docAST[apiliteral::filter::configuration] = configuration();
 
   if (docAST.empty()) {
@@ -275,6 +275,21 @@ JsonData ManageDocumentOperation::configuration_to_JsonData() const {
   auto docAST = object_t{};
 
   docAST[jsonliteral::name] = configuration();
+
+  auto json_buffer = std::string{};
+
+  if (!JsonWriter{}.write(docAST, json_buffer)) {
+    throw db::invalid_option_exception("ManageDocumentOperation") << "Unable to write JSON buffer.";
+  }
+
+  return {json_buffer};
+}
+
+JsonData ManageDocumentOperation::configurationsname_to_JsonData() const {
+  using namespace artdaq::database::json;
+  auto docAST = object_t{};
+
+  docAST[apiliteral::filter::configuration] = configuration();
 
   auto json_buffer = std::string{};
 

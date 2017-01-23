@@ -23,7 +23,7 @@ configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_FILE_NUMBER}.cmp.json ${
 cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC ManageConfigs_t 
   DATAFILES 
     ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json
-  TEST_ARGS  -o findentities -d ${TEST_DBPROVIDER}  -f gui --filter="{\"configurable_entity.name\" :{\"\$regex\":\"^${TEST_COLLECTION_NAME_QUAL}-${CONFIG_NUMBER}-*\"} }" -r test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json )
+  TEST_ARGS  -o findentities -d ${TEST_DBPROVIDER}  -f gui --filter="{\"entities.name\" :{\"\$regex\":\"^${TEST_COLLECTION_NAME_QUAL}-${CONFIG_NUMBER}-*\"} }" -r test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json )
 
 
 SET ( TEST_FILE_NUMBER "003" )
@@ -31,8 +31,8 @@ SET ( TEST_DBPROVIDER "filesystem" )
 cet_test_env("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}")
 string(RANDOM LENGTH 3 ALPHABET 0123456789 RAND_NAME)
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_FILE_NUMBER}.cmp.json ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json @ONLY )
-cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}a_t HANDBUILT  TEST_EXEC ManageConfigs_t 
-  DATAFILES 
-    ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json
-  TEST_ARGS  -o findentities -d ${TEST_DBPROVIDER} -f gui -e "${TEST_COLLECTION_NAME_QUAL}-${CONFIG_NUMBER}*" -r test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json )
+#cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}a_t HANDBUILT  TEST_EXEC ManageConfigs_t 
+#  DATAFILES 
+#    ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json
+#  TEST_ARGS  -o findentities -d ${TEST_DBPROVIDER} -f gui -e "${TEST_COLLECTION_NAME_QUAL}-${CONFIG_NUMBER}*" -r test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json )
   

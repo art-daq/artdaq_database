@@ -1,4 +1,4 @@
-SET ( TEST_NAME "ManageConfigs_buildfilter" )
+SET ( TEST_NAME "ManageConfigs_confcomposition" )
 
 SET ( TEST_NUMBER "002" )
 

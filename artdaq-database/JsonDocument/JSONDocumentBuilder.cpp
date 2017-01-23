@@ -129,6 +129,10 @@ JSONDocumentBuilder& JSONDocumentBuilder::setObjectID(JSONDocument const& object
   return self();
 }
 
+JSONDocument JSONDocumentBuilder::getObjectID() const {
+  return { _overlay->id().to_string()};
+}
+
 JSONDocumentBuilder& JSONDocumentBuilder::setVersion(JSONDocument const& version) try {
   TRACE_(6, "setVersion() args  version=<" << version << ">");
 

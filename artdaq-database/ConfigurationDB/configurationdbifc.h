@@ -343,7 +343,7 @@ struct ConfigurationInterface final {
       op[apiliteral::option::collection] = versionInfo.configuration;
       // op[apiliteral::option::provider] = _database_provider;
       op[apiliteral::option::format] = to_string(data_format_t::gui);
-      op[apiliteral::option::operation] = std::string{apiliteral::operation::addconfig};
+      op[apiliteral::option::operation] = std::string{apiliteral::operation::assignconfig};
       op[apiliteral::filterx] = jsn::object_t{};
 
       auto& filter = boost::get<jsn::object_t>(op[apiliteral::filterx]);

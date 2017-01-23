@@ -39,6 +39,7 @@ class ManageDocumentOperation final : public OperationBase {
   JsonData query_filter_to_JsonData() const override;
 
   JsonData configuration_to_JsonData() const;
+  JsonData configurationsname_to_JsonData() const;
   JsonData version_to_JsonData() const;
   JsonData entity_to_JsonData() const;
   JsonData collection_to_JsonData() const;

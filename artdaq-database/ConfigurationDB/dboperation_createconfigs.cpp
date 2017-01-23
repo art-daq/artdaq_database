@@ -111,7 +111,7 @@ result_t json::assign_configuration(std::string const& query_payload) noexcept {
   try {
     if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = ManageDocumentOperation{apiliteral::operation::addconfig};
+    auto options = ManageDocumentOperation{apiliteral::operation::assignconfig};
     options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
@@ -127,7 +127,7 @@ result_t json::remove_configuration(std::string const& query_payload) noexcept {
   try {
     if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = ManageDocumentOperation{apiliteral::operation::rmconfig};
+    auto options = ManageDocumentOperation{apiliteral::operation::removeconfig};
     options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
