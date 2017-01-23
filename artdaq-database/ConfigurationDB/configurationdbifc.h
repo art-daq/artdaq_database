@@ -1,7 +1,11 @@
 #ifndef _ARTDAQ_DATABASE_CONFIGURATIONDBIFC_H_
 #define _ARTDAQ_DATABASE_CONFIGURATIONDBIFC_H_
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
 #include "artdaq-database/ConfigurationDB/configurationdbifc_base.h"
+#pragma GCC diagnostic pop
+
 #include "options_operation_manageconfigs.h"
 
 using debug::demangle;
@@ -332,8 +336,8 @@ struct ConfigurationInterface final {
       throw artdaq::database::invalid_option_exception(apifunctname) << "Global configuration name is empty";
 
     auto payloadAST = jsn::object_t{};
-    payloadAST[apiliteral::operation::operations] = jsn::array_t{};
-    auto& operations = boost::get<jsn::array_t>(payloadAST[apiliteral::operation::operations]);
+    payloadAST[apiliteral::operations] = jsn::array_t{};
+    auto& operations = boost::get<jsn::array_t>(payloadAST[apiliteral::operations]);
 
     for (auto const& versionInfo : versionInfoList) {
       versionInfo.validate();

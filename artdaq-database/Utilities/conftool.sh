@@ -8,7 +8,7 @@ conftool_log_dir=${HOME}/daqoutput/daqlogs/conftool
 function show_help(){
 printf "\n\nUsage: $(basename $0) [OPERATION] [OPTION]...\n"
 printf " -h [ --help ]              Produce help message\n"
-printf " -o [ --operation ] arg     Database operation [import_global_config or export_global_config]\n"
+printf " -o [ --operation ] arg     Database operation [import_global_config, export_global_config, or list_global_configs]\n"
 printf " -g [ --configuration ] arg Global configuration name [globConfig001]\n"
 printf " -v [ --version ] arg       Configuration version [ver001]\n"
 printf " -s [ --source ] arg        Configuration directory name[config]\n"
@@ -283,6 +283,29 @@ function import_global_config()
  return $result_code
 }
 
+
+function list_global_configs()
+{
+  arg_strings=($*)
+  num_args=${#arg_strings[*]}
+        
+ if [ $num_args -lt 1 ]; then
+   printf "\nError: invalid argument count in list_global_configs(); arg_strings=\"${arg_strings[*]}\" $*"
+   printf "\nUsage: list_global_configs global-config"   
+   return 1
+ fi
+
+ global_config_name=$1
+ 
+ search_result=$(conftool -o findconfigs  -f csv -g ${global_config_name})
+ result_code=$? 
+ if [[  $result_code -gt 0 ]]; then 
+    printf "\nError: Failed to list configs"
+ fi  
+ 
+ printf "\n${search_result}" 
+}
+
 function was_ups_setup()
 { 
  if [ ! -e "$( printenv |grep SETUP_UPS |grep -Eo '/.+')/setup" ]; then
@@ -411,6 +434,9 @@ function main()
   elif [[ "${operation_name}" == "export_global_config" ]]; then
     export_global_config ${global_config_name}
     result_code=$? 
+  elif [[ "${operation_name}" == "list_global_configs" ]]; then
+    list_global_configs ${global_config_name}
+    result_code=$?     
   fi 
   
   printf "\n"

@@ -12,7 +12,7 @@
 #include "artdaq-database/DataFormats/Json/json_reader.h"
 #include "artdaq-database/DataFormats/Json/json_writer.h"
 
-#include "options_operation_readwrite.h"
+#include "artdaq-database/ConfigurationDB/options_operation_managedocument.h"
 
 namespace debug {
 std::string demangle(const char*);
@@ -36,7 +36,7 @@ auto make_error_msg = [](const char* msg) { return std::string("{error:\"").appe
 
 template <typename CONF>
 class MakeSerializable final {
-  static_confirm(std::is_pointer<CONF>::value || std::is_reference<CONF>::value,
+  static_assert(std::is_pointer<CONF>::value || std::is_reference<CONF>::value,
                  "Template parameter must be either a pointer or reference type");
 
  public:
@@ -103,7 +103,7 @@ class MakeSerializable final {
 
 template <typename CONF, template <typename CONF> class SERIALIZABLE>
 class ConfigurationSerializer final {
-  static_confirm(std::is_pointer<CONF>::value || std::is_reference<CONF>::value,
+  static_assert(std::is_pointer<CONF>::value || std::is_reference<CONF>::value,
                  "Template parameter must be either a pointer or reference type");
 
  public:

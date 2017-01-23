@@ -10,7 +10,6 @@
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 
 #include "artdaq-database/DataFormats/Json/json_reader.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
 #include "artdaq-database/DataFormats/shared_literals.h"
 
 #include <libgen.h>
@@ -22,7 +21,7 @@ namespace db = artdaq::database;
 namespace cf = db::configuration;
 namespace cfo = cf::options;
 
-namespace literal = artdaq::database::configuration::literal;
+//namespace literal = artdaq::database::configuration::literal;
 namespace bpo = boost::program_options;
 
 using Options = cf::ManageDocumentOperation;

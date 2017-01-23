@@ -3,7 +3,7 @@
 #include "boost/test/auto_unit_test.hpp"
 
 #include <time.h> /* time */
-#include <cconfirm>
+#include <cassert>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
@@ -21,7 +21,6 @@
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 
 #include "artdaq-database/DataFormats/Json/json_reader.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
 #include "artdaq-database/DataFormats/shared_literals.h"
 
 struct TestData {

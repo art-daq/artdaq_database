@@ -8,7 +8,7 @@ namespace ots {
 struct ConfigurationInterface {};
 
 struct ConfigurationView {
-  void printJSON(std::stringstream& ss) const { oss << _json; }
+  void printJSON(std::stringstream& ss) const { ss << _json; }
   int fillFromJSON(std::string const& newjson) {
     _json = newjson;
     return 0;

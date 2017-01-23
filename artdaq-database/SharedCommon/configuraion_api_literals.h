@@ -11,6 +11,8 @@ constexpr auto msg_SystemCallFailed = "{\"message\":\"Unable to call system() fr
 namespace configapi {
 namespace literal {
 
+constexpr auto operations = "operations";
+  
 namespace operation {
 constexpr auto writeconfiguration = "globalconfstore";
 constexpr auto readconfiguration = "globalconfload";

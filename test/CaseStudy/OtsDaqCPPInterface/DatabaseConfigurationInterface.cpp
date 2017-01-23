@@ -56,6 +56,8 @@ int DatabaseConfigurationInterface::saveActiveVersion(const ConfigurationBase* c
 
   return -1;
 }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
 
 // find the latest configuration version by configuration type
 int DatabaseConfigurationInterface::findLatestVersion(const ConfigurationBase* configuration) const noexcept {
@@ -166,3 +168,4 @@ void DatabaseConfigurationInterface::storeGlobalConfiguration(config_version_map
   throw std::runtime_error("DBI Unknown exception.");
 }
 
+#pragma GCC diagnostic pop

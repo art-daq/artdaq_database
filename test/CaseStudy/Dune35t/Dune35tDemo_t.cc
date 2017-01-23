@@ -10,14 +10,11 @@
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 
 #include "artdaq-database/DataFormats/Json/json_reader.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
-#include "artdaq-database/DataFormats/shared_literals.h"
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
 namespace cfo = cf::options;
 
-namespace literal = artdaq::database::configuration::literal;
 namespace bpo = boost::program_options;
 
 using Options = cf::ManageConfigsOperation;
@@ -28,13 +25,11 @@ using artdaq::database::basictypes::JsonData;
 int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
-  // artdaq::database::docrecord::debug::enableJSONDocument();
-  // artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
-
+  artdaq::database::docrecord::debug::enableJSONDocument();
+  artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
 
   artdaq::database::configuration::debug::enableFindConfigsOperation();
   artdaq::database::configuration::debug::enableCreateConfigsOperation();
-  artdaq::database::configuration::debug::enableConfigurationManageDocumentOperation();
 
   artdaq::database::configuration::debug::options::enableOperationBase();
   artdaq::database::configuration::debug::options::enableOperationManageConfigs();
@@ -99,23 +94,33 @@ int main(int argc, char* argv[]) try {
 
   cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP, std::string const&, std::string&>(
       apiliteral::operation::readconfiguration, read_configuration, options_string, test_document);
-  
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      apiliteral::operation::findconfigs, find_configurations, options_string);
+
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findconfigs,
+                                                                                  find_configurations, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
       apiliteral::operation::confcomposition, configuration_composition, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::assignconfig,
+                                                                                  assign_configuration, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findversions,
+                                                                                  find_versions, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findentities,
+                                                                                  find_entities, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::addalias,
+                                                                                  add_version_alias, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::rmalias,
+                                                                                  remove_version_alias, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findalias,
+                                                                                  find_version_aliases, options_string);
+
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::listdatabases,
+                                                                                  list_databases, options_string);
+
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      apiliteral::operation::assignconfig, assign_configuration, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      apiliteral::operation::findversions, find_versions, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      apiliteral::operation::findentities, find_entities, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::addalias, add_version_alias,
-                                                                                  options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::rmalias, remove_version_alias,
-                                                                                  options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findalias, find_version_aliases,
-                                                                                  options_string);
+      apiliteral::operation::listcollections, list_collections, options_string);
+
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::readdbinfo,
+                                                                                  read_dbinfo, options_string);
+
   try {
     std::ifstream is(file_src_name);
     test_document = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
@@ -147,11 +152,6 @@ int main(int argc, char* argv[]) try {
 
   using cfo::data_format_t;
 
-  if(options.operation().compare(apiliteral::operation::readconfiguration) || options.operation().compare(apiliteral::operation::writeconfiguration)){
-    //TODO: compare the contents of tar.bz2.base64
-    return process_exit_code::SUCCESS;
-  }
-    
   if (options.format() == data_format_t::gui || options.format() == data_format_t::db ||
       options.format() == data_format_t::json) {
     auto compare_result = artdaq::database::json::compare_json_objects(returned, expected);
