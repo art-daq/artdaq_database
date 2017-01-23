@@ -31,7 +31,7 @@ std::string expand_environment_variables(std::string var);
 }
 
 int main(int argc, char* argv[]) try {
-#if 1
+#if 0
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
   artdaq::database::docrecord::debug::enableJSONDocument();
@@ -151,7 +151,7 @@ int main(int argc, char* argv[]) try {
   } catch (...) {
   }
 
-  std::cout << "Running :<" << options.operation() << ">\n";
+  //std::cout << "Running :<" << options.operation() << ">\n";
 
   auto result = cf::getOperations().at(options.operation())->invoke();
 
@@ -182,7 +182,7 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::SUCCESS;
   }
 
-  std::cout << "Results(Returned value):\n" << returned << "\n";
+  std::cout << "Results:" << returned << "\n";
   return process_exit_code::SUCCESS;
 
 } catch (...) {

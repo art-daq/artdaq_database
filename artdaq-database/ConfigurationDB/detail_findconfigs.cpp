@@ -94,6 +94,36 @@ void find_configurations(Options const& options, std::string& configs) {
       returnValueChanged = true;
       break;
     }
+
+    case data_format_t::csv: {
+      using namespace artdaq::database::json;
+      auto reader = JsonReader{};
+      object_t results_ast;
+
+      if (!reader.read(search_result.json_buffer, results_ast)) {
+        TRACE_(11, "find_configurations() Failed to create an AST from search results JSON.");
+
+        throw runtime_error("find_configurations") << "Failed to create an AST from search results JSON.";
+      }
+
+      auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
+
+      TRACE_(11, "find_configurations: found " << results_list.size() << " results.");
+
+      std::ostringstream os;
+
+      for (auto const& result_entry : results_list) {
+        auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
+        auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
+
+        TRACE_(11, "find_configurations() Found config=<" << value << ">.");
+
+        os << value << ", ";
+      }
+      returnValue = os.str();
+      returnValueChanged = true;
+      break;
+    }
   }
 
   if (returnValueChanged) configs.swap(returnValue);

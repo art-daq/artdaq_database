@@ -194,9 +194,7 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByEnti
   confirm(!search.json_buffer.empty());
   auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
   TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByEntityName() begin");
-  TRACE_(5,
-         "StorageProvider::FileSystemDB::index::findVersionsByEntityName() "
-         "args search=<"
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByEntityName() args search=<"
              << search.json_buffer << ">.");
 
   auto reader = JsonReader{};
@@ -209,7 +207,7 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByEnti
     return returnCollection;
   }
 
-  auto entityNameFilter = std::string{};
+  auto entityNameFilter = std::string{"notprovided"};
 
   try {
     entityNameFilter = boost::get<std::string>(search_ast.at("entities.name"));

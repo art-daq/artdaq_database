@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export artdaq_database_version=v1_03_18
+export artdaq_database_version=v1_03_19
 export config_editor_version=v1_00_03
 
 conftool_log_dir=${HOME}/daqoutput/daqlogs/conftool
@@ -106,7 +106,8 @@ function read_command_line_options() {
   
   if [[ "${operation_name_present}" == "${no}" ]] \
   || ( [[ "${operation_name}" != "import_global_config" ]] \
-  && [[ "${operation_name}" != "export_global_config" ]] ); then
+  && [[ "${operation_name}" != "export_global_config" ]] \
+  && [[ "${operation_name}" != "list_global_configs" ]]); then
   printf "\nError: operation is unsupported or missing; operation=<${operation_name}>"
     return 5
   fi
@@ -129,7 +130,7 @@ function read_command_line_options() {
       return 6
   fi
   
-  if [[ "${global_config_name_present}" == "${yes}" ]] \
+  if [[ "${global_config_name_present}" == "${yes}" ]] &&  [[ "${operation_name}" != "list_global_configs" ]]\
     && ( [[ "${global_config_name}" =~ [^[:alnum:]] ]] \
     ||   [[ "${global_config_name}" =~ [^[:digit:]]$ ]] ); then
     printf "\nError: configuration must be an alphanumeric string and ending with a digit; configuration=<${global_config_name}>"
@@ -175,7 +176,7 @@ function export_global_config()
         
  if [ $num_args -lt 1 ]; then
    printf "\nError: invalid argument count in export_global_config(); arg_strings=\"${arg_strings[*]}\" $*"
-   printf "\nUsage: export_global_config global-config"   
+   printf "\nUsage: export_global_config -g global-config"   
    return 1
  fi
 
@@ -230,7 +231,7 @@ function import_global_config()
 
  if [ $num_args -lt 1 ]; then
    printf "\nError: invalid argument count in import_global_config(); arg_strings=\"${arg_strings[*]}\" $*"
-   printf "\nUsage: import_global_config global-config [version-name]"         
+   printf "\nUsage: import_global_config -g global-config [version-name]"         
    return 1
  fi
 
@@ -290,20 +291,21 @@ function list_global_configs()
   num_args=${#arg_strings[*]}
         
  if [ $num_args -lt 1 ]; then
-   printf "\nError: invalid argument count in list_global_configs(); arg_strings=\"${arg_strings[*]}\" $*"
-   printf "\nUsage: list_global_configs global-config"   
-   return 1
- fi
+   search_result=$(conftool -o findconfigs  -f csv -g '*')
+   result_code=$? 
+  else
+   global_config_name=$1
+   search_result=$(conftool -o findconfigs  -f csv -g ${global_config_name})
+   result_code=$? 
+  fi
 
- global_config_name=$1
- 
- search_result=$(conftool -o findconfigs  -f csv -g ${global_config_name})
- result_code=$? 
  if [[  $result_code -gt 0 ]]; then 
     printf "\nError: Failed to list configs"
  fi  
  
- printf "\n${search_result}" 
+ printf "\n${search_result}"
+ 
+ return $result_code
 }
 
 function was_ups_setup()
@@ -399,7 +401,7 @@ function main()
     exit 0
   fi
 
-  setup_config_editor
+  setup_artdaq_database
   if [[  $? -gt 0 ]]; then 
     touch_log
     printf "\nInfo: Exiting..."
@@ -409,9 +411,9 @@ function main()
   unset ARTDAQ_DATABASE_URI
 
   redirect_stdout_stderr_tolog
-  
+ 
   printf "\nInfo: operation=${operation_name}, configuration=${global_config_name}, "
-  
+ 
   if [[ "${version_name_present}" == "${yes}" ]] ; then
     printf "version=${version_name}, "
   fi
@@ -434,14 +436,16 @@ function main()
   elif [[ "${operation_name}" == "export_global_config" ]]; then
     export_global_config ${global_config_name}
     result_code=$? 
-  elif [[ "${operation_name}" == "list_global_configs" ]]; then
-    list_global_configs ${global_config_name}
-    result_code=$?     
   fi 
   
   printf "\n"
   
   restore_stdout_stderr
+
+  if [[ "${operation_name}" == "list_global_configs" ]]; then
+    list_global_configs ${global_config_name}
+    result_code=$?     
+  fi 
   
   return $result_code
 }

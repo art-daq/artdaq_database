@@ -267,6 +267,7 @@ JsonData ManageDocumentOperation::query_filter_to_JsonData() const {
   if (!JsonWriter{}.write(docAST, json_buffer)) {
     throw db::invalid_option_exception("ManageDocumentOperation") << "Unable to write JSON buffer.";
   }
+
   return {json_buffer};
 }
 

@@ -229,10 +229,40 @@ void find_versions(Options const& options, std::string& versions) {
     }
 
     case data_format_t::csv: {
-      returnValue = search_result.json_buffer;
+      using namespace artdaq::database::json;
+      auto reader = JsonReader{};
+      object_t results_ast;
+
+      if (!reader.read(search_result.json_buffer, results_ast)) {
+        TRACE_(13, "find_entities() Failed to create an AST from search results JSON.");
+
+        throw runtime_error("find_entities") << "Failed to create an AST from search results JSON.";
+      }
+
+      auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
+
+      TRACE_(13, "find_entities: found " << results_list.size() << " results.");
+
+      std::ostringstream os;
+
+      auto entities = std::set<std::string>{};
+      
+      for (auto const& result_entry : results_list) {
+        auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
+        auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
+	entities.emplace(value);
+      }
+      
+      for (auto const& entity : entities){
+        TRACE_(13, "find_entities() Found entity=<" << entity << ">.");
+        os << entity << ", ";
+      }
+      
+      returnValue = os.str();
       returnValueChanged = true;
       break;
     }
+    
   }
 
   if (returnValueChanged) versions.swap(returnValue);
@@ -281,7 +311,36 @@ void find_entities(Options const& options, std::string& entities) {
     }
 
     case data_format_t::csv: {
-      returnValue = search_result.json_buffer;
+      using namespace artdaq::database::json;
+      auto reader = JsonReader{};
+      object_t results_ast;
+
+      if (!reader.read(search_result.json_buffer, results_ast)) {
+        TRACE_(13, "find_entities() Failed to create an AST from search results JSON.");
+
+        throw runtime_error("find_entities") << "Failed to create an AST from search results JSON.";
+      }
+
+      auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
+
+      TRACE_(13, "find_entities: found " << results_list.size() << " results.");
+
+      std::ostringstream os;
+
+      auto entities = std::set<std::string>{};
+      
+      for (auto const& result_entry : results_list) {
+        auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
+        auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
+	entities.emplace(value);
+      }
+      
+      for (auto const& entity : entities){
+        TRACE_(13, "find_entities() Found entity=<" << entity << ">.");
+        os << entity << ", ";
+      }
+      
+      returnValue = os.str();
       returnValueChanged = true;
       break;
     }
