@@ -32,7 +32,7 @@ cet_make_exec(readfhicl
 
 cet_script(conftool.sh)
 
-add_subdirectory(mongo)
+#add_subdirectory(mongo)
 
 install_headers()
 install_source()
