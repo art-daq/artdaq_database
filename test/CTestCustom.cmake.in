@@ -6,7 +6,7 @@ mongod  \
 --logappend \
 --pidfilepath=${CMAKE_BINARY_DIR}/databases/mongod.pid \
 --bind_ip=127.0.0.1 \
---fork; sleep 5; netstat -apnt4; \
+--fork; sleep 5; \
 tail -10 ${CMAKE_BINARY_DIR}/databases/mongod.log")  
 
 set(CTEST_CUSTOM_POST_TEST "bash -c \"pkill -F  ${CMAKE_BINARY_DIR}/databases/mongod.pid || echo 'MongoDB already stopped'\"; \
