@@ -14,6 +14,9 @@ printf " -v [ --version ] arg       Configuration version [ver001]\n"
 printf " -s [ --source ] arg        Configuration directory name[config]\n"
 printf "Example: \n\tconftool.sh -o export_global_config -g demo003 -s newconfig"
 printf "\n\tconftool.sh -o import_global_config -g demo004 -v ver004 -s config"
+printf "\n\tconftool.sh -o list_global_configs -g \"de*\" "
+printf "\n\tconftool.sh -o list_global_configs "
+
 printf "\n"
 printf "\nLogs in ${conftool_log_dir}\n"
 ls -t  ${conftool_log_dir} |head -3
