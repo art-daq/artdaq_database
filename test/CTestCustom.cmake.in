@@ -1,5 +1,5 @@
-set(CTEST_CUSTOM_PRE_TEST "/usr/bin/rm -rf ${CMAKE_BINARY_DIR}/databases; /usr/bin/mkdir -p ${CMAKE_BINARY_DIR}/databases/mongodb; \
-/usr/bin/printenv ; \
+set(CTEST_CUSTOM_PRE_TEST "mkdir -p ${CMAKE_BINARY_DIR}/databases/mongodb; \
+printenv ; \
 mongod  \
 --dbpath ${CMAKE_BINARY_DIR}/databases/mongodb \
 --logpath ${CMAKE_BINARY_DIR}/databases/mongod.log \
