@@ -59,7 +59,7 @@ std::list<std::string> dbuc::folders(UconDBSPtr_t provider) {
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FILE, &ss)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TIMEOUT, provider->timeout())) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L)) &&
+        //CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 10L)) &&
         // CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_USERPWD, provider->authentication().c_str())) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_URL, url.c_str()))) {
@@ -114,7 +114,7 @@ std::list<std::string> dbuc::tags(UconDBSPtr_t provider, std::string const& fold
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FILE, &ss)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TIMEOUT, provider->timeout())) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L)) &&
+        //CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 10L)) &&
         // CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_USERPWD, provider->authentication().c_str())) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_URL, url.c_str()))) {
@@ -169,7 +169,7 @@ std::list<std::string> dbuc::objects(UconDBSPtr_t provider, std::string const& f
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FILE, &ss)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TIMEOUT, provider->timeout())) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L)) &&
+        //CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 10L)) &&
         // CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_USERPWD, provider->authentication().c_str())) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_URL, url.c_str()))) {
@@ -230,7 +230,7 @@ result_t dbuc::get_object(UconDBSPtr_t provider, std::string const& folder, std:
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FILE, &ss)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TIMEOUT, provider->timeout())) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L)) &&
+        //CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 10L)) &&
         // CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_USERPWD, provider->authentication().c_str())) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_URL, url.c_str()))) {
@@ -312,7 +312,7 @@ result_t dbuc::put_object(UconDBSPtr_t provider, std::string const& folder, std:
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FILE, &oss)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_INFILE, &iss)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TIMEOUT, provider->timeout())) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L)) &&
+        //CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)size)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 10L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L)) &&
@@ -370,7 +370,7 @@ result_t dbuc::create_folder(UconDBSPtr_t provider, std::string const& folder) {
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FILE, &ss)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TIMEOUT, provider->timeout())) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L)) &&
+        //CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 10L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_USERPWD, provider->authentication().c_str())) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_URL, url.c_str()))) {
