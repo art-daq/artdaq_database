@@ -89,8 +89,8 @@ T JSONDocument::value_as(path_t const& path) const {
 }
 
 namespace debug {
-void enableJSONDocument();
-void enableJSONDocumentUtils();
+void JSONDocument();
+void JSONDocumentUtils();
 }
 std::ostream& operator<<(std::ostream&, JSONDocument const&);
 

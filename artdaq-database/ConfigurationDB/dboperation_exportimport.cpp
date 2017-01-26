@@ -30,12 +30,12 @@ namespace artdaq {
 namespace database {
 namespace configuration {
 namespace detail {
-void export_configuration(ManageDocumentOperation const&, std::string&) noexcept;
-void import_configuration(ManageDocumentOperation const&, std::string&) noexcept;
-void export_database(ManageDocumentOperation const&, std::string&) noexcept;
-void import_database(ManageDocumentOperation const&, std::string&) noexcept;
-void export_collection(ManageDocumentOperation const&, std::string&) noexcept;
-void import_collection(ManageDocumentOperation const&, std::string&) noexcept;
+void export_configuration(ManageDocumentOperation const&, std::string&);
+void import_configuration(ManageDocumentOperation const&, std::string&);
+void export_database(ManageDocumentOperation const&, std::string&);
+void import_database(ManageDocumentOperation const&, std::string&);
+void export_collection(ManageDocumentOperation const&, std::string&);
+void import_collection(ManageDocumentOperation const&, std::string&);
 
 void configuration_composition(ManageDocumentOperation const&, std::string&);
 
@@ -377,14 +377,14 @@ result_t json::read_configuration(std::string const& query_payload, std::string&
   }
 }
 
-void dbcfg::debug::enableExportImport() {
+void dbcfg::debug::ExportImport() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  dbcfg::debug::detail::enableExportImport();
+  dbcfg::debug::detail::ExportImport();
 
-  TRACE_(0, "artdaq::database::configuration::enableExportImport trace_enable");
+  TRACE_(0, "artdaq::database::configuration::ExportImport trace_enable");
 }

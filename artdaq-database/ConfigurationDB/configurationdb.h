@@ -10,8 +10,11 @@
 namespace artdaq {
 namespace database {
 namespace configuration {
-namespace json {  
+namespace json {
 void enable_trace();
-}}}}
+}
+}
+}
+}
 
 #endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_H_ */

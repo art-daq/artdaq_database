@@ -154,13 +154,13 @@ object_id_t StorageProvider<JsonData, MongoDB>::writeDocument(JsonData const& ar
 
 namespace mongo {
 namespace debug {
-void enableReadWrite() {
+void ReadWrite() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::mongo::enableReadWrite trace_enable");
+  TRACE_(0, "artdaq::database::mongo::ReadWrite trace_enable");
 }
 }
 }  // namespace mongo

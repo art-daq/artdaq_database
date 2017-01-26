@@ -33,9 +33,9 @@ result_t import_collection(std::string const& /*task_payload*/) noexcept;
 }
 
 namespace debug {
-void enableExportImport();
+void ExportImport();
 namespace detail {
-void enableExportImport();
+void ExportImport();
 }
 }
 

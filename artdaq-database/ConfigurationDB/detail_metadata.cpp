@@ -264,12 +264,12 @@ void list_collections(Options const& options, std::string& collections) {
 }  // namespace database
 }  // namespace artdaq
 
-void cftd::enableMetadata() {
+void cftd::Metadata() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::enableMetadata trace_enable");
+  TRACE_(0, "artdaq::database::configuration::Metadata trace_enable");
 }

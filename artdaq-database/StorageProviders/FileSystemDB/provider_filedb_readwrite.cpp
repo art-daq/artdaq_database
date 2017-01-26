@@ -177,13 +177,13 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeDocument(JsonData cons
 
 namespace filesystem {
 namespace debug {
-void enableReadWrite() {
+void ReadWrite() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::filesystem::enableReadWrite trace_enable");
+  TRACE_(0, "artdaq::database::filesystem::ReadWrite trace_enable");
 
   artdaq::database::filesystem::index::debug::enable();
 }

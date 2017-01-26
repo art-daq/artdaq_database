@@ -383,7 +383,7 @@ result_t JSONDocumentBuilder::CallUndo() noexcept try { return Success(); } catc
 
 #pragma GCC diagnostic pop
 
-void dbdr::debug::enableJSONDocumentUtils() {
+void dbdr::debug::JSONDocumentUtils() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);

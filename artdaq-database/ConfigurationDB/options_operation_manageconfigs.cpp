@@ -120,7 +120,6 @@ void ManageConfigsOperation::readJsonData(JsonData const& data) {
   } catch (...) {
   }
 
-
   try {
     auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(apiliteral::option::searchfilter));
 
@@ -286,14 +285,12 @@ JsonData ManageConfigsOperation::entity_to_JsonData() const {
   return {json_buffer};
 }
 //
-void cf::debug::options::enableOperationManageConfigs() {
+void cf::debug::options::ManageConfigs() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0,
-         "artdaq::database::configuration::options::OperationFindConfigs "
-         "trace_enable");
+  TRACE_(0, "artdaq::database::configuration::options::ManageConfigs trace_enable");
 }

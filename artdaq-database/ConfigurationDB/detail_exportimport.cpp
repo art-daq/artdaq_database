@@ -57,6 +57,13 @@ result_t write_document_file(ManageDocumentOperation const& options, std::string
 void write_document(ManageDocumentOperation const&, std::string&);
 void read_document(ManageDocumentOperation const&, std::string&);
 
+void export_configuration(ManageDocumentOperation const&, std::string&);
+void import_configuration(ManageDocumentOperation const&, std::string&);
+void export_database(ManageDocumentOperation const&, std::string&);
+void import_database(ManageDocumentOperation const&, std::string&);
+void export_collection(ManageDocumentOperation const&, std::string&);
+void import_collection(ManageDocumentOperation const&, std::string&);
+
 }  // namespace detail
 }  // namespace configuration
 }  // namespace database
@@ -121,12 +128,36 @@ result_t cfd::write_document_file(ManageDocumentOperation const& options, std::s
   return Failure(boost::current_exception_diagnostic_information());
 }
 
-void cftd::enableExportImport() {
+void cfd::export_configuration(ManageDocumentOperation const&, std::string&) {
+  throw runtime_error("export_configuration") << "export_configuration: is not implemented";
+}
+
+void cfd::import_configuration(ManageDocumentOperation const&, std::string&) {
+  throw runtime_error("import_configuration") << "import_configuration: is not implemented";
+}
+
+void cfd::export_database(ManageDocumentOperation const&, std::string&) {
+  throw runtime_error("export_database") << "export_database: is not implemented";
+}
+
+void cfd::import_database(ManageDocumentOperation const&, std::string&) {
+  throw runtime_error("import_database") << "import_database: is not implemented";
+}
+
+void cfd::export_collection(ManageDocumentOperation const&, std::string&) {
+  throw runtime_error("export_collection") << "export_collection: is not implemented";
+}
+
+void cfd::import_collection(ManageDocumentOperation const&, std::string&) {
+  throw runtime_error("import_collection") << "import_collection: is not implemented";
+}
+
+void cftd::ExportImport() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::enableExportImport trace_enable");
+  TRACE_(0, "artdaq::database::configuration::ExportImport trace_enable");
 }

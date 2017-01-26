@@ -89,7 +89,7 @@ struct json2fcldb final {
 };
 
 namespace debug {
-void enableFCL2JSON();
+void FCL2JSON();
 }
 
 }  // namespace fhicljson

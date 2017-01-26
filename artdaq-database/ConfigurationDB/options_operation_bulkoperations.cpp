@@ -132,7 +132,7 @@ JsonData BulkOperations::to_JsonData() const { return {bulkOperations()}; }
 std::string BulkOperations::to_string() const { return to_JsonData().json_buffer; }
 
 //
-void cf::debug::options::enableBulkOperations() {
+void cf::debug::options::BulkOperations() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 

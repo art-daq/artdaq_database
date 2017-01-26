@@ -27,8 +27,8 @@ bool test_update(std::string const&, std::string const&, std::string const&);
 
 int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
-//  artdaq::database::docrecord::debug::enableJSONDocument();
-    artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
+//  artdaq::database::docrecord::debug::JSONDocument();
+    artdaq::database::docrecord::debug::JSONDocumentBuilder();
   debug::registerUngracefullExitHandlers();
   artdaq::database::useFakeTime(true);
 

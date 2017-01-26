@@ -62,10 +62,10 @@ void assign_configuration(Options const& options, std::string& configs) {
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_addconfiguration_t>{
-        {apiliteral::provider::mongo, cf::mongo::assignConfiguration},
-        {apiliteral::provider::filesystem, cf::filesystem::assignConfiguration},
-        {apiliteral::provider::ucon, cf::ucon::assignConfiguration}};
+    auto providers =
+        std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::assignConfiguration},
+                                               {apiliteral::provider::filesystem, cf::filesystem::assignConfiguration},
+                                               {apiliteral::provider::ucon, cf::ucon::assignConfiguration}};
 
     return providers.at(name);
   };
@@ -108,10 +108,10 @@ void remove_configuration(Options const& options, std::string& configs) {
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_addconfiguration_t>{
-        {apiliteral::provider::mongo, cf::mongo::rmConfiguration},
-        {apiliteral::provider::filesystem, cf::filesystem::rmConfiguration},
-        {apiliteral::provider::ucon, cf::ucon::rmConfiguration}};
+    auto providers =
+        std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::removeConfiguration},
+                                               {apiliteral::provider::filesystem, cf::filesystem::removeConfiguration},
+                                               {apiliteral::provider::ucon, cf::ucon::removeConfiguration}};
 
     return providers.at(name);
   };
@@ -194,10 +194,10 @@ void find_configurations(Options const& options, std::string& configs) {
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_findconfigurations_t>{
-        {apiliteral::provider::mongo, cf::mongo::findConfigurations},
-        {apiliteral::provider::filesystem, cf::filesystem::findConfigurations},
-        {apiliteral::provider::ucon, cf::ucon::findConfigurations}};
+    auto providers =
+        std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::findConfigurations},
+                                               {apiliteral::provider::filesystem, cf::filesystem::findConfigurations},
+                                               {apiliteral::provider::ucon, cf::ucon::findConfigurations}};
 
     return providers.at(name);
   };
@@ -272,7 +272,7 @@ void configuration_composition(Options const& options, std::string& filters) {
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_configurationcomposition_t>{
+    auto providers = std::map<std::string, provider_call_t>{
         {apiliteral::provider::mongo, cf::mongo::configurationComposition},
         {apiliteral::provider::filesystem, cf::filesystem::configurationComposition},
         {apiliteral::provider::ucon, cf::ucon::configurationComposition}};
@@ -314,12 +314,12 @@ void configuration_composition(Options const& options, std::string& filters) {
 }  // namespace configuration
 }  // namespace database
 }  // namespace artdaq
-void cftd::enableManageConfigs() {
+void cftd::ManageConfigs() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::enableManageConfigs trace_enable");
+  TRACE_(0, "artdaq::database::configuration::ManageConfigs trace_enable");
 }

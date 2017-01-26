@@ -25,9 +25,9 @@ result_t read_dbinfo(std::string const& /*task_payload*/) noexcept;
 }
 
 namespace debug {
-void enableMetadata();
+void Metadata();
 namespace detail {
-void enableMetadata();
+void Metadata();
 }
 }
 

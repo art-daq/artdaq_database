@@ -62,7 +62,7 @@ class BulkOperations final {
 
 namespace debug {
 namespace options {
-void enableBulkOperations();
+void BulkOperations();
 }
 }
 }  // namespace configuration

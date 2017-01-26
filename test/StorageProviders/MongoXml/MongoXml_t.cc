@@ -28,7 +28,7 @@ bool test_update(std::string const&, std::string const&,std::string const&);
 int main(int argc, char* argv[])try
 {
     artdaq::database::mongo::debug::enable();
-//    artdaq::database::docrecord::debug::enableJSONDocument();
+//    artdaq::database::docrecord::debug::JSONDocument();
 
 
     debug::registerUngracefullExitHandlers();

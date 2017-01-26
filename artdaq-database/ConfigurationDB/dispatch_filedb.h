@@ -26,12 +26,12 @@ JsonData findVersions(cf::ManageDocumentOperation const& /*options*/, JsonData c
 JsonData findEntities(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
 JsonData addEntity(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
 JsonData removeEntity(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
-JsonData addVersionAlias(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
-JsonData removeVersionAlias(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
-JsonData findVersionAliases(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
+JsonData addVersionAlias(cf::ManageAliasesOperation const& /*options*/, JsonData const& /*query_payload*/);
+JsonData removeVersionAlias(cf::ManageAliasesOperation const& /*options*/, JsonData const& /*query_payload*/);
+JsonData findVersionAliases(cf::ManageAliasesOperation const& /*options*/, JsonData const& /*query_payload*/);
 
-JsonData addConfigurationAlias(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
-JsonData removeConfigurationAlias(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
+JsonData addConfigurationAlias(cf::ManageAliasesOperation const& /*options*/, JsonData const& /*query_payload*/);
+JsonData removeConfigurationAlias(cf::ManageAliasesOperation const& /*options*/, JsonData const& /*query_payload*/);
 JsonData findConfigurations(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
 JsonData configurationComposition(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
 JsonData assignConfiguration(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
@@ -43,7 +43,7 @@ JsonData readDbInfo(cf::ManageDocumentOperation const& /*options*/, JsonData con
 }  // namespace filesystem
 
 namespace debug {
-void enableDBOperationFileSystem();
+void FileSystemDB();
 }
 }  // namespace configuration
 }  // namespace database

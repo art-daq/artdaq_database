@@ -10,14 +10,14 @@ namespace xmljson {
 bool xml_to_json(std::string const&, std::string&);
 bool json_to_xml(std::string const&, std::string&);
 namespace debug {
-void enableXmlJson();
+void XmlJson();
 }
 }  // namespace xmljson
 
 namespace xml {
 namespace debug {
-void enableXmlReader();
-void enableXmlWriter();
+void XmlReader();
+void XmlWriter();
 }
 }  // namespace xml
 

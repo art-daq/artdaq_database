@@ -3,9 +3,7 @@
 
 #include "artdaq-database/ConfigurationDB/configurationdb.h"
 #include "artdaq-database/ConfigurationDB/dispatch_signatures.h"
-#include "artdaq-database/ConfigurationDB/options_operation_base.h"
-#include "artdaq-database/ConfigurationDB/options_operation_managealiases.h"
-#include "artdaq-database/ConfigurationDB/options_operation_managedocument.h"
+#include "artdaq-database/ConfigurationDB/options_operations.h"
 #include "artdaq-database/DataFormats/shared_literals.h"
 #include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 

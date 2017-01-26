@@ -372,16 +372,17 @@ JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData con
   return {oss.str()};
 }
 
-JsonData prov::addConfiguration(ManageDocumentOperation const& options, JsonData const& search_payload) {
+JsonData prov::assignConfiguration(ManageDocumentOperation const& options, JsonData const& search_payload) {
   confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
   confirm(options.operation().compare(apiliteral::operation::assignconfig) == 0);
 
   if (options.operation().compare(apiliteral::operation::assignconfig) != 0) {
-    throw runtime_error("operation_addconfig") << "Wrong operation option; operation=<" << options.operation() << ">.";
+    throw runtime_error("operation_assignconfig") << "Wrong operation option; operation=<" << options.operation()
+                                                  << ">.";
   }
 
   if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
-    throw runtime_error("operation_addconfig") << "Wrong provider option; provider=<" << options.provider() << ">.";
+    throw runtime_error("operation_assignconfig") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
   TRACE_(20, "operation_addconfig: begin");
@@ -418,6 +419,60 @@ JsonData prov::addConfiguration(ManageDocumentOperation const& options, JsonData
   find_options.configuration(new_options.configuration());
 
   return filesystem::configurationComposition(find_options, options.configurationsname_to_JsonData().json_buffer);
+}
+
+JsonData prov::removeConfiguration(ManageDocumentOperation const& options, JsonData const& search_payload) {
+  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
+  confirm(options.operation().compare(apiliteral::operation::removeconfig) == 0);
+
+  if (options.operation().compare(apiliteral::operation::removeconfig) != 0) {
+    throw runtime_error("operation_removeconfig") << "Wrong operation option; operation=<" << options.operation()
+                                                  << ">.";
+  }
+
+  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+    throw runtime_error("operation_removeconfig") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  }
+
+  TRACE_(20, "operation_removeconfig: begin");
+
+  auto new_options = options;
+  new_options.operation(apiliteral::operation::readdocument);
+
+  auto search =
+      JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collection() + "\"}"};
+  TRACE_(20, "operation_removeconfig: args search_payload=<" << search.json_buffer << ">");
+
+  auto document = filesystem::readDocument(new_options, search);
+  auto json_document = JSONDocument{document.json_buffer};
+  JSONDocumentBuilder builder{json_document};
+  auto configuration = JSONDocument{new_options.configuration_to_JsonData().json_buffer};
+  builder.removeConfiguration(configuration);
+
+  new_options.operation(apiliteral::operation::writedocument);
+
+  auto update =
+      JsonData{"{\"filter\": "s + builder.getObjectID().to_string() + ",  \"document\":" + builder.to_string() + "\n}"};
+
+  // TRACE_(20, "operation_addconfig: writeDocument() begin");
+  filesystem::writeDocument(new_options, update.json_buffer);
+  // TRACE_(20, "operation_addconfig: writeDocument() done");
+
+  new_options.operation(apiliteral::operation::confcomposition);
+
+  auto find_options = ManageDocumentOperation{apiliteral::operation::removeconfig};
+
+  find_options.operation(apiliteral::operation::confcomposition);
+  find_options.format(options::data_format_t::gui);
+  find_options.provider(apiliteral::provider::filesystem);
+  find_options.configuration(new_options.configuration());
+
+  return filesystem::configurationComposition(find_options, options.configurationsname_to_JsonData().json_buffer);
+}
+
+JsonData prov::findVersionAliases(cf::ManageAliasesOperation const& /*options*/, JsonData const& /*query_payload*/) {
+  throw runtime_error("findVersionAliases") << "findVersionAliases: is not implemented";
+  return {apiliteral::empty_json};
 }
 
 JsonData prov::listCollections(ManageDocumentOperation const& options, JsonData const& search_payload) {
@@ -564,12 +619,12 @@ JsonData prov::readDbInfo(ManageDocumentOperation const& options, JsonData const
   return {oss.str()};
 }
 
-void cf::debug::enableDBOperationFileSystem() {
+void cf::debug::FileSystemDB() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::FileSystem trace_enable");
+  TRACE_(0, "artdaq::database::configuration::FileSystemDB trace_enable");
 }

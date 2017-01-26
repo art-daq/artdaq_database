@@ -169,13 +169,13 @@ result_t json::create_configuration(std::string const& operations) noexcept {
   }
 }
 
-void dbcfg::debug::enableManageConfigs() {
+void dbcfg::debug::ManageConfigs() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  dbcfg::debug::detail::enableManageConfigs();
-  TRACE_(0, "artdaq::database::configuration::enableManageConfigs trace_enable");
+  dbcfg::debug::detail::ManageConfigs();
+  TRACE_(0, "artdaq::database::configuration::ManageConfigs trace_enable");
 }

@@ -442,7 +442,7 @@ void enable() {
   TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::filesystem trace_enable");
-  artdaq::database::filesystem::debug::enableReadWrite();
+  artdaq::database::filesystem::debug::ReadWrite();
   artdaq::database::filesystem::index::debug::enable();
 }
 }

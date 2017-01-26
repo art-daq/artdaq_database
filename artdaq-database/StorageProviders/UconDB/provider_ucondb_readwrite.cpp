@@ -186,13 +186,13 @@ object_id_t StorageProvider<JsonData, UconDB>::writeDocument(JsonData const& arg
 
 namespace ucon {
 namespace debug {
-void enableReadWrite() {
+void ReadWrite() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::ucon::enableReadWrite trace_enable");
+  TRACE_(0, "artdaq::database::ucon::ReadWrite trace_enable");
 }
 }
 }  // namespace ucon

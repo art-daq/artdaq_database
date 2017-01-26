@@ -32,25 +32,38 @@ std::string expand_environment_variables(std::string var);
 
 int main(int argc, char* argv[]) try {
 #if 0
+  artdaq::database::configuration::debug::ExportImport();
+  artdaq::database::configuration::debug::ManageAliases();
+  artdaq::database::configuration::debug::ManageConfigs();
+  artdaq::database::configuration::debug::ManageDocuments();
+  artdaq::database::configuration::debug::Metadata();
+  
+  artdaq::database::configuration::debug::detail::ExportImport();
+  artdaq::database::configuration::debug::detail::ManageAliases();
+  artdaq::database::configuration::debug::detail::ManageConfigs();
+  artdaq::database::configuration::debug::detail::ManageDocuments();
+  artdaq::database::configuration::debug::detail::Metadata();
+
+  artdaq::database::configuration::debug::options::OperationBase();
+  artdaq::database::configuration::debug::options::BulkOperations();
+  artdaq::database::configuration::debug::options::ManageDocuments();
+  artdaq::database::configuration::debug::options::ManageConfigs();
+  artdaq::database::configuration::debug::options::ManageAliases();
+  
+  artdaq::database::configuration::debug::MongoDB();
+  artdaq::database::configuration::debug::UconDB();
+  artdaq::database::configuration::debug::FileSystemDB();
+  
+  artdaq::database::filesystem::index::debug::enable();
+  
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
-  artdaq::database::docrecord::debug::enableJSONDocument();
-  artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
 
-  artdaq::database::configuration::debug::enableFindConfigsOperation();
-  artdaq::database::configuration::debug::enableCreateConfigsOperation();
-
-  artdaq::database::configuration::debug::options::enableOperationBase();
-  artdaq::database::configuration::debug::options::enableOperationManageConfigs();
-  artdaq::database::configuration::debug::detail::enableCreateConfigsOperation();
-  artdaq::database::configuration::debug::detail::enableFindConfigsOperation();
-
-  artdaq::database::configuration::debug::enableDBOperationMongo();
-  artdaq::database::configuration::debug::enableDBOperationFileSystem();
+  artdaq::database::docrecord::debug::JSONDocumentBuilder();
+  artdaq::database::docrecord::debug::JSONDocument();
 
   debug::registerUngracefullExitHandlers();
   artdaq::database::useFakeTime(true);
-  artdaq::database::filesystem::index::debug::enable();
 #endif
 
   artdaq::database::filesystem::index::shouldAutoRebuildSearchIndex(true);

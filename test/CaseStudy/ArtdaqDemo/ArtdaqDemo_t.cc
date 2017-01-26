@@ -25,19 +25,24 @@ using artdaq::database::basictypes::JsonData;
 int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
-  // artdaq::database::docrecord::debug::enableJSONDocument();
-  //artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
+  // artdaq::database::docrecord::debug::JSONDocument();
+  //artdaq::database::docrecord::debug::JSONDocumentBuilder();
 
-  artdaq::database::configuration::debug::enableFindConfigsOperation();
-  artdaq::database::configuration::debug::enableCreateConfigsOperation();
+  artdaq::database::configuration::debug::ManageConfigs();
+  artdaq::database::configuration::debug::ManageAliases();
+  artdaq::database::configuration::debug::ManageDocuments();
   
-  artdaq::database::configuration::debug::options::enableOperationBase();
-  artdaq::database::configuration::debug::options::enableOperationManageConfigs();
-  artdaq::database::configuration::debug::detail::enableCreateConfigsOperation();
-  artdaq::database::configuration::debug::detail::enableFindConfigsOperation();
+  artdaq::database::configuration::debug::options::OperationBase();
+  artdaq::database::configuration::debug::options::ManageDocuments();
+  artdaq::database::configuration::debug::options::ManageConfigs();
+  artdaq::database::configuration::debug::options::ManageAliases();
   
-  artdaq::database::configuration::debug::enableDBOperationMongo();
-  artdaq::database::configuration::debug::enableDBOperationFileSystem();
+  artdaq::database::configuration::debug::detail::ManageConfigs();
+  artdaq::database::configuration::debug::detail::ManageAliases();
+  artdaq::database::configuration::debug::detail::ManageDocuments();
+
+  artdaq::database::configuration::debug::MongoDB();
+  artdaq::database::configuration::debug::UconDB();
 
   debug::registerUngracefullExitHandlers();
   artdaq::database::useFakeTime(true);

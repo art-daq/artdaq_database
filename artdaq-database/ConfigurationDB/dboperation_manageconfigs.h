@@ -29,9 +29,9 @@ result_t configuration_composition(std::string const& /*task_payload*/) noexcept
 }
 
 namespace debug {
-void enableManageConfigs();
+void ManageConfigs();
 namespace detail {
-void enableManageConfigs();
+void ManageConfigs();
 }
 }
 

@@ -31,9 +31,9 @@ result_t remove_configuration_alias(std::string const& /*task_payload*/) noexcep
 }
 
 namespace debug {
-void enableManageAliases();
+void ManageAliases();
 namespace detail {
-void enableManageAliases();
+void ManageAliases();
 }
 }
 

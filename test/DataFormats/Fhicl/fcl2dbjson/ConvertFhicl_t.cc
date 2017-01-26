@@ -18,10 +18,10 @@ bool test_roundconvertfcl(std::string const&, std::string const&);
 bool test_roundconvertjson(std::string const&, std::string const&);
 
 int main(int argc, char* argv[]) try {
-  artdaq::database::fhicl::debug::enableFhiclReader();
-  artdaq::database::fhicl::debug::enableFhiclWriter();
-  artdaq::database::fhicljson::debug::enableFhiclJson();
-  artdaq::database::fhicljson::debug::enableFCL2JSON();
+  artdaq::database::fhicl::debug::FhiclReader();
+  artdaq::database::fhicl::debug::FhiclWriter();
+  artdaq::database::fhicljson::debug::FhiclJson();
+  artdaq::database::fhicljson::debug::FCL2JSON();
 
   debug::registerUngracefullExitHandlers();
   artdaq::database::useFakeTime(true);

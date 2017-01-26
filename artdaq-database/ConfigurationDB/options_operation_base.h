@@ -68,7 +68,7 @@ class OperationBase {
 
 namespace debug {
 namespace options {
-void enableOperationBase();
+void OperationBase();
 }
 }
 

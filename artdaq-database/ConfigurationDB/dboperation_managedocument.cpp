@@ -279,12 +279,12 @@ result_t json::mark_document_deleted(std::string const& query_payload) noexcept 
   }
 }
 
-void dbcfg::debug::enableManageDocument() {
+void dbcfg::debug::ManageDocuments() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
-  dbcfg::debug::detail::enableManageDocument();
-  TRACE_(0, "artdaq::database::configuration::enableManageDocument trace_enable");
+  dbcfg::debug::detail::ManageDocuments();
+  TRACE_(0, "artdaq::database::configuration::ManageDocuments trace_enable");
 }

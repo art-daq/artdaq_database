@@ -394,7 +394,7 @@ JSONDocument JSONDocument::removeChild(JSONDocument const& delChild, path_t cons
   throw;
 }
 
-void dbdr::debug::enableJSONDocument() {
+void dbdr::debug::JSONDocument() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);

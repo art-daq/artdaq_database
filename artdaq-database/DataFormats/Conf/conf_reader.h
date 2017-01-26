@@ -18,7 +18,7 @@ struct ConfReader final {
 };
 
 namespace debug {
-void enableConfReader();
+void ConfReader();
 }
 }  // namespace conf
 }  // namespace database

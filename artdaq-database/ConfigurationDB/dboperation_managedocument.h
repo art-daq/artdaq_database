@@ -35,9 +35,9 @@ result_t remove_entity(std::string const& /*task_payload*/) noexcept;
 }
 
 namespace debug {
-void enableManageDocument();
+void ManageDocuments();
 namespace detail {
-void enableManageDocument();
+void ManageDocuments();
 }
 }
 

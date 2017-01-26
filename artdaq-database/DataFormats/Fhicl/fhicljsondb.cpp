@@ -126,7 +126,7 @@ bool dbfj::json_to_fhicl(std::string const& json, std::string& fcl, std::string 
   return result;
 }
 
-void dbfj::debug::enableFhiclJson() {
+void dbfj::debug::FhiclJson() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);

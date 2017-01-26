@@ -321,7 +321,7 @@ JsonData OperationBase::to_JsonData() const { return {writeJsonData()}; }
 std::string OperationBase::to_string() const { return to_JsonData().json_buffer; }
 
 //
-void cf::debug::options::enableOperationBase() {
+void cf::debug::options::OperationBase() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 

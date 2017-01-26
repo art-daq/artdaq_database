@@ -11,7 +11,7 @@
 
 // TODO xml to json conversion code
 
-void artdaq::database::xmljson::debug::enableXml2Json() {
+void artdaq::database::xmljson::debug::Xml2Json() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);

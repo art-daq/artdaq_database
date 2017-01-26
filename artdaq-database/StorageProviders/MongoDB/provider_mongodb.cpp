@@ -551,7 +551,7 @@ void enable() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  artdaq::database::mongo::debug::enableReadWrite();
+  artdaq::database::mongo::debug::ReadWrite();
   TRACE_(0, "artdaq::database::mongo trace_enable");
 }
 }

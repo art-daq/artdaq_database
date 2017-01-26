@@ -59,7 +59,7 @@ class ManageDocumentOperation final : public OperationBase {
 
 namespace debug {
 namespace options {
-void enableManageDocumentOperation();
+void ManageDocuments();
 }
 }
 }  // namespace configuration

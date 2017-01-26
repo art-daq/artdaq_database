@@ -81,7 +81,7 @@ bool XmlWriter::write(jsn::object_t const& json_object, std::string& out) {
   }
 }
 
-void artdaq::database::xml::debug::enableXmlWriter() {
+void artdaq::database::xml::debug::XmlWriter() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);

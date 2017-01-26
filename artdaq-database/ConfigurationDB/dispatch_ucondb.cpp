@@ -372,7 +372,7 @@ JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData con
   return {oss.str()};
 }
 
-JsonData prov::addConfiguration(ManageDocumentOperation const& options, JsonData const& search_payload) {
+JsonData prov::assignConfiguration(ManageDocumentOperation const& options, JsonData const& search_payload) {
   confirm(options.provider().compare(apiliteral::provider::ucon) == 0);
   confirm(options.operation().compare(apiliteral::operation::assignconfig) == 0);
 
@@ -420,6 +420,54 @@ JsonData prov::addConfiguration(ManageDocumentOperation const& options, JsonData
   return ucon::configurationComposition(find_options, options.configuration_to_JsonData().json_buffer);
 }
 
+JsonData prov::removeConfiguration(ManageDocumentOperation const& options, JsonData const& search_payload) {
+  confirm(options.provider().compare(apiliteral::provider::ucon) == 0);
+  confirm(options.operation().compare(apiliteral::operation::removeconfig) == 0);
+
+  if (options.operation().compare(apiliteral::operation::removeconfig) != 0) {
+    throw runtime_error("operation_removeconfig") << "Wrong operation option; operation=<" << options.operation()
+                                                  << ">.";
+  }
+
+  if (options.provider().compare(apiliteral::provider::ucon) != 0) {
+    throw runtime_error("operation_removeconfig") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  }
+
+  TRACE_(20, "operation_removeconfig: begin");
+
+  auto new_options = options;
+  new_options.operation(apiliteral::operation::readdocument);
+
+  auto search =
+      JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collection() + "\"}"};
+  TRACE_(20, "operation_addconfig: args search_payload=<" << search.json_buffer << ">");
+
+  auto document = ucon::readDocument(new_options, search);
+  auto json_document = JSONDocument{document.json_buffer};
+  JSONDocumentBuilder builder{json_document};
+  auto configuration = JSONDocument{new_options.configuration_to_JsonData().json_buffer};
+
+  builder.removeConfiguration(configuration);
+
+  new_options.operation(apiliteral::operation::writedocument);
+
+  auto update =
+      JsonData{"{\"filter\":{\"$oid\":\"" + builder.extract().deleteChild("_id").value() + "\"},  \"document\":" +
+               builder.extract().to_string() + ", \"collection\":\"" + options.collection() + "\"}"};
+
+  ucon::writeDocument(new_options, update.json_buffer);
+
+  new_options.operation(apiliteral::operation::confcomposition);
+
+  auto find_options = ManageDocumentOperation{apiliteral::operation::removeconfig};
+
+  find_options.operation(apiliteral::operation::confcomposition);
+  find_options.format(options::data_format_t::gui);
+  find_options.provider(apiliteral::provider::ucon);
+  find_options.configuration(new_options.configuration());
+
+  return ucon::configurationComposition(find_options, options.configuration_to_JsonData().json_buffer);
+}
 JsonData prov::listCollections(ManageDocumentOperation const& options, JsonData const& search_payload) {
   confirm(options.provider().compare(apiliteral::provider::ucon) == 0);
   confirm(options.operation().compare(apiliteral::operation::listcollections) == 0);
@@ -564,12 +612,17 @@ JsonData prov::readDbInfo(ManageDocumentOperation const& options, JsonData const
   return {oss.str()};
 }
 
-void cf::debug::enableDBOperationUcond() {
+JsonData prov::findVersionAliases(cf::ManageAliasesOperation const& /*options*/, JsonData const& /*query_payload*/) {
+  throw runtime_error("findVersionAliases") << "findVersionAliases: is not implemented";
+  return {apiliteral::empty_json};
+}
+
+void cf::debug::UconDB() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::Ucond trace_enable");
+  TRACE_(0, "artdaq::database::configuration::UconDB trace_enable");
 }

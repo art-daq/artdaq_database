@@ -144,8 +144,8 @@ void enable() {
   TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::ucon trace_enable");
-  artdaq::database::ucon::debug::enableUconDBAPI();
-  artdaq::database::ucon::debug::enableReadWrite();   
+  artdaq::database::ucon::debug::UconDBAPI();
+  artdaq::database::ucon::debug::ReadWrite();   
 }
 }
 }  // namespace ucon

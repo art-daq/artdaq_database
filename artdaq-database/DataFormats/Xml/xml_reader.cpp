@@ -71,7 +71,7 @@ bool XmlReader::read(std::string const& in, jsn::object_t& json_object) {
   }
 }
 
-void artdaq::database::xml::debug::enableXmlReader() {
+void artdaq::database::xml::debug::XmlReader() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);

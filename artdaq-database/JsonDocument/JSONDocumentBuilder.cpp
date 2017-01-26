@@ -174,7 +174,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::addEntity(JSONDocument const& entity) 
   TRACE_(9, "addEntity() args  entity=<" << entity << ">");
 
   JSONDocument copy(entity);
-  auto ovl = overlay<ovl::ovlEntity>(copy, jsonliteral::entities);
+  auto ovl = overlay<ovl::ovlEntity>(copy, jsonliteral::entity);
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->addEntity(ovl));
@@ -193,7 +193,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeEntity(JSONDocument const& entit
   TRACE_(9, "addEntity() args  entity=<" << entity << ">");
 
   JSONDocument copy(entity);
-  auto ovl = overlay<ovl::ovlEntity>(copy, jsonliteral::entities);
+  auto ovl = overlay<ovl::ovlEntity>(copy, jsonliteral::entity);
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->removeEntity(ovl));
@@ -271,7 +271,7 @@ std::ostream& utl::operator<<(std::ostream& os, JSONDocumentBuilder const& data)
   return os;
 }
 
-void dbdr::debug::enableJSONDocumentBuilder() {
+void dbdr::debug::JSONDocumentBuilder() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);

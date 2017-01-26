@@ -13,11 +13,11 @@ result_t write_document(std::string const& query_payload, std::string const& jso
 }
 
 result_t mark_document_readonly(std::string const& query_payload) {
-  return impl::mark_document_readonly(query_payload, conf);
+  return impl::mark_document_readonly(query_payload);
 }
 
 result_t mark_document_deleted(std::string const& query_payload) {
-  return impl::mark_document_deleted(query_payload, conf);
+  return impl::mark_document_deleted(query_payload);
 }
 
 result_t find_versions(std::string const& query_payload) { return impl::find_versions(query_payload); }
@@ -65,11 +65,11 @@ result_t remove_configuration_alias(std::string const& query_payload) {
 }
 
 result_t export_configuration(std::string const& query_payload, std::string & json_document) {
-  return impl::export_configuration(query_payload, json_document);
+  return impl::export_configuration(query_payload);
 }
 
 result_t import_configuration(std::string const& query_payload,  std::string const& json_document) {
-  return impl::import_configuration(query_payload, json_document);
+  return impl::import_configuration(query_payload);
 }
 
 result_t list_databases(std::string const& query_payload) { return impl::list_databases(query_payload); }
@@ -77,17 +77,17 @@ result_t list_databases(std::string const& query_payload) { return impl::list_da
 result_t read_dbinfo(std::string const& query_payload) { return impl::read_dbinfo(query_payload); }
 
 result_t export_database(std::string const& query_payload, std::string& json_document) {
-  return impl::export_database(query_payload, json_document);
+  return impl::export_database(query_payload);
 }
 
 result_t import_database(std::string const& query_payload, std::string const& json_document) {
-  return impl::export_database(query_payload, json_document);
+  return impl::export_database(query_payload);
 }
 
 result_t export_collection(std::string const& query_payload, std::string & json_document){
-    return impl::export_collection(query_payload, json_document);
+    return impl::export_collection(query_payload);
 }
 
 result_t import_collection(std::string const& query_payload,std::string & json_document){
-      return impl::import_collection(query_payload, json_document);
+      return impl::import_collection(query_payload);
 }

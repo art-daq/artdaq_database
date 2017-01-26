@@ -112,13 +112,13 @@ result_t json::list_collections(std::string const& query_payload) noexcept {
     return Failure(boost::current_exception_diagnostic_information());
   }
 }
-void dbcfg::debug::enableMetadata() {
+void dbcfg::debug::Metadata() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  dbcfg::debug::detail::enableMetadata();
-  TRACE_(0, "artdaq::database::configuration::enableMetadata trace_enable");
+  dbcfg::debug::detail::Metadata();
+  TRACE_(0, "artdaq::database::configuration::Metadata trace_enable");
 }
