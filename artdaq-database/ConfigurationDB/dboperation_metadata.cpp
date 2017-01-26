@@ -25,6 +25,7 @@ namespace configuration {
 namespace detail {
 void list_databases(ManageDocumentOperation const&, std::string&);
 void read_dbinfo(ManageDocumentOperation const&, std::string&);
+void list_collections(ManageDocumentOperation const&, std::string&);
 
 }  // namespace detail
 }  // namespace configuration
@@ -47,6 +48,18 @@ result_t opts::read_dbinfo(ManageDocumentOperation const& options, std::string& 
   try {
     detail::read_dbinfo(options, conf);
     return Success(conf);
+  } catch (...) {
+    return Failure(boost::current_exception_diagnostic_information());
+  }
+}
+
+result_t opts::list_collections(ManageDocumentOperation const& options) noexcept {
+  try {
+    auto returnValue = std::string{};
+
+    detail::list_collections(options, returnValue);
+
+    return Success(returnValue);
   } catch (...) {
     return Failure(boost::current_exception_diagnostic_information());
   }
@@ -84,12 +97,28 @@ result_t json::read_dbinfo(std::string const& query_payload) noexcept {
   }
 }
 
-void dbcfg::debug::enableMetadataOperation() {
+result_t json::list_collections(std::string const& query_payload) noexcept {
+  try {
+    if (query_payload.empty()) return Failure(msg_EmptyFilter);
+
+    auto options = ManageDocumentOperation{apiliteral::operation::listcollections};
+    options.readJsonData({query_payload});
+
+    auto returnValue = std::string{};
+
+    detail::list_collections(options, returnValue);
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(boost::current_exception_diagnostic_information());
+  }
+}
+void dbcfg::debug::enableMetadata() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::MetadataOperation trace_enable");
+  dbcfg::debug::detail::enableMetadata();
+  TRACE_(0, "artdaq::database::configuration::enableMetadata trace_enable");
 }

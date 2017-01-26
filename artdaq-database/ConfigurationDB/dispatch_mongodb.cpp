@@ -83,7 +83,7 @@ JsonData prov::readDocument(ManageDocumentOperation const& options, JsonData con
   return data;
 }
 
-JsonData prov::findConfigurations(ManageConfigsOperation const& options, JsonData const& search_payload) {
+JsonData prov::findConfigurations(ManageDocumentOperation const& options, JsonData const& search_payload) {
   confirm(options.provider().compare(apiliteral::provider::mongo) == 0);
   confirm(options.operation().compare(apiliteral::operation::findconfigs) == 0);
 
@@ -150,17 +150,18 @@ JsonData prov::findConfigurations(ManageConfigsOperation const& options, JsonDat
   return {oss.str()};
 }
 
-JsonData prov::configurationComposition(ManageConfigsOperation const& options, JsonData const& search_payload) {
+JsonData prov::configurationComposition(ManageDocumentOperation const& options, JsonData const& search_payload) {
   confirm(options.provider().compare(apiliteral::provider::mongo) == 0);
   confirm(options.operation().compare(apiliteral::operation::confcomposition) == 0);
 
   if (options.operation().compare(apiliteral::operation::confcomposition) != 0) {
     throw runtime_error("operation_confcomposition") << "Wrong operation option; operation=<" << options.operation()
-                                                 << ">.";
+                                                     << ">.";
   }
 
   if (options.provider().compare(apiliteral::provider::mongo) != 0) {
-    throw runtime_error("operation_confcomposition") << "Wrong provider option; provider=<" << options.provider() << ">.";
+    throw runtime_error("operation_confcomposition") << "Wrong provider option; provider=<" << options.provider()
+                                                     << ">.";
   }
 
   TRACE_(18, "operation_confcomposition: begin");
@@ -173,7 +174,6 @@ JsonData prov::configurationComposition(ManageConfigsOperation const& options, J
 
   TRACE_(18, "operation_confcomposition: configurationComposition returned " << query_payloads.size() << " results.");
 
-  
   if (query_payloads.empty()) {
     throw runtime_error("operation_confcomposition") << "No results found for " << options.configuration();
   }
@@ -404,14 +404,14 @@ JsonData prov::addConfiguration(ManageDocumentOperation const& options, JsonData
 
   new_options.operation(apiliteral::operation::writedocument);
 
-    auto update =
-      JsonData{"{\"filter\": "s + builder.getObjectID().to_string()+ ",  \"document\":" + builder.to_string() + "\n}"};
+  auto update =
+      JsonData{"{\"filter\": "s + builder.getObjectID().to_string() + ",  \"document\":" + builder.to_string() + "\n}"};
 
   mongo::writeDocument(new_options, update.json_buffer);
 
   new_options.operation(apiliteral::operation::confcomposition);
 
-  auto find_options = ManageConfigsOperation{apiliteral::operation::assignconfig};
+  auto find_options = ManageDocumentOperation{apiliteral::operation::assignconfig};
 
   find_options.operation(apiliteral::operation::confcomposition);
   find_options.format(options::data_format_t::gui);

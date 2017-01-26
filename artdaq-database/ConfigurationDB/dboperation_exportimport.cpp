@@ -3,7 +3,7 @@
 #include <boost/exception/diagnostic_information.hpp>
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/ConfigurationDB/dboperation_exportimport.h"
-#include "artdaq-database/ConfigurationDB/dboperation_readwrite.h"
+#include "artdaq-database/ConfigurationDB/dboperation_managedocument.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
 #include "artdaq-database/DataFormats/shared_literals.h"
@@ -20,19 +20,30 @@
 using namespace artdaq::database::configuration;
 namespace dbcfg = artdaq::database::configuration;
 
+namespace db = artdaq::database;
+namespace jsonliteral = db::dataformats::literal;
+namespace apiliteral = db::configapi::literal;
+
 using artdaq::database::configuration::options::data_format_t;
 
 namespace artdaq {
 namespace database {
 namespace configuration {
 namespace detail {
-void write_document(ManageDocumentOperation const&, std::string&);
-void read_document(ManageDocumentOperation const&, std::string&);
-void configuration_composition(ManageConfigsOperation const&, std::string&);
+void export_configuration(ManageDocumentOperation const&, std::string&) noexcept;
+void import_configuration(ManageDocumentOperation const&, std::string&) noexcept;
+void export_database(ManageDocumentOperation const&, std::string&) noexcept;
+void import_database(ManageDocumentOperation const&, std::string&) noexcept;
+void export_collection(ManageDocumentOperation const&, std::string&) noexcept;
+void import_collection(ManageDocumentOperation const&, std::string&) noexcept;
+
+void configuration_composition(ManageDocumentOperation const&, std::string&);
 
 using artdaq::database::configuration::result_t;
-result_t write_document_file(ManageDocumentOperation const&, std::string const&);
-result_t read_document_file(ManageDocumentOperation const&, std::string const&);
+
+result_t read_document_file(ManageDocumentOperation const& options, std::string const& file_out_name);
+result_t write_document_file(ManageDocumentOperation const& options, std::string const& file_src_name);
+
 }  // namespace detail
 }  // namespace configuration
 }  // namespace database
@@ -43,7 +54,155 @@ auto make_error_msg = [](auto msg) { return std::string("{\"error\":\"").append(
 using namespace artdaq::database::result;
 using artdaq::database::result_t;
 
-namespace jsonliteral = artdaq::database::dataformats::literal; 
+result_t json::export_database(std::string const& query_payload) noexcept {
+  try {
+    auto options = ManageDocumentOperation{apiliteral::operation::exportdatabase};
+    options.readJsonData({query_payload});
+
+    auto returnValue = std::string{};
+
+    detail::export_database(options, returnValue);
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(boost::current_exception_diagnostic_information());
+  }
+}
+
+result_t opts::export_database(ManageDocumentOperation const& options) noexcept {
+  try {
+    auto returnValue = std::string{};
+
+    detail::export_database(options, returnValue);
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(boost::current_exception_diagnostic_information());
+  }
+}
+
+result_t json::import_database(std::string const& query_payload) noexcept {
+  try {
+    auto options = ManageDocumentOperation{apiliteral::operation::importdatabase};
+    options.readJsonData({query_payload});
+
+    auto returnValue = std::string{};
+
+    detail::import_database(options, returnValue);
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(boost::current_exception_diagnostic_information());
+  }
+}
+
+result_t opts::import_database(ManageDocumentOperation const& options) noexcept {
+  try {
+    auto returnValue = std::string{};
+
+    detail::import_database(options, returnValue);
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(boost::current_exception_diagnostic_information());
+  }
+}
+
+result_t json::export_configuration(std::string const& query_payload) noexcept {
+  try {
+    auto options = ManageDocumentOperation{apiliteral::operation::exportconfig};
+    options.readJsonData({query_payload});
+
+    auto returnValue = std::string{};
+
+    detail::export_configuration(options, returnValue);
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(boost::current_exception_diagnostic_information());
+  }
+}
+
+result_t opts::export_configuration(ManageDocumentOperation const& options) noexcept {
+  try {
+    auto returnValue = std::string{};
+
+    detail::export_configuration(options, returnValue);
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(boost::current_exception_diagnostic_information());
+  }
+}
+
+result_t json::import_configuration(std::string const& query_payload) noexcept {
+  try {
+    auto options = ManageDocumentOperation{apiliteral::operation::importconfig};
+    options.readJsonData({query_payload});
+
+    auto returnValue = std::string{};
+
+    detail::import_configuration(options, returnValue);
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(boost::current_exception_diagnostic_information());
+  }
+}
+
+result_t opts::import_configuration(ManageDocumentOperation const& options) noexcept {
+  try {
+    auto returnValue = std::string{};
+
+    detail::import_configuration(options, returnValue);
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(boost::current_exception_diagnostic_information());
+  }
+}
+
+result_t json::export_collection(std::string const& query_payload) noexcept {
+  try {
+    auto options = ManageDocumentOperation{apiliteral::operation::exportcollection};
+    options.readJsonData({query_payload});
+
+    auto returnValue = std::string{};
+
+    detail::export_collection(options, returnValue);
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(boost::current_exception_diagnostic_information());
+  }
+}
+
+result_t opts::export_collection(ManageDocumentOperation const& options) noexcept {
+  try {
+    auto returnValue = std::string{};
+
+    detail::export_collection(options, returnValue);
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(boost::current_exception_diagnostic_information());
+  }
+}
+
+result_t json::import_collection(std::string const& query_payload) noexcept {
+  try {
+    auto options = ManageDocumentOperation{apiliteral::operation::importcollection};
+    options.readJsonData({query_payload});
+
+    auto returnValue = std::string{};
+
+    detail::import_collection(options, returnValue);
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(boost::current_exception_diagnostic_information());
+  }
+}
+
+result_t opts::import_collection(ManageDocumentOperation const& options) noexcept {
+  try {
+    auto returnValue = std::string{};
+
+    detail::import_collection(options, returnValue);
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(boost::current_exception_diagnostic_information());
+  }
+}
 
 result_t json::write_configuration(std::string const& query_payload, std::string const& conf_tarbzip2_base64) noexcept {
   try {
@@ -63,7 +222,7 @@ result_t json::write_configuration(std::string const& query_payload, std::string
 
     auto tmp_dir_name = std::string{"/tmp/adb"};
     tmp_dir_name.append(std::to_string(rand() % 9000000 + 1000000));
-    
+
     auto system_cmd = std::string{"mkdir -p "};
     system_cmd += tmp_dir_name;
 
@@ -132,7 +291,7 @@ result_t json::read_configuration(std::string const& query_payload, std::string&
     if (query_payload.empty()) return Failure(msg_EmptyFilter);
     if (!system(NULL)) return Failure(msg_SystemCallFailed);
 
-    auto options = ManageConfigsOperation{apiliteral::operation::readconfiguration};
+    auto options = ManageDocumentOperation{apiliteral::operation::readconfiguration};
     options.readJsonData({query_payload});
 
     TRACE_(10, "read_configuration: operation=<" << options.to_string() << ">");
@@ -218,80 +377,14 @@ result_t json::read_configuration(std::string const& query_payload, std::string&
   }
 }
 
-namespace artdaq {
-namespace database {
-namespace configuration {
-namespace detail {
-
-result_t read_document_file(ManageDocumentOperation const& options, std::string const& file_out_name) try {
-  confirm(!file_out_name.empty());
-
-  TRACE_(11, "read_configuration: file_name=<" << file_out_name << ">");
-
-  auto test_document = std::string{};
-
-  detail::read_document(options, test_document);
-
-  if (!mkdirfile(file_out_name))
-    throw runtime_error("read_document_file") << "read_document_file: Unable to create a directory path for "
-                                                 "writing a config file file="
-                                              << file_out_name;
-
-  std::ofstream os(file_out_name.c_str());
-  std::copy(test_document.begin(), test_document.end(), std::ostream_iterator<char>(os));
-  os.close();
-
-  return Success();
-} catch (...) {
-  return Failure(boost::current_exception_diagnostic_information());
-}
-
-result_t write_document_file(ManageDocumentOperation const& options, std::string const& file_src_name) try {
-  confirm(!file_src_name.empty());
-
-  using namespace artdaq::database::configuration::json;
-
-  std::ifstream is(file_src_name);
-  auto test_document = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-  is.close();
-
-  detail::write_document(options, test_document);
-
-#ifdef _WRITE_DEBUG_FILE_
-  std::cout << "Returned buffer:\n" << result.second << "\n";
-
-  auto file_out_name = std::string(artdaq::database::mkdir(tmpdir))
-                           .append(option::appname)
-                           .append("-")
-                           .append(options.operation())
-                           .append("-")
-                           .append(basename((char*)file_src_name.c_str()))
-                           .append(".txt");
-
-  std::ofstream os(file_out_name.c_str());
-  std::copy(result.second.begin(), result.second.end(), std::ostream_iterator<char>(os));
-  os.close();
-
-  std::cout << "Wrote file:" << file_out_name << "\n";
-#endif  //_WRITE_DEBUG_FILE_
-
-  return Success();
-} catch (...) {
-  return Failure(boost::current_exception_diagnostic_information());
-}
-}  // namespace detail
-}  // namespace configuration
-}  // namespace database
-}  // namespace artdaq
-
-void dbcfg::debug::enableConfigurationManageDocumentOperation() {
+void dbcfg::debug::enableExportImport() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0,
-         "artdaq::database::configuration::GlobalConfManageDocumentOperation "
-         "trace_enable");
+  dbcfg::debug::detail::enableExportImport();
+
+  TRACE_(0, "artdaq::database::configuration::enableExportImport trace_enable");
 }

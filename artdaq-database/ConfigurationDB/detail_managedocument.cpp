@@ -1,6 +1,6 @@
 #include "artdaq-database/ConfigurationDB/common.h"
 
-#include "artdaq-database/ConfigurationDB/dboperation_readwrite.h"
+#include "artdaq-database/ConfigurationDB/dboperation_managedocument.h"
 
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
 #include "artdaq-database/DataFormats/shared_literals.h"
@@ -52,6 +52,8 @@ namespace configuration {
 namespace detail {
 typedef JsonData (*provider_load_t)(Options const& /*options*/, JsonData const& /*query_payload*/);
 typedef void (*provider_store_t)(Options const& /*options*/, JsonData const& /*insert_payload*/);
+typedef JsonData (*provider_findversions_t)(Options const& /*options*/, JsonData const& /*task_payload*/);
+typedef JsonData (*provider_findentities_t)(Options const& /*options*/, JsonData const& /*task_payload*/);
 
 void write_document(Options const& options, std::string& conf) {
   confirm(!conf.empty());
@@ -148,7 +150,7 @@ void write_document(Options const& options, std::string& conf) {
   auto version = JSONDocument{options.version_to_JsonData().json_buffer};
   auto entity = JSONDocument{options.entity_to_JsonData().json_buffer};
   auto collection = JSONDocument{options.collection_to_JsonData().json_buffer};
-  
+
   builder.addConfiguration(configuration);
   builder.setVersion(version);
   builder.setCollection(collection);
@@ -160,9 +162,10 @@ void write_document(Options const& options, std::string& conf) {
   TRACE_(15, "write_document: insert_payload=<" << insert_payload.json_buffer << ">");
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_store_t>{{apiliteral::provider::mongo, cf::mongo::writeDocument},
-                                                             {apiliteral::provider::filesystem, cf::filesystem::writeDocument},
-                                                             {apiliteral::provider::ucon, cf::ucon::writeDocument}};
+    auto providers =
+        std::map<std::string, provider_store_t>{{apiliteral::provider::mongo, cf::mongo::writeDocument},
+                                                {apiliteral::provider::filesystem, cf::filesystem::writeDocument},
+                                                {apiliteral::provider::ucon, cf::ucon::writeDocument}};
 
     return providers.at(name);
   };
@@ -192,9 +195,10 @@ void read_document(Options const& options, std::string& conf) {
   TRACE_(16, "read_document: search_payload=<" << search_payload.json_buffer << ">");
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_load_t>{{apiliteral::provider::mongo, cf::mongo::readDocument},
-                                                            {apiliteral::provider::filesystem, cf::filesystem::readDocument},
-                                                            {apiliteral::provider::ucon, cf::ucon::readDocument}};
+    auto providers =
+        std::map<std::string, provider_load_t>{{apiliteral::provider::mongo, cf::mongo::readDocument},
+                                               {apiliteral::provider::filesystem, cf::filesystem::readDocument},
+                                               {apiliteral::provider::ucon, cf::ucon::readDocument}};
 
     return providers.at(name);
   };
@@ -292,17 +296,181 @@ void read_document(Options const& options, std::string& conf) {
 
   TRACE_(15, "read_document: end");
 }
+
+void find_versions(Options const& options, std::string& versions) {
+  confirm(versions.empty());
+  confirm(options.operation().compare(apiliteral::operation::findversions) == 0);
+
+  TRACE_(12, "find_versions: begin");
+  TRACE_(12, "find_versions args options=<" << options.to_string() << ">");
+
+  validate_dbprovider_name(options.provider());
+
+  auto dispatch_persistence_provider = [](std::string const& name) {
+    auto providers =
+        std::map<std::string, provider_findversions_t>{{apiliteral::provider::mongo, cf::mongo::findVersions},
+                                                       {apiliteral::provider::filesystem, cf::filesystem::findVersions},
+                                                       {apiliteral::provider::ucon, cf::ucon::findVersions}};
+
+    return providers.at(name);
+  };
+
+  auto search_result =
+      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData().json_buffer);
+
+  auto returnValue = std::string{};
+  auto returnValueChanged = bool{false};
+
+  switch (options.format()) {
+    default:
+    case data_format_t::db:
+    case data_format_t::json:
+    case data_format_t::unknown:
+    case data_format_t::fhicl: {
+      throw runtime_error("find_versions") << "Unsupported data format.";
+      break;
+    }
+
+    case data_format_t::gui: {
+      returnValue = search_result.json_buffer;
+      returnValueChanged = true;
+      break;
+    }
+
+    case data_format_t::csv: {
+      using namespace artdaq::database::json;
+      auto reader = JsonReader{};
+      object_t results_ast;
+
+      if (!reader.read(search_result.json_buffer, results_ast)) {
+        TRACE_(13, "find_entities() Failed to create an AST from search results JSON.");
+
+        throw runtime_error("find_entities") << "Failed to create an AST from search results JSON.";
+      }
+
+      auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
+
+      TRACE_(13, "find_entities: found " << results_list.size() << " results.");
+
+      std::ostringstream os;
+
+      auto entities = std::set<std::string>{};
+
+      for (auto const& result_entry : results_list) {
+        auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
+        auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
+        entities.emplace(value);
+      }
+
+      for (auto const& entity : entities) {
+        TRACE_(13, "find_entities() Found entity=<" << entity << ">.");
+        os << entity << ", ";
+      }
+
+      returnValue = os.str();
+      returnValueChanged = true;
+      break;
+    }
+  }
+
+  if (returnValueChanged) versions.swap(returnValue);
+
+  TRACE_(12, "find_versions: end");
+}
+
+void find_entities(Options const& options, std::string& entities) {
+  confirm(entities.empty());
+  confirm(options.operation().compare(apiliteral::operation::findentities) == 0);
+
+  TRACE_(13, "find_entities: begin");
+  TRACE_(13, "find_entities args options=<" << options.to_string() << ">");
+
+  validate_dbprovider_name(options.provider());
+
+  auto dispatch_persistence_provider = [](std::string const& name) {
+    auto providers =
+        std::map<std::string, provider_findentities_t>{{apiliteral::provider::mongo, cf::mongo::findEntities},
+                                                       {apiliteral::provider::filesystem, cf::filesystem::findEntities},
+                                                       {apiliteral::provider::ucon, cf::ucon::findEntities}};
+
+    return providers.at(name);
+  };
+
+  auto search_result =
+      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData().json_buffer);
+
+  auto returnValue = std::string{};
+  auto returnValueChanged = bool{false};
+
+  switch (options.format()) {
+    default:
+    case data_format_t::db:
+    case data_format_t::json:
+    case data_format_t::unknown:
+    case data_format_t::fhicl: {
+      throw runtime_error("find_entities") << "Unsupported data format.";
+      break;
+    }
+
+    case data_format_t::gui: {
+      returnValue = search_result.json_buffer;
+      returnValueChanged = true;
+      break;
+    }
+
+    case data_format_t::csv: {
+      using namespace artdaq::database::json;
+      auto reader = JsonReader{};
+      object_t results_ast;
+
+      if (!reader.read(search_result.json_buffer, results_ast)) {
+        TRACE_(13, "find_entities() Failed to create an AST from search results JSON.");
+
+        throw runtime_error("find_entities") << "Failed to create an AST from search results JSON.";
+      }
+
+      auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
+
+      TRACE_(13, "find_entities: found " << results_list.size() << " results.");
+
+      std::ostringstream os;
+
+      auto entities = std::set<std::string>{};
+
+      for (auto const& result_entry : results_list) {
+        auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
+        auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
+        entities.emplace(value);
+      }
+
+      for (auto const& entity : entities) {
+        TRACE_(13, "find_entities() Found entity=<" << entity << ">.");
+        os << entity << ", ";
+      }
+
+      returnValue = os.str();
+      returnValueChanged = true;
+      break;
+    }
+  }
+
+  if (returnValueChanged) entities.swap(returnValue);
+
+  TRACE_(13, "find_entities: end");
+  TRACE_(13, "find_entities: end entities=" << entities);
+}
+
 }  // namespace detail
 }  // namespace configuration
 }  // namespace database
 }  // namespace artdaq
 
-void cftd::enableManageDocumentOperation() {
+void cftd::enableManageDocument() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::ManageDocumentOperationDetail trace_enable");
+  TRACE_(0, "artdaq::database::configuration::enableManageDocument trace_enable");
 }

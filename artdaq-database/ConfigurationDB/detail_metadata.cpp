@@ -30,7 +30,6 @@ namespace cftd = cf::debug::detail;
 namespace jsonliteral = db::dataformats::literal;
 namespace apiliteral = db::configapi::literal;
 
-using cf::ManageDocumentOperation;
 using cf::options::data_format_t;
 
 using Options = cf::ManageDocumentOperation;
@@ -265,12 +264,12 @@ void list_collections(Options const& options, std::string& collections) {
 }  // namespace database
 }  // namespace artdaq
 
-void cftd::enableMetadataOperation() {
+void cftd::enableMetadata() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::MetadataOperation trace_enable");
+  TRACE_(0, "artdaq::database::configuration::enableMetadata trace_enable");
 }

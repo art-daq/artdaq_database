@@ -31,14 +31,30 @@ constexpr auto findentities = "findentities";
 constexpr auto addentity = "addentity";
 constexpr auto rmentity = "rmentity";
 
+
+constexpr auto markdeleted = "markdeleted";
+constexpr auto markreadonly = "markreadonly";
+
+
 constexpr auto confcomposition = "buildfilter";
 constexpr auto assignconfig = "addconfig";
 constexpr auto removeconfig = "rmconfig";
 constexpr auto newconfig = "newconfig";
 
-constexpr auto addalias = "addalias";
-constexpr auto rmalias = "rmalias";
-constexpr auto findalias = "findalias";
+constexpr auto addversionalias = "addveralias";
+constexpr auto rmversionalias = "rmveralias";
+constexpr auto findversionalias = "findveralias";
+
+constexpr auto addconfigalias = "addconfigalias";
+constexpr auto rmconfigalias = "rmconfigalias";
+constexpr auto findconfigalias = "findconfigalias";
+
+constexpr auto exportdatabase = "exportdatabase";
+constexpr auto importdatabase = "importdatabase";
+constexpr auto exportconfig = "exportconfig";
+constexpr auto importconfig = "importconfig";
+constexpr auto exportcollection = "exportcollection";
+constexpr auto importcollection = "importcollection";
 }
 
 namespace provider {

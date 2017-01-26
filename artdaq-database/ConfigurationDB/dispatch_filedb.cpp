@@ -82,7 +82,7 @@ JsonData prov::readDocument(ManageDocumentOperation const& options, JsonData con
   return data;
 }
 
-JsonData prov::findConfigurations(ManageConfigsOperation const& options, JsonData const& search_payload) {
+JsonData prov::findConfigurations(ManageDocumentOperation const& options, JsonData const& search_payload) {
   confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
   confirm(options.operation().compare(apiliteral::operation::findconfigs) == 0);
 
@@ -150,7 +150,7 @@ JsonData prov::findConfigurations(ManageConfigsOperation const& options, JsonDat
   return {oss.str()};
 }
 
-JsonData prov::configurationComposition(ManageConfigsOperation const& options, JsonData const& search_payload) {
+JsonData prov::configurationComposition(ManageDocumentOperation const& options, JsonData const& search_payload) {
   confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
   confirm(options.operation().compare(apiliteral::operation::confcomposition) == 0);
 
@@ -401,17 +401,16 @@ JsonData prov::addConfiguration(ManageDocumentOperation const& options, JsonData
 
   new_options.operation(apiliteral::operation::writedocument);
 
-  
   auto update =
-      JsonData{"{\"filter\": "s + builder.getObjectID().to_string()+ ",  \"document\":" + builder.to_string() + "\n}"};
-      
-  //TRACE_(20, "operation_addconfig: writeDocument() begin");
+      JsonData{"{\"filter\": "s + builder.getObjectID().to_string() + ",  \"document\":" + builder.to_string() + "\n}"};
+
+  // TRACE_(20, "operation_addconfig: writeDocument() begin");
   filesystem::writeDocument(new_options, update.json_buffer);
-  //TRACE_(20, "operation_addconfig: writeDocument() done");
+  // TRACE_(20, "operation_addconfig: writeDocument() done");
 
   new_options.operation(apiliteral::operation::confcomposition);
 
-  auto find_options = ManageConfigsOperation{apiliteral::operation::assignconfig};
+  auto find_options = ManageDocumentOperation{apiliteral::operation::assignconfig};
 
   find_options.operation(apiliteral::operation::confcomposition);
   find_options.format(options::data_format_t::gui);

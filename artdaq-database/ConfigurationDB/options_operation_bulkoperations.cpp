@@ -99,7 +99,7 @@ int BulkOperations::readProgramOptions(bpo::variables_map const& vm) {
 void BulkOperations::readJsonData(JsonData const& data) {
   confirm(!data.json_buffer.empty());
 
-  using cf::ManageConfigsOperation;
+  using cf::ManageDocumentOperation;
   using namespace artdaq::database::json;
   auto dataAST = object_t{};
 
@@ -121,7 +121,7 @@ void BulkOperations::readJsonData(JsonData const& data) {
       throw db::invalid_option_exception("BulkOperations") << "Unable to write JSON buffer.";
     }
 
-    _operations_list.emplace_back(std::make_tuple(opname, std::make_unique<ManageConfigsOperation>(_process_name)));
+    _operations_list.emplace_back(std::make_tuple(opname, std::make_unique<ManageDocumentOperation>(_process_name)));
 
     std::get<OperationBaseUPtr>(_operations_list.back())->readJsonData(buffer);
   }

@@ -17,7 +17,7 @@ namespace cf = db::configuration;
 namespace cfo = cf::options;
 namespace bpo = boost::program_options;
 
-using Options = cf::ManageConfigsOperation;
+using Options = cf::ManageDocumentOperation;
 
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::basictypes::JsonData;

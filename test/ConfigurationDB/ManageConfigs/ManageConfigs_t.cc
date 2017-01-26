@@ -17,7 +17,7 @@ namespace cfo = cf::options;
 
 namespace bpo = boost::program_options;
 
-using Options = cf::ManageConfigsOperation;
+using Options = cf::ManageDocumentOperation;
 
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::basictypes::JsonData;
@@ -98,11 +98,11 @@ int main(int argc, char* argv[]) try {
       apiliteral::operation::findversions, find_versions, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
       apiliteral::operation::findentities, find_entities, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::addalias, add_version_alias,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::addversionalias, add_version_alias,
                                                                                   options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::rmalias, remove_version_alias,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::rmversionalias, remove_version_alias,
                                                                                   options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findalias, find_version_aliases,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findversionalias, find_version_aliases,
                                                                                   options_string);
 
   std::cout << "Running test:<" << options.operation() << ">\n";

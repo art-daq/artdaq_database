@@ -12,7 +12,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "CONF:OpCrtCfs_C"
+#define TRACE_NAME "CONF:OpSrch_C"
 
 using namespace artdaq::database::configuration;
 namespace dbcfg = artdaq::database::configuration;
@@ -30,20 +30,41 @@ namespace artdaq {
 namespace database {
 namespace configuration {
 namespace detail {
+void find_configurations(ManageDocumentOperation const&, std::string&);
+void configuration_composition(ManageDocumentOperation const&, std::string&);
 void assign_configuration(ManageDocumentOperation const&, std::string&);
 void remove_configuration(ManageDocumentOperation const&, std::string&);
 void create_configuration(std::string const&, std::string&);
-void find_versions(ManageDocumentOperation const&, std::string&);
-void find_entities(ManageDocumentOperation const&, std::string&);
-void list_collections(ManageDocumentOperation const&, std::string&);
 
 }  // namespace detail
 }  // namespace configuration
 }  // namespace database
 }  // namespace artdaq
 
-using namespace artdaq::database::result;
 using artdaq::database::result_t;
+
+result_t opts::find_configurations(ManageDocumentOperation const& options) noexcept {
+  try {
+    auto returnValue = std::string{};
+
+    detail::find_configurations(options, returnValue);
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(boost::current_exception_diagnostic_information());
+  }
+}
+
+result_t opts::configuration_composition(ManageDocumentOperation const& options) noexcept {
+  try {
+    auto returnValue = std::string{};
+
+    detail::configuration_composition(options, returnValue);
+
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(boost::current_exception_diagnostic_information());
+  }
+}
 
 result_t opts::assign_configuration(ManageDocumentOperation const& options) noexcept {
   try {
@@ -71,11 +92,28 @@ result_t opts::create_configuration(ManageDocumentOperation const& /*options*/) 
   return Failure("Not Implemented");
 }
 
-result_t opts::list_collections(ManageDocumentOperation const& options) noexcept {
+result_t json::find_configurations(std::string const& query_payload) noexcept {
   try {
+    auto options = ManageDocumentOperation{apiliteral::operation::findconfigs};
+    options.readJsonData({query_payload});
+
     auto returnValue = std::string{};
 
-    detail::list_collections(options, returnValue);
+    detail::find_configurations(options, returnValue);
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(boost::current_exception_diagnostic_information());
+  }
+}
+
+result_t json::configuration_composition(std::string const& query_payload) noexcept {
+  try {
+    auto options = ManageDocumentOperation{apiliteral::operation::confcomposition};
+    options.readJsonData({query_payload});
+
+    auto returnValue = std::string{};
+
+    detail::configuration_composition(options, returnValue);
 
     return Success(returnValue);
   } catch (...) {
@@ -83,29 +121,7 @@ result_t opts::list_collections(ManageDocumentOperation const& options) noexcept
   }
 }
 
-result_t opts::find_versions(ManageDocumentOperation const& options) noexcept {
-  try {
-    auto returnValue = std::string{};
-
-    detail::find_versions(options, returnValue);
-
-    return Success(returnValue);
-  } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
-  }
-}
-
-result_t opts::find_entities(ManageDocumentOperation const& options) noexcept {
-  try {
-    auto returnValue = std::string{};
-
-    detail::find_entities(options, returnValue);
-
-    return Success(returnValue);
-  } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
-  }
-}
+using namespace artdaq::database::result;
 
 result_t json::assign_configuration(std::string const& query_payload) noexcept {
   try {
@@ -153,62 +169,13 @@ result_t json::create_configuration(std::string const& operations) noexcept {
   }
 }
 
-result_t json::list_collections(std::string const& query_payload) noexcept {
-  try {
-    if (query_payload.empty()) return Failure(msg_EmptyFilter);
-
-    auto options = ManageDocumentOperation{apiliteral::operation::listcollections};
-    options.readJsonData({query_payload});
-
-    auto returnValue = std::string{};
-
-    detail::list_collections(options, returnValue);
-    return Success(returnValue);
-  } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
-  }
-}
-
-result_t json::find_versions(std::string const& query_payload) noexcept {
-  try {
-    if (query_payload.empty()) return Failure(msg_EmptyFilter);
-
-    auto options = ManageDocumentOperation{apiliteral::operation::findversions};
-    options.readJsonData({query_payload});
-
-    auto returnValue = std::string{};
-
-    detail::find_versions(options, returnValue);
-
-    return Success(returnValue);
-  } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
-  }
-}
-
-result_t json::find_entities(std::string const& query_payload) noexcept {
-  try {
-    if (query_payload.empty()) return Failure(msg_EmptyFilter);
-
-    auto options = ManageDocumentOperation{apiliteral::operation::findentities};
-    options.readJsonData({query_payload});
-
-    auto returnValue = std::string{};
-
-    detail::find_entities(options, returnValue);
-
-    return Success(returnValue);
-  } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
-  }
-}
-
-void dbcfg::debug::enableCreateConfigsOperation() {
+void dbcfg::debug::enableManageConfigs() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::CreateConfigsOperation trace_enable");
+  dbcfg::debug::detail::enableManageConfigs();
+  TRACE_(0, "artdaq::database::configuration::enableManageConfigs trace_enable");
 }
