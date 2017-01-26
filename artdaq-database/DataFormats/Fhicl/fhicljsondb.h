@@ -6,8 +6,8 @@
 namespace artdaq {
 namespace database {
 namespace fhicljson {
-bool fhicl_to_json(std::string const&, std::string&);
-bool json_to_fhicl(std::string const&, std::string&);
+bool fhicl_to_json(std::string const&, std::string const&, std::string&);
+bool json_to_fhicl(std::string const&, std::string&, std::string&);
 namespace debug {
 void enableFhiclJson();
 void enableFCL2JSONDB();

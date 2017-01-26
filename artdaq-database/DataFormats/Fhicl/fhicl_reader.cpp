@@ -1,12 +1,9 @@
 #include "artdaq-database/DataFormats/common.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
 
 #include "artdaq-database/DataFormats/Fhicl/convertfhicl2jsondb.h"
 #include "artdaq-database/DataFormats/Fhicl/fhicl_reader.h"
 #include "artdaq-database/DataFormats/Fhicl/fhicl_types.h"
 #include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
-#include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
 #include "artdaq-database/DataFormats/Json/json_types.h"
 
 #ifdef TRACE_NAME
@@ -22,8 +19,8 @@ namespace literal = artdaq::database::dataformats::literal;
 using artdaq::database::fhicl::FhiclReader;
 
 bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
-  assert(!in.empty());
-  assert(json_object.empty());
+  confirm(!in.empty());
+  confirm(json_object.empty());
 
   TRACE_(2, "read_data() begin");
 
@@ -51,18 +48,16 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
       return boost::get<jsn::object_t>(parent[child_name]);
     };
 
-    auto& data_node = make_SubNode(object, literal::data_node);
-    auto& metadata_node = make_SubNode(object, literal::metadata_node);
+    auto& data_node = make_SubNode(object, literal::data);
+    auto& metadata_node = make_SubNode(object, literal::metadata);
 
     auto conf = std::string{in};
     conf.reserve(conf.size() + 1024);
 
     auto idx = std::size_t{0};
 
-    std::for_each(std::sregex_iterator(conf.begin(), conf.end(), std::regex{"(#include\\s)([^'\"]*)"}),
-                  std::sregex_iterator(), [&conf, &idx](auto& m) {
-                    conf.replace(m.position(), m.length(), "fhicl_pound_include_" + std::to_string(idx++) + ":");
-                  });
+    std::for_each(std::sregex_iterator(conf.begin(), conf.end(), std::regex{"(#include\\s)([^'\"]*)"}), std::sregex_iterator(),
+                  [&conf, &idx](auto& m) { conf.replace(m.position(), m.length(), "fhicl_pound_include_" + std::to_string(idx++) + ":"); });
 
     ::fhicl::intermediate_table fhicl_table;
 
@@ -76,12 +71,13 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
       auto opts = extra_opts{};
       opts.enablePrologMode();
 
-      auto& data = make_SubNode(data_node, literal::prolog_node);
+      auto& data = make_SubNode(data_node, literal::prolog);
 
-      auto& prolog = make_SubNode(metadata_node, literal::prolog_node);
+      auto& prolog = make_SubNode(metadata_node, literal::prolog);
       prolog[literal::type] = std::string{literal::table};
-      prolog[literal::comment] = std::string{"#"}.append(literal::prolog_node);
-//      prolog[literal::annotation] = std::string{"//Auto generated "}.append(literal::prolog_node);
+      prolog[literal::comment] = std::string{"#"}.append(literal::prolog);
+      //      prolog[literal::annotation] = std::string{"//Auto generated
+      //      "}.append(literal::prolog);
 
       auto& metadata = make_SubNode(prolog, literal::children);
 
@@ -98,12 +94,13 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
       auto opts = extra_opts{};
       opts.enableDefaultMode();
 
-      auto& data = make_SubNode(data_node, literal::main_node);
+      auto& data = make_SubNode(data_node, literal::main);
 
-      auto& main = make_SubNode(metadata_node, literal::main_node);
+      auto& main = make_SubNode(metadata_node, literal::main);
       main[literal::type] = std::string{literal::table};
-      main[literal::comment] = std::string{"#"}.append(literal::main_node);
-//      main[literal::annotation] = std::string{"//Auto generated "}.append(literal::main_node);
+      main[literal::comment] = std::string{"#"}.append(literal::main);
+      //      main[literal::annotation] = std::string{"//Auto generated
+      //      "}.append(literal::main);
 
       auto& metadata = make_SubNode(main, literal::children);
 
@@ -131,8 +128,8 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
 }
 
 bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array) {
-  assert(!in.empty());
-  assert(json_array.empty());
+  confirm(!in.empty());
+  confirm(json_array.empty());
 
   try {
     using boost::spirit::qi::phrase_parse;
@@ -161,8 +158,7 @@ bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
       array.push_back(jsn::object_t());
       auto& object = boost::get<jsn::object_t>(array.back());
       object.push_back(jsn::data_t::make(literal::linenum, comment.first));
-      object.push_back(
-          jsn::data_t::make(literal::value, artdaq::database::dataformats::filter_jsonstring(comment.second)));
+      object.push_back(jsn::data_t::make(literal::value, artdaq::database::filter_jsonstring(comment.second)));
     }
 
     json_array.swap(array);
@@ -178,8 +174,8 @@ bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
 void artdaq::database::fhicl::debug::enableFhiclReader() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::fhicl::FhiclReader trace_enable");
 }

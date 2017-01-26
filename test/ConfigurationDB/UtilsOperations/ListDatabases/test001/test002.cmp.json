@@ -1,0 +1,4 @@
+{ "search": [
+ {"name" :"test_db","query" :{"database" : "test_db","dbprovider" : "mongo","dataformat" : "gui","filter" : {}}}
+, {"name" :"test_dba","query" :{"database" : "test_dba","dbprovider" : "mongo","dataformat" : "gui","filter" : {}}}
+] }

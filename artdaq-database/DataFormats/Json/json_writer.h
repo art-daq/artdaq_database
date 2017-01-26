@@ -17,7 +17,7 @@ struct json_generator_grammar : karma::grammar<Iter, object_t()> {
   json_generator_grammar() : json_generator_grammar::base_type(start) {
     value_rule = object_rule | array_rule | quoted_string | karma::int_ | karma::double_ | karma::bool_;
 
-    quoted_string ='"' << karma::string << '"';
+    quoted_string = '"' << karma::string << '"';
 
     key_rule = quoted_string;
 

@@ -4,15 +4,17 @@
 #include "artdaq-database/StorageProviders/storage_providers.h"
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 #include "artdaq-database/JsonDocument/JSONDocument.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
+#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 
 namespace  bpo = boost::program_options;
 using namespace artdaq::database;
 
-using artdaq::database::jsonutils::JSONDocument;
+using artdaq::database::docrecord::JSONDocument;
 using  artdaq::database::basictypes::JsonData;
 using  artdaq::database::basictypes::XmlData;
+using artdaq::database::docrecord::JSONDocumentBuilder;
+using artdaq::database::overlay::ovlDatabaseRecord;
+namespace ovl = artdaq::database::overlay;
 
 namespace literal = artdaq::database::dataformats::literal;
 
@@ -26,11 +28,11 @@ bool test_update(std::string const&, std::string const&,std::string const&);
 int main(int argc, char* argv[])try
 {
     artdaq::database::mongo::debug::enable();
-    artdaq::database::jsonutils::debug::enableJSONDocument();
+//    artdaq::database::docrecord::debug::enableJSONDocument();
 
 
     debug::registerUngracefullExitHandlers();
-    artdaq::database::dataformats::useFakeTime(true);
+    artdaq::database::useFakeTime(true);
 
     std::ostringstream descstr;
     descstr << argv[0] << " <-s <source-file>> <-c <compare-with-file>> <-t <test-name>> [<-o <options file>>] (available test names: insert,search1,search1,update)";
@@ -145,8 +147,8 @@ catch(...)
 
 bool test_insert(std::string const& source_xml, std::string const& compare_xml,std::string const& filter)
 {
-    assert(!source_xml.empty());
-    assert(!compare_xml.empty());
+    confirm(!source_xml.empty());
+    confirm(!compare_xml.empty());
 
     JsonData source = XmlData(source_xml);
     JsonData compare = XmlData(compare_xml);
@@ -155,7 +157,7 @@ bool test_insert(std::string const& source_xml, std::string const& compare_xml,s
     auto insert = JSONDocument(source.json_buffer);
 
     //validate compare
-    auto expected = JSONDocument(compare.json_buffer);
+    auto cmpdoc = JSONDocument(compare.json_buffer);
 
 
     namespace DBI= artdaq::database::mongo;
@@ -164,46 +166,51 @@ bool test_insert(std::string const& source_xml, std::string const& compare_xml,s
     auto database = DBI::DB::create(config);
     auto provider = DBI::DBProvider<JsonData>::create(database);
 
-    auto colle11ctionName=std::string("testXML_V001");
+    auto collection=std::string("testXML_V001");
 
-    auto json = JsonData {"{\"document\":" + insert.to_string() + ", \"collection\":\"" +colle11ctionName +"\"}"};
+    auto json = JsonData {"{\"document\":" + insert.to_string() + ", \"collection\":\"" +collection +"\"}"};
 
-    auto object_id =  provider->store(json);
+    auto object_id =  provider->writeDocument(json);
 
-    auto search = JsonData {"{\"filter\":" + ( filter.empty()?object_id:filter)+ ", \"collection\":\"" +colle11ctionName +"\"}"};
+    auto search = JsonData {"{\"filter\":" + ( filter.empty()?object_id:filter)+ ", \"collection\":\"" +collection +"\"}"};
 
     std::cout << "Search criteria " <<  search.json_buffer << "\n";
 
-    auto collection = provider->load(search);
+    auto results = provider->readDocument(search);
 
-    if(collection.size()!=1) {
-        std::cout << "Search returned " << collection.size() << " results.\n";
+    if(results.size()!=1) {
+        std::cout << "Search returned " << results.size() << " results.\n";
 
-        for (auto&& element : collection) {
+        for (auto&& element : results) {
             std::cout << element.json_buffer  << "\n";
         }
         return false;
     }
 
-    auto result = JSONDocument(collection.begin()->json_buffer);
-    result.deleteChild("_id");
+  auto retdoc = JSONDocument(results.begin()->json_buffer);
 
-    if (result == expected) {
-        return true;
-    } else {
-        std::cout << "Convertion failed. \n" ;
-        std::cerr << "result:\n" << result << "\n";
-        std::cerr << "expected:\n" << expected << "\n";
-    }
+  JSONDocumentBuilder returned{retdoc};
+  JSONDocumentBuilder expected{cmpdoc};
 
-    return false;
+  using namespace artdaq::database::overlay;
+  ovl::useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS | DOCUMENT_COMPARE_MUTE_UPDATES |
+                      DOCUMENT_COMPARE_MUTE_COLLECTION);
+
+  auto result = returned == expected;
+
+  if (result.first) return true;
+
+  std::cout << "Error returned!=expected.\n";
+  std::cerr << "returned:\n" << returned << "\n";
+  std::cerr << "expected:\n" << expected << "\n";
+  std::cerr << "error:\n" << result.second << "\n";
+  return false;
 }
-
 
 bool test_search1(std::string const& source_xml, std::string const& compare_xml,std::string const& filter)
 {
-    assert(!source_xml.empty());
-    assert(!compare_xml.empty());
+    confirm(!source_xml.empty());
+    confirm(!compare_xml.empty());
 
     JsonData source = XmlData(source_xml);
     JsonData compare = XmlData(compare_xml);
@@ -212,7 +219,7 @@ bool test_search1(std::string const& source_xml, std::string const& compare_xml,
     auto insert = JSONDocument(source.json_buffer);
 
     //validate compare
-    auto expected = JSONDocument(compare.json_buffer);
+    auto cmpdoc = JSONDocument(compare.json_buffer);
 
     using  artdaq::database::basictypes::JsonData;
     using  artdaq::database::basictypes::XmlData;
@@ -223,45 +230,49 @@ bool test_search1(std::string const& source_xml, std::string const& compare_xml,
     auto database = DBI::DB::create(config);
     auto provider = DBI::DBProvider<JsonData>::create(database);
 
-    auto colle11ctionName=std::string("testXML_V001");
+    auto collection=std::string("testXML_V001");
 
-    auto json = JsonData {"{\"document\":" + insert.to_string() + ", \"collection\":\"" +colle11ctionName +"\"}"};
+    auto json = JsonData {"{\"document\":" + insert.to_string() + ", \"collection\":\"" +collection +"\"}"};
 
-    auto object_id =  provider->store(json);
+    auto object_id =  provider->writeDocument(json);
 
-    auto search = JsonData {"{\"filter\":" + ( filter.empty()?object_id:filter)+ ", \"collection\":\"" +colle11ctionName +"\"}"};
+    auto search = JsonData {"{\"filter\":" + ( filter.empty()?object_id:filter)+ ", \"collection\":\"" +collection +"\"}"};
 
     std::cout << "Search criteria " <<  search.json_buffer << "\n";
 
-    auto collection = provider->load(search);
+    auto results = provider->readDocument(search);
 
-    if(collection.size()!=1) {
-        std::cout << "Search returned " << collection.size() << " results.\n";
+    if(results.size()!=1) {
+        std::cout << "Search returned " << results.size() << " results.\n";
 
-        for (auto&& element : collection) {
+        for (auto&& element : results) {
             std::cout << element.json_buffer  << "\n";
         }
         return false;
     }
 
-    auto result = JSONDocument(collection.begin()->json_buffer);
-    result.deleteChild("_id");
+  auto retdoc = JSONDocument(results.begin()->json_buffer);
+  JSONDocumentBuilder returned{retdoc};
+  JSONDocumentBuilder expected{cmpdoc};
 
-    if (result == expected)
-        return true;
-    else {
-        std::cout << "Convertion failed. \n" ;
-        std::cerr << "result:\n" << result << "\n";
-        std::cerr << "expected:\n" << expected << "\n";
-    }
+  using namespace artdaq::database::overlay;
+  ovl::useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS | DOCUMENT_COMPARE_MUTE_UPDATES |
+                      DOCUMENT_COMPARE_MUTE_COLLECTION|DOCUMENT_COMPARE_MUTE_COMMENTS);
 
-    return false;
+  auto result = returned == expected;
+
+  if (result.first) return true;
+
+  std::cout << "Error returned!=expected.\n";
+  std::cerr << "returned:\n" << returned << "\n";
+  std::cerr << "expected:\n" << expected << "\n";
+  std::cerr << "error:\n" << result.second << "\n";
+  return false;
 }
-
 bool test_search2(std::string const& source_xml, std::string const& compare_xml, std::string const& options[[gnu::unused]])
 {
-    assert(!source_xml.empty());
-    assert(!compare_xml.empty());
+    confirm(!source_xml.empty());
+    confirm(!compare_xml.empty());
 
     JsonData source = XmlData(source_xml);
     JsonData compare = XmlData(compare_xml);
@@ -273,51 +284,55 @@ bool test_search2(std::string const& source_xml, std::string const& compare_xml,
     auto database = DBI::DB::create(config);
     auto provider = DBI::DBProvider<JsonData>::create(database);
 
-    auto colle11ctionName=std::string("testXML_V001");
+    auto collection=std::string("testXML_V001");
 
-    auto json = JsonData {"{\"document\":" + source.json_buffer + ", \"collection\":\"" +colle11ctionName +"\"}"};
+  auto json = JsonData{"{\"document\":" + source.json_buffer + ", \"collection\":\"" + collection + "\"}"};
 
-    auto repeatCount = std::size_t {10};
+  auto repeatCount = std::size_t{10};
 
-    auto object_ids = std::vector<std::string>();
+  auto object_ids = std::vector<std::string>();
 
-    auto printComma=bool {false};
+  std::ostringstream oss;
+  oss << "{\"_id\" : { \"$in\" : [";
 
-    std::stringstream ss;
-    ss << "{\"_id\" : { \"$in\" : [";
+  auto nodata_pos = oss.tellp();
 
-    for (int i=repeatCount; i!=0; i--) {
-        auto object_id =  provider->store(json);
-        object_ids.push_back(object_id);
-        ss << (printComma?',':' ') << object_id;
-        printComma=true;
+  for (int i = repeatCount; i != 0; i--) {
+    auto object_id = provider->writeDocument(json);
+    object_ids.push_back(object_id);
+    oss << JSONDocument(object_id).findChildDocument("_id").to_string() << ",";
+  }
+  
+  if (oss.tellp() != nodata_pos) 
+    oss.seekp(-1, oss.cur);
+  
+  oss << "]} }";
+
+  auto filter = oss.str();
+
+  auto search =
+      JsonData{"{\"filter\":" + (filter.empty() ? options : filter) + ", \"collection\":\"" + collection + "\"}"};
+
+  std::cout << "Search criteria " << search.json_buffer << "\n";
+
+  auto results = provider->readDocument(search);
+
+  if (results.size() != repeatCount) {
+    std::cout << "Search returned " << results.size() << " results.\n";
+
+    for (auto&& element : results) {
+      std::cout << element.json_buffer << "\n";
     }
-    ss << "]} }";
+    return false;
+  }
 
-    auto filter = ss.str();
-
-    auto search = JsonData {"{\"filter\":" + ( filter.empty()?options:filter)+ ", \"collection\":\"" +colle11ctionName +"\"}"};
-
-    std::cout << "Search criteria " <<  search.json_buffer << "\n";
-
-    auto collection = provider->load(search);
-
-    if(collection.size()!=repeatCount) {
-        std::cout << "Search returned " << collection.size() << " results.\n";
-
-        for (auto&& element : collection) {
-            std::cout << element.json_buffer  << "\n";
-        }
-        return false;
-    }
-
-    return true;
+  return true;
 }
 
 bool test_update(std::string const& source_xml, std::string const& compare_xml,std::string const& update_xml)
 {
-    assert(!source_xml.empty());
-    assert(!compare_xml.empty());
+    confirm(!source_xml.empty());
+    confirm(!compare_xml.empty());
 
     JsonData source = XmlData(source_xml);
     JsonData compare = XmlData(compare_xml);
@@ -328,7 +343,7 @@ bool test_update(std::string const& source_xml, std::string const& compare_xml,s
     //insert.deleteChild(literal::comments_node);
 
     //validate compare
-    auto expected = JSONDocument(compare.json_buffer);
+    auto cmpdoc = JSONDocument(compare.json_buffer);
     //expected.deleteChild(literal::comments_node);
 
     auto changes = JSONDocument(update.json_buffer);
@@ -340,57 +355,62 @@ bool test_update(std::string const& source_xml, std::string const& compare_xml,s
     auto database = DBI::DB::create(config);
     auto provider = DBI::DBProvider<JsonData>::create(database);
 
-    auto colle11ctionName=std::string("testXML_V001");
+    auto collection=std::string("testXML_V001");
 
-    auto json = JsonData {"{\"document\":" + insert.to_string() + ", \"collection\":\"" +colle11ctionName +"\"}"};
+  auto json = JsonData{"{\"document\":" + insert.to_string() + ", \"collection\":\"" + collection + "\"}"};
 
-    auto object_id =  provider->store(json);
+  auto object_id = provider->writeDocument(json);
 
-    auto search = JsonData {"{\"filter\":" + object_id + ", \"collection\":\"" +colle11ctionName +"\"}"};
+  auto search = JsonData{"{\"filter\":" + object_id + ", \"collection\":\"" + collection + "\"}"};
 
-    std::cout << "Search criteria " <<  search.json_buffer << "\n";
+  std::cout << "Search criteria " << search.json_buffer << "\n";
 
-    auto collection = provider->load(search);
+  auto results = provider->readDocument(search);
 
-    if(collection.size()!=1) {
-        std::cout << "Search returned " << collection.size() << " results.\n";
+  if (results.size() != 1) {
+    std::cout << "Search returned " << results.size() << " results.\n";
 
-        for (auto&& element : collection) {
-            std::cout << element.json_buffer  << "\n";
-        }
-        return false;
+    for (auto&& element : results) {
+      std::cout << element.json_buffer << "\n";
     }
-
-    auto result = JSONDocument(collection.begin()->json_buffer);
-    result.deleteChild("_id");
-    auto payload = changes.findChild("document");
-    result.replaceChild(payload,"document");
-
-    json = JsonData {"{\"document\":" + result.to_string() + ", \"filter\":" + object_id +  ",\"collection\":\"" +colle11ctionName +"\"}"};
-
-    object_id =  provider->store(json);
-
-    collection = provider->load(search);
-
-    if(collection.size()!=1) {
-        std::cout << "Search returned " << collection.size() << " results.\n";
-
-        for (auto&& element : collection) {
-            std::cout << element.json_buffer  << "\n";
-        }
-        return false;
-    }
-
-    auto updated = JSONDocument(collection.begin()->json_buffer);
-    updated.deleteChild("_id");
-
-    if (updated == expected)
-        return true;
-    else {
-        std::cout << "Convertion failed. \n" ;
-        std::cerr << "updated:\n" << updated << "\n";
-        std::cerr << "expected:\n" << expected << "\n";
-    }
-
     return false;
+  }
+
+  auto found = JSONDocument(results.begin()->json_buffer);
+  auto payload = changes.findChild("document");
+  found.replaceChild(payload, "document");
+
+  json = JsonData{"{\"document\":" + found.to_string() + ", \"filter\":" + object_id + ",\"collection\":\"" +
+                  collection + "\"}"};
+
+  object_id = provider->writeDocument(json);
+
+  results = provider->readDocument(search);
+
+  if (results.size() != 1) {
+    std::cout << "Search returned " << results.size() << " results.\n";
+
+    for (auto&& element : results) {
+      std::cout << element.json_buffer << "\n";
+    }
+    return false;
+  }
+
+  auto retdoc = JSONDocument(results.begin()->json_buffer);
+  JSONDocumentBuilder returned{retdoc};
+  JSONDocumentBuilder expected{cmpdoc};
+
+  using namespace artdaq::database::overlay;
+  ovl::useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS | DOCUMENT_COMPARE_MUTE_UPDATES |
+                      DOCUMENT_COMPARE_MUTE_COLLECTION|DOCUMENT_COMPARE_MUTE_COMMENTS);
+
+  auto result = returned == expected;
+
+  if (result.first) return true;
+
+  std::cout << "Error returned!=expected.\n";
+  std::cerr << "returned:\n" << returned << "\n";
+  std::cerr << "expected:\n" << expected << "\n";
+  std::cerr << "error:\n" << result.second << "\n";
+  return false;
 }

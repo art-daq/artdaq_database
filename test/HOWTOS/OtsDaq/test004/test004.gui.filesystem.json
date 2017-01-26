@@ -240,7 +240,7 @@
          }
       ]
    },
-   "configurable_entity":{
+   "entity":{
       "name":"TestEntity"
    },
    "_id":{

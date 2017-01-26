@@ -14,6 +14,7 @@ class JsonData;
 }
 
 namespace configuration {
+namespace apiliteral = artdaq::database::configapi::literal;
 
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::configuration::options::data_format_t;
@@ -21,20 +22,21 @@ using artdaq::database::configuration::options::data_format_t;
 class ManageConfigsOperation final : public OperationBase {
  public:
   ManageConfigsOperation(std::string const&);
+
   std::string const& version() const noexcept;
   std::string const& version(std::string const&);
 
-  std::string const& configurableEntity() const noexcept;
-  std::string const& configurableEntity(std::string const&);
+  std::string const& entity() const noexcept;
+  std::string const& entity(std::string const&);
 
-  std::string const& globalConfiguration() const noexcept;
-  std::string const& globalConfiguration(std::string const&);
+  std::string const& configuration() const noexcept;
+  std::string const& configuration(std::string const&);
 
-  JsonData search_filter_to_JsonData() const override;
+  JsonData query_filter_to_JsonData() const override;
 
-  JsonData globalConfiguration_to_JsonData() const;
+  JsonData configuration_to_JsonData() const;
   JsonData version_to_JsonData() const;
-  JsonData configurableEntity_to_JsonData() const;
+  JsonData entity_to_JsonData() const;
 
   bpo::options_description makeProgramOptions() const override;
 
@@ -44,9 +46,9 @@ class ManageConfigsOperation final : public OperationBase {
   JsonData writeJsonData() const override;
 
  private:
-  std::string _version = {literal::notprovided};   
-  std::string _configurable_entity = {literal::notprovided};
-  std::string _global_configuration = {literal::notprovided};
+  std::string _version = {apiliteral::notprovided};
+  std::string _entity = {apiliteral::notprovided};
+  std::string _configuration = {apiliteral::notprovided};
 };
 
 namespace debug {
@@ -59,4 +61,5 @@ void enableOperationManageConfigs();
 }  // namespace database
 }  // namespace artdaq
 
-#endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_MANAGECONFIGS_H_ */
+#endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_MANAGECONFIGS_H_ \
+          */

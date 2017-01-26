@@ -9,7 +9,7 @@
             "operation":"load",
             "filter":{
                "configurations.name":"@TEST_CONFIGURATION_NAME@",
-               "configurable_entity.name":"test001"
+               "entities.name":"test001"
             }
          }
       },
@@ -22,7 +22,7 @@
             "operation":"load",
             "filter":{
                "configurations.name":"@TEST_CONFIGURATION_NAME@",
-               "configurable_entity.name":"test002"
+               "entities.name":"test002"
             }
          }
       },
@@ -35,7 +35,7 @@
             "operation":"load",
             "filter":{
                "configurations.name":"@TEST_CONFIGURATION_NAME@",
-               "configurable_entity.name":"test003"
+               "entities.name":"test003"
             }
          }
       },
@@ -48,7 +48,7 @@
             "operation":"load",
             "filter":{
                "configurations.name":"@TEST_CONFIGURATION_NAME@",
-               "configurable_entity.name":"test004"
+               "entities.name":"test004"
             }
          }
       },
@@ -61,7 +61,7 @@
             "operation":"load",
             "filter":{
                "configurations.name":"@TEST_CONFIGURATION_NAME@",
-               "configurable_entity.name":"test005"
+               "entities.name":"test005"
             }
          }
       },
@@ -74,7 +74,7 @@
             "operation":"load",
             "filter":{
                "configurations.name":"@TEST_CONFIGURATION_NAME@",
-               "configurable_entity.name":"test006"
+               "entities.name":"test006"
             }
          }
       }

@@ -23,9 +23,9 @@ namespace cf = db::configuration;
 namespace cfo = cf::options;
 namespace cfol = cfo::literal;
 
-using Options = cfo::LoadStoreOperation;
+using Options = cfo::ManageDocumentOperation;
 
-using artdaq::database::jsonutils::JSONDocument;
+using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::basictypes::JsonData;
 
 typedef bool (*test_case)(Options const& /*options*/, std::string const& /*file_name*/);
@@ -120,7 +120,7 @@ int main(int argc, char* argv[]) try {
   }
 
   if (vm.count("globalid")) {
-    options.globalConfiguration(vm["globalid"].as<std::string>());
+    options.configuration(vm["globalid"].as<std::string>());
   }
 
   if (vm.count("version")) {
@@ -136,10 +136,10 @@ int main(int argc, char* argv[]) try {
   }
   
   if (vm.count("entity")) {
-    options.configurableEntity(vm["entity"].as<std::string>());
+    options.entity(vm["entity"].as<std::string>());
   }
   
-  options.dataFormat("gui");
+  options.format("gui");
 
   auto file_name = vm["compare"].as<std::string>();
 
@@ -167,7 +167,7 @@ int main(int argc, char* argv[]) try {
 
 bool test_addalias(Options const& options, std::string const& file_name)
 {
-  assert(!file_name.empty());
+  confirm(!file_name.empty());
 
   std::ifstream is(file_name);
 
@@ -198,7 +198,7 @@ bool test_addalias(Options const& options, std::string const& file_name)
 
 bool test_removealias(Options const& options, std::string const& file_name)
 {
-  assert(!file_name.empty());
+  confirm(!file_name.empty());
 
   std::ifstream is(file_name);
 
@@ -228,7 +228,7 @@ bool test_removealias(Options const& options, std::string const& file_name)
 }
 
 bool test_findaliases(Options const& options, std::string const& file_name){
-  assert(!file_name.empty());
+  confirm(!file_name.empty());
 
   std::ifstream is(file_name);
 

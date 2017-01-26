@@ -1,5 +1,4 @@
-#include "artdaq-database/DataFormats/common/helper_functions.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
+#include "artdaq-database/DataFormats/common.h"
 
 #include "artdaq-database/DataFormats/Conf/conf_common.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
@@ -26,25 +25,23 @@ using artdaq::database::conf::ConfWriter;
 namespace literal = artdaq::database::dataformats::literal;
 
 bool conf_to_json(std::string const& conf, std::string& json) {
-  assert(!conf.empty());
-  assert(json.empty());
+  confirm(!conf.empty());
+  confirm(json.empty());
 
   TRACE_(2, "conf_to_json: begin");
 
   auto result = bool{false};
 
   auto json_root = jsn::object_t{};
-  json_root[literal::document_node] = jsn::object_t{};
-  json_root[literal::origin_node] = jsn::object_t{};
+  json_root[literal::document] = jsn::object_t{};
+  json_root[literal::origin] = jsn::object_t{};
 
-  auto get_object = [&json_root](std::string const& name) -> auto& {
-    return boost::get<jsn::object_t>(json_root[name]);
-  };
-  get_object(literal::origin_node)[literal::format] = std::string("conf");
-  get_object(literal::origin_node)[literal::source] = std::string("conf_to_json");
-  get_object(literal::origin_node)[literal::timestamp] = artdaq::database::dataformats::timestamp();
+  auto get_object = [&json_root](std::string const& name) -> auto& { return boost::get<jsn::object_t>(json_root[name]); };
+  get_object(literal::origin)[literal::format] = std::string("conf");
+  get_object(literal::origin)[literal::source] = std::string("conf_to_json");
+  get_object(literal::origin)[literal::timestamp] = artdaq::database::timestamp();
 
-  auto& json_node = get_object(literal::document_node);
+  auto& json_node = get_object(literal::document);
 
   auto reader = conf::ConfReader{};
   result = reader.read(conf, json_node);
@@ -65,8 +62,8 @@ bool conf_to_json(std::string const& conf, std::string& json) {
 }
 
 bool json_to_conf(std::string const& json, std::string& conf) {
-  assert(!json.empty());
-  assert(conf.empty());
+  confirm(!json.empty());
+  confirm(conf.empty());
 
   TRACE_(3, "json_to_conf: begin");
 
@@ -83,11 +80,9 @@ bool json_to_conf(std::string const& json, std::string& conf) {
     return result;
   }
 
-  auto get_object = [&json_root](std::string const& name) -> auto& {
-    return boost::get<jsn::object_t>(json_root.at(name));
-  };
+  auto get_object = [&json_root](std::string const& name) -> auto& { return boost::get<jsn::object_t>(json_root.at(name)); };
 
-  auto& json_node = get_object(literal::document_node);
+  auto& json_node = get_object(literal::document);
 
   auto conf1 = std::string{};
 
@@ -106,8 +101,8 @@ namespace debug {
 void enableConfJson() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::confjson trace_enable");
 }

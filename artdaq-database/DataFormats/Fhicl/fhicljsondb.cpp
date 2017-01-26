@@ -1,21 +1,20 @@
 #include "artdaq-database/DataFormats/common.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 
 #include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
 #include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
 
 #include "artdaq-database/DataFormats/Fhicl/fhicl_common.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
+#include "artdaq-database/DataFormats/Fhicl/fhicljsondb.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "FHJS:fhicljsondb_C"
+#define TRACE_NAME "FHJS:fhcljsndb_C"
 
-namespace artdaq {
-namespace database {
-namespace fhicljson {
+namespace dbfj=artdaq::database::fhicljson;
 
 namespace literal = artdaq::database::dataformats::literal;
 
@@ -28,9 +27,10 @@ using artdaq::database::json::JsonWriter;
 using artdaq::database::fhicl::FhiclReader;
 using artdaq::database::fhicl::FhiclWriter;
 
-bool fhicl_to_json(std::string const& fcl, std::string& json) {
-  assert(!fcl.empty());
-  assert(json.empty());
+bool dbfj::fhicl_to_json(std::string const& fcl, std::string const& filename, std::string& json ) {
+  confirm(!fcl.empty());
+  confirm(json.empty());
+  confirm(!filename.empty());
 
   TRACE_(2, "fhicl_to_json: begin");
 
@@ -40,36 +40,33 @@ bool fhicl_to_json(std::string const& fcl, std::string& json) {
 
   auto json_root = jsn::object_t();
 
-  auto get_object = [&json_root](std::string const& name) -> auto& {
-    return boost::get<jsn::object_t>(json_root[name]);
-  };
+  auto get_object = [&json_root](std::string const& name) -> auto& { return boost::get<jsn::object_t>(json_root[name]); };
 
-  json_root[literal::document_node] = jsn::object_t();
-  json_root[literal::comments_node] = jsn::array_t();
-  json_root[literal::origin_node] = jsn::object_t();
-  
-  json_root[literal::version_node] = std::string{literal::notprovided};
-  json_root[literal::configurable_entity_node] =  jsn::object_t();
-  json_root[literal::configurations_node] =  jsn::array_t();
-  
+  json_root[literal::document] = jsn::object_t();
+  json_root[literal::comments] = jsn::array_t();
+  json_root[literal::origin] = jsn::object_t();
+
+  json_root[literal::version] = std::string{literal::notprovided};
+  json_root[literal::entities] = jsn::array_t();
+  json_root[literal::configurations] = jsn::array_t();
+
   TRACE_(2, "fhicl_to_json: Created root nodes");
 
-  get_object(literal::origin_node)[literal::format] = std::string("fhicl");
-  get_object(literal::origin_node)[literal::source] = std::string("fhicl_to_json");
-  get_object(literal::origin_node)[literal::timestamp] = artdaq::database::dataformats::timestamp();
+  get_object(literal::origin)[literal::format] = std::string("fhicl");
+  get_object(literal::origin)[literal::name] = filename;
+  get_object(literal::origin)[literal::source] = std::string("fhicl_to_json");
+  get_object(literal::origin)[literal::timestamp] = artdaq::database::timestamp();
 
-  get_object(literal::configurable_entity_node)[literal::name]=std::string{literal::notprovided};
-  
   auto reader = FhiclReader();
 
   TRACE_(2, "read_comments begin");
-  result = reader.read_comments(fcl, boost::get<jsn::array_t>(json_root[literal::comments_node]));
+  result = reader.read_comments(fcl, boost::get<jsn::array_t>(json_root[literal::comments]));
   TRACE_(2, "read_comments end result=" << std::to_string(result));
 
   if (!result) return result;
 
   TRACE_(2, "read_data begin");
-  result = reader.read_data(fcl, boost::get<jsn::object_t>(json_root[literal::document_node]));
+  result = reader.read_data(fcl, boost::get<jsn::object_t>(json_root[literal::document]));
   TRACE_(2, "read_data end result=" << std::to_string(result));
 
   if (!result) return result;
@@ -89,9 +86,9 @@ bool fhicl_to_json(std::string const& fcl, std::string& json) {
   return result;
 }
 
-bool json_to_fhicl(std::string const& json, std::string& fcl) {
-  assert(!json.empty());
-  assert(fcl.empty());
+bool dbfj::json_to_fhicl(std::string const& json, std::string& fcl, std::string & filename) {
+  confirm(!json.empty());
+  confirm(fcl.empty());
 
   TRACE_(3, "json_to_fhicl: begin");
 
@@ -113,8 +110,9 @@ bool json_to_fhicl(std::string const& json, std::string& fcl) {
   auto writer = FhiclWriter();
 
   auto fcl_data = std::string();
-  auto const& document_object = boost::get<jsn::object_t>(json_root[literal::document_node]);
+  auto const& document_object = boost::get<jsn::object_t>(json_root[literal::document]);
 
+  filename="notprovided";
   result = writer.write_data(document_object, fcl_data);
 
   if (!result) return result;
@@ -128,16 +126,11 @@ bool json_to_fhicl(std::string const& json, std::string& fcl) {
   return result;
 }
 
-namespace debug {
-void enableFhiclJson() {
+void dbfj::debug::enableFhiclJson() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::fhicljson trace_enable");
 }
-}
-}  // namespace fhicljson
-}  // namespace database
-}  // namespace artdaq

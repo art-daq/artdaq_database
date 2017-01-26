@@ -1,6 +1,5 @@
 #include "artdaq-database/DataFormats/Json/json_writer.h"
 #include "artdaq-database/DataFormats/common.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
 
 using namespace boost::spirit;
 using namespace artdaq::database;
@@ -9,8 +8,8 @@ using artdaq::database::json::object_t;
 using artdaq::database::json::JsonWriter;
 
 bool JsonWriter::write(object_t const& ast, std::string& out) {
-  assert(out.empty());
-  assert(!ast.empty());
+  confirm(out.empty());
+  confirm(!ast.empty());
 
   auto result = bool(false);
   auto buffer = std::string();

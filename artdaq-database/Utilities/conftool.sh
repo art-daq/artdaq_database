@@ -1,19 +1,22 @@
 #!/bin/bash
 
-export artdaq_database_version=v1_03_17
-export config_editor_version=v1_00_02
+export artdaq_database_version=v1_03_19
+export config_editor_version=v1_00_03
 
-conftool_log_dir=/home/nfs/daqoutput/daqlogs/conftool
+conftool_log_dir=${HOME}/daqoutput/daqlogs/conftool
 
 function show_help(){
 printf "\n\nUsage: $(basename $0) [OPERATION] [OPTION]...\n"
 printf " -h [ --help ]              Produce help message\n"
-printf " -o [ --operation ] arg     Database operation [import_global_config or export_global_config]\n"
+printf " -o [ --operation ] arg     Database operation [import_global_config, export_global_config, or list_global_configs]\n"
 printf " -g [ --configuration ] arg Global configuration name [globConfig001]\n"
 printf " -v [ --version ] arg       Configuration version [ver001]\n"
 printf " -s [ --source ] arg        Configuration directory name[config]\n"
 printf "Example: \n\tconftool.sh -o export_global_config -g demo003 -s newconfig"
 printf "\n\tconftool.sh -o import_global_config -g demo004 -v ver004 -s config"
+printf "\n\tconftool.sh -o list_global_configs -g \"de*\" "
+printf "\n\tconftool.sh -o list_global_configs "
+
 printf "\n"
 printf "\nLogs in ${conftool_log_dir}\n"
 ls -t  ${conftool_log_dir} |head -3
@@ -106,7 +109,8 @@ function read_command_line_options() {
   
   if [[ "${operation_name_present}" == "${no}" ]] \
   || ( [[ "${operation_name}" != "import_global_config" ]] \
-  && [[ "${operation_name}" != "export_global_config" ]] ); then
+  && [[ "${operation_name}" != "export_global_config" ]] \
+  && [[ "${operation_name}" != "list_global_configs" ]]); then
   printf "\nError: operation is unsupported or missing; operation=<${operation_name}>"
     return 5
   fi
@@ -129,7 +133,7 @@ function read_command_line_options() {
       return 6
   fi
   
-  if [[ "${global_config_name_present}" == "${yes}" ]] \
+  if [[ "${global_config_name_present}" == "${yes}" ]] &&  [[ "${operation_name}" != "list_global_configs" ]]\
     && ( [[ "${global_config_name}" =~ [^[:alnum:]] ]] \
     ||   [[ "${global_config_name}" =~ [^[:digit:]]$ ]] ); then
     printf "\nError: configuration must be an alphanumeric string and ending with a digit; configuration=<${global_config_name}>"
@@ -175,7 +179,7 @@ function export_global_config()
         
  if [ $num_args -lt 1 ]; then
    printf "\nError: invalid argument count in export_global_config(); arg_strings=\"${arg_strings[*]}\" $*"
-   printf "\nUsage: export_global_config global-config"   
+   printf "\nUsage: export_global_config -g global-config"   
    return 1
  fi
 
@@ -230,7 +234,7 @@ function import_global_config()
 
  if [ $num_args -lt 1 ]; then
    printf "\nError: invalid argument count in import_global_config(); arg_strings=\"${arg_strings[*]}\" $*"
-   printf "\nUsage: import_global_config global-config [version-name]"         
+   printf "\nUsage: import_global_config -g global-config [version-name]"         
    return 1
  fi
 
@@ -280,6 +284,30 @@ function import_global_config()
   return 4
  fi
 
+ return $result_code
+}
+
+
+function list_global_configs()
+{
+  arg_strings=($*)
+  num_args=${#arg_strings[*]}
+        
+ if [ $num_args -lt 1 ]; then
+   search_result=$(conftool -o findconfigs  -f csv -g '*')
+   result_code=$? 
+  else
+   global_config_name=$1
+   search_result=$(conftool -o findconfigs  -f csv -g ${global_config_name})
+   result_code=$? 
+  fi
+
+ if [[  $result_code -gt 0 ]]; then 
+    printf "\nError: Failed to list configs"
+ fi  
+ 
+ printf "\n${search_result}"
+ 
  return $result_code
 }
 
@@ -376,7 +404,7 @@ function main()
     exit 0
   fi
 
-  setup_config_editor
+  setup_artdaq_database
   if [[  $? -gt 0 ]]; then 
     touch_log
     printf "\nInfo: Exiting..."
@@ -386,9 +414,9 @@ function main()
   unset ARTDAQ_DATABASE_URI
 
   redirect_stdout_stderr_tolog
-  
+ 
   printf "\nInfo: operation=${operation_name}, configuration=${global_config_name}, "
-  
+ 
   if [[ "${version_name_present}" == "${yes}" ]] ; then
     printf "version=${version_name}, "
   fi
@@ -401,7 +429,7 @@ function main()
 
   printf "\nInfo: using $(which conftool)"
   
-  export ARTDAQ_DATABASE_DATADIR=/home/nfs/dunedaq/daqarea/databases
+  export ARTDAQ_DATABASE_DATADIR=${HOME}/daqarea/databases
   
   printf "\n"
   
@@ -416,6 +444,11 @@ function main()
   printf "\n"
   
   restore_stdout_stderr
+
+  if [[ "${operation_name}" == "list_global_configs" ]]; then
+    list_global_configs ${global_config_name}
+    result_code=$?     
+  fi 
   
   return $result_code
 }

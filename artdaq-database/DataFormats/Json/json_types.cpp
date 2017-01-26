@@ -1,7 +1,6 @@
 #include "artdaq-database/DataFormats/common.h"
 
 #include "artdaq-database/DataFormats/Json/json_types.h"
-#include "artdaq-database/DataFormats/common/shared_types.h"
 
 using artdaq::database::sharedtypes::unwrap;
 using artdaq::database::sharedtypes::unwrapper;
@@ -49,20 +48,17 @@ std::pair<bool, std::string> operator==(value_t const& first, value_t const& sec
 }
 
 std::pair<bool, std::string> operator==(data_t const& first, data_t const& second) {
-  if (first.key.compare(second.key) != 0)
-    return std::make_pair(false, "Keys are different <" + first.key + "," + second.key + ">");
+  if (first.key.compare(second.key) != 0) return std::make_pair(false, "Keys are different <" + first.key + "," + second.key + ">");
 
   return boost::apply_visitor(compare_visitor(), first.value, second.value)
              ? std::make_pair(true, noerror)
-             : std::make_pair(false, "Values are different< " + first.key + ":" +
-                                         boost::apply_visitor(print_visitor(), first.value) + "," + second.key + ":" +
-                                         boost::apply_visitor(print_visitor(), second.value) + ">");
+             : std::make_pair(false, "Values are different< " + first.key + ":" + boost::apply_visitor(print_visitor(), first.value) + "," +
+                                         second.key + ":" + boost::apply_visitor(print_visitor(), second.value) + ">");
 }
 
 std::pair<bool, std::string> operator==(array_t const& first, array_t const& second) {
   if (first.size() != second.size())
-    return std::make_pair(
-        false, "Arrays have different sizes <" + print_visitor()(first) + "," + print_visitor()(second) + ">");
+    return std::make_pair(false, "Arrays have different sizes <" + print_visitor()(first) + "," + print_visitor()(second) + ">");
   //
   auto first_it = first.begin();
   auto first_end = first.end();
@@ -71,8 +67,7 @@ std::pair<bool, std::string> operator==(array_t const& first, array_t const& sec
 
   for (; first_it != first_end; first_it++, second_it++) {
     if (!boost::apply_visitor(compare_visitor(), *first_it, *second_it))
-      return std::make_pair(false,
-                            "Arrays are different <" + print_visitor()(first) + "," + print_visitor()(second) + ">");
+      return std::make_pair(false, "Arrays are different <" + print_visitor()(first) + "," + print_visitor()(second) + ">");
   }
 
   return std::make_pair(true, noerror);
@@ -80,8 +75,7 @@ std::pair<bool, std::string> operator==(array_t const& first, array_t const& sec
 
 std::pair<bool, std::string> operator==(object_t const& first, object_t const& second) {
   if (first.size() != second.size())
-    return std::make_pair(
-        false, "Objects have different sizes <" + print_visitor()(first) + "," + print_visitor()(second) + ">");
+    return std::make_pair(false, "Objects have different sizes <" + print_visitor()(first) + "," + print_visitor()(second) + ">");
 
   auto first_it = first.begin();
   auto first_end = first.end();
@@ -90,8 +84,7 @@ std::pair<bool, std::string> operator==(object_t const& first, object_t const& s
 
   for (; first_it != first_end; first_it++, second_it++) {
     auto result = (*first_it == *second_it);
-    if (!result.first)
-      return std::make_pair(false, "Ojbects are different at key=\"" + first_it->key + "\" " + result.second);
+    if (!result.first) return std::make_pair(false, "Ojbects are different at key=\"" + first_it->key + "\" " + result.second);
   }
 
   return std::make_pair(true, noerror);

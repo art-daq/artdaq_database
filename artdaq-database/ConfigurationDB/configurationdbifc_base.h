@@ -7,13 +7,12 @@
 #include <utility>
 
 #include "artdaq-database/BasicTypes/basictypes.h"
-#include "artdaq-database/BuildInfo/process_exceptions.h"
 
 #include "artdaq-database/ConfigurationDB/configurationdb.h"
 #include "artdaq-database/DataFormats/Json/json_reader.h"
 #include "artdaq-database/DataFormats/Json/json_writer.h"
 
-#include "options_operation_loadstore.h"
+#include "artdaq-database/ConfigurationDB/options_operation_managedocument.h"
 
 namespace debug {
 std::string demangle(const char*);
@@ -27,7 +26,6 @@ namespace configuration {
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
-namespace cfl = cf::literal;
 namespace impl = cf::opts;
 
 using artdaq::database::basictypes::JsonData;
@@ -39,30 +37,30 @@ auto make_error_msg = [](const char* msg) { return std::string("{error:\"").appe
 template <typename CONF>
 class MakeSerializable final {
   static_assert(std::is_pointer<CONF>::value || std::is_reference<CONF>::value,
-                "Template parameter must be either a pointer or reference type");
+                 "Template parameter must be either a pointer or reference type");
 
  public:
   template <class TYPE>
-  bool writeConfiguration(TYPE& data) const throw(artdaq::database::exception) try {
-    return writeConfigurationImpl(data);
+  bool writeDocument(TYPE& data) const throw(artdaq::database::exception) try {
+    return writeDocumentImpl(data);
   } catch (std::exception const& e) {
-    throw artdaq::database::exception("MakeSerializable::writeConfiguration")
+    throw artdaq::database::exception("MakeSerializable::writeDocument")
         << "Unable to write " << demangle(typeid(CONF).name()) << " into " << demangle(typeid(TYPE).name())
         << "; Exception msg:" << e.what() << ".";
   } catch (...) {
-    throw artdaq::database::exception("MakeSerializable::writeConfiguration")
+    throw artdaq::database::exception("MakeSerializable::writeDocument")
         << "Unable to write " << demangle(typeid(CONF).name()) << " into " << demangle(typeid(TYPE).name()) << ".";
   }
 
   template <class TYPE>
-  bool readConfiguration(TYPE const& data) throw(artdaq::database::exception) try {
-    return readConfigurationImpl(data);
+  bool readDocument(TYPE const& data) throw(artdaq::database::exception) try {
+    return readDocumentImpl(data);
   } catch (std::exception const& e) {
-    throw artdaq::database::exception("MakeSerializable::readConfiguration")
+    throw artdaq::database::exception("MakeSerializable::readDocument")
         << "Unable to read " << demangle(typeid(CONF).name()) << " from " << demangle(typeid(TYPE).name())
         << "; Exception msg:" << e.what() << ".";
   } catch (...) {
-    throw artdaq::database::exception("MakeSerializable::readConfiguration")
+    throw artdaq::database::exception("MakeSerializable::readDocument")
         << "Unable to read " << demangle(typeid(CONF).name()) << " from " << demangle(typeid(TYPE).name()) << ".";
   }
 
@@ -92,10 +90,10 @@ class MakeSerializable final {
   // readImpl and writeImpl methods should be specialized
   // for concrete configuration types
   template <class TYPE>
-  bool writeConfigurationImpl(TYPE&) const;
+  bool writeDocumentImpl(TYPE&) const;
 
   template <class TYPE>
-  bool readConfigurationImpl(TYPE const&);
+  bool readDocumentImpl(TYPE const&);
 
   std::string configurationNameImpl() const;
 
@@ -106,7 +104,7 @@ class MakeSerializable final {
 template <typename CONF, template <typename CONF> class SERIALIZABLE>
 class ConfigurationSerializer final {
   static_assert(std::is_pointer<CONF>::value || std::is_reference<CONF>::value,
-                "Template parameter must be either a pointer or reference type");
+                 "Template parameter must be either a pointer or reference type");
 
  public:
   using Serializable_t = SERIALIZABLE<CONF>;
@@ -114,10 +112,10 @@ class ConfigurationSerializer final {
   static ConfigurationSerializer<CONF, SERIALIZABLE> wrap(CONF conf) { return {conf}; }
 
   template <class TYPE>
-  typename std::enable_if<std::is_same<TYPE, FhiclData>::value, cf::result_pair_t>::type writeConfiguration(
-      TYPE& data) const noexcept try {
+  typename std::enable_if<std::is_same<TYPE, FhiclData>::value, cf::result_t>::type writeDocument(TYPE& data) const
+      noexcept try {
     auto tmp = TYPE{""};
-    auto result = Serializable_t{_conf}.template writeConfiguration<TYPE>(tmp);
+    auto result = Serializable_t{_conf}.template writeDocument<TYPE>(tmp);
 
     if (result) std::swap(data, tmp);
 
@@ -127,10 +125,10 @@ class ConfigurationSerializer final {
   }
 
   template <class TYPE>
-  typename std::enable_if<std::is_same<TYPE, JsonData>::value, cf::result_pair_t>::type writeConfiguration(
-      TYPE& data) const noexcept try {
+  typename std::enable_if<std::is_same<TYPE, JsonData>::value, cf::result_t>::type writeDocument(TYPE& data) const
+      noexcept try {
     auto tmp = TYPE{"{}"};
-    auto result = Serializable_t{_conf}.template writeConfiguration<TYPE>(tmp);
+    auto result = Serializable_t{_conf}.template writeDocument<TYPE>(tmp);
 
     if (result) std::swap(data, tmp);
 
@@ -140,9 +138,9 @@ class ConfigurationSerializer final {
   }
 
   template <class TYPE>
-  typename std::enable_if<std::is_same<TYPE, FhiclData>::value, cf::result_pair_t>::type readConfiguration(
+  typename std::enable_if<std::is_same<TYPE, FhiclData>::value, cf::result_t>::type readDocument(
       TYPE const& data) noexcept try {
-    auto result = Serializable_t{_conf}.template readConfiguration<TYPE>(data);
+    auto result = Serializable_t{_conf}.template readDocument<TYPE>(data);
 
     return {result, {make_error_msg(result ? "Success" : "Failure")}};
   } catch (std::exception const& e) {
@@ -150,9 +148,9 @@ class ConfigurationSerializer final {
   }
 
   template <class TYPE>
-  typename std::enable_if<std::is_same<TYPE, JsonData>::value, cf::result_pair_t>::type readConfiguration(
+  typename std::enable_if<std::is_same<TYPE, JsonData>::value, cf::result_t>::type readDocument(
       TYPE const& data) noexcept try {
-    auto result = Serializable_t{_conf}.template readConfiguration<TYPE>(data);
+    auto result = Serializable_t{_conf}.template readDocument<TYPE>(data);
 
     return {result, {make_error_msg(result ? "Success" : "Failure")}};
   } catch (std::exception const& e) {
@@ -196,16 +194,16 @@ struct VersionInfo {
   std::string entity;
 
   void validate() const {
-    assert(!configuration.empty());
+    confirm(!configuration.empty());
 
     if (configuration.empty())
       throw artdaq::database::invalid_option_exception("VersionInfo") << "Configuration name is empty";
 
-    assert(!version.empty());
+    confirm(!version.empty());
 
     if (version.empty()) throw artdaq::database::invalid_option_exception("VersionInfo") << "Version is empty";
 
-    assert(!entity.empty());
+    confirm(!entity.empty());
 
     if (entity.empty()) throw artdaq::database::invalid_option_exception("VersionInfo") << "Entity is empty";
   }

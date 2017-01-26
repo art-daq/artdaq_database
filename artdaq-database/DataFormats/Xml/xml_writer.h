@@ -10,9 +10,6 @@ namespace artdaq {
 namespace database {
 namespace xml {
 
-namespace fcl = artdaq::database::xml;
-namespace jsn = artdaq::database::json;
-
 struct XmlWriter final {
   bool write(jsn::object_t const&, std::string&);
 };

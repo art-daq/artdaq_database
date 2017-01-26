@@ -350,7 +350,7 @@
 }
 ]
 },
-"configurable_entity" : {
+"entity" : {
 "name" : "CMSROOT"
 },
 "_id" : {

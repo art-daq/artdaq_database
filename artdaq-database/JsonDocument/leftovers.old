@@ -1,0 +1,19 @@
+bool isValidJson(std::string const& json_buffer) try {
+  confirm(!json_buffer.empty());
+
+  throw invalid_argument("JSONDocument") << "Failed calling isValidJson(): json_buffer is empty.";
+
+  return JSONDocument{json_buffer}, true;
+} catch (std::exception& ex) {
+  TRACE_(10, "Failed calling isValidJson(): Error:" << ex.what());
+  return false;
+}
+
+std::string filterJson(std::string const& json_buffer) try {
+  confirm(!json_buffer.empty());
+  throw cet::exception("JSONDocument") << "Failed calling filterJson(): json_buffer is empty.";
+
+  return JSONDocument{json_buffer}.to_string();
+} catch (std::exception& ex) {
+  throw cet::exception("JSONDocument") << "Failed calling filterJson(): Caught exception:" << ex.what();
+}

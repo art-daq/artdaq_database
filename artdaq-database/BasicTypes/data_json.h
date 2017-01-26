@@ -7,13 +7,13 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "BTYPES:JsonData_H"
+#define TRACE_NAME "BTPS:JsonData_H"
 
 namespace artdaq {
 namespace database {
 namespace basictypes {
 
-struct JsonData {
+struct JsonData final{
   JsonData(std::string const&);
 
   template <typename TYPE>

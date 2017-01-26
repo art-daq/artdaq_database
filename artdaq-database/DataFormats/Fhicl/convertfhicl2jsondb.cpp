@@ -1,10 +1,9 @@
 #include "artdaq-database/DataFormats/common.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
 
+
+#include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
 #include "artdaq-database/DataFormats/Fhicl/convertfhicl2jsondb.h"
 #include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
-#include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
 
 #include <boost/variant/get.hpp>
 #include <cmath>
@@ -13,7 +12,10 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "FHJS:fcl2jsondb_C"
+#define TRACE_NAME "FHJS:fcl2jsndb_C"
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
 
 namespace jsn = artdaq::database::json;
 namespace fcl = artdaq::database::fhicl;
@@ -41,8 +43,8 @@ fcl2jsondb::operator datapair_t() try {
 
   using artdaq::database::fhicljson::return_pair;
 
-  assert(!key.empty());
-  assert(!comments.empty());
+  confirm(!key.empty());
+  confirm(!comments.empty());
 
   auto returnValue = datapair_t();
   auto pair = return_pair{returnValue};
@@ -63,18 +65,18 @@ fcl2jsondb::operator datapair_t() try {
   };
 
   auto annotation_at = [this](int linenum) -> std::string {
-    assert(linenum > -1);
+    confirm(linenum > -1);
 
     if (comments.empty() || linenum < 1) return literal::whitespace;
 
     auto search = comments.find(linenum);
     if (comments.end() == search) return literal::whitespace;
 
-    return artdaq::database::dataformats::filter_jsonstring(search->second);
+    return artdaq::database::filter_jsonstring(search->second);
   };
 
   auto comment_at = [&annotation_at](int linenum) -> std::string {
-    assert(linenum > -1);
+    confirm(linenum > -1);
 
     auto comment = annotation_at(linenum);
     if (!comment.empty() && comment.at(0) != '/') return comment;
@@ -83,7 +85,7 @@ fcl2jsondb::operator datapair_t() try {
   };
 
   auto add_comment = [&object](auto& func, std::string field, int linenum) {
-    assert(linenum > -1);
+    confirm(linenum > -1);
 
     auto result = func(linenum);
 
@@ -238,8 +240,7 @@ fcl2jsondb::operator datapair_t() try {
   throw ::fhicl::exception(::fhicl::cant_insert, self.first) << e.what();
 }
 
-json2fcldb::json2fcldb(args_tuple_t args)
-    : self{std::get<0>(args)}, parent{std::get<1>(args)}, opts{std::get<2>(args)} {}
+json2fcldb::json2fcldb(args_tuple_t args) : self{std::get<0>(args)}, parent{std::get<1>(args)}, opts{std::get<2>(args)} {}
 
 json2fcldb::operator fcl::value_t() try {
   auto const& self_value = std::get<1>(self);
@@ -423,11 +424,13 @@ T& unwrapper<fcl::value_t>::value_as() {
   return boost::get<T>(any.value);
 }
 
+#pragma GCC diagnostic pop
+
 void artdaq::database::fhicljson::debug::enableFCL2JSON() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::convertjson::FCL2JSON trace_enable");
 }

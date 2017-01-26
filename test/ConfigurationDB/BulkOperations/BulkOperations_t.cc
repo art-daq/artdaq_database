@@ -11,26 +11,23 @@
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 
 #include "artdaq-database/DataFormats/Json/json_reader.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
 namespace cfo = cf::options;
 
-namespace literal = artdaq::database::configuration::literal;
 namespace bpo = boost::program_options;
 
 using Options = cf::BulkOperations;
 
-using artdaq::database::jsonutils::JSONDocument;
+using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::basictypes::JsonData;
 
 int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
-  // artdaq::database::jsonutils::debug::enableJSONDocument();
-  artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
+  // artdaq::database::docrecord::debug::enableJSONDocument();
+  artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
 
   artdaq::database::configuration::debug::enableFindConfigsOperation();
   artdaq::database::configuration::debug::enableCreateConfigsOperation();
@@ -45,7 +42,7 @@ int main(int argc, char* argv[]) try {
   artdaq::database::configuration::debug::enableDBOperationFileSystem();
 
   debug::registerUngracefullExitHandlers();
-  artdaq::database::dataformats::useFakeTime(true);
+  artdaq::database::useFakeTime(true);
 
   auto options = Options{argv[0]};
   auto desc = options.makeProgramOptions();
@@ -71,7 +68,7 @@ int main(int argc, char* argv[]) try {
     return exit_code;
   }
 
-  if (!vm.count(literal::option::result)) {
+  if (!vm.count(apiliteral::option::result)) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no result file name given.\n"
               << "For usage and an options list, please do '" << argv[0] << " --help"
               << "'.\n";
@@ -79,7 +76,7 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::INVALID_ARGUMENT | 1;
   }
 
-  auto file_res_name = vm[literal::option::result].as<std::string>();
+  auto file_res_name = vm[apiliteral::option::result].as<std::string>();
 
   auto options_string = options.to_string();
   auto operation_name = std::string{"newconfig"};
@@ -89,7 +86,7 @@ int main(int argc, char* argv[]) try {
   using namespace artdaq::database::configuration::json;
 
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      operation_name, create_new_global_configuration, options_string);
+      operation_name, create_configuration, options_string);
 
   std::cout << "Running test:<" << operation_name << ">\n";
 
@@ -109,8 +106,8 @@ int main(int argc, char* argv[]) try {
 
   using cfo::data_format_t;
 
-  if (options.dataFormat() == data_format_t::gui || options.dataFormat() == data_format_t::db ||
-      options.dataFormat() == data_format_t::json) {
+  if (options.format() == data_format_t::gui || options.format() == data_format_t::db ||
+      options.format() == data_format_t::json) {
     auto compare_result = artdaq::database::json::compare_json_objects(returned, expected);
     if (compare_result.first) {
       std::cout << "returned:\n" << returned << "\n";
@@ -140,7 +137,7 @@ int main(int argc, char* argv[]) try {
   std::cout << "First mismatch at position " << std::distance(expected.begin(), mismatch.first) << ", (exp,ret)=(0x"
             << std::hex << (unsigned int)*mismatch.first << ",0x" << (unsigned int)*mismatch.second << ")\n";
 
-  auto file_out_name = std::string(artdaq::database::mkdir(tmpdir))
+  auto file_out_name = std::string(db::filesystem::mkdir(tmpdir))
                            .append(argv[0])
                            .append("-")
                            .append(operation_name)

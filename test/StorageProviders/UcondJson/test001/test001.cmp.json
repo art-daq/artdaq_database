@@ -1,0 +1,77 @@
+{
+"document" : {
+"data" : {
+"daq" : {
+"event_builder" : {
+"expected_fragments_per_event" : "\" ddd \" \n \b \r AA \t",
+"first_fragment_receiver_rank" : 0,
+"fragment_receiver_count" : 2,
+"mpi_buffer_count" : 16,
+"print_event_store_stats" : true,
+"use_art" : true,
+"verbose" : false
+}
+}
+},
+"metadata" : {
+
+},
+"search" : [
+
+]
+},
+"version" : "ver001",
+"comments" : [
+
+],
+"origin" : {
+"source" : "template",
+"name" : "notprovided",
+"format" : "json",
+"created" : "Mon Feb  8 14:00:30 2016",
+"rawdata" : [
+
+]
+},
+"entities" : [
+
+],
+"configurations" : [
+
+],
+"changelog" : "notprovided",
+"bookkeeping" : {
+"isdeleted" : false,
+"isreadonly" : true,
+"updates" : [
+{
+"event" : "setCollection",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "testJSON_V001",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+}
+],
+"created" : "Mon Feb  8 14:00:30 2016"
+},
+"_id" : {
+"$oid" : "300e5432e543451e9012be1c"
+},
+"collection" : "testJSON_V001",
+"aliases" : {
+"active" : [
+
+],
+"history" : [
+
+]
+},
+"runs" : [
+
+],
+"attachments" : [
+
+],
+"configtype" : "notprovided"
+}

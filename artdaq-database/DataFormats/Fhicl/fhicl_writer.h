@@ -11,9 +11,6 @@ namespace artdaq {
 namespace database {
 namespace fhicl {
 
-namespace fcl = artdaq::database::fhicl;
-namespace jsn = artdaq::database::json;
-
 using namespace boost::spirit;
 
 template <typename Iter>

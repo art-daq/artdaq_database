@@ -56,14 +56,11 @@ struct fhicl_comments_parser_grammar : qi::grammar<Iter, comments_t(), qi::blank
 
     quoted_string_rule = '"' >> +(ascii::char_ - '"') >> '"';
 
-    padded_quoted_string_rule =
-        whitespace_b4quotedstring_rule >> *(quoted_string_rule >> whitespace_b4quotedstring_rule);
+    padded_quoted_string_rule = whitespace_b4quotedstring_rule >> *(quoted_string_rule >> whitespace_b4quotedstring_rule);
 
     string_rule = +(ascii::char_ - (eol | eoi));
 
-    comment_rule =
-        raw[string_rule]
-           [_val = construct<linenum_comment_t>(get_line_(begin(_1)), construct<std::string>(begin(_1), end(_1)))];
+    comment_rule = raw[string_rule][_val = construct<linenum_comment_t>(get_line_(begin(_1)), construct<std::string>(begin(_1), end(_1)))];
 
     comments_rule = (padded_quoted_string_rule >> whitespace_rule >> comment_rule) % eol;
   }
@@ -96,7 +93,6 @@ struct fhicl_includes_parser_grammar : qi::grammar<Iter, includes_t(), qi::blank
   qi::rule<Iter, include_t()> filename_rule;
   qi::rule<Iter, includes_t(), qi::blank_type> includes_rule;
 };
-namespace jsn = artdaq::database::json;
 
 struct FhiclReader final {
   bool read_data(std::string const&, jsn::object_t&);

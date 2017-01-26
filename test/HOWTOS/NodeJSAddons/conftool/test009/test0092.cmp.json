@@ -9,7 +9,7 @@
             "operation":"load",
             "filter":{
                "configurations.name":"configA005",
-               "configurable_entity.name":"DAQ_HOST_001"
+               "entities.name":"DAQ_HOST_001"
             }
          }
       },
@@ -22,7 +22,7 @@
             "operation":"load",
             "filter":{
                "configurations.name":"configA005",
-               "configurable_entity.name":"DAQ_HOST_002"
+               "entities.name":"DAQ_HOST_002"
             }
          }
       },
@@ -35,7 +35,7 @@
             "operation":"load",
             "filter":{
                "configurations.name":"configA005",
-               "configurable_entity.name":"DAQ_HOST_001"
+               "entities.name":"DAQ_HOST_001"
             }
          }
       },
@@ -48,7 +48,7 @@
             "operation":"load",
             "filter":{
                "configurations.name":"configA005",
-               "configurable_entity.name":"DAQ_HOST_002"
+               "entities.name":"DAQ_HOST_002"
             }
          }
       },
@@ -61,7 +61,7 @@
             "operation":"load",
             "filter":{
                "configurations.name":"configA005",
-               "configurable_entity.name":"DAQ_HOST_001"
+               "entities.name":"DAQ_HOST_001"
             }
          }
       },
@@ -74,7 +74,7 @@
             "operation":"load",
             "filter":{
                "configurations.name":"configA005",
-               "configurable_entity.name":"DAQ_HOST_002"
+               "entities.name":"DAQ_HOST_002"
             }
          }
       }

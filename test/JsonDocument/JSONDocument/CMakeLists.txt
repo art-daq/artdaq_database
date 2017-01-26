@@ -1,6 +1,6 @@
 cet_make_exec(JSONDocument_t
   LIBRARIES
-  artdaq-database_StackTrace
+  
   artdaq-database_JsonDocument
   ${BSONCXXLIB}
   ${CETLIB}

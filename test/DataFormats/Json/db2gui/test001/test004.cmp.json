@@ -1509,7 +1509,7 @@
 }
 ]
 },
-"configurable_entity" : {
+"entity" : {
 "name" : "notprovided"
 },
 "_id" : {

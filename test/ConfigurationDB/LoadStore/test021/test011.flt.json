@@ -1,9 +1,0 @@
-{
-   "configurable_entity":"ENTITY-@TEST_COLLECTION_NAME@",
-   "version":"@TEST_VERSION_NAME@",
-   "configuration":"@TEST_CONFIG_NAME@",
-   "collection":"@TEST_COLLECTION_NAME@",
-   "dbprovider":"@TEST_DBPROVIDER@",
-   "operation":"store",
-   "dataformat":"gui"
-}

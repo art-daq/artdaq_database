@@ -3,22 +3,17 @@
 #include "artdaq-database/ConfigurationDB/dboperation_manageconfigs.h"
 
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
-#include "artdaq-database/ConfigurationDB/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
+#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 
-#include "artdaq-database/ConfigurationDB/dispatch_filedb.h"
-#include "artdaq-database/ConfigurationDB/dispatch_mongodb.h"
+#include "artdaq-database/ConfigurationDB/configuration_dbproviders.h"
 
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 
-#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
-#include "artdaq-database/JsonDocument/JSONDocument_template.h"
-
-#include <boost/exception/diagnostic_information.hpp>
-
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
+#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -28,10 +23,9 @@
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
-namespace cfl = cf::literal;
-namespace cflo = cfl::operation;
-namespace cflp = cfl::provider;
 namespace cftd = cf::debug::detail;
+namespace jsonliteral = db::dataformats::literal;
+namespace apiliteral = db::configapi::literal;
 
 using cf::ManageConfigsOperation;
 using cf::options::data_format_t;
@@ -40,8 +34,8 @@ using Options = cf::ManageConfigsOperation;
 
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::basictypes::FhiclData;
-using artdaq::database::jsonutils::JSONDocument;
-using artdaq::database::jsonutils::JSONDocumentBuilder;
+using artdaq::database::docrecord::JSONDocument;
+using artdaq::database::docrecord::JSONDocumentBuilder;
 
 namespace artdaq {
 namespace database {
@@ -55,46 +49,42 @@ namespace database {
 namespace configuration {
 namespace detail {
 
-typedef JsonData (*provider_findglobalconfigs_t)(Options const& /*options*/, JsonData const& /*search_filter*/);
-typedef JsonData (*provider_buildconfigsearchfilter_t)(Options const& /*options*/, JsonData const& /*search_filter*/);
+typedef JsonData (*provider_findglobalconfigs_t)(Options const& /*options*/, JsonData const& /*task_payload*/);
+typedef JsonData (*provider_buildconfigsearchfilter_t)(Options const& /*options*/, JsonData const& /*task_payload*/);
 
-void find_global_configurations(Options const& options, std::string& configs) {
-  assert(configs.empty());
-  assert(options.operation().compare(cflo::findconfigs) == 0);
+void find_configurations(Options const& options, std::string& configs) {
+  confirm(configs.empty());
+  confirm(options.operation().compare(apiliteral::operation::findconfigs) == 0);
 
-  TRACE_(11, "find_global_configurations: begin");
-  TRACE_(11, "find_global_configurations args options=<" << options.to_string() << ">");
+  TRACE_(11, "find_configurations: begin");
+  TRACE_(11, "find_configurations args options=<" << options.to_string() << ">");
 
-  if (cf::not_equal(options.provider(), cflp::filesystem) && cf::not_equal(options.provider(), cflp::mongo)) {
-    TRACE_(11, "Error in find_global_configurations:"
-                   << " Invalid database provider; database provider=" << options.provider() << ".");
-
-    throw cet::exception("find_global_configurations")
-        << "Invalid database provider; database provider=" << options.provider() << ".";
-  }
+  validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers = std::map<std::string, provider_findglobalconfigs_t>{
-        {cflp::mongo, cf::mongo::findGlobalConfigs}, {cflp::filesystem, cf::filesystem::findGlobalConfigs}};
+        {apiliteral::provider::mongo, cf::mongo::findConfigurations},
+        {apiliteral::provider::filesystem, cf::filesystem::findConfigurations},
+        {apiliteral::provider::ucon, cf::ucon::findConfigurations}};
 
     return providers.at(name);
   };
 
   auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
+      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData().json_buffer);
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
 
-  switch (options.dataFormat()) {
+  switch (options.format()) {
     default:
     case data_format_t::db:
     case data_format_t::json:
     case data_format_t::unknown:
     case data_format_t::fhicl:
-    case data_format_t::xml:{
+    case data_format_t::xml: {
       if (!db::json_db_to_gui(search_result.json_buffer, returnValue)) {
-        throw cet::exception("find_global_configurations") << "Unsupported data format.";
+        throw runtime_error("find_configurations") << "Unsupported data format.";
       }
       break;
     }
@@ -104,49 +94,75 @@ void find_global_configurations(Options const& options, std::string& configs) {
       returnValueChanged = true;
       break;
     }
+
+    case data_format_t::csv: {
+      using namespace artdaq::database::json;
+      auto reader = JsonReader{};
+      object_t results_ast;
+
+      if (!reader.read(search_result.json_buffer, results_ast)) {
+        TRACE_(11, "find_configurations() Failed to create an AST from search results JSON.");
+
+        throw runtime_error("find_configurations") << "Failed to create an AST from search results JSON.";
+      }
+
+      auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
+
+      TRACE_(11, "find_configurations: found " << results_list.size() << " results.");
+
+      std::ostringstream os;
+
+      for (auto const& result_entry : results_list) {
+        auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
+        auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
+
+        TRACE_(11, "find_configurations() Found config=<" << value << ">.");
+
+        os << value << ", ";
+      }
+      returnValue = os.str();
+      returnValueChanged = true;
+      break;
+    }
   }
 
   if (returnValueChanged) configs.swap(returnValue);
 
-  TRACE_(11, "find_global_configurations: end");
+  TRACE_(11, "find_configurations: end");
 }
-void build_global_configuration_search_filter(Options const& options, std::string& filters) {
-  assert(filters.empty());
-  assert(options.operation().compare(cflo::buildfilter) == 0);
+void configuration_composition(Options const& options, std::string& filters) {
+  confirm(filters.empty());
+  confirm(options.operation().compare(apiliteral::operation::confcomposition) == 0);
 
-  TRACE_(12, "build_global_configuration_search_filter: begin");
-  TRACE_(11, "build_global_configuration_search_filter args options=<" << options.to_string() << ">");
+  TRACE_(12, "configuration_composition: begin");
+  TRACE_(11, "configuration_composition args options=<" << options.to_string() << ">");
 
-  if (cf::not_equal(options.provider(), cflp::filesystem) && cf::not_equal(options.provider(), cflp::mongo)) {
-    TRACE_(11, "Error in build_global_configuration_search_filter:"
-                   << " Invalid database provider; database provider=" << options.provider() << ".");
-
-    throw cet::exception("build_global_configuration_search_filter")
-        << "Invalid database provider; database provider=" << options.provider() << ".";
-  }
+  validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers = std::map<std::string, provider_buildconfigsearchfilter_t>{
-        {cflp::mongo, cf::mongo::buildConfigSearchFilter}, {cflp::filesystem, cf::filesystem::buildConfigSearchFilter}};
+        {apiliteral::provider::mongo, cf::mongo::configurationComposition},
+        {apiliteral::provider::filesystem, cf::filesystem::configurationComposition},
+        {apiliteral::provider::ucon, cf::ucon::configurationComposition}};
 
     return providers.at(name);
   };
 
   auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.search_filter_to_JsonData().json_buffer);
+      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData().json_buffer);
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
 
-  switch (options.dataFormat()) {
+  switch (options.format()) {
     default:
     case data_format_t::db:
     case data_format_t::json:
     case data_format_t::unknown:
-    case data_format_t::fhicl: 
-    case data_format_t::xml:{
+    case data_format_t::fhicl:
+    case data_format_t::xml: {
       if (!db::json_db_to_gui(search_result.json_buffer, returnValue)) {
-        throw cet::exception("build_global_configuration_search_filter") << "Unsupported data format.";
+        throw runtime_error("configuration_composition") << "Unsupported data format.";
       }
       break;
     }
@@ -160,7 +176,7 @@ void build_global_configuration_search_filter(Options const& options, std::strin
 
   if (returnValueChanged) filters.swap(returnValue);
 
-  TRACE_(11, "build_global_configuration_search_filter: end");
+  TRACE_(11, "configuration_composition: end");
 }
 }  // namespace detail
 }  // namespace configuration

@@ -1,10 +1,13 @@
 #include "artdaq-database/DataFormats/common.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
-#include "artdaq-database/DataFormats/common/shared_types.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
 #include "artdaq-database/DataFormats/Json/convertjson2guijson.h"
+#pragma GCC diagnostic pop
+ 
 #include "artdaq-database/DataFormats/Json/json_reader.h"
 #include "artdaq-database/DataFormats/Json/json_writer.h"
+#include "artdaq-database/DataFormats/Json/json_types_impl.h"
 
 #include <boost/variant/get.hpp>
 
@@ -14,6 +17,7 @@
 
 #define TRACE_NAME "FHJS:json2gui_C"
 
+
 using namespace artdaq::database::sharedtypes;
 using namespace artdaq::database::json;
 
@@ -22,36 +26,13 @@ using artdaq::database::json::gui2db;
 
 /*
  * http://stackoverflow.com/questions/21832701/does-json-syntax-allow-duplicate-keys-in-an-object
- * For now, to have a "better" compartibilty with FHICL I'll allow duplicate key names in JSON.
+ * For now, to have a "better" compartibilty with FHICL I'll allow duplicate key
+ * names in JSON.
 */
 
-template <>
-template <typename T>
-T const& unwrapper<const object_t>::value_as(std::string const& name) {
-  assert(!name.empty());
-
-  using V = typename std::remove_const<T>::type;
-
-  return boost::get<V>(any.at(name));
-}
-
-template <>
-template <typename T>
-T& unwrapper<object_t>::value_as(std::string const& name) {
-  assert(!name.empty());
-
-  return boost::get<T>(any.at(name));
-}
-
-template <>
-template <typename T>
-T& unwrapper<value_t>::value_as() {
-  return boost::get<T>(any);
-}
-
 std::string metadata_node_t::_string_value_of(std::string const& name) const {
-  assert(!name.empty());
-  assert(_node.type() == type_t::OBJECT);
+  confirm(!name.empty());
+  confirm(_node.type() == type_t::OBJECT);
 
   TRACE_(12, "json_db_to_gui() _string_value_of args name <" << name << ">");
 
@@ -62,8 +43,8 @@ std::string metadata_node_t::_string_value_of(std::string const& name) const {
 }
 
 json_node_t metadata_node_t::child(std::string const& name) const {
-  assert(!name.empty());
-  assert(_node.type() == type_t::OBJECT);
+  confirm(!name.empty());
+  confirm(_node.type() == type_t::OBJECT);
 
   TRACE_(13, "json_db_to_gui() child args name <" << name << ">");
 
@@ -80,11 +61,13 @@ json_node_t metadata_node_t::child(std::string const& name) const {
     object_t const& children = jcunwrap(value_table.at(literal::children));
     object_t const& child = jcunwrap(children.at(name));
     TRACE_(13, "json_db_to_gui() metadata node was found, name=<" << name << ">");
+    
     return {child};
   } catch (...) {
   }
 
   TRACE_(13, "json_db_to_gui() metadata node was not found, name=<" << name << ">");
+  
   return {false};
 }
 
@@ -93,13 +76,13 @@ bool metadata_node_t::hasMetadata() const { return _node.type() != type_t::NOTSE
 bool artdaq::database::json_db_to_gui(std::string const& db_json, std::string& gui_json) {
   TRACE_(10, "json_db_to_gui() begin");
 
-  assert(!db_json.empty());
-  assert(gui_json.empty());
+  confirm(!db_json.empty());
+  confirm(gui_json.empty());
 
   auto dbAST = object_t{};
 
   if (!JsonReader{}.read(db_json, dbAST)) {
-    throw cet::exception("json_db_to_gui") << "json_db_to_gui: Unable to read JSON buffer.";
+    throw runtime_error("json_db_to_gui") << "json_db_to_gui: Unable to read JSON buffer.";
   }
 
   TRACE_(10, "json_db_to_gui() read dbAST");
@@ -107,13 +90,13 @@ bool artdaq::database::json_db_to_gui(std::string const& db_json, std::string& g
   auto guiAST = object_t{};
   auto gui_node = json_node_t{guiAST};
 
-  auto& document = unwrap(dbAST).value_as<const object_t>(literal::document_node);
+  auto& document = unwrap(dbAST).value_as<const object_t>(literal::document);
 
   try {
-    db2gui{{unwrap(document).value_as<const object_t>(literal::data_node)},
-           {unwrap(document).value_as<const object_t>(literal::metadata_node)}}(gui_node);
+    db2gui{{unwrap(document).value_as<const object_t>(literal::data)},
+           {unwrap(document).value_as<const object_t>(literal::metadata)}}(gui_node);
 
-    guiAST.back().key = literal::gui_data_node;
+    guiAST.back().key = literal::gui_data;
 
     try {
       guiAST[literal::changelog] = unwrap(dbAST).value_as<std::string>(literal::changelog);
@@ -121,11 +104,12 @@ bool artdaq::database::json_db_to_gui(std::string const& db_json, std::string& g
       TRACE_(10, "json_db_to_gui() No changelog in dbAST");
     }
 
-    auto& doc_node = unwrap(dbAST).value_as<object_t>(literal::document_node);
+    auto& doc_node = unwrap(dbAST).value_as<object_t>(literal::document);
     doc_node[literal::converted] = object_t{};
     unwrap(doc_node).value_as<object_t>(literal::converted).swap(guiAST);
   } catch (...) {
     TRACE_(10, "json_db_to_gui() Uncaught exception:" << boost::current_exception_diagnostic_information());
+    
     throw;
   }
 
@@ -134,7 +118,7 @@ bool artdaq::database::json_db_to_gui(std::string const& db_json, std::string& g
   auto json = std::string();
 
   if (!JsonWriter{}.write(dbAST, json)) {
-    throw cet::exception("json_db_to_gui") << "Unable to write JSON buffer.";
+    throw runtime_error("json_db_to_gui") << "Unable to write JSON buffer.";
   }
 
   TRACE_(10, "json_db_to_gui() created gui_json");
@@ -224,8 +208,7 @@ void db2gui::operator()(json_node_t& gui_node) const {
         auto array_node = json_node_t{array};
 
         for (value_t const& value : data_node.value<array_t>()) {
-          TRACE_(11, "json_db_to_gui() operator() switch ARRAY child value=" << boost::apply_visitor(print_visitor(),
-                                                                                                     value));
+          TRACE_(11, "json_db_to_gui() operator() switch ARRAY child value=" << boost::apply_visitor(print_visitor(), value));
           const value_crt valcrt{value};
           db2gui{{valcrt}, {false}}(array_node);
         }
@@ -270,30 +253,30 @@ void db2gui::operator()(json_node_t& gui_node) const {
 bool artdaq::database::json_gui_to_db(std::string const& gui_json, std::string& db_json) {
   TRACE_(14, "json_gui_to_db() begin");
 
-  assert(!gui_json.empty());
-  assert(db_json.empty());
+  confirm(!gui_json.empty());
+  confirm(db_json.empty());
 
   auto guiAST = object_t{};
 
   if (!JsonReader{}.read(gui_json, guiAST)) {
-    throw cet::exception("json_gui_to_db") << "json_db_to_gui: Unable to read JSON buffer.";
+    throw runtime_error("json_gui_to_db") << "json_db_to_gui: Unable to read JSON buffer.";
   }
 
-  auto& gui_document = unwrap(guiAST).value_as<object_t>(literal::document_node);
+  auto& gui_document = unwrap(guiAST).value_as<object_t>(literal::document);
   auto& converted = unwrap(gui_document).value_as<object_t>(literal::converted);
 
   TRACE_(14, "json_gui_to_db() read guiAST");
 
   auto dbAST = object_t{};
 
-  dbAST[literal::document_node] = object_t{};
-  auto& db_document = unwrap(dbAST).value_as<object_t>(literal::document_node);
+  dbAST[literal::document] = object_t{};
+  auto& db_document = unwrap(dbAST).value_as<object_t>(literal::document);
 
-  db_document[literal::data_node] = object_t{};
-  auto& data = unwrap(db_document).value_as<object_t>(literal::data_node);
+  db_document[literal::data] = object_t{};
+  auto& data = unwrap(db_document).value_as<object_t>(literal::data);
 
-  db_document[literal::metadata_node] = object_t{};
-  auto& metadata = unwrap(db_document).value_as<object_t>(literal::metadata_node);
+  db_document[literal::metadata] = object_t{};
+  auto& metadata = unwrap(db_document).value_as<object_t>(literal::metadata);
 
   auto data_node = json_node_t(data);
   auto metadata_node = json_node_t(metadata);
@@ -301,7 +284,7 @@ bool artdaq::database::json_gui_to_db(std::string const& gui_json, std::string& 
   TRACE_(14, "json_gui_to_db() created dbAST");
 
   try {
-    auto const& gui_node = unwrap(converted.at(literal::gui_data_node)).value_as<array_t>();
+    auto const& gui_node = unwrap(converted.at(literal::gui_data)).value_as<array_t>();
     gui2db{gui_node}(data_node, metadata_node);
 
     try {
@@ -312,8 +295,8 @@ bool artdaq::database::json_gui_to_db(std::string const& gui_json, std::string& 
       TRACE_(14, "json_gui_to_db() No changelog in guiAST");
     }
 
-    unwrap(gui_document).value_as<object_t>(literal::data_node).swap(data);
-    unwrap(gui_document).value_as<object_t>(literal::metadata_node).swap(metadata);
+    unwrap(gui_document).value_as<object_t>(literal::data).swap(data);
+    unwrap(gui_document).value_as<object_t>(literal::metadata).swap(metadata);
     unwrap(gui_document).value_as<object_t>(literal::converted) = object_t{};
 
   } catch (...) {
@@ -326,7 +309,7 @@ bool artdaq::database::json_gui_to_db(std::string const& gui_json, std::string& 
   auto json = std::string();
 
   if (!JsonWriter{}.write(guiAST, json)) {
-    throw cet::exception("json_gui_to_db") << "Unable to write JSON buffer.";
+    throw runtime_error("json_gui_to_db") << "Unable to write JSON buffer.";
   }
 
   TRACE_(14, "json_gui_to_db() created db_json");
@@ -351,8 +334,7 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
       TRACE_(15, "json_gui_to_db() operator() switch ARRAY looping over children");
 
       for (value_t const& value : gui_node.value<array_t>()) {
-        TRACE_(15,
-               "json_gui_to_db() operator() switch ARRAY child value=" << boost::apply_visitor(print_visitor(), value));
+        TRACE_(15, "json_gui_to_db() operator() switch ARRAY child value=" << boost::apply_visitor(print_visitor(), value));
 
         if (value.type() == typeid(object_t)) {
           object_t const& child = jcunwrap(value);
@@ -364,11 +346,11 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
 
           std::string type_name = unwrap(child).value_as<const std::string>(literal::type);
 
-          if (type_name.compare(literal::table) == 0 && child.count(literal::value) == 1 &&
-              child.count(literal::children) == 0)
+          if (type_name.compare(literal::table) == 0 && child.count(literal::value) == 1 && child.count(literal::children) == 0)
             type_name = std::string{literal::string};
 
-          // auto const& node_name = unwrap( child ).value_as<const std::string>( literal::name );
+          // auto const& node_name = unwrap( child ).value_as<const std::string>(
+          // literal::name );
 
           TRACE_(15, "json_gui_to_db() operator() switch ARRAY child type=" << type_name);
 
@@ -378,12 +360,10 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
             auto children_metadata = json_node_t{metadata_node.makeChild<object_t, object_t>(child)};
 
             children_metadata.value_as<object_t>()[literal::type] = std::string{literal::sequence};
-            children_metadata.value_as<object_t>()[literal::comment] =
-                unwrap(child).value_as<const std::string>(literal::comment);
+            children_metadata.value_as<object_t>()[literal::comment] = unwrap(child).value_as<const std::string>(literal::comment);
 
             try {
-              children_metadata.value_as<object_t>()[literal::annotation] =
-                  unwrap(child).value_as<const std::string>(literal::annotation);
+              children_metadata.value_as<object_t>()[literal::annotation] = unwrap(child).value_as<const std::string>(literal::annotation);
             } catch (...) {
               children_metadata.value_as<object_t>()[literal::annotation] = std::string(literal::whitespace);
             }
@@ -394,14 +374,12 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
           } else if (type_name.compare(literal::table) == 0 || type_name.compare(literal::object) == 0) {
             auto new_metadata_node = json_node_t{metadata_node.makeChild<object_t, object_t>(child)};
             new_metadata_node.value_as<object_t>()[literal::type] = std::string{literal::table};
-            new_metadata_node.value_as<object_t>()[literal::comment] =
-                unwrap(child).value_as<const std::string>(literal::comment);
+            new_metadata_node.value_as<object_t>()[literal::comment] = unwrap(child).value_as<const std::string>(literal::comment);
             new_metadata_node.value_as<object_t>()[literal::children] = object_t{};
 
             auto const& children_node = unwrap(child).value_as<const array_t>(literal::children);
 
-            auto children_metadata =
-                json_node_t{boost::get<object_t>(new_metadata_node.value_as<object_t>().at(literal::children))};
+            auto children_metadata = json_node_t{boost::get<object_t>(new_metadata_node.value_as<object_t>().at(literal::children))};
             auto children_data = json_node_t{data_node.makeChild<object_t, object_t>(child)};
 
             TRACE_(15, "json_gui_to_db() operator() switch ARRAY table");
@@ -410,17 +388,15 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
           } else {
             auto const& child_value = child.at(literal::value);
             auto const& node_name = unwrap(child).value_as<const std::string>(literal::name);
-            TRACE_(15, "json_gui_to_db() operator() switch ARRAY child name= "
-                           << node_name << ", value=" << boost::apply_visitor(print_visitor(), child_value));
+            TRACE_(15, "json_gui_to_db() operator() switch ARRAY child name= " << node_name
+                                                                               << ", value=" << boost::apply_visitor(print_visitor(), child_value));
 
             auto new_metadata_node = json_node_t{metadata_node.makeChild<object_t, object_t>(child)};
             new_metadata_node.value_as<object_t>()[literal::type] = type_name;
-            new_metadata_node.value_as<object_t>()[literal::comment] =
-                unwrap(child).value_as<const std::string>(literal::comment);
-            new_metadata_node.value_as<object_t>()[literal::annotation] =
-                unwrap(child).value_as<const std::string>(literal::annotation);
+            new_metadata_node.value_as<object_t>()[literal::comment] = unwrap(child).value_as<const std::string>(literal::comment);
+            new_metadata_node.value_as<object_t>()[literal::annotation] = unwrap(child).value_as<const std::string>(literal::annotation);
 
-            data_node.value_as<object_t>().push_back(data_t{node_name,child_value});
+            data_node.value_as<object_t>().push_back(data_t{node_name, child_value});
           }
         } else if (value.type() == typeid(array_t)) {
           data_node.value_as<array_t>().push_back(value);
@@ -437,8 +413,9 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
 void artdaq::database::json::debug::enableJSON2GUIJSON() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::JSON2GUIJSON trace_enable");
-}
+}  
+

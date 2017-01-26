@@ -1,8 +1,8 @@
 #include "artdaq-database/DataFormats/common.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 
 #include "artdaq-database/DataFormats/Xml/convertxml2json.h"
 #include "artdaq-database/DataFormats/Xml/xml_writer.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
@@ -23,24 +23,24 @@ namespace literal = artdaq::database::dataformats::literal;
 
 template <typename T>
 bool is_leaf_type(T& leaf) {
-  assert(!leaf.value.empty());
+  confirm(!leaf.value.empty());
   return jsn::type(leaf.value) == jsn::type_t::VALUE;
 }
 
 template <typename T>
 std::string leaf_string_value(T& leaf) {
-  assert(!leaf.value.empty());
+  confirm(!leaf.value.empty());
   return boost::apply_visitor(jsn::tostring_visitor(), leaf.value);
 }
 
 bool XmlWriter::write(jsn::object_t const& json_object, std::string& out) {
-  assert(out.empty());
-  assert(!json_object.empty());
+  confirm(out.empty());
+  confirm(!json_object.empty());
 
   TRACE_(2, "write() begin");
 
   try {
-    auto const& json_tree = boost::get<jsn::object_t>(json_object.at(literal::data_node));
+    auto const& json_tree = boost::get<jsn::object_t>(json_object.at(literal::data));
 
     pt::ptree xml_tree;
 
@@ -66,9 +66,8 @@ bool XmlWriter::write(jsn::object_t const& json_object, std::string& out) {
 
     auto buffer = sout.str();
 
-    if(buffer.empty())
-      return false;
-    
+    if (buffer.empty()) return false;
+
     out.swap(buffer);
 
     TRACE_(2, "write() end");
@@ -85,8 +84,8 @@ bool XmlWriter::write(jsn::object_t const& json_object, std::string& out) {
 void artdaq::database::xml::debug::enableXmlWriter() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::xml::XmlWriter trace_enable");
 }

@@ -39,12 +39,12 @@ class DatabaseConfigurationInterface : public ConfigurationInterface {
   std::set<std::string /*name*/> findAllGlobalConfigurations() const throw(std::runtime_error);
 
   // return the contents of a global configuration
-  config_version_map_t loadGlobalConfiguration(std::string const& /*globalConfiguration*/) const
+  config_version_map_t loadGlobalConfiguration(std::string const& /*configuration*/) const
       throw(std::runtime_error);
 
   // create a new global configuration from the contents map
   void storeGlobalConfiguration(config_version_map_t const& /*configurationMap*/,
-                                std::string const& /*globalConfiguration*/) const throw(std::runtime_error);
+                                std::string const& /*configuration*/) const throw(std::runtime_error);
 
  private:
 };

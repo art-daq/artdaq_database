@@ -9,7 +9,7 @@
 
 #include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
 
-#include "artdaq-database/DataFormats/common/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 
 #include "artdaq-database/BasicTypes/base64.h"
 
@@ -17,7 +17,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "BTYPES:FhiclData_C"
+#define TRACE_NAME "BTPS:FhiclData_C"
 
 namespace regex {
 constexpr auto parse_base64data = "[\\s\\S]*\"base64\"\\s*:\\s*\"(\\S*?)\"";
@@ -31,22 +31,22 @@ template <>
 bool JsonData::convert_to(FhiclData& fhicl) const {
   using artdaq::database::fhicljson::json_to_fhicl;
 
-  return json_to_fhicl(json_buffer, fhicl.fhicl_buffer);
+  return json_to_fhicl(json_buffer, fhicl.fhicl_buffer, fhicl.fhicl_file_name);
 }
 
 template <>
 bool JsonData::convert_from(FhiclData const& fhicl) {
   using artdaq::database::fhicljson::fhicl_to_json;
 
-  return fhicl_to_json(fhicl.fhicl_buffer, json_buffer);
+  return fhicl_to_json(fhicl.fhicl_buffer, fhicl.fhicl_file_name, json_buffer);
 }
 
 FhiclData::FhiclData(std::string const& buffer) : fhicl_buffer{buffer} {}
 
 FhiclData::FhiclData(JsonData const& document) {
   namespace literal = artdaq::database::dataformats::literal;
-  
-  assert(!document.json_buffer.empty());
+
+  confirm(!document.json_buffer.empty());
 
   TRACE_(1, "FHICL document=" << document.json_buffer);
 
@@ -55,12 +55,16 @@ FhiclData::FhiclData(JsonData const& document) {
   auto results = std::smatch();
 
   if (!std::regex_search(document.json_buffer, results, ex))
-    throw ::fhicl::exception(::fhicl::parse_error, literal::document_node)
-        << ("JSON to FHICL convertion error, regex_search()==false; JSON buffer: " + document.json_buffer);
+    throw ::fhicl::exception(::fhicl::parse_error, literal::document)
+        << ("JSON to FHICL convertion error, regex_search()==false; JSON "
+            "buffer: " +
+            document.json_buffer);
 
   if (results.size() != 1)
-    throw ::fhicl::exception(::fhicl::parse_error, literal::document_node)
-        << ("JSON to FHICL convertion error, regex_search().size()!=1; JSON buffer: " + document.json_buffer);
+    throw ::fhicl::exception(::fhicl::parse_error, literal::document)
+        << ("JSON to FHICL convertion error, regex_search().size()!=1; JSON "
+            "buffer: " +
+            document.json_buffer);
 
   auto base64 = std::string(results[0]);
   TRACE_(2, "FHICL base64=" << base64);
@@ -75,14 +79,13 @@ FhiclData::FhiclData(JsonData const& document) {
 
 FhiclData::operator JsonData() const {
   namespace literal = artdaq::database::dataformats::literal;
-  
+
   TRACE_(5, "FHICL fhicl=" << fhicl_buffer);
 
   auto json = JsonData("");
 
   if (!json.convert_from(*this))
-    throw ::fhicl::exception(::fhicl::parse_error, literal::data_node)
-        << ("FHICL to JSON convertion error; FHICL buffer: " + this->fhicl_buffer);
+    throw ::fhicl::exception(::fhicl::parse_error, literal::data) << ("FHICL to JSON convertion error; FHICL buffer: " + this->fhicl_buffer);
 
   TRACE_(6, "FHICL  json=" << json.json_buffer);
 
@@ -108,8 +111,8 @@ std::istream& operator>>(std::istream& is, FhiclData& data) {
 }
 
 std::ostream& operator<<(std::ostream& os, FhiclData const& data) {
-    os << data.fhicl_buffer;
-    return os;
+  os << data.fhicl_buffer;
+  return os;
 }
 
 }  // namespace basictypes

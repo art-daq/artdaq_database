@@ -1,15 +1,6 @@
 #ifndef _ARTDAQ_DATABASE_CONFIGURATIONDB_COMMON_H_
 #define _ARTDAQ_DATABASE_CONFIGURATIONDB_COMMON_H_
 
-#include <cassert>
-#include <ctime>
-#include <iostream>
-#include <memory>
-#include <tuple>
-#include <type_traits>
-#include <vector>
-#include "trace.h"
-
-#include <boost/core/demangle.hpp>
+#include "artdaq-database/SharedCommon/common.h"
 
 #endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_COMMON_H_ */

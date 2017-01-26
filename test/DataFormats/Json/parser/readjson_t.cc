@@ -1,7 +1,6 @@
 #include "test/common.h"
 
 #include "artdaq-database/DataFormats/Json/json_common.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
 
 namespace bpo = boost::program_options;
 using namespace artdaq::database;

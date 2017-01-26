@@ -2,8 +2,7 @@
 #define _ARTDAQ_DATABASE_DATAFORMATS_JSON_CONVERTJSON2JSONGUI_H_
 
 #include "artdaq-database/DataFormats/common.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
-
+#include "artdaq-database/DataFormats/shared_literals.h"
 #include "artdaq-database/DataFormats/Json/json_types.h"
 
 namespace artdaq {
@@ -67,26 +66,28 @@ class json_node_t final {
 
   template <typename T>
   T const& value_as() const {
-    assert(!_any.empty());
+    confirm(!_any.empty());
 
     if (_any.which() == 0) {
       auto& value = boost::get<json_any_ref_t>(_any);
       TRACE_(2, "json_node_t() value_as() any.which()=" << _any.which() << " const value.which()=" << value.which());
+      
       return boost::get<T&>(value);
     } else if (_any.which() == 1) {
       auto& value = boost::get<json_any_cref_t>(_any);
-      TRACE_(2, "json_node_t() value_as() const any.which()=" << _any.which()
-                                                              << " const value.which()=" << value.which());
+      TRACE_(2, "json_node_t() value_as() const any.which()=" << _any.which() << " const value.which()=" << value.which());
+      
       return boost::get<T const&>(value);
     }
 
-    throw cet::exception("json_node_t") << "Value was not set";
+    throw runtime_error("json_node_t") << "Value was not set";
   }
 
   template <typename T>
   T& value_as() {
-    assert(!_any.empty());
-    assert(_any.which() == 0);
+    confirm(!_any.empty());
+    confirm(_any.which() == 0);
+    
     auto& value = boost::get<json_any_ref_t>(_any);
 
     TRACE_(2, "json_node_t() value_as() any.which()=" << _any.which() << " value.which()=" << value.which());
@@ -98,7 +99,7 @@ class json_node_t final {
   T& makeChild(O const& o) {
     using namespace artdaq::database::sharedtypes;
 
-    assert(type() == type_t::OBJECT || type() == type_t::ARRAY);
+    confirm(type() == type_t::OBJECT || type() == type_t::ARRAY);
 
     auto const node_name = unwrap(o).value_as<const std::string>(literal::name);
 
@@ -116,14 +117,14 @@ class json_node_t final {
       return unwrap(array.back()).value_as<T>();
     }
 
-    throw cet::exception("json_node_t") << "Value was not created";
+    throw runtime_error("json_node_t") << "Value was not created";
   }
 
   template <typename T, typename O>
   T& makeChildOfChildren(O const& o) {
     using namespace artdaq::database::sharedtypes;
 
-    assert(type() == type_t::OBJECT || type() == type_t::ARRAY);
+    confirm(type() == type_t::OBJECT || type() == type_t::ARRAY);
     TRACE_(16, "json_node_t() makeChildOfChildren() node_name=<children>");
 
     object_t& object = value_as<object_t>();
@@ -133,7 +134,7 @@ class json_node_t final {
   }
 
   type_t type() const {
-    assert(!_any.empty());
+    confirm(!_any.empty());
 
     if (_any.which() == 0)
       return boost::apply_visitor(type_visitor(), boost::get<json_any_ref_t>(_any));
@@ -170,8 +171,7 @@ json_node_t json_node_t::make_json_node(T const& t) {
 
 class db2gui final {
  public:
-  explicit db2gui(json_node_t data_node, json_node_t metadata_node)
-      : _data_node{std::move(data_node)}, _metadata_node{std::move(metadata_node)} {}
+  explicit db2gui(json_node_t data_node, json_node_t metadata_node) : _data_node{std::move(data_node)}, _metadata_node{std::move(metadata_node)} {}
 
   void operator()(json_node_t&) const;
 

@@ -8,7 +8,7 @@
             "dataformat":"gui",
             "operation":"findversions",
             "filter":{
-               "configurable_entity.name":"findentities-@CONFIG_NUMBER@-A"
+               "entities.name":"findentities-@CONFIG_NUMBER@-A"
             }
          }
       },
@@ -20,7 +20,7 @@
             "dataformat":"gui",
             "operation":"findversions",
             "filter":{
-               "configurable_entity.name":"findentities-@CONFIG_NUMBER@-B"
+               "entities.name":"findentities-@CONFIG_NUMBER@-B"
             }
          }
       }

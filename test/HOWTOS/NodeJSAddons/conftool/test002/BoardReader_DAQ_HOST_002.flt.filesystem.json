@@ -1,8 +1,8 @@
 {"filter":{
- "configurable_entity.name":"DAQ_HOST_002"
+ "entities.name":"DAQ_HOST_002"
 }, 
 "collection":"artdaq_BoardReader",
-"configurable_entity":"DAQ_HOST_002",
+"entity":"DAQ_HOST_002",
 "configuration":"configA001",
 "dbprovider":"filesystem",
 "operation":"load"

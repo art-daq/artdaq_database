@@ -2,7 +2,7 @@
  
 "version":"version002",
 "collection":"artdaq_Aggregator",
-"configurable_entity":"DAQ_HOST_002",
+"entity":"DAQ_HOST_002",
 "dbprovider":"mongo",
 "operation":"store",
 "dataformat":"gui"

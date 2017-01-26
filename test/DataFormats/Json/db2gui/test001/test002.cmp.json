@@ -821,7 +821,7 @@
 }
 ]
 },
-"configurable_entity" : {
+"entity" : {
 "name" : "EventBuilder_topol"
 },
 "changelog" : "Edit: comment"

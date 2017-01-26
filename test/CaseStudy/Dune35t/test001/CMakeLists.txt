@@ -1,14 +1,15 @@
 cet_make_exec(ImportDune35tData_t
   LIBRARIES
-  artdaq-database_StackTrace  
+    
   artdaq-database_BasicTypes
-  artdaq-database_DataFormats_common
+  
   artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
   artdaq-database_ConfigurationDB
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
+  artdaq-database_StorageProviders_UconDB
   ${FHICLCPP}
   ${CETLIB}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}  

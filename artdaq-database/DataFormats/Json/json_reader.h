@@ -3,7 +3,6 @@
 
 #include "artdaq-database/DataFormats/Json/json_types.h"
 #include "artdaq-database/DataFormats/common.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
 
 #include <boost/spirit/include/qi.hpp>
 
@@ -16,12 +15,11 @@ using namespace boost::spirit;
 template <typename Iter>
 struct json_parser_grammar : qi::grammar<Iter, object_t(), ascii::space_type> {
   json_parser_grammar() : json_parser_grammar::base_type(start) {
-    
     escape_rule = ascii::char_('\\') >> ascii::char_("\\\"bfnrt");
-    
+
     text_string = +(escape_rule | ~ascii::char_('"'));
-    
-    quoted_string =  qi::lexeme['"' >> *text_string >> '"'];
+
+    quoted_string = qi::lexeme['"' >> *text_string >> '"'];
 
     object_rule = '{' >> -(data_rule % ',') >> '}';
 
@@ -49,8 +47,8 @@ struct json_parser_grammar : qi::grammar<Iter, object_t(), ascii::space_type> {
   qi::rule<Iter, data_t(), ascii::space_type> data_rule;
   qi::rule<Iter, object_t(), ascii::space_type> start, object_rule;
   qi::rule<Iter, array_t(), ascii::space_type> array_rule;
-  qi::rule< Iter, std::string() > text_string;
-  qi::rule< Iter, std::string() > escape_rule;
+  qi::rule<Iter, std::string()> text_string;
+  qi::rule<Iter, std::string()> escape_rule;
 };
 
 struct JsonReader final {

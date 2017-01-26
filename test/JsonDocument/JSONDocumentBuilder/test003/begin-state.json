@@ -1,52 +1,70 @@
 {
-   "document":{
-      "data":{
-            "aa": 3,
-            "b": {
-                "c": "2",
-                "dd": [
-                    2,
-                    5,
-                    6,
-                    7
-                ]
-            }
-      },
-      "metadata":{
-         "comments":{
-            "empty":"empty"
-         }
-      },
-      "search":[
-         {
-            "name":"find any",
-            "query":"not defined"
-         }
-      ]
-   },
-   "version":"version1",   
-   "origin":{
-      "encoding":"base64",
-      "format":"json",
-      "rawdata":"as"
-   },   
-   "configurations":[
-      "config1"
-   ],
-   "aliases":{
-      "active":[
+"document" : {
+"data" : {
+"aa" : 3,
+"b" : {
+"c" : "2",
+"dd" : [
+2,
+5,
+6,
+7
+]
+}
+},
+"metadata" : {
+"comments" : {
+"empty" : "empty"
+}
+},
+"search" : [
 
-      ],
-      "history":[
+]
+},
+"comments" : [
 
-      ]
-   },
-   "bookkeeping":{
-      "isdeleted":false,
-      "isreadonly":true,
-      "created":"Tue Dec 29 18:19:25 2015",
-      "updates":[
-         "Tue Dec 29 18:19:25 2015"
-      ]
-   }
+],
+"origin" : {
+"format" : "json",
+"source" : "template",
+"name" : "demo001",
+"created" : "Fri Jan 13 18:31:51 2017",
+"rawdata" : [
+
+]
+},
+"version" : "test001",
+"entities" : [
+
+],
+"configurations" : [
+
+],
+"changelog" : "testupdates",
+"bookkeeping" : {
+"isdeleted" : false,
+"isreadonly" : false,
+"updates" : [
+
+],
+"created" : "Fri Jan 13 18:31:51 2017"
+},
+"_id" : {
+"_oid" : "9bfe155c84d44ba3bbff3fb8"
+},
+"collection" : "test",
+"aliases" : {
+"active" : [
+
+],
+"history" : [
+
+]
+},
+"runs" : [
+
+],
+"attachments" : [
+
+]
 }

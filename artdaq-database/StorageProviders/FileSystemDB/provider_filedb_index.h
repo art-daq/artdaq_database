@@ -30,7 +30,7 @@ class SearchIndex final {
   std::vector<std::pair<std::string, std::string>> findVersionsByGlobalConfigName(JsonData const&);
   std::vector<std::pair<std::string, std::string>> findVersionsByEntityName(JsonData const&);
 
-  std::vector<std::string> findConfigEntities(JsonData const&);
+  std::vector<std::string> findEntities(JsonData const&);
 
   bool addDocument(JsonData const&, object_id_t const&);
   bool removeDocument(JsonData const&, object_id_t const&);
@@ -44,26 +44,26 @@ class SearchIndex final {
  private:
   void _addVersion(object_id_t const&, std::string const&);
   void _addConfiguration(object_id_t const&, std::string const&);
-  void _addConfigurableEntity(object_id_t const&, std::string const&);
+  void _addEntity(object_id_t const&, std::string const&);
 
   void _removeVersion(object_id_t const&, std::string const&);
   void _removeConfiguration(object_id_t const&, std::string const&);
-  void _removeConfigurableEntity(object_id_t const&, std::string const&);
-  std::vector<object_id_t> _matchVersion(std::string const&);
-  std::vector<object_id_t> _matchConfiguration(std::string const&);
-  std::vector<object_id_t> _matchConfigurableEntity(std::string const&);
-  std::vector<object_id_t> _matchObjectId(std::string const&);
-  std::vector<object_id_t> _matchObjectIds(std::string const&);
+  void _removeentity(object_id_t const&, std::string const&);
+  std::vector<object_id_t> _matchVersion(std::string const&) const;
+  std::vector<object_id_t> _matchConfiguration(std::string const&) const;
+  std::vector<object_id_t> _matchentity(std::string const&) const;
+  std::vector<object_id_t> _matchObjectId(std::string const&) const;
+  std::vector<object_id_t> _matchObjectIds(std::string const&) const;
 
   void _build_ouid_map(std::map<std::string, std::string>&, std::string const&) const;
 
   template <typename TYPE>
-  void _make_unique_sorted(jsn::array_t&);
+  void _make_unique_sorted(jsn::array_t&) const;
 
   std::vector<std::pair<std::string, std::string>> _indexed_filtered_innerjoin_over_ouid(std::string const&,
                                                                                          std::string const&,
                                                                                          std::string const&) const;
-  std::vector<std::string> _filtered_attribute_list(std::string const& attribute, std::string const& attribute_with);
+  std::vector<std::string> _filtered_attribute_list(std::string const& attribute, std::string const& attribute_with) const;
 
  private:
   bool _open(boost::filesystem::path const&);
@@ -81,7 +81,7 @@ class SearchIndex final {
 bool shouldAutoRebuildSearchIndex(bool = false);
 
 template <typename TYPE>
-void SearchIndex::_make_unique_sorted(jsn::array_t& ouids) {
+void SearchIndex::_make_unique_sorted(jsn::array_t& ouids) const{
   auto tmp = std::vector<std::string>{};
 
   tmp.reserve(ouids.size());

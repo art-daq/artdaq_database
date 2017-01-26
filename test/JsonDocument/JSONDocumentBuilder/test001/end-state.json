@@ -1,53 +1,68 @@
 {
-    "document" : {
-        "data" : {
-            "a" : 1, 
-            "b" : {
-                "c" : "2", 
-                "dd" : [
-                    2, 
-                    5, 
-                    6, 
-                    7
-                ]
-            }
-        }, 
-        "metadata" : {
-            "comments" : {
-                "empty" : "empty"
-            }
-        }, 
-        "search" : [
-            {
-                "name" : "find any", 
-                "query" : "not defined"
-            }
-        ]
-    }, 
-    "origin" : {
-          
-        "format" : "json" 
-         
-    }, 
-    "version" : "default", 
-    "configurations" : [
+"document" : {
+"data" : {
+"a" : 1,
+"b" : {
+"c" : "2",
+"dd" : [
+2,
+5,
+6,
+7
+]
+}
+},
+"metadata" : {
 
-    ], 
-    "aliases" : {
-        "active" : [
+},
+"search" : [
 
-        ], 
-        "history" : [
+]
+},
+"comments" : [
 
-        ]
-    }, 
-    "changelog" : "empty", 
-    "bookkeeping" : {
-        "isdeleted" : false, 
-        "isreadonly" : true, 
-        "created" : "Tue Dec 29 18:19:25 2015", 
-        "updates" : [
+],
+"origin" : {
+"source" : "template",
+"name" : "notprovided",
+"format" : "json",
+"created" : "Fri Jan 13 18:28:16 2017",
+"rawdata" : [
 
-        ]
-    }
+]
+},
+"version" : "notprovided",
+"entities" : [
+
+],
+"configurations" : [
+
+],
+"changelog" : "notprovided",
+"bookkeeping" : {
+"isdeleted" : false,
+"isreadonly" : false,
+"updates" : [
+
+],
+"created" : "Fri Jan 13 18:28:16 2017"
+},
+"_id" : {
+"_oid" : "ee9ae91817d84c268e071e39"
+},
+"collection" : "notprovided",
+"aliases" : {
+"active" : [
+
+],
+"history" : [
+
+]
+},
+"runs" : [
+
+],
+"attachments" : [
+
+]
 }

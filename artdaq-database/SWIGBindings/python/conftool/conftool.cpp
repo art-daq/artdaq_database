@@ -1,15 +1,43 @@
-#include "conftool.h"
 #include "artdaq-database/ConfigurationDB/configurationdb.h"
+#include "conftool.h"
 
 namespace impl = artdaq::database::configuration::json;
 
-result_pair_t load_configuration(std::string const& search_filter) {auto conf= std::string{}; return impl::load_configuration(search_filter,conf);}
-result_pair_t store_configuration(std::string const& search_filter, std::string const& json_document) {return impl::store_configuration(search_filter,json_document);}
-result_pair_t find_global_configurations(std::string const& search_filter) {return  impl::find_global_configurations(search_filter); }
-result_pair_t build_global_configuration_search_filter(std::string const& search_filter) {return impl::build_global_configuration_search_filter(search_filter);}
-result_pair_t add_configuration_to_global_configuration(std::string const& search_filter) {return impl::add_configuration_to_global_configuration(search_filter);}
-result_pair_t create_new_global_configuration(std::string const& search_filter) {return impl::create_new_global_configuration(search_filter);}
-result_pair_t find_configuration_versions(std::string const& search_filter) {return impl::find_configuration_versions(search_filter);}
-result_pair_t find_configuration_entities(std::string const& search_filter) {return impl::find_configuration_entities(search_filter);} 
-result_pair_t load_globalconfiguration(std::string const& search_filter) {auto conf= std::string{}; return impl::load_globalconfiguration(search_filter,conf);}
-result_pair_t store_globalconfiguration(std::string const& search_filter, std::string const& json_document) {return impl::store_globalconfiguration(search_filter,json_document);}
+result_t read_document(std::string const& query_payload) {
+  auto conf = std::string{};
+  return impl::read_document(query_payload, conf);
+}
+
+result_t write_document(std::string const& query_payload, std::string const& json_document) {
+  return impl::write_document(query_payload, json_document);
+}
+
+result_t find_configurations(std::string const& query_payload) { return impl::find_configurations(query_payload); }
+
+result_t configuration_composition(std::string const& query_payload) {
+  return impl::configuration_composition(query_payload);
+}
+
+result_t assign_configuration(std::string const& query_payload) { return impl::assign_configuration(query_payload); }
+
+result_t create_configuration(std::string const& query_payload) { return impl::create_configuration(query_payload); }
+
+result_t find_versions(std::string const& query_payload) { return impl::find_versions(query_payload); }
+
+result_t find_entities(std::string const& query_payload) { return impl::find_entities(query_payload); }
+
+result_t read_configuration(std::string const& query_payload) {
+  auto conf = std::string{};
+  return impl::read_configuration(query_payload, conf);
+}
+
+void enable_trace(){
+  return impl::enable_trace();
+}
+result_t write_configuration(std::string const& query_payload, std::string const& json_document) {
+  return impl::write_configuration(query_payload, json_document);
+}
+
+result_t list_databases(std::string const& query_payload) { return impl::list_databases(query_payload); }
+
+result_t read_dbinfo(std::string const& query_payload) { return impl::read_dbinfo(query_payload); }

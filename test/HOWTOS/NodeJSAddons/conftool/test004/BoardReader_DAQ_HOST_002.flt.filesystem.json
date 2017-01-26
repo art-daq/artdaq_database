@@ -1,7 +1,7 @@
 { 
 "version":"version002",
 "collection":"artdaq_BoardReader",
-"configurable_entity":"DAQ_HOST_002",
+"entity":"DAQ_HOST_002",
 "dbprovider":"filesystem",
 "operation":"store",
 "dataformat":"gui"

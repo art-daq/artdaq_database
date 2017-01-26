@@ -1,8 +1,5 @@
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
-#include "artdaq-database/JsonDocument/JSONDocument_template.h"
 #include "artdaq-database/JsonDocument/common.h"
-
-#include <ctime>
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -10,367 +7,275 @@
 
 #define TRACE_NAME "JSNU:DocuBldr_C"
 
-namespace artdaq {
-namespace database {
-namespace jsonutils {
+using artdaq::database::json::object_t;
+using artdaq::database::json::value_t;
+using artdaq::database::json::array_t;
+using artdaq::database::json::type_t;
+using artdaq::database::ThrowOnFailure;
+using artdaq::database::result_t;
 
-constexpr auto name = "\"name\"";
-constexpr auto assigned = "\"assigned\"";
-constexpr auto colon = ":";
-constexpr auto quote = "\"";
-constexpr auto comma = ",";
+using namespace artdaq::database::docrecord;
 
-std::string quoted_(std::string const& text) { return "\"" + text + "\""; }
-std::string operator"" _quoted(const char* text, std::size_t) { return "\"" + std::string(text) + "\""; }
+namespace db = artdaq::database;
+namespace utl = db::docrecord;
+namespace ovl = db::overlay;
 
-bool useFakeTime(bool useFakeTime = false) {
-  static bool _useFakeTime = useFakeTime;
-  return _useFakeTime;
+namespace dbdr = artdaq::database::docrecord;
+
+namespace jsonliteral = artdaq::database::dataformats::literal;
+
+JSONDocumentBuilder::JSONDocumentBuilder()
+    : _document(std::string(template__empty_document)),
+      _overlay(std::make_unique<ovlDatabaseRecord>(_document._value)),
+      _initOK(init()) {}
+
+JSONDocumentBuilder::JSONDocumentBuilder(JSONDocument const& document)
+    : _document(document), _overlay(std::make_unique<ovlDatabaseRecord>(_document._value)), _initOK(init()) {}
+
+bool JSONDocumentBuilder::init() {
+  auto buff[[gnu::unused]] = _document.writeJson();
+  TRACE_(3, "JSONDocumentBuilder::init() new document=<" << buff << ">");
+  return true;
 }
 
-std::string timestamp() {
-  std::time_t now = std::time(nullptr);
-  auto result = std::string(std::asctime(std::localtime(&now)));
-  result.pop_back();
-
-  if (useFakeTime()) return "Mon Feb  8 14:00:30 2016";
-
-  return result;
-}
-
-JSONDocumentBuilder::JSONDocumentBuilder() : _document(template__empty_document) {}
-
-JSONDocumentBuilder::JSONDocumentBuilder(JSONDocument const& document) : _document(document) {}
-
-JSONDocument JSONDocumentBuilder::_makeAlias(JSONDocument const& newAlias) const {
-  std::stringstream ss;
-
-  ss << '{';
-  ss << "name"_quoted << colon << quoted_(JSONDocument::value(newAlias));
-  ss << '}';
-
-  TRACE_(10, "_makeAlias() activeAlias<" << ss.str() << ">");
-
-  return {ss.str()};
-}
-
-JSONDocument JSONDocumentBuilder::_makeObjectId(JSONDocument const& objectId) const {
-  std::stringstream ss;
-
-  ss << '{';
-  ss << "_oid"_quoted << colon << quoted_(JSONDocument::value(objectId));
-  ss << '}';
-
-  TRACE_(10, "_makeObjectId() objectId<" << ss.str() << ">");
-
-  return {ss.str()};
-}
-
-JSONDocument JSONDocumentBuilder::_makeaddToGlobalConfig(JSONDocument const& config) const {
-  std::stringstream ss;
-  ss << '{';
-  ss << "name"_quoted << colon << quoted_(JSONDocument::value(config));
-  ss << comma;
-  ss << "assigned"_quoted << colon << quoted_(timestamp());
-  ss << '}';
-
-  TRACE_(10, "_makeaddToGlobalConfig() globalConfig<" << ss.str() << ">");
-
-  return {ss.str()};
-}
-
-JSONDocument JSONDocumentBuilder::_makeActiveAlias(JSONDocument const& newAlias) const {
-  std::stringstream ss;
-  ss << '{';
-  ss << "name"_quoted << colon << quoted_(JSONDocument::value(newAlias));
-  ss << comma;
-  ss << "assigned"_quoted << colon << quoted_(timestamp());
-  ss << '}';
-
-  TRACE_(10, "_makeActiveAlias() activeAlias<" << ss.str() << ">");
-
-  return {ss.str()};
-}
-
-JSONDocument JSONDocumentBuilder::_makeHistoryAlias(JSONDocument const& activeAlias) const {
-  std::stringstream ss;
-  ss << '{';
-  ss << "removed"_quoted << colon << quoted_(timestamp());
-  ss << '}';
-
-  auto historyAlias = JSONDocument{JSONDocument::value_at(activeAlias, 0)};
-
-  historyAlias.insertChild({ss.str()}, "removed");
-
-  TRACE_(10, "_makeHistoryAlias() historyAlias<" << historyAlias << ">");
-
-  return historyAlias;
-}
-
-JSONDocument JSONDocumentBuilder::_makeReadonly() const {
-  std::stringstream ss;
-
-  ss << '{';
-  ss << "isreadonly"_quoted << colon << "true";
-  ss << '}';
-
-  return {ss.str()};
-}
-
-JSONDocument JSONDocumentBuilder::_makeDeleted() const {
-  std::stringstream ss;
-
-  ss << '{';
-  ss << "isdeleted"_quoted << colon << "true";
-  ss << '}';
-
-  return {ss.str()};
-}
-
-JSONDocument JSONDocumentBuilder::_wrap_as_payload(JSONDocument const& document) const {
-  std::stringstream ss;
-  ss << '{';
-  ss << "payload"_quoted << colon << document.to_string();
-  ss << '}';
-
-  return {ss.str()};
-}
-
-JSONDocument JSONDocumentBuilder::_bookkeeping_update_payload(std::string action = "update") const {
-  std::stringstream ss;
-  ss << '{';
-  ss << quoted_(action) << colon << quoted_(timestamp());
-  ss << '}';
-
-  return _wrap_as_payload({ss.str()});
-}
-
-using string_pair_t = std::pair<std::string, std::string>;
-
-template <>
-JSONDocument toJSONDocument<string_pair_t>(string_pair_t const& pair) {
-  std::stringstream ss;
-  ss << '{';
-  ss << quoted_(pair.first) << colon << quoted_(pair.second);
-  ss << '}';
-
-  return {ss.str()};
-}
-
-JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& document) {
-  TRACE_(2, "createFrom() args  document=<" << document << ">");
-
-  _createFromTemplate(JSONDocument(template__default_document));
-
-  // replace metadata if any
-  try {
-    auto metadata = document.findChild(literal::metadata);
-
-    TRACE_(2, "createFrom() Found document.metadata=<" << metadata << ">");
-
-    _document.replaceChild(metadata, literal::metadata);
-
-  } catch (notfound_exception const&) {
-    TRACE_(2, "createFrom() No document.metadata");
-  }
-
-  // replace data if any
-  try {
-    auto data = document.findChild(literal::changelog);
-
-    TRACE_(2, "createFrom() Found converted.changelog=<" << data << ">");
-
-    _document.replaceChild(data, literal::changelog);
-
-  } catch (notfound_exception const&) {
-    TRACE_(2, "createFrom() No converted.changelog");
-  }
-  
-  // replace data origin if any
-  try {
-    auto data = document.findChild(literal::origin);
-
-    TRACE_(2, "createFrom() Found origin=<" << data << ">");
-    
-    _document.replaceChild(data, literal::origin);
-
-  } catch (notfound_exception const&) {
-    TRACE_(2, "createFrom() No origin");
-  }
-  
-  // replace data if any
-  try {
-    auto data = document.findChild(literal::data);
-
-    TRACE_(2, "createFrom() Found document.data=<" << data << ">");
-    
-    _document.replaceChild(data, literal::data);
-
-    return self();
-  } catch (notfound_exception const&) {
-    TRACE_(2, "createFrom() No document.data");
-  }
-
-
-  // document contains data only
-  _document.replaceChild(document, literal::data);
-
-  return self();
-}
-
-JSONDocumentBuilder& JSONDocumentBuilder::addAlias(JSONDocument const& alias) {
+JSONDocumentBuilder& JSONDocumentBuilder::addAlias(JSONDocument const& alias) try {
   TRACE_(3, "addAlias() args  alias=<" << alias << ">");
 
-  enforce();
+  JSONDocument copy(alias);
+  auto ovl = overlay<ovl::ovlAlias>(copy, jsonliteral::alias);
 
-  auto newAlias = _wrap_as_payload(_makeActiveAlias(alias));
+  ThrowOnFailure(SaveUndo());
+  ThrowOnFailure(_overlay->addAlias(ovl));
+  _document.writeJson();
 
-  auto tmp_document = _document;
-  tmp_document.appendChild(newAlias, literal::aliases_active);
-  tmp_document.appendChild(_bookkeeping_update_payload(actions::addAlias), literal::bookkeeping_updates);
-
-  _document = std::move(tmp_document);
+  return self();
+} catch (std::exception const& ex) {
+  TRACE_(3, "addAlias() Exception:" << ex.what());
+  ThrowOnFailure(CallUndo());
 
   return self();
 }
 
-JSONDocumentBuilder& JSONDocumentBuilder::removeAlias(JSONDocument const& alias) {
+JSONDocumentBuilder& JSONDocumentBuilder::removeAlias(JSONDocument const& alias) try {
   TRACE_(4, "removeAlias() args  alias=<" << alias << ">");
 
-  enforce();
+  JSONDocument copy(alias);
+  auto ovl = overlay<ovl::ovlAlias>(copy, jsonliteral::alias);
 
-  auto removeAlias = _wrap_as_payload(_makeAlias(alias));
+  ThrowOnFailure(SaveUndo());
+  ThrowOnFailure(_overlay->removeAlias(ovl));
+  _document.writeJson();
 
-  auto tmp_document = _document;
-
-  // move alias to history
-  auto removedAlias = tmp_document.removeChild(removeAlias, literal::aliases_active);
-  tmp_document.appendChild(_wrap_as_payload(_makeHistoryAlias(removedAlias)), literal::aliases_history);
-
-  // do bookkeeping
-  tmp_document.appendChild(_bookkeeping_update_payload(actions::removeAlias), literal::bookkeeping_updates);
-
-  _document = std::move(tmp_document);
+  return self();
+} catch (std::exception const& ex) {
+  TRACE_(5, "removeAlias() Exception:" << ex.what());
+  ThrowOnFailure(CallUndo());
 
   return self();
 }
 
-JSONDocumentBuilder& JSONDocumentBuilder::addToGlobalConfig(JSONDocument const& globalconfig) {
-  TRACE_(5, "addToGlobalConfig() args  globalconfig=<" << globalconfig << ">");
+JSONDocumentBuilder& JSONDocumentBuilder::addConfiguration(JSONDocument const& config) try {
+  TRACE_(5, "addConfiguration() args config=<" << config << ">");
 
-  enforce();
+  JSONDocument copy(config);
+  auto ovl = overlay<ovl::ovlConfiguration>(copy, jsonliteral::configuration);
 
-  auto newGlobalConfig = _wrap_as_payload(_makeaddToGlobalConfig(globalconfig));
+  ThrowOnFailure(SaveUndo());
+  ThrowOnFailure(_overlay->addConfiguration(ovl));
+  _document.writeJson();
 
-  auto tmp_document = _document;
-  tmp_document.appendChild(newGlobalConfig, literal::configurations);
-  tmp_document.appendChild(_bookkeeping_update_payload(actions::addToGlobalConfig), literal::bookkeeping_updates);
-
-  _document = std::move(tmp_document);
+  return self();
+} catch (std::exception const& ex) {
+  TRACE_(5, "addConfiguration() Exception:" << ex.what());
+  ThrowOnFailure(CallUndo());
 
   return self();
 }
 
-JSONDocumentBuilder& JSONDocumentBuilder::setObjectID(JSONDocument const& objectId) {
+JSONDocumentBuilder& JSONDocumentBuilder::removeConfiguration(JSONDocument const& config) try {
+  TRACE_(5, "removeConfiguration() args  config=<" << config << ">");
+
+  JSONDocument copy(config);
+  auto ovl = overlay<ovl::ovlConfiguration>(copy, jsonliteral::configuration);
+
+  ThrowOnFailure(SaveUndo());
+  ThrowOnFailure(_overlay->removeConfiguration(ovl));
+  _document.writeJson();
+
+  return self();
+} catch (std::exception const& ex) {
+  TRACE_(5, "removeConfiguration() Exception:" << ex.what());
+  ThrowOnFailure(CallUndo());
+
+  return self();
+}
+
+JSONDocumentBuilder& JSONDocumentBuilder::setObjectID(JSONDocument const& objectId) try {
   TRACE_(8, "setObjectID() args  objectId=<" << objectId << ">");
 
-  enforce();
+  JSONDocument copy(objectId);
+  auto id = std::make_unique<ovl::ovlId>(jsonliteral::id, copy.findChildValue(jsonliteral::id));
+  
+  ThrowOnFailure(SaveUndo());
+  ThrowOnFailure(_overlay->swap(id));
 
-  auto newObjectID = _wrap_as_payload(_makeObjectId(objectId));
+  _document.writeJson();
 
-  auto tmp_document = _document;
-  tmp_document.insertChild(newObjectID, literal::id);
-
-  _document = std::move(tmp_document);
+  return self();
+} catch (std::exception const& ex) {
+  TRACE_(5, "setObjectID() Exception:" << ex.what());
+  ThrowOnFailure(CallUndo());
 
   return self();
 }
 
-JSONDocumentBuilder& JSONDocumentBuilder::setVersion(JSONDocument const& version) {
+JSONDocument JSONDocumentBuilder::getObjectID() const {
+  return { _overlay->id().to_string()};
+}
+
+JSONDocumentBuilder& JSONDocumentBuilder::setVersion(JSONDocument const& version) try {
   TRACE_(6, "setVersion() args  version=<" << version << ">");
 
-  enforce();
+  JSONDocument copy(version);
 
-  auto newVersion = _wrap_as_payload(version);
+  auto ovl = std::make_unique<ovl::ovlVersion>(jsonliteral::version, copy.findChildValue(jsonliteral::name));
 
-  auto tmp_document = _document;
-  tmp_document.replaceChild(newVersion, literal::version);
-  tmp_document.appendChild(_bookkeeping_update_payload(actions::setVersion), literal::bookkeeping_updates);
+  ThrowOnFailure(SaveUndo());
+  ThrowOnFailure(_overlay->setVersion(ovl));
+  _document.writeJson();
 
-  _document = std::move(tmp_document);
+  return self();
+} catch (std::exception const& ex) {
+  TRACE_(6, "setVersion() Exception:" << ex.what());
+  ThrowOnFailure(CallUndo());
 
   return self();
 }
 
-JSONDocumentBuilder& JSONDocumentBuilder::setConfigurableEntity(JSONDocument const& entity) {
-  TRACE_(9, "setConfigurableEntity() args  entity=<" << entity << ">");
+JSONDocumentBuilder& JSONDocumentBuilder::setCollection(JSONDocument const& collection) try {
+  TRACE_(6, "collection() args  collection=<" << collection << ">");
 
-  enforce();
+  auto copy =collection.findChild(jsonliteral::collection);
+  auto ovl = std::make_unique<ovl::ovlCollection>(jsonliteral::collection, copy.findChildValue(jsonliteral::collection));
 
-  auto newEntity = _wrap_as_payload(entity);
+  ThrowOnFailure(SaveUndo());
+  ThrowOnFailure(_overlay->setCollection(ovl));
+  _document.writeJson();
 
-  auto tmp_document = _document;
-  tmp_document.insertChild(newEntity, literal::configurable_entity);
-  tmp_document.appendChild(_bookkeeping_update_payload(actions::setConfigurableEntity), literal::bookkeeping_updates);
-
-  _document = std::move(tmp_document);
+  return self();
+} catch (std::exception const& ex) {
+  TRACE_(6, "collection() Exception:" << ex.what());
+  ThrowOnFailure(CallUndo());
 
   return self();
 }
 
-JSONDocumentBuilder& JSONDocumentBuilder::markReadonly() {
+JSONDocumentBuilder& JSONDocumentBuilder::addEntity(JSONDocument const& entity) try {
+  TRACE_(9, "addEntity() args  entity=<" << entity << ">");
+
+  JSONDocument copy(entity);
+  auto ovl = overlay<ovl::ovlEntity>(copy, jsonliteral::entities);
+
+  ThrowOnFailure(SaveUndo());
+  ThrowOnFailure(_overlay->addEntity(ovl));
+
+  _document.writeJson();
+
+  return self();
+} catch (std::exception const& ex) {
+  TRACE_(9, "setVersion() Exception:" << ex.what());
+  ThrowOnFailure(CallUndo());
+
+  return self();
+}
+
+JSONDocumentBuilder& JSONDocumentBuilder::removeEntity(JSONDocument const& entity) try {
+  TRACE_(9, "addEntity() args  entity=<" << entity << ">");
+
+  JSONDocument copy(entity);
+  auto ovl = overlay<ovl::ovlEntity>(copy, jsonliteral::entities);
+
+  ThrowOnFailure(SaveUndo());
+  ThrowOnFailure(_overlay->removeEntity(ovl));
+
+  _document.writeJson();
+
+  return self();
+} catch (std::exception const& ex) {
+  TRACE_(9, "setVersion() Exception:" << ex.what());
+  ThrowOnFailure(CallUndo());
+
+  return self();
+}
+
+JSONDocumentBuilder& JSONDocumentBuilder::markReadonly() try {
   TRACE_(6, "markReadonly()");
 
-  enforce();
+  ThrowOnFailure(SaveUndo());
+  ThrowOnFailure(_overlay->markReadonly());
 
-  auto newValue = _wrap_as_payload(_makeReadonly());
+  _document.writeJson();
 
-  auto tmp_document = _document;
-  tmp_document.replaceChild(newValue, literal::bookkeeping_isreadonly);
-  tmp_document.appendChild(_bookkeeping_update_payload(actions::markReadonly), literal::bookkeeping_updates);
-
-  _document = std::move(tmp_document);
+  return self();
+} catch (std::exception const& ex) {
+  TRACE_(6, "markReadonly() Exception:" << ex.what());
+  ThrowOnFailure(CallUndo());
 
   return self();
 }
 
-JSONDocumentBuilder& JSONDocumentBuilder::markDeleted() {
+JSONDocumentBuilder& JSONDocumentBuilder::markDeleted() try {
   TRACE_(7, "markDeleted()");
 
-  enforce();
+  ThrowOnFailure(SaveUndo());
+  ThrowOnFailure(_overlay->markDeleted());
 
-  auto newValue = _wrap_as_payload(_makeDeleted());
+  _document.writeJson();
 
-  auto tmp_document = _document;
-  tmp_document.replaceChild(newValue, literal::bookkeeping_isdeleted);
-  tmp_document.appendChild(_bookkeeping_update_payload(actions::markDeleted), literal::bookkeeping_updates);
-
-  newValue = _wrap_as_payload(_makeReadonly());
-  tmp_document.replaceChild(newValue, literal::bookkeeping_isreadonly);
-  tmp_document.appendChild(_bookkeeping_update_payload(actions::markReadonly), literal::bookkeeping_updates);
-
-  _document = std::move(tmp_document);
+  return self();
+} catch (std::exception const& ex) {
+  TRACE_(7, "markDeleted() Exception:" << ex.what());
+  ThrowOnFailure(CallUndo());
 
   return self();
 }
 
-void JSONDocumentBuilder::enforce() const {
-  if (!_document.isReadonly()) return;
+std::list<std::string> JSONDocumentBuilder::extractTags() const {
+  auto retValue =std::list<std::string>{};
+  
+  retValue.push_back( std::string(jsonliteral::version).append(":").append(_overlay->version().string_value()));
 
-  TRACE_(11, "enforce() Document is readonly.");
-  throw notfound_exception("JSONDocumentBuilder") << "Document is readonly.";
+  auto const& configurations = _overlay->configurations();
+  
+  for(auto const& configuration:configurations){
+    retValue.push_back( std::string(jsonliteral::configuration).append(":").append(configuration.name()));
+  }
+
+  auto const& entities = _overlay->entities();
+  
+  for(auto const& entity:entities){
+    retValue.push_back( std::string(jsonliteral::entity).append(":").append(entity.name()));
+  }
+
+  return retValue;
 }
 
-namespace debug {
-void enableJSONDocumentBuilder() {
+result_t JSONDocumentBuilder::comapreUsingOverlays(JSONDocumentBuilder const& other) const {
+  return *_overlay == *other._overlay;
+}
+
+std::string JSONDocumentBuilder::to_string() const { return _document.to_string(); }
+
+std::ostream& utl::operator<<(std::ostream& os, JSONDocumentBuilder const& data) {
+  os << data.to_string();
+  return os;
+}
+
+void dbdr::debug::enableJSONDocumentBuilder() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::JSONDocumentBuilder trace_enable");
 }
-}
-}  // namespace jsonutils
-}  // namespace database
-}  // namespace artdaq

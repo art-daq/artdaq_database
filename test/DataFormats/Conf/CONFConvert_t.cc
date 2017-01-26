@@ -6,7 +6,6 @@
 #include "artdaq-database/DataFormats/Conf/convertconf2json.h"
 #include "artdaq-database/DataFormats/Conf/conf_common.h"
 #include "artdaq-database/DataFormats/Conf/confjsondb.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
 
 namespace bpo = boost::program_options;
 using namespace artdaq::database;
@@ -23,7 +22,7 @@ int main(int argc, char* argv[]) {
   artdaq::database::confjson::debug::enableConfJson();
 
   debug::registerUngracefullExitHandlers();
-  artdaq::database::dataformats::useFakeTime(true);
+  artdaq::database::useFakeTime(true);
 
   // Get the input parameters via the boost::program_options library,
   // designed to make it relatively simple to define arguments and
@@ -102,8 +101,8 @@ int main(int argc, char* argv[]) {
 }
 
 bool test_convertconf2json(std::string const& input, std::string const& compare) {
-  assert(!input.empty());
-  assert(!compare.empty());
+  confirm(!input.empty());
+  confirm(!compare.empty());
 
   auto output = std::string();
 
@@ -122,8 +121,8 @@ bool test_convertconf2json(std::string const& input, std::string const& compare)
 }
 
 bool test_convertjson2conf(std::string const& input, std::string const& compare) {
-  assert(!input.empty());
-  assert(!compare.empty());
+  confirm(!input.empty());
+  confirm(!compare.empty());
 
   auto output = std::string();
 

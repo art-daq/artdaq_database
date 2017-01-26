@@ -1,9 +1,9 @@
 {"filter":{
- "configurable_entity.name":"CMSROOT",
+ "entities.name":"CMSROOT",
  "configurations.name":"otsdaqC001"
 }, 
 "collection":"otsdaq_DefaultConfigurations",
-"configurable_entity":"CMSROOT",
+"entity":"CMSROOT",
 "configuration":"otsdaqC001",
 "dbprovider":"filesystem",
 "operation":"load",

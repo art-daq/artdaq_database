@@ -15,6 +15,8 @@ class JsonData;
 
 namespace configuration {
 
+namespace apiliteral = artdaq::database::configapi::literal;
+
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::configuration::options::data_format_t;
 
@@ -28,16 +30,16 @@ class ManageAliasesOperation final : public OperationBase {
   std::string const& versionAlias() const noexcept;
   std::string const& versionAlias(std::string const&);
 
-  std::string const& configurableEntity() const noexcept;
-  std::string const& configurableEntity(std::string const&);
+  std::string const& entity() const noexcept;
+  std::string const& entity(std::string const&);
 
-  std::string const& globalConfiguration() const noexcept;
-  std::string const& globalConfiguration(std::string const&);
+  std::string const& configuration() const noexcept;
+  std::string const& configuration(std::string const&);
 
-  std::string const& globalConfigurationAlias() const noexcept;
-  std::string const& globalConfigurationAlias(std::string const&);
+  std::string const& configurationAlias() const noexcept;
+  std::string const& configurationAlias(std::string const&);
 
-  JsonData search_filter_to_JsonData() const override;
+  JsonData query_filter_to_JsonData() const override;
 
   bpo::options_description makeProgramOptions() const override;
 
@@ -47,13 +49,13 @@ class ManageAliasesOperation final : public OperationBase {
   JsonData writeJsonData() const override;
 
  private:
-  std::string _version = {literal::notprovided};
-  std::string _version_alias = {literal::notprovided};
+  std::string _version = {apiliteral::notprovided};
+  std::string _version_alias = {apiliteral::notprovided};
 
-  std::string _configurable_entity = {literal::notprovided};
+  std::string _entity = {apiliteral::notprovided};
 
-  std::string _global_configuration = {literal::notprovided};
-  std::string _global_configuration_alias = {literal::notprovided};
+  std::string _configuration = {apiliteral::notprovided};
+  std::string _configuration_alias = {apiliteral::notprovided};
 };
 
 namespace debug {
@@ -66,4 +68,5 @@ void enableOperationManageAliases();
 }  // namespace database
 }  // namespace artdaq
 
-#endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_MANAGEALIASES_H_ */
+#endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_MANAGEALIASES_H_ \
+          */

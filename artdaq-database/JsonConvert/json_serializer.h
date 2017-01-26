@@ -2,6 +2,7 @@
 #define _ARTDAQ_DATABASE_JSONCONVERT_SERIALIZER_H_
 
 #include "artdaq-database/JsonConvert/common.h"
+#include "artdaq-database/SharedCommon/helper_functions.h"
 
 namespace artdaq {
 namespace database {
@@ -15,14 +16,14 @@ struct JsonSerializer {
   explicit JsonSerializer(std::ostream& os_) : os(os_) { os << std::boolalpha; }
 
   void start_member(std::string const& name[[gnu::unused]]) {
-    assert(!name.empty());
+    confirm(!name.empty());
     if (write_comma) os << ", ";
     os << quote(name) << ':';
     write_comma = false;
   }
 
   void finish_member(std::string const& name[[gnu::unused]]) {
-    assert(!name.empty());
+    confirm(!name.empty());
     write_comma = true;
   }
 

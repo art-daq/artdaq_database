@@ -1,10 +1,11 @@
 #include "artdaq-database/BasicTypes/data_json.h"
+#include <iostream>
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "BTYPES:JsonData_C"
+#define TRACE_NAME "BTPS:JsonData_C"
 
 using artdaq::database::basictypes::JsonData;
 

@@ -332,7 +332,7 @@
 }
 ]
 },
-"configurable_entity" : {
+"entity" : {
 "name" : "BoardReader_TOY1_topol"
 }
 }

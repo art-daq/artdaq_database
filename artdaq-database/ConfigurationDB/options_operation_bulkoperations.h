@@ -16,6 +16,7 @@ class JsonData;
 }
 
 namespace configuration {
+namespace apiliteral = artdaq::database::configapi::literal;
 
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::configuration::options::data_format_t;
@@ -24,16 +25,16 @@ class BulkOperations final {
  public:
   using OperationBaseUPtr = std::unique_ptr<OperationBase>;
   using OperationsList = std::list<std::tuple<std::string, OperationBaseUPtr>>;
-  
+
   using iterator = std::list<std::tuple<std::string, OperationBaseUPtr>>::iterator;
   using const_iterator = std::list<std::tuple<std::string, OperationBaseUPtr>>::const_iterator;
-  
+
   BulkOperations(std::string const&);
 
   std::string const& bulkOperations() const noexcept;
   std::string const& bulkOperations(std::string const&);
 
-  data_format_t const& dataFormat() const noexcept;
+  data_format_t const& format() const noexcept;
 
   JsonData to_JsonData() const;
   std::string to_string() const;
@@ -43,17 +44,17 @@ class BulkOperations final {
   virtual int readProgramOptions(bpo::variables_map const&);
   virtual void readJsonData(JsonData const&);
 
-  iterator begin() {return _operations_list.begin();}
-  iterator end() {return _operations_list.end();}
+  iterator begin() { return _operations_list.begin(); }
+  iterator end() { return _operations_list.end(); }
 
-  const_iterator begin() const {return _operations_list.cbegin();}
-  const_iterator end() const {return _operations_list.cend();}
-  
+  const_iterator begin() const { return _operations_list.cbegin(); }
+  const_iterator end() const { return _operations_list.cend(); }
+
  private:
-  std::string _process_name = {literal::notprovided};
+  std::string _process_name = {apiliteral::notprovided};
 
-  std::string _bulk_operations = {literal::notprovided};
-  
+  std::string _bulk_operations = {apiliteral::notprovided};
+
   data_format_t _data_format = {data_format_t::gui};
 
   OperationsList _operations_list;
@@ -68,4 +69,5 @@ void enableBulkOperations();
 }  // namespace database
 }  // namespace artdaq
 
-#endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_BULKOPERATIONS_H_ */
+#endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_BULKOPERATIONS_H_ \
+          */

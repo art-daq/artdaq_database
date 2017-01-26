@@ -21,16 +21,15 @@
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 
 #include "artdaq-database/DataFormats/Json/json_reader.h"
-#include "artdaq-database/DataFormats/common/helper_functions.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 
 struct TestData {
   TestData() {
     /*
     artdaq::database::filesystem::debug::enable();
     artdaq::database::mongo::debug::enable();
-    // artdaq::database::jsonutils::debug::enableJSONDocument();
-    // artdaq::database::jsonutils::debug::enableJSONDocumentBuilder();
+    // artdaq::database::docrecord::debug::enableJSONDocument();
+    // artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
 
     artdaq::database::configuration::debug::enableFindConfigsOperation();
     artdaq::database::configuration::debug::enableCreateConfigsOperation();
@@ -44,7 +43,7 @@ struct TestData {
     artdaq::database::configuration::debug::enableDBOperationFileSystem();
 
 //    debug::registerUngracefullExitHandlers();
-    artdaq::database::dataformats::useFakeTime(true);
+    artdaq::database::useFakeTime(true);
     */
     std::cout << "setup fixture\n";
   }
@@ -74,7 +73,7 @@ BOOST_AUTO_TEST_CASE(configure_tests) {
   return;
 }
 
-BOOST_AUTO_TEST_CASE(store_configuration) {
+BOOST_AUTO_TEST_CASE(write_document) {
   std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();
   auto ifc = DatabaseConfigurationInterface();
 
@@ -85,7 +84,7 @@ BOOST_AUTO_TEST_CASE(store_configuration) {
   return;
 }
 
-BOOST_AUTO_TEST_CASE(load_configuration) {
+BOOST_AUTO_TEST_CASE(read_document) {
   std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();
   auto ifc = DatabaseConfigurationInterface();
 
@@ -96,7 +95,7 @@ BOOST_AUTO_TEST_CASE(load_configuration) {
   return;
 }
 
-BOOST_AUTO_TEST_CASE(store_global_configuration) {
+BOOST_AUTO_TEST_CASE(store_configuration) {
   std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();
   std::shared_ptr<ConfigurationBase> cfg2 = std::make_shared<TestConfiguration002>();
 
@@ -126,7 +125,7 @@ BOOST_AUTO_TEST_CASE(store_global_configuration) {
   return;
 }
 
-BOOST_AUTO_TEST_CASE(load_global_configuration) {
+BOOST_AUTO_TEST_CASE(load_configuration) {
   auto ifc = DatabaseConfigurationInterface();
 
   auto configName = std::string{"config"} + std::to_string(fixture.version());
@@ -144,7 +143,7 @@ BOOST_AUTO_TEST_CASE(load_global_configuration) {
   return;
 }
 
-BOOST_AUTO_TEST_CASE(find_all_global_configurations) {
+BOOST_AUTO_TEST_CASE(find_all_configurations) {
   auto ifc = DatabaseConfigurationInterface();
 
   auto list = ifc.findAllGlobalConfigurations();

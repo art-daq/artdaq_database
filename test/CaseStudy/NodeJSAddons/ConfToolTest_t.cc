@@ -23,8 +23,8 @@ namespace cfgui = cf::guiexports;
 namespace cfo = cf::options;
 namespace cfol = cfo::literal;
 
-using Options = cfo::LoadStoreOperation;
-using artdaq::database::jsonutils::JSONDocument;
+using Options = cfo::ManageDocumentOperation;
+using artdaq::database::docrecord::JSONDocument;
 
 typedef bool (*test_case)(std::string const& /*filt*/, std::string const& /*src*/, std::string const& /*cmp*/);
 
@@ -138,9 +138,9 @@ int main(int argc, char* argv[]) try {
 }
 
 bool test_storeconfig(std::string const& filt, std::string const& src, std::string const& cmp) {
-  assert(!filt.empty());
-  assert(!src.empty());
-  assert(!cmp.empty());
+  confirm(!filt.empty());
+  confirm(!src.empty());
+  confirm(!cmp.empty());
 
   std::ifstream is1(filt);
   std::string filt_json((std::istreambuf_iterator<char>(is1)), std::istreambuf_iterator<char>());
@@ -154,7 +154,7 @@ bool test_storeconfig(std::string const& filt, std::string const& src, std::stri
   std::string cmp_json((std::istreambuf_iterator<char>(is3)), std::istreambuf_iterator<char>());
   is3.close();
 
-  auto result = cfgui::store_configuration(filt_json, src_json);
+  auto result = cfgui::write_document(filt_json, src_json);
 
   if (!result.first) {
     std::cerr << "Error message: " << result.second << "\n";
@@ -178,9 +178,9 @@ bool test_storeconfig(std::string const& filt, std::string const& src, std::stri
 }
 
 bool test_loadconfig(std::string const& filt, std::string const& src, std::string const& cmp) {
-  assert(!filt.empty());
-  assert(!src.empty());
-  assert(!cmp.empty());
+  confirm(!filt.empty());
+  confirm(!src.empty());
+  confirm(!cmp.empty());
 
   std::ifstream is1(filt);
   std::string filt_json((std::istreambuf_iterator<char>(is1)), std::istreambuf_iterator<char>());
@@ -192,7 +192,7 @@ bool test_loadconfig(std::string const& filt, std::string const& src, std::strin
 
   auto src_json = std::string();
 
-  auto result = cfgui::load_configuration(filt_json, src_json);
+  auto result = cfgui::read_document(filt_json, src_json);
 
   if (!result.first) {
     std::cerr << "Error message: " << result.second << "\n";

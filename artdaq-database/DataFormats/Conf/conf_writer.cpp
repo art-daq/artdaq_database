@@ -1,8 +1,7 @@
 #include "artdaq-database/DataFormats/common.h"
 
-#include "artdaq-database/DataFormats/Conf/convertconf2json.h"
 #include "artdaq-database/DataFormats/Conf/conf_writer.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
+#include "artdaq-database/DataFormats/Conf/convertconf2json.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -18,12 +17,12 @@ using artdaq::database::conf::ConfWriter;
 namespace literal = artdaq::database::dataformats::literal;
 
 bool ConfWriter::write(jsn::object_t const& json_object, std::string& out) {
-  assert(out.empty());
-  assert(!json_object.empty());
+  confirm(out.empty());
+  confirm(!json_object.empty());
 
   TRACE_(2, "write() begin");
 
-  auto const& data_node = boost::get<jsn::object_t>(json_object.at(literal::data_node));
+  auto const& data_node = boost::get<jsn::object_t>(json_object.at(literal::data));
 
   auto result = bool(false);
   auto buffer = std::string();
@@ -46,8 +45,8 @@ bool ConfWriter::write(jsn::object_t const& json_object, std::string& out) {
 void artdaq::database::conf::debug::enableConfWriter() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::conf::ConfWriter trace_enable");
 }

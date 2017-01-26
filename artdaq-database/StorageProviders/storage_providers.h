@@ -1,12 +1,16 @@
 #ifndef _ARTDAQ_DATABASE_PROVIDERS_H_
 #define _ARTDAQ_DATABASE_PROVIDERS_H_
 
-#include "artdaq-database/StorageProviders/common.h"
+#include <list>
+#include <memory>
+#include <string>
+
+#include "artdaq-database/SharedCommon/shared_datatypes.h"
 
 namespace artdaq {
 namespace database {
 
-using object_id_t = std::string;
+constexpr auto system_metadata = "SystemMetadata";
 
 template <typename TYPE, typename IMPL>
 class StorageProvider final {
@@ -29,35 +33,40 @@ class StorageProvider final {
   StorageProvider(std::shared_ptr<IMPL> const& provider, PassKeyIdiom const&) : _provider(provider) {}
 
   template <typename FILTER>
-  std::list<TYPE> load(FILTER const&);
-  object_id_t store(TYPE const&);
+  std::list<TYPE> readDocument(FILTER const&);
+  object_id_t writeDocument(TYPE const&);
 
   template <typename FILTER>
-  std::list<FILTER> findGlobalConfigs(FILTER const&);
+  std::list<FILTER> findConfigurations(FILTER const&);
 
   template <typename FILTER>
-  std::list<FILTER> addConfigToGlobalConfig(FILTER const&);
+  std::list<FILTER> addConfiguration(FILTER const&);
 
   template <typename FILTER>
-  std::list<FILTER> findConfigVersions(FILTER const&);
+  std::list<FILTER> findVersions(FILTER const&);
 
   template <typename FILTER>
-  std::list<FILTER> findConfigEntities(FILTER const&);
+  std::list<FILTER> findEntities(FILTER const&);
 
   template <typename FILTER>
-  std::list<FILTER> buildConfigSearchFilter(FILTER const&);
+  std::list<FILTER> configurationComposition(FILTER const&);
 
   template <typename FILTER>
-  std::list<FILTER> listCollectionNames(FILTER const&);
-  
+  std::list<FILTER> listCollections(FILTER const&);
+
+  template <typename FILTER>
+  std::list<FILTER> listDatabases(FILTER const&);
+
+  template <typename FILTER>
+  std::list<FILTER> databaseMetadata(FILTER const&);
+
  private:
   std::shared_ptr<IMPL> _provider;
 };
 
 constexpr auto ouid_invalid = "000000000000000000000000";
 
-std::string expand_environment_variables(std::string var);
-object_id_t  generate_oid();
+std::string make_database_metadata(std::string const& /*name*/, std::string const& /*uri*/);
 
 }  // namespace database
 }  // namespace artdaq

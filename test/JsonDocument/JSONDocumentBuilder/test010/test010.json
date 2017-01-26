@@ -1,0 +1,7 @@
+{ 
+  "operation":"addEntity",
+  "begin-state":"begin-state.json", 
+  "end-state":"end-state.json",
+  "delta":"entity.json",
+  "must-succeed":1
+}

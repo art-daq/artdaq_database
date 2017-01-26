@@ -1,0 +1,15 @@
+{
+"document" : {
+"data" : {
+"daq" : {
+"event_builder" : {
+"expected_fragments_per_event" : "\" ddd \" \n \b \r AA \t",
+"first_fragment_receiver_rank" : 0,
+"fragment_receiver_count" : 2,
+"mpi_buffer_count" : 16,
+"print_event_store_stats" : true,
+"use_art" : true,
+"verbose" : false
+}}}},
+"version":"ver001"
+}

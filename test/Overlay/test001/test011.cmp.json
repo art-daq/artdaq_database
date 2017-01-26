@@ -1,0 +1,308 @@
+{
+"_id" : {
+"$oid" : "cafe6a7a44f3445d9dd813a4"
+}
+,
+
+"collection" : "myfhicldocuments"
+,
+
+"version" : "version001"
+,
+"origin":{
+"format":"json",
+"name":"notprovided",
+"source":"template",
+"created":"Fri Jan 13 16:01:37 2017",
+"rawdata": [
+]
+},
+"aliases": {
+        "active" : [
+            {
+                "name" : "alias012", 
+                "assigned" : "Mon Feb  8 14:00:30 2016"
+            }, 
+            {
+                "name" : "alias99", 
+                "assigned" : "Mon Feb  8 14:00:30 2016"
+            }
+        ], 
+        "history" : [
+            {
+                "name" : "alias01", 
+                "assigned" : "Mon Feb  8 14:00:30 2016", 
+                "removed" : "Mon Feb  8 14:00:30 2016"
+            }
+        ]
+
+}
+,
+"bookkeeping": {
+"isreadonly":false,
+"isdeleted":false,
+"created":"Fri Jan 13 16:01:37 2017",
+"updates": [
+{
+"event" : "addAlias",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "alias01",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+},
+{
+"event" : "removeAlias",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "alias01",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+}
+]
+}
+,
+
+"changelog" : "notprovided"
+,
+"entities": [
+            {
+                "name" : "boardreader01", 
+                "assigned" : "Mon Feb  8 14:00:30 2016"
+            }, 
+            {
+                "name" : "boardreader02", 
+                "assigned" : "Mon Feb  8 14:00:30 2016"
+            }
+],
+"runs": [
+],
+"attachments": [
+],
+"configurations": [
+        {
+            "name" : "test", 
+            "assigned" : "Mon Feb  8 14:00:30 2016"
+        }
+],
+"comments": [
+],
+
+
+"document" : {
+"data" : {
+"prolog" : {
+
+},
+"main" : {
+"lbne_artdaq" : "/home/nfs/dunedaq/lbnedaq/build_lbne-artdaq",
+"PMT_host" : "pdunedaq01.fnal.gov",
+"PMT_port" : 5400,
+"pause_before_initialization" : 5,
+"debug_level" : 1,
+"log_directory" : "/home/nfs/daqoutput/daqlogs",
+"record_directory" : "/home/nfs/daqoutput/run_records",
+"disable_configuration_check" : true,
+"TDU_XMLRPC_port" : 0,
+"EventBuilder_host" : "pdunedaq02.fnal.gov",
+"EventBuilder_port" : 5235,
+"EventBuilder_host" : "pdunedaq01.fnal.gov",
+"EventBuilder_port" : 5236,
+"EventBuilder_host" : "pdunedaq01.fnal.gov",
+"EventBuilder_port" : 5237,
+"EventBuilder_host" : "pdunedaq01.fnal.gov",
+"EventBuilder_port" : 5238,
+"EventBuilder_host" : "pdunedaq01.fnal.gov",
+"EventBuilder_port" : 5239,
+"EventBuilder_host" : "pdunedaq01.fnal.gov",
+"EventBuilder_port" : 5240,
+"EventBuilder_host" : "pdunedaq01.fnal.gov",
+"EventBuilder_port" : 5241,
+"EventBuilder_host" : "pdunedaq01.fnal.gov",
+"EventBuilder_port" : 5242,
+"Aggregator_host" : "pdunedaq01.fnal.gov",
+"Aggregator_port" : 5265,
+"Aggregator_host" : "pdunedaq01.fnal.gov",
+"Aggregator_port" : 5266,
+"max_file_size_MB_" : 5000,
+"max_file_time_min_" : 10
+}
+},
+"metadata" : {
+"prolog" : {
+"type" : "table",
+"comment" : "#prolog",
+"children" : {
+
+}
+},
+"main" : {
+"type" : "table",
+"comment" : "#main",
+"children" : {
+"lbne_artdaq" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"PMT_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"PMT_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"pause_before_initialization" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"debug_level" : {
+"type" : "number",
+"comment" : "# debug level can range from 0 to 3 (increasing order of verbosity)",
+"annotation" : " "
+},
+"log_directory" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"record_directory" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"disable_configuration_check" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : " "
+},
+"TDU_XMLRPC_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"EventBuilder_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"Aggregator_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"Aggregator_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"Aggregator_host" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"Aggregator_port" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"max_file_size_MB_" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"max_file_time_min_" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+},
+"search" : [
+{
+"name" : "find any",
+"query" : "not defined"
+}
+]
+}
+}

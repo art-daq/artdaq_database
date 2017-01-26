@@ -8,13 +8,17 @@ include(CetTest)
 set(ARTDAQ_DATABASE_URI_FILESYSTEM "filesystemdb://${CMAKE_BINARY_DIR}/databases/filesystemdb/test_db")
 set(ARTDAQ_DATABASE_URI_MONGO "mongodb://127.0.0.1:27017/test_db")
 
+set(ARTDAQ_DATABASE_URI_UCOND $ENV{ARTDAQ_DATABASE_URI_UCOND})
+set(ARTDAQ_DATABASE_AUTH $ENV{ARTDAQ_DATABASE_AUTH})
+
 cet_test_env("FHICL_FILE_PATH=.")
 
 #test order is important
 add_subdirectory(JsonDocument)
+add_subdirectory(Overlay)
 add_subdirectory(DataFormats)
-add_subdirectory(ConfigurationDB)
-add_subdirectory(CaseStudy)
 add_subdirectory(StorageProviders)
 
-#add_subdirectory(JSONConvert)
+add_subdirectory(ConfigurationDB)
+add_subdirectory(CaseStudy)
+

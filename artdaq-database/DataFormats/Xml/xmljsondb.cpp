@@ -1,8 +1,10 @@
-#include "artdaq-database/DataFormats/common/helper_functions.h"
-#include "artdaq-database/DataFormats/common/shared_literals.h"
+#include "artdaq-database/DataFormats/common.h"
+
+#include "artdaq-database/DataFormats/shared_literals.h"
 
 #include "artdaq-database/DataFormats/Json/json_common.h"
 #include "artdaq-database/DataFormats/Xml/xml_common.h"
+#include "artdaq-database/DataFormats/Xml/xmljsondb.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -10,12 +12,6 @@
 
 #define TRACE_NAME "XML:xmljsondb_C"
 
-namespace artdaq {
-namespace database {
-namespace xmljson {
-
-namespace fcl = artdaq::database::xml;
-namespace jsn = artdaq::database::json;
 
 using artdaq::database::json::JsonReader;
 using artdaq::database::json::JsonWriter;
@@ -25,27 +21,29 @@ using artdaq::database::xml::XmlWriter;
 
 namespace literal = artdaq::database::dataformats::literal;
 
-bool xml_to_json(std::string const& xml, std::string& json) {
-  assert(!xml.empty());
-  assert(json.empty());
+namespace dbxj=artdaq::database::xmljson;
+
+namespace xml = artdaq::database::xml;
+
+bool dbxj::xml_to_json(std::string const& xml, std::string& json) {
+  confirm(!xml.empty());
+  confirm(json.empty());
 
   TRACE_(2, "xml_to_json: begin");
 
   auto result = bool{false};
 
   auto json_root = jsn::object_t{};
-  json_root[literal::document_node] = jsn::object_t{};
-  json_root[literal::origin_node] = jsn::object_t{};
+  json_root[literal::document] = jsn::object_t{};
+  json_root[literal::origin] = jsn::object_t{};
 
-  auto get_object = [&json_root](std::string const& name) -> auto& {
-    return boost::get<jsn::object_t>(json_root[name]);
-  };
+  auto get_object = [&json_root](std::string const& name) -> auto& { return boost::get<jsn::object_t>(json_root[name]); };
 
-  get_object(literal::origin_node)[literal::format] = std::string("xml");
-  get_object(literal::origin_node)[literal::source] = std::string("xml_to_json");
-  get_object(literal::origin_node)[literal::timestamp] = artdaq::database::dataformats::timestamp();
+  get_object(literal::origin)[literal::format] = std::string("xml");
+  get_object(literal::origin)[literal::source] = std::string("xml_to_json");
+  get_object(literal::origin)[literal::timestamp] = artdaq::database::timestamp();
 
-  auto& json_node = get_object(literal::document_node);
+  auto& json_node = get_object(literal::document);
 
   auto reader = xml::XmlReader{};
   result = reader.read(xml, json_node);
@@ -65,9 +63,9 @@ bool xml_to_json(std::string const& xml, std::string& json) {
   return result;
 }
 
-bool json_to_xml(std::string const& json, std::string& xml) {
-  assert(!json.empty());
-  assert(xml.empty());
+bool dbxj::json_to_xml(std::string const& json, std::string& xml) {
+  confirm(!json.empty());
+  confirm(xml.empty());
 
   TRACE_(3, "json_to_xml: begin");
 
@@ -84,11 +82,9 @@ bool json_to_xml(std::string const& json, std::string& xml) {
     return result;
   }
 
-  auto get_object = [&json_root](std::string const& name) -> auto& {
-    return boost::get<jsn::object_t>(json_root.at(name));
-  };
+  auto get_object = [&json_root](std::string const& name) -> auto& { return boost::get<jsn::object_t>(json_root.at(name)); };
 
-  auto& json_node = get_object(literal::document_node);
+  auto& json_node = get_object(literal::document);
 
   auto xml1 = std::string{};
 
@@ -103,16 +99,11 @@ bool json_to_xml(std::string const& json, std::string& xml) {
   return result;
 }
 
-namespace debug {
-void enableXmlJson() {
+void dbxj::debug::enableXmlJson() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", 1LL);
-  TRACE_CNTL("modeS", 1LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
 
   TRACE_(0, "artdaq::database::xmljson trace_enable");
 }
-}
-}  // namespace fhicljson
-}  // namespace database
-}  // namespace artdaq

@@ -1,53 +1,70 @@
 {
-    "document" : {
-        "data" : {
-            "aa" : 3, 
-            "b" : {
-                "c" : "2", 
-                "dd" : [
-                    2, 
-                    5, 
-                    6, 
-                    7
-                ]
-            }
-        }, 
-        "metadata" : {
-            "comments" : {
-                "empty" : "empty"
-            }
-        }, 
-        "search" : [
-            {
-                "name" : "find any", 
-                "query" : "not defined"
-            }
-        ]
-    }, 
-    "origin" : {
-          
-        "format" : "json" 
-         
-    }, 
-    "version" : "default", 
-    "configurations" : [
+"document" : {
+"data" : {
+"aa" : 3,
+"b" : {
+"c" : "2",
+"dd" : [
+2,
+5,
+6,
+7
+]
+}
+},
+"metadata" : {
+"comments" : {
+"empty" : "empty"
+}
+},
+"search" : [
 
-    ], 
-    "aliases" : {
-        "active" : [
+]
+},
+"comments" : [
 
-        ], 
-        "history" : [
+],
+"origin" : {
+"format" : "json",
+"source" : "template",
+"name" : "notprovided",
+"created" : "Fri Jan 13 18:31:51 2017",
+"rawdata" : [
 
-        ]
-    }, 
-    "changelog" : "empty", 
-    "bookkeeping" : {
-        "isdeleted" : false, 
-        "isreadonly" : true, 
-        "created" : "Tue Dec 29 18:19:25 2015", 
-        "updates" : [
+]
+},
+"version" : "notprovided",
+"entities" : [
 
-        ]
-    }
+],
+"configurations" : [
+
+],
+"changelog" : "notprovided",
+"bookkeeping" : {
+"isdeleted" : false,
+"isreadonly" : false,
+"updates" : [
+
+],
+"created" : "Fri Jan 13 18:31:51 2017"
+},
+"_id" : {
+"_oid" : "9bfe155c84d44ba3bbff3fb8"
+},
+"collection" : "notprovided",
+"aliases" : {
+"active" : [
+
+],
+"history" : [
+
+]
+},
+"runs" : [
+
+],
+"attachments" : [
+
+]
 }

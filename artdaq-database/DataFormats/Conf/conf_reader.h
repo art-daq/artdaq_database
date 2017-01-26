@@ -3,8 +3,8 @@
 
 #include "artdaq-database/DataFormats/common.h"
 
-#include "artdaq-database/DataFormats/Json/json_types.h"
 #include "artdaq-database/DataFormats/Conf/conf_types.h"
+#include "artdaq-database/DataFormats/Json/json_types.h"
 
 namespace artdaq {
 namespace database {

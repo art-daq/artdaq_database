@@ -1,12 +1,5 @@
-#include <fstream>
-#include <iostream>
-#include <streambuf>
-#include <string>
+#include "test/common.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
-#include "boost/program_options.hpp"
-
-#include <boost/exception/diagnostic_information.hpp>
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
 
 namespace bpo = boost::program_options;
 using namespace artdaq::database;
@@ -21,8 +14,8 @@ int main(int argc, char* argv[]) try {
 
   bpo::options_description desc = descstr.str();
 
-  desc.add_options()("config,c", bpo::value<std::string>(), "Configuration file.")(
-      "outputformat,f", bpo::value<std::string>(), "Output file format.")("help,h", "produce help message");
+  desc.add_options()("config,c", bpo::value<std::string>(), "Configuration file.")("outputformat,f", bpo::value<std::string>(),
+                                                                                   "Output file format.")("help,h", "produce help message");
 
   bpo::variables_map vm;
 
@@ -63,7 +56,7 @@ int main(int argc, char* argv[]) try {
   jsn::object_t doc_ast;
 
   if (!reader.read(json, doc_ast)) {
-    assert(false);
+    confirm(false);
   }
 
   return process_exit_code::SUCCESS;

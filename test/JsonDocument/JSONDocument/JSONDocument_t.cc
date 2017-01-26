@@ -1,17 +1,8 @@
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <streambuf>
-#include "boost/program_options.hpp"
+#include "test/common.h"
 #include "artdaq-database/JsonDocument/JSONDocument.h"
-#include "cetlib/coded_exception.h"
-#include "artdaq-database/BuildInfo/process_exit_codes.h"
-#include "artdaq-database/BuildInfo/printStackTrace.h"
-#include <boost/exception/diagnostic_information.hpp>
-
 
 namespace  bpo = boost::program_options;
-using artdaq::database::jsonutils::JSONDocument;
+using artdaq::database::docrecord::JSONDocument;
 
 typedef bool (*test_case)(std::string const&);
 
@@ -25,7 +16,8 @@ bool test_removeChild(std::string const& conf);
 
 int main(int argc, char* argv[]) try
 {
-    artdaq::database::jsonutils::debug::enableJSONDocument();
+    artdaq::database::docrecord::debug::enableJSONDocument();
+    artdaq::database::docrecord::debug::enableJSONDocumentUtils();
 
     debug::registerUngracefullExitHandlers();
 
@@ -117,7 +109,7 @@ constexpr auto mustsucceed = "must-succeed";
 
 bool test_insertChild(std::string const& conf)
 {
-    assert(!conf.empty());
+    confirm(!conf.empty());
 
     auto opts = JSONDocument(conf);
     auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
@@ -154,7 +146,7 @@ bool test_insertChild(std::string const& conf)
 
 bool test_replaceChild(std::string const& conf)
 {
-    assert(!conf.empty());
+    confirm(!conf.empty());
 
     auto opts = JSONDocument(conf);
     auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
@@ -191,7 +183,7 @@ bool test_replaceChild(std::string const& conf)
 
 bool test_deleteChild(std::string const& conf)
 {
-    assert(!conf.empty());
+    confirm(!conf.empty());
 
     auto opts = JSONDocument(conf);
     auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
@@ -225,7 +217,7 @@ bool test_deleteChild(std::string const& conf)
 
 bool test_findChild(std::string const& conf)
 {
-    assert(!conf.empty());
+    confirm(!conf.empty());
 
     auto opts = JSONDocument(conf);
     auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
@@ -260,7 +252,7 @@ bool test_findChild(std::string const& conf)
 
 bool test_appendChild(std::string const& conf)
 {
-    assert(!conf.empty());
+    confirm(!conf.empty());
 
     auto opts = JSONDocument(conf);
     auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
@@ -299,7 +291,7 @@ bool test_appendChild(std::string const& conf)
 
 bool test_removeChild(std::string const& conf)
 {
-    assert(!conf.empty());
+    confirm(!conf.empty());
 
     auto opts = JSONDocument(conf);
     auto begin = JSONDocument::loadFromFile(opts.value_as<std::string>(literal::beginstate));
