@@ -21,12 +21,13 @@ namespace db = artdaq::database;
 namespace cf = db::configuration;
 namespace dbbt = db::basictypes;
 
-namespace jsonliteral = artdaq::database::dataformats::literal;
 namespace apiliteral = artdaq::database::configapi::literal;
 
 using dbbt::JsonData;
 using cf::BulkOperations;
 using cf::options::data_format_t;
+
+namespace apiliteral = artdaq::database::configapi::literal;
 
 BulkOperations::BulkOperations(std::string const& process_name) : _process_name{process_name} {}
 
@@ -108,7 +109,7 @@ void BulkOperations::readJsonData(JsonData const& data) {
 
   bulkOperations(data.json_buffer);
 
-  auto const& operations = boost::get<jsn::array_t>(dataAST.at(jsonliteral::operations));
+  auto const& operations = boost::get<jsn::array_t>(dataAST.at(apiliteral::operations));
 
   for (auto& operation : operations) {
     auto const& tmp_op_object = boost::get<jsn::object_t>(operation);

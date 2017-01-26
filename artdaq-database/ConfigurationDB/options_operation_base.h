@@ -20,7 +20,6 @@ namespace configuration {
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::configuration::options::data_format_t;
 
-namespace jsonliteral = artdaq::database::dataformats::literal;
 namespace apiliteral = artdaq::database::configapi::literal;
 
 class OperationBase {
@@ -58,13 +57,13 @@ class OperationBase {
   std::string _getProviderFromURI();
 
  private:
-  std::string _process_name = {jsonliteral::notprovided};
+  std::string _process_name = {apiliteral::notprovided};
 
   std::string _provider = {apiliteral::provider::filesystem};
   std::string _operation = {apiliteral::operation::readdocument};
   data_format_t _data_format = {data_format_t::unknown};
-  std::string _collection_name = {jsonliteral::notprovided};
-  std::string _query_payload = {jsonliteral::notprovided};
+  std::string _collection_name = {apiliteral::notprovided};
+  std::string _query_payload = {apiliteral::notprovided};
 };
 
 namespace debug {

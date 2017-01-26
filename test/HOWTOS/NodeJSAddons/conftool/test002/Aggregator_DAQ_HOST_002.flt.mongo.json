@@ -3,7 +3,7 @@
  "configurations.name":"configA001"
 }, 
 "collection":"artdaq_Aggregator",
-"configurable_entity":"DAQ_HOST_002",
+"entity":"DAQ_HOST_002",
 "configuration":"configA001",
 "dbprovider":"mongo",
 "operation":"load"

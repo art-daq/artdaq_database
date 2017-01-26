@@ -120,7 +120,7 @@ JsonData prov::findConfigurations(ManageConfigsOperation const& options, JsonDat
   std::ostringstream oss;
 
   auto seenValues = std::list<std::string>{};
-  seenValues.push_back(jsonliteral::notprovided);
+  seenValues.push_back(apiliteral::notprovided);
 
   auto isNew = [& v = seenValues](auto const& name) {
     confirm(!name.empty());

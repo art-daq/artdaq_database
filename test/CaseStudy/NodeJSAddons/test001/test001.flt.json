@@ -1,10 +1,10 @@
 {"filter":{
  "version":"version55",
- "configurable_entity":"topol.fnal.gov",
+ "entity":"topol.fnal.gov",
  "configurations.name":"config001"
 }, 
 "collection":"testNodeJSAddons",
-"configurable_entity":"topol.fnal.gov",
+"entity":"topol.fnal.gov",
 "version":"version55",
 "configuration":"config001",
 "dbprovider":"filesystem",

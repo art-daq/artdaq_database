@@ -43,6 +43,8 @@ auto make_error_msg = [](auto msg) { return std::string("{\"error\":\"").append(
 using namespace artdaq::database::result;
 using artdaq::database::result_t;
 
+namespace jsonliteral = artdaq::database::dataformats::literal; 
+
 result_t json::write_configuration(std::string const& query_payload, std::string const& conf_tarbzip2_base64) noexcept {
   try {
     if (query_payload.empty()) return Failure(msg_EmptyFilter);

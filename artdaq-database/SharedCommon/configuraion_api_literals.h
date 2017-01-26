@@ -57,27 +57,24 @@ constexpr auto source = "source";
 
 constexpr auto version = "version";
 constexpr auto version_alias = "alias";
+
 constexpr auto searchfilter = "filter";
 constexpr auto searchquery = "searchquery";
 constexpr auto bulkoperations = "bulkoperations";
 
 constexpr auto collection = "collection";
 constexpr auto entity = "entity";
+
 constexpr auto configuration = "configuration";
 constexpr auto configuration_alias = "configurationalias";
 }
 
 namespace filter {
-constexpr auto entity = "entities.name";
+constexpr auto entities = "entities.name";
+constexpr auto configurations = "configurations.name";
 constexpr auto version = "version";
 constexpr auto version_alias = "alias";
-constexpr auto configuration = "configurations.name";
 constexpr auto configuration_alias = "configuration_alias";
-}
-
-namespace gui {
-constexpr auto entity = "entities";
-constexpr auto operations = "operations";
 }
 
 namespace msg {
@@ -89,20 +86,9 @@ constexpr auto cant_call_system =
     "check if either set-user-ID or set-group-ID ";
 }
 
-namespace search {
-constexpr auto default_filter = "{\"entities\":\"any\"}";
-}
-
-
-
 constexpr auto name = "name";
-
-constexpr auto filterx = "filter";
 constexpr auto notprovided = "notprovided";
-constexpr auto unknown = "unknown";
-constexpr auto collection_default = "test_Data_Type001";
 
-constexpr auto colon = ":";
 constexpr auto empty_json = "{ }";
 constexpr auto empty_search_result = "{\"search\":[ ]}";
 }

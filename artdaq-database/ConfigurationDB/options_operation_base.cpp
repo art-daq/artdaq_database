@@ -24,6 +24,8 @@ using dbbt::JsonData;
 using cf::OperationBase;
 using cf::options::data_format_t;
 
+namespace apiliteral = artdaq::database::configapi::literal;
+
 namespace artdaq {
 namespace database {
 std::string expand_environment_variables(std::string var);
@@ -130,7 +132,7 @@ std::string const& OperationBase::queryFilter(std::string const& query_payload) 
 }
 
 JsonData OperationBase::query_filter_to_JsonData() const {
-  if (queryFilter() != jsonliteral::notprovided) {
+  if (queryFilter() != apiliteral::notprovided) {
     return {queryFilter()};
   }
 
@@ -140,7 +142,7 @@ JsonData OperationBase::query_filter_to_JsonData() const {
 bpo::options_description OperationBase::makeProgramOptions() const {
   std::ostringstream descstr;
   descstr << _process_name;
-  descstr << " <" << apiliteral::option::searchquery << ">";
+  descstr << " <" << apiliteral::option::searchfilter << ">";
 
   // descstr << "  <-d <" << apiliteral::option::provider << ">>";
   descstr << "  <-o <" << apiliteral::option::operation << ">>";
@@ -248,7 +250,7 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
 
 void OperationBase::readJsonData(JsonData const& data) {
   confirm(!data.json_buffer.empty());
-  confirm(data.json_buffer != jsonliteral::notprovided);
+  confirm(data.json_buffer != apiliteral::notprovided);
 
   TRACE_(14, "OperationBase::readJsonData() data=<" << data.json_buffer << ">");
 

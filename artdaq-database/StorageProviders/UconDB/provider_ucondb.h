@@ -14,12 +14,10 @@ void enableReadWrite();
 namespace literal {
 constexpr auto UCONURI = "http://";
 constexpr auto search_index = "index.json";
-constexpr auto db_name = "artdaq_ucondb_dev";
-constexpr auto hostname = "dbweb3.fnal.gov";
-constexpr auto port = 9090;
+constexpr auto db_name = "test_db";
+constexpr auto hostname = "127.0.0.1";
+constexpr auto port = 80;
 }
-
-//http://dbweb3.fnal.gov:9090/artdaq_uconb_dev/app
 
 struct DBConfig final {
   DBConfig();

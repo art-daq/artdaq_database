@@ -31,6 +31,9 @@ result_t read_configuration(std::string const& query_payload) {
   return impl::read_configuration(query_payload, conf);
 }
 
+void enable_trace(){
+  return impl::enable_trace();
+}
 result_t write_configuration(std::string const& query_payload, std::string const& json_document) {
   return impl::write_configuration(query_payload, json_document);
 }

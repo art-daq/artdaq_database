@@ -27,6 +27,7 @@ using cf::OperationBase;
 using cf::ManageAliasesOperation;
 
 using cf::options::data_format_t;
+namespace apiliteral = artdaq::database::configapi::literal;
 
 ManageAliasesOperation::ManageAliasesOperation(std::string const& process_name) : OperationBase{process_name} {}
 
@@ -148,7 +149,7 @@ void ManageAliasesOperation::readJsonData(JsonData const& data) {
   try {
     auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(apiliteral::option::searchfilter));
 
-    if (filterAST.empty()) queryFilter(jsonliteral::notprovided);
+    if (filterAST.empty()) queryFilter(apiliteral::notprovided);
 
     try {
       entity(boost::get<std::string>(filterAST.at(apiliteral::option::entity)));
@@ -241,11 +242,11 @@ JsonData ManageAliasesOperation::writeJsonData() const {
     throw db::invalid_option_exception("ManageAliasesOperation") << "Unable to readquery_filter_to_JsonData().";
   }
 
-  if (configuration() != jsonliteral::notprovided) docAST[apiliteral::option::configuration] = configuration();
-  if (versionAlias() != jsonliteral::notprovided) docAST[apiliteral::option::version_alias] = versionAlias();
-  if (configurationAlias() != jsonliteral::notprovided)
+  if (configuration() != apiliteral::notprovided) docAST[apiliteral::option::configuration] = configuration();
+  if (versionAlias() != apiliteral::notprovided) docAST[apiliteral::option::version_alias] = versionAlias();
+  if (configurationAlias() != apiliteral::notprovided)
     docAST[apiliteral::option::configuration_alias] = configurationAlias();
-  if (version() != jsonliteral::notprovided) docAST[apiliteral::option::version] = version();
+  if (version() != apiliteral::notprovided) docAST[apiliteral::option::version] = version();
 
   auto json_buffer = std::string{};
 
@@ -256,7 +257,7 @@ JsonData ManageAliasesOperation::writeJsonData() const {
 }
 
 JsonData ManageAliasesOperation::query_filter_to_JsonData() const {
-  if (queryFilter() != jsonliteral::notprovided) {
+  if (queryFilter() != apiliteral::notprovided) {
     return {queryFilter()};
   }
 
@@ -268,10 +269,10 @@ JsonData ManageAliasesOperation::query_filter_to_JsonData() const {
     throw db::invalid_option_exception("ManageAliasesOperation") << "Unable to query_filter_to_JsonData().";
   }
 
-  if (entity() != jsonliteral::notprovided) docAST[apiliteral::filter::entity] = entity();
+  if (entity() != apiliteral::notprovided) docAST[apiliteral::filter::entities] = entity();
 
-  if (configuration() != jsonliteral::notprovided && operation() != apiliteral::operation::assignconfig)
-    docAST[apiliteral::filter::configuration] = configuration();
+  if (configuration() != apiliteral::notprovided && operation() != apiliteral::operation::assignconfig)
+    docAST[apiliteral::filter::configurations] = configuration();
 
   if (docAST.empty()) {
     return {apiliteral::empty_json};

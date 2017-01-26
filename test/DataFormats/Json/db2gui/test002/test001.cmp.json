@@ -382,7 +382,7 @@
 }
 ]
 },
-"configurable_entity" : {
+"entity" : {
 "name" : "Aggregator_topol"
 }
 }

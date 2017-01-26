@@ -167,7 +167,7 @@ void create_configuration(std::string const& operations, std::string& configs) {
     throw runtime_error("create_configuration") << "Failed to create an AST from operations JSON.";
   }
 
-  auto const& operations_list = boost::get<array_t>(operations_ast.at(apiliteral::gui::operations));
+  auto const& operations_list = boost::get<array_t>(operations_ast.at(apiliteral::operations));
 
   TRACE_(11, "create_configuration: found " << operations_list.size() << " operations.");
 
@@ -177,7 +177,7 @@ void create_configuration(std::string const& operations, std::string& configs) {
 
     TRACE_(11, "create_configuration() Found operation=<" << buff << ">.");
 
-    auto addconfig = Options{apiliteral::gui::operations};
+    auto addconfig = Options{apiliteral::operations};
     addconfig.readJsonData(buff);
 
     configs.clear();

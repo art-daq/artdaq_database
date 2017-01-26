@@ -22,7 +22,6 @@ namespace db = artdaq::database;
 namespace cf = db::configuration;
 namespace dbbt = db::basictypes;
 
-namespace jsonliteral = artdaq::database::dataformats::literal;
 namespace apiliteral = artdaq::database::configapi::literal;
 
 using dbbt::JsonData;
@@ -112,9 +111,20 @@ void ManageConfigsOperation::readJsonData(JsonData const& data) {
   }
 
   try {
+    version(boost::get<std::string>(dataAST.at(apiliteral::option::version)));
+  } catch (...) {
+  }
+
+  try {
+    entity(boost::get<std::string>(dataAST.at(apiliteral::option::entity)));
+  } catch (...) {
+  }
+
+
+  try {
     auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(apiliteral::option::searchfilter));
 
-    if (filterAST.empty()) queryFilter(jsonliteral::notprovided);
+    if (filterAST.empty()) queryFilter(apiliteral::notprovided);
 
     try {
       version(boost::get<std::string>(filterAST.at(apiliteral::filter::version)));
@@ -122,12 +132,12 @@ void ManageConfigsOperation::readJsonData(JsonData const& data) {
     }
 
     try {
-      entity(boost::get<std::string>(filterAST.at(apiliteral::filter::entity)));
+      entity(boost::get<std::string>(filterAST.at(apiliteral::filter::entities)));
     } catch (...) {
     }
 
     try {
-      configuration(boost::get<std::string>(filterAST.at(apiliteral::filter::configuration)));
+      configuration(boost::get<std::string>(filterAST.at(apiliteral::filter::configurations)));
     } catch (...) {
     }
 
@@ -185,7 +195,11 @@ JsonData ManageConfigsOperation::writeJsonData() const {
     throw db::invalid_option_exception("ManageConfigsOperation") << "Unable to readquery_filter_to_JsonData().";
   }
 
-  if (configuration() != jsonliteral::notprovided) docAST[apiliteral::option::configuration] = configuration();
+  if (configuration() != apiliteral::notprovided) docAST[apiliteral::option::configuration] = configuration();
+
+  if (entity() != apiliteral::notprovided) docAST[apiliteral::option::entity] = entity();
+
+  if (version() != apiliteral::notprovided) docAST[apiliteral::option::version] = version();
 
   auto json_buffer = std::string{};
 
@@ -196,7 +210,7 @@ JsonData ManageConfigsOperation::writeJsonData() const {
 }
 
 JsonData ManageConfigsOperation::query_filter_to_JsonData() const {
-  if (queryFilter() != jsonliteral::notprovided) {
+  if (queryFilter() != apiliteral::notprovided) {
     return {queryFilter()};
   }
 
@@ -208,12 +222,12 @@ JsonData ManageConfigsOperation::query_filter_to_JsonData() const {
     throw db::invalid_option_exception("ManageConfigsOperation") << "Unable to query_filter_to_JsonData().";
   }
 
-  if (version() != jsonliteral::notprovided) docAST[apiliteral::filter::version] = version();
+  if (version() != apiliteral::notprovided) docAST[apiliteral::filter::version] = version();
 
-  if (entity() != jsonliteral::notprovided) docAST[apiliteral::filter::entity] = entity();
+  if (entity() != apiliteral::notprovided) docAST[apiliteral::filter::entities] = entity();
 
-  if (configuration() != jsonliteral::notprovided && operation() != apiliteral::operation::assignconfig)
-    docAST[apiliteral::filter::configuration] = configuration();
+  if (configuration() != apiliteral::notprovided && operation() != apiliteral::operation::assignconfig)
+    docAST[apiliteral::filter::configurations] = configuration();
 
   if (docAST.empty()) {
     return {apiliteral::empty_json};
@@ -231,7 +245,7 @@ JsonData ManageConfigsOperation::configuration_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[apiliteral::filter::configuration] = configuration();
+  docAST[apiliteral::filter::configurations] = configuration();
 
   auto json_buffer = std::string{};
 
@@ -246,7 +260,7 @@ JsonData ManageConfigsOperation::version_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[apiliteral::filter::version] = version();
+  docAST[apiliteral::name] = version();
 
   auto json_buffer = std::string{};
 

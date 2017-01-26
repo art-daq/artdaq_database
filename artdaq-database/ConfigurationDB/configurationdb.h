@@ -7,4 +7,11 @@
 #include "artdaq-database/ConfigurationDB/dboperation_metadata.h"
 #include "artdaq-database/ConfigurationDB/dboperation_readwrite.h"
 
+namespace artdaq {
+namespace database {
+namespace configuration {
+namespace json {  
+void enable_trace();
+}}}}
+
 #endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_H_ */

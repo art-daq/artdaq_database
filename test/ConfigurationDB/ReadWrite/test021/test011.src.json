@@ -345,7 +345,7 @@
 ,{
 "setConfigurableEntity":"Thu Sep  8 19:38:10 2016"}
 ]}
-,"configurable_entity":{
+,"entity":{
 "name":"notprovided"}
 ,"_id":{
 "_oid":"15781635e2564d60ac331274"}
@@ -697,7 +697,7 @@
 ,{
 "setConfigurableEntity":"Thu Sep  8 19:38:10 2016"}
 ]}
-,"configurable_entity":{
+,"entity":{
 "name":"notprovided"}
 ,"_id":{
 "_oid":"15781635e2564d60ac331274"}

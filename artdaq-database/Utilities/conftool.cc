@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) try {
   auto options_string = options.to_string();
   auto test_document = std::string{};
 
-  std::cout << "Parsed options:\n" << options_string << "\n";
+  //std::cout << "Parsed options:\n" << options_string << "\n";
 
   using namespace artdaq::database::configuration::json;
 

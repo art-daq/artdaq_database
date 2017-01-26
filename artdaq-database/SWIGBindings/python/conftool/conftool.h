@@ -15,3 +15,5 @@ result_t read_configuration(std::string const& query_payload);
 result_t write_configuration(std::string const& query_payload, std::string const& tarbz2base64);
 result_t list_databases(std::string const& query_payload);
 result_t read_dbinfo(std::string const& query_payload);
+
+void enable_trace();

@@ -332,7 +332,7 @@
 }
 ]
 },
-"configurable_entity" : {
+"entity" : {
 "name" : "DAQ_HOST_002"
 },
 "_id" : {

@@ -27,6 +27,7 @@ using cf::OperationBase;
 using cf::ManageDocumentOperation;
 
 using cf::options::data_format_t;
+namespace apiliteral = artdaq::database::configapi::literal;
 
 ManageDocumentOperation::ManageDocumentOperation(std::string const& process_name) : OperationBase{process_name} {}
 
@@ -134,7 +135,7 @@ void ManageDocumentOperation::readJsonData(JsonData const& data) {
   }
 
   try {
-    entity(boost::get<std::string>(dataAST.at(apiliteral::gui::entity)));
+    entity(boost::get<std::string>(dataAST.at(apiliteral::option::entity)));
   } catch (...) {
   }
 
@@ -146,7 +147,7 @@ void ManageDocumentOperation::readJsonData(JsonData const& data) {
   try {
     auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(apiliteral::option::searchfilter));
 
-    if (filterAST.empty()) queryFilter(jsonliteral::notprovided);
+    if (filterAST.empty()) queryFilter(apiliteral::notprovided);
 
     try {
       version(boost::get<std::string>(filterAST.at(apiliteral::filter::version)));
@@ -154,17 +155,12 @@ void ManageDocumentOperation::readJsonData(JsonData const& data) {
     }
 
     try {
-      entity(boost::get<std::string>(filterAST.at(apiliteral::filter::entity)));
+      entity(boost::get<std::string>(filterAST.at(apiliteral::filter::entities)));
     } catch (...) {
     }
 
     try {
-      configuration(boost::get<std::string>(filterAST.at(apiliteral::filter::configuration)));
-    } catch (...) {
-    }
-
-    try {
-      sourceFileName(boost::get<std::string>(dataAST.at(apiliteral::option::source)));
+      configuration(boost::get<std::string>(filterAST.at(apiliteral::filter::configurations)));
     } catch (...) {
     }
 
@@ -226,10 +222,14 @@ JsonData ManageDocumentOperation::writeJsonData() const {
     throw db::invalid_option_exception("ManageDocumentOperation") << "Unable to readquery_filter_to_JsonData().";
   }
 
-  if (configuration() != jsonliteral::notprovided) docAST[apiliteral::option::configuration] = configuration();
+  if (configuration() != apiliteral::notprovided) docAST[apiliteral::option::configuration] = configuration();
 
-  if (sourceFileName() != jsonliteral::notprovided) docAST[apiliteral::option::source] = sourceFileName();
+  if (sourceFileName() != apiliteral::notprovided) docAST[apiliteral::option::source] = sourceFileName();
 
+  if (entity() != apiliteral::notprovided) docAST[apiliteral::option::entity] = entity();
+
+  if (version() != apiliteral::notprovided) docAST[apiliteral::option::version] = version();
+  
   auto json_buffer = std::string{};
 
   if (!JsonWriter{}.write(docAST, json_buffer)) {
@@ -239,7 +239,7 @@ JsonData ManageDocumentOperation::writeJsonData() const {
 }
 
 JsonData ManageDocumentOperation::query_filter_to_JsonData() const {
-  if (queryFilter() != jsonliteral::notprovided) {
+  if (queryFilter() != apiliteral::notprovided) {
     return {queryFilter()};
   }
 
@@ -251,12 +251,12 @@ JsonData ManageDocumentOperation::query_filter_to_JsonData() const {
     throw db::invalid_option_exception("ManageDocumentOperation") << "Unable to query_filter_to_JsonData().";
   }
 
-  if (version() != jsonliteral::notprovided) docAST[apiliteral::filter::version] = version();
+  if (version() != apiliteral::notprovided) docAST[apiliteral::filter::version] = version();
 
-  if (entity() != jsonliteral::notprovided) docAST[apiliteral::filter::entity] = entity();
+  if (entity() != apiliteral::notprovided) docAST[apiliteral::filter::entities] = entity();
 
-  if (configuration() != jsonliteral::notprovided && operation() != apiliteral::operation::assignconfig)
-    docAST[apiliteral::filter::configuration] = configuration();
+  if (configuration() != apiliteral::notprovided && operation() != apiliteral::operation::assignconfig)
+    docAST[apiliteral::filter::configurations] = configuration();
 
   if (docAST.empty()) {
     return {apiliteral::empty_json};
@@ -275,7 +275,7 @@ JsonData ManageDocumentOperation::configuration_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[jsonliteral::name] = configuration();
+  docAST[apiliteral::name] = configuration();
 
   auto json_buffer = std::string{};
 
@@ -290,7 +290,7 @@ JsonData ManageDocumentOperation::configurationsname_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[apiliteral::filter::configuration] = configuration();
+  docAST[apiliteral::filter::configurations] = configuration();
 
   auto json_buffer = std::string{};
 
@@ -305,7 +305,7 @@ JsonData ManageDocumentOperation::collection_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[jsonliteral::collection] = collection();
+  docAST[apiliteral::option::collection] = collection();
 
   auto json_buffer = std::string{};
 
@@ -320,7 +320,7 @@ JsonData ManageDocumentOperation::version_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[jsonliteral::name] = version();
+  docAST[apiliteral::name] = version();
 
   auto json_buffer = std::string{};
 
@@ -334,7 +334,7 @@ JsonData ManageDocumentOperation::entity_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
-  docAST[jsonliteral::name] = entity();
+  docAST[apiliteral::name] = entity();
 
   auto json_buffer = std::string{};
 

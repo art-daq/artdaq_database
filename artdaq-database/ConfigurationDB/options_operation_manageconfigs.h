@@ -14,7 +14,6 @@ class JsonData;
 }
 
 namespace configuration {
-namespace jsonliteral = artdaq::database::dataformats::literal;
 namespace apiliteral = artdaq::database::configapi::literal;
 
 using artdaq::database::basictypes::JsonData;
@@ -47,9 +46,9 @@ class ManageConfigsOperation final : public OperationBase {
   JsonData writeJsonData() const override;
 
  private:
-  std::string _version = {jsonliteral::notprovided};
-  std::string _entity = {jsonliteral::notprovided};
-  std::string _configuration = {jsonliteral::notprovided};
+  std::string _version = {apiliteral::notprovided};
+  std::string _entity = {apiliteral::notprovided};
+  std::string _configuration = {apiliteral::notprovided};
 };
 
 namespace debug {

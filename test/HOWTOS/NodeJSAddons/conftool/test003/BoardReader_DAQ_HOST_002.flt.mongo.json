@@ -2,7 +2,7 @@
  "entities.name":"DAQ_HOST_002"
 }, 
 "collection":"artdaq_BoardReader",
-"configurable_entity":"DAQ_HOST_002",
+"entity":"DAQ_HOST_002",
 "configuration":"configA001",
 "dbprovider":"mongo",
 "operation":"load",

@@ -137,6 +137,7 @@ void write_document(Options const& options, std::string& conf) {
   }
 
   TRACE_(15, "write_document: json_buffer=<" << data.json_buffer << ">");
+  TRACE_(15, "write_document: options=<" << options.to_string() << ">");
 
   // create a json document to be inserted into the database
   JSONDocumentBuilder builder{};

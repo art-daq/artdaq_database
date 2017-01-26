@@ -39,3 +39,7 @@ result_t store_globalconfiguration_ui(std::string const& query_payload, std::str
 result_t list_databases(std::string const& query_payload) { return impl::list_databases(query_payload); }
 
 result_t read_dbinfo(std::string const& query_payload) { return impl::read_dbinfo(query_payload); }
+
+void enable_trace(){
+  return impl::enable_trace();
+}

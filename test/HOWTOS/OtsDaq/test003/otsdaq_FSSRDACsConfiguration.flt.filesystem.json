@@ -3,7 +3,7 @@
  "configurations.name":"otsdaqC001"
 }, 
 "collection":"otsdaq_FSSRDACsConfiguration",
-"configurable_entity":"CMSROOT",
+"entity":"CMSROOT",
 "configuration":"otsdaqC001",
 "dbprovider":"filesystem",
 "operation":"load",

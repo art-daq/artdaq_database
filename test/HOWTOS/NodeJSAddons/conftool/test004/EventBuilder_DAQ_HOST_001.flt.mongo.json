@@ -1,7 +1,7 @@
 { 
 "version":"version002",
 "collection":"artdaq_EventBuilder",
-"configurable_entity":"DAQ_HOST_001",
+"entity":"DAQ_HOST_001",
 "dbprovider":"mongo",
 "operation":"store",
 "dataformat":"gui"
