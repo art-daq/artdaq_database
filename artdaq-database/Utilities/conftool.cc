@@ -153,6 +153,11 @@ int main(int argc, char* argv[]) try {
 
   //std::cout << "Running :<" << options.operation() << ">\n";
 
+  if(cf::getOperations().count(options.operation())==0){
+      std::cerr << "Unsupported operation \"" << options.operation() << "\"\n";
+      return process_exit_code::INVALID_ARGUMENT | 2;
+  }
+    
   auto result = cf::getOperations().at(options.operation())->invoke();
 
   if (!result.first) {
