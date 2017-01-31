@@ -60,7 +60,7 @@ void list_databases(Options const& options, std::string& configs) {
   confirm(options.operation().compare(apiliteral::operation::listdatabases) == 0);
 
   TRACE_(11, "list_databases: begin");
-  TRACE_(11, "list_databases args options=<" << options.to_string() << ">");
+  TRACE_(11, "list_databases args options=<" << options << ">");
 
   validate_dbprovider_name(options.provider());
 
@@ -74,7 +74,7 @@ void list_databases(Options const& options, std::string& configs) {
   };
 
   auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData().json_buffer);
+      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -86,14 +86,14 @@ void list_databases(Options const& options, std::string& configs) {
     case data_format_t::unknown:
     case data_format_t::fhicl:
     case data_format_t::xml: {
-      if (!db::json_db_to_gui(search_result.json_buffer, returnValue)) {
+      if (!db::json_db_to_gui(search_result, returnValue)) {
         throw runtime_error("list_databases") << "Unsupported data format.";
       }
       break;
     }
 
     case data_format_t::gui: {
-      returnValue = search_result.json_buffer;
+      returnValue = search_result;
       returnValueChanged = true;
       break;
     }
@@ -103,7 +103,7 @@ void list_databases(Options const& options, std::string& configs) {
       auto reader = JsonReader{};
       object_t results_ast;
 
-      if (!reader.read(search_result.json_buffer, results_ast)) {
+      if (!reader.read(search_result, results_ast)) {
         TRACE_(11, "list_databases() Failed to create an AST from search results JSON.");
 
         throw runtime_error("list_databases") << "Failed to create an AST from search results JSON.";
@@ -138,7 +138,7 @@ void read_dbinfo(Options const& options, std::string& filters) {
   confirm(options.operation().compare(apiliteral::operation::readdbinfo) == 0);
 
   TRACE_(12, "read_dbinfo: begin");
-  TRACE_(11, "read_dbinfo args options=<" << options.to_string() << ">");
+  TRACE_(11, "read_dbinfo args options=<" << options << ">");
 
   validate_dbprovider_name(options.provider());
 
@@ -152,7 +152,7 @@ void read_dbinfo(Options const& options, std::string& filters) {
   };
 
   auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData().json_buffer);
+      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -164,14 +164,14 @@ void read_dbinfo(Options const& options, std::string& filters) {
     case data_format_t::unknown:
     case data_format_t::fhicl:
     case data_format_t::xml: {
-      if (!db::json_db_to_gui(search_result.json_buffer, returnValue)) {
+      if (!db::json_db_to_gui(search_result, returnValue)) {
         throw runtime_error("read_dbinfo") << "Unsupported data format.";
       }
       break;
     }
 
     case data_format_t::gui: {
-      returnValue = search_result.json_buffer;
+      returnValue = search_result;
       returnValueChanged = true;
       break;
     }
@@ -187,7 +187,7 @@ void list_collections(Options const& options, std::string& collections) {
   confirm(options.operation().compare(apiliteral::operation::listcollections) == 0);
 
   TRACE_(13, "list_collections: begin");
-  TRACE_(13, "list_collections args query_payload=<" << options.to_string() << ">");
+  TRACE_(13, "list_collections args query_payload=<" << options << ">");
 
   validate_dbprovider_name(options.provider());
 
@@ -201,7 +201,7 @@ void list_collections(Options const& options, std::string& collections) {
   };
 
   auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.collection_to_JsonData().json_buffer);
+      dispatch_persistence_provider(options.provider())(options, options.collection_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -218,7 +218,7 @@ void list_collections(Options const& options, std::string& collections) {
     }
 
     case data_format_t::gui: {
-      returnValue = search_result.json_buffer;
+      returnValue = search_result;
       returnValueChanged = true;
       break;
     }
@@ -227,7 +227,7 @@ void list_collections(Options const& options, std::string& collections) {
       auto reader = JsonReader{};
       object_t results_ast;
 
-      if (!reader.read(search_result.json_buffer, results_ast)) {
+      if (!reader.read(search_result, results_ast)) {
         TRACE_(11, "list_collections() Failed to create an AST from search results JSON.");
 
         throw runtime_error("list_collections") << "Failed to create an AST from search results JSON.";

@@ -41,12 +41,17 @@ bool JsonData::convert_from(XmlData const& xml) {
 
 XmlData::XmlData(std::string const& buffer) : xml_buffer{buffer} {}
 
+XmlData::operator std::string const&() const{
+  return xml_buffer;
+}
+
+
 XmlData::XmlData(JsonData const& document) {
   namespace literal = artdaq::database::dataformats::literal;
 
-  confirm(!document.json_buffer.empty());
+  confirm(!document.empty());
 
-  TRACE_(1, "XML document=" << document.json_buffer);
+  TRACE_(1, "XML document=" << document);
 
   auto ex = std::regex({regex::parse_base64data});
 
@@ -81,7 +86,7 @@ XmlData::operator JsonData() const {
 
   if (!json.convert_from(*this)) throw std::runtime_error("XML to JSON convertion error; XML buffer: " + this->xml_buffer);
 
-  TRACE_(6, "XML  json=" << json.json_buffer);
+  TRACE_(6, "XML  json=" << json);
 
   auto collection = std::string("XmlData_") + type_version();
 
@@ -90,7 +95,7 @@ XmlData::operator JsonData() const {
 
   std::ostringstream os;
 
-  os << json.json_buffer;
+  os << json ;
 
   TRACE_(8, "XML document=" << os.str());
 

@@ -112,9 +112,10 @@ std::string const& ManageDocumentOperation::sourceFileName(std::string const& so
 }
 
 void ManageDocumentOperation::readJsonData(JsonData const& data) {
-  confirm(!data.json_buffer.empty());
-
+  confirm(!data.empty());
+  
   OperationBase::readJsonData(data);
+   TRACE_(12, "OperationBase::readJsonData <" << data.json_buffer << ">");
 
   using namespace artdaq::database::json;
   auto dataAST = object_t{};
@@ -185,7 +186,7 @@ int ManageDocumentOperation::readProgramOptions(bpo::variables_map const& vm) {
   if (vm.count(apiliteral::option::configuration)) {
     configuration(vm[apiliteral::option::configuration].as<std::string>());
   }
-
+  
   if (vm.count(apiliteral::option::source)) {
     sourceFileName(vm[apiliteral::option::source].as<std::string>());
   }
@@ -218,7 +219,7 @@ JsonData ManageDocumentOperation::writeJsonData() const {
 
   auto docAST = object_t{};
 
-  if (!JsonReader{}.read(OperationBase::writeJsonData().json_buffer, docAST)) {
+  if (!JsonReader{}.read(OperationBase::writeJsonData(), docAST)) {
     throw db::invalid_option_exception("ManageDocumentOperation") << "Unable to readquery_filter_to_JsonData().";
   }
 
@@ -247,7 +248,7 @@ JsonData ManageDocumentOperation::query_filter_to_JsonData() const {
 
   auto docAST = object_t{};
 
-  if (!JsonReader{}.read(OperationBase::query_filter_to_JsonData().json_buffer, docAST)) {
+  if (!JsonReader{}.read(OperationBase::query_filter_to_JsonData(), docAST)) {
     throw db::invalid_option_exception("ManageDocumentOperation") << "Unable to query_filter_to_JsonData().";
   }
 

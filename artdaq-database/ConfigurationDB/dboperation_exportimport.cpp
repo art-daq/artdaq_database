@@ -214,7 +214,7 @@ result_t json::write_configuration(std::string const& query_payload, std::string
     auto options = ManageDocumentOperation{apiliteral::operation::writeconfiguration};
     options.readJsonData({query_payload});
 
-    TRACE_(10, "write_configuration: operation=<" << options.to_string() << ">");
+    TRACE_(10, "write_configuration: operation=<" << options << ">");
 
     confirm(options.operation().compare(apiliteral::operation::writeconfiguration) == 0);
 
@@ -294,7 +294,7 @@ result_t json::read_configuration(std::string const& query_payload, std::string&
     auto options = ManageDocumentOperation{apiliteral::operation::readconfiguration};
     options.readJsonData({query_payload});
 
-    TRACE_(10, "read_configuration: operation=<" << options.to_string() << ">");
+    TRACE_(10, "read_configuration: operation=<" << options << ">");
 
     confirm(options.operation().compare(apiliteral::operation::readconfiguration) == 0);
 

@@ -154,10 +154,10 @@ bool test_insert(std::string const& source_xml, std::string const& compare_xml,s
     JsonData compare = XmlData(compare_xml);
 
     //validate source
-    auto insert = JSONDocument(source.json_buffer);
+    auto insert = JSONDocument(source);
 
     //validate compare
-    auto cmpdoc = JSONDocument(compare.json_buffer);
+    auto cmpdoc = JSONDocument(compare);
 
 
     namespace DBI= artdaq::database::filesystem;
@@ -174,7 +174,7 @@ bool test_insert(std::string const& source_xml, std::string const& compare_xml,s
 
     auto search = JsonData {"{\"filter\":" + ( filter.empty()?object_id:filter)+ ", \"collection\":\"" +collection +"\"}"};
 
-    std::cout << "Search criteria " <<  search.json_buffer << "\n";
+    std::cout << "Search criteria " <<  search<< "\n";
 
     auto results = provider->readDocument(search);
 
@@ -182,12 +182,12 @@ bool test_insert(std::string const& source_xml, std::string const& compare_xml,s
         std::cout << "Search returned " << results.size() << " results.\n";
 
         for (auto&& element : results) {
-            std::cout << element.json_buffer  << "\n";
+            std::cout << element   << "\n";
         }
         return false;
     }
 
-  auto retdoc = JSONDocument(results.begin()->json_buffer);
+  auto retdoc = JSONDocument{*results.begin()};
 
   JSONDocumentBuilder returned{retdoc};
   JSONDocumentBuilder expected{cmpdoc};
@@ -216,10 +216,10 @@ bool test_search1(std::string const& source_xml, std::string const& compare_xml,
     JsonData compare = XmlData(compare_xml);
 
     //validate source
-    auto insert = JSONDocument(source.json_buffer);
+    auto insert = JSONDocument(source);
 
     //validate compare
-    auto cmpdoc = JSONDocument(compare.json_buffer);
+    auto cmpdoc = JSONDocument(compare);
 
     using  artdaq::database::basictypes::JsonData;
     using  artdaq::database::basictypes::XmlData;
@@ -238,7 +238,7 @@ bool test_search1(std::string const& source_xml, std::string const& compare_xml,
 
     auto search = JsonData {"{\"filter\":" + ( filter.empty()?object_id:filter)+ ", \"collection\":\"" +collection +"\"}"};
 
-    std::cout << "Search criteria " <<  search.json_buffer << "\n";
+    std::cout << "Search criteria " <<  search<< "\n";
 
     auto results = provider->readDocument(search);
 
@@ -246,12 +246,12 @@ bool test_search1(std::string const& source_xml, std::string const& compare_xml,
         std::cout << "Search returned " << results.size() << " results.\n";
 
         for (auto&& element : results) {
-            std::cout << element.json_buffer  << "\n";
+            std::cout << element   << "\n";
         }
         return false;
     }
 
-  auto retdoc = JSONDocument(results.begin()->json_buffer);
+  auto retdoc = JSONDocument{*results.begin()};
   JSONDocumentBuilder returned{retdoc};
   JSONDocumentBuilder expected{cmpdoc};
 
@@ -313,7 +313,7 @@ bool test_search2(std::string const& source_xml, std::string const& compare_xml,
   auto search =
       JsonData{"{\"filter\":" + (filter.empty() ? options : filter) + ", \"collection\":\"" + collection + "\"}"};
 
-  std::cout << "Search criteria " << search.json_buffer << "\n";
+  std::cout << "Search criteria " << search<< "\n";
 
   auto results = provider->readDocument(search);
 
@@ -321,7 +321,7 @@ bool test_search2(std::string const& source_xml, std::string const& compare_xml,
     std::cout << "Search returned " << results.size() << " results.\n";
 
     for (auto&& element : results) {
-      std::cout << element.json_buffer << "\n";
+      std::cout << element<< "\n";
     }
     return false;
   }
@@ -339,14 +339,14 @@ bool test_update(std::string const& source_xml, std::string const& compare_xml,s
     JsonData update = XmlData(update_xml);
 
     //validate source
-    auto insert = JSONDocument(source.json_buffer);
+    auto insert = JSONDocument(source);
     //insert.deleteChild(literal::comments_node);
 
     //validate compare
-    auto cmpdoc = JSONDocument(compare.json_buffer);
+    auto cmpdoc = JSONDocument(compare);
     //expected.deleteChild(literal::comments_node);
 
-    auto changes = JSONDocument(update.json_buffer);
+    auto changes = JSONDocument(update);
     //changes.deleteChild(literal::comments_node);
 
     namespace DBI= artdaq::database::filesystem;
@@ -363,7 +363,7 @@ bool test_update(std::string const& source_xml, std::string const& compare_xml,s
 
   auto search = JsonData{"{\"filter\":" + object_id + ", \"collection\":\"" + collection + "\"}"};
 
-  std::cout << "Search criteria " << search.json_buffer << "\n";
+  std::cout << "Search criteria " << search<< "\n";
 
   auto results = provider->readDocument(search);
 
@@ -371,12 +371,12 @@ bool test_update(std::string const& source_xml, std::string const& compare_xml,s
     std::cout << "Search returned " << results.size() << " results.\n";
 
     for (auto&& element : results) {
-      std::cout << element.json_buffer << "\n";
+      std::cout << element<< "\n";
     }
     return false;
   }
 
-  auto found = JSONDocument(results.begin()->json_buffer);
+  auto found = JSONDocument{*results.begin()};
   auto payload = changes.findChild("document");
   found.replaceChild(payload, "document");
 
@@ -391,12 +391,12 @@ bool test_update(std::string const& source_xml, std::string const& compare_xml,s
     std::cout << "Search returned " << results.size() << " results.\n";
 
     for (auto&& element : results) {
-      std::cout << element.json_buffer << "\n";
+      std::cout << element<< "\n";
     }
     return false;
   }
 
-  auto retdoc = JSONDocument(results.begin()->json_buffer);
+  auto retdoc = JSONDocument{*results.begin()};
   JSONDocumentBuilder returned{retdoc};
   JSONDocumentBuilder expected{cmpdoc};
 

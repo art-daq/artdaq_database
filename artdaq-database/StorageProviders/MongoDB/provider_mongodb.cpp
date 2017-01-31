@@ -57,11 +57,11 @@ namespace database {
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonData const& search) {
-  confirm(!search.json_buffer.empty());
+  confirm(!search.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(4, "MongoDB::findConfigurations() begin");
-  TRACE_(4, "MongoDB::findConfigurations() args data=<" << search.json_buffer << ">");
+  TRACE_(4, "MongoDB::findConfigurations() args data=<" << search<< ">");
 
   auto filter = bsoncxx::builder::core(false);
 
@@ -135,11 +135,11 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition(JsonData const& search) {
-  confirm(!search.json_buffer.empty());
+  confirm(!search.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(5, "MongoDB::configurationComposition() begin");
-  TRACE_(5, "MongoDB::configurationComposition() args data=<" << search.json_buffer << ">");
+  TRACE_(5, "MongoDB::configurationComposition() args data=<" << search<< ">");
 
   auto filter = bsoncxx::builder::core(false);
 
@@ -246,7 +246,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
   }
 
   if (returnCollection.empty()) {
-    TRACE_(4, "MongoDB::configurationComposition() No data found for json=<" << search.json_buffer << ">");
+    TRACE_(4, "MongoDB::configurationComposition() No data found for json=<" << search<< ">");
   }
 
   return returnCollection;
@@ -255,11 +255,11 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData const& query_payload) {
-  confirm(!query_payload.json_buffer.empty());
+  confirm(!query_payload.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(7, "MongoDB::findVersions() begin");
-  TRACE_(7, "MongoDB::findVersions() args data=<" << query_payload.json_buffer << ">");
+  TRACE_(7, "MongoDB::findVersions() args data=<" << query_payload<< ">");
 
   auto bson_document = bsoncxx::from_json(query_payload.json_buffer);
 
@@ -326,11 +326,11 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData const& search) {
-  confirm(!search.json_buffer.empty());
+  confirm(!search.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(9, "MongoDB::findEntities() begin");
-  TRACE_(9, "MongoDB::findEntities() args data=<" << search.json_buffer << ">");
+  TRACE_(9, "MongoDB::findEntities() args data=<" << search<< ">");
 
   auto bson_document = bsoncxx::from_json(search.json_buffer);
 
@@ -429,11 +429,11 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::addConfiguration(JsonData const& query_payload) {
-  confirm(!query_payload.json_buffer.empty());
+  confirm(!query_payload.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(8, "MongoDB::addConfiguration() begin");
-  TRACE_(8, "MongoDB::addConfiguration() args data=<" << query_payload.json_buffer << ">");
+  TRACE_(8, "MongoDB::addConfiguration() args data=<" << query_payload<< ">");
 
   return returnCollection;
 }
@@ -441,11 +441,11 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::addConfiguration(JsonDat
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::listCollections(JsonData const& query_payload) {
-  confirm(!query_payload.json_buffer.empty());
+  confirm(!query_payload.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(9, "MongoDB::listCollections() begin");
-  TRACE_(9, "MongoDB::listCollections() args data=<" << query_payload.json_buffer << ">");
+  TRACE_(9, "MongoDB::listCollections() args data=<" << query_payload<< ">");
 
   auto filter = bsoncxx::builder::core(false);
   auto query_payload_doc = bbs::document{};
@@ -491,11 +491,11 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listCollections(JsonData
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::listDatabases(JsonData const& query_payload) {
-  confirm(!query_payload.json_buffer.empty());
+  confirm(!query_payload.empty());
   auto returnCollection = std::list<JsonData>();
 
   TRACE_(9, "MongoDB::listDatabases() begin");
-  TRACE_(9, "MongoDB::listDatabases() args data=<" << query_payload.json_buffer << ">");
+  TRACE_(9, "MongoDB::listDatabases() args data=<" << query_payload<< ">");
 
   mongocxx::cursor databaseDescriptors = _provider->list_databases();
 
@@ -533,7 +533,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listDatabases(JsonData c
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::databaseMetadata(JsonData const& query_payload[[gnu::unused]]) {
-  confirm(!query_payload.json_buffer.empty());
+  confirm(!query_payload.empty());
 
   std::ostringstream oss;
   oss << "{";

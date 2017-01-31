@@ -5,10 +5,14 @@
 
 namespace artdaq {
 namespace database {
+namespace basictypes {  
+class JsonData;
+}
 namespace docrecord {
 
 using artdaq::database::json::object_t;
 using artdaq::database::json::value_t;
+using artdaq::database::basictypes::JsonData;
 
 class JSONDocumentBuilder;
 
@@ -16,9 +20,10 @@ class JSONDocument final {
   friend class JSONDocumentBuilder;
 
  public:
-  JSONDocument(std::string const& json) : _value{readJson(json)}, _cached_json_buffer(json) {}
-  JSONDocument(value_t const& value) : _value{value}, _cached_json_buffer(writeJson()) {}
-  JSONDocument() : _value{object_t{}}, _cached_json_buffer(writeJson()) {}
+  JSONDocument(JsonData const&); 
+  JSONDocument(std::string const&);
+  JSONDocument(value_t const&);
+  JSONDocument();
 
   // returns inserted child
   JSONDocument insertChild(JSONDocument const&, path_t const&);

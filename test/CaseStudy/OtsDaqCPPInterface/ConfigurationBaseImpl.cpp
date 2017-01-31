@@ -38,7 +38,7 @@ std::string MakeSerializable<ConfigurationBase const*>::configurationNameImpl() 
 template <>
 template <>
 bool MakeSerializable<ConfigurationBase*>::readDocumentImpl<JsonData>(JsonData const& data) {
-  int retVal = _conf->getViewP()->fillFromJSON(data.json_buffer);
+  int retVal = _conf->getViewP()->fillFromJSON(data);
 
   return (retVal >= 0);
 }

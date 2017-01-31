@@ -73,13 +73,16 @@ void write_document(Options const& options, std::string& conf) {
 
   switch (options.format()) {
     default:
-    case data_format_t::json:
-      data = JsonData{std::string("{\"data\":").append(conf).append("}")};
-      break;
-
     case data_format_t::unknown: {
       throw runtime_error("write_document") << "Invalid data format; data format=" << cf::to_string(options.format())
                                             << ".";
+      break;
+    }
+    case data_format_t::json: {
+      data = JsonData{std::string("{\"data\":").append(conf).append("}")};
+      break;
+    }
+    case data_format_t::db: {
       break;
     }
     case data_format_t::gui: {
@@ -100,15 +103,15 @@ void write_document(Options const& options, std::string& conf) {
       auto fhicl = FhiclData{};
 
       if (!data.convert_to<FhiclData>(fhicl)) {
-        TRACE_(2, "write_document: Unable to convert json data to fcl; json=<" << data.json_buffer << ">");
+        TRACE_(2, "write_document: Unable to convert json data to fcl; json=<" << data << ">");
 
         throw runtime_error("write_document") << "Unable to reverse fhicl-to-json convertion";
       } else {
-        TRACE_(2, "write_document: Converted json data to fcl; json=<" << data.json_buffer << ">");
-        TRACE_(2, "write_document: Converted json data to fcl; fcl=<" << fhicl.fhicl_buffer << ">");
+        TRACE_(2, "write_document: Converted json data to fcl; json=<" << data << ">");
+        TRACE_(2, "write_document: Converted json data to fcl; fcl=<" << fhicl << ">");
       }
 
-      returnValue = fhicl.fhicl_buffer;
+      returnValue = fhicl;
       returnValueChanged = true;
 
       break;
@@ -121,43 +124,45 @@ void write_document(Options const& options, std::string& conf) {
       auto xml = XmlData{};
 
       if (!data.convert_to<XmlData>(xml)) {
-        TRACE_(2, "write_document: Unable to convert json data to fcl; json=<" << data.json_buffer << ">");
+        TRACE_(2, "write_document: Unable to convert json data to fcl; json=<" << data << ">");
 
         throw runtime_error("write_document") << "Unable to reverse xml-to-json convertion";
       } else {
-        TRACE_(2, "write_document: Converted json data to fcl; json=<" << data.json_buffer << ">");
-        TRACE_(2, "write_document: Converted json data to fcl; fcl=<" << xml.xml_buffer << ">");
+        TRACE_(2, "write_document: Converted json data to fcl; json=<" << data << ">");
+        TRACE_(2, "write_document: Converted json data to fcl; fcl=<" << xml << ">");
       }
 
-      returnValue = xml.xml_buffer;
+      returnValue = xml;
       returnValueChanged = true;
 
       break;
     }
   }
 
-  TRACE_(2, "write_document: json_buffer=<" << data.json_buffer << ">");
-  TRACE_(2, "write_document: options=<" << options.to_string() << ">");
+  TRACE_(2, "write_document: json_buffer=<" << data << ">");
+  TRACE_(2, "write_document: options=<" << options << ">");
 
   // create a json document to be inserted into the database
-  JSONDocumentBuilder builder{};
+  JSONDocumentBuilder builder{{data}};
 
-  builder.createFromData(data.json_buffer);
+  auto filter= std::string{", \"filter\":"};
+  filter.append(options.query_filter_to_JsonData());
 
-  auto configuration = JSONDocument{options.configuration_to_JsonData().json_buffer};
-  auto version = JSONDocument{options.version_to_JsonData().json_buffer};
-  auto entity = JSONDocument{options.entity_to_JsonData().json_buffer};
-  auto collection = JSONDocument{options.collection_to_JsonData().json_buffer};
+  if (options.format() != data_format_t::db && options.format() != data_format_t::gui){
+    builder.createFromData(data);
+  }else{
+    filter = std::string{", \"filter\":"} + builder.getObjectID().to_string();
+  }
 
-  builder.addConfiguration(configuration);
-  builder.setVersion(version);
-  builder.setCollection(collection);
-  builder.addEntity(entity);
+  builder.addConfiguration({options.configuration_to_JsonData()});
+  builder.setVersion({options.version_to_JsonData()});
+  builder.setCollection({options.collection_to_JsonData()});
+  builder.addEntity({options.entity_to_JsonData()});
 
   auto insert_payload =
-      JsonData{"{\"document\":" + builder.to_string() + ", \"collection\":\"" + options.collection() + "\"}"};
+      JsonData{"{\"document\":" + builder.to_string() +filter+ ", \"collection\":\"" + options.collection() + "\"}"};
 
-  TRACE_(2, "write_document: insert_payload=<" << insert_payload.json_buffer << ">");
+  TRACE_(2, "write_document: insert_payload=<" << insert_payload << ">");
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers =
@@ -190,7 +195,7 @@ void read_document(Options const& options, std::string& conf) {
   auto search_payload = JsonData{"{\"filter\":" + options.query_filter_to_JsonData().json_buffer +
                                  +", \"collection\":\"" + options.collection() + "\"}"};
 
-  TRACE_(3, "read_document: search_payload=<" << search_payload.json_buffer << ">");
+  TRACE_(3, "read_document: search_payload=<" << search_payload << ">");
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers =
@@ -211,7 +216,7 @@ void read_document(Options const& options, std::string& conf) {
   if (format == data_format_t::origin) {
     auto resultAst = jsn::object_t{};
 
-    if (!jsn::JsonReader{}.read(search_result.json_buffer, resultAst))
+    if (!jsn::JsonReader{}.read(search_result, resultAst))
       throw runtime_error("read_document") << "Invalid json data";
 
     auto const& docAst = boost::get<jsn::object_t>(resultAst.at(jsonliteral::origin));
@@ -223,13 +228,13 @@ void read_document(Options const& options, std::string& conf) {
   switch (format) {
     default:
     case data_format_t::db: {
-      returnValue = search_result.json_buffer;
+      returnValue = search_result;
       returnValueChanged = true;
       break;
     }
 
     case data_format_t::gui: {
-      if (!db::json_db_to_gui(search_result.json_buffer, returnValue)) {
+      if (!db::json_db_to_gui(search_result, returnValue)) {
         throw runtime_error("read_document") << "DB to GUI data convertion failed";
       }
 
@@ -240,7 +245,7 @@ void read_document(Options const& options, std::string& conf) {
     case data_format_t::json: {
       auto resultAst = jsn::object_t{};
 
-      if (!jsn::JsonReader{}.read(search_result.json_buffer, resultAst))
+      if (!jsn::JsonReader{}.read(search_result, resultAst))
         throw runtime_error("read_document") << "Invalid json data";
 
       auto const& docAst = boost::get<jsn::object_t>(resultAst.at(jsonliteral::document));
@@ -257,12 +262,12 @@ void read_document(Options const& options, std::string& conf) {
       break;
 
     case data_format_t::fhicl: {
-      auto document = JSONDocument{search_result.json_buffer};
+      auto document = JSONDocument{search_result};
       auto json = JsonData{document.findChild(jsonliteral::document).to_string()};
 
       auto fhicl = FhiclData{};
       if (!json.convert_to<FhiclData>(fhicl)) {
-        TRACE_(3, "read_document: Unable to convert json data to fcl; json=<" << json.json_buffer << ">");
+        TRACE_(3, "read_document: Unable to convert json data to fcl; json=<" << json << ">");
 
         throw runtime_error("read_document") << "Unable to reverse fhicl-to-json convertion";
       }
@@ -273,12 +278,12 @@ void read_document(Options const& options, std::string& conf) {
       break;
     }
     case data_format_t::xml: {
-      auto document = JSONDocument{search_result.json_buffer};
+      auto document = JSONDocument{search_result};
       auto json = JsonData{document.findChild(jsonliteral::document).to_string()};
 
       auto xml = XmlData{};
       if (!json.convert_to<XmlData>(xml)) {
-        TRACE_(3, "read_document: Unable to convert json data to xml; json=<" << json.json_buffer << ">");
+        TRACE_(3, "read_document: Unable to convert json data to xml; json=<" << json << ">");
 
         throw runtime_error("read_document") << "Unable to reverse xml-to-json convertion";
       }
@@ -300,7 +305,7 @@ void find_versions(Options const& options, std::string& versions) {
   confirm(options.operation().compare(apiliteral::operation::findversions) == 0);
 
   TRACE_(4, "find_versions: begin");
-  TRACE_(4, "find_versions args options=<" << options.to_string() << ">");
+  TRACE_(4, "find_versions args options=<" << options << ">");
 
   validate_dbprovider_name(options.provider());
 
@@ -314,7 +319,7 @@ void find_versions(Options const& options, std::string& versions) {
   };
 
   auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData().json_buffer);
+      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -330,7 +335,7 @@ void find_versions(Options const& options, std::string& versions) {
     }
 
     case data_format_t::gui: {
-      returnValue = search_result.json_buffer;
+      returnValue = search_result;
       returnValueChanged = true;
       break;
     }
@@ -340,7 +345,7 @@ void find_versions(Options const& options, std::string& versions) {
       auto reader = JsonReader{};
       object_t results_ast;
 
-      if (!reader.read(search_result.json_buffer, results_ast)) {
+      if (!reader.read(search_result, results_ast)) {
         TRACE_(4, "find_entities() Failed to create an AST from search results JSON.");
 
         throw runtime_error("find_entities") << "Failed to create an AST from search results JSON.";
@@ -381,7 +386,7 @@ void find_entities(Options const& options, std::string& entities) {
   confirm(options.operation().compare(apiliteral::operation::findentities) == 0);
 
   TRACE_(5, "find_entities: begin");
-  TRACE_(5, "find_entities args options=<" << options.to_string() << ">");
+  TRACE_(5, "find_entities args options=<" << options << ">");
 
   validate_dbprovider_name(options.provider());
 
@@ -395,7 +400,7 @@ void find_entities(Options const& options, std::string& entities) {
   };
 
   auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData().json_buffer);
+      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -411,7 +416,7 @@ void find_entities(Options const& options, std::string& entities) {
     }
 
     case data_format_t::gui: {
-      returnValue = search_result.json_buffer;
+      returnValue = search_result;
       returnValueChanged = true;
       break;
     }
@@ -421,7 +426,7 @@ void find_entities(Options const& options, std::string& entities) {
       auto reader = JsonReader{};
       object_t results_ast;
 
-      if (!reader.read(search_result.json_buffer, results_ast)) {
+      if (!reader.read(search_result, results_ast)) {
         TRACE_(5, "find_entities() Failed to create an AST from search results JSON.");
 
         throw runtime_error("find_entities") << "Failed to create an AST from search results JSON.";
@@ -463,7 +468,7 @@ void add_entity(Options const& options, std::string& conf) {
   confirm(options.operation().compare(apiliteral::operation::addentity) == 0);
 
   TRACE_(6, "add_entity: begin");
-  TRACE_(6, "add_entity args options=<" << options.to_string() << ">");
+  TRACE_(6, "add_entity args options=<" << options << ">");
   TRACE_(6, "add_entity args conf=<" << conf << ">");
 
   validate_dbprovider_name(options.provider());
@@ -473,18 +478,31 @@ void add_entity(Options const& options, std::string& conf) {
   Options newOptions = options;
   newOptions.operation(apiliteral::operation::readdocument);
   newOptions.format(data_format_t::db);
+  newOptions.entity(apiliteral::notprovided);  
+      TRACE_(6, "add_entity 0");
+
+  newOptions.queryFilter(apiliteral::notprovided);
+    TRACE_(6, "add_entity 0");
 
   read_document(newOptions, document);
   JSONDocumentBuilder builder{{document}};
+  TRACE_(6, "add_entity 1");
 
-  builder.addEntity({options.entity_to_JsonData().json_buffer});
+  builder.addEntity({options.entity_to_JsonData()});
 
   newOptions.operation(apiliteral::operation::writedocument);
   newOptions.format(data_format_t::db);
-  write_document(newOptions, document);
 
+  TRACE_(6, "add_entity 2");
+  
+  auto updated = builder.to_string();  
+  write_document(newOptions, updated);
+TRACE_(6, "add_entity 3");
   newOptions.operation(apiliteral::operation::readdocument);
   newOptions.format(options.format());
+TRACE_(6, "add_entity 4");
+
+  document.clear();
   read_document(newOptions, document);
 
   conf.swap(document);
@@ -497,8 +515,8 @@ void remove_entity(Options const& options, std::string& conf) {
   confirm(options.operation().compare(apiliteral::operation::rmentity) == 0);
 
   TRACE_(7, "remove_entity: begin");
-  TRACE_(7, "remove_entity args options=<" << options.to_string() << ">");
-  TRACE_(7, "remove_entity args conf=<" << conf << ">");
+  TRACE_(6, "remove_entity args options=<" << options << ">");
+  TRACE_(6, "remove_entity args conf=<" << conf << ">");
 
   validate_dbprovider_name(options.provider());
 
@@ -506,23 +524,30 @@ void remove_entity(Options const& options, std::string& conf) {
 
   Options newOptions = options;
   newOptions.operation(apiliteral::operation::readdocument);
-
+  newOptions.format(data_format_t::db);
+  newOptions.entity(apiliteral::notprovided);  
+  newOptions.queryFilter(apiliteral::notprovided);
+  
   read_document(newOptions, document);
   JSONDocumentBuilder builder{{document}};
 
-  builder.removeEntity({options.entity_to_JsonData().json_buffer});
+  builder.removeEntity({options.entity_to_JsonData()});
 
   newOptions.operation(apiliteral::operation::writedocument);
   newOptions.format(data_format_t::db);
-  write_document(newOptions, document);
+  
+  auto updated = builder.to_string();  
+  write_document(newOptions, updated);
 
   newOptions.operation(apiliteral::operation::readdocument);
   newOptions.format(options.format());
+
+  document.clear();
   read_document(newOptions, document);
 
   conf.swap(document);
 
-  TRACE_(7, "remove_entity end conf=<" << conf << ">");
+  TRACE_(6, "remove_entity end conf=<" << conf << ">");
 }
 
 void mark_document_readonly(Options const& options, std::string& conf) {
@@ -530,7 +555,7 @@ void mark_document_readonly(Options const& options, std::string& conf) {
   confirm(options.operation().compare(apiliteral::operation::markreadonly) == 0);
 
   TRACE_(8, "mark_document_readonly: begin");
-  TRACE_(8, "mark_document_readonly args options=<" << options.to_string() << ">");
+  TRACE_(8, "mark_document_readonly args options=<" << options << ">");
   TRACE_(8, "mark_document_readonly args conf=<" << conf << ">");
 
   validate_dbprovider_name(options.provider());
@@ -539,7 +564,10 @@ void mark_document_readonly(Options const& options, std::string& conf) {
 
   Options newOptions = options;
   newOptions.operation(apiliteral::operation::readdocument);
-
+  newOptions.format(data_format_t::db);
+  newOptions.entity(apiliteral::notprovided);  
+  newOptions.queryFilter(apiliteral::notprovided);
+  
   read_document(newOptions, document);
   JSONDocumentBuilder builder{{document}};
 
@@ -547,14 +575,18 @@ void mark_document_readonly(Options const& options, std::string& conf) {
 
   newOptions.operation(apiliteral::operation::writedocument);
   newOptions.format(data_format_t::db);
-  write_document(newOptions, document);
+  
+  auto updated = builder.to_string();  
+  write_document(newOptions, updated);
 
   newOptions.operation(apiliteral::operation::readdocument);
   newOptions.format(options.format());
+
+  document.clear();
   read_document(newOptions, document);
 
   conf.swap(document);
-
+  
   TRACE_(8, "mark_document_readonly end conf=<" << conf << ">");
 }
 
@@ -563,7 +595,7 @@ void mark_document_deleted(Options const& options, std::string& conf) {
   confirm(options.operation().compare(apiliteral::operation::markdeleted) == 0);
 
   TRACE_(9, "mark_document_deleted: begin");
-  TRACE_(9, "mark_document_deleted args options=<" << options.to_string() << ">");
+  TRACE_(9, "mark_document_deleted args options=<" << options << ">");
   TRACE_(9, "mark_document_deleted args conf=<" << conf << ">");
 
   validate_dbprovider_name(options.provider());
@@ -572,7 +604,10 @@ void mark_document_deleted(Options const& options, std::string& conf) {
 
   Options newOptions = options;
   newOptions.operation(apiliteral::operation::readdocument);
-
+  newOptions.format(data_format_t::db);
+  newOptions.entity(apiliteral::notprovided);  
+  newOptions.queryFilter(apiliteral::notprovided);
+  
   read_document(newOptions, document);
   JSONDocumentBuilder builder{{document}};
 
@@ -580,10 +615,14 @@ void mark_document_deleted(Options const& options, std::string& conf) {
 
   newOptions.operation(apiliteral::operation::writedocument);
   newOptions.format(data_format_t::db);
-  write_document(newOptions, document);
+  
+  auto updated = builder.to_string();  
+  write_document(newOptions, updated);
 
   newOptions.operation(apiliteral::operation::readdocument);
   newOptions.format(options.format());
+
+  document.clear();
   read_document(newOptions, document);
 
   conf.swap(document);

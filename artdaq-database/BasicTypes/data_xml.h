@@ -22,6 +22,7 @@ struct XmlData final{
 
   XmlData(JsonData const&);
   operator JsonData() const;
+  operator std::string const&() const;
 
   static constexpr auto type_version() { return "V100"; }
 

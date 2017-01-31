@@ -58,7 +58,7 @@ void find_aliases(Options const& options, std::string& configs) {
   confirm(options.operation().compare(apiliteral::operation::findversionalias) == 0);
 
   TRACE_(11, "find_aliases: begin");
-  TRACE_(11, "find_aliases args options=<" << options.to_string() << ">");
+  TRACE_(11, "find_aliases args options=<" << options << ">");
 
   validate_dbprovider_name(options.provider());
 
@@ -72,7 +72,7 @@ void find_aliases(Options const& options, std::string& configs) {
   };
 
   auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData().json_buffer);
+      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -84,14 +84,14 @@ void find_aliases(Options const& options, std::string& configs) {
     case data_format_t::unknown:
     case data_format_t::fhicl:
     case data_format_t::xml: {
-      if (!db::json_db_to_gui(search_result.json_buffer, returnValue)) {
+      if (!db::json_db_to_gui(search_result, returnValue)) {
         throw runtime_error("find_aliases") << "Unsupported data format.";
       }
       break;
     }
 
     case data_format_t::gui: {
-      returnValue = search_result.json_buffer;
+      returnValue = search_result;
       returnValueChanged = true;
       break;
     }
@@ -101,7 +101,7 @@ void find_aliases(Options const& options, std::string& configs) {
       auto reader = JsonReader{};
       object_t results_ast;
 
-      if (!reader.read(search_result.json_buffer, results_ast)) {
+      if (!reader.read(search_result, results_ast)) {
         TRACE_(11, "find_aliases() Failed to create an AST from search results JSON.");
 
         throw runtime_error("find_aliases") << "Failed to create an AST from search results JSON.";
@@ -137,7 +137,7 @@ void add_version_alias(Options const& options, std::string& conf) {
   confirm(options.operation().compare(apiliteral::operation::addversionalias) == 0);
 
   TRACE_(6, "add_version_alias: begin");
-  TRACE_(6, "add_version_alias args options=<" << options.to_string() << ">");
+  TRACE_(6, "add_version_alias args options=<" << options << ">");
   TRACE_(6, "add_version_alias args conf=<" << conf << ">");
 
   validate_dbprovider_name(options.provider());
@@ -152,7 +152,7 @@ void add_version_alias(Options const& options, std::string& conf) {
   read_document(newOptions, document);
   JSONDocumentBuilder builder{{document}};
 
-  builder.addAlias({options.versionAlias_to_JsonData().json_buffer});
+  builder.addAlias({options.versionAlias_to_JsonData()});
 
   newOptions.operation(apiliteral::operation::writedocument);
   newOptions.format(data_format_t::db);
@@ -172,7 +172,7 @@ void remove_version_alias(Options const& options, std::string& conf) {
   confirm(options.operation().compare(apiliteral::operation::rmversionalias) == 0);
 
   TRACE_(7, "remove_version_alias: begin");
-  TRACE_(7, "remove_version_alias args options=<" << options.to_string() << ">");
+  TRACE_(7, "remove_version_alias args options=<" << options << ">");
   TRACE_(7, "remove_version_alias args conf=<" << conf << ">");
 
   validate_dbprovider_name(options.provider());
@@ -186,7 +186,7 @@ void remove_version_alias(Options const& options, std::string& conf) {
   read_document(newOptions, document);
   JSONDocumentBuilder builder{{document}};
 
-  builder.removeAlias({options.versionAlias_to_JsonData().json_buffer});
+  builder.removeAlias({options.versionAlias_to_JsonData()});
 
   newOptions.operation(apiliteral::operation::writedocument);
   newOptions.format(data_format_t::db);

@@ -214,9 +214,13 @@ result_t json::find_entities(std::string const& query_payload) noexcept {
 result_t json::add_entity(std::string const& query_payload) noexcept {
   try {
     if (query_payload.empty()) return Failure(msg_EmptyFilter);
+  TRACE_(0, "add_entity 1");
 
-    auto options = ManageDocumentOperation{apiliteral::operation::findentities};
+    auto options = ManageDocumentOperation{apiliteral::operation::addentity};
+      TRACE_(0, "add_entity 2");
+
     options.readJsonData({query_payload});
+  TRACE_(0, "add_entity 2");
 
     auto returnValue = std::string{};
 
@@ -232,7 +236,7 @@ result_t json::remove_entity(std::string const& query_payload) noexcept {
   try {
     if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = ManageDocumentOperation{apiliteral::operation::findentities};
+    auto options = ManageDocumentOperation{apiliteral::operation::rmentity};
     options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
@@ -249,7 +253,7 @@ result_t json::mark_document_readonly(std::string const& query_payload) noexcept
   try {
     if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = ManageDocumentOperation{apiliteral::operation::findentities};
+    auto options = ManageDocumentOperation{apiliteral::operation::markreadonly};
     options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
@@ -266,7 +270,7 @@ result_t json::mark_document_deleted(std::string const& query_payload) noexcept 
   try {
     if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = ManageDocumentOperation{apiliteral::operation::findentities};
+    auto options = ManageDocumentOperation{apiliteral::operation::markdeleted};
     options.readJsonData({query_payload});
 
     auto returnValue = std::string{};

@@ -57,7 +57,7 @@ void assign_configuration(Options const& options, std::string& configs) {
   confirm(options.operation().compare(apiliteral::operation::assignconfig) == 0);
 
   TRACE_(11, "assign_configuration: begin");
-  TRACE_(11, "assign_configuration args options=<" << options.to_string() << ">");
+  TRACE_(11, "assign_configuration args options=<" << options << ">");
 
   validate_dbprovider_name(options.provider());
 
@@ -71,7 +71,7 @@ void assign_configuration(Options const& options, std::string& configs) {
   };
 
   auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData().json_buffer);
+      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -87,7 +87,7 @@ void assign_configuration(Options const& options, std::string& configs) {
     }
 
     case data_format_t::gui: {
-      returnValue = search_result.json_buffer;
+      returnValue = search_result;
       returnValueChanged = true;
       break;
     }
@@ -103,7 +103,7 @@ void remove_configuration(Options const& options, std::string& configs) {
   confirm(options.operation().compare(apiliteral::operation::removeconfig) == 0);
 
   TRACE_(11, "remove_configuration: begin");
-  TRACE_(11, "remove_configuration args options=<" << options.to_string() << ">");
+  TRACE_(11, "remove_configuration args options=<" << options << ">");
 
   validate_dbprovider_name(options.provider());
 
@@ -117,7 +117,7 @@ void remove_configuration(Options const& options, std::string& configs) {
   };
 
   auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData().json_buffer);
+      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -133,7 +133,7 @@ void remove_configuration(Options const& options, std::string& configs) {
     }
 
     case data_format_t::gui: {
-      returnValue = search_result.json_buffer;
+      returnValue = search_result;
       returnValueChanged = true;
       break;
     }
@@ -189,7 +189,7 @@ void find_configurations(Options const& options, std::string& configs) {
   confirm(options.operation().compare(apiliteral::operation::findconfigs) == 0);
 
   TRACE_(11, "find_configurations: begin");
-  TRACE_(11, "find_configurations args options=<" << options.to_string() << ">");
+  TRACE_(11, "find_configurations args options=<" << options << ">");
 
   validate_dbprovider_name(options.provider());
 
@@ -203,7 +203,7 @@ void find_configurations(Options const& options, std::string& configs) {
   };
 
   auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData().json_buffer);
+      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -215,14 +215,14 @@ void find_configurations(Options const& options, std::string& configs) {
     case data_format_t::unknown:
     case data_format_t::fhicl:
     case data_format_t::xml: {
-      if (!db::json_db_to_gui(search_result.json_buffer, returnValue)) {
+      if (!db::json_db_to_gui(search_result, returnValue)) {
         throw runtime_error("find_configurations") << "Unsupported data format.";
       }
       break;
     }
 
     case data_format_t::gui: {
-      returnValue = search_result.json_buffer;
+      returnValue = search_result;
       returnValueChanged = true;
       break;
     }
@@ -232,7 +232,7 @@ void find_configurations(Options const& options, std::string& configs) {
       auto reader = JsonReader{};
       object_t results_ast;
 
-      if (!reader.read(search_result.json_buffer, results_ast)) {
+      if (!reader.read(search_result, results_ast)) {
         TRACE_(11, "find_configurations() Failed to create an AST from search results JSON.");
 
         throw runtime_error("find_configurations") << "Failed to create an AST from search results JSON.";
@@ -267,7 +267,7 @@ void configuration_composition(Options const& options, std::string& filters) {
   confirm(options.operation().compare(apiliteral::operation::confcomposition) == 0);
 
   TRACE_(12, "configuration_composition: begin");
-  TRACE_(11, "configuration_composition args options=<" << options.to_string() << ">");
+  TRACE_(11, "configuration_composition args options=<" << options << ">");
 
   validate_dbprovider_name(options.provider());
 
@@ -281,7 +281,7 @@ void configuration_composition(Options const& options, std::string& filters) {
   };
 
   auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData().json_buffer);
+      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -293,14 +293,14 @@ void configuration_composition(Options const& options, std::string& filters) {
     case data_format_t::unknown:
     case data_format_t::fhicl:
     case data_format_t::xml: {
-      if (!db::json_db_to_gui(search_result.json_buffer, returnValue)) {
+      if (!db::json_db_to_gui(search_result, returnValue)) {
         throw runtime_error("configuration_composition") << "Unsupported data format.";
       }
       break;
     }
 
     case data_format_t::gui: {
-      returnValue = search_result.json_buffer;
+      returnValue = search_result;
       returnValueChanged = true;
       break;
     }

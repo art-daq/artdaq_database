@@ -12,11 +12,11 @@ template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonData const& arg) {
   TRACE_(3, "FileSystemDB::readDocument() begin");
-  TRACE_(3, "FileSystemDB::readDocument() args=<" << arg.json_buffer << ">");
+  TRACE_(3, "FileSystemDB::readDocument() args=<" << arg<< ">");
 
   auto returnCollection = std::list<JsonData>();
 
-  auto arg_document = JSONDocument{arg.json_buffer};
+  auto arg_document = JSONDocument{arg };
 
   auto filter_document = JSONDocument{};
 
@@ -79,9 +79,9 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonDa
 template <>
 object_id_t StorageProvider<JsonData, FileSystemDB>::writeDocument(JsonData const& arg) {
   TRACE_(4, "FileSystemDB::writeDocument() begin");
-  TRACE_(4, "FileSystemDB::writeDocument() args=<" << arg.json_buffer << ">");
+  TRACE_(4, "FileSystemDB::writeDocument() args=<" << arg<< ">");
 
-  auto arg_document = JSONDocument{arg.json_buffer};
+  auto arg_document = JSONDocument{arg };
 
   auto user_document = arg_document.findChildDocument(jsonliteral::document);
 

@@ -183,14 +183,14 @@ JSONDocumentBuilder& JSONDocumentBuilder::addEntity(JSONDocument const& entity) 
 
   return self();
 } catch (std::exception const& ex) {
-  TRACE_(9, "setVersion() Exception:" << ex.what());
+  TRACE_(9, "addEntity() Exception:" << ex.what());
   ThrowOnFailure(CallUndo());
 
   return self();
 }
 
 JSONDocumentBuilder& JSONDocumentBuilder::removeEntity(JSONDocument const& entity) try {
-  TRACE_(9, "addEntity() args  entity=<" << entity << ">");
+  TRACE_(9, "removeEntity() args  entity=<" << entity << ">");
 
   JSONDocument copy(entity);
   auto ovl = overlay<ovl::ovlEntity>(copy, jsonliteral::entity);
@@ -202,7 +202,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeEntity(JSONDocument const& entit
 
   return self();
 } catch (std::exception const& ex) {
-  TRACE_(9, "setVersion() Exception:" << ex.what());
+  TRACE_(9, "removeEntity() Exception:" << ex.what());
   ThrowOnFailure(CallUndo());
 
   return self();
