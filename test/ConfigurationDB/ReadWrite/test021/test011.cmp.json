@@ -690,47 +690,5 @@
 
 }
 },
-"origin" : {
- 
-"format" : "json"
- 
-},
-"version" : "demoVersion002",
-"configurations" : [
-{
-"name" : "demoConfig001",
-"assigned" : "Thu Sep  8 19:38:10 2016"
-}
-],
-"aliases" : {
-"active" : [
-
-],
-"history" : [
-
-]
-},
-"changelog" : "empty",
-"bookkeeping" : {
-"isdeleted" : false,
-"isreadonly" : true,
-"created" : "Tue Dec 29 18:19:25 2015",
-"updates" : [
-{
-"addToGlobalConfig" : "Thu Sep  8 19:38:10 2016"
-},
-{
-"setVersion" : "Thu Sep  8 19:38:10 2016"
-},
-{
-"setConfigurableEntity" : "Thu Sep  8 19:38:10 2016"
-}
-]
-},
-"entity" : {
-"name" : "notprovided"
-},
-"_id" : {
-"_oid" : "15781635e2564d60ac331274"
-}
+"changelog" : "empty"
 }
