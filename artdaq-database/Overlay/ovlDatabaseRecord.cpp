@@ -129,7 +129,7 @@ result_t ovlDatabaseRecord::markReadonly() {
   return Success();
 }
 result_t ovlDatabaseRecord::markDeleted() {
-  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+  //if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
 
   _bookkeeping->markDeleted(true);
 
