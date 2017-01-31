@@ -17,7 +17,7 @@ struct xml2json final {};
 struct json2xml final {};
 
 namespace debug {
-void enableXml2Json();
+void Xml2Json();
 }
 }  // namespace xmljson
 }  // namespace database

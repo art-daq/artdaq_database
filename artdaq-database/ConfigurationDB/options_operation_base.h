@@ -45,6 +45,7 @@ class OperationBase {
 
   JsonData to_JsonData() const;
   std::string to_string() const;
+  operator std::string() const;
 
   virtual bpo::options_description makeProgramOptions() const;
 
@@ -66,9 +67,11 @@ class OperationBase {
   std::string _query_payload = {apiliteral::notprovided};
 };
 
+std::ostream& operator<<(std::ostream&, OperationBase const&);
+
 namespace debug {
 namespace options {
-void enableOperationBase();
+void OperationBase();
 }
 }
 

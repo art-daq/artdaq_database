@@ -98,7 +98,7 @@ template <typename T>
 JSONDocument toJSONDocument(T const& t);
 
 namespace debug {
-void enableJSONDocumentBuilder();
+void JSONDocumentBuilder();
 }
 
 std::ostream& operator<<(std::ostream&, JSONDocumentBuilder const&);

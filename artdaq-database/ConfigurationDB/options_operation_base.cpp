@@ -249,16 +249,18 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
 }
 
 void OperationBase::readJsonData(JsonData const& data) {
-  confirm(!data.json_buffer.empty());
+  TRACE_(14, "OperationBase::readJsonData() data=<" << data<< ">");
+  confirm(!data.empty());
+  TRACE_(14, "OperationBase::readJsonData() not empty=<" << data<< ">");
   confirm(data.json_buffer != apiliteral::notprovided);
 
-  TRACE_(14, "OperationBase::readJsonData() data=<" << data.json_buffer << ">");
+  TRACE_(14, "OperationBase::readJsonData() object=<" << data<< ">");
 
   using namespace artdaq::database::json;
   auto filterAST = object_t{};
 
-  if (!JsonReader{}.read(data.json_buffer, filterAST)) {
-    TRACE_(14, "OperationBase: JSON buffer= <" << data.json_buffer << ">");
+  if (!JsonReader{}.read(data , filterAST)) {
+    TRACE_(14, "OperationBase: JSON buffer= <" << data<< ">");
     throw db::invalid_option_exception("OperationBase") << "OperationBase: Unable to read JSON buffer.";
   }
 
@@ -296,7 +298,7 @@ JsonData OperationBase::writeJsonData() const {
 
   auto queryFilterAST = object_t{};
 
-  if (!JsonReader{}.read(query_filter_to_JsonData().json_buffer, queryFilterAST)) {
+  if (!JsonReader{}.read(query_filter_to_JsonData(), queryFilterAST)) {
     throw db::invalid_option_exception("OperationBase") << "Unable to readquery_filter_to_JsonData().";
   }
 
@@ -318,10 +320,19 @@ JsonData OperationBase::writeJsonData() const {
 
 JsonData OperationBase::to_JsonData() const { return {writeJsonData()}; }
 
-std::string OperationBase::to_string() const { return to_JsonData().json_buffer; }
+std::string OperationBase::to_string() const { return to_JsonData(); }
+
+std::ostream& cf::operator<<(std::ostream& os, OperationBase const& o){
+  os << o.to_string();
+  return os;
+}
+
+OperationBase::operator std::string() const{
+  return to_string();
+}
 
 //
-void cf::debug::options::enableOperationBase() {
+void cf::debug::options::OperationBase() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 

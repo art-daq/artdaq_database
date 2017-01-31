@@ -30,9 +30,9 @@ using artdaq::database::basictypes::JsonData;
 
 typedef bool (*test_case)(Options const& /*options*/, std::string const& /*file_name*/);
 
-bool test_findaliases(Options const&, std::string const&);
+bool test_findversionaliases(Options const&, std::string const&);
 bool test_removealias(Options const&, std::string const&);
-bool test_addalias(Options const&, std::string const&);
+bool test_addversionalias(Options const&, std::string const&);
 
 int main(int argc, char* argv[]) try {
   debug::registerUngracefullExitHandlers();
@@ -147,9 +147,9 @@ int main(int argc, char* argv[]) try {
 
   auto runTest = [](std::string const& name) {
     auto tests = std::map<std::string, test_case>{
-      {"addalias", test_addalias}, 
+      {"addversionalias", test_addversionalias}, 
       {"removealias", test_removealias},
-      {"findaliases", test_findaliases}
+      {"findversionaliases", test_findversionaliases}
     };
 
     return tests.at(name);
@@ -165,7 +165,7 @@ int main(int argc, char* argv[]) try {
   return process_exit_code::UNCAUGHT_EXCEPTION;
 }
 
-bool test_addalias(Options const& options, std::string const& file_name)
+bool test_addversionalias(Options const& options, std::string const& file_name)
 {
   confirm(!file_name.empty());
 
@@ -227,7 +227,7 @@ bool test_removealias(Options const& options, std::string const& file_name)
   return false;  
 }
 
-bool test_findaliases(Options const& options, std::string const& file_name){
+bool test_findversionaliases(Options const& options, std::string const& file_name){
   confirm(!file_name.empty());
 
   std::ifstream is(file_name);

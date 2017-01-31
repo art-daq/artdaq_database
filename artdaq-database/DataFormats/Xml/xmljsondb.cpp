@@ -99,7 +99,7 @@ bool dbxj::json_to_xml(std::string const& json, std::string& xml) {
   return result;
 }
 
-void dbxj::debug::enableXmlJson() {
+void dbxj::debug::XmlJson() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);

@@ -12,11 +12,11 @@ template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonData const& arg) {
   TRACE_(3, "FileSystemDB::readDocument() begin");
-  TRACE_(3, "FileSystemDB::readDocument() args=<" << arg.json_buffer << ">");
+  TRACE_(3, "FileSystemDB::readDocument() args=<" << arg<< ">");
 
   auto returnCollection = std::list<JsonData>();
 
-  auto arg_document = JSONDocument{arg.json_buffer};
+  auto arg_document = JSONDocument{arg };
 
   auto filter_document = JSONDocument{};
 
@@ -79,9 +79,9 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonDa
 template <>
 object_id_t StorageProvider<JsonData, FileSystemDB>::writeDocument(JsonData const& arg) {
   TRACE_(4, "FileSystemDB::writeDocument() begin");
-  TRACE_(4, "FileSystemDB::writeDocument() args=<" << arg.json_buffer << ">");
+  TRACE_(4, "FileSystemDB::writeDocument() args=<" << arg<< ">");
 
-  auto arg_document = JSONDocument{arg.json_buffer};
+  auto arg_document = JSONDocument{arg };
 
   auto user_document = arg_document.findChildDocument(jsonliteral::document);
 
@@ -177,13 +177,13 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeDocument(JsonData cons
 
 namespace filesystem {
 namespace debug {
-void enableReadWrite() {
+void ReadWrite() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::filesystem::enableReadWrite trace_enable");
+  TRACE_(0, "artdaq::database::filesystem::ReadWrite trace_enable");
 
   artdaq::database::filesystem::index::debug::enable();
 }

@@ -97,17 +97,17 @@ int BulkOperations::readProgramOptions(bpo::variables_map const& vm) {
 }
 
 void BulkOperations::readJsonData(JsonData const& data) {
-  confirm(!data.json_buffer.empty());
+  confirm(!data.empty());
 
-  using cf::ManageConfigsOperation;
+  using cf::ManageDocumentOperation;
   using namespace artdaq::database::json;
   auto dataAST = object_t{};
 
-  if (!JsonReader{}.read(data.json_buffer, dataAST)) {
+  if (!JsonReader{}.read(data , dataAST)) {
     throw db::invalid_option_exception("BulkOperations") << "BulkOperations: Unable to read JSON buffer.";
   }
 
-  bulkOperations(data.json_buffer);
+  bulkOperations(data);
 
   auto const& operations = boost::get<jsn::array_t>(dataAST.at(apiliteral::operations));
 
@@ -121,7 +121,7 @@ void BulkOperations::readJsonData(JsonData const& data) {
       throw db::invalid_option_exception("BulkOperations") << "Unable to write JSON buffer.";
     }
 
-    _operations_list.emplace_back(std::make_tuple(opname, std::make_unique<ManageConfigsOperation>(_process_name)));
+    _operations_list.emplace_back(std::make_tuple(opname, std::make_unique<ManageDocumentOperation>(_process_name)));
 
     std::get<OperationBaseUPtr>(_operations_list.back())->readJsonData(buffer);
   }
@@ -129,10 +129,10 @@ void BulkOperations::readJsonData(JsonData const& data) {
 
 JsonData BulkOperations::to_JsonData() const { return {bulkOperations()}; }
 
-std::string BulkOperations::to_string() const { return to_JsonData().json_buffer; }
+std::string BulkOperations::to_string() const { return to_JsonData(); }
 
 //
-void cf::debug::options::enableBulkOperations() {
+void cf::debug::options::BulkOperations() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 

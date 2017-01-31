@@ -41,6 +41,8 @@ class ManageAliasesOperation final : public OperationBase {
 
   JsonData query_filter_to_JsonData() const override;
 
+  JsonData versionAlias_to_JsonData() const;
+
   bpo::options_description makeProgramOptions() const override;
 
   int readProgramOptions(bpo::variables_map const&) override;
@@ -60,7 +62,7 @@ class ManageAliasesOperation final : public OperationBase {
 
 namespace debug {
 namespace options {
-void enableOperationManageAliases();
+void ManageAliases();
 }
 }
 

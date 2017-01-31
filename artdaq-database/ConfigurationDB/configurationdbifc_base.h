@@ -37,7 +37,7 @@ auto make_error_msg = [](const char* msg) { return std::string("{error:\"").appe
 template <typename CONF>
 class MakeSerializable final {
   static_assert(std::is_pointer<CONF>::value || std::is_reference<CONF>::value,
-                 "Template parameter must be either a pointer or reference type");
+                "Template parameter must be either a pointer or reference type");
 
  public:
   template <class TYPE>
@@ -104,7 +104,7 @@ class MakeSerializable final {
 template <typename CONF, template <typename CONF> class SERIALIZABLE>
 class ConfigurationSerializer final {
   static_assert(std::is_pointer<CONF>::value || std::is_reference<CONF>::value,
-                 "Template parameter must be either a pointer or reference type");
+                "Template parameter must be either a pointer or reference type");
 
  public:
   using Serializable_t = SERIALIZABLE<CONF>;

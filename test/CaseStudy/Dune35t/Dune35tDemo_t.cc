@@ -17,27 +17,39 @@ namespace cfo = cf::options;
 
 namespace bpo = boost::program_options;
 
-using Options = cf::ManageConfigsOperation;
+using Options = cf::ManageDocumentOperation;
 
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::basictypes::JsonData;
 
 int main(int argc, char* argv[]) try {
+  artdaq::database::configuration::debug::ExportImport();
+  artdaq::database::configuration::debug::ManageAliases();
+  artdaq::database::configuration::debug::ManageConfigs();
+  artdaq::database::configuration::debug::ManageDocuments();
+  artdaq::database::configuration::debug::Metadata();
+  
+  artdaq::database::configuration::debug::detail::ExportImport();
+  artdaq::database::configuration::debug::detail::ManageAliases();
+  artdaq::database::configuration::debug::detail::ManageConfigs();
+  artdaq::database::configuration::debug::detail::ManageDocuments();
+  artdaq::database::configuration::debug::detail::Metadata();
+
+  artdaq::database::configuration::debug::options::OperationBase();
+  artdaq::database::configuration::debug::options::BulkOperations();
+  artdaq::database::configuration::debug::options::ManageDocuments();
+  artdaq::database::configuration::debug::options::ManageConfigs();
+  artdaq::database::configuration::debug::options::ManageAliases();
+  
+  artdaq::database::configuration::debug::MongoDB();
+  artdaq::database::configuration::debug::FileSystemDB();
+  artdaq::database::configuration::debug::UconDB();
+  
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
-  artdaq::database::docrecord::debug::enableJSONDocument();
-  artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
 
-  artdaq::database::configuration::debug::enableFindConfigsOperation();
-  artdaq::database::configuration::debug::enableCreateConfigsOperation();
-
-  artdaq::database::configuration::debug::options::enableOperationBase();
-  artdaq::database::configuration::debug::options::enableOperationManageConfigs();
-  artdaq::database::configuration::debug::detail::enableCreateConfigsOperation();
-  artdaq::database::configuration::debug::detail::enableFindConfigsOperation();
-
-  artdaq::database::configuration::debug::enableDBOperationMongo();
-  artdaq::database::configuration::debug::enableDBOperationFileSystem();
+  artdaq::database::docrecord::debug::JSONDocumentBuilder();
+  artdaq::database::docrecord::debug::JSONDocument();
 
   debug::registerUngracefullExitHandlers();
   artdaq::database::useFakeTime(true);
@@ -105,11 +117,11 @@ int main(int argc, char* argv[]) try {
                                                                                   find_versions, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findentities,
                                                                                   find_entities, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::addalias,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::addversionalias,
                                                                                   add_version_alias, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::rmalias,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::rmversionalias,
                                                                                   remove_version_alias, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findalias,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findversionalias,
                                                                                   find_version_aliases, options_string);
 
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::listdatabases,

@@ -9,7 +9,7 @@ namespace artdaq {
 namespace database {
 namespace ucon {
 namespace debug {
-void enableUconDBAPI();
+void UconDBAPI();
 }
 
 using namespace artdaq::database;

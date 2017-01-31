@@ -16,8 +16,8 @@ void enableConfJson();
 
 namespace conf {
 namespace debug {
-void enableConfReader();
-void enableConfWriter();
+void ConfReader();
+void ConfWriter();
 }
 }  // namespace conf
 

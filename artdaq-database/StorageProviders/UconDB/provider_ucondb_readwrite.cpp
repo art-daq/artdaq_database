@@ -23,11 +23,11 @@ template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, UconDB>::readDocument(JsonData const& arg) {
   TRACE_(3, "UconDB::readDocument() begin");
-  TRACE_(3, "UconDB::readDocument() args=<" << arg.json_buffer << ">");
+  TRACE_(3, "UconDB::readDocument() args=<" << arg<< ">");
 
   auto returnCollection = std::list<JsonData>();
 
-  auto arg_document = JSONDocument{arg.json_buffer};
+  auto arg_document = JSONDocument{arg };
 
   auto filter_document = JSONDocument{};
 
@@ -97,9 +97,9 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::readDocument(JsonData con
 template <>
 object_id_t StorageProvider<JsonData, UconDB>::writeDocument(JsonData const& arg) {
   TRACE_(4, "UconDB::writeDocument() begin");
-  TRACE_(4, "UconDB::writeDocument() args=<" << arg.json_buffer << ">");
+  TRACE_(4, "UconDB::writeDocument() args=<" << arg<< ">");
 
-  auto arg_document = JSONDocument{arg.json_buffer};
+  auto arg_document = JSONDocument{arg };
 
   auto user_document = arg_document.findChildDocument(jsonliteral::document);
 
@@ -186,13 +186,13 @@ object_id_t StorageProvider<JsonData, UconDB>::writeDocument(JsonData const& arg
 
 namespace ucon {
 namespace debug {
-void enableReadWrite() {
+void ReadWrite() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::ucon::enableReadWrite trace_enable");
+  TRACE_(0, "artdaq::database::ucon::ReadWrite trace_enable");
 }
 }
 }  // namespace ucon

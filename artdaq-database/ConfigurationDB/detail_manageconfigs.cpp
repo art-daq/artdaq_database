@@ -29,7 +29,6 @@ namespace cftd = cf::debug::detail;
 namespace jsonliteral = db::dataformats::literal;
 namespace apiliteral = db::configapi::literal;
 
-using cf::ManageDocumentOperation;
 using cf::options::data_format_t;
 
 using Options = cf::ManageDocumentOperation;
@@ -51,30 +50,28 @@ namespace database {
 namespace configuration {
 namespace detail {
 
-typedef JsonData (*provider_findversions_t)(Options const& /*options*/, JsonData const& /*task_payload*/);
-typedef JsonData (*provider_findentities_t)(Options const& /*options*/, JsonData const& /*task_payload*/);
-typedef JsonData (*provider_addtoglobalconfig_t)(Options const& /*options*/, JsonData const& /*task_payload*/);
+typedef JsonData (*provider_call_t)(Options const& /*options*/, JsonData const& /*task_payload*/);
 
 void assign_configuration(Options const& options, std::string& configs) {
   confirm(configs.empty());
   confirm(options.operation().compare(apiliteral::operation::assignconfig) == 0);
 
   TRACE_(11, "assign_configuration: begin");
-  TRACE_(11, "assign_configuration args options=<" << options.to_string() << ">");
+  TRACE_(11, "assign_configuration args options=<" << options << ">");
 
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_addtoglobalconfig_t>{
-        {apiliteral::provider::mongo, cf::mongo::addConfiguration},
-        {apiliteral::provider::filesystem, cf::filesystem::addConfiguration},
-        {apiliteral::provider::ucon, cf::ucon::addConfiguration}};
+    auto providers =
+        std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::assignConfiguration},
+                                               {apiliteral::provider::filesystem, cf::filesystem::assignConfiguration},
+                                               {apiliteral::provider::ucon, cf::ucon::assignConfiguration}};
 
     return providers.at(name);
   };
 
   auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData().json_buffer);
+      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -90,7 +87,7 @@ void assign_configuration(Options const& options, std::string& configs) {
     }
 
     case data_format_t::gui: {
-      returnValue = search_result.json_buffer;
+      returnValue = search_result;
       returnValueChanged = true;
       break;
     }
@@ -101,27 +98,26 @@ void assign_configuration(Options const& options, std::string& configs) {
   TRACE_(11, "assign_configuration: end");
 }
 
-
 void remove_configuration(Options const& options, std::string& configs) {
   confirm(configs.empty());
   confirm(options.operation().compare(apiliteral::operation::removeconfig) == 0);
 
   TRACE_(11, "remove_configuration: begin");
-  TRACE_(11, "remove_configuration args options=<" << options.to_string() << ">");
+  TRACE_(11, "remove_configuration args options=<" << options << ">");
 
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_addtoglobalconfig_t>{
-        {apiliteral::provider::mongo, cf::mongo::addConfiguration},
-        {apiliteral::provider::filesystem, cf::filesystem::addConfiguration},
-        {apiliteral::provider::ucon, cf::ucon::addConfiguration}};
+    auto providers =
+        std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::removeConfiguration},
+                                               {apiliteral::provider::filesystem, cf::filesystem::removeConfiguration},
+                                               {apiliteral::provider::ucon, cf::ucon::removeConfiguration}};
 
     return providers.at(name);
   };
 
   auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData().json_buffer);
+      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -137,7 +133,7 @@ void remove_configuration(Options const& options, std::string& configs) {
     }
 
     case data_format_t::gui: {
-      returnValue = search_result.json_buffer;
+      returnValue = search_result;
       returnValueChanged = true;
       break;
     }
@@ -188,26 +184,26 @@ void create_configuration(std::string const& operations, std::string& configs) {
   TRACE_(11, "create_configuration: end");
 }
 
-void find_versions(Options const& options, std::string& versions) {
-  confirm(versions.empty());
-  confirm(options.operation().compare(apiliteral::operation::findversions) == 0);
+void find_configurations(Options const& options, std::string& configs) {
+  confirm(configs.empty());
+  confirm(options.operation().compare(apiliteral::operation::findconfigs) == 0);
 
-  TRACE_(12, "find_versions: begin");
-  TRACE_(12, "find_versions args options=<" << options.to_string() << ">");
+  TRACE_(11, "find_configurations: begin");
+  TRACE_(11, "find_configurations args options=<" << options << ">");
 
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers =
-        std::map<std::string, provider_findversions_t>{{apiliteral::provider::mongo, cf::mongo::findVersions},
-                                                       {apiliteral::provider::filesystem, cf::filesystem::findVersions},
-                                                       {apiliteral::provider::ucon, cf::ucon::findVersions}};
+        std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::findConfigurations},
+                                               {apiliteral::provider::filesystem, cf::filesystem::findConfigurations},
+                                               {apiliteral::provider::ucon, cf::ucon::findConfigurations}};
 
     return providers.at(name);
   };
 
   auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData().json_buffer);
+      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -217,13 +213,16 @@ void find_versions(Options const& options, std::string& versions) {
     case data_format_t::db:
     case data_format_t::json:
     case data_format_t::unknown:
-    case data_format_t::fhicl: {
-      throw runtime_error("find_versions") << "Unsupported data format.";
+    case data_format_t::fhicl:
+    case data_format_t::xml: {
+      if (!db::json_db_to_gui(search_result, returnValue)) {
+        throw runtime_error("find_configurations") << "Unsupported data format.";
+      }
       break;
     }
 
     case data_format_t::gui: {
-      returnValue = search_result.json_buffer;
+      returnValue = search_result;
       returnValueChanged = true;
       break;
     }
@@ -233,63 +232,56 @@ void find_versions(Options const& options, std::string& versions) {
       auto reader = JsonReader{};
       object_t results_ast;
 
-      if (!reader.read(search_result.json_buffer, results_ast)) {
-        TRACE_(13, "find_entities() Failed to create an AST from search results JSON.");
+      if (!reader.read(search_result, results_ast)) {
+        TRACE_(11, "find_configurations() Failed to create an AST from search results JSON.");
 
-        throw runtime_error("find_entities") << "Failed to create an AST from search results JSON.";
+        throw runtime_error("find_configurations") << "Failed to create an AST from search results JSON.";
       }
 
       auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
 
-      TRACE_(13, "find_entities: found " << results_list.size() << " results.");
+      TRACE_(11, "find_configurations: found " << results_list.size() << " results.");
 
       std::ostringstream os;
 
-      auto entities = std::set<std::string>{};
-      
       for (auto const& result_entry : results_list) {
         auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
         auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
-	entities.emplace(value);
+
+        TRACE_(11, "find_configurations() Found config=<" << value << ">.");
+
+        os << value << ", ";
       }
-      
-      for (auto const& entity : entities){
-        TRACE_(13, "find_entities() Found entity=<" << entity << ">.");
-        os << entity << ", ";
-      }
-      
       returnValue = os.str();
       returnValueChanged = true;
       break;
     }
-    
   }
 
-  if (returnValueChanged) versions.swap(returnValue);
+  if (returnValueChanged) configs.swap(returnValue);
 
-  TRACE_(12, "find_versions: end");
+  TRACE_(11, "find_configurations: end");
 }
+void configuration_composition(Options const& options, std::string& filters) {
+  confirm(filters.empty());
+  confirm(options.operation().compare(apiliteral::operation::confcomposition) == 0);
 
-void find_entities(Options const& options, std::string& entities) {
-  confirm(entities.empty());
-  confirm(options.operation().compare(apiliteral::operation::findentities) == 0);
-
-  TRACE_(13, "find_entities: begin");
-  TRACE_(13, "find_entities args options=<" << options.to_string() << ">");
+  TRACE_(12, "configuration_composition: begin");
+  TRACE_(11, "configuration_composition args options=<" << options << ">");
 
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers =
-        std::map<std::string, provider_findentities_t>{{apiliteral::provider::mongo, cf::mongo::findEntities},
-                                                       {apiliteral::provider::filesystem, cf::filesystem::findEntities},
-                                                       {apiliteral::provider::ucon, cf::ucon::findEntities}};
+    auto providers = std::map<std::string, provider_call_t>{
+        {apiliteral::provider::mongo, cf::mongo::configurationComposition},
+        {apiliteral::provider::filesystem, cf::filesystem::configurationComposition},
+        {apiliteral::provider::ucon, cf::ucon::configurationComposition}};
 
     return providers.at(name);
   };
 
   auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData().json_buffer);
+      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -299,72 +291,35 @@ void find_entities(Options const& options, std::string& entities) {
     case data_format_t::db:
     case data_format_t::json:
     case data_format_t::unknown:
-    case data_format_t::fhicl: {
-      throw runtime_error("find_entities") << "Unsupported data format.";
+    case data_format_t::fhicl:
+    case data_format_t::xml: {
+      if (!db::json_db_to_gui(search_result, returnValue)) {
+        throw runtime_error("configuration_composition") << "Unsupported data format.";
+      }
       break;
     }
 
     case data_format_t::gui: {
-      returnValue = search_result.json_buffer;
-      returnValueChanged = true;
-      break;
-    }
-
-    case data_format_t::csv: {
-      using namespace artdaq::database::json;
-      auto reader = JsonReader{};
-      object_t results_ast;
-
-      if (!reader.read(search_result.json_buffer, results_ast)) {
-        TRACE_(13, "find_entities() Failed to create an AST from search results JSON.");
-
-        throw runtime_error("find_entities") << "Failed to create an AST from search results JSON.";
-      }
-
-      auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
-
-      TRACE_(13, "find_entities: found " << results_list.size() << " results.");
-
-      std::ostringstream os;
-
-      auto entities = std::set<std::string>{};
-      
-      for (auto const& result_entry : results_list) {
-        auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
-        auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
-	entities.emplace(value);
-      }
-      
-      for (auto const& entity : entities){
-        TRACE_(13, "find_entities() Found entity=<" << entity << ">.");
-        os << entity << ", ";
-      }
-      
-      returnValue = os.str();
+      returnValue = search_result;
       returnValueChanged = true;
       break;
     }
   }
 
-  if (returnValueChanged) entities.swap(returnValue);
+  if (returnValueChanged) filters.swap(returnValue);
 
-  TRACE_(13, "find_entities: end");
-  TRACE_(13, "find_entities: end entities=" << entities);
+  TRACE_(11, "configuration_composition: end");
 }
-
 }  // namespace detail
 }  // namespace configuration
 }  // namespace database
 }  // namespace artdaq
-
-void cftd::enableCreateConfigsOperation() {
+void cftd::ManageConfigs() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0,
-         "artdaq::database::configuration::CreateConfigsOperationDetail "
-         "trace_enable");
+  TRACE_(0, "artdaq::database::configuration::ManageConfigs trace_enable");
 }

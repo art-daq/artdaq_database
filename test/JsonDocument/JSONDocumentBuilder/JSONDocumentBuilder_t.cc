@@ -32,10 +32,10 @@ bool test_addEntity(std::string const& conf);
 bool test_removeEntity(std::string const& conf);
 
 int main(int argc, char* argv[]) {
-  artdaq::database::docrecord::debug::enableJSONDocument();
-  artdaq::database::docrecord::debug::enableJSONDocumentUtils();
+  artdaq::database::docrecord::debug::JSONDocument();
+  artdaq::database::docrecord::debug::JSONDocumentUtils();
 
-  artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
+  artdaq::database::docrecord::debug::JSONDocumentBuilder();
   debug::registerUngracefullExitHandlers();
 
   std::ostringstream descstr;

@@ -46,7 +46,7 @@ result_t json::add_version_alias(std::string const& query_payload) noexcept {
   try {
     if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = ManageDocumentOperation{apiliteral::operation::addalias};
+    auto options = ManageDocumentOperation{apiliteral::operation::addversionalias};
     options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
@@ -63,7 +63,7 @@ result_t json::remove_version_alias(std::string const& query_payload) noexcept {
   try {
     if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = ManageDocumentOperation{apiliteral::operation::rmalias};
+    auto options = ManageDocumentOperation{apiliteral::operation::rmversionalias};
     options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
@@ -80,7 +80,7 @@ result_t json::find_version_aliases(std::string const& query_payload) noexcept {
   try {
     if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = ManageDocumentOperation{apiliteral::operation::rmalias};
+    auto options = ManageDocumentOperation{apiliteral::operation::rmversionalias};
     options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
@@ -93,12 +93,13 @@ result_t json::find_version_aliases(std::string const& query_payload) noexcept {
   }
 }
 
-void dbcfg::debug::enableVersionAliasOperation() {
+void dbcfg::debug::ManageAliases() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::CreateConfigsOperation trace_enable");
+  dbcfg::debug::detail::ManageAliases();
+  TRACE_(0, "artdaq::database::configuration::ManageAliases trace_enable");
 }

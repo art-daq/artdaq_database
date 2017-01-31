@@ -134,14 +134,14 @@ std::string const& ManageAliasesOperation::configurationAlias(std::string const&
 }
 
 void ManageAliasesOperation::readJsonData(JsonData const& data) {
-  confirm(!data.json_buffer.empty());
+  confirm(!data.empty());
 
   OperationBase::readJsonData(data);
 
   using namespace artdaq::database::json;
   auto dataAST = object_t{};
 
-  if (!JsonReader{}.read(data.json_buffer, dataAST)) {
+  if (!JsonReader{}.read(data , dataAST)) {
     throw db::invalid_option_exception("ManageAliasesOperation")
         << "ManageAliasesOperation: Unable to read JSON buffer.";
   }
@@ -238,7 +238,7 @@ JsonData ManageAliasesOperation::writeJsonData() const {
 
   auto docAST = object_t{};
 
-  if (!JsonReader{}.read(OperationBase::writeJsonData().json_buffer, docAST)) {
+  if (!JsonReader{}.read(OperationBase::writeJsonData(), docAST)) {
     throw db::invalid_option_exception("ManageAliasesOperation") << "Unable to readquery_filter_to_JsonData().";
   }
 
@@ -265,7 +265,7 @@ JsonData ManageAliasesOperation::query_filter_to_JsonData() const {
 
   auto docAST = object_t{};
 
-  if (!JsonReader{}.read(OperationBase::query_filter_to_JsonData().json_buffer, docAST)) {
+  if (!JsonReader{}.read(OperationBase::query_filter_to_JsonData(), docAST)) {
     throw db::invalid_option_exception("ManageAliasesOperation") << "Unable to query_filter_to_JsonData().";
   }
 
@@ -286,15 +286,28 @@ JsonData ManageAliasesOperation::query_filter_to_JsonData() const {
   return {json_buffer};
 }
 
+JsonData ManageAliasesOperation::versionAlias_to_JsonData() const {
+  using namespace artdaq::database::json;
+  auto docAST = object_t{};
+
+  docAST[apiliteral::filter::version_alias] = versionAlias();
+
+  auto json_buffer = std::string{};
+
+  if (!JsonWriter{}.write(docAST, json_buffer)) {
+    throw db::invalid_option_exception("ManageConfigsOperation") << "Unable to write JSON buffer.";
+  }
+
+  return {json_buffer};
+}
+
 //
-void cf::debug::options::enableOperationManageAliases() {
+void cf::debug::options::ManageAliases() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0,
-         "artdaq::database::configuration::options::OperationManageAliases "
-         "trace_enable");
+  TRACE_(0, "artdaq::database::configuration::options::ManageAliases trace_enable");
 }

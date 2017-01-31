@@ -42,7 +42,7 @@ bool ConfReader::read(std::string const& in[[gnu::unused]], jsn::object_t& json_
   }
 }
 
-void artdaq::database::conf::debug::enableConfReader() {
+void artdaq::database::conf::debug::ConfReader() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);

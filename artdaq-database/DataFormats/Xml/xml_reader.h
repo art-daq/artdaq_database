@@ -15,7 +15,7 @@ struct XmlReader final {
 };
 
 namespace debug {
-void enableXmlReader();
+void XmlReader();
 }
 }  // namespace xml
 }  // namespace database

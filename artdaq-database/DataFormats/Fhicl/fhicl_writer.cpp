@@ -99,7 +99,7 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
   return true;
 }
 
-void artdaq::database::fhicl::debug::enableFhiclWriter() {
+void artdaq::database::fhicl::debug::FhiclWriter() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);

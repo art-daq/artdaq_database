@@ -14,7 +14,7 @@ bool test_roundconvertgui(std::string const&, std::string const&);
 bool test_roundconvertdb(std::string const&, std::string const&);
 
 int main(int argc, char* argv[]) try {
-  artdaq::database::json::debug::enableJSON2GUIJSON();
+  artdaq::database::json::debug::JSON2GUIJSON();
 
   debug::registerUngracefullExitHandlers();
   artdaq::database::useFakeTime(true);

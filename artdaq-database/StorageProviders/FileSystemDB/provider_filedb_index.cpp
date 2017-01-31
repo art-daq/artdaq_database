@@ -42,16 +42,16 @@ SearchIndex::~SearchIndex() {
 std::vector<object_id_t> SearchIndex::findDocumentIDs(JsonData const& search) {
   auto ouids = std::vector<object_id_t>{};
 
-  confirm(!search.json_buffer.empty());
+  confirm(!search.empty());
 
   TRACE_(2, "StorageProvider::FileSystemDB::index::findDocumentIDs() begin");
-  TRACE_(2, "StorageProvider::FileSystemDB::index::findDocumentIDs() args search=<" << search.json_buffer << ">.");
+  TRACE_(2, "StorageProvider::FileSystemDB::index::findDocumentIDs() args search=<" << search<< ">.");
 
   auto reader = JsonReader{};
 
   object_t search_ast;
 
-  if (!reader.read(search.json_buffer, search_ast)) {
+  if (!reader.read(search , search_ast)) {
     TRACE_(5,
            "StorageProvider::FileSystemDB::index::findDocumentIDs() Failed "
            "to create an AST from search.");
@@ -156,7 +156,7 @@ std::vector<object_id_t> SearchIndex::findDocumentIDs(JsonData const& search) {
 }
 
 std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByGlobalConfigName(JsonData const& search) {
-  confirm(!search.json_buffer.empty());
+  confirm(!search.empty());
   auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
   TRACE_(5,
          "StorageProvider::FileSystemDB::index::"
@@ -164,13 +164,13 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByGlob
   TRACE_(5,
          "StorageProvider::FileSystemDB::index::"
          "findVersionsByGlobalConfigName() args search=<"
-             << search.json_buffer << ">.");
+             << search<< ">.");
 
   auto reader = JsonReader{};
 
   object_t search_ast;
 
-  if (!reader.read(search.json_buffer, search_ast)) {
+  if (!reader.read(search , search_ast)) {
     TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByGlobalConfigName()"
                   << " Failed to create an AST from search.");
     return returnCollection;
@@ -191,17 +191,17 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByGlob
 }
 
 std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByEntityName(JsonData const& search) {
-  confirm(!search.json_buffer.empty());
+  confirm(!search.empty());
   auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
   TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByEntityName() begin");
   TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByEntityName() args search=<"
-             << search.json_buffer << ">.");
+             << search<< ">.");
 
   auto reader = JsonReader{};
 
   object_t search_ast;
 
-  if (!reader.read(search.json_buffer, search_ast)) {
+  if (!reader.read(search , search_ast)) {
     TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByEntityName()"
                   << " Failed to create an AST from search.");
     return returnCollection;
@@ -222,16 +222,16 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByEnti
 }
 
 std::vector<std::string> SearchIndex::findEntities(JsonData const& search) {
-  confirm(!search.json_buffer.empty());
+  confirm(!search.empty());
   auto returnCollection = std::vector<std::string>{};
   TRACE_(5, "StorageProvider::FileSystemDB::index::findEntities() begin");
-  TRACE_(5, "StorageProvider::FileSystemDB::index::findEntities() args search=<" << search.json_buffer << ">.");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findEntities() args search=<" << search<< ">.");
 
   auto reader = JsonReader{};
 
   object_t search_ast;
 
-  if (!reader.read(search.json_buffer, search_ast)) {
+  if (!reader.read(search , search_ast)) {
     TRACE_(5, "StorageProvider::FileSystemDB::index::findEntities()"
                   << " Failed to create an AST from search.");
     return returnCollection;
@@ -252,7 +252,7 @@ std::vector<std::string> SearchIndex::findEntities(JsonData const& search) {
 }
 
 std::vector<std::pair<std::string, std::string>> SearchIndex::findAllGlobalConfigurations(JsonData const& search) {
-  confirm(!search.json_buffer.empty());
+  confirm(!search.empty());
   auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
   TRACE_(5,
          "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations("
@@ -260,13 +260,13 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findAllGlobalConfi
   TRACE_(5,
          "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations("
          ") args search=<"
-             << search.json_buffer << ">.");
+             << search<< ">.");
 
   auto reader = JsonReader{};
 
   object_t search_ast;
 
-  if (!reader.read(search.json_buffer, search_ast)) {
+  if (!reader.read(search , search_ast)) {
     TRACE_(5, "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations()"
                   << " Failed to create an AST from search.");
     return returnCollection;
@@ -285,18 +285,18 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findAllGlobalConfi
 }
 
 bool SearchIndex::addDocument(JsonData const& document, object_id_t const& ouid) {
-  confirm(!document.json_buffer.empty());
+  confirm(!document.empty());
   confirm(!ouid.empty());
 
   TRACE_(5, "StorageProvider::FileSystemDB::index::addDocument() begin");
-  TRACE_(5, "StorageProvider::FileSystemDB::index::addDocument() args document=<" << document.json_buffer << ">.");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::addDocument() args document=<" << document<< ">.");
   TRACE_(5, "StorageProvider::FileSystemDB::index::addDocument() args ouid=<" << ouid << ">.");
 
   auto reader = JsonReader{};
 
   object_t doc_ast;
 
-  if (!reader.read(document.json_buffer, doc_ast)) {
+  if (!reader.read(document, doc_ast)) {
     TRACE_(5,
            "StorageProvider::FileSystemDB::index::addDocument() Failed to "
            "create an AST from document.");
@@ -346,18 +346,18 @@ bool SearchIndex::addDocument(JsonData const& document, object_id_t const& ouid)
 }
 
 bool SearchIndex::removeDocument(JsonData const& document, object_id_t const& ouid) {
-  confirm(!document.json_buffer.empty());
+  confirm(!document.empty());
   confirm(!ouid.empty());
 
   TRACE_(5, "StorageProvider::FileSystemDB::index::removeDocument() begin");
-  TRACE_(5, "StorageProvider::FileSystemDB::index::removeDocument() args document=<" << document.json_buffer << ">.");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::removeDocument() args document=<" << document<< ">.");
   TRACE_(5, "StorageProvider::FileSystemDB::index::removeDocument() args ouid=<" << ouid << ">.");
 
   auto reader = JsonReader{};
 
   object_t doc_ast;
 
-  if (!reader.read(document.json_buffer, doc_ast)) {
+  if (!reader.read(document, doc_ast)) {
     TRACE_(6,
            "StorageProvider::FileSystemDB::index::removeDocument() Failed "
            "to create an AST from document.");

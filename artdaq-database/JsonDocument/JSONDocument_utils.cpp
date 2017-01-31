@@ -1,3 +1,4 @@
+#include "artdaq-database/BasicTypes/data_json.h"
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/JsonDocument/common.h"
@@ -147,12 +148,21 @@ std::string JSONDocument::writeJson() const {
   if (!JsonWriter().write(tmpObject, json))
     throw invalid_argument("JSONDocument") << "Failed writing JSON: JSONDocument::_value has invalid AST";
 
-  //TRACE_(1, "writeJson() json=<" << json << " > ");
+  // TRACE_(1, "writeJson() json=<" << json << " > ");
 
   return json;
 }
 
 std::string JSONDocument::to_string() const { return writeJson(); }
+
+JSONDocument::JSONDocument(JsonData const& data)
+    : _value{readJson(data)}, _cached_json_buffer(data) {}
+
+JSONDocument::JSONDocument(std::string const& json) : _value{readJson(json)}, _cached_json_buffer(json) {}
+
+JSONDocument::JSONDocument(value_t const& value) : _value{value}, _cached_json_buffer(writeJson()) {}
+
+JSONDocument::JSONDocument() : _value{object_t{}}, _cached_json_buffer(writeJson()) {}
 
 std::string const& JSONDocument::cached_json_buffer() const { return _cached_json_buffer; }
 
@@ -248,7 +258,7 @@ void JSONDocumentBuilder::_importUserData(JSONDocument const& document) {
 
     TRACE_(2, "_importUserData() Found document.metadata=<" << metadata << ">");
 
-    _document.replaceChild(metadata,path);
+    _document.replaceChild(metadata, path);
 
   } catch (notfound_exception const&) {
     TRACE_(2, "_importUserData() No document.metadata");
@@ -289,7 +299,7 @@ void JSONDocumentBuilder::_importUserData(JSONDocument const& document) {
   } catch (notfound_exception const&) {
     TRACE_(2, "_importUserData() No collection");
   }
-  
+
   // replace data attachments if any
   try {
     auto attachments = document.findChild(jsonliteral::attachments);
@@ -301,7 +311,7 @@ void JSONDocumentBuilder::_importUserData(JSONDocument const& document) {
   } catch (notfound_exception const&) {
     TRACE_(2, "_importUserData() No attachments");
   }
-  
+
   // replace data if any
   try {
     auto path = ""s + jsonliteral::document + jsonliteral::dot + jsonliteral::data;
@@ -327,7 +337,7 @@ void JSONDocumentBuilder::_importUserData(JSONDocument const& document) {
 
 std::string JSONDocument::value(JSONDocument const& document) {
   TRACE_(14, "value() document=<" << document.cached_json_buffer() << ">");
-  
+
   auto docValue = document.getPayloadValueForKey("null");
 
   if (type(docValue) == type_t::OBJECT)
@@ -383,7 +393,7 @@ result_t JSONDocumentBuilder::CallUndo() noexcept try { return Success(); } catc
 
 #pragma GCC diagnostic pop
 
-void dbdr::debug::enableJSONDocumentUtils() {
+void dbdr::debug::JSONDocumentUtils() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);

@@ -76,14 +76,14 @@ JsonData prov::readDocument(ManageDocumentOperation const& options, JsonData con
     throw runtime_error("read_document") << "Search returned " << collection.size() << " results.";
   }
 
-  auto data = JsonData{collection.begin()->json_buffer};
+  auto data = JsonData{*collection.begin()};
 
   TRACE_(16, "readDocument(): end");
 
   return data;
 }
 
-JsonData prov::findConfigurations(ManageConfigsOperation const& options, JsonData const& search_payload) {
+JsonData prov::findConfigurations(ManageDocumentOperation const& options, JsonData const& search_payload) {
   confirm(options.provider().compare(apiliteral::provider::mongo) == 0);
   confirm(options.operation().compare(apiliteral::operation::findconfigs) == 0);
 
@@ -133,7 +133,7 @@ JsonData prov::findConfigurations(ManageConfigsOperation const& options, JsonDat
   oss << "{ \"search\": [";
 
   for (auto const& global_config : global_configs) {
-    auto doc = JSONDocument{global_config.json_buffer};
+    auto doc = JSONDocument{global_config};
 
     auto global_config_name = JSONDocument::value(doc.findChild("filter").value());
 
@@ -141,7 +141,7 @@ JsonData prov::findConfigurations(ManageConfigsOperation const& options, JsonDat
 
     oss << printComma() << "{";
     oss << "\"name\" :\"" << global_config_name << "\",";
-    oss << "\"query\" :" << global_config.json_buffer;
+    oss << "\"query\" :" << global_config;
     oss << "}";
   }
 
@@ -150,17 +150,18 @@ JsonData prov::findConfigurations(ManageConfigsOperation const& options, JsonDat
   return {oss.str()};
 }
 
-JsonData prov::configurationComposition(ManageConfigsOperation const& options, JsonData const& search_payload) {
+JsonData prov::configurationComposition(ManageDocumentOperation const& options, JsonData const& search_payload) {
   confirm(options.provider().compare(apiliteral::provider::mongo) == 0);
   confirm(options.operation().compare(apiliteral::operation::confcomposition) == 0);
 
   if (options.operation().compare(apiliteral::operation::confcomposition) != 0) {
     throw runtime_error("operation_confcomposition") << "Wrong operation option; operation=<" << options.operation()
-                                                 << ">.";
+                                                     << ">.";
   }
 
   if (options.provider().compare(apiliteral::provider::mongo) != 0) {
-    throw runtime_error("operation_confcomposition") << "Wrong provider option; provider=<" << options.provider() << ">.";
+    throw runtime_error("operation_confcomposition") << "Wrong provider option; provider=<" << options.provider()
+                                                     << ">.";
   }
 
   TRACE_(18, "operation_confcomposition: begin");
@@ -173,7 +174,6 @@ JsonData prov::configurationComposition(ManageConfigsOperation const& options, J
 
   TRACE_(18, "operation_confcomposition: configurationComposition returned " << query_payloads.size() << " results.");
 
-  
   if (query_payloads.empty()) {
     throw runtime_error("operation_confcomposition") << "No results found for " << options.configuration();
   }
@@ -195,7 +195,7 @@ JsonData prov::configurationComposition(ManageConfigsOperation const& options, J
   oss << "{ \"search\": [\n";
 
   for (auto const& query_payload : query_payloads) {
-    auto filter_json = JSONDocument{query_payload.json_buffer}.findChild("filter").value();
+    auto filter_json = JSONDocument{query_payload }.findChild("filter").value();
 
     auto results = std::smatch();
 
@@ -215,7 +215,7 @@ JsonData prov::configurationComposition(ManageConfigsOperation const& options, J
 
     oss << printComma() << "{";
     oss << "\"name\" :\"" << results[1].str() << ":" << results[3].str() << "\",";
-    oss << "\"query\" :" << query_payload.json_buffer;
+    oss << "\"query\" :" << query_payload;
     oss << "}\n";
   }
 
@@ -269,7 +269,7 @@ JsonData prov::findVersions(ManageDocumentOperation const& options, JsonData con
   oss << "{ \"search\": [";
 
   for (auto const& config_version : config_versions) {
-    auto filter_json = JSONDocument{config_version.json_buffer}.findChild("filter").value();
+    auto filter_json = JSONDocument{config_version }.findChild("filter").value();
 
     auto results = std::smatch();
 
@@ -290,7 +290,7 @@ JsonData prov::findVersions(ManageDocumentOperation const& options, JsonData con
     oss << printComma() << "{";
     oss << "\"name\" :\"" << results[1].str() /*<< ":" << results[3].str()*/
         << "\",";
-    oss << "\"query\" :" << config_version.json_buffer;
+    oss << "\"query\" :" << config_version;
     oss << "}";
   }
 
@@ -341,7 +341,7 @@ JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData con
   oss << "{ \"search\": [";
 
   for (auto const& config_entity : config_entities) {
-    auto filter_json = JSONDocument{config_entity.json_buffer}.findChild("filter").value();
+    auto filter_json = JSONDocument{config_entity }.findChild("filter").value();
     TRACE_(18, "operation_findentities: filter_json=<" << filter_json << '>');
 
     auto results = std::smatch();
@@ -365,7 +365,7 @@ JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData con
     oss << printComma() << "{";
     oss << "\"name\" :\"" << results[2].str() /*<< ":" << results[3].str()*/
         << "\",";
-    oss << "\"query\" :" << config_entity.json_buffer;
+    oss << "\"query\" :" << config_entity;
     oss << "}";
   }
 
@@ -374,7 +374,7 @@ JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData con
   return {oss.str()};
 }
 
-JsonData prov::addConfiguration(ManageDocumentOperation const& options, JsonData const& search_payload) {
+JsonData prov::assignConfiguration(ManageDocumentOperation const& options, JsonData const& search_payload) {
   confirm(options.provider().compare(apiliteral::provider::mongo) == 0);
   confirm(options.operation().compare(apiliteral::operation::assignconfig) == 0);
 
@@ -393,32 +393,80 @@ JsonData prov::addConfiguration(ManageDocumentOperation const& options, JsonData
 
   auto search =
       JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collection() + "\"}"};
-  TRACE_(20, "operation_addconfig: args search_payload=<" << search.json_buffer << ">");
+  TRACE_(20, "operation_addconfig: args search_payload=<" << search<< ">");
 
   auto document = mongo::readDocument(new_options, search);
-  auto json_document = JSONDocument{document.json_buffer};
+  auto json_document = JSONDocument{document};
   JSONDocumentBuilder builder{json_document};
-  auto configuration = JSONDocument{new_options.configuration_to_JsonData().json_buffer};
+  auto configuration = JSONDocument{new_options.configuration_to_JsonData()};
 
   builder.addConfiguration(configuration);
 
   new_options.operation(apiliteral::operation::writedocument);
 
-    auto update =
-      JsonData{"{\"filter\": "s + builder.getObjectID().to_string()+ ",  \"document\":" + builder.to_string() + "\n}"};
+  auto update =
+      JsonData{"{\"filter\": "s + builder.getObjectID().to_string() + ",  \"document\":" + builder.to_string() + "\n}"};
 
-  mongo::writeDocument(new_options, update.json_buffer);
+  mongo::writeDocument(new_options, update);
 
   new_options.operation(apiliteral::operation::confcomposition);
 
-  auto find_options = ManageConfigsOperation{apiliteral::operation::assignconfig};
+  auto find_options = ManageDocumentOperation{apiliteral::operation::assignconfig};
 
   find_options.operation(apiliteral::operation::confcomposition);
   find_options.format(options::data_format_t::gui);
   find_options.provider(apiliteral::provider::mongo);
   find_options.configuration(new_options.configuration());
 
-  return mongo::configurationComposition(find_options, options.configurationsname_to_JsonData().json_buffer);
+  return mongo::configurationComposition(find_options, options.configurationsname_to_JsonData());
+}
+
+JsonData prov::removeConfiguration(ManageDocumentOperation const& options, JsonData const& search_payload) {
+  confirm(options.provider().compare(apiliteral::provider::mongo) == 0);
+  confirm(options.operation().compare(apiliteral::operation::removeconfig) == 0);
+
+  if (options.operation().compare(apiliteral::operation::removeconfig) != 0) {
+    throw runtime_error("operation_removeconfig") << "Wrong operation option; operation=<" << options.operation()
+                                                  << ">.";
+  }
+
+  if (options.provider().compare(apiliteral::provider::mongo) != 0) {
+    throw runtime_error("operation_removeconfig") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  }
+
+  TRACE_(20, "operation_removeconfig: begin");
+
+  auto new_options = options;
+  new_options.operation(apiliteral::operation::readdocument);
+
+  auto search =
+      JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collection() + "\"}"};
+  TRACE_(20, "operation_addconfig: args search_payload=<" << search<< ">");
+
+  auto document = mongo::readDocument(new_options, search);
+  auto json_document = JSONDocument{document};
+  JSONDocumentBuilder builder{json_document};
+  auto configuration = JSONDocument{new_options.configuration_to_JsonData()};
+
+  builder.removeConfiguration(configuration);
+
+  new_options.operation(apiliteral::operation::writedocument);
+
+  auto update =
+      JsonData{"{\"filter\": "s + builder.getObjectID().to_string() + ",  \"document\":" + builder.to_string() + "\n}"};
+
+  mongo::writeDocument(new_options, update);
+
+  new_options.operation(apiliteral::operation::confcomposition);
+
+  auto find_options = ManageDocumentOperation{apiliteral::operation::removeconfig};
+
+  find_options.operation(apiliteral::operation::confcomposition);
+  find_options.format(options::data_format_t::gui);
+  find_options.provider(apiliteral::provider::mongo);
+  find_options.configuration(new_options.configuration());
+
+  return mongo::configurationComposition(find_options, options.configurationsname_to_JsonData());
 }
 
 JsonData prov::listCollections(ManageDocumentOperation const& options, JsonData const& search_payload) {
@@ -461,12 +509,12 @@ JsonData prov::listCollections(ManageDocumentOperation const& options, JsonData 
   oss << "{ \"search\": [\n";
 
   for (auto const& collection_name : collection_names) {
-    auto name = JSONDocument{collection_name.json_buffer}.findChild("collection").value();
+    auto name = JSONDocument{collection_name}.findChild("collection").value();
     TRACE_(18, "operation_listcollections: collection=<" << name << '>');
 
     oss << printComma() << "{";
     oss << "\"name\" :\"" << name << "\",";
-    oss << "\"query\" :" << collection_name.json_buffer;
+    oss << "\"query\" :" << collection_name;
     oss << "}\n";
   }
 
@@ -514,12 +562,12 @@ JsonData prov::listDatabases(ManageDocumentOperation const& options, JsonData co
   oss << "{ \"search\": [\n";
 
   for (auto const& database_name : database_names) {
-    auto name = JSONDocument{database_name.json_buffer}.findChild("database").value();
+    auto name = JSONDocument{database_name }.findChild("database").value();
     TRACE_(18, "operation_listdatabases: database=<" << name << '>');
 
     oss << printComma() << "{";
     oss << "\"name\" :\"" << name << "\",";
-    oss << "\"query\" :" << database_name.json_buffer;
+    oss << "\"query\" :" << database_name;
     oss << "}\n";
   }
 
@@ -555,22 +603,27 @@ JsonData prov::readDbInfo(ManageDocumentOperation const& options, JsonData const
 
   auto const database_metadata = search_results.begin();
 
-  TRACE_(20, "operation_readdbinfo: database_metadata =<" << database_metadata->json_buffer << ">");
+  TRACE_(20, "operation_readdbinfo: database_metadata =<" << *database_metadata << ">");
 
   std::ostringstream oss;
   oss << "{ \"search\":\n";
-  oss << database_metadata->json_buffer;
+  oss << *database_metadata;
   oss << "\n}";
 
   return {oss.str()};
 }
 
-void cf::debug::enableDBOperationMongo() {
+JsonData prov::findVersionAliases(cf::ManageAliasesOperation const& /*options*/, JsonData const& /*query_payload*/) {
+  throw runtime_error("findVersionAliases") << "findVersionAliases: is not implemented";
+  return {apiliteral::empty_json};
+}
+
+void cf::debug::MongoDB() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::Mongo trace_enable");
+  TRACE_(0, "artdaq::database::configuration::MongoDB trace_enable");
 }

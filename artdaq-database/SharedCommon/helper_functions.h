@@ -5,14 +5,26 @@
 #include <iterator>
 #include <sstream>
 #include <string>
+#include <iostream>
 
 #include "artdaq-database/SharedCommon/shared_datatypes.h"
 
+namespace debug { std::string getStackTrace();}
+
 #ifndef NDEBUG
-#define confirm(expr) assert(expr)
+#define confirm(expr) \
+if((expr) ==false) {\
+  std::cerr << "Failed Assertion:" << ::debug::getStackTrace();\
+  }\
+  assert(expr)
 #else
 #include "artdaq-database/SharedCommon/shared_exceptions.h"
-#define confirm(expr) if((expr) ==false) throw artdaq::database::runtime_exception("Failed assertion");
+#define confirm(expr) \
+if((expr) ==false) { \
+  auto msg = ::debug::getStackTrace();\
+  std::cerr << "Failed Assertion:" << msg;\
+  throw artdaq::database::runtime_exception("Failed assertion") << ::debug::getStackTrace();\
+}
 #endif
 
 namespace artdaq {

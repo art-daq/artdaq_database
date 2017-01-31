@@ -46,7 +46,6 @@ IF (SANITIZE_ADDRESS)
     cet_add_compiler_flags(-fsanitize=address)
   endif()
 ENDIF()
-# cet_add_compiler_flags(-fsanitize=address)
 cet_add_compiler_flags( -rdynamic -ldl)
 
 cet_report_compiler_flags()

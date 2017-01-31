@@ -19,7 +19,7 @@ using file_paths_t = std::vector<boost::filesystem::path>;
 file_paths_t list_files_in_directory(boost::filesystem::path const& path, std::string const& ext);
 namespace debug {
 void enable();
-void enableReadWrite();
+void ReadWrite();
 }
 
 namespace literal {

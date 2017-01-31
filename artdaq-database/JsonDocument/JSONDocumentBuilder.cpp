@@ -174,7 +174,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::addEntity(JSONDocument const& entity) 
   TRACE_(9, "addEntity() args  entity=<" << entity << ">");
 
   JSONDocument copy(entity);
-  auto ovl = overlay<ovl::ovlEntity>(copy, jsonliteral::entities);
+  auto ovl = overlay<ovl::ovlEntity>(copy, jsonliteral::entity);
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->addEntity(ovl));
@@ -183,17 +183,17 @@ JSONDocumentBuilder& JSONDocumentBuilder::addEntity(JSONDocument const& entity) 
 
   return self();
 } catch (std::exception const& ex) {
-  TRACE_(9, "setVersion() Exception:" << ex.what());
+  TRACE_(9, "addEntity() Exception:" << ex.what());
   ThrowOnFailure(CallUndo());
 
   return self();
 }
 
 JSONDocumentBuilder& JSONDocumentBuilder::removeEntity(JSONDocument const& entity) try {
-  TRACE_(9, "addEntity() args  entity=<" << entity << ">");
+  TRACE_(9, "removeEntity() args  entity=<" << entity << ">");
 
   JSONDocument copy(entity);
-  auto ovl = overlay<ovl::ovlEntity>(copy, jsonliteral::entities);
+  auto ovl = overlay<ovl::ovlEntity>(copy, jsonliteral::entity);
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->removeEntity(ovl));
@@ -202,7 +202,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeEntity(JSONDocument const& entit
 
   return self();
 } catch (std::exception const& ex) {
-  TRACE_(9, "setVersion() Exception:" << ex.what());
+  TRACE_(9, "removeEntity() Exception:" << ex.what());
   ThrowOnFailure(CallUndo());
 
   return self();
@@ -271,7 +271,7 @@ std::ostream& utl::operator<<(std::ostream& os, JSONDocumentBuilder const& data)
   return os;
 }
 
-void dbdr::debug::enableJSONDocumentBuilder() {
+void dbdr::debug::JSONDocumentBuilder() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);

@@ -26,13 +26,13 @@ typedef bool (*test_case)(Options const& /*options*/, std::string const& /*file_
 int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
-  //artdaq::database::docrecord::debug::enableJSONDocument();
-  artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
+  //artdaq::database::docrecord::debug::JSONDocument();
+  artdaq::database::docrecord::debug::JSONDocumentBuilder();
 
-  artdaq::database::configuration::debug::enableManageDocumentOperation();
-  artdaq::database::configuration::debug::options::enableOperationBase();
-  artdaq::database::configuration::debug::options::enableManageDocumentOperation();
-  artdaq::database::configuration::debug::detail::enableManageDocumentOperation();
+  artdaq::database::configuration::debug::ManageDocuments();
+  artdaq::database::configuration::debug::options::OperationBase();
+  artdaq::database::configuration::debug::options::ManageDocuments();
+  artdaq::database::configuration::debug::detail::ManageDocuments();
 
   debug::registerUngracefullExitHandlers();
   artdaq::database::useFakeTime(true);

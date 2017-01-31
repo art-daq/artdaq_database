@@ -7,26 +7,35 @@ namespace artdaq {
 namespace database {
 namespace configuration {
 class ManageDocumentOperation;
-class ManageConfigsOperation;
 
 using artdaq::database::result_t;
 
 namespace opts {
-result_t export_configuration(ManageConfigsOperation const& /*options*/) noexcept;
-result_t import_configuration(ManageConfigsOperation const& /*options*/) noexcept;
+result_t export_configuration(ManageDocumentOperation const& /*options*/) noexcept;
+result_t import_configuration(ManageDocumentOperation const& /*options*/) noexcept;
+result_t export_database(ManageDocumentOperation const& /*options*/) noexcept;
+result_t import_database(ManageDocumentOperation const& /*options*/) noexcept;
+
+result_t export_collection(ManageDocumentOperation const& /*options*/) noexcept;
+result_t import_collection(ManageDocumentOperation const& /*options*/) noexcept;
 }
 
 namespace json {
 result_t write_configuration(std::string const& /*task_payload*/, std::string const& /*conf*/) noexcept;
 result_t read_configuration(std::string const& /*task_payload*/, std::string& /*conf*/) noexcept;
+
 result_t export_configuration(std::string const& /*task_payload*/) noexcept;
 result_t import_configuration(std::string const& /*task_payload*/) noexcept;
+result_t export_database(std::string const& /*task_payload*/) noexcept;
+result_t import_database(std::string const& /*task_payload*/) noexcept;
+result_t export_collection(std::string const& /*task_payload*/) noexcept;
+result_t import_collection(std::string const& /*task_payload*/) noexcept;
 }
 
 namespace debug {
-void enableConfigurationManageDocumentOperation();
+void ExportImport();
 namespace detail {
-void enableConfigurationManageDocumentOperation();
+void ExportImport();
 }
 }
 

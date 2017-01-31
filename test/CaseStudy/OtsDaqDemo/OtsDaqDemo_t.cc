@@ -17,7 +17,7 @@ namespace cfo = cf::options;
 
 namespace bpo = boost::program_options;
 
-using Options = cf::ManageConfigsOperation;
+using Options = cf::ManageDocumentOperation;
 
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::basictypes::JsonData;
@@ -25,22 +25,28 @@ using artdaq::database::basictypes::JsonData;
 int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
-  // artdaq::database::docrecord::debug::enableJSONDocument();
-  //artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
+  // artdaq::database::docrecord::debug::JSONDocument();
+  //artdaq::database::docrecord::debug::JSONDocumentBuilder();
 
-  artdaq::database::configuration::debug::enableFindConfigsOperation();
-  artdaq::database::configuration::debug::enableCreateConfigsOperation();
+  artdaq::database::configuration::debug::ManageConfigs();
+  artdaq::database::configuration::debug::ManageAliases();
+  artdaq::database::configuration::debug::ManageDocuments();
   
-  artdaq::database::configuration::debug::options::enableOperationBase();
-  artdaq::database::configuration::debug::options::enableOperationManageConfigs();
-  artdaq::database::configuration::debug::detail::enableCreateConfigsOperation();
-  artdaq::database::configuration::debug::detail::enableFindConfigsOperation();
+  artdaq::database::configuration::debug::options::OperationBase();
+  artdaq::database::configuration::debug::options::ManageDocuments();
+  artdaq::database::configuration::debug::options::ManageConfigs();
+  artdaq::database::configuration::debug::options::ManageAliases();
   
-  artdaq::database::configuration::debug::enableDBOperationMongo();
-  artdaq::database::configuration::debug::enableDBOperationFileSystem();
+  artdaq::database::configuration::debug::detail::ManageConfigs();
+  artdaq::database::configuration::debug::detail::ManageAliases();
+  artdaq::database::configuration::debug::detail::ManageDocuments();
+
+  artdaq::database::configuration::debug::MongoDB();
+  artdaq::database::configuration::debug::UconDB();
 
   debug::registerUngracefullExitHandlers();
   artdaq::database::useFakeTime(true);
+
 
   auto options = Options{argv[0]};
   auto desc = options.makeProgramOptions();
@@ -102,11 +108,11 @@ int main(int argc, char* argv[]) try {
       apiliteral::operation::findversions, find_versions, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
       apiliteral::operation::findentities, find_entities, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::addalias, add_version_alias,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::addversionalias, add_version_alias,
                                                                                   options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::rmalias, remove_version_alias,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::rmversionalias, remove_version_alias,
                                                                                   options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findalias, find_version_aliases,
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findversionalias, find_version_aliases,
                                                                                   options_string);
   try {
     std::ifstream is(file_src_name);

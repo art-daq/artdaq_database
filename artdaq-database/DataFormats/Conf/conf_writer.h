@@ -18,7 +18,7 @@ struct ConfWriter final {
 };
 
 namespace debug {
-void enableConfWriter();
+void ConfWriter();
 }
 }  // namespace conf
 }  // namespace database

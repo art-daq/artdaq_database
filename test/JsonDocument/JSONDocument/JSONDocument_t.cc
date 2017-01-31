@@ -16,8 +16,8 @@ bool test_removeChild(std::string const& conf);
 
 int main(int argc, char* argv[]) try
 {
-    artdaq::database::docrecord::debug::enableJSONDocument();
-    artdaq::database::docrecord::debug::enableJSONDocumentUtils();
+    artdaq::database::docrecord::debug::JSONDocument();
+    artdaq::database::docrecord::debug::JSONDocumentUtils();
 
     debug::registerUngracefullExitHandlers();
 

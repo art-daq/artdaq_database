@@ -16,9 +16,9 @@ bool test_convertconf2json(std::string const&, std::string const&);
 bool test_convertjson2conf(std::string const&, std::string const&);
 
 int main(int argc, char* argv[]) {
-  artdaq::database::conf::debug::enableConfReader();
-  artdaq::database::conf::debug::enableConfWriter();
-  artdaq::database::confjson::debug::enableConf2Json();
+  artdaq::database::conf::debug::ConfReader();
+  artdaq::database::conf::debug::ConfWriter();
+  artdaq::database::confjson::debug::Conf2Json();
   artdaq::database::confjson::debug::enableConfJson();
 
   debug::registerUngracefullExitHandlers();

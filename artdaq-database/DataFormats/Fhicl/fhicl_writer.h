@@ -67,7 +67,7 @@ struct FhiclWriter final {
 };
 
 namespace debug {
-void enableFhiclWriter();
+void FhiclWriter();
 }
 }  // namespace fhicl
 }  // namespace database

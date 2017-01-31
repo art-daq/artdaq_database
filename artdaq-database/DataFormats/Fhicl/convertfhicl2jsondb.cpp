@@ -426,7 +426,7 @@ T& unwrapper<fcl::value_t>::value_as() {
 
 #pragma GCC diagnostic pop
 
-void artdaq::database::fhicljson::debug::enableFCL2JSON() {
+void artdaq::database::fhicljson::debug::FCL2JSON() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);

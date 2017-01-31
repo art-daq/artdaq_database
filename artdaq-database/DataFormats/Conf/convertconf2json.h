@@ -17,7 +17,7 @@ struct conf2json final {};
 struct json2conf final {};
 
 namespace debug {
-void enableConf2Json();
+void Conf2Json();
 }
 }  // namespace confjson
 }  // namespace database

@@ -93,14 +93,14 @@ std::string const& ManageConfigsOperation::configuration(std::string const& glob
 }
 
 void ManageConfigsOperation::readJsonData(JsonData const& data) {
-  confirm(!data.json_buffer.empty());
+  confirm(!data.empty());
 
   OperationBase::readJsonData(data);
 
   using namespace artdaq::database::json;
   auto dataAST = object_t{};
 
-  if (!JsonReader{}.read(data.json_buffer, dataAST)) {
+  if (!JsonReader{}.read(data , dataAST)) {
     throw db::invalid_option_exception("ManageConfigsOperation")
         << "ManageConfigsOperation: Unable to read JSON buffer.";
   }
@@ -119,7 +119,6 @@ void ManageConfigsOperation::readJsonData(JsonData const& data) {
     entity(boost::get<std::string>(dataAST.at(apiliteral::option::entity)));
   } catch (...) {
   }
-
 
   try {
     auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(apiliteral::option::searchfilter));
@@ -191,7 +190,7 @@ JsonData ManageConfigsOperation::writeJsonData() const {
 
   auto docAST = object_t{};
 
-  if (!JsonReader{}.read(OperationBase::writeJsonData().json_buffer, docAST)) {
+  if (!JsonReader{}.read(OperationBase::writeJsonData(), docAST)) {
     throw db::invalid_option_exception("ManageConfigsOperation") << "Unable to readquery_filter_to_JsonData().";
   }
 
@@ -218,7 +217,7 @@ JsonData ManageConfigsOperation::query_filter_to_JsonData() const {
 
   auto docAST = object_t{};
 
-  if (!JsonReader{}.read(OperationBase::query_filter_to_JsonData().json_buffer, docAST)) {
+  if (!JsonReader{}.read(OperationBase::query_filter_to_JsonData(), docAST)) {
     throw db::invalid_option_exception("ManageConfigsOperation") << "Unable to query_filter_to_JsonData().";
   }
 
@@ -286,14 +285,12 @@ JsonData ManageConfigsOperation::entity_to_JsonData() const {
   return {json_buffer};
 }
 //
-void cf::debug::options::enableOperationManageConfigs() {
+void cf::debug::options::ManageConfigs() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
 
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0,
-         "artdaq::database::configuration::options::OperationFindConfigs "
-         "trace_enable");
+  TRACE_(0, "artdaq::database::configuration::options::ManageConfigs trace_enable");
 }

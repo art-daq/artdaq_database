@@ -394,11 +394,11 @@ result_t dbuc::create_folder(UconDBSPtr_t provider, std::string const& folder) {
     return Failure(db::result::msg_Failure);
 }
 
-void dbuc::debug::enableUconDBAPI() {
+void dbuc::debug::UconDBAPI() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::ucon::enableUconDBAPI trace_enable");
+  TRACE_(0, "artdaq::database::ucon::UconDBAPI trace_enable");
 }

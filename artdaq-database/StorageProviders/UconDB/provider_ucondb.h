@@ -8,7 +8,7 @@ namespace database {
 namespace ucon {
 namespace debug {
 void enable();
-void enableReadWrite();
+void ReadWrite();
 }
 
 namespace literal {

@@ -171,7 +171,7 @@ bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
   }
 }
 
-void artdaq::database::fhicl::debug::enableFhiclReader() {
+void artdaq::database::fhicl::debug::FhiclReader() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);

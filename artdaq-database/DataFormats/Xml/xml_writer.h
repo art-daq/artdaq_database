@@ -15,7 +15,7 @@ struct XmlWriter final {
 };
 
 namespace debug {
-void enableXmlWriter();
+void XmlWriter();
 }
 }  // namespace xml
 }  // namespace database

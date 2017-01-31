@@ -16,10 +16,10 @@ bool test_convertxml2json(std::string const&, std::string const&);
 bool test_convertjson2xml(std::string const&, std::string const&);
 
 int main(int argc, char* argv[]) {
-  artdaq::database::xml::debug::enableXmlReader();
-  artdaq::database::xml::debug::enableXmlWriter();
-  artdaq::database::xmljson::debug::enableXml2Json();
-  artdaq::database::xmljson::debug::enableXmlJson();
+  artdaq::database::xml::debug::XmlReader();
+  artdaq::database::xml::debug::XmlWriter();
+  artdaq::database::xmljson::debug::Xml2Json();
+  artdaq::database::xmljson::debug::XmlJson();
 
   debug::registerUngracefullExitHandlers();
   artdaq::database::useFakeTime(true);

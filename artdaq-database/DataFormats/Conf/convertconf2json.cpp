@@ -11,7 +11,7 @@
 
 // TODO conf to json conversion code
 
-void artdaq::database::confjson::debug::enableConf2Json() {
+void artdaq::database::confjson::debug::Conf2Json() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);

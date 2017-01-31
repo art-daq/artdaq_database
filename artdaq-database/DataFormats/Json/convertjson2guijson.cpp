@@ -410,7 +410,7 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
   }
 }
 
-void artdaq::database::json::debug::enableJSON2GUIJSON() {
+void artdaq::database::json::debug::JSON2GUIJSON() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);

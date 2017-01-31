@@ -195,7 +195,7 @@ struct ConfigurationInterface final {
     constexpr auto apifunctname = "ConfigurationInterface::findGlobalConfigurations";
 
     try {
-      auto opts = ManageConfigsOperation{apiname};
+      auto opts = ManageDocumentOperation{apiname};
       opts.operation(apiliteral::operation::findconfigs);
       opts.format(data_format_t::gui);
       opts.provider(_database_provider);
@@ -255,7 +255,7 @@ struct ConfigurationInterface final {
     };
 
     try {
-      auto opts = ManageConfigsOperation{apiname};
+      auto opts = ManageDocumentOperation{apiname};
       opts.operation(apiliteral::operation::confcomposition);
       opts.format(data_format_t::gui);
       opts.provider(_database_provider);

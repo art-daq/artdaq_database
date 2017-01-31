@@ -1,0 +1,159 @@
+{
+"document" : {
+"data" : {
+"daq" : {
+"event_builder" : {
+"expected_fragments_per_event" : 2,
+"first_fragment_receiver_rank" : 0,
+"fragment_receiver_count" : 2,
+"mpi_buffer_count" : 16,
+"print_event_store_stats" : true,
+"use_art" : true,
+"verbose" : false
+}
+}
+},
+"metadata" : {
+
+},
+"search" : [
+
+]
+},
+"comments" : [
+
+],
+"origin" : {
+"source" : "template",
+"name" : "notprovided",
+"format" : "json",
+"created" : "Mon Feb  8 14:00:30 2016",
+"rawdata" : [
+
+]
+},
+"version" : "@TEST_VERSION_NAME@",
+"entities" : [
+{
+"name" : "notprovided",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+},
+{
+"name" : "@TEST_ENTITY_NAME@",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+],
+"configurations" : [
+{
+"name" : "notprovided",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+],
+"changelog" : "notprovided",
+"bookkeeping" : {
+"isdeleted" : false,
+"isreadonly" : false,
+"updates" : [
+{
+"event" : "addConfiguration",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "notprovided",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+},
+{
+"event" : "setVersion",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "@TEST_VERSION_NAME@",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+},
+{
+"event" : "setCollection",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "testManageDocuments",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+},
+{
+"event" : "addEntity",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "notprovided",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+},
+{
+"event" : "setCollection",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "testManageDocuments",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+},
+{
+"event" : "addConfiguration",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "notprovided",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+},
+{
+"event" : "setVersion",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "@TEST_VERSION_NAME@",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+},
+{
+"event" : "setCollection",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "testManageDocuments",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+},
+{
+"event" : "addEntity",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "@TEST_ENTITY_NAME@",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+},
+{
+"event" : "setCollection",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "testManageDocuments",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+}
+],
+"created" : "Mon Feb  8 14:00:30 2016"
+},
+"_id" : {
+"$oid" : "f28e659e7a8c4b1e8d98f999"
+},
+"collection" : "testManageDocuments",
+"aliases" : {
+"active" : [
+
+],
+"history" : [
+
+]
+},
+"runs" : [
+
+],
+"attachments" : [
+
+],
+"configtype" : "notprovided"
+}

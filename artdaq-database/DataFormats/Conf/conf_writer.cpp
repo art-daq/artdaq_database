@@ -42,7 +42,7 @@ bool ConfWriter::write(jsn::object_t const& json_object, std::string& out) {
   return result;
 }
 
-void artdaq::database::conf::debug::enableConfWriter() {
+void artdaq::database::conf::debug::ConfWriter() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);

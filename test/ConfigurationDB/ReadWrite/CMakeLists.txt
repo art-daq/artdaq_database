@@ -48,6 +48,6 @@ add_subdirectory(test012)
 add_subdirectory(test014)
 
 SET (TEST_VERSION_NAME    versionZ${VERSION_NUMBER} )
-add_subdirectory(test020)
-add_subdirectory(test021)
+#add_subdirectory(test020)
+#add_subdirectory(test021)
 

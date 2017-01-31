@@ -27,8 +27,8 @@ bool test_update(std::string const&, std::string const&, std::string const&);
 
 int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
-//  artdaq::database::docrecord::debug::enableJSONDocument();
-    artdaq::database::docrecord::debug::enableJSONDocumentBuilder();
+//  artdaq::database::docrecord::debug::JSONDocument();
+    artdaq::database::docrecord::debug::JSONDocumentBuilder();
   debug::registerUngracefullExitHandlers();
   artdaq::database::useFakeTime(true);
 
@@ -151,7 +151,7 @@ bool test_insert(std::string const& source, std::string const& compare, std::str
   auto search = JsonData{"{\"filter\":" + (filter.empty() ? object_id : filter) + ", \"collection\":\"" +
                          collection + "\"}"};
 
-  std::cout << "Search criteria " << search.json_buffer << "\n";
+  std::cout << "Search criteria " << search<< "\n";
 
   auto results = provider->readDocument(search);
 
@@ -159,12 +159,12 @@ bool test_insert(std::string const& source, std::string const& compare, std::str
     std::cout << "Search returned " << results.size() << " results.\n";
 
     for (auto&& element : results) {
-      std::cout << element.json_buffer << "\n";
+      std::cout << element<< "\n";
     }
     return false;
   }
 
-  auto retdoc = JSONDocument(results.begin()->json_buffer);
+  auto retdoc = JSONDocument{*results.begin()};
   JSONDocumentBuilder returned{retdoc};
   JSONDocumentBuilder expected{cmpdoc};
 
@@ -210,7 +210,7 @@ bool test_search1(std::string const& source, std::string const& compare, std::st
   auto search = JsonData{"{\"filter\":" + (filter.empty() ? object_id : filter) + ", \"collection\":\"" +
                          collection + "\"}"};
 
-  std::cout << "Search criteria " << search.json_buffer << "\n";
+  std::cout << "Search criteria " << search<< "\n";
 
   auto results = provider->readDocument(search);
 
@@ -218,12 +218,12 @@ bool test_search1(std::string const& source, std::string const& compare, std::st
     std::cout << "Search returned " << results.size() << " results.\n";
 
     for (auto&& element : results) {
-      std::cout << element.json_buffer << "\n";
+      std::cout << element<< "\n";
     }
     return false;
   }
 
-  auto retdoc = JSONDocument(results.begin()->json_buffer);
+  auto retdoc = JSONDocument{*results.begin()};
   JSONDocumentBuilder returned{retdoc};
   JSONDocumentBuilder expected{cmpdoc};
 
@@ -284,7 +284,7 @@ bool test_search2(std::string const& source, std::string const& compare, std::st
   auto search =
       JsonData{"{\"filter\":" + (filter.empty() ? options : filter) + ", \"collection\":\"" + collection + "\"}"};
 
-  std::cout << "Search criteria " << search.json_buffer << "\n";
+  std::cout << "Search criteria " << search<< "\n";
 
   auto results = provider->readDocument(search);
 
@@ -292,7 +292,7 @@ bool test_search2(std::string const& source, std::string const& compare, std::st
     std::cout << "Search returned " << results.size() << " results.\n";
 
     for (auto&& element : results) {
-      std::cout << element.json_buffer << "\n";
+      std::cout << element<< "\n";
     }
     return false;
   }
@@ -328,7 +328,7 @@ bool test_update(std::string const& source, std::string const& compare, std::str
 
   auto search = JsonData{"{\"filter\":" + object_id + ", \"collection\":\"" + collection + "\"}"};
 
-  std::cout << "Search criteria " << search.json_buffer << "\n";
+  std::cout << "Search criteria " << search<< "\n";
 
   auto results = provider->readDocument(search);
 
@@ -336,12 +336,12 @@ bool test_update(std::string const& source, std::string const& compare, std::str
     std::cout << "Search returned " << results.size() << " results.\n";
 
     for (auto&& element : results) {
-      std::cout << element.json_buffer << "\n";
+      std::cout << element<< "\n";
     }
     return false;
   }
 
-  auto found = JSONDocument(results.begin()->json_buffer);
+  auto found = JSONDocument{*results.begin()};
   
   std::cout << "Update candidate=<" << found.to_string() << ">\n";
   auto displaced=found.replaceChild(updates, "document");
@@ -359,12 +359,12 @@ bool test_update(std::string const& source, std::string const& compare, std::str
     std::cout << "Search returned " << results.size() << " results.\n";
 
     for (auto&& element : results) {
-      std::cout << element.json_buffer << "\n";
+      std::cout << element<< "\n";
     }
     return false;
   }
 
-  auto retdoc = JSONDocument(results.begin()->json_buffer);
+  auto retdoc = JSONDocument{*results.begin()};
 
   JSONDocumentBuilder returned{retdoc};
   JSONDocumentBuilder expected{cmpdoc};

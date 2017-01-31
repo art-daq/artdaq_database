@@ -53,7 +53,7 @@ class ManageConfigsOperation final : public OperationBase {
 
 namespace debug {
 namespace options {
-void enableOperationManageConfigs();
+void ManageConfigs();
 }
 }
 

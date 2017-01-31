@@ -12,11 +12,11 @@ template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::readDocument(JsonData const& arg) {
   TRACE_(3, "MongoDB::readDocument() begin");
-  TRACE_(3, "MongoDB::readDocument() args=<" << arg.json_buffer << ">");
+  TRACE_(3, "MongoDB::readDocument() args=<" << arg<< ">");
 
   auto returnCollection = std::list<JsonData>();
 
-  auto arg_document = JSONDocument{arg.json_buffer};
+  auto arg_document = JSONDocument{arg };
 
   auto filter_document = arg_document.findChildDocument(jsonliteral::filter);
 
@@ -59,9 +59,9 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::readDocument(JsonData co
 template <>
 object_id_t StorageProvider<JsonData, MongoDB>::writeDocument(JsonData const& arg) {
   TRACE_(4, "MongoDB::writeDocument() begin");
-  TRACE_(4, "MongoDB::writeDocument() args=<" << arg.json_buffer << ">");
+  TRACE_(4, "MongoDB::writeDocument() args=<" << arg<< ">");
 
-  auto arg_document = JSONDocument{arg.json_buffer};
+  auto arg_document = JSONDocument{arg };
 
   auto user_document = arg_document.findChildDocument(jsonliteral::document);
 
@@ -154,13 +154,13 @@ object_id_t StorageProvider<JsonData, MongoDB>::writeDocument(JsonData const& ar
 
 namespace mongo {
 namespace debug {
-void enableReadWrite() {
+void ReadWrite() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::mongo::enableReadWrite trace_enable");
+  TRACE_(0, "artdaq::database::mongo::ReadWrite trace_enable");
 }
 }
 }  // namespace mongo
