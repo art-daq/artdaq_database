@@ -55,7 +55,7 @@ bpo::options_description BulkOperations::makeProgramOptions() const {
   descstr << _process_name;
   descstr << " <" << apiliteral::option::bulkoperations << ">";
 
-  descstr << "  <-r <" << apiliteral::option::result << ">>";
+  descstr << "  <-x <" << apiliteral::option::result << ">>";
 
   bpo::options_description opts = descstr.str();
 
@@ -67,7 +67,7 @@ bpo::options_description BulkOperations::makeProgramOptions() const {
 
   opts.add_options()(apiliteral::option::bulkoperations, bpo::value<std::string>(), "BulkOperations json");
 
-  opts.add_options()(make_opt_name(apiliteral::option::result, "r").c_str(), bpo::value<std::string>(),
+  opts.add_options()(make_opt_name(apiliteral::option::result, "x").c_str(), bpo::value<std::string>(),
                      "Expected result file name");
 
   return opts;

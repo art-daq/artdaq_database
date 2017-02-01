@@ -13,5 +13,5 @@ cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC R
     ${CMAKE_CURRENT_BINARY_DIR}/test011.src.${RAND_NAME}.json 
     ${CMAKE_CURRENT_BINARY_DIR}/test011.cmp.${RAND_NAME}.json
     ${CMAKE_CURRENT_BINARY_DIR}/test011.flt.${RAND_NAME}.json
-  TEST_ARGS  --searchquery=test011.flt.${RAND_NAME}.json -s test011.src.${RAND_NAME}.json -r test011.cmp.${RAND_NAME}.json )
+  TEST_ARGS  --searchquery=test011.flt.${RAND_NAME}.json -s test011.src.${RAND_NAME}.json -x test011.cmp.${RAND_NAME}.json )
 

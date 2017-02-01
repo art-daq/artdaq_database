@@ -11,7 +11,7 @@ cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC R
   DATAFILES 
     ${CMAKE_CURRENT_BINARY_DIR}/test001.src.${RAND_NAME}.json 
     ${CMAKE_CURRENT_BINARY_DIR}/test001.cmp.${RAND_NAME}.json 
-  TEST_ARGS -o store -d ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f json -v ${TEST_VERSION_NAME}  -s test001.src.${RAND_NAME}.json -r test001.cmp.${RAND_NAME}.json )
+  TEST_ARGS -o store -p ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f json -v ${TEST_VERSION_NAME}  -s test001.src.${RAND_NAME}.json -x test001.cmp.${RAND_NAME}.json )
 
 SET ( TEST_DBPROVIDER "mongo" )
 cet_test_env("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_MONGO}")
@@ -22,4 +22,4 @@ cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC R
   DATAFILES 
     ${CMAKE_CURRENT_BINARY_DIR}/test001.src.${RAND_NAME}.json 
     ${CMAKE_CURRENT_BINARY_DIR}/test001.cmp.${RAND_NAME}.json 
-  TEST_ARGS -o store -d ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f json -v ${TEST_VERSION_NAME} -s test001.src.${RAND_NAME}.json -r test001.cmp.${RAND_NAME}.json )
+  TEST_ARGS -o store -p ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f json -v ${TEST_VERSION_NAME} -s test001.src.${RAND_NAME}.json -x test001.cmp.${RAND_NAME}.json )

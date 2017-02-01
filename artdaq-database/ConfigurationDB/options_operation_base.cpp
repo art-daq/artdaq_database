@@ -148,7 +148,7 @@ bpo::options_description OperationBase::makeProgramOptions() const {
   descstr << "  <-o <" << apiliteral::option::operation << ">>";
   descstr << "  <-f <" << apiliteral::option::format << ">>";
   descstr << "  <-c <" << apiliteral::option::collection << ">>";
-  descstr << "  <-r <" << apiliteral::option::result << ">>";
+  descstr << "  <-x <" << apiliteral::option::result << ">>";
 
   descstr << " <" << apiliteral::option::searchfilter << ">";
 
@@ -161,20 +161,20 @@ bpo::options_description OperationBase::makeProgramOptions() const {
   opts.add_options()("help,h", "Produce help message");
 
   opts.add_options()(make_opt_name(apiliteral::option::operation, "o").c_str(), bpo::value<std::string>(),
-                     "Database operation name");
+                     "Operation");
   opts.add_options()(make_opt_name(apiliteral::option::format, "f").c_str(), bpo::value<std::string>(),
                      "In/Out data format [fhicl, xml, gui, db, or csv]");
   opts.add_options()(make_opt_name(apiliteral::option::collection, "c").c_str(), bpo::value<std::string>(),
-                     "Configuration collection name");
+                     "Collection");
 
-  opts.add_options()(make_opt_name(apiliteral::option::provider, "d").c_str(), bpo::value<std::string>(),
+  opts.add_options()(make_opt_name(apiliteral::option::provider, "p").c_str(), bpo::value<std::string>(),
                      "Database provider name; depricated");
 
   opts.add_options()(apiliteral::option::searchfilter, bpo::value<std::string>(), "Search filter");
 
   opts.add_options()(apiliteral::option::searchquery, bpo::value<std::string>(), "Search query");
 
-  opts.add_options()(make_opt_name(apiliteral::option::result, "r").c_str(), bpo::value<std::string>(),
+  opts.add_options()(make_opt_name(apiliteral::option::result, "x").c_str(), bpo::value<std::string>(),
                      "Expected result file name");
 
   return opts;

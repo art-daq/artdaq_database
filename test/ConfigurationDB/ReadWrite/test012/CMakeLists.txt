@@ -13,7 +13,7 @@ cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC R
     ${CMAKE_CURRENT_BINARY_DIR}/test011.src.${RAND_NAME}.fcl 
     ${CMAKE_CURRENT_BINARY_DIR}/test011.cmp.${RAND_NAME}.fcl
     ${CMAKE_CURRENT_BINARY_DIR}/test011.flt.${RAND_NAME}.json
-  TEST_ARGS  --searchquery=test011.flt.${RAND_NAME}.json -s test011.src.${RAND_NAME}.fcl -r test011.cmp.${RAND_NAME}.fcl )
+  TEST_ARGS  --searchquery=test011.flt.${RAND_NAME}.json -s test011.src.${RAND_NAME}.fcl -x test011.cmp.${RAND_NAME}.fcl )
 
 SET ( TEST_DBPROVIDER "mongo" )
 cet_test_env("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_MONGO}")
@@ -26,4 +26,4 @@ cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC R
     ${CMAKE_CURRENT_BINARY_DIR}/test011.src.${RAND_NAME}.fcl 
     ${CMAKE_CURRENT_BINARY_DIR}/test011.cmp.${RAND_NAME}.fcl 
     ${CMAKE_CURRENT_BINARY_DIR}/test011.flt.${RAND_NAME}.json
-  TEST_ARGS  --searchquery=test011.flt.${RAND_NAME}.json -s test011.src.${RAND_NAME}.fcl -r test011.cmp.${RAND_NAME}.fcl )
+  TEST_ARGS  --searchquery=test011.flt.${RAND_NAME}.json -s test011.src.${RAND_NAME}.fcl -x test011.cmp.${RAND_NAME}.fcl )

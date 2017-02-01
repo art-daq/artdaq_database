@@ -10,7 +10,7 @@ configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_FILE_NUMBER}.cmp.json ${
 cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC ManageConfigs_t 
   DATAFILES 
     ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json
-  TEST_ARGS  -o findconfigs -d ${TEST_DBPROVIDER} -f gui -g ${TEST_CONFIGURATION_NAME} -r test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json )
+  TEST_ARGS  -o findconfigs -p ${TEST_DBPROVIDER} -f gui -g ${TEST_CONFIGURATION_NAME} -x test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json )
 
 SET ( TEST_FILE_NUMBER "002" ) 
 SET ( TEST_DBPROVIDER "mongo" )
@@ -20,7 +20,7 @@ configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_FILE_NUMBER}.cmp.json ${
 cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC ManageConfigs_t 
   DATAFILES 
     ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json
-  TEST_ARGS  -o findconfigs -d ${TEST_DBPROVIDER} -f gui -g ${TEST_CONFIGURATION_NAME}  -r test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json )
+  TEST_ARGS  -o findconfigs -p ${TEST_DBPROVIDER} -f gui -g ${TEST_CONFIGURATION_NAME}  -x test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json )
 
   
   
