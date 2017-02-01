@@ -12,7 +12,7 @@ cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC M
   DATAFILES 
     ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json
     ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_FILE_NUMBER}.flt.${RAND_NAME}.json
-  TEST_ARGS  --searchquery=test${TEST_FILE_NUMBER}.flt.${RAND_NAME}.json -r test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json )
+  TEST_ARGS  --searchquery=test${TEST_FILE_NUMBER}.flt.${RAND_NAME}.json -x test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json )
 
 SET ( TEST_FILE_NUMBER "011" )  
 SET ( TEST_DBPROVIDER "mongo" )
@@ -24,4 +24,4 @@ cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC M
   DATAFILES 
     ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json
     ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_FILE_NUMBER}.flt.${RAND_NAME}.json
-  TEST_ARGS  --searchquery=test${TEST_FILE_NUMBER}.flt.${RAND_NAME}.json -r test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json )
+  TEST_ARGS  --searchquery=test${TEST_FILE_NUMBER}.flt.${RAND_NAME}.json -x test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json )

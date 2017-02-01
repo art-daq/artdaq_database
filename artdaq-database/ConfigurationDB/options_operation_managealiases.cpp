@@ -217,18 +217,18 @@ bpo::options_description ManageAliasesOperation::makeProgramOptions() const {
   };
 
   opts.add_options()(make_opt_name(apiliteral::option::version, "v").c_str(), bpo::value<std::string>(),
-                     "Configuration version");
+                     "Version");
 
   opts.add_options()(make_opt_name(apiliteral::option::version_alias, "a").c_str(), bpo::value<std::string>(),
-                     "Version alias");
+                     "Version Alias");
 
   opts.add_options()(make_opt_name(apiliteral::option::entity, "e").c_str(), bpo::value<std::string>(),
                      "Configurable-entity name");
   opts.add_options()(make_opt_name(apiliteral::option::configuration, "g").c_str(), bpo::value<std::string>(),
-                     "Global configuration name");
+                     "Configuration name");
 
   opts.add_options()(make_opt_name(apiliteral::option::configuration_alias, "q").c_str(), bpo::value<std::string>(),
-                     "Configuration alias");
+                     "Configuration Alias");
 
   return opts;
 }

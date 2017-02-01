@@ -40,13 +40,13 @@ add_subdirectory(test001)
 add_subdirectory(test011)
 
 add_subdirectory(test002)
-#add_subdirectory(test012)
+add_subdirectory(test012)
 
-#add_subdirectory(test003)
-#add_subdirectory(test013)
+add_subdirectory(test003)
+add_subdirectory(test013)
 
-#add_subdirectory(test004)
-#add_subdirectory(test014)
+add_subdirectory(test004)
+add_subdirectory(test014)
 
-#add_subdirectory(test005)
-#add_subdirectory(test015)
+add_subdirectory(test005)
+add_subdirectory(test015)

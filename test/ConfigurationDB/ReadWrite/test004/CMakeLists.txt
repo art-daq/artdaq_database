@@ -9,7 +9,7 @@ configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test001.cmp.fcl ${CMAKE_CURRENT_BIN
 cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC ReadWrite_t 
   DATAFILES 
     ${CMAKE_CURRENT_BINARY_DIR}/test001.cmp.${RAND_NAME}.fcl 
-  TEST_ARGS -o load -d ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f origin -v ${TEST_VERSION_NAME} -r test001.cmp.${RAND_NAME}.fcl )
+  TEST_ARGS -o load -p ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f origin -v ${TEST_VERSION_NAME} -x test001.cmp.${RAND_NAME}.fcl )
 
 
 SET ( TEST_DBPROVIDER "mongo" )
@@ -19,5 +19,5 @@ configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test001.cmp.fcl ${CMAKE_CURRENT_BIN
 cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC ReadWrite_t 
   DATAFILES 
     ${CMAKE_CURRENT_BINARY_DIR}/test001.cmp.${RAND_NAME}.fcl 
-  TEST_ARGS -o load -d ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f origin -v ${TEST_VERSION_NAME} -r test001.cmp.${RAND_NAME}.fcl )
+  TEST_ARGS -o load -p ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f origin -v ${TEST_VERSION_NAME} -x test001.cmp.${RAND_NAME}.fcl )
 

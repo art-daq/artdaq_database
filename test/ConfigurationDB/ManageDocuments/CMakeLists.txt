@@ -42,20 +42,6 @@ add_subdirectory(test000)
 SET (TEST_VERSION_NAME    versionA${VERSION_NUMBER} )
 add_subdirectory(test001)
 add_subdirectory(test002)
-
-#SET (TEST_VERSION_NAME    versionB${VERSION_NUMBER} )
-#add_subdirectory(test002)
-#add_subdirectory(test004)
-
-#SET (TEST_VERSION_NAME    versionC${VERSION_NUMBER} )
-#add_subdirectory(test011)
-#add_subdirectory(test013)
-
-#SET (TEST_VERSION_NAME    versionD${VERSION_NUMBER} )
-#add_subdirectory(test012)
-#add_subdirectory(test014)
-
-#SET (TEST_VERSION_NAME    versionZ${VERSION_NUMBER} )
-#add_subdirectory(test020)
-#add_subdirectory(test021)
+add_subdirectory(test003)
+add_subdirectory(test004)
 
