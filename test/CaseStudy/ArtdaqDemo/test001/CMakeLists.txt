@@ -13,7 +13,7 @@ cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC A
   DATAFILES 
     ${CMAKE_CURRENT_BINARY_DIR}/test001.src.${RAND_NAME}.fcl 
     ${CMAKE_CURRENT_BINARY_DIR}/test001.cmp.${RAND_NAME}.fcl 
-  TEST_ARGS -o store -d ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f fhicl -v ${TEST_VERSION_NAME}-${TEST_NUMBER}  -s test001.src.${RAND_NAME}.fcl -r test001.cmp.${RAND_NAME}.fcl )
+  TEST_ARGS -o store -p ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f fhicl -v ${TEST_VERSION_NAME}-${TEST_NUMBER}  -s test001.src.${RAND_NAME}.fcl -x test001.cmp.${RAND_NAME}.fcl )
 
 
 SET ( TEST_DBPROVIDER "mongo" )
@@ -25,5 +25,5 @@ cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC A
   DATAFILES 
     ${CMAKE_CURRENT_BINARY_DIR}/test001.src.${RAND_NAME}.fcl 
     ${CMAKE_CURRENT_BINARY_DIR}/test001.cmp.${RAND_NAME}.fcl 
-  TEST_ARGS -o store -d ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f fhicl -v ${TEST_VERSION_NAME}-${TEST_NUMBER} -s test001.src.${RAND_NAME}.fcl -r test001.cmp.${RAND_NAME}.fcl )
+  TEST_ARGS -o store -p ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f fhicl -v ${TEST_VERSION_NAME}-${TEST_NUMBER} -s test001.src.${RAND_NAME}.fcl -x test001.cmp.${RAND_NAME}.fcl )
 

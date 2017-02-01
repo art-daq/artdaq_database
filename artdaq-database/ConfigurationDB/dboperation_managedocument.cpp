@@ -268,7 +268,7 @@ result_t json::mark_document_readonly(std::string const& query_payload) noexcept
 
 result_t json::mark_document_deleted(std::string const& query_payload) noexcept {
   try {
-    if (query_payload.empty()) return Failure(msg_EmptyFilter);
+  //  if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
     auto options = ManageDocumentOperation{apiliteral::operation::markdeleted};
     options.readJsonData({query_payload});

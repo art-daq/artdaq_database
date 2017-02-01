@@ -18,13 +18,13 @@ int main(int argc, char* argv[]) try {
   debug::registerUngracefullExitHandlers();
 
   std::ostringstream descstr;
-  descstr << argv[0] << " <-c <config-file>> <other-options>";
+  descstr << argv[0] << " <-s <config-file>> <other-options>";
 
   bpo::options_description desc = descstr.str();
 
   desc.add_options()
   ("source,s", bpo::value<std::string>(), "Source file.")
-  ("result,r", bpo::value<std::string>(), "Result file.")
+  ("result,x", bpo::value<std::string>(), "Result file.")
   ("mask,m", bpo::value<uint32_t>(), "Compare mask file.")
   ("fail,f", "Test should fail.")
   ("help,h", "produce help message");
