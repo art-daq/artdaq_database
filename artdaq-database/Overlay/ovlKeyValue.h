@@ -37,7 +37,7 @@ class ovlKeyValue {
   ovlKeyValue& self();
 
   // virtuals
-  virtual std::string to_string() const noexcept;
+  virtual std::string to_string() const;
 
   // ops
   result_t operator==(ovlKeyValue const&) const;

@@ -1,9 +1,9 @@
 source  /products/setup
-setup artdaq_database v1_00_00 -q debug:e9:s21
+setup artdaq_database v1_05_00 -q debug:e10:s41
 
 cd ~/artdaq-demo-base/artdaq-utilities-database/test/HOWTOS/NodeJSAddons/conftool/test003/
 
-conftool2 -o load -c otsdaq_FEWRPurdueFSSRInterfaceConfiguration.flt.filesystem.json -j otsdaq_FEWRPurdueFSSRInterfaceConfiguration.gui.filesystem.json
-conftool2 -o load -c otsdaq_FSSRDACsConfiguration.flt.filesystem.json -j otsdaq_FSSRDACsConfiguration.gui.filesystem.json
+conftool --searchquery=otsdaq_FEWRPurdueFSSRInterfaceConfiguration.flt.filesystem.json -x otsdaq_FEWRPurdueFSSRInterfaceConfiguration.gui.filesystem.json
+conftool --searchquery=otsdaq_FSSRDACsConfiguration.flt.filesystem.json -x otsdaq_FSSRDACsConfiguration.gui.filesystem.json
 
-conftool2 -o load -c otsdaq_DefaultConfigurations.flt.filesystem.json -j otsdaq_DefaultConfigurations.gui.filesystem.json
+conftool --searchquery=otsdaq_DefaultConfigurations.flt.filesystem.json -x otsdaq_DefaultConfigurations.gui.filesystem.json

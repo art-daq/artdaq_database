@@ -37,7 +37,7 @@ class ovlBookkeeping final : public ovlKeyValue {
   result_t postUpdate(std::string const& /*name*/, T const& /*what*/);
 
   // overrides
-  std::string to_string() const noexcept override;
+  std::string to_string() const override;
 
   // ops
   result_t operator==(ovlBookkeeping const&) const;

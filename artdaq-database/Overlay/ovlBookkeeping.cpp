@@ -35,7 +35,7 @@ bool& ovlBookkeeping::markDeleted(bool const& state) {
   return isDeleted();
 }
 
-std::string ovlBookkeeping::to_string() const noexcept {
+std::string ovlBookkeeping::to_string() const {
   std::ostringstream oss;
   oss << "{" << quoted_(jsonliteral::bookkeeping) << ": {\n";
   oss << quoted_(jsonliteral::isreadonly) << ":" << bool_(isReadonly()) << ",\n";

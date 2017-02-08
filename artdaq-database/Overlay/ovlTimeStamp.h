@@ -23,7 +23,7 @@ class ovlTimeStamp final : public ovlKeyValue {
   std::string& timestamp(std::string const& /*ts*/);
 
   // overridess
-  std::string to_string() const noexcept override;
+  std::string to_string() const override;
 
   // ops
   result_t operator==(ovlTimeStamp const&) const;

@@ -6,5 +6,6 @@
 "entity":"DAQ_HOST_001",
 "configuration":"configA001",
 "dbprovider":"filesystem",
-"operation":"load"
+"operation":"load",
+"dataformat":"db"
 }

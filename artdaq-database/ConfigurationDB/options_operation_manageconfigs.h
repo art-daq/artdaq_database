@@ -23,13 +23,13 @@ class ManageConfigsOperation final : public OperationBase {
  public:
   ManageConfigsOperation(std::string const&);
 
-  std::string const& version() const noexcept;
+  std::string const& version() const;
   std::string const& version(std::string const&);
 
-  std::string const& entity() const noexcept;
+  std::string const& entity() const;
   std::string const& entity(std::string const&);
 
-  std::string const& configuration() const noexcept;
+  std::string const& configuration() const;
   std::string const& configuration(std::string const&);
 
   JsonData query_filter_to_JsonData() const override;

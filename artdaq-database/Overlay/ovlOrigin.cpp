@@ -28,7 +28,7 @@ std::string& ovlOrigin::source() { return value_as<std::string>(jsonliteral::sou
 
 std::string const& ovlOrigin::source() const { return value_as<std::string>(jsonliteral::source); }
 
-std::string ovlOrigin::to_string() const noexcept {
+std::string ovlOrigin::to_string() const {
   std::ostringstream oss;
   oss << "{" << quoted_(jsonliteral::origin) << ":{\n";
   oss << quoted_(jsonliteral::format) << ":" << quoted_(format()) << ",\n";

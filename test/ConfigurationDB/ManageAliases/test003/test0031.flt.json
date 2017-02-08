@@ -1,7 +1,5 @@
 {
-    "filter":{"version":"version002", "entities.name":"DAQ_HOST_001"},
-    "collection":"artdaq_Aggregator",
     "dbprovider":"mongo",
-    "operation":"findaliases",
+    "operation":"findentities",
     "dataformat":"gui"
 }

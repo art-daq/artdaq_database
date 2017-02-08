@@ -1,15 +1,15 @@
 {
    "search":[
       {
-         "name":"configA006:DAQ_HOST_001",
+         "name":"@TEST_CONFIGURATION_NAME@:@TEST_ENTITY_NAME@",
          "query":{
             "collection":"artdaq_Aggregator",
             "dbprovider":"filesystem",
             "dataformat":"gui",
             "operation":"load",
             "filter":{
-               "configurations.name":"configA006",
-               "entities.name":"DAQ_HOST_001"
+               "configurations.name":"@TEST_CONFIGURATION_NAME@",
+               "entities.name":"@TEST_ENTITY_NAME@"
             }
          }
       }

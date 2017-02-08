@@ -1,8 +1,5 @@
 {
-    "filter":{"version":"version002", "entities.name":"DAQ_HOST_001"},
-    "configuration":"configA006",      
-    "collection":"artdaq_Aggregator",
     "dbprovider":"filesystem",
-    "operation":"addconfig",
+    "operation":"findentities",
     "dataformat":"gui"
 }

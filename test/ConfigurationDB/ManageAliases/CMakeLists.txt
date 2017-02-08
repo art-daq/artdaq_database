@@ -32,8 +32,8 @@ set (TEST_CONFIG_NAME "testConfigA${CONFIG_NUMBER}")
 set (TEST_ENTITY_NAME "Aggregator_topol${CONFIG_NUMBER}")
 
 add_subdirectory(test000)
-#add_subdirectory(test001)
-#add_subdirectory(test002)
-#add_subdirectory(test003)
+add_subdirectory(test001)
+add_subdirectory(test002)
+add_subdirectory(test003)
 
 install_source()
