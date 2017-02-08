@@ -29,7 +29,7 @@ class ovlMovableList final : public ovlKeyValue {
   result_t remove(ElementUPtr_t&);
 
   // overrides
-  std::string to_string() const noexcept override;
+  std::string to_string() const override;
 
   // ops
   result_t operator==(ovlMovableList const&) const;
@@ -136,7 +136,7 @@ result_t ovlMovableList<T, mask>::remove(ElementUPtr_t& oldEntry) {
 }
 
 template <typename T, int mask>
-std::string ovlMovableList<T, mask>::to_string() const noexcept {
+std::string ovlMovableList<T, mask>::to_string() const {
   std::ostringstream oss;
   oss << "{" << quoted_(key()) << ": {";
 

@@ -3,7 +3,6 @@
 #include "artdaq-database/SharedCommon/shared_exceptions.h"
 
 #include <wordexp.h>
-#include <chrono>
 #include <fstream>
 #include <regex>
 

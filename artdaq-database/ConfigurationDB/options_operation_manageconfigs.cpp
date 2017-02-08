@@ -32,7 +32,7 @@ using cf::options::data_format_t;
 
 ManageConfigsOperation::ManageConfigsOperation(std::string const& process_name) : OperationBase{process_name} {}
 
-std::string const& ManageConfigsOperation::version() const noexcept {
+std::string const& ManageConfigsOperation::version() const {
   confirm(!_version.empty());
 
   return _version;
@@ -52,7 +52,7 @@ std::string const& ManageConfigsOperation::version(std::string const& version) {
   return _version;
 }
 
-std::string const& ManageConfigsOperation::entity() const noexcept {
+std::string const& ManageConfigsOperation::entity() const {
   confirm(!_entity.empty());
 
   return _entity;
@@ -72,7 +72,7 @@ std::string const& ManageConfigsOperation::entity(std::string const& entity) {
   return _entity;
 }
 
-std::string const& ManageConfigsOperation::configuration() const noexcept {
+std::string const& ManageConfigsOperation::configuration() const {
   confirm(!_configuration.empty());
 
   return _configuration;
@@ -100,7 +100,7 @@ void ManageConfigsOperation::readJsonData(JsonData const& data) {
   using namespace artdaq::database::json;
   auto dataAST = object_t{};
 
-  if (!JsonReader{}.read(data , dataAST)) {
+  if (!JsonReader{}.read(data, dataAST)) {
     throw db::invalid_option_exception("ManageConfigsOperation")
         << "ManageConfigsOperation: Unable to read JSON buffer.";
   }
@@ -172,8 +172,7 @@ bpo::options_description ManageConfigsOperation::makeProgramOptions() const {
     return std::string{long_name}.append(",").append(short_name);
   };
 
-  opts.add_options()(make_opt_name(apiliteral::option::version, "v").c_str(), bpo::value<std::string>(),
-                     "Version");
+  opts.add_options()(make_opt_name(apiliteral::option::version, "v").c_str(), bpo::value<std::string>(), "Version");
   opts.add_options()(make_opt_name(apiliteral::option::entity, "e").c_str(), bpo::value<std::string>(),
                      "Configurable-entity name");
   opts.add_options()(make_opt_name(apiliteral::option::configuration, "g").c_str(), bpo::value<std::string>(),

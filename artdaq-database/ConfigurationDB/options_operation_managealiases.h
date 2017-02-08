@@ -24,19 +24,19 @@ class ManageAliasesOperation final : public OperationBase {
  public:
   ManageAliasesOperation(std::string const&);
 
-  std::string const& version() const noexcept;
+  std::string const& version() const;
   std::string const& version(std::string const&);
 
-  std::string const& versionAlias() const noexcept;
+  std::string const& versionAlias() const;
   std::string const& versionAlias(std::string const&);
 
-  std::string const& entity() const noexcept;
+  std::string const& entity() const;
   std::string const& entity(std::string const&);
 
-  std::string const& configuration() const noexcept;
+  std::string const& configuration() const;
   std::string const& configuration(std::string const&);
 
-  std::string const& configurationAlias() const noexcept;
+  std::string const& configurationAlias() const;
   std::string const& configurationAlias(std::string const&);
 
   JsonData query_filter_to_JsonData() const override;

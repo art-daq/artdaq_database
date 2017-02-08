@@ -31,7 +31,7 @@ namespace apiliteral = artdaq::database::configapi::literal;
 
 ManageAliasesOperation::ManageAliasesOperation(std::string const& process_name) : OperationBase{process_name} {}
 
-std::string const& ManageAliasesOperation::version() const noexcept {
+std::string const& ManageAliasesOperation::version() const {
   confirm(!_version.empty());
 
   return _version;
@@ -51,7 +51,7 @@ std::string const& ManageAliasesOperation::version(std::string const& version) {
   return _version;
 }
 
-std::string const& ManageAliasesOperation::entity() const noexcept {
+std::string const& ManageAliasesOperation::entity() const {
   confirm(!_entity.empty());
 
   return _entity;
@@ -71,7 +71,7 @@ std::string const& ManageAliasesOperation::entity(std::string const& entity) {
   return _entity;
 }
 
-std::string const& ManageAliasesOperation::configuration() const noexcept {
+std::string const& ManageAliasesOperation::configuration() const {
   confirm(!_configuration.empty());
 
   return _configuration;
@@ -91,7 +91,7 @@ std::string const& ManageAliasesOperation::configuration(std::string const& glob
   return _configuration;
 }
 
-std::string const& ManageAliasesOperation::versionAlias() const noexcept {
+std::string const& ManageAliasesOperation::versionAlias() const {
   confirm(!_version_alias.empty());
 
   return _version_alias;
@@ -111,7 +111,7 @@ std::string const& ManageAliasesOperation::versionAlias(std::string const& alias
   return _version_alias;
 }
 
-std::string const& ManageAliasesOperation::configurationAlias() const noexcept {
+std::string const& ManageAliasesOperation::configurationAlias() const {
   confirm(!_configuration_alias.empty());
 
   return _configuration_alias;
@@ -141,7 +141,7 @@ void ManageAliasesOperation::readJsonData(JsonData const& data) {
   using namespace artdaq::database::json;
   auto dataAST = object_t{};
 
-  if (!JsonReader{}.read(data , dataAST)) {
+  if (!JsonReader{}.read(data, dataAST)) {
     throw db::invalid_option_exception("ManageAliasesOperation")
         << "ManageAliasesOperation: Unable to read JSON buffer.";
   }
@@ -216,8 +216,7 @@ bpo::options_description ManageAliasesOperation::makeProgramOptions() const {
     return std::string{long_name}.append(",").append(short_name);
   };
 
-  opts.add_options()(make_opt_name(apiliteral::option::version, "v").c_str(), bpo::value<std::string>(),
-                     "Version");
+  opts.add_options()(make_opt_name(apiliteral::option::version, "v").c_str(), bpo::value<std::string>(), "Version");
 
   opts.add_options()(make_opt_name(apiliteral::option::version_alias, "a").c_str(), bpo::value<std::string>(),
                      "Version Alias");

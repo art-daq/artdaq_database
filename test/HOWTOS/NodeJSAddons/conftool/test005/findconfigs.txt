@@ -1,10 +1,10 @@
 source  /products/setup
-setup artdaq_database v1_00_00 -q debug:e9:s21
+setup artdaq_database v1_05_00 -q debug:e10:s41
 
 cd ~/artdaq-demo-base/artdaq-utilities-database/test/HOWTOS/NodeJSAddons/conftool/test005/
 
-conftool2 -o findconfigs -c test0051.flt.json -j test0051.gui.json
-conftool2 -o findconfigs -c test0052.flt.json -j test0052.gui.json
+conftool --searchquery=test0051.flt.json -x test0051.gui.json
+conftool --searchquery=test0052.flt.json -x test0052.gui.json
 
 #test005{1,2}.gui.json  should be identical with test005{1,2}.cmp.json
 

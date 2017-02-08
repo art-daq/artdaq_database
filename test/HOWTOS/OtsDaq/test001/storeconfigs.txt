@@ -1,22 +1,22 @@
 source  /products/setup
-setup artdaq_database v1_00_00 -q debug:e9:s21
+setup artdaq_database v1_05_00 -q debug:e10:s41
 
 cd ~/artdaq-demo-base/artdaq-utilities-database/test/HOWTOS/OtsDaq/test001
 
-conftool -p filesystem -o store -t otsdaq_ConfigurationAliases                  -c ConfigurationAliases_v0_pretty.json                -f json -v version001 -g otsdaqC001 -e CMSROOT
-conftool -p filesystem -o store -t otsdaq_Configurations                        -c Configurations_v0_pretty.json                      -f json -v version001 -g otsdaqC001 -e CMSROOT
+conftool -p filesystem -o store -f otsdaq_ConfigurationAliases                  -s ConfigurationAliases_v0_pretty.json                -f json -v version001 -g otsdaqC001 -e CMSROOT
+conftool -p filesystem -o store -f otsdaq_Configurations                        -s Configurations_v0_pretty.json                      -f json -v version001 -g otsdaqC001 -e CMSROOT
 
-conftool -p filesystem -o store -t otsdaq_DefaultConfigurations                 -c DefaultConfigurations_v0_pretty.json               -f json -v version001 -g otsdaqC001 -e CMSROOT
-conftool -p filesystem -o store -t otsdaq_FEConfiguration                       -c FEConfiguration_v0_pretty.json                     -f json -v version001 -g otsdaqC001 -e CMSROOT
+conftool -p filesystem -o store -f otsdaq_DefaultConfigurations                 -s DefaultConfigurations_v0_pretty.json               -f json -v version001 -g otsdaqC001 -e CMSROOT
+conftool -p filesystem -o store -f otsdaq_FEConfiguration                       -s FEConfiguration_v0_pretty.json                     -f json -v version001 -g otsdaqC001 -e CMSROOT
 
-conftool -p filesystem -o store -t otsdaq_FEWROtsUDPFSSRInterfaceConfiguration -c FEWROtsUDPFSSRInterfaceConfiguration_v0_pretty.json -f json -v version001 -g otsdaqC001 -e CMSROOT
-conftool -p filesystem -o store -t otsdaq_FEWROtsUDPHCALInterfaceConfiguration -c FEWROtsUDPHCALInterfaceConfiguration_v0_pretty.json -f json -v version001 -g otsdaqC001 -e CMSROOT
-conftool -p filesystem -o store -t otsdaq_FEWRPurdueFSSRInterfaceConfiguration -c FEWRPurdueFSSRInterfaceConfiguration_v0_pretty.json -f json -v version001 -g otsdaqC001 -e CMSROOT
+conftool -p filesystem -o store -f otsdaq_FEWROtsUDPFSSRInterfaceConfiguration -s FEWROtsUDPFSSRInterfaceConfiguration_v0_pretty.json -f json -v version001 -g otsdaqC001 -e CMSROOT
+conftool -p filesystem -o store -f otsdaq_FEWROtsUDPHCALInterfaceConfiguration -s FEWROtsUDPHCALInterfaceConfiguration_v0_pretty.json -f json -v version001 -g otsdaqC001 -e CMSROOT
+conftool -p filesystem -o store -f otsdaq_FEWRPurdueFSSRInterfaceConfiguration -s FEWRPurdueFSSRInterfaceConfiguration_v0_pretty.json -f json -v version001 -g otsdaqC001 -e CMSROOT
 
-conftool -p filesystem -o store -t otsdaq_MaskConfiguration                    -c MaskConfiguration_v0_pretty.json                    -f json -v version001 -g otsdaqC001 -e CMSROOT
-conftool -p filesystem -o store -t otsdaq_ROCToFEConfiguration                 -c ROCToFEConfiguration_v0_pretty.json                 -f json -v version001 -g otsdaqC001 -e CMSROOT
-conftool -p filesystem -o store -t otsdaq_VersionAliases                       -c VersionAliases_v0_pretty.json                       -f json -v version001 -g otsdaqC001 -e CMSROOT
+conftool -p filesystem -o store -f otsdaq_MaskConfiguration                    -s MaskConfiguration_v0_pretty.json                    -f json -v version001 -g otsdaqC001 -e CMSROOT
+conftool -p filesystem -o store -f otsdaq_ROCToFEConfiguration                 -s ROCToFEConfiguration_v0_pretty.json                 -f json -v version001 -g otsdaqC001 -e CMSROOT
+conftool -p filesystem -o store -f otsdaq_VersionAliases                       -s VersionAliases_v0_pretty.json                       -f json -v version001 -g otsdaqC001 -e CMSROOT
 
-conftool -p filesystem -o store -t otsdaq_FSSRDACsConfiguration                -c FSSRDACsConfiguration_v0_pretty.json                -f json -v version001 -g otsdaqC001 -e CMSROOT
+conftool -p filesystem -o store -f otsdaq_FSSRDACsConfiguration                -s FSSRDACsConfiguration_v0_pretty.json                -f json -v version001 -g otsdaqC001 -e CMSROOT
 
 

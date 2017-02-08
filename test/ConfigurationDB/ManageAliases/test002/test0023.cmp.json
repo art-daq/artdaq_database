@@ -1,0 +1,1 @@
+{ "search": [ {"name" :"configA006:DAQ_HOST_001","query" :{"collection" : "artdaq_Aggregator","dbprovider" : "mongo","dataformat" : "gui","operation" : "load","filter" : {"configurations.name" : "configA006", "entities.name" : "DAQ_HOST_001"}}}] }

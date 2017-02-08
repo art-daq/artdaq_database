@@ -46,7 +46,7 @@ class ovlDocument final : public ovlKeyValue {
   void make_empty();
 
   // overridess
-  std::string to_string() const noexcept override;
+  std::string to_string() const override;
 
   // ops
   result_t operator==(ovlDocument const&) const;

@@ -49,7 +49,7 @@ void ovlDocument::make_empty() {
   std::swap(_search, search);
 }
 
-std::string ovlDocument::to_string() const noexcept {
+std::string ovlDocument::to_string() const {
   std::ostringstream oss;
   oss << quoted_(jsonliteral::document) << ":{\n";
   oss << debrace(_data->to_string()) << ",\n";

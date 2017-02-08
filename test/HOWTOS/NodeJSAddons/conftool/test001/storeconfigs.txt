@@ -1,24 +1,24 @@
 source  /products/setup
-setup artdaq_database v1_00_00 -q debug:e9:s21
+setup artdaq_database v1_05_00 -q debug:e10:s41
 
 cd ~/artdaq-demo-base/artdaq-utilities-database/test/HOWTOS/NodeJSAddons/conftool/test001/
 
-conftool -p filesystem -o store -t artdaq_BoardReader -c BoardReader_TOY1_topol.fnal.gov_5205.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_001
-conftool -p filesystem -o store -t artdaq_BoardReader -c BoardReader_TOY2_topol.fnal.gov_5206.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_002
+conftool -p filesystem -o store -c artdaq_BoardReader -s BoardReader_TOY1_topol.fnal.gov_5205.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_001
+conftool -p filesystem -o store -c artdaq_BoardReader -s BoardReader_TOY2_topol.fnal.gov_5206.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_002
 
-conftool -p filesystem -o store -t artdaq_EventBuilder -c EventBuilder_topol.fnal.gov_5235.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_001
-conftool -p filesystem -o store -t artdaq_EventBuilder -c EventBuilder_topol.fnal.gov_5235.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_002
+conftool -p filesystem -o store -c artdaq_EventBuilder -s EventBuilder_topol.fnal.gov_5235.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_001
+conftool -p filesystem -o store -c artdaq_EventBuilder -s EventBuilder_topol.fnal.gov_5235.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_002
 
-conftool -p filesystem -o store -t artdaq_Aggregator -c Aggregator_topol.fnal.gov_5266.fcl -f fhicl -v version001  -g configA001 -e DAQ_HOST_001
-conftool -p filesystem -o store -t artdaq_Aggregator -c Aggregator_topol.fnal.gov_5266.fcl -f fhicl -v version001  -g configA001 -e DAQ_HOST_002
+conftool -p filesystem -o store -c artdaq_Aggregator -s Aggregator_topol.fnal.gov_5266.fcl -f fhicl -v version001  -g configA001 -e DAQ_HOST_001
+conftool -p filesystem -o store -c artdaq_Aggregator -s Aggregator_topol.fnal.gov_5266.fcl -f fhicl -v version001  -g configA001 -e DAQ_HOST_002
 
 
-conftool -p mongo -o store -t artdaq_BoardReader -c BoardReader_TOY1_topol.fnal.gov_5205.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_001
-conftool -p mongo -o store -t artdaq_BoardReader -c BoardReader_TOY2_topol.fnal.gov_5206.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_002
+conftool -p mongo -o store -c artdaq_BoardReader -s BoardReader_TOY1_topol.fnal.gov_5205.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_001
+conftool -p mongo -o store -c artdaq_BoardReader -s BoardReader_TOY2_topol.fnal.gov_5206.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_002
 
-conftool -p mongo -o store -t artdaq_EventBuilder -c EventBuilder_topol.fnal.gov_5235.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_001
-conftool -p mongo -o store -t artdaq_EventBuilder -c EventBuilder_topol.fnal.gov_5235.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_002
+conftool -p mongo -o store -c artdaq_EventBuilder -s EventBuilder_topol.fnal.gov_5235.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_001
+conftool -p mongo -o store -c artdaq_EventBuilder -s EventBuilder_topol.fnal.gov_5235.fcl -f fhicl -v version001 -g configA001 -e DAQ_HOST_002
 
-conftool -p mongo -o store -t artdaq_Aggregator -c Aggregator_topol.fnal.gov_5266.fcl -f fhicl -v version001  -g configA001 -e DAQ_HOST_001
-conftool -p mongo -o store -t artdaq_Aggregator -c Aggregator_topol.fnal.gov_5266.fcl -f fhicl -v version001  -g configA001 -e DAQ_HOST_002
+conftool -p mongo -o store -c artdaq_Aggregator -s Aggregator_topol.fnal.gov_5266.fcl -f fhicl -v version001  -g configA001 -e DAQ_HOST_001
+conftool -p mongo -o store -c artdaq_Aggregator -s Aggregator_topol.fnal.gov_5266.fcl -f fhicl -v version001  -g configA001 -e DAQ_HOST_002
 

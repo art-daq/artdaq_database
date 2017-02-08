@@ -21,7 +21,7 @@ std::string& ovlTimeStamp::timestamp(std::string const& ts) {
   return timestamp();
 }
 
-std::string ovlTimeStamp::to_string() const noexcept {
+std::string ovlTimeStamp::to_string() const {
   std::ostringstream oss;
   oss << "{" << quoted_(key()) << ":" << quoted_(timestamp()) << "}";
 

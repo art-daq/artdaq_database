@@ -96,7 +96,7 @@ result_t ovlDatabaseRecord::swap(ovlIdUPtr_t& id) {
   return _id->ovlKeyValue::swap(id.get());
 }
 
-std::string ovlDatabaseRecord::to_string() const noexcept {
+std::string ovlDatabaseRecord::to_string() const {
   std::ostringstream oss;
   oss << "{";
   oss << debrace(_id->to_string()) << ",\n";

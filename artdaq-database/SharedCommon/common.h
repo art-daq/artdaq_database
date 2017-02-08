@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdio>
-#include <ctime>
+#include <chrono>
 #include <fstream>
 #include <functional>
 #include <iostream>

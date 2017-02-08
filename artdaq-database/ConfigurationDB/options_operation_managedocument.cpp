@@ -31,7 +31,7 @@ namespace apiliteral = artdaq::database::configapi::literal;
 
 ManageDocumentOperation::ManageDocumentOperation(std::string const& process_name) : OperationBase{process_name} {}
 
-std::string const& ManageDocumentOperation::version() const noexcept {
+std::string const& ManageDocumentOperation::version() const {
   confirm(!_version.empty());
 
   return _version;
@@ -51,7 +51,7 @@ std::string const& ManageDocumentOperation::version(std::string const& version) 
   return _version;
 }
 
-std::string const& ManageDocumentOperation::entity() const noexcept {
+std::string const& ManageDocumentOperation::entity() const {
   confirm(!_entity.empty());
 
   return _entity;
@@ -71,7 +71,7 @@ std::string const& ManageDocumentOperation::entity(std::string const& entity) {
   return _entity;
 }
 
-std::string const& ManageDocumentOperation::configuration() const noexcept {
+std::string const& ManageDocumentOperation::configuration() const {
   confirm(!_configuration.empty());
 
   return _configuration;
@@ -91,7 +91,7 @@ std::string const& ManageDocumentOperation::configuration(std::string const& glo
   return _configuration;
 }
 
-std::string const& ManageDocumentOperation::sourceFileName() const noexcept {
+std::string const& ManageDocumentOperation::sourceFileName() const {
   confirm(!_source_file_name.empty());
 
   return _source_file_name;
@@ -113,9 +113,9 @@ std::string const& ManageDocumentOperation::sourceFileName(std::string const& so
 
 void ManageDocumentOperation::readJsonData(JsonData const& data) {
   confirm(!data.empty());
-  
+
   OperationBase::readJsonData(data);
-   TRACE_(12, "OperationBase::readJsonData <" << data.json_buffer << ">");
+  TRACE_(12, "OperationBase::readJsonData <" << data.json_buffer << ">");
 
   using namespace artdaq::database::json;
   auto dataAST = object_t{};
@@ -186,7 +186,7 @@ int ManageDocumentOperation::readProgramOptions(bpo::variables_map const& vm) {
   if (vm.count(apiliteral::option::configuration)) {
     configuration(vm[apiliteral::option::configuration].as<std::string>());
   }
-  
+
   if (vm.count(apiliteral::option::source)) {
     sourceFileName(vm[apiliteral::option::source].as<std::string>());
   }
@@ -201,8 +201,7 @@ bpo::options_description ManageDocumentOperation::makeProgramOptions() const {
     return std::string{long_name}.append(",").append(short_name);
   };
 
-  opts.add_options()(make_opt_name(apiliteral::option::version, "v").c_str(), bpo::value<std::string>(),
-                     "Version");
+  opts.add_options()(make_opt_name(apiliteral::option::version, "v").c_str(), bpo::value<std::string>(), "Version");
   opts.add_options()(make_opt_name(apiliteral::option::entity, "e").c_str(), bpo::value<std::string>(),
                      "Configurable-entity name");
   opts.add_options()(make_opt_name(apiliteral::option::configuration, "g").c_str(), bpo::value<std::string>(),

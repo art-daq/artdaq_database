@@ -93,7 +93,7 @@ class ovlDatabaseRecord final : public ovlKeyValue {
   result_t swap(ovlIdUPtr_t& /*id*/);
 
   // overrides
-  std::string to_string() const noexcept override;
+  std::string to_string() const override;
 
   // ops
   result_t operator==(ovlDatabaseRecord const&) const;

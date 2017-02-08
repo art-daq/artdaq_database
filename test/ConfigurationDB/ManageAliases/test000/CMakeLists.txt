@@ -1,6 +1,8 @@
 SET ( TEST_NUMBER "000" )
 SET ( TEST_NAME "seeddatacab" )
 
+cet_test_env("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_MONGO}b")
+
 cet_test(conftool_mongo_store_${TEST_NUMBER}_01_t HANDBUILT  TEST_EXEC conftool 
   DATAFILES 
     ${CMAKE_CURRENT_SOURCE_DIR}/Aggregator_topol.fnal.gov_5265.fcl 
@@ -26,6 +28,7 @@ cet_test(conftool_mongo_store_${TEST_NUMBER}_04_t HANDBUILT  TEST_EXEC conftool
   
   
 
+cet_test_env("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}b")
   
 cet_test(conftool_filesystem_store_${TEST_NUMBER}_01_t HANDBUILT  TEST_EXEC conftool 
   DATAFILES 
