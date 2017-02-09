@@ -33,8 +33,9 @@ namespace artdaq {
 namespace database {
 namespace configuration {
 namespace detail {
-// reserved
-
+void add_version_alias(ManageAliasesOperation const& options, std::string& conf);
+void remove_version_alias(ManageAliasesOperation const& options, std::string& conf);
+void find_version_aliases(ManageAliasesOperation const& options, std::string& conf);
 }  // namespace detail
 }  // namespace configuration
 }  // namespace database
@@ -46,12 +47,12 @@ result_t json::add_version_alias(std::string const& query_payload) noexcept {
   try {
     if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = ManageDocumentOperation{apiliteral::operation::addversionalias};
+    auto options = ManageAliasesOperation{apiliteral::operation::addversionalias};
     options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
 
-    // detail::add_version_alias(options, returnValue);
+    detail::add_version_alias(options, returnValue);
 
     return Success(returnValue);
   } catch (...) {
@@ -63,12 +64,12 @@ result_t json::remove_version_alias(std::string const& query_payload) noexcept {
   try {
     if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = ManageDocumentOperation{apiliteral::operation::rmversionalias};
+    auto options = ManageAliasesOperation{apiliteral::operation::rmversionalias};
     options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
 
-    // detail::remove_version_alias(options, returnValue);
+    detail::remove_version_alias(options, returnValue);
 
     return Success(returnValue);
   } catch (...) {
@@ -80,12 +81,12 @@ result_t json::find_version_aliases(std::string const& query_payload) noexcept {
   try {
     if (query_payload.empty()) return Failure(msg_EmptyFilter);
 
-    auto options = ManageDocumentOperation{apiliteral::operation::rmversionalias};
+    auto options = ManageAliasesOperation{apiliteral::operation::rmversionalias};
     options.readJsonData({query_payload});
 
     auto returnValue = std::string{};
 
-    // detail::find_version_aliases(options, returnValue);
+    detail::find_version_aliases(options, returnValue);
 
     return Success(returnValue);
   } catch (...) {

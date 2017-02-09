@@ -733,7 +733,7 @@
 
 ]
 },
-"version" : "version001",
+"version" : "version004",
 "entities" : [
 {
 "name" : "@TEST_ENTITY_NAME@",
@@ -767,7 +767,7 @@
 "event" : "setVersion",
 "timestamp" : "Wed Feb  8 16:14:27 2017",
 "value" : {
-"name" : "version001",
+"name" : "version004",
 "assigned" : "Wed Feb  8 16:14:27 2017"
 }
 },
@@ -832,7 +832,7 @@
 "event" : "setVersion",
 "timestamp" : "Mon Feb  8 14:00:30 2016",
 "value" : {
-"name" : "version001",
+"name" : "version004",
 "assigned" : "Mon Feb  8 14:00:30 2016"
 }
 },

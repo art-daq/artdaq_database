@@ -32,6 +32,9 @@ class ManageDocumentOperation final : public OperationBase {
   std::string const& entity() const;
   std::string const& entity(std::string const&);
 
+  std::string const& run() const;
+  std::string const& run(std::string const&);
+  
   std::string const& configuration() const;
   std::string const& configuration(std::string const&);
 
@@ -42,6 +45,7 @@ class ManageDocumentOperation final : public OperationBase {
   JsonData version_to_JsonData() const;
   JsonData entity_to_JsonData() const;
   JsonData collection_to_JsonData() const;
+  JsonData run_to_JsonData() const;
 
   bpo::options_description makeProgramOptions() const override;
 
@@ -53,6 +57,7 @@ class ManageDocumentOperation final : public OperationBase {
  private:
   std::string _version = {apiliteral::notprovided};
   std::string _entity = {apiliteral::notprovided};
+  std::string _run = {apiliteral::notprovided};
   std::string _configuration = {apiliteral::notprovided};
   std::string _source_file_name = {apiliteral::notprovided};
 };
