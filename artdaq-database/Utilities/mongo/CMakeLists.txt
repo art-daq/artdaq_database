@@ -1,1 +1,0 @@
-cet_script(mongod.conf mongod)

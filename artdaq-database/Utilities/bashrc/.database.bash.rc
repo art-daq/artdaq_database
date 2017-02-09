@@ -1,0 +1,54 @@
+export ARTDAQ_DATABASE_HOME=${HOME}/daqsw
+
+printf "\n$(whoami)@$(uname -a)\n\n"   
+
+source  /home/pduser/daqsw/products/setup
+unsetup_all > /dev/null 2>&1
+
+setup artdaq v2_00_00 -q e10:eth:prof:s41
+setup artdaq_database v1_04_02 -q e10:prof:s41
+
+#setup artdaq_node_server v1_00_03 -q prof:e10:s35
+
+ups active |grep artdaq
+
+export ARTDAQ_DATABASE_URI="filesystemdb://${ARTDAQ_DATABASE_HOME}/databases/filesystemdb/test_configuration_db"
+export ARTDAQ_DATABASE_LOGS=${ARTDAQ_DATABASE_HOME}/logs/conftool
+
+printf "\n\n"
+printf "ARTDAQ_DATABASE_URI=$ARTDAQ_DATABASE_URI\n"
+
+conftool.sh --help
+
+#mkdir -p  ${ARTDAQ_DATABASE_HOME}/work-db-dir  > /dev/null 2>&1
+#mkdir -p  ${ARTDAQ_DATABASE_LOGS} > /dev/null 2>&1
+
+
+cd ${ARTDAQ_DATABASE_HOME}/work-db-dir
+
+printf "\nWeb GUI server pid:  $(ps -ef |grep -v -E '(grep|grid)' |grep serverbase.js| cut -d' ' -f2-6)"
+printf "\nCurrent dir: $(pwd)\n"
+
+function startWebGUIServer(){
+cur_dir=$(pwd)
+cd $ARTDAQ_NODE_SERVER_DIR && nohup node serverbase.js &> ${ARTDAQ_DATABASE_LOGS}/nodeserver-$(date +"%Y%m%d-%H%M%S")-$(hostname -s).log &
+cd $cur_dir
+}
+
+function stopWebGUIServer(){
+killall -u sbnd -9 node
+}
+
+function statusWebGUIServer(){
+ps -ef |grep -v -E "(grep|grid)" |grep serverbase.js 
+}
+
+#unalias ssh
+
+function guitunnel(){
+http_fwd_port=$((8800+$RANDOM%99))
+node_server=$1.fnal.gov
+ssh_opts="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "
+ssh ${ssh_opts}  -t -K -L 8080:localhost:${http_fwd_port} sbnd@sbnd-daq00.fnal.gov \
+ssh ${ssh_opts}  -C -N -K -L ${http_fwd_port}:localhost:8080 sbnd@${node_server}
+}
