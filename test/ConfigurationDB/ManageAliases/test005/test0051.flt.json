@@ -2,6 +2,6 @@
     "filter":{"version":"version002", "entities.name":"@TEST_ENTITY_NAME@"},
     "collection":"artdaq_Aggregator",
     "dbprovider":"mongo",
-    "operation":"addveralias",
+    "operation":"rmveralias",
     "dataformat":"db"
 }

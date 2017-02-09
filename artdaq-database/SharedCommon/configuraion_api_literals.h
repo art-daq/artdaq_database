@@ -41,6 +41,8 @@ constexpr auto assignconfig = "addconfig";
 constexpr auto removeconfig = "rmconfig";
 constexpr auto newconfig = "newconfig";
 
+constexpr auto addrun = "addrun";
+
 constexpr auto addversionalias = "addveralias";
 constexpr auto rmversionalias = "rmveralias";
 constexpr auto findversionalias = "findveralias";
@@ -73,6 +75,7 @@ constexpr auto source = "source";
 
 constexpr auto version = "version";
 constexpr auto version_alias = "alias";
+constexpr auto run = "run";
 
 constexpr auto searchfilter = "filter";
 constexpr auto searchquery = "searchquery";
@@ -88,8 +91,13 @@ constexpr auto configuration_alias = "configurationalias";
 namespace filter {
 constexpr auto entities = "entities.name";
 constexpr auto configurations = "configurations.name";
+constexpr auto version_aliases = "aliases.active.name";
+constexpr auto configuration_aliases = "configaliases.active.name";
+constexpr auto runs = "runs.name";
+
 constexpr auto version = "version";
 constexpr auto version_alias = "alias";
+constexpr auto run = "run";
 constexpr auto configuration_alias = "configuration_alias";
 }
 

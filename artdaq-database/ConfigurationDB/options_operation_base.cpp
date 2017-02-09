@@ -251,8 +251,7 @@ void OperationBase::readJsonData(JsonData const& data) {
   TRACE_(14, "OperationBase::readJsonData() data=<" << data << ">");
   confirm(!data.empty());
   TRACE_(14, "OperationBase::readJsonData() not empty=<" << data << ">");
-  confirm(data.json_buffer != apiliteral::notprovided);
-
+  confirm(data.json_buffer != apiliteral::notprovided);  
   TRACE_(14, "OperationBase::readJsonData() object=<" << data << ">");
 
   using namespace artdaq::database::json;

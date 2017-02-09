@@ -51,6 +51,25 @@ std::string const& ManageDocumentOperation::version(std::string const& version) 
   return _version;
 }
 
+std::string const& ManageDocumentOperation::run() const {
+  confirm(!_run.empty());
+
+  return _run;
+}
+
+std::string const& ManageDocumentOperation::run(std::string const& run) {
+  confirm(!run.empty());
+
+  if (run.empty()) {
+    throw runtime_error("Options") << "Invalid run; run is empty.";
+  }
+
+  TRACE_(10, "Options: Updating run from " << _run << " to " << run << ".");
+
+  _run = run;
+
+  return _run;
+}
 std::string const& ManageDocumentOperation::entity() const {
   confirm(!_entity.empty());
 
@@ -141,6 +160,11 @@ void ManageDocumentOperation::readJsonData(JsonData const& data) {
   }
 
   try {
+    run(boost::get<std::string>(dataAST.at(apiliteral::option::run)));
+  } catch (...) {
+  }
+  
+  try {
     sourceFileName(boost::get<std::string>(dataAST.at(apiliteral::option::source)));
   } catch (...) {
   }
@@ -165,6 +189,11 @@ void ManageDocumentOperation::readJsonData(JsonData const& data) {
     } catch (...) {
     }
 
+    try {
+      run(boost::get<std::string>(filterAST.at(apiliteral::filter::runs)));
+    } catch (...) {
+    }
+    
   } catch (...) {
     TRACE_(1, "Options() no filter provided <" << data << ">");
   }
@@ -183,6 +212,10 @@ int ManageDocumentOperation::readProgramOptions(bpo::variables_map const& vm) {
     entity(vm[apiliteral::option::entity].as<std::string>());
   }
 
+  if (vm.count(apiliteral::option::run)) {
+    run(vm[apiliteral::option::run].as<std::string>());
+  }
+  
   if (vm.count(apiliteral::option::configuration)) {
     configuration(vm[apiliteral::option::configuration].as<std::string>());
   }
@@ -202,6 +235,8 @@ bpo::options_description ManageDocumentOperation::makeProgramOptions() const {
   };
 
   opts.add_options()(make_opt_name(apiliteral::option::version, "v").c_str(), bpo::value<std::string>(), "Version");
+  opts.add_options()(make_opt_name(apiliteral::option::run, "r").c_str(), bpo::value<std::string>(), "Run");
+  
   opts.add_options()(make_opt_name(apiliteral::option::entity, "e").c_str(), bpo::value<std::string>(),
                      "Configurable-entity name");
   opts.add_options()(make_opt_name(apiliteral::option::configuration, "g").c_str(), bpo::value<std::string>(),
@@ -219,7 +254,7 @@ JsonData ManageDocumentOperation::writeJsonData() const {
   auto docAST = object_t{};
 
   if (!JsonReader{}.read(OperationBase::writeJsonData(), docAST)) {
-    throw db::invalid_option_exception("ManageDocumentOperation") << "Unable to readquery_filter_to_JsonData().";
+    throw db::invalid_option_exception("ManageDocumentOperation") << "Unable to read query_filter_to_JsonData().";
   }
 
   if (configuration() != apiliteral::notprovided) docAST[apiliteral::option::configuration] = configuration();
@@ -229,6 +264,8 @@ JsonData ManageDocumentOperation::writeJsonData() const {
   if (entity() != apiliteral::notprovided) docAST[apiliteral::option::entity] = entity();
 
   if (version() != apiliteral::notprovided) docAST[apiliteral::option::version] = version();
+
+  if (run() != apiliteral::notprovided) docAST[apiliteral::option::run] = run();
 
   auto json_buffer = std::string{};
 
@@ -258,6 +295,11 @@ JsonData ManageDocumentOperation::query_filter_to_JsonData() const {
   if (configuration() != apiliteral::notprovided && operation() != apiliteral::operation::assignconfig)
     docAST[apiliteral::filter::configurations] = configuration();
 
+  /*
+  if (run() != apiliteral::notprovided)
+    docAST[apiliteral::filter::runs] = run();
+  */
+  
   if (docAST.empty()) {
     return {apiliteral::empty_json};
   }
@@ -330,11 +372,27 @@ JsonData ManageDocumentOperation::version_to_JsonData() const {
 
   return {json_buffer};
 }
+
 JsonData ManageDocumentOperation::entity_to_JsonData() const {
   using namespace artdaq::database::json;
   auto docAST = object_t{};
 
   docAST[apiliteral::name] = entity();
+
+  auto json_buffer = std::string{};
+
+  if (!JsonWriter{}.write(docAST, json_buffer)) {
+    throw db::invalid_option_exception("ManageDocumentOperation") << "Unable to write JSON buffer.";
+  }
+
+  return {json_buffer};
+}
+
+JsonData ManageDocumentOperation::run_to_JsonData() const {
+  using namespace artdaq::database::json;
+  auto docAST = object_t{};
+
+  docAST[apiliteral::name] = run();
 
   auto json_buffer = std::string{};
 

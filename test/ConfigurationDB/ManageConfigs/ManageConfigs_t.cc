@@ -120,6 +120,11 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::FAILURE;
   }
 
+  if(result.second.empty()){
+    std::cout << "Test failed; error message: result is empty." << "\n";
+    return process_exit_code::FAILURE;
+  }
+  
   auto returned = std::string{result.second};
 
   std::ifstream is(file_res_name);

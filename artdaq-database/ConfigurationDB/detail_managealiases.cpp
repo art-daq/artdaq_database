@@ -53,12 +53,12 @@ void read_document(cf::ManageDocumentOperation const&, std::string&);
 
 typedef JsonData (*provider_call_t)(Options const& /*options*/, JsonData const& /*task_payload*/);
 
-void find_aliases(Options const& options, std::string& configs) {
+void find_version_aliases(Options const& options, std::string& configs) {
   confirm(configs.empty());
   confirm(options.operation().compare(apiliteral::operation::findversionalias) == 0);
 
-  TRACE_(11, "find_aliases: begin");
-  TRACE_(11, "find_aliases args options=<" << options << ">");
+  TRACE_(11, "find_version_aliases: begin");
+  TRACE_(11, "find_version_aliases args options=<" << options << ">");
 
   validate_dbprovider_name(options.provider());
 
@@ -85,7 +85,7 @@ void find_aliases(Options const& options, std::string& configs) {
     case data_format_t::fhicl:
     case data_format_t::xml: {
       if (!db::json_db_to_gui(search_result, returnValue)) {
-        throw runtime_error("find_aliases") << "Unsupported data format.";
+        throw runtime_error("find_version_aliases") << "Unsupported data format.";
       }
       break;
     }
@@ -102,14 +102,14 @@ void find_aliases(Options const& options, std::string& configs) {
       object_t results_ast;
 
       if (!reader.read(search_result, results_ast)) {
-        TRACE_(11, "find_aliases() Failed to create an AST from search results JSON.");
+        TRACE_(11, "find_version_aliases() Failed to create an AST from search results JSON.");
 
-        throw runtime_error("find_aliases") << "Failed to create an AST from search results JSON.";
+        throw runtime_error("find_version_aliases") << "Failed to create an AST from search results JSON.";
       }
 
       auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
 
-      TRACE_(11, "find_aliases: found " << results_list.size() << " results.");
+      TRACE_(11, "find_version_aliases: found " << results_list.size() << " results.");
 
       std::ostringstream os;
 
@@ -117,7 +117,7 @@ void find_aliases(Options const& options, std::string& configs) {
         auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
         auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
 
-        TRACE_(11, "find_aliases() Found config=<" << value << ">.");
+        TRACE_(11, "find_version_aliases() Found alias=<" << value << ">.");
 
         os << value << ", ";
       }
@@ -129,7 +129,7 @@ void find_aliases(Options const& options, std::string& configs) {
 
   if (returnValueChanged) configs.swap(returnValue);
 
-  TRACE_(11, "find_aliases: end");
+  TRACE_(11, "find_version_aliases: end");
 }
 
 void add_version_alias(Options const& options, std::string& conf) {
@@ -156,10 +156,14 @@ void add_version_alias(Options const& options, std::string& conf) {
 
   newOptions.operation(apiliteral::operation::writedocument);
   newOptions.format(data_format_t::db);
-  write_document(newOptions, document);
+
+  auto updated = builder.to_string();  
+  write_document(newOptions, updated);
 
   newOptions.operation(apiliteral::operation::readdocument);
   newOptions.format(options.format());
+
+  document.clear();
   read_document(newOptions, document);
 
   conf.swap(document);
@@ -190,10 +194,15 @@ void remove_version_alias(Options const& options, std::string& conf) {
 
   newOptions.operation(apiliteral::operation::writedocument);
   newOptions.format(data_format_t::db);
-  write_document(newOptions, document);
+
+  auto updated = builder.to_string();  
+  write_document(newOptions, updated);
 
   newOptions.operation(apiliteral::operation::readdocument);
   newOptions.format(options.format());
+  newOptions.queryFilter(apiliteral::notprovided);
+
+  document.clear();
   read_document(newOptions, document);
 
   conf.swap(document);
