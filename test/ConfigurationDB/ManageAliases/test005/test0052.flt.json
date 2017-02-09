@@ -1,0 +1,7 @@
+{
+    "filter":{"version":"version002", "entities.name":"@TEST_ENTITY_NAME@"},
+    "collection":"artdaq_Aggregator",
+    "dbprovider":"filesystem",
+    "operation":"rmveralias",
+    "dataformat":"db"
+}

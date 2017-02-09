@@ -24,7 +24,7 @@ ovlKeyValue& ovlUpdate::what() { return _what; }
 
 ovlKeyValue const& ovlUpdate::what() const { return _what; }
 
-std::string ovlUpdate::to_string() const noexcept {
+std::string ovlUpdate::to_string() const {
   std::ostringstream oss;
 
   oss << "{";

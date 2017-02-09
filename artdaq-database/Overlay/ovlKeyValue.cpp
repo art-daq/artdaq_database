@@ -16,7 +16,7 @@ std::uint32_t artdaq::database::overlay::useCompareMask(std::uint32_t compareMas
 
 ovlKeyValue::ovlKeyValue(object_t::key_type const& key, value_t& value) : _key(key), _value(value) {}
 
-std::string ovlKeyValue::to_string() const noexcept {
+std::string ovlKeyValue::to_string() const {
   auto retValue = std::string{};
   auto tmpAST = object_t{};
 

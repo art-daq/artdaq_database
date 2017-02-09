@@ -38,7 +38,7 @@ class ovlOrigin final : public ovlKeyValue {
   std::string const& source() const;
 
   // overridess
-  std::string to_string() const noexcept override;
+  std::string to_string() const override;
 
   // ops
   result_t operator==(ovlOrigin const&) const;

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-export artdaq_database_version=v1_03_19
+export artdaq_database_version=v1_04_04
 export config_editor_version=v1_00_03
 
-conftool_log_dir=${HOME}/daqoutput/daqlogs/conftool
+conftool_log_dir=${ARTDAQ_DATABASE_LOGS}
 
 function show_help(){
 printf "\n\nUsage: $(basename $0) [OPERATION] [OPTION]...\n"
@@ -23,7 +23,7 @@ ls -t  ${conftool_log_dir} |head -3
 echo
 }
 
-unset ARTDAQ_DATABASE_URI
+#unset ARTDAQ_DATABASE_URI
 
 yes=yes
 no=no
@@ -134,14 +134,14 @@ function read_command_line_options() {
   fi
   
   if [[ "${global_config_name_present}" == "${yes}" ]] &&  [[ "${operation_name}" != "list_global_configs" ]]\
-    && ( [[ "${global_config_name}" =~ [^[:alnum:]] ]] \
+    && ( [[ "${global_config_name}" =~ [^[:alnum:]_] ]] \
     ||   [[ "${global_config_name}" =~ [^[:digit:]]$ ]] ); then
     printf "\nError: configuration must be an alphanumeric string and ending with a digit; configuration=<${global_config_name}>"
    return 7
   fi
 
   if [[ "${version_name_present}" == "${yes}" ]] \
-    && ( [[ "${version_name}" =~ [^[:alnum:]] ]] \
+    && ( [[ "${version_name}" =~ [^[:alnum:]_] ]] \
     ||   [[ "${version_name}" =~ [^[:digit:]]$ ]] ); then
     printf "\nError: version must be an alphanumeric string and ending with a digit; version=<${version_name}>"
    return 7
@@ -269,7 +269,7 @@ function import_global_config()
 
  tar cjf - ${config_dir}/*  -C ${config_dir} |base64 --wrap=0 > ${tmp_file_name}
 
- conftool -o globalconfstore -d filesystem -f origin -v ${version_name} -g ${global_config_name} -s ${tmp_file_name} -r ~/result.json
+ conftool -o globalconfstore -d filesystem -f origin -v ${version_name} -g ${global_config_name} -s ${tmp_file_name} -x ~/result.json
  result_code=$? 
  if [[  $result_code -gt 0 ]]; then 
     printf "\nError: Failed to import config data"
@@ -411,7 +411,7 @@ function main()
     return 1
   fi
 
-  unset ARTDAQ_DATABASE_URI
+#  unset ARTDAQ_DATABASE_URI
 
   redirect_stdout_stderr_tolog
  
@@ -429,7 +429,7 @@ function main()
 
   printf "\nInfo: using $(which conftool)"
   
-  export ARTDAQ_DATABASE_DATADIR=${HOME}/daqarea/databases
+#  export ARTDAQ_DATABASE_DATADIR=${HOME}/daqarea/databases
   
   printf "\n"
   

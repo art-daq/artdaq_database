@@ -25,20 +25,20 @@ namespace apiliteral = artdaq::database::configapi::literal;
 class OperationBase {
  public:
   OperationBase(std::string const& process_name);
-  std::string const& operation() const noexcept;
+  std::string const& operation() const;
   std::string const& operation(std::string const&);
 
-  std::string const& collection() const noexcept;
+  std::string const& collection() const;
   std::string const& collection(std::string const&);
 
-  std::string const& provider() const noexcept;
+  std::string const& provider() const;
   std::string const& provider(std::string const&);
 
-  data_format_t const& format() const noexcept;
+  data_format_t const& format() const;
   data_format_t const& format(data_format_t const&);
   data_format_t const& format(std::string const&);
 
-  std::string const& queryFilter() const noexcept;
+  std::string const& queryFilter() const;
   std::string const& queryFilter(std::string const&);
 
   virtual JsonData query_filter_to_JsonData() const;

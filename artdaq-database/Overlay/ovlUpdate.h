@@ -29,7 +29,7 @@ class ovlUpdate final : public ovlKeyValue {
   ovlKeyValue const& what() const;
 
   // overrides
-  std::string to_string() const noexcept override;
+  std::string to_string() const override;
 
   // ops
   result_t operator==(ovlUpdate const&) const;

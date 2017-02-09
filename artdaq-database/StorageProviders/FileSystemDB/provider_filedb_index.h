@@ -45,16 +45,24 @@ class SearchIndex final {
   void _addVersion(object_id_t const&, std::string const&);
   void _addConfiguration(object_id_t const&, std::string const&);
   void _addEntity(object_id_t const&, std::string const&);
+  void _addVersionAlias(object_id_t const&, std::string const&);
+  void _addRun(object_id_t const&, std::string const&);
 
   void _removeVersion(object_id_t const&, std::string const&);
   void _removeConfiguration(object_id_t const&, std::string const&);
-  void _removeentity(object_id_t const&, std::string const&);
+  void _removeEntity(object_id_t const&, std::string const&);
+  void _removeVersionAlias(object_id_t const&, std::string const&);
+  void _removeRun(object_id_t const&, std::string const&);
+  
   std::vector<object_id_t> _matchVersion(std::string const&) const;
+  std::vector<object_id_t> _matchVersionAlias(std::string const&) const;
   std::vector<object_id_t> _matchConfiguration(std::string const&) const;
-  std::vector<object_id_t> _matchentity(std::string const&) const;
+  std::vector<object_id_t> _matchEntity(std::string const&) const;
   std::vector<object_id_t> _matchObjectId(std::string const&) const;
   std::vector<object_id_t> _matchObjectIds(std::string const&) const;
+  std::vector<object_id_t> _matchRun(std::string const&) const;
 
+  
   void _build_ouid_map(std::map<std::string, std::string>&, std::string const&) const;
 
   template <typename TYPE>

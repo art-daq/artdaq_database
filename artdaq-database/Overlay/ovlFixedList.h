@@ -32,7 +32,7 @@ class ovlFixedList final : public ovlKeyValue {
   typename List_t::const_iterator end() const {return _list.end();}
   
   // overrides
-  std::string to_string() const noexcept override;
+  std::string to_string() const override;
 
   // ops
   result_t operator==(ovlFixedList const&) const;
@@ -52,7 +52,7 @@ ovlFixedList<T, mask>::ovlFixedList(object_t::key_type const& key, value_t& entr
     : ovlKeyValue(key, entries), _list(make_list(ovlKeyValue::array_value())) {}
 
 template <typename T, int mask>
-std::string ovlFixedList<T, mask>::to_string() const noexcept {
+std::string ovlFixedList<T, mask>::to_string() const {
   std::ostringstream oss;
   oss << "{" << quoted_(key()) << ": [";
 

@@ -19,7 +19,7 @@ int const& ovlComment::linenum() const { return value_as<int>(jsonliteral::linen
 
 std::string const& ovlComment::text() const { return value_as<std::string>(jsonliteral::value); }
 
-std::string ovlComment::to_string() const noexcept {
+std::string ovlComment::to_string() const {
   std::ostringstream oss;
   oss << "{" << quoted_(jsonliteral::linenum) << ":" << linenum() << ",";
   oss << quoted_(jsonliteral::value) << ":" << quoted_(text()) << "}";

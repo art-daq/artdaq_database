@@ -31,13 +31,13 @@ namespace apiliteral = artdaq::database::configapi::literal;
 
 BulkOperations::BulkOperations(std::string const& process_name) : _process_name{process_name} {}
 
-std::string const& BulkOperations::bulkOperations() const noexcept {
+std::string const& BulkOperations::bulkOperations() const {
   confirm(!_bulk_operations.empty());
 
   return _bulk_operations;
 }
 
-data_format_t const& BulkOperations::format() const noexcept { return _data_format; }
+data_format_t const& BulkOperations::format() const { return _data_format; }
 
 std::string const& BulkOperations::bulkOperations(std::string const& query_payload) {
   confirm(!query_payload.empty());
@@ -103,7 +103,7 @@ void BulkOperations::readJsonData(JsonData const& data) {
   using namespace artdaq::database::json;
   auto dataAST = object_t{};
 
-  if (!JsonReader{}.read(data , dataAST)) {
+  if (!JsonReader{}.read(data, dataAST)) {
     throw db::invalid_option_exception("BulkOperations") << "BulkOperations: Unable to read JSON buffer.";
   }
 

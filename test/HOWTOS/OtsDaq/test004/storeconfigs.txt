@@ -1,6 +1,6 @@
 source  /products/setup
-setup artdaq_database v1_00_00 -q debug:e9:s21
+setup artdaq_database v1_05_00 -q debug:e10:s41
 
 cd ~/artdaq-demo-base/artdaq-utilities-database/test/HOWTOS/NodeJSAddons/conftool/test004/
 
-conftool2 -o store -c test004.flt.filesystem.json -j test004.gui.filesystem.json
+conftool --searchquery=test004.flt.filesystem.json -x test004.gui.filesystem.json

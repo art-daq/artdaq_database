@@ -1,0 +1,889 @@
+{
+"document" : {
+"data" : {
+"prolog" : {
+
+},
+"main" : {
+"services" : {
+"scheduler" : {
+"fileMode" : "NOMERGE"
+},
+"NetMonTransportServiceInterface" : {
+"service_provider" : "NetMonTransportService",
+"max_fragment_size_words" : 2097152
+}
+},
+"daq" : {
+"max_fragment_size_words" : 2097152,
+"aggregator" : {
+"mpi_buffer_count" : 8,
+"first_event_builder_rank" : 2,
+"event_builder_count" : 2,
+"expected_events_per_bunch" : 1,
+"print_event_store_stats" : true,
+"event_queue_depth" : 2,
+"event_queue_wait_time" : 1,
+"onmon_event_prescale" : 1,
+"xmlrpc_client_list" : ";http://topol.fnal.gov:5205/RPC2,3;http://topol.fnal.gov:5206/RPC2,3;http://topol.fnal.gov:5235/RPC2,4;http://topol.fnal.gov:5236/RPC2,4;http://topol.fnal.gov:5265/RPC2,5;http://topol.fnal.gov:5266/RPC2,5",
+"file_size_MB" : 8000,
+"file_duration" : 0,
+"file_event_count" : 0
+},
+"metrics" : {
+"aggFile" : {
+"metricPluginType" : "file",
+"level" : 3,
+"fileName" : "/tmp/aggregator/agg_%UID%_metrics.log",
+"uniquify" : true
+}
+}
+},
+"source" : {
+"module_type" : "NetMonInput"
+},
+"outputs" : {
+
+},
+"physics" : {
+"analyzers" : {
+
+},
+"producers" : {
+"BuildInfo" : {
+"module_type" : "ArtdaqDemoBuildInfo",
+"instance_name" : "ArtdaqDemo"
+}
+},
+"filters" : {
+"prescaleMod2" : {
+"module_type" : "NthEvent",
+"nth" : 2
+},
+"prescaleMod3" : {
+"module_type" : "NthEvent",
+"nth" : 3
+}
+},
+"p1" : [
+
+],
+"p2" : [
+"BuildInfo"
+],
+"pmod2" : [
+"prescaleMod2"
+],
+"pmod3" : [
+"prescaleMod3"
+]
+},
+"process_name" : "DAQAG"
+}
+},
+"metadata" : {
+"prolog" : {
+"type" : "table",
+"comment" : "#prolog",
+"children" : {
+
+}
+},
+"main" : {
+"type" : "table",
+"comment" : "#main",
+"children" : {
+"services" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"scheduler" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"fileMode" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+},
+"NetMonTransportServiceInterface" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"service_provider" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"max_fragment_size_words" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+}
+},
+"daq" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"max_fragment_size_words" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"aggregator" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"mpi_buffer_count" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"first_event_builder_rank" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"event_builder_count" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"expected_events_per_bunch" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"print_event_store_stats" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : " "
+},
+"event_queue_depth" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"event_queue_wait_time" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"onmon_event_prescale" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"xmlrpc_client_list" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"file_size_MB" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"file_duration" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"file_event_count" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+}
+}
+},
+"metrics" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"aggFile" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"metricPluginType" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"level" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"fileName" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"uniquify" : {
+"type" : "bool",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+}
+}
+}
+},
+"source" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"module_type" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+},
+"outputs" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+
+}
+},
+"physics" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"analyzers" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+
+}
+},
+"producers" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"BuildInfo" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"module_type" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"instance_name" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+}
+},
+"filters" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"prescaleMod2" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"module_type" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"nth" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+}
+}
+},
+"prescaleMod3" : {
+"type" : "table",
+"comment" : " ",
+"children" : {
+"module_type" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+},
+"nth" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+}
+},
+"p1" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " "
+},
+"p2" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " "
+},
+"pmod2" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " "
+},
+"pmod3" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " "
+}
+}
+},
+"process_name" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+},
+"search" : [
+
+],
+"converted" : {
+"guidata" : [
+{
+"type" : "table",
+"name" : "prolog",
+"comment" : "#prolog",
+"children" : [
+
+]
+},
+{
+"type" : "table",
+"name" : "main",
+"comment" : "#main",
+"children" : [
+{
+"type" : "table",
+"name" : "services",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "scheduler",
+"comment" : " ",
+"children" : [
+{
+"type" : "string",
+"name" : "fileMode",
+"comment" : " ",
+"value" : "NOMERGE",
+"annotation" : " "
+}
+]
+},
+{
+"type" : "table",
+"name" : "NetMonTransportServiceInterface",
+"comment" : " ",
+"children" : [
+{
+"type" : "string",
+"name" : "service_provider",
+"comment" : " ",
+"value" : "NetMonTransportService",
+"annotation" : " "
+},
+{
+"type" : "number",
+"name" : "max_fragment_size_words",
+"comment" : " ",
+"value" : 2097152,
+"annotation" : " "
+}
+]
+}
+]
+},
+{
+"type" : "table",
+"name" : "daq",
+"comment" : " ",
+"children" : [
+{
+"type" : "number",
+"name" : "max_fragment_size_words",
+"comment" : " ",
+"value" : 2097152,
+"annotation" : " "
+},
+{
+"type" : "table",
+"name" : "aggregator",
+"comment" : " ",
+"children" : [
+{
+"type" : "number",
+"name" : "mpi_buffer_count",
+"comment" : " ",
+"value" : 8,
+"annotation" : " "
+},
+{
+"type" : "number",
+"name" : "first_event_builder_rank",
+"comment" : " ",
+"value" : 2,
+"annotation" : " "
+},
+{
+"type" : "number",
+"name" : "event_builder_count",
+"comment" : " ",
+"value" : 2,
+"annotation" : " "
+},
+{
+"type" : "number",
+"name" : "expected_events_per_bunch",
+"comment" : " ",
+"value" : 1,
+"annotation" : " "
+},
+{
+"type" : "bool",
+"name" : "print_event_store_stats",
+"comment" : " ",
+"value" : true,
+"annotation" : " "
+},
+{
+"type" : "number",
+"name" : "event_queue_depth",
+"comment" : " ",
+"value" : 2,
+"annotation" : " "
+},
+{
+"type" : "number",
+"name" : "event_queue_wait_time",
+"comment" : " ",
+"value" : 1,
+"annotation" : " "
+},
+{
+"type" : "number",
+"name" : "onmon_event_prescale",
+"comment" : " ",
+"value" : 1,
+"annotation" : " "
+},
+{
+"type" : "string",
+"name" : "xmlrpc_client_list",
+"comment" : " ",
+"value" : ";http://topol.fnal.gov:5205/RPC2,3;http://topol.fnal.gov:5206/RPC2,3;http://topol.fnal.gov:5235/RPC2,4;http://topol.fnal.gov:5236/RPC2,4;http://topol.fnal.gov:5265/RPC2,5;http://topol.fnal.gov:5266/RPC2,5",
+"annotation" : " "
+},
+{
+"type" : "number",
+"name" : "file_size_MB",
+"comment" : " ",
+"value" : 8000,
+"annotation" : " "
+},
+{
+"type" : "number",
+"name" : "file_duration",
+"comment" : " ",
+"value" : 0,
+"annotation" : " "
+},
+{
+"type" : "number",
+"name" : "file_event_count",
+"comment" : " ",
+"value" : 0,
+"annotation" : " "
+}
+]
+},
+{
+"type" : "table",
+"name" : "metrics",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "aggFile",
+"comment" : " ",
+"children" : [
+{
+"type" : "string",
+"name" : "metricPluginType",
+"comment" : " ",
+"value" : "file",
+"annotation" : " "
+},
+{
+"type" : "number",
+"name" : "level",
+"comment" : " ",
+"value" : 3,
+"annotation" : " "
+},
+{
+"type" : "string",
+"name" : "fileName",
+"comment" : " ",
+"value" : "/tmp/aggregator/agg_%UID%_metrics.log",
+"annotation" : " "
+},
+{
+"type" : "bool",
+"name" : "uniquify",
+"comment" : " ",
+"value" : true,
+"annotation" : " "
+}
+]
+}
+]
+}
+]
+},
+{
+"type" : "table",
+"name" : "source",
+"comment" : " ",
+"children" : [
+{
+"type" : "string",
+"name" : "module_type",
+"comment" : " ",
+"value" : "NetMonInput",
+"annotation" : " "
+}
+]
+},
+{
+"type" : "table",
+"name" : "outputs",
+"comment" : " ",
+"children" : [
+
+]
+},
+{
+"type" : "table",
+"name" : "physics",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "analyzers",
+"comment" : " ",
+"children" : [
+
+]
+},
+{
+"type" : "table",
+"name" : "producers",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "BuildInfo",
+"comment" : " ",
+"children" : [
+{
+"type" : "string",
+"name" : "module_type",
+"comment" : " ",
+"value" : "ArtdaqDemoBuildInfo",
+"annotation" : " "
+},
+{
+"type" : "string",
+"name" : "instance_name",
+"comment" : " ",
+"value" : "ArtdaqDemo",
+"annotation" : " "
+}
+]
+}
+]
+},
+{
+"type" : "table",
+"name" : "filters",
+"comment" : " ",
+"children" : [
+{
+"type" : "table",
+"name" : "prescaleMod2",
+"comment" : " ",
+"children" : [
+{
+"type" : "string",
+"name" : "module_type",
+"comment" : " ",
+"value" : "NthEvent",
+"annotation" : " "
+},
+{
+"type" : "number",
+"name" : "nth",
+"comment" : " ",
+"value" : 2,
+"annotation" : " "
+}
+]
+},
+{
+"type" : "table",
+"name" : "prescaleMod3",
+"comment" : " ",
+"children" : [
+{
+"type" : "string",
+"name" : "module_type",
+"comment" : " ",
+"value" : "NthEvent",
+"annotation" : " "
+},
+{
+"type" : "number",
+"name" : "nth",
+"comment" : " ",
+"value" : 3,
+"annotation" : " "
+}
+]
+}
+]
+},
+{
+"type" : "sequence",
+"name" : "p1",
+"comment" : " ",
+"children" : [
+
+]
+},
+{
+"type" : "sequence",
+"name" : "p2",
+"comment" : " ",
+"children" : [
+"BuildInfo"
+]
+},
+{
+"type" : "sequence",
+"name" : "pmod2",
+"comment" : " ",
+"children" : [
+"prescaleMod2"
+]
+},
+{
+"type" : "sequence",
+"name" : "pmod3",
+"comment" : " ",
+"children" : [
+"prescaleMod3"
+]
+}
+]
+},
+{
+"type" : "string",
+"name" : "process_name",
+"comment" : " ",
+"value" : "DAQAG",
+"annotation" : " "
+}
+]
+}
+],
+"changelog" : "notprovided"
+}
+},
+"comments" : [
+
+],
+"origin" : {
+"format" : "fhicl",
+"name" : "notprovided",
+"source" : "fhicl_to_json",
+"timestamp" : "Wed Feb  8 16:14:27 2017",
+"created" : "Wed Feb  8 16:14:27 2017",
+"rawdata" : [
+
+]
+},
+"version" : "version004",
+"entities" : [
+{
+"name" : "@TEST_ENTITY_NAME@",
+"assigned" : "Wed Feb  8 16:14:27 2017"
+},
+{
+"name" : "notprovided",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+],
+"configurations" : [
+{
+"name" : "notprovided",
+"assigned" : "Wed Feb  8 16:14:27 2017"
+}
+],
+"changelog" : "notprovided",
+"bookkeeping" : {
+"isdeleted" : false,
+"isreadonly" : false,
+"updates" : [
+{
+"event" : "addConfiguration",
+"timestamp" : "Wed Feb  8 16:14:27 2017",
+"value" : {
+"name" : "notprovided",
+"assigned" : "Wed Feb  8 16:14:27 2017"
+}
+},
+{
+"event" : "setVersion",
+"timestamp" : "Wed Feb  8 16:14:27 2017",
+"value" : {
+"name" : "version004",
+"assigned" : "Wed Feb  8 16:14:27 2017"
+}
+},
+{
+"event" : "setCollection",
+"timestamp" : "Wed Feb  8 16:14:27 2017",
+"value" : {
+"name" : "artdaq_Aggregator",
+"assigned" : "Wed Feb  8 16:14:27 2017"
+}
+},
+{
+"event" : "addEntity",
+"timestamp" : "Wed Feb  8 16:14:27 2017",
+"value" : {
+"name" : "@TEST_ENTITY_NAME@",
+"assigned" : "Wed Feb  8 16:14:27 2017"
+}
+},
+{
+"event" : "setCollection",
+"timestamp" : "Wed Feb  8 16:14:27 2017",
+"value" : {
+"name" : "artdaq_Aggregator",
+"assigned" : "Wed Feb  8 16:14:27 2017"
+}
+},
+{
+"event" : "addConfiguration",
+"timestamp" : "Wed Feb  8 16:14:30 2017",
+"value" : {
+"name" : "notprovided",
+"assigned" : "Wed Feb  8 16:14:30 2017"
+}
+},
+{
+"event" : "setCollection",
+"timestamp" : "Wed Feb  8 16:14:30 2017",
+"value" : {
+"name" : "artdaq_Aggregator",
+"assigned" : "Wed Feb  8 16:14:30 2017"
+}
+},
+{
+"event" : "addAlias",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "@TEST_ALIAS_NAME@",
+"assigned" : "Mon Feb  8 14:00:30 2016",
+"removed" : "Mon Feb  8 14:00:30 2016"
+}
+},
+{
+"event" : "addConfiguration",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "notprovided",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+},
+{
+"event" : "setVersion",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "version004",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+},
+{
+"event" : "setCollection",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "artdaq_Aggregator",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+},
+{
+"event" : "addEntity",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "notprovided",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+},
+{
+"event" : "setCollection",
+"timestamp" : "Mon Feb  8 14:00:30 2016",
+"value" : {
+"name" : "artdaq_Aggregator",
+"assigned" : "Mon Feb  8 14:00:30 2016"
+}
+}
+],
+"created" : "Wed Feb  8 16:14:27 2017"
+},
+"_id" : {
+"$oid" : "f9b39330ddcb49d4ba07c7e0"
+},
+"collection" : "artdaq_Aggregator",
+"aliases" : {
+"active" : [
+{
+"name" : "@TEST_ALIAS_NAME@",
+"assigned" : "Mon Feb  8 14:00:30 2016",
+"removed" : "Mon Feb  8 14:00:30 2016"
+}
+],
+"history" : [
+
+]
+},
+"runs" : [
+
+],
+"attachments" : [
+
+],
+"configtype" : "notprovided"
+}

@@ -29,7 +29,7 @@ class ovlKeyValueTimeStamp final : public ovlKeyValue {
   std::string& removed();
 
   // overrides
-  std::string to_string() const noexcept override;
+  std::string to_string() const override;
 
   // ops
   result_t operator==(ovlKeyValueTimeStamp const&) const;
@@ -109,7 +109,7 @@ std::string& ovlKeyValueTimeStamp<mask, A, R>::removed() {
 }
 
 template <int mask, bool A, bool R>
-std::string ovlKeyValueTimeStamp<mask, A, R>::to_string() const noexcept {
+std::string ovlKeyValueTimeStamp<mask, A, R>::to_string() const {
   std::ostringstream oss;
   oss << "{";
   oss << quoted_(jsonliteral::name) << ":" << quoted_(name());

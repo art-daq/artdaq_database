@@ -5,54 +5,30 @@
 # chkconfig: 35 85 15
 # description: Mongo is a scalable, document-oriented database.
 # processname: mongod
-# config: /etc/mongod.conf
+# config: /home/pduser/daqsw/databases/config/mongod.conf
+# pidfile: /home/pduser/daqsw/databases/mongod.pid
+MONGO_USER=pduser
+MONGO_GROUP=pduser
+
+daqswdir=/home/${MONGO_USER}
 
 . /etc/rc.d/init.d/functions
 
-if [ -f ${HOME}/databases/init.mongod ]
-then
-    source ${HOME}/databases/init.mongod    
-else
-    echo ${HOME}/databases/init.mongod does not exist
-    return 1
-fi
 
-mongod=$(which mongod)
+source ${daqswdir}/products/setup
+setup mongodb           v3_2_7c         -f Linux64bit+3.10-2.17 -q e10:prof:s41
+#ups active
 
-if [ ! -f ${mongod} ]
-then
-    echo "Mongod is not setup"
-    return 2
-fi
-
-
-ARTDAQ_DATABASE_DATADIR=${HOME}/databases
-MONGO_DIR=${ARTDAQ_DATABASE_DATADIR}/mongo
 
 # NOTE: if you change any OPTIONS here, you get what you pay for:
 # this script assumes all options are in the config file.
-CONFIGFILE="${ARTDAQ_DATABASE_DATADIR}/config/mongod.conf"
-
-if [ ! -f ${CONFIGFILE} ]
-then
-    echo "${ARTDAQ_DATABASE_DATADIR}/config/mongod.conf is missing."
-    return 3
-fi
+CONFIGFILE="${daqswdir}/databases/config/mongod.conf"
 
 OPTIONS=" -f $CONFIGFILE"
 
 mongod=$(which mongod)
 
-MONGO_USER=mongod
-MONGO_GROUP=mongod
-
-# All variables set before this point can be overridden by users, by
-# setting them directly in the SYSCONFIG file. Use this to explicitly
-# override these values, at your own risk.
-SYSCONFIG="/etc/sysconfig/mongod"
-if [ -f "$SYSCONFIG" ]; then
-    . "$SYSCONFIG"
-fi
+mongodlock=${daqswdir}/databases/mongod.lock
 
 # Handle NUMA access to CPUs (SERVER-3574)
 # This verifies the existence of numactl as well as testing that the command works
@@ -65,7 +41,7 @@ else
 fi
 
 # things from mongod.conf get there by mongod reading it
-PIDFILEPATH="`awk -F'[:=]' -v IGNORECASE=1 '/^[[:blank:]]*(processManagement\.)?pidfilepath[[:blank:]]*[:=][[:blank:]]*/{print $2}' \"$CONFIGFILE\" | tr -d \"[:blank:]\\"'\" | awk -F'#' '{print $1}'`"
+PIDFILEPATH=`awk -F'[:=]' -v IGNORECASE=1 '/^[[:blank:]]*(processManagement\.)?pidfilepath[[:blank:]]*[:=][[:blank:]]*/{print $2}' "$CONFIGFILE" | tr -d "[:blank:]\"'" | awk -F'#' '{print $1}'`
 PIDDIR=`dirname $PIDFILEPATH`
 
 start()
@@ -73,13 +49,6 @@ start()
   # Make sure the default pidfile directory exists
   if [ ! -d $PIDDIR ]; then
     install -d -m 0755 -o $MONGO_USER -g $MONGO_GROUP $PIDDIR
-  fi
-
-  # Make sure the pidfile does not exist
-  if [ -f "$PIDFILEPATH" ]; then
-      echo "Error starting mongod. $PIDFILEPATH exists."
-      RETVAL=1
-      return
   fi
 
   # Recommended ulimit values for mongod or mongos
@@ -96,7 +65,7 @@ start()
   daemon --user "$MONGO_USER" --check $mongod "$NUMACTL $mongod $OPTIONS >/dev/null 2>&1"
   RETVAL=$?
   echo
-  [ $RETVAL -eq 0 ] && touch ${ARTDAQ_DATABASE_DATADIR}/var/lock/subsys/mongod
+  [ $RETVAL -eq 0 ] && touch ${mongodlock}
 }
 
 stop()
@@ -105,7 +74,7 @@ stop()
   mongo_killproc "$PIDFILEPATH" $mongod
   RETVAL=$?
   echo
-  [ $RETVAL -eq 0 ] && rm -f ${ARTDAQ_DATABASE_DATADIR}/var/lock/subsys/mongod
+  [ $RETVAL -eq 0 ] && rm -f ${mongodlock}
 }
 
 restart () {
@@ -157,7 +126,7 @@ case "$1" in
     restart
     ;;
   condrestart)
-    [ -f ${ARTDAQ_DATABASE_DATADIR}/var/lock/subsys/mongod ] && restart || :
+    [ -f ${mongodlock} ] && restart || :
     ;;
   status)
     status $mongod

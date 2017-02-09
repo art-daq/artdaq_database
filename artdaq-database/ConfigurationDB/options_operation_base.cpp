@@ -34,7 +34,7 @@ std::string expand_environment_variables(std::string var);
 
 OperationBase::OperationBase(std::string const& process_name) : _process_name{process_name} {}
 
-std::string const& OperationBase::operation() const noexcept {
+std::string const& OperationBase::operation() const {
   confirm(!_operation.empty());
 
   return _operation;
@@ -50,7 +50,7 @@ std::string const& OperationBase::operation(std::string const& operation) {
   return _operation;
 }
 
-std::string const& OperationBase::collection() const noexcept {
+std::string const& OperationBase::collection() const {
   confirm(!_collection_name.empty());
 
   return _collection_name;
@@ -66,7 +66,7 @@ std::string const& OperationBase::collection(std::string const& collection_name)
   return _collection_name;
 }
 
-std::string const& OperationBase::provider() const noexcept {
+std::string const& OperationBase::provider() const {
   confirm(!_provider.empty());
 
   return _provider;
@@ -88,7 +88,7 @@ std::string const& OperationBase::provider(std::string const& provider) {
   return _provider;
 }
 
-data_format_t const& OperationBase::format() const noexcept {
+data_format_t const& OperationBase::format() const {
   confirm(_data_format != data_format_t::unknown);
   return _data_format;
 }
@@ -114,7 +114,7 @@ data_format_t const& OperationBase::format(std::string const& format) {
   return _data_format;
 }
 
-std::string const& OperationBase::queryFilter() const noexcept {
+std::string const& OperationBase::queryFilter() const {
   confirm(!_query_payload.empty());
 
   return _query_payload;
@@ -160,8 +160,7 @@ bpo::options_description OperationBase::makeProgramOptions() const {
 
   opts.add_options()("help,h", "Produce help message");
 
-  opts.add_options()(make_opt_name(apiliteral::option::operation, "o").c_str(), bpo::value<std::string>(),
-                     "Operation");
+  opts.add_options()(make_opt_name(apiliteral::option::operation, "o").c_str(), bpo::value<std::string>(), "Operation");
   opts.add_options()(make_opt_name(apiliteral::option::format, "f").c_str(), bpo::value<std::string>(),
                      "In/Out data format [fhicl, xml, gui, db, or csv]");
   opts.add_options()(make_opt_name(apiliteral::option::collection, "c").c_str(), bpo::value<std::string>(),
@@ -249,18 +248,17 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
 }
 
 void OperationBase::readJsonData(JsonData const& data) {
-  TRACE_(14, "OperationBase::readJsonData() data=<" << data<< ">");
+  TRACE_(14, "OperationBase::readJsonData() data=<" << data << ">");
   confirm(!data.empty());
-  TRACE_(14, "OperationBase::readJsonData() not empty=<" << data<< ">");
-  confirm(data.json_buffer != apiliteral::notprovided);
-
-  TRACE_(14, "OperationBase::readJsonData() object=<" << data<< ">");
+  TRACE_(14, "OperationBase::readJsonData() not empty=<" << data << ">");
+  confirm(data.json_buffer != apiliteral::notprovided);  
+  TRACE_(14, "OperationBase::readJsonData() object=<" << data << ">");
 
   using namespace artdaq::database::json;
   auto filterAST = object_t{};
 
-  if (!JsonReader{}.read(data , filterAST)) {
-    TRACE_(14, "OperationBase: JSON buffer= <" << data<< ">");
+  if (!JsonReader{}.read(data, filterAST)) {
+    TRACE_(14, "OperationBase: JSON buffer= <" << data << ">");
     throw db::invalid_option_exception("OperationBase") << "OperationBase: Unable to read JSON buffer.";
   }
 
@@ -322,14 +320,12 @@ JsonData OperationBase::to_JsonData() const { return {writeJsonData()}; }
 
 std::string OperationBase::to_string() const { return to_JsonData(); }
 
-std::ostream& cf::operator<<(std::ostream& os, OperationBase const& o){
+std::ostream& cf::operator<<(std::ostream& os, OperationBase const& o) {
   os << o.to_string();
   return os;
 }
 
-OperationBase::operator std::string() const{
-  return to_string();
-}
+OperationBase::operator std::string() const { return to_string(); }
 
 //
 void cf::debug::options::OperationBase() {

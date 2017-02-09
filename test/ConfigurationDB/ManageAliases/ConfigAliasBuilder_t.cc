@@ -19,7 +19,7 @@ namespace cfo = cf::options;
 
 namespace bpo = boost::program_options;
 
-using Options = cf::ManageDocumentOperation;
+using Options = cf::ManageAliasesOperation;
 
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::docrecord::JSONDocument;
@@ -34,8 +34,6 @@ namespace database {
 std::string expand_environment_variables(std::string var);
 }
 }
-
-typedef bool (*test_case)(Options const& /*options*/, std::string const& /*file_name*/);
 
 int main(int argc, char* argv[]) try {
 #if 1
@@ -193,6 +191,11 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::FAILURE;
   }
 
+  if(result.second.empty()){
+    std::cout << "Test failed; error message: result is empty." << "\n";
+    return process_exit_code::FAILURE;
+  }
+  
   auto retdoc = std::string{result.second};
 
   std::ifstream is(file_res_name);

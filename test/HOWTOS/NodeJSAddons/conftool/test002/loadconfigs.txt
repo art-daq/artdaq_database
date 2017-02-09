@@ -1,23 +1,23 @@
 source  /products/setup
-setup artdaq_database v1_00_00 -q debug:e9:s21
+setup artdaq_database v1_05_00 -q debug:e10:s41
 
 cd ~/artdaq-demo-base/artdaq-utilities-database/test/HOWTOS/NodeJSAddons/conftool/test002/
 
-conftool2 -o load -c BoardReader_DAQ_HOST_001.flt.mongo.json -j BoardReader_DAQ_HOST_001.db.mongo.json
-conftool2 -o load -c BoardReader_DAQ_HOST_002.flt.mongo.json -j BoardReader_DAQ_HOST_002.db.mongo.json
+conftool --searchquery=BoardReader_DAQ_HOST_001.flt.mongo.json -x BoardReader_DAQ_HOST_001.db.mongo.json
+conftool --searchquery=BoardReader_DAQ_HOST_002.flt.mongo.json -x BoardReader_DAQ_HOST_002.db.mongo.json
 
-conftool2 -o load -c EventBuilder_DAQ_HOST_001.flt.mongo.json -j EventBuilder_DAQ_HOST_001.db.mongo.json
-conftool2 -o load -c EventBuilder_DAQ_HOST_002.flt.mongo.json -j EventBuilder_DAQ_HOST_002.db.mongo.json
+conftool --searchquery=EventBuilder_DAQ_HOST_001.flt.mongo.json -x EventBuilder_DAQ_HOST_001.db.mongo.json
+conftool --searchquery=EventBuilder_DAQ_HOST_002.flt.mongo.json -x EventBuilder_DAQ_HOST_002.db.mongo.json
 
-conftool2 -o load -c Aggregator_DAQ_HOST_001.flt.mongo.json -j Aggregator_DAQ_HOST_001.db.mongo.json
-conftool2 -o load -c Aggregator_DAQ_HOST_002.flt.mongo.json -j Aggregator_DAQ_HOST_002.db.mongo.json
+conftool --searchquery=Aggregator_DAQ_HOST_001.flt.mongo.json -x Aggregator_DAQ_HOST_001.db.mongo.json
+conftool --searchquery=Aggregator_DAQ_HOST_002.flt.mongo.json -x Aggregator_DAQ_HOST_002.db.mongo.json
 
 
-conftool2 -o load -c BoardReader_DAQ_HOST_001.flt.filesystem.json -j BoardReader_DAQ_HOST_001.db.filesystem.json
-conftool2 -o load -c BoardReader_DAQ_HOST_002.flt.filesystem.json -j BoardReader_DAQ_HOST_002.db.filesystem.json
+conftool --searchquery=BoardReader_DAQ_HOST_001.flt.filesystem.json -x BoardReader_DAQ_HOST_001.db.filesystem.json
+conftool --searchquery=BoardReader_DAQ_HOST_002.flt.filesystem.json -x BoardReader_DAQ_HOST_002.db.filesystem.json
 
-conftool2 -o load -c EventBuilder_DAQ_HOST_001.flt.filesystem.json -j EventBuilder_DAQ_HOST_001.db.filesystem.json
-conftool2 -o load -c EventBuilder_DAQ_HOST_002.flt.filesystem.json -j EventBuilder_DAQ_HOST_002.db.filesystem.json
+conftool --searchquery=EventBuilder_DAQ_HOST_001.flt.filesystem.json -x EventBuilder_DAQ_HOST_001.db.filesystem.json
+conftool --searchquery=EventBuilder_DAQ_HOST_002.flt.filesystem.json -x EventBuilder_DAQ_HOST_002.db.filesystem.json
 
-conftool2 -o load -c Aggregator_DAQ_HOST_001.flt.filesystem.json -j Aggregator_DAQ_HOST_001.db.filesystem.json
-conftool2 -o load -c Aggregator_DAQ_HOST_002.flt.filesystem.json -j Aggregator_DAQ_HOST_002.db.filesystem.json
+conftool --searchquery=Aggregator_DAQ_HOST_001.flt.filesystem.json -x Aggregator_DAQ_HOST_001.db.filesystem.json
+conftool --searchquery=Aggregator_DAQ_HOST_002.flt.filesystem.json -x Aggregator_DAQ_HOST_002.db.filesystem.json
