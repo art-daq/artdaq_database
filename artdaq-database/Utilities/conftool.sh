@@ -1,98 +1,98 @@
-#!/bin/bash
+#!/bin/bash                                                                                                                   
+                                                                                                                              
+export artdaq_database_version=v1_04_04                                                                                                
+export config_editor_version=v1_00_03                                                                                                  
+                                                                                                                                       
+conftool_log_dir=${ARTDAQ_DATABASE_LOGS}                                                                                               
+                                                                                                                                       
+function show_help(){                                                                                                                             
+printf "\n\nUsage: $(basename $0) [OPERATION] [OPTION]...\n"                                                                                      
+printf " -h [ --help ]              Produce help message\n"                                                                                                   
+printf " -o [ --operation ] arg     Database operation [import_global_config, export_global_config, or list_global_configs]\n"                                
+printf " -g [ --configuration ] arg Global configuration name [globConfig001]\n"                                                                                            
+printf " -v [ --version ] arg       Configuration version [ver001]\n"                                                                                                       
+printf " -s [ --source ] arg        Configuration directory name[config]\n"                                                                                                 
+printf "Example: \n\tconftool.sh -o export_global_config -g demo003 -s newconfig"                                                                                           
+printf "\n\tconftool.sh -o import_global_config -g demo004 -v ver004 -s config"                                                                                                               
+printf "\n\tconftool.sh -o list_global_configs -g \"de*\" "                                                                                                                                   
+printf "\n\tconftool.sh -o list_global_configs "                                                                                                                                              
+                                                                                                                                                                                              
+printf "\n"                                                                                                                                                                                   
+printf "\nLogs in ${conftool_log_dir}\n"                                                                                                                                                      
+ls -t  ${conftool_log_dir} |head -3                                                                                                                                                           
+echo                                                                                                                                                                                          
+}                                                                                                                                                                                                                  
+                                                                                                                                                                                                                   
+#unset ARTDAQ_DATABASE_URI                                                                                                                                                                                         
+                                                                                                                                                                                                                                             
+yes=yes                                                                                                                                                                                                                                      
+no=no                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                             
+                                                                                                                                                                                                                                             
+function read_command_line_options() {                                                                                                                                                                                                       
+  show_help_present=$no                                                                                                                                                                                                                      
+  global_config_name_present=$no                                                                                                                                                                                                             
+  source_dir_present=$no                                                                                                                                                                                                                     
+  version_name_present=$no                                                                                                                                                                                                                   
+  enable_debug_present=$no                                                                                                                                                                                                                   
+                                                                                                                                                                                                                                             
+  getopt --test > /dev/null                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                               
+  if [[ $? -ne 4 ]]; then                                                                                                                                                                                                                                                      
+    echo "\"getopt\" is not working."                                                                                                                                                                                                                                          
+    return 1                                                                                                                                                                                                                                                                   
+  fi                                                                                                                                                                                                                                                                           
+                                                                                                                                                                                                                                                                               
+  PARSED=$(getopt --options     "o:g:s:v:h" \                                                                                                                                                                                                                                  
+                  --longoptions "operation:,configuration:,version:,help" \                                                                                                                                                                                                    
+                  --name "$0" -- "$@")                                                                                                                                                                                                                                         
+                                                                                                                                                                                                                                                                               
+  if [[ $? -ne 0 ]]; then                                                                                                                                                                                                                                                      
+      echo "\"getopt\" returned errors."                                                                                                                                                                                                                                                                                                                                                    
+      return  2                                                                                                                                                                                                                                                                                                                                                                             
+  fi                                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                            
+  eval set -- "$PARSED"                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                            
+  while true; do                                                                                                                                                                                                                                                                                                                                                                            
+      case "$1" in                                                                                                                                                                                                                                                                                                                                                                          
+          -g|--configuration)                                                                                                                                                                                                                                                                                                                                                               
+              global_config_name="$2"                                                                                                                                                                                                                                                                                                                                                       
+              global_config_name_present=$yes                                                                                                                                                                                                                                                                                                                                               
+              shift 2                                                                                                                                                                                                                                                                                                                                                                       
+              ;;                                                                                                                                                                                                                                                                                                                                                                            
+          -v|--version)                                                                                                                                                                                                                                                                                                                                                                     
+              version_name="$2"                                                                                                                                                                                                                                                                                                                                                             
+              version_name_present=$yes                                                                                                                                                                                                                                                                                                                                                     
+              shift 2                                                                                                                                                                                                                                                                                                                                                                       
+              ;;                                                                                                                                                                                                                                                                                                                                                                            
+          -s|--source)                                                                                                                                                                                                                                                                                                                                                                      
+              source_dir="$2"                                                                                                                                                                                                                                                                                                                                                               
+              source_dir_present=$yes                                                                                                                                                                                                                                                                                                                                                       
+              shift 2                                                                                                                                                                                                                                                                                                                                                                       
+              ;;                                                                                                                                                                                                                                                                                                                                                                            
+          -o|--operation)                                                                                                                                                                                                                                                                                                                                                                   
+              operation_name="$2"                                                                                                                                                                                                                                                                                                                                                           
+              operation_name_present=$yes                                                                                                                                                                                                                                                                                                                                                   
+              shift 2
+              ;;
 
-export artdaq_database_version=v1_04_04
-export config_editor_version=v1_00_03
-
-conftool_log_dir=${ARTDAQ_DATABASE_LOGS}
-
-function show_help(){
-printf "\n\nUsage: $(basename $0) [OPERATION] [OPTION]...\n"
-printf " -h [ --help ]              Produce help message\n"
-printf " -o [ --operation ] arg     Database operation [import_global_config, export_global_config, or list_global_configs]\n"
-printf " -g [ --configuration ] arg Global configuration name [globConfig001]\n"
-printf " -v [ --version ] arg       Configuration version [ver001]\n"
-printf " -s [ --source ] arg        Configuration directory name[config]\n"
-printf "Example: \n\tconftool.sh -o export_global_config -g demo003 -s newconfig"
-printf "\n\tconftool.sh -o import_global_config -g demo004 -v ver004 -s config"
-printf "\n\tconftool.sh -o list_global_configs -g \"de*\" "
-printf "\n\tconftool.sh -o list_global_configs "
-
-printf "\n"
-printf "\nLogs in ${conftool_log_dir}\n"
-ls -t  ${conftool_log_dir} |head -3
-echo
-}
-
-#unset ARTDAQ_DATABASE_URI
-
-yes=yes
-no=no
-
-
-function read_command_line_options() {
-  show_help_present=$no
-  global_config_name_present=$no
-  source_dir_present=$no
-  version_name_present=$no
-  enable_debug_present=$no
-
-  getopt --test > /dev/null
-  
-  if [[ $? -ne 4 ]]; then
-    echo "\"getopt\" is not working."
-    return 1
-  fi
-  
-  PARSED=$(getopt --options     "o:g:s:v:h" \
-		  --longoptions "operation:,configuration:,version:,help" \
-		  --name "$0" -- "$@")
-
-  if [[ $? -ne 0 ]]; then
-      echo "\"getopt\" returned errors."
-      return  2
-  fi
-
-  eval set -- "$PARSED"
-
-  while true; do
-      case "$1" in
-	  -g|--configuration)
-	      global_config_name="$2"
-	      global_config_name_present=$yes
-	      shift 2
-	      ;;
-	  -v|--version)
-	      version_name="$2"
-	      version_name_present=$yes
-	      shift 2
-	      ;;
-	  -s|--source)
-	      source_dir="$2"
-	      source_dir_present=$yes
-	      shift 2
-	      ;;
-	  -o|--operation)
-	      operation_name="$2"
-	      operation_name_present=$yes
-	      shift 2
-	      ;;
-
-	  -d|--debug)
-	      enable_debug_present=$yes
-	      shift
-	      ;;
-	  -h|--help)
-	      show_help_present=$yes
-	      shift
-	      ;;
-	      
-	  --)
-	      shift
-	      break
-	      ;;
-   	   *)
-	      return 3
-	      ;;
+          -d|--debug)
+              enable_debug_present=$yes
+              shift
+              ;;
+          -h|--help)
+              show_help_present=$yes
+              shift
+              ;;
+              
+          --)
+              shift
+              break
+              ;;
+           *)
+              return 3
+              ;;
       esac
   done
   
@@ -210,7 +210,7 @@ function export_global_config()
   return 3
  fi
  
- conftool -o globalconfload -d filesystem -f gui -g ${global_config_name} -r ${tmp_file_name}.out
+ conftool -o globalconfload -f gui -g ${global_config_name} -x ${tmp_file_name}.out
  result_code=$? 
  if [[  $result_code -gt 0 ]]; then 
     printf "\nError: Failed to export config data"
@@ -269,7 +269,7 @@ function import_global_config()
 
  tar cjf - ${config_dir}/*  -C ${config_dir} |base64 --wrap=0 > ${tmp_file_name}
 
- conftool -o globalconfstore -d filesystem -f origin -v ${version_name} -g ${global_config_name} -s ${tmp_file_name} -x ~/result.json
+ conftool -o globalconfstore -f origin -v ${version_name} -g ${global_config_name} -s ${tmp_file_name} -x ~/result.json
  result_code=$? 
  if [[  $result_code -gt 0 ]]; then 
     printf "\nError: Failed to import config data"

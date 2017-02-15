@@ -15,6 +15,8 @@ namespace database {
 namespace configuration {
 
 namespace db = artdaq::database;
+namespace jsonliteral = db::dataformats::literal;
+
 namespace cf = db::configuration;
 namespace impl = cf::opts;
 
@@ -166,7 +168,7 @@ struct ConfigurationInterface final {
 
         for (auto const search : searches) {
           auto const& query = boost::get<jsn::object_t>(search).at(jsonliteral::query);
-          auto const& filter = boost::get<jsn::object_t>(query).at(apiliteral::filterx);
+          auto const& filter = boost::get<jsn::object_t>(query).at(jsonliteral::filter);
           auto const& version =
               boost::get<std::string>(boost::get<jsn::object_t>(filter).at(apiliteral::filter::version));
           returnList.emplace_back(version);
@@ -216,9 +218,9 @@ struct ConfigurationInterface final {
 
         for (auto const search : searches) {
           auto const& query = boost::get<jsn::object_t>(search).at(jsonliteral::query);
-          auto const& filter = boost::get<jsn::object_t>(query).at(apiliteral::filterx);
+          auto const& filter = boost::get<jsn::object_t>(query).at(jsonliteral::filter);
           auto const& configuration =
-              boost::get<std::string>(boost::get<jsn::object_t>(filter).at(apiliteral::filter::configuration));
+              boost::get<std::string>(boost::get<jsn::object_t>(filter).at(apiliteral::filter::configurations));
           returnSet.insert(configuration);
         }
       } catch (std::exception const& e) {
@@ -248,9 +250,9 @@ struct ConfigurationInterface final {
     auto to_VersionInfo = [](auto const& query) {
       auto const& configuration =
           boost::get<std::string>(boost::get<jsn::object_t>(query).at(apiliteral::option::collection));
-      auto const& filter = boost::get<jsn::object_t>(query).at(apiliteral::filterx);
+      auto const& filter = boost::get<jsn::object_t>(query).at(jsonliteral::filter);
       auto const& version = boost::get<std::string>(boost::get<jsn::object_t>(filter).at(apiliteral::filter::version));
-      auto const& entity = boost::get<std::string>(boost::get<jsn::object_t>(filter).at(apiliteral::filter::entity));
+      auto const& entity = boost::get<std::string>(boost::get<jsn::object_t>(filter).at(apiliteral::filter::entities));
       return VersionInfo{configuration, version, entity};
     };
 
@@ -348,12 +350,12 @@ struct ConfigurationInterface final {
       // op[apiliteral::option::provider] = _database_provider;
       op[apiliteral::option::format] = to_string(data_format_t::gui);
       op[apiliteral::option::operation] = std::string{apiliteral::operation::assignconfig};
-      op[apiliteral::filterx] = jsn::object_t{};
+      op[jsonliteral::filter] = jsn::object_t{};
 
-      auto& filter = boost::get<jsn::object_t>(op[apiliteral::filterx]);
+      auto& filter = boost::get<jsn::object_t>(op[jsonliteral::filter]);
 
       filter[apiliteral::filter::version] = versionInfo.version;
-      filter[apiliteral::filter::entity] = versionInfo.entity;
+      filter[apiliteral::filter::entities] = versionInfo.entity;
 
       operations.push_back(op);
     }
