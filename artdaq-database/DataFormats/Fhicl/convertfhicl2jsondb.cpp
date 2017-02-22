@@ -1,9 +1,9 @@
 #include "artdaq-database/DataFormats/common.h"
 
-
-#include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
 #include "artdaq-database/DataFormats/Fhicl/convertfhicl2jsondb.h"
 #include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
+#include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
+#include "artdaq-database/SharedCommon/printStackTrace.h"
 
 #include <boost/variant/get.hpp>
 #include <cmath>
@@ -150,56 +150,18 @@ fcl2jsondb::operator datapair_t() try {
     }
     case ::fhicl::SEQUENCE: {
       pair.data.value = jsn::array_t();
+      pair.metadata_<jsn::object_t>()[literal::children] = jsn::object_t();
+
       auto& tmpDataArray = pair.data_<jsn::array_t>();
+      auto& tmpMetadataObject = boost::get<jsn::object_t>(pair.metadata_<jsn::object_t>()[literal::children]);
+
+      int idx = 0;
 
       for (auto const& tmpVal : fcl_value::sequence_t(value)) {
-        if (tmpVal.tag == ::fhicl::SEQUENCE) {
-          tmpDataArray.push_back(jsn::array_t{});
-          auto& subDataArray = boost::get<jsn::array_t>(tmpDataArray.back());
-          for (auto const& subTmpVal : fcl_value::sequence_t(tmpVal)) {
-            switch (subTmpVal.tag) {
-              case ::fhicl::UNKNOWN:
-              case ::fhicl::NIL:
-              case ::fhicl::STRING: {
-                subDataArray.push_back(dequote(fcl_value::atom_t(subTmpVal)));
-                break;
-              }
-              case ::fhicl::BOOL: {
-                bool boolean;
-                std::istringstream(fcl_value::atom_t(subTmpVal)) >> std::boolalpha >> boolean;
-                subDataArray.push_back(boolean);
-                break;
-              }
-              case ::fhicl::NUMBER: {
-                std::string str = fcl_value::atom_t(subTmpVal);
-
-                if (fcl::isDouble(str)) {
-                  auto dbl = boost::lexical_cast<double>(str);
-
-                  if (std::fmod(dbl, static_cast<decltype(dbl)>(1.0)) == 0.0)
-                    subDataArray.push_back(int(dbl));
-                  else
-                    subDataArray.push_back(dbl);
-                } else {
-                  subDataArray.push_back(boost::lexical_cast<int>(str));
-                }
-                break;
-              }
-              case ::fhicl::COMPLEX: {
-                subDataArray.push_back(dequote(fcl_value::atom_t(subTmpVal)));
-                break;
-              }
-              case ::fhicl::TABLEID:
-              case ::fhicl::TABLE:
-              case ::fhicl::SEQUENCE: {
-                subDataArray.push_back(subTmpVal.to_string());
-                break;
-              }
-            }
-          }
-        } else {
-          tmpDataArray.push_back(dequote(fcl_value::atom_t(tmpVal)));
-        }
+        fhicl_key_value_pair_t kvp = std::make_pair(std::to_string(idx++), tmpVal);
+        datapair_t pair = std::move(fcl2jsondb(std::make_tuple(kvp, self, comments, opts)));
+        tmpDataArray.push_back(std::move(pair.first.value));
+        tmpMetadataObject.push_back(std::move(pair.second));
       }
 
       break;
@@ -240,7 +202,8 @@ fcl2jsondb::operator datapair_t() try {
   throw ::fhicl::exception(::fhicl::cant_insert, self.first) << e.what();
 }
 
-json2fcldb::json2fcldb(args_tuple_t args) : self{std::get<0>(args)}, parent{std::get<1>(args)}, opts{std::get<2>(args)} {}
+json2fcldb::json2fcldb(args_tuple_t args)
+    : self{std::get<0>(args)}, parent{std::get<1>(args)}, opts{std::get<2>(args)} {}
 
 json2fcldb::operator fcl::value_t() try {
   auto const& self_value = std::get<1>(self);
@@ -253,9 +216,13 @@ json2fcldb::operator fcl::value_t() try {
     return fcl::value_t(unwrap(self_value).value_as<const double>());
   } else if (self_value.type() == typeid(std::string)) {
     return fcl::value_t(unwrap(self_value).value_as<const std::string>());
+  }else if (self_value.type() == typeid(jsn::object_t)) {    
+    return fcl::value_t(operator fcl::atom_t().value);
+  }else if (self_value.type() == typeid(jsn::array_t)) {    
+    return fcl::value_t(operator fcl::atom_t().value);
   }
 
-  return fcl::value_t(literal::unknown);
+  return fcl::value_t(std::string(literal::unknown)+::debug::demangle(self_value.type().name()));
 } catch (std::exception const&) {
   throw;
 }
@@ -331,34 +298,16 @@ json2fcldb::operator fcl::atom_t() try {
 
       try {
         auto const& values = boost::get<jsn::array_t>(self_data);
+        auto const& children = boost::get<jsn::object_t>(metadata_object.at(literal::children));
 
+        int idx = 0;
         for (auto const& tmpVal : values) {
-          if (tmpVal.type() == typeid(jsn::array_t)) {
-            sequence.push_back(fcl::value_t(fcl::sequence_t()));
-
-            auto& sub_sequence = unwrap(sequence.back()).value_as<fcl::sequence_t>();
-
-            auto const& sub_values = boost::get<jsn::array_t>(tmpVal);
-
-            for (auto const& subTmpVal : sub_values) {
-              if (subTmpVal.type() == typeid(std::string)) {
-                sub_sequence.push_back(fcl::value_t(boost::get<std::string>(subTmpVal)));
-              } else if (subTmpVal.type() == typeid(bool)) {
-                sub_sequence.push_back(fcl::value_t(boost::get<bool>(subTmpVal)));
-              } else if (subTmpVal.type() == typeid(int)) {
-                sub_sequence.push_back(fcl::value_t(boost::get<int>(subTmpVal)));
-              } else if (subTmpVal.type() == typeid(double)) {
-                sub_sequence.push_back(fcl::value_t(boost::get<double>(subTmpVal)));
-              }
-            }
-          } else {
-            valuetuple_t value_tuple = std::forward_as_tuple(self_key, tmpVal, self_metadata);
-            sequence.push_back(json2fcldb(std::make_tuple(value_tuple, self, opts)));
-          }
+          auto datakey = std::to_string(idx++);
+          valuetuple_t value_tuple = std::forward_as_tuple(datakey, tmpVal, children.at(datakey));
+          sequence.push_back(json2fcldb(std::make_tuple(value_tuple, self, opts)));
         }
       } catch (std::out_of_range const&) {
       }
-
       break;
     }
     case ::fhicl::TABLE: {

@@ -282,7 +282,19 @@
 "SelectEvents" : {
 "type" : "sequence",
 "comment" : " ",
+"annotation" : " ",
+"children" : {
+"0" : {
+"type" : "string",
+"comment" : " ",
 "annotation" : " "
+},
+"1" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
 }
 }
 }
@@ -349,22 +361,46 @@
 "p1" : {
 "type" : "sequence",
 "comment" : " ",
-"annotation" : " "
+"annotation" : " ",
+"children" : {
+
+}
 },
 "pmod2" : {
 "type" : "sequence",
 "comment" : " ",
+"annotation" : " ",
+"children" : {
+"0" : {
+"type" : "string",
+"comment" : " ",
 "annotation" : " "
+}
+}
 },
 "pmod3" : {
 "type" : "sequence",
 "comment" : " ",
+"annotation" : " ",
+"children" : {
+"0" : {
+"type" : "string",
+"comment" : " ",
 "annotation" : " "
+}
+}
 },
 "my_output_modules" : {
 "type" : "sequence",
 "comment" : " ",
+"annotation" : " ",
+"children" : {
+"0" : {
+"type" : "string",
+"comment" : " ",
 "annotation" : " "
+}
+}
 }
 }
 },
@@ -390,7 +426,111 @@
 "fragment_type_map" : {
 "type" : "sequence",
 "comment" : " ",
+"annotation" : " ",
+"children" : {
+"0" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " ",
+"children" : {
+"0" : {
+"type" : "number",
+"comment" : " ",
 "annotation" : " "
+},
+"1" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+},
+"1" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " ",
+"children" : {
+"0" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"1" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+},
+"2" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " ",
+"children" : {
+"0" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"1" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+},
+"3" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " ",
+"children" : {
+"0" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"1" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+},
+"4" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " ",
+"children" : {
+"0" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"1" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+},
+"5" : {
+"type" : "sequence",
+"comment" : " ",
+"annotation" : " ",
+"children" : {
+"0" : {
+"type" : "number",
+"comment" : " ",
+"annotation" : " "
+},
+"1" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : " "
+}
+}
+}
+}
 }
 }
 },

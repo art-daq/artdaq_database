@@ -58,17 +58,18 @@ std::string dbfs::mkdir(std::string const& d) {
     }
   }
 
-  auto perms = boost::filesystem::perms::add_perms | boost::filesystem::perms::owner_write | boost::filesystem::perms::owner_read;
 
   ec.clear();
 
-  boost::filesystem::permissions(path, perms, ec);
+/*
+ auto perms = boost::filesystem::perms::add_perms | boost::filesystem::perms::owner_write | boost::filesystem::perms::owner_read;
+ boost::filesystem::permissions(path, perms, ec);
 
   if (ec != boost::system::errc::success) {
     TRACE_(11, "StorageProvider::FileSystemDB Failed enforcing directory permissions for path=<" << dir << "> error code=" << ec.message());
     throw runtime_error("FileSystemDB") << "Failed enforcing directory permissions for path=<" << dir << "> error code=" << ec.message();
   }
-
+*/
   return dir;
 }
 

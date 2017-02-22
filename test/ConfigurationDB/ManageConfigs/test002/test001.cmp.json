@@ -1,6 +1,32 @@
 {
    "search":[
       {
+         "name":"@TEST_CONFIGURATION_NAME@:test005",
+         "query":{
+            "collection":"testManageConfigs_eventbuilder",
+            "dbprovider":"@TEST_DBPROVIDER@",
+            "dataformat":"gui",
+            "operation":"load",
+            "filter":{
+               "configurations.name":"@TEST_CONFIGURATION_NAME@",
+               "entities.name":"test005"
+            }
+         }
+      },
+      {
+         "name":"@TEST_CONFIGURATION_NAME@:test006",
+         "query":{
+            "collection":"testManageConfigs_eventbuilder",
+            "dbprovider":"@TEST_DBPROVIDER@",
+            "dataformat":"gui",
+            "operation":"load",
+            "filter":{
+               "configurations.name":"@TEST_CONFIGURATION_NAME@",
+               "entities.name":"test006"
+            }
+         }
+      },   
+      {
          "name":"@TEST_CONFIGURATION_NAME@:test001",
          "query":{
             "collection":"testManageConfigs_aggregator",
@@ -51,32 +77,7 @@
                "entities.name":"test004"
             }
          }
-      },
-      {
-         "name":"@TEST_CONFIGURATION_NAME@:test005",
-         "query":{
-            "collection":"testManageConfigs_eventbuilder",
-            "dbprovider":"@TEST_DBPROVIDER@",
-            "dataformat":"gui",
-            "operation":"load",
-            "filter":{
-               "configurations.name":"@TEST_CONFIGURATION_NAME@",
-               "entities.name":"test005"
-            }
-         }
-      },
-      {
-         "name":"@TEST_CONFIGURATION_NAME@:test006",
-         "query":{
-            "collection":"testManageConfigs_eventbuilder",
-            "dbprovider":"@TEST_DBPROVIDER@",
-            "dataformat":"gui",
-            "operation":"load",
-            "filter":{
-               "configurations.name":"@TEST_CONFIGURATION_NAME@",
-               "entities.name":"test006"
-            }
-         }
       }
+
    ]
 }
