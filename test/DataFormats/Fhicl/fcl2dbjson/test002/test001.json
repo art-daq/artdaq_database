@@ -249,7 +249,19 @@
 "SelectEvents" : {
 "type" : "sequence",
 "comment" : "#Failure 5 not a satom ",
+"annotation" : " ",
+"children" : {
+"0" : {
+"type" : "string",
+"comment" : "#Failure 5 not a satom ",
 "annotation" : " "
+},
+"1" : {
+"type" : "string",
+"comment" : "#Failure 5 not a satom ",
+"annotation" : " "
+}
+}
 }
 }
 }
@@ -302,17 +314,38 @@
 "pmod2" : {
 "type" : "sequence",
 "comment" : " ",
+"annotation" : " ",
+"children" : {
+"0" : {
+"type" : "string",
+"comment" : " ",
 "annotation" : " "
+}
+}
 },
 "pmod3" : {
 "type" : "sequence",
 "comment" : "#Failure 2 not a satom ",
+"annotation" : " ",
+"children" : {
+"0" : {
+"type" : "string",
+"comment" : "#Failure 2 not a satom ",
 "annotation" : " "
+}
+}
 },
 "my_output_modules" : {
 "type" : "sequence",
 "comment" : " ",
+"annotation" : " ",
+"children" : {
+"0" : {
+"type" : "string",
+"comment" : " ",
 "annotation" : " "
+}
+}
 }
 }
 },
