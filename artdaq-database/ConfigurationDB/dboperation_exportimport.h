@@ -13,6 +13,7 @@ using artdaq::database::result_t;
 namespace opts {
 result_t export_configuration(ManageDocumentOperation const& /*options*/) noexcept;
 result_t import_configuration(ManageDocumentOperation const& /*options*/) noexcept;
+
 result_t export_database(ManageDocumentOperation const& /*options*/) noexcept;
 result_t import_database(ManageDocumentOperation const& /*options*/) noexcept;
 
@@ -26,8 +27,10 @@ result_t read_configuration(std::string const& /*task_payload*/, std::string& /*
 
 result_t export_configuration(std::string const& /*task_payload*/) noexcept;
 result_t import_configuration(std::string const& /*task_payload*/) noexcept;
+
 result_t export_database(std::string const& /*task_payload*/) noexcept;
 result_t import_database(std::string const& /*task_payload*/) noexcept;
+
 result_t export_collection(std::string const& /*task_payload*/) noexcept;
 result_t import_collection(std::string const& /*task_payload*/) noexcept;
 }

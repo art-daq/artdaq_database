@@ -12,8 +12,9 @@
 #include "artdaq-database/DataFormats/Json/json_common.h"
 #include "artdaq-database/DataFormats/shared_literals.h"
 
-#include "artdaq-database/ConfigurationDB/options_operations.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
+
+#include "artdaq-database/ConfigurationDB/options_operations.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -59,10 +60,6 @@ void read_document(ManageDocumentOperation const&, std::string&);
 
 void export_configuration(ManageDocumentOperation const&, std::string&);
 void import_configuration(ManageDocumentOperation const&, std::string&);
-void export_database(ManageDocumentOperation const&, std::string&);
-void import_database(ManageDocumentOperation const&, std::string&);
-void export_collection(ManageDocumentOperation const&, std::string&);
-void import_collection(ManageDocumentOperation const&, std::string&);
 
 }  // namespace detail
 }  // namespace configuration
@@ -80,14 +77,7 @@ result_t cfd::read_document_file(ManageDocumentOperation const& options, std::st
 
   detail::read_document(options, test_document);
 
-  if (!mkdirfile(file_out_name))
-    throw runtime_error("read_document_file") << "read_document_file: Unable to create a directory path for "
-                                                 "writing a config file file="
-                                              << file_out_name;
-
-  std::ofstream os(file_out_name.c_str());
-  std::copy(test_document.begin(), test_document.end(), std::ostream_iterator<char>(os));
-  os.close();
+  if (!write_buffer_to_file(test_document, file_out_name)) return Failure();
 
   return Success();
 } catch (...) {
@@ -99,9 +89,9 @@ result_t cfd::write_document_file(ManageDocumentOperation const& options, std::s
 
   using namespace artdaq::database::configuration::json;
 
-  std::ifstream is(file_src_name);
-  auto test_document = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-  is.close();
+  auto test_document = std::string{};
+
+  if (!read_buffer_from_file(test_document, file_src_name)) return Failure();
 
   detail::write_document(options, test_document);
 
@@ -136,21 +126,6 @@ void cfd::import_configuration(ManageDocumentOperation const&, std::string&) {
   throw runtime_error("import_configuration") << "import_configuration: is not implemented";
 }
 
-void cfd::export_database(ManageDocumentOperation const&, std::string&) {
-  throw runtime_error("export_database") << "export_database: is not implemented";
-}
-
-void cfd::import_database(ManageDocumentOperation const&, std::string&) {
-  throw runtime_error("import_database") << "import_database: is not implemented";
-}
-
-void cfd::export_collection(ManageDocumentOperation const&, std::string&) {
-  throw runtime_error("export_collection") << "export_collection: is not implemented";
-}
-
-void cfd::import_collection(ManageDocumentOperation const&, std::string&) {
-  throw runtime_error("import_collection") << "import_collection: is not implemented";
-}
 
 void cftd::ExportImport() {
   TRACE_CNTL("name", TRACE_NAME);

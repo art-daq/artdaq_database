@@ -2,6 +2,7 @@
 #include "artdaq-database/SharedCommon/helper_functions.h"
 #include "artdaq-database/SharedCommon/shared_exceptions.h"
 
+#include <sys/utsname.h>
 #include <wordexp.h>
 #include <fstream>
 #include <regex>
@@ -37,6 +38,28 @@ std::string db::timestamp() {
   if (useFakeTime()) return "Mon Feb  8 14:00:30 2016";
 
   return result;
+}
+
+std::string db::unamejson() {
+  struct utsname thisuname;
+  if (uname(&thisuname) == -1) {
+    return "{}";
+  } else {
+    std::ostringstream oss;
+    oss << "{";
+    oss << "sysname"_quoted
+        << ":" << quoted_(thisuname.sysname) << ",";
+    oss << "nodename"_quoted
+        << ":" << quoted_(thisuname.nodename) << ",";
+    oss << "release"_quoted
+        << ":" << quoted_(thisuname.release) << ",";
+    oss << "version"_quoted
+        << ":" << quoted_(thisuname.version) << ",";
+    oss << "machine"_quoted
+        << ":" << quoted_(thisuname.machine);
+    oss << "}";
+    return oss.str();
+  }
 }
 
 std::string db::quoted_(std::string const& text) { return "\"" + text + "\""; }
@@ -113,7 +136,7 @@ std::string db::expand_environment_variables(std::string var) {
   for (size_t i = 0; i < p.we_wordc; i++) oss << w[i] << "/";
 
   ::wordfree(&p);
-
+  
   return oss.str();
 }
 

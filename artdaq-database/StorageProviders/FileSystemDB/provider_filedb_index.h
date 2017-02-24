@@ -43,12 +43,14 @@ class SearchIndex final {
 
  private:
   void _addVersion(object_id_t const&, std::string const&);
+  void _addId(object_id_t const&);
   void _addConfiguration(object_id_t const&, std::string const&);
   void _addEntity(object_id_t const&, std::string const&);
   void _addVersionAlias(object_id_t const&, std::string const&);
   void _addRun(object_id_t const&, std::string const&);
 
   void _removeVersion(object_id_t const&, std::string const&);
+  void _removeId(object_id_t const&);
   void _removeConfiguration(object_id_t const&, std::string const&);
   void _removeEntity(object_id_t const&, std::string const&);
   void _removeVersionAlias(object_id_t const&, std::string const&);
@@ -62,7 +64,8 @@ class SearchIndex final {
   std::vector<object_id_t> _matchObjectIds(std::string const&) const;
   std::vector<object_id_t> _matchRun(std::string const&) const;
 
-  
+  std::vector<object_id_t> getObjectIds() const;
+
   void _build_ouid_map(std::map<std::string, std::string>&, std::string const&) const;
 
   template <typename TYPE>

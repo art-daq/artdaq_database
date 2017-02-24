@@ -40,6 +40,9 @@ class JSONDocumentBuilder final {
   JSONDocumentBuilder& setObjectID(JSONDocument const&);
 
   JSONDocument getObjectID() const;
+  
+  std::string getObjectOUID() const;
+
 
   std::list<std::string> extractTags() const;
   

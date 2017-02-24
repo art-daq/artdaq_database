@@ -115,6 +115,12 @@ constexpr auto notprovided = "notprovided";
 constexpr auto apiname = "artdaq_database";
 constexpr auto empty_json = "{ }";
 constexpr auto empty_search_result = "{\"search\":[ ]}";
+
+constexpr auto bzip2base64 = "ascii.tar.bzip2.base64";
+constexpr auto tmpdirprefix = "/tmp/adb";
+constexpr auto dbexport_extension = ".tar-bzip2-base64";
+
+constexpr auto database_format_version=2;
 }
 }  // namespace configapi
 }  // namespace database

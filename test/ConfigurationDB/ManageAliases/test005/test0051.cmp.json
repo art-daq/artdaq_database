@@ -1,4 +1,7 @@
 {
+"_id" : {
+"$oid" : "18a9603673244d958d0e226e"
+},
 "document" : {
 "data" : {
 "prolog" : {
@@ -327,22 +330,46 @@
 "p1" : {
 "type" : "sequence",
 "comment" : " ",
-"annotation" : " "
+"annotation" : " ",
+"children" : {
+
+}
 },
 "p2" : {
 "type" : "sequence",
 "comment" : " ",
+"annotation" : " ",
+"children" : {
+"0" : {
+"type" : "string",
+"comment" : " ",
 "annotation" : " "
+}
+}
 },
 "pmod2" : {
 "type" : "sequence",
 "comment" : " ",
+"annotation" : " ",
+"children" : {
+"0" : {
+"type" : "string",
+"comment" : " ",
 "annotation" : " "
+}
+}
 },
 "pmod3" : {
 "type" : "sequence",
 "comment" : " ",
+"annotation" : " ",
+"children" : {
+"0" : {
+"type" : "string",
+"comment" : " ",
 "annotation" : " "
+}
+}
 }
 }
 },
@@ -365,8 +392,8 @@
 "format" : "fhicl",
 "name" : "notprovided",
 "source" : "fhicl_to_json",
-"timestamp" : "Wed Feb  8 17:00:37 2017",
-"created" : "Wed Feb  8 17:00:37 2017",
+"timestamp" : "Wed Feb 22 23:07:12 2017",
+"created" : "Wed Feb 22 23:07:12 2017",
 "rawdata" : [
 
 ]
@@ -374,8 +401,8 @@
 "version" : "version001",
 "entities" : [
 {
-"name" : "@TEST_ENTITY_NAME@",
-"assigned" : "Wed Feb  8 17:00:37 2017"
+"name" : "Aggregator_topol03252016-222027",
+"assigned" : "Wed Feb 22 23:07:13 2017"
 },
 {
 "name" : "notprovided",
@@ -385,7 +412,7 @@
 "configurations" : [
 {
 "name" : "notprovided",
-"assigned" : "Wed Feb  8 17:00:37 2017"
+"assigned" : "Wed Feb 22 23:07:12 2017"
 }
 ],
 "changelog" : "notprovided",
@@ -395,42 +422,42 @@
 "updates" : [
 {
 "event" : "addConfiguration",
-"timestamp" : "Wed Feb  8 17:00:37 2017",
+"timestamp" : "Wed Feb 22 23:07:12 2017",
 "value" : {
 "name" : "notprovided",
-"assigned" : "Wed Feb  8 17:00:37 2017"
+"assigned" : "Wed Feb 22 23:07:12 2017"
 }
 },
 {
 "event" : "setVersion",
-"timestamp" : "Wed Feb  8 17:00:37 2017",
+"timestamp" : "Wed Feb 22 23:07:12 2017",
 "value" : {
 "name" : "version001",
-"assigned" : "Wed Feb  8 17:00:37 2017"
+"assigned" : "Wed Feb 22 23:07:12 2017"
 }
 },
 {
 "event" : "setCollection",
-"timestamp" : "Wed Feb  8 17:00:37 2017",
+"timestamp" : "Wed Feb 22 23:07:13 2017",
 "value" : {
 "name" : "artdaq_Aggregator",
-"assigned" : "Wed Feb  8 17:00:37 2017"
+"assigned" : "Wed Feb 22 23:07:13 2017"
 }
 },
 {
 "event" : "addEntity",
-"timestamp" : "Wed Feb  8 17:00:37 2017",
+"timestamp" : "Wed Feb 22 23:07:13 2017",
 "value" : {
-"name" : "@TEST_ENTITY_NAME@",
-"assigned" : "Wed Feb  8 17:00:37 2017"
+"name" : "Aggregator_topol03252016-222027",
+"assigned" : "Wed Feb 22 23:07:13 2017"
 }
 },
 {
 "event" : "setCollection",
-"timestamp" : "Wed Feb  8 17:00:37 2017",
+"timestamp" : "Wed Feb 22 23:07:13 2017",
 "value" : {
 "name" : "artdaq_Aggregator",
-"assigned" : "Wed Feb  8 17:00:37 2017"
+"assigned" : "Wed Feb 22 23:07:13 2017"
 }
 },
 {
@@ -532,10 +559,7 @@
 }
 }
 ],
-"created" : "Wed Feb  8 17:00:37 2017"
-},
-"_id" : {
-"$oid" : "496a63e1e7d04058b872f482"
+"created" : "Wed Feb 22 23:07:12 2017"
 },
 "collection" : "artdaq_Aggregator",
 "aliases" : {

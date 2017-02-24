@@ -54,7 +54,6 @@ typedef void (*provider_store_t)(Options const& /*options*/, JsonData const& /*i
 typedef JsonData (*provider_call_t)(Options const& /*options*/, JsonData const& /*task_payload*/);
 
 void write_document(Options const& options, std::string& conf) {
-  confirm(!conf.empty());
   confirm(options.operation().compare(apiliteral::operation::writedocument) == 0);
 
   TRACE_(2, "write_document: begin");
@@ -145,12 +144,12 @@ void write_document(Options const& options, std::string& conf) {
   // create a json document to be inserted into the database
   JSONDocumentBuilder builder{{data}};
 
-  auto filter= std::string{", \"filter\":"};
+  auto filter = std::string{", \"filter\":"};
   filter.append(options.query_filter_to_JsonData());
 
-  if (options.format() != data_format_t::db && options.format() != data_format_t::gui){
+  if (options.format() != data_format_t::db && options.format() != data_format_t::gui) {
     builder.createFromData(data);
-  }else{
+  } else {
     filter = std::string{", \"filter\":"} + builder.getObjectID().to_string();
   }
 
@@ -160,7 +159,7 @@ void write_document(Options const& options, std::string& conf) {
   builder.addEntity({options.entity_to_JsonData()});
 
   auto insert_payload =
-      JsonData{"{\"document\":" + builder.to_string() +filter+ ", \"collection\":\"" + options.collection() + "\"}"};
+      JsonData{"{\"document\":" + builder.to_string() + filter + ", \"collection\":\"" + options.collection() + "\"}"};
 
   TRACE_(2, "write_document: insert_payload=<" << insert_payload << ">");
 
@@ -181,7 +180,6 @@ void write_document(Options const& options, std::string& conf) {
 }
 
 void read_document(Options const& options, std::string& conf) {
-  confirm(conf.empty());
   confirm(options.operation().compare(apiliteral::operation::readdocument) == 0);
 
   TRACE_(3, "read_document: begin");
@@ -216,8 +214,7 @@ void read_document(Options const& options, std::string& conf) {
   if (format == data_format_t::origin) {
     auto resultAst = jsn::object_t{};
 
-    if (!jsn::JsonReader{}.read(search_result, resultAst))
-      throw runtime_error("read_document") << "Invalid json data";
+    if (!jsn::JsonReader{}.read(search_result, resultAst)) throw runtime_error("read_document") << "Invalid json data";
 
     auto const& docAst = boost::get<jsn::object_t>(resultAst.at(jsonliteral::origin));
     format = to_data_format(boost::get<std::string>(docAst.at(jsonliteral::format)));
@@ -318,8 +315,7 @@ void find_versions(Options const& options, std::string& versions) {
     return providers.at(name);
   };
 
-  auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
+  auto search_result = dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -399,8 +395,7 @@ void find_entities(Options const& options, std::string& entities) {
     return providers.at(name);
   };
 
-  auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
+  auto search_result = dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -478,11 +473,11 @@ void add_entity(Options const& options, std::string& conf) {
   Options newOptions = options;
   newOptions.operation(apiliteral::operation::readdocument);
   newOptions.format(data_format_t::db);
-  newOptions.entity(apiliteral::notprovided);  
-      TRACE_(6, "add_entity 0");
+  newOptions.entity(apiliteral::notprovided);
+  TRACE_(6, "add_entity 0");
 
   newOptions.queryFilter(apiliteral::notprovided);
-    TRACE_(6, "add_entity 0");
+  TRACE_(6, "add_entity 0");
 
   read_document(newOptions, document);
   JSONDocumentBuilder builder{{document}};
@@ -494,13 +489,13 @@ void add_entity(Options const& options, std::string& conf) {
   newOptions.format(data_format_t::db);
 
   TRACE_(6, "add_entity 2");
-  
-  auto updated = builder.to_string();  
+
+  auto updated = builder.to_string();
   write_document(newOptions, updated);
-TRACE_(6, "add_entity 3");
+  TRACE_(6, "add_entity 3");
   newOptions.operation(apiliteral::operation::readdocument);
   newOptions.format(options.format());
-TRACE_(6, "add_entity 4");
+  TRACE_(6, "add_entity 4");
 
   document.clear();
   read_document(newOptions, document);
@@ -525,9 +520,9 @@ void remove_entity(Options const& options, std::string& conf) {
   Options newOptions = options;
   newOptions.operation(apiliteral::operation::readdocument);
   newOptions.format(data_format_t::db);
-  newOptions.entity(apiliteral::notprovided);  
+  newOptions.entity(apiliteral::notprovided);
   newOptions.queryFilter(apiliteral::notprovided);
-  
+
   read_document(newOptions, document);
   JSONDocumentBuilder builder{{document}};
 
@@ -535,8 +530,8 @@ void remove_entity(Options const& options, std::string& conf) {
 
   newOptions.operation(apiliteral::operation::writedocument);
   newOptions.format(data_format_t::db);
-  
-  auto updated = builder.to_string();  
+
+  auto updated = builder.to_string();
   write_document(newOptions, updated);
 
   newOptions.operation(apiliteral::operation::readdocument);
@@ -565,9 +560,9 @@ void mark_document_readonly(Options const& options, std::string& conf) {
   Options newOptions = options;
   newOptions.operation(apiliteral::operation::readdocument);
   newOptions.format(data_format_t::db);
-  newOptions.entity(apiliteral::notprovided);  
+  newOptions.entity(apiliteral::notprovided);
   newOptions.queryFilter(apiliteral::notprovided);
-  
+
   read_document(newOptions, document);
   JSONDocumentBuilder builder{{document}};
 
@@ -575,8 +570,8 @@ void mark_document_readonly(Options const& options, std::string& conf) {
 
   newOptions.operation(apiliteral::operation::writedocument);
   newOptions.format(data_format_t::db);
-  
-  auto updated = builder.to_string();  
+
+  auto updated = builder.to_string();
   write_document(newOptions, updated);
 
   newOptions.operation(apiliteral::operation::readdocument);
@@ -586,7 +581,7 @@ void mark_document_readonly(Options const& options, std::string& conf) {
   read_document(newOptions, document);
 
   conf.swap(document);
-  
+
   TRACE_(8, "mark_document_readonly end conf=<" << conf << ">");
 }
 
@@ -605,9 +600,9 @@ void mark_document_deleted(Options const& options, std::string& conf) {
   Options newOptions = options;
   newOptions.operation(apiliteral::operation::readdocument);
   newOptions.format(data_format_t::db);
-  newOptions.entity(apiliteral::notprovided);  
+  newOptions.entity(apiliteral::notprovided);
   newOptions.queryFilter(apiliteral::notprovided);
-  
+
   read_document(newOptions, document);
   JSONDocumentBuilder builder{{document}};
 
@@ -615,8 +610,8 @@ void mark_document_deleted(Options const& options, std::string& conf) {
 
   newOptions.operation(apiliteral::operation::writedocument);
   newOptions.format(data_format_t::db);
-  
-  auto updated = builder.to_string();  
+
+  auto updated = builder.to_string();
   write_document(newOptions, updated);
 
   newOptions.operation(apiliteral::operation::readdocument);
@@ -630,6 +625,71 @@ void mark_document_deleted(Options const& options, std::string& conf) {
   TRACE_(9, "mark_document_deleted end conf=<" << conf << ">");
 }
 
+void read_documents(ManageDocumentOperation const& options, std::list<JsonData>& document_list) {
+  confirm(document_list.empty());
+  confirm(options.operation().compare(apiliteral::operation::readdocument) == 0);
+
+  typedef std::list<JsonData> (*provider_call_t)(ManageDocumentOperation const& /*options*/,
+                                                 JsonData const& /*task_payload*/);
+
+  TRACE_(3, "read_documents: begin");
+
+  validate_dbprovider_name(options.provider());
+
+  std::ostringstream oss;
+  oss << "{" << quoted_(jsonliteral::filter) <<  ":" << options.query_filter_to_JsonData() << ",";
+  oss << quoted_(jsonliteral::collection) << ":" <<  quoted_(options.collection()) << "}";  
+  
+  auto search_payload = oss.str();
+
+  TRACE_(3, "read_documents: search_payload=<" << search_payload << ">");
+
+  auto dispatch_persistence_provider = [](std::string const& name) {
+    auto providers =
+        std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::readDocuments},
+                                               {apiliteral::provider::filesystem, cf::filesystem::readDocuments},
+                                               {apiliteral::provider::ucon, cf::ucon::readDocuments}};
+    return providers.at(name);
+  };
+
+  auto documents = dispatch_persistence_provider(options.provider())(options, search_payload);
+  document_list.swap(documents);
+
+  TRACE_(3, "read_documents: found " << document_list.size() << "documents.");
+  TRACE_(3, "read_documents: end");
+}
+
+void write_documents(ManageDocumentOperation const& options, std::list<JsonData> const& document_list) {
+  confirm(!document_list.empty());
+  confirm(options.operation().compare(apiliteral::operation::writedocument) == 0);
+
+  TRACE_(2, "write_documents: begin");
+
+  auto dispatch_persistence_provider = [](std::string const& name) {
+    auto providers =
+        std::map<std::string, provider_store_t>{{apiliteral::provider::mongo, cf::mongo::writeDocument},
+                                                {apiliteral::provider::filesystem, cf::filesystem::writeDocument},
+                                                {apiliteral::provider::ucon, cf::ucon::writeDocument}};
+    return providers.at(name);
+  };
+
+  TRACE_(2, "write_documents: writing " << document_list.size() << "documents.");
+
+  for (auto const& document : document_list) {
+    JSONDocumentBuilder builder{{document}};
+
+    std::ostringstream oss;
+    oss << "{" << quoted_(jsonliteral::document) << ":" << document.json_buffer << ",";
+    oss << quoted_(jsonliteral::filter) << ":" << builder.getObjectID().to_string() << ",";
+    oss << quoted_(jsonliteral::collection) << ":" << quoted_(options.collection()) << "}";
+
+    dispatch_persistence_provider(options.provider())(options, {oss.str()});
+
+    TRACE_(2, "write_documents: wrote document ouid=" << builder.getObjectOUID());
+  }
+
+  TRACE_(2, "write_documents: end");
+}
 }  // namespace detail
 }  // namespace configuration
 }  // namespace database

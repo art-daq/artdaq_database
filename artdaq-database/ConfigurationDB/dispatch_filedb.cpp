@@ -25,9 +25,6 @@ using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocument;
 
 void prov::writeDocument(ManageDocumentOperation const& options, JsonData const& insert_payload) {
-  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
-  confirm(options.operation().compare(apiliteral::operation::writedocument) == 0);
-
   if (options.operation().compare(apiliteral::operation::writedocument) != 0) {
     throw runtime_error("write_document") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
@@ -49,24 +46,9 @@ void prov::writeDocument(ManageDocumentOperation const& options, JsonData const&
 }
 
 JsonData prov::readDocument(ManageDocumentOperation const& options, JsonData const& search_payload) {
-  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
-  confirm(options.operation().compare(apiliteral::operation::readdocument) == 0);
-
-  if (options.operation().compare(apiliteral::operation::readdocument) != 0) {
-    throw runtime_error("read_document") << "Wrong operation option; operation=<" << options.operation() << ">.";
-  }
-
-  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
-    throw runtime_error("read_document") << "Wrong provider option; provider=<" << options.provider() << ">.";
-  }
-
   TRACE_(16, "readDocument(): begin");
 
-  auto config = DBI::DBConfig{};
-  auto database = DBI::DB::create(config);
-  auto provider = DBI::DBProvider<JsonData>::create(database);
-
-  auto collection = provider->readDocument(search_payload);
+  auto collection = readDocuments(options,search_payload);
 
   TRACE_(16, "read_document: "
                  << "Search returned " << collection.size() << " results.");
@@ -82,10 +64,32 @@ JsonData prov::readDocument(ManageDocumentOperation const& options, JsonData con
   return data;
 }
 
-JsonData prov::findConfigurations(ManageDocumentOperation const& options, JsonData const& search_payload) {
-  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
-  confirm(options.operation().compare(apiliteral::operation::findconfigs) == 0);
+std::list<JsonData> prov::readDocuments(ManageDocumentOperation const& options, JsonData const& search_payload) {
+  if (options.operation().compare(apiliteral::operation::readdocument) != 0) {
+    throw runtime_error("read_documents") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  }
 
+  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+    throw runtime_error("read_documents") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  }
+
+  TRACE_(16, "readDocuments(): begin");
+
+  auto config = DBI::DBConfig{};
+  auto database = DBI::DB::create(config);
+  auto provider = DBI::DBProvider<JsonData>::create(database);
+
+  auto collection = provider->readDocument(search_payload);
+
+  TRACE_(16, "read_documents: "
+                 << "Search returned " << collection.size() << " results.");
+
+  TRACE_(16, "readDocuments(): end");
+
+  return collection;  
+}
+
+JsonData prov::findConfigurations(ManageDocumentOperation const& options, JsonData const& search_payload) {
   if (options.operation().compare(apiliteral::operation::findconfigs) != 0) {
     throw runtime_error("operation_findconfigs") << "Wrong operation option; operation=<" << options.operation()
                                                  << ">.";
@@ -151,9 +155,6 @@ JsonData prov::findConfigurations(ManageDocumentOperation const& options, JsonDa
 }
 
 JsonData prov::configurationComposition(ManageDocumentOperation const& options, JsonData const& search_payload) {
-  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
-  confirm(options.operation().compare(apiliteral::operation::confcomposition) == 0);
-
   if (options.operation().compare(apiliteral::operation::confcomposition) != 0) {
     throw runtime_error("operation_confcomposition") << "Wrong operation option; operation=<" << options.operation()
                                                      << ">.";
@@ -224,9 +225,6 @@ JsonData prov::configurationComposition(ManageDocumentOperation const& options, 
 }
 
 JsonData prov::findVersions(ManageDocumentOperation const& options, JsonData const& /*not used*/) {
-  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
-  confirm(options.operation().compare(apiliteral::operation::findversions) == 0);
-
   if (options.operation().compare(apiliteral::operation::findversions) != 0) {
     throw runtime_error("operation_findversions") << "Wrong operation option; operation=<" << options.operation()
                                                   << ">.";
@@ -299,9 +297,6 @@ JsonData prov::findVersions(ManageDocumentOperation const& options, JsonData con
 }
 
 JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData const& /*not used*/) {
-  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
-  confirm(options.operation().compare(apiliteral::operation::findentities) == 0);
-
   if (options.operation().compare(apiliteral::operation::findentities) != 0) {
     throw runtime_error("operation_findentities") << "Wrong operation option; operation=<" << options.operation()
                                                   << ">.";
@@ -373,9 +368,6 @@ JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData con
 }
 
 JsonData prov::assignConfiguration(ManageDocumentOperation const& options, JsonData const& search_payload) {
-  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
-  confirm(options.operation().compare(apiliteral::operation::assignconfig) == 0);
-
   if (options.operation().compare(apiliteral::operation::assignconfig) != 0) {
     throw runtime_error("operation_assignconfig") << "Wrong operation option; operation=<" << options.operation()
                                                   << ">.";
@@ -422,9 +414,6 @@ JsonData prov::assignConfiguration(ManageDocumentOperation const& options, JsonD
 }
 
 JsonData prov::removeConfiguration(ManageDocumentOperation const& options, JsonData const& search_payload) {
-  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
-  confirm(options.operation().compare(apiliteral::operation::removeconfig) == 0);
-
   if (options.operation().compare(apiliteral::operation::removeconfig) != 0) {
     throw runtime_error("operation_removeconfig") << "Wrong operation option; operation=<" << options.operation()
                                                   << ">.";
@@ -476,9 +465,6 @@ JsonData prov::findVersionAliases(cf::ManageAliasesOperation const& /*options*/,
 }
 
 JsonData prov::listCollections(ManageDocumentOperation const& options, JsonData const& search_payload) {
-  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
-  confirm(options.operation().compare(apiliteral::operation::listcollections) == 0);
-
   if (options.operation().compare(apiliteral::operation::listcollections) != 0) {
     throw runtime_error("operation_listcollections") << "Wrong operation option; operation=<" << options.operation()
                                                      << ">.";
@@ -530,9 +516,6 @@ JsonData prov::listCollections(ManageDocumentOperation const& options, JsonData 
 }
 
 JsonData prov::listDatabases(ManageDocumentOperation const& options, JsonData const& search_payload) {
-  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
-  confirm(options.operation().compare(apiliteral::operation::listdatabases) == 0);
-
   if (options.operation().compare(apiliteral::operation::listdatabases) != 0) {
     throw runtime_error("operation_listdatabases") << "Wrong operation option; operation=<" << options.operation()
                                                    << ">.";
@@ -583,9 +566,6 @@ JsonData prov::listDatabases(ManageDocumentOperation const& options, JsonData co
 }
 
 JsonData prov::readDbInfo(ManageDocumentOperation const& options, JsonData const& search_payload) {
-  confirm(options.provider().compare(apiliteral::provider::filesystem) == 0);
-  confirm(options.operation().compare(apiliteral::operation::readdbinfo) == 0);
-
   if (options.operation().compare(apiliteral::operation::readdbinfo) != 0) {
     throw runtime_error("operation_readdbinfo") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }

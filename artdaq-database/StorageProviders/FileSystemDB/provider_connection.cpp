@@ -65,7 +65,7 @@ std::string& FileSystemDB::connection() {
   oss << "{";
   oss << make_database_metadata("artdaq", expand_environment_variables(_config.connectionURI())) << ",";
   oss <<  db::quoted_(jsonliteral::id) << ": { ";
-  oss <<  db::quoted_(jsonliteral::oid) << ":" << db::quoted_(oid) << "}";
+  oss <<  db::quoted_(jsonliteral::oid) << ":" << db::quoted_(oid) << "}";  
   oss << "}";
 
   auto filename = mkdir(collection) + oid + ".json";
