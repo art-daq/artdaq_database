@@ -53,6 +53,8 @@ std::string trim(std::string const& s);
 std::string to_lower(std::string const& s);
 std::string to_upper(std::string const& s);
 
+std::string unamejson();
+
 template <typename T>
 std::string to_csv(T const& data) {
   auto retvalue = std::string{};

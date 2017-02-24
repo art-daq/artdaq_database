@@ -160,6 +160,12 @@ int main(int argc, char* argv[]) try {
 
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::readdbinfo, read_dbinfo, options_string);
 
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::exportcollection,export_collection, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const& >(apiliteral::operation::importcollection,import_collection, options_string);
+
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::exportdatabase,export_database, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::importdatabase,import_database, options_string);
+  
   try {
     std::ifstream is(file_src_name);
     test_document = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());

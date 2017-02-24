@@ -19,6 +19,7 @@ namespace cf = artdaq::database::configuration;
 
 void writeDocument(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*insert_payload*/);
 JsonData readDocument(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
+std::list<JsonData> readDocuments(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
 JsonData markDocumentReadonly(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
 JsonData markDocumentDeleted(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
 JsonData findVersions(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);

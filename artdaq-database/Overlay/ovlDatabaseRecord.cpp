@@ -197,6 +197,9 @@ result_t ovlDatabaseRecord::setVersion(ovlVersionUPtr_t& version) {
 
   if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
 
+  if(_version->string_value().compare(version->string_value())==0)
+   return Success(msg_Ignored);
+  
   auto result = swap(version);
 
   if (!result.first) return result;
@@ -206,12 +209,15 @@ result_t ovlDatabaseRecord::setVersion(ovlVersionUPtr_t& version) {
   return _bookkeeping->postUpdate(update, _version);
 }
 
-result_t ovlDatabaseRecord::setConfigurationType(ovlConfigurationTypeUPtr_t& configtype) {
-  confirm(configtype);
+result_t ovlDatabaseRecord::setConfigurationType(ovlConfigurationTypeUPtr_t& configurationtype) {
+  confirm(configurationtype);
 
   if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
 
-  auto result = swap(configtype);
+  if(_configurationtype->string_value().compare(configurationtype->string_value())==0)
+   return Success(msg_Ignored);
+  
+  auto result = swap(configurationtype);
 
   if (!result.first) return result;
 
@@ -225,6 +231,9 @@ result_t ovlDatabaseRecord::setCollection(ovlCollectionUPtr_t& collection) {
 
   if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
 
+  if(_collection->string_value().compare(collection->string_value())==0)
+   return Success(msg_Ignored);
+  
   auto result = swap(collection);
 
   if (!result.first) return result;
