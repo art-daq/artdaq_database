@@ -107,7 +107,7 @@ std::set<std::string /*name*/> DatabaseConfigurationInterface::findAllGlobalConf
     throw(std::runtime_error) try {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
 
-  return ifc.findGlobalConfigurations("");
+  return ifc.findGlobalConfigurations("*");
 } catch (std::exception const& e) {
   std::cout << "DBI Exception:" << e.what() << "\n";
   throw std::runtime_error(e.what());

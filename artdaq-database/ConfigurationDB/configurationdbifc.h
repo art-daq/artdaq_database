@@ -27,10 +27,9 @@ using cf::options::data_format_t;
 constexpr auto apiname = "ConfigurationInterface";
 
 struct ConfigurationInterface final {
-  std::string _database_provider;
   using VersionInfoList_t = std::list<VersionInfo>;
 
-  ConfigurationInterface(std::string const& database_provider) : _database_provider(database_provider){};
+  ConfigurationInterface(std::string const&){};
 
   //==============================================================================
   // stores configuration version to database
@@ -61,8 +60,6 @@ struct ConfigurationInterface final {
     }
 
     if (!entity.empty()) opts.entity(entity);
-
-    opts.provider(_database_provider);
 
     auto data = TYPE{"{}"};
 
@@ -114,8 +111,6 @@ struct ConfigurationInterface final {
 
     if (!entity.empty()) opts.entity(entity);
 
-    opts.provider(_database_provider);
-
     auto buffer = std::string{};
 
     auto apiCallResult = impl::read_document(opts, buffer);
@@ -152,8 +147,6 @@ struct ConfigurationInterface final {
       opts.format(data_format_t::gui);
 
       if (!entity.empty()) opts.entity(entity);
-
-      opts.provider(_database_provider);
 
       auto apiCallResult = impl::find_versions(opts);
 
@@ -200,9 +193,14 @@ struct ConfigurationInterface final {
       auto opts = ManageDocumentOperation{apiname};
       opts.operation(apiliteral::operation::findconfigs);
       opts.format(data_format_t::gui);
-      opts.provider(_database_provider);
 
-      if (!mongosearch.empty()) opts.configuration(mongosearch);
+      if (!mongosearch.empty()){
+        if (opts.provider() == apiliteral::provider::mongo && mongosearch!="*" ){
+          opts.configuration(mongosearch);
+        } else if(opts.provider() == apiliteral::provider::filesystem){
+          opts.configuration(mongosearch);
+        }
+      }
 
       auto apiCallResult = impl::find_configurations(opts);
 
@@ -260,7 +258,6 @@ struct ConfigurationInterface final {
       auto opts = ManageDocumentOperation{apiname};
       opts.operation(apiliteral::operation::confcomposition);
       opts.format(data_format_t::gui);
-      opts.provider(_database_provider);
 
       if (!configuration.empty()) opts.configuration(configuration);
 
@@ -347,7 +344,6 @@ struct ConfigurationInterface final {
       auto op = jsn::object_t{};
       op[apiliteral::option::configuration] = configuration;
       op[apiliteral::option::collection] = versionInfo.configuration;
-      // op[apiliteral::option::provider] = _database_provider;
       op[apiliteral::option::format] = to_string(data_format_t::gui);
       op[apiliteral::option::operation] = std::string{apiliteral::operation::assignconfig};
       op[jsonliteral::filter] = jsn::object_t{};
@@ -386,7 +382,6 @@ struct ConfigurationInterface final {
 
     opts.operation(apiliteral::operation::listcollections);
     opts.format(data_format_t::gui);
-    opts.provider(_database_provider);
 
     if (!name_prefix.empty()) opts.collection(name_prefix);
 
@@ -413,9 +408,9 @@ struct ConfigurationInterface final {
   // defaults
   ~ConfigurationInterface() = default;
   ConfigurationInterface(ConfigurationInterface&&) = default;
+  ConfigurationInterface() = default;
 
   // deleted
-  ConfigurationInterface() = delete;
   ConfigurationInterface(ConfigurationInterface const&) = delete;
   ConfigurationInterface& operator=(ConfigurationInterface const&) = delete;
   ConfigurationInterface& operator=(ConfigurationInterface&&) = delete;

@@ -40,6 +40,33 @@ result_t list_databases(std::string const& query_payload) { return impl::list_da
 
 result_t read_dbinfo(std::string const& query_payload) { return impl::read_dbinfo(query_payload); }
 
+result_t list_collections(std::string const& query_payload){
+  return impl::list_collections(query_payload);
+}
+
+result_t export_configuration(std::string const& query_payload) {
+  return impl::export_configuration(query_payload);
+}
+
+result_t import_configuration(std::string const& query_payload) {
+  return impl::import_configuration(query_payload);
+}
+
+result_t export_database(std::string const& query_payload) {
+  return impl::export_database(query_payload);
+}
+
+result_t import_database(std::string const& query_payload) {
+  return impl::export_database(query_payload);
+}
+
+result_t export_collection(std::string const& query_payload){
+    return impl::export_collection(query_payload);
+}
+
+result_t import_collection(std::string const& query_payload){
+      return impl::import_collection(query_payload);
+}
 void enable_trace(){
   return impl::enable_trace();
 }

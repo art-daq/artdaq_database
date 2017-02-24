@@ -29,12 +29,12 @@ result_t remove_configuration(std::string const& query_payload);   //manage conf
 result_t read_configuration(std::string const& query_payload);//exportimport
 result_t write_configuration(std::string const& query_payload, std::string const& tarbz2base64);//exportimport
 
-result_t export_configuration(std::string const& query_payload, std::string & json_document);//exportimport
-result_t import_configuration(std::string const& query_payload,  std::string const& json_document);//exportimport
-result_t export_database(std::string const& query_payload, std::string& json_document);//exportimport
-result_t import_database(std::string const& query_payload, std::string const& json_document);//exportimport
-result_t export_collection(std::string const& query_payload, std::string& json_document);//exportimport
-result_t import_collection(std::string const& query_payload, std::string const& json_document);//exportimport
+result_t export_configuration(std::string const& query_payload);//exportimport
+result_t import_configuration(std::string const& query_payload);//exportimport
+result_t export_database(std::string const& query_payload);//exportimport
+result_t import_database(std::string const& query_payload);//exportimport
+result_t export_collection(std::string const& query_payload);//exportimport
+result_t import_collection(std::string const& query_payload);//exportimport
 
 result_t list_databases(std::string const& query_payload);//metadata
 result_t read_dbinfo(std::string const& query_payload);//metadata

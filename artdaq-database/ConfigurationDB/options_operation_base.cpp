@@ -32,7 +32,7 @@ std::string expand_environment_variables(std::string var);
 }
 }
 
-OperationBase::OperationBase(std::string const& process_name) : _process_name{process_name} {}
+OperationBase::OperationBase(std::string const& process_name) : _process_name{process_name},_provider{_getProviderFromURI()}{}
 
 std::string const& OperationBase::operation() const {
   confirm(!_operation.empty());
