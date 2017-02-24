@@ -98,8 +98,6 @@ bool matches(value_t const& left, value_t const& right) {
 std::vector<std::string> utl::split_path(std::string const& path) {
   auto tmp = std::string{path};
 
-  TRACE_(1, "split_path() args path=<" << path << ">");
-
   std::replace(tmp.begin(), tmp.end(), '.', ' ');
 
   std::istringstream iss(tmp);
@@ -108,13 +106,8 @@ std::vector<std::string> utl::split_path(std::string const& path) {
 
   if (!tokens.empty()) {
     std::ostringstream oss;
-
     for (auto const& token : tokens) oss << "\"" << token << "\",";
-
-    TRACE_(1, "split_path() loop token=<" << oss.str() << ">");
-  } else {
-    TRACE_(1, "split_path() token=<empty> ");
-  }
+  } 
 
   return tokens;
 }
