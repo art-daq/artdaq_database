@@ -115,9 +115,7 @@ int main(int argc, char* argv[]) try {
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findversionalias, find_version_aliases,
                                                                                   options_string);
   try {
-    std::ifstream is(file_src_name);
-    test_document = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-    is.close();
+      db::read_buffer_from_file(test_document,file_src_name);
     cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
         apiliteral::operation::writedocument, write_document, options_string, test_document);
   } catch (...) {
@@ -129,7 +127,7 @@ int main(int argc, char* argv[]) try {
 
   if (!result.first) {
     std::cout << "Test failed; error message: " << result.second << "\n";
-    std::cout << debug::current_exception_diagnostic_information();
+    std::cout << ::debug::current_exception_diagnostic_information();
     return process_exit_code::FAILURE;
   }
   
@@ -140,9 +138,8 @@ int main(int argc, char* argv[]) try {
   
   auto returned = std::string{result.second};
 
-  std::ifstream is(file_res_name);
-  auto expected = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-  is.close();
+        auto expected=std::string{};
+      db::read_buffer_from_file(expected,file_res_name);
 
   using cfo::data_format_t;
 
@@ -177,7 +174,7 @@ int main(int argc, char* argv[]) try {
   std::cout << "First mismatch at position " << std::distance(expected.begin(), mismatch.first) << ", (exp,ret)=(0x"
             << std::hex << (unsigned int)*mismatch.first << ",0x" << (unsigned int)*mismatch.second << ")\n";
 
-  auto file_out_name = std::string(db::filesystem::mkdir(tmpdir))
+  auto file_out_name = std::string(db::filesystem::mkdir(tmpdir)).append("/")
                            .append(argv[0])
                            .append("-")
                            .append(options.operation())
@@ -185,14 +182,12 @@ int main(int argc, char* argv[]) try {
                            .append(basename((char*)file_src_name.c_str()))
                            .append(".txt");
 
-  std::ofstream os(file_out_name.c_str());
-  std::copy(returned.begin(), returned.end(), std::ostream_iterator<char>(os));
-  os.close();
-
+  db::write_buffer_to_file(returned,file_out_name);
+			   
   std::cout << "Wrote file:" << file_out_name << "\n";
 
   return process_exit_code::FAILURE;
 } catch (...) {
-  std::cout << "Process exited with error: " << boost::current_exception_diagnostic_information();
+  std::cout << "Process exited with error: " << ::debug::current_exception_diagnostic_information();
   return process_exit_code::UNCAUGHT_EXCEPTION;
 }

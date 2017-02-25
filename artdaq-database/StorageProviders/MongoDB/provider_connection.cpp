@@ -50,8 +50,6 @@ DBConfig::DBConfig()
   auto tmpURI =
       getenv("ARTDAQ_DATABASE_URI") ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
 
-  if (tmpURI.back() == '/') tmpURI.pop_back();  // remove trailing slash
-
   auto prefixURI = std::string{literal::MONGOURI};
   if (tmpURI.length() > prefixURI.length() && std::equal(prefixURI.begin(), prefixURI.end(), tmpURI.begin()))
     uri = tmpURI;

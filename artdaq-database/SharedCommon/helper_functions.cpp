@@ -137,7 +137,11 @@ std::string db::expand_environment_variables(std::string var) {
 
   ::wordfree(&p);
   
-  return oss.str();
+  auto result=oss.str();
+  
+  if (result.back() == '/') result.pop_back();  // remove trailing slash
+  
+  return result;
 }
 
 bool db::equal(std::string const& left, std::string const& right) {

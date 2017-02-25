@@ -9,6 +9,6 @@ int main(int argc[[gnu::unused]], char* argv[] [[gnu::unused]]) try {
   */
   return process_exit_code::FAILURE;
 } catch (...) {
- // std::cout << "Process exited with error: " << ::debug::current_exception_diagnostic_information();
+  std::cout << "Process exited with error: " << ::debug::current_exception_diagnostic_information();
   return process_exit_code::UNCAUGHT_EXCEPTION;
 }

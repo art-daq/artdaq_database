@@ -94,30 +94,19 @@ int main(int argc, char* argv[])try
     auto compare_name = vm["compare"].as<std::string>();
     auto test_name = vm["testname"].as<std::string>();
 
-    std::ifstream is1(input_name);
+  auto input=std::string{};
+  db::read_buffer_from_file(input,input_name);
 
-    std::string input((std::istreambuf_iterator<char>(is1)),
-                      std::istreambuf_iterator<char>());
+  auto compare=std::string{};
+  db::read_buffer_from_file(compare,compare_name);
 
+  auto options = std::string();
 
-    std::ifstream is2(compare_name);
+  if (vm.count("options")) {
+    auto opts_name = vm["options"].as<std::string>();
 
-    std::string compare((std::istreambuf_iterator<char>(is2)),
-                        std::istreambuf_iterator<char>());
-
-
-    auto options =std::string();
-
-    if (vm.count("options")) {
-        auto opts_name = vm["options"].as<std::string>();
-
-        std::ifstream is3(opts_name);
-
-        std::string tmp((std::istreambuf_iterator<char>(is3)),
-                        std::istreambuf_iterator<char>());
-
-        options= std::move(tmp);
-    }
+    db::read_buffer_from_file(options,opts_name);
+  }
 
     auto runTest = [](std::string const & name) {
         auto tests = std::map<std::string, test_case> {
@@ -141,7 +130,7 @@ int main(int argc, char* argv[])try
 }
 catch(...)
 {
-    std::cerr << "Process exited with error: " << boost::current_exception_diagnostic_information();
+    std::cerr << "Process exited with error: " << ::debug::current_exception_diagnostic_information();
     return process_exit_code::UNCAUGHT_EXCEPTION;
 }
 

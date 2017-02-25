@@ -1,6 +1,5 @@
 #include "artdaq-database/ConfigurationDB/common.h"
 
-#include <boost/exception/diagnostic_information.hpp>
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/ConfigurationDB/dboperation_exportimport.h"
 #include "artdaq-database/ConfigurationDB/dboperation_managedocument.h"
@@ -66,7 +65,7 @@ result_t opts::export_database(ManageDocumentOperation const& options) noexcept 
   try {
     return json::export_database(options.to_JsonData());
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -129,7 +128,7 @@ result_t json::export_database(std::string const& query_payload) noexcept {
 
     return Success(res);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -137,7 +136,7 @@ result_t opts::import_database(ManageDocumentOperation const& options) noexcept 
   try {
     return json::import_database(options.to_JsonData());
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -191,7 +190,7 @@ result_t json::import_database(std::string const& query_payload) noexcept {
 
     return Success(res);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -202,7 +201,7 @@ result_t opts::export_configuration(ManageDocumentOperation const& options) noex
     detail::export_configuration(options, returnValue);
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -216,7 +215,7 @@ result_t json::export_configuration(std::string const& query_payload) noexcept {
     detail::export_configuration(options, returnValue);
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -230,7 +229,7 @@ result_t json::import_configuration(std::string const& query_payload) noexcept {
     detail::import_configuration(options, returnValue);
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -241,7 +240,7 @@ result_t opts::import_configuration(ManageDocumentOperation const& options) noex
     detail::import_configuration(options, returnValue);
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -290,7 +289,7 @@ result_t json::write_configuration(std::string const& query_payload, std::string
 
     return Success();
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -370,7 +369,7 @@ result_t json::read_configuration(std::string const& query_payload, std::string&
 
     return Success(tarbzip2_base64);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -378,7 +377,7 @@ result_t opts::export_collection(ManageDocumentOperation const& options) noexcep
   try {
     return json::export_collection(options.to_JsonData());
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -431,7 +430,7 @@ result_t json::export_collection(std::string const& query_payload) noexcept {
 
     return Success(oss.str());
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -439,7 +438,7 @@ result_t opts::import_collection(ManageDocumentOperation const& options) noexcep
   try {
     return json::import_collection(options.to_JsonData());
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -490,7 +489,7 @@ result_t json::import_collection(std::string const& query_payload) noexcept {
 
     return Success(oss.str());
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 

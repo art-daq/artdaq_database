@@ -54,9 +54,12 @@ class JSONDocument final {
   T value_as(path_t const& path) const;
 
   // utilities
+  bool saveToFile(std::string const&);
+  
   static std::string value(JSONDocument const&);
   static std::string value_at(JSONDocument const&, std::size_t);
   static JSONDocument loadFromFile(std::string const&);
+  
 
   // defaults
   ~JSONDocument() = default;
@@ -98,11 +101,6 @@ void JSONDocument();
 void JSONDocumentUtils();
 }
 std::ostream& operator<<(std::ostream&, JSONDocument const&);
-
-/*
-bool isValidJson(std::string const&);
-std::string filterJson(std::string const&);
-*/
 
 std::vector<path_t> split_path(path_t const&);
 

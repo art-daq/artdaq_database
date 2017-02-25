@@ -1,6 +1,5 @@
 #include "artdaq-database/ConfigurationDB/common.h"
 
-#include <boost/exception/diagnostic_information.hpp>
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/ConfigurationDB/dboperation_managealiases.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
@@ -56,7 +55,7 @@ result_t json::add_version_alias(std::string const& query_payload) noexcept {
 
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -73,7 +72,7 @@ result_t json::remove_version_alias(std::string const& query_payload) noexcept {
 
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -90,7 +89,7 @@ result_t json::find_version_aliases(std::string const& query_payload) noexcept {
 
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 

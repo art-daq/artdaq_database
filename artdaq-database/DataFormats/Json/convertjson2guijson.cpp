@@ -108,7 +108,7 @@ bool artdaq::database::json_db_to_gui(std::string const& db_json, std::string& g
     doc_node[literal::converted] = object_t{};
     unwrap(doc_node).value_as<object_t>(literal::converted).swap(guiAST);
   } catch (...) {
-    TRACE_(10, "json_db_to_gui() Uncaught exception:" << boost::current_exception_diagnostic_information());
+    TRACE_(10, "json_db_to_gui() Uncaught exception:" << ::debug::current_exception_diagnostic_information());
     
     throw;
   }
@@ -300,7 +300,7 @@ bool artdaq::database::json_gui_to_db(std::string const& gui_json, std::string& 
     unwrap(gui_document).value_as<object_t>(literal::converted) = object_t{};
 
   } catch (...) {
-    TRACE_(14, "json_gui_to_db() Uncaught exception:" << boost::current_exception_diagnostic_information());
+    TRACE_(14, "json_gui_to_db() Uncaught exception:" << ::debug::current_exception_diagnostic_information());
     throw;
   }
 

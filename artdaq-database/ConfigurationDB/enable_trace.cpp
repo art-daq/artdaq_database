@@ -16,7 +16,7 @@ void t::enable_trace() {
   artdaq::database::configuration::debug::ManageConfigs();
   artdaq::database::configuration::debug::ManageDocuments();
   artdaq::database::configuration::debug::Metadata();
-
+  
   artdaq::database::configuration::debug::detail::ExportImport();
   artdaq::database::configuration::debug::detail::ManageAliases();
   artdaq::database::configuration::debug::detail::ManageConfigs();
@@ -28,14 +28,16 @@ void t::enable_trace() {
   artdaq::database::configuration::debug::options::ManageDocuments();
   artdaq::database::configuration::debug::options::ManageConfigs();
   artdaq::database::configuration::debug::options::ManageAliases();
-
+  
   artdaq::database::configuration::debug::MongoDB();
   artdaq::database::configuration::debug::UconDB();
   artdaq::database::configuration::debug::FileSystemDB();
-
-  artdaq::database::filesystem::debug::enable();
+  
   artdaq::database::filesystem::index::debug::enable();
+  
+  artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
 
   artdaq::database::docrecord::debug::JSONDocumentBuilder();
+  artdaq::database::docrecord::debug::JSONDocument();  
 }

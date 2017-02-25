@@ -47,7 +47,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigurations(
   auto collection = _provider->connection();
   collection = expand_environment_variables(collection);
 
-  auto dir_name = dbfs::mkdir(collection);
+  auto dir_name = dbfs::mkdir(collection).append("/");
   auto collection_names = dbfs::find_subdirs(dir_name);
 
   for (auto const& collection_name : collection_names) {
@@ -99,7 +99,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::configurationCompos
   auto collection = _provider->connection();
   collection = expand_environment_variables(collection);
 
-  auto dir_name = dbfs::mkdir(collection);
+  auto dir_name = dbfs::mkdir(collection).append("/");
   auto collection_names = dbfs::find_subdirs(dir_name);
 
   for (auto const& collection_name : collection_names) {
@@ -164,7 +164,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findVersions(JsonDa
 
   TRACE_(7, "FileSystemDB::readDocument() collection_path=<" << collection << ">.");
 
-  auto dir_name = dbfs::mkdir(collection);
+  auto dir_name = dbfs::mkdir(collection).append("/");
 
   auto index_path = boost::filesystem::path(dir_name.c_str()).append(dbfsl::search_index);
 
@@ -260,7 +260,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findEntities(JsonDa
   auto collection = _provider->connection();
   collection = expand_environment_variables(collection);
 
-  auto dir_name = dbfs::mkdir(collection);
+  auto dir_name = dbfs::mkdir(collection).append("/");
   auto collection_names = dbfs::find_subdirs(dir_name);
 
   for (auto const& collection_name : collection_names) {
@@ -318,7 +318,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listCollections(Jso
   auto collection = _provider->connection();
   collection = expand_environment_variables(collection);
 
-  auto dir_name = dbfs::mkdir(collection);
+  auto dir_name = dbfs::mkdir(collection).append("/");
   auto collection_names = dbfs::find_subdirs(dir_name);
 
   for (auto const& collection_name : collection_names) {
@@ -420,10 +420,9 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::databaseMetadata(
 
     TRACE_(3, "FileSystemDB::databaseMetadata() reading document <" << doc_path.c_str() << ">.");
 
-    std::ifstream is(doc_path.c_str());
-    std::string json((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+    auto json=std::string{};
 
-    is.close();
+    db::read_buffer_from_file(json,{doc_path.c_str()});
 
     TRACE_(3, "FileSystemDB::databaseMetadata() document <" << json << ">.");
 

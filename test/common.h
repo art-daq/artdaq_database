@@ -8,7 +8,7 @@
 
 #include "boost/program_options.hpp"
 
-constexpr auto tmpdir = "/tmp/artdaqtest/";
+constexpr auto tmpdir = "/tmp/artdaqtest";
 
 namespace db = artdaq::database;
 namespace jsonliteral = db::dataformats::literal;

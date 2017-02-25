@@ -10,9 +10,6 @@ namespace apiliteral = db::configapi::literal;
 std::string db::make_database_metadata(std::string const& name, std::string const& uri) {
   confirm(!name.empty());
   confirm(!uri.empty());
-
-  auto user = expand_environment_variables("$USER");
-  user.pop_back();
   
   // clang-format off
   std::ostringstream oss;
@@ -20,7 +17,7 @@ std::string db::make_database_metadata(std::string const& name, std::string cons
   oss << "name"_quoted     << ":" << quoted_(name) << ",";
   oss << "uri"_quoted      << ":" << quoted_(uri)  << ",";
   oss << "create_time"_quoted << ":" << quoted_(timestamp())  << ",";
-  oss << "create_user"_quoted << ":" << quoted_(user)  << ",";
+  oss << "create_user"_quoted << ":" << quoted_(expand_environment_variables("$USER"))  << ",";
   oss << "uname"_quoted << ":" << unamejson() << ",";
   oss << "database_format"_quoted << ":" << apiliteral::database_format_version;
   oss << "}";  

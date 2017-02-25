@@ -4,6 +4,10 @@
 #include <exception>
 #include "cetlib/coded_exception.h"
 
+namespace debug {
+  std::string current_exception_diagnostic_information();
+}
+
 namespace artdaq {
 namespace database {
 

@@ -1,21 +1,23 @@
 #include "test/common.h"
-#include "artdaq-database/DataFormats/Json/json_common.h"
+
+#include "artdaq-database/BasicTypes/basictypes.h"
+#include "artdaq-database/ConfigurationDB/dboperation_metadata.h"
+#include "artdaq-database/JsonDocument/JSONDocument.h"
+#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
+
 
 namespace bpo = boost::program_options;
 using namespace artdaq::database;
 
 int main(int argc, char* argv[]) try {
-  // Get the input parameters via the boost::program_options library,
-  // designed to make it relatively simple to define arguments and
-  // issue errors if argument list is supplied incorrectly
-
   std::ostringstream descstr;
-  descstr << argv[0] << " <-c <config-file>> <other-options>";
+  descstr << argv[0] << " <-uri <database uri>>";
 
   bpo::options_description desc = descstr.str();
 
-  desc.add_options()("config,c", bpo::value<std::string>(), "Configuration file.")("outputformat,f", bpo::value<std::string>(),
-                                                                                   "Output file format.")("help,h", "produce help message");
+  desc.add_options()
+  ("uri,u", bpo::value<std::string>(),"Database URI")
+  ("help,h", "produce help message");
 
   bpo::variables_map vm;
 
@@ -32,27 +34,15 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::HELP;
   }
 
-  if (!vm.count("config")) {
-    std::cerr << "Exception from command line processing in " << argv[0] << ": no configuration file given.\n"
+  if (!vm.count("uri")) {
+    std::cerr << "Exception from command line processing in " << argv[0] << ": no databse URI given.\n"
               << "For usage and an options list, please do '" << argv[0] << " --help"
               << "'.\n";
     return process_exit_code::INVALID_ARGUMENT | 1;
   }
 
-  auto file_name = vm["config"].as<std::string>();
+  auto database_uri = vm["uri"].as<std::string>();
 
-  auto json=std::string{};
-  db::read_buffer_from_file(json,file_name);
-
-  namespace jsn = artdaq::database::json;
-
-  auto reader = jsn::JsonReader{};
-
-  jsn::object_t doc_ast;
-
-  if (!reader.read(json, doc_ast)) {
-    confirm(false);
-  }
 
   return process_exit_code::SUCCESS;
 } catch (...) {

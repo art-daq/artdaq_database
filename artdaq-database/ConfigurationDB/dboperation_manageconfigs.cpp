@@ -1,6 +1,5 @@
 #include "artdaq-database/ConfigurationDB/common.h"
 
-#include <boost/exception/diagnostic_information.hpp>
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/ConfigurationDB/dboperation_manageconfigs.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
@@ -50,7 +49,7 @@ result_t opts::find_configurations(ManageDocumentOperation const& options) noexc
     detail::find_configurations(options, returnValue);
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -62,7 +61,7 @@ result_t opts::configuration_composition(ManageDocumentOperation const& options)
 
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -73,7 +72,7 @@ result_t opts::assign_configuration(ManageDocumentOperation const& options) noex
     detail::assign_configuration(options, returnValue);
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -84,7 +83,7 @@ result_t opts::remove_configuration(ManageDocumentOperation const& options) noex
     detail::remove_configuration(options, returnValue);
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -102,7 +101,7 @@ result_t json::find_configurations(std::string const& query_payload) noexcept {
     detail::find_configurations(options, returnValue);
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -117,7 +116,7 @@ result_t json::configuration_composition(std::string const& query_payload) noexc
 
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -135,7 +134,7 @@ result_t json::assign_configuration(std::string const& query_payload) noexcept {
     detail::assign_configuration(options, returnValue);
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -151,7 +150,7 @@ result_t json::remove_configuration(std::string const& query_payload) noexcept {
     detail::remove_configuration(options, returnValue);
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -165,7 +164,7 @@ result_t json::create_configuration(std::string const& operations) noexcept {
 
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
