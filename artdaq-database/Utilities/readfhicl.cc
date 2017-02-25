@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) try {
   }
 
   auto file_name = vm["config"].as<std::string>();
-
+  
   std::ifstream is(file_name);
   std::string conf((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
   is.close();

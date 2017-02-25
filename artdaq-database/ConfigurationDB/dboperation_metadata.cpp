@@ -1,6 +1,5 @@
 #include "artdaq-database/ConfigurationDB/common.h"
 
-#include <boost/exception/diagnostic_information.hpp>
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/ConfigurationDB/dboperation_metadata.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
@@ -40,7 +39,7 @@ result_t opts::list_databases(ManageDocumentOperation const& options, std::strin
     detail::list_databases(options, conf);
     return Success(conf);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -49,7 +48,7 @@ result_t opts::read_dbinfo(ManageDocumentOperation const& options, std::string& 
     detail::read_dbinfo(options, conf);
     return Success(conf);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -61,7 +60,7 @@ result_t opts::list_collections(ManageDocumentOperation const& options) noexcept
 
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -77,7 +76,7 @@ result_t json::list_databases(std::string const& query_payload) noexcept {
     detail::list_databases(options, returnValue);
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -93,7 +92,7 @@ result_t json::read_dbinfo(std::string const& query_payload) noexcept {
     detail::read_dbinfo(options, returnValue);
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -109,7 +108,7 @@ result_t json::list_collections(std::string const& query_payload) noexcept {
     detail::list_collections(options, returnValue);
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 void dbcfg::debug::Metadata() {

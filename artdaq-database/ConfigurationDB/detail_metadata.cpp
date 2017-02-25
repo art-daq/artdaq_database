@@ -14,8 +14,6 @@
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/JsonDocument/docrecord_literals.h"
 
-#include <boost/exception/diagnostic_information.hpp>
-
 #include "artdaq-database/ConfigurationDB/options_operations.h"
 
 #ifdef TRACE_NAME

@@ -50,7 +50,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonDa
 
   auto filter_json = filter_document.to_string();
 
-  auto index_path = boost::filesystem::path(dir_name.c_str()).append(dbfsl::search_index);
+  auto index_path = boost::filesystem::path(dir_name.c_str()).append("/").append(dbfsl::search_index);
 
   SearchIndex search_index(index_path);
 
@@ -63,10 +63,8 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonDa
   for (auto const& oid : oids) {
     auto doc_path = boost::filesystem::path(dir_name.c_str()).append(oid).replace_extension(".json");
 
-    std::ifstream is(doc_path.c_str());
-    std::string json((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-
-    is.close();
+    auto json=std::string{};
+    db::read_buffer_from_file(json,{doc_path.c_str()});
 
     TRACE_(3, "FileSystemDB::readDocument() found_document=<" << json << ">");
 
@@ -144,7 +142,7 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeDocument(JsonData cons
 
   TRACE_(4, "FileSystemDB::writeDocument() collection_path=<" << collection << ">");
 
-  auto filename = dbfs::mkdir(collection) + oid + ".json";
+  auto filename = dbfs::mkdir(collection) + "/" + oid + ".json";
 
   TRACE_(4, "FileSystemDB::writeDocument() filename=<" << filename << ">.");
 
@@ -154,16 +152,12 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeDocument(JsonData cons
                                           << filename << ">, filter= <" << filter_document << ">";
   }
 
-  std::ofstream os(filename);
-
   auto json = builder.to_string();
 
   TRACE_(4, "FileSystemDB::writeDocument() json=<" << json << ">.");
   
-  std::copy(json.begin(), json.end(), std::ostream_iterator<char>(os));
-
-  os.close();
-
+  db::write_buffer_to_file(json,filename);
+  
   auto index_path = boost::filesystem::path(filename.c_str()).parent_path().append(dbfsl::search_index);
 
   SearchIndex search_index(index_path);

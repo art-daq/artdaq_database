@@ -1,6 +1,5 @@
 #include "artdaq-database/ConfigurationDB/common.h"
 
-#include <boost/exception/diagnostic_information.hpp>
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/ConfigurationDB/dboperation_managedocument.h"
 #include "artdaq-database/ConfigurationDB/options_operations.h"
@@ -55,7 +54,7 @@ result_t opts::write_document(ManageDocumentOperation const& options, std::strin
     detail::write_document(options, conf);
     return Success(conf);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -64,7 +63,7 @@ result_t opts::read_document(ManageDocumentOperation const& options, std::string
     detail::read_document(options, conf);
     return Success(conf);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 result_t opts::find_versions(ManageDocumentOperation const& options) noexcept {
@@ -75,7 +74,7 @@ result_t opts::find_versions(ManageDocumentOperation const& options) noexcept {
 
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -87,7 +86,7 @@ result_t opts::find_entities(ManageDocumentOperation const& options) noexcept {
 
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -99,7 +98,7 @@ result_t opts::add_entity(ManageDocumentOperation const& options) noexcept {
 
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -111,7 +110,7 @@ result_t opts::remove_entity(ManageDocumentOperation const& options) noexcept {
 
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -123,7 +122,7 @@ result_t opts::mark_document_readonly(ManageDocumentOperation const& options) no
 
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -135,7 +134,7 @@ result_t opts::mark_document_deleted(ManageDocumentOperation const& options) noe
 
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -153,7 +152,7 @@ result_t json::write_document(std::string const& query_payload, std::string cons
     detail::write_document(options, database_format);
     return Success(database_format);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -173,7 +172,7 @@ result_t json::read_document(std::string const& query_payload, std::string& conf
 
     return Success(conf);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -190,7 +189,7 @@ result_t json::find_versions(std::string const& query_payload) noexcept {
 
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -207,7 +206,7 @@ result_t json::find_entities(std::string const& query_payload) noexcept {
 
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -228,7 +227,7 @@ result_t json::add_entity(std::string const& query_payload) noexcept {
 
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -245,7 +244,7 @@ result_t json::remove_entity(std::string const& query_payload) noexcept {
 
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -262,7 +261,7 @@ result_t json::mark_document_readonly(std::string const& query_payload) noexcept
 
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -279,7 +278,7 @@ result_t json::mark_document_deleted(std::string const& query_payload) noexcept 
 
     return Success(returnValue);
   } catch (...) {
-    return Failure(boost::current_exception_diagnostic_information());
+    return Failure(::debug::current_exception_diagnostic_information());
   }
 }
 

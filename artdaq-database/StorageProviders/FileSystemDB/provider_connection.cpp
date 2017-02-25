@@ -68,13 +68,10 @@ std::string& FileSystemDB::connection() {
   oss <<  db::quoted_(jsonliteral::oid) << ":" << db::quoted_(oid) << "}";  
   oss << "}";
 
-  auto filename = mkdir(collection) + oid + ".json";
+  auto filename = mkdir(collection)+ "/" + oid + ".json";
 
-  std::ofstream os(filename);
-  auto json = oss.str();
-  std::copy(json.begin(), json.end(), std::ostream_iterator<char>(os));
-  os.close();
-
+  db::write_buffer_to_file(oss.str(),filename);
+  
   TRACE_(5, "StorageProvider::FileSystemDB::connection created metadata record id=" << oid << ", path=" << path.c_str());
 
   return _connection;

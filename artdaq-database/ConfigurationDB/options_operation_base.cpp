@@ -131,6 +131,26 @@ std::string const& OperationBase::queryFilter(std::string const& query_payload) 
   return _query_payload;
 }
 
+std::string const& OperationBase::processName() const{
+  return _process_name;
+}
+
+std::string const& OperationBase::resultFileName() const {
+  confirm(!_result_file_name.empty());
+
+  return _result_file_name;
+}
+
+std::string const& OperationBase::resultFileName(std::string const& result_file_name){
+  confirm(!result_file_name.empty());
+
+  _result_file_name= db::expand_environment_variables(result_file_name);
+  
+  TRACE_(14, "Options: resultFileName args result_file_name=<" << _result_file_name << ">.");
+
+  return _result_file_name;
+}
+  
 JsonData OperationBase::query_filter_to_JsonData() const {
   if (queryFilter() != apiliteral::notprovided) {
     return {queryFilter()};
@@ -244,6 +264,11 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
   if (vm.count(apiliteral::option::searchfilter)) {
     queryFilter(vm[apiliteral::option::searchfilter].as<std::string>());
   }
+  
+  if (vm.count(apiliteral::option::result)) {
+    resultFileName(vm[apiliteral::option::result].as<std::string>());
+  }else {resultFileName("${HOME}/${0}.result.out");}
+
   return process_exit_code::SUCCESS;
 }
 

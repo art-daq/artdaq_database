@@ -104,7 +104,7 @@ int main(int argc, char* argv[]) try {
 
   return process_exit_code::FAILURE;
 } catch (...) {
-  std::cerr << "Process exited with error: " << boost::current_exception_diagnostic_information();
+  std::cerr << "Process exited with error: " << ::debug::current_exception_diagnostic_information();
   return process_exit_code::UNCAUGHT_EXCEPTION;
 }
 
@@ -223,9 +223,9 @@ bool test_roundconvertjson(std::string const& input, std::string const& compare)
     std::cerr << "output:\n" << output << "\n";
     std::cerr << "expected:\n" << compare << "\n";
     std::cerr << "tmp:\n" << tmp << "\n";
-      std::ofstream os("/tmp/test.json");
-  os << output;
-  os.close();
+
+  auto filename=std::string{"/tmp/test.json"};  
+  db::write_buffer_to_file(output,filename);
   }
 
   return false;

@@ -107,6 +107,6 @@ int main(int argc, char* argv[]) try {
 
   return process_exit_code::FAILURE;
 } catch (...) {
-  std::cerr << "Process exited with error: " << boost::current_exception_diagnostic_information();
+  std::cerr << "Process exited with error: " << ::debug::current_exception_diagnostic_information();
   return process_exit_code::UNCAUGHT_EXCEPTION;
 }

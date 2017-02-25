@@ -9,8 +9,6 @@
 #include "artdaq-database/SharedCommon/helper_functions.h"
 #include "artdaq-database/SharedCommon/shared_exceptions.h"
 
-#include <boost/exception/diagnostic_information.hpp>
-
 namespace db = artdaq::database;
 using namespace artdaq::database;
 
@@ -98,24 +96,34 @@ bool db::write_buffer_to_file(std::string const& buffer, std::string const& file
 } catch (...) {
   std::ostringstream oss;
   oss << "Failed to write a data file, fiel=" << file_out_name << ";\n";
-  oss << boost::current_exception_diagnostic_information();
+  oss << ::debug::current_exception_diagnostic_information();
   throw runtime_error(oss.str());
   return false;
 }
 
 bool db::read_buffer_from_file(std::string& buffer, std::string const& file_in_name) try {
   confirm(!file_in_name.empty());
+  confirm(buffer.empty());
 
   std::ifstream is(file_in_name);
-  auto test_document = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+  
+  if (!is.good()) {
+    is.close();
+
+    throw invalid_argument("read_buffer_from_file") << "Failed calling read_buffer_from_file(): Failed opening a file=" << file_in_name;
+  }  
+
+  std::stringstream ss;
+  ss << is.rdbuf();
   is.close();
 
-  buffer.swap(test_document);
+  buffer=std::move(ss.str());
+
   return true;
 } catch (...) {
   std::ostringstream oss;
   oss << "Failed to read a data file, file=" << file_in_name << ";\n";
-  oss << boost::current_exception_diagnostic_information();
+  oss << ::debug::current_exception_diagnostic_information();
   throw runtime_error(oss.str());
   return false;
 }

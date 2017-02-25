@@ -81,7 +81,7 @@ result_t cfd::read_document_file(ManageDocumentOperation const& options, std::st
 
   return Success();
 } catch (...) {
-  return Failure(boost::current_exception_diagnostic_information());
+  return Failure(::debug::current_exception_diagnostic_information());
 }
 
 result_t cfd::write_document_file(ManageDocumentOperation const& options, std::string const& file_src_name) try {
@@ -98,7 +98,7 @@ result_t cfd::write_document_file(ManageDocumentOperation const& options, std::s
 #ifdef _WRITE_DEBUG_FILE_
   std::cout << "Returned buffer:\n" << result.second << "\n";
 
-  auto file_out_name = std::string(artdaq::database::mkdir(tmpdir))
+  auto file_out_name = std::string(artdaq::database::mkdir(tmpdir)).append("/")
                            .append(option::appname)
                            .append("-")
                            .append(options.operation())
@@ -106,16 +106,14 @@ result_t cfd::write_document_file(ManageDocumentOperation const& options, std::s
                            .append(basename((char*)file_src_name.c_str()))
                            .append(".txt");
 
-  std::ofstream os(file_out_name.c_str());
-  std::copy(result.second.begin(), result.second.end(), std::ostream_iterator<char>(os));
-  os.close();
+  db::write_buffer_to_file(result,file_out_name);
 
   std::cout << "Wrote file:" << file_out_name << "\n";
 #endif  //_WRITE_DEBUG_FILE_
 
   return Success();
 } catch (...) {
-  return Failure(boost::current_exception_diagnostic_information());
+  return Failure(::debug::current_exception_diagnostic_information());
 }
 
 void cfd::export_configuration(ManageDocumentOperation const&, std::string&) {

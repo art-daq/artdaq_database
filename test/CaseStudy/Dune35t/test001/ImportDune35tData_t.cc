@@ -123,7 +123,7 @@ int main(int argc, char* argv[]) try {
      write_document_file(options,file_name);
   }
 } catch (...) {
-  std::cout << "Process exited with error: " << boost::current_exception_diagnostic_information();
+  std::cout << "Process exited with error: " << ::debug::current_exception_diagnostic_information();
   return process_exit_code::UNCAUGHT_EXCEPTION;
 }
 
@@ -133,9 +133,9 @@ int write_document_file(Options const& options, std::string const& file_src_name
   std::cout << "write_document_file file name=<" << file_src_name << ">\n";
   std::cout << "write_document_file operation=<" << options.operation() << ">\n";
 
-  std::ifstream is(file_src_name);
-  auto test_document = std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-  is.close();
+        auto test_document=std::string{};
+      db::read_buffer_from_file(test_document,file_src_name);
+
 
   auto options_string = options.to_string();
   
@@ -151,7 +151,7 @@ int write_document_file(Options const& options, std::string const& file_src_name
 
   std::cout << "Returned buffer:\n" << result.second << "\n";
 
-  auto file_out_name = std::string(db::filesystem::mkdir(tmpdir))
+  auto file_out_name = std::string(db::filesystem::mkdir(tmpdir)).append("/")
                            .append(option::appname)
                            .append("-")
                            .append(options.operation())
@@ -159,15 +159,13 @@ int write_document_file(Options const& options, std::string const& file_src_name
                            .append(basename((char*)file_src_name.c_str()))
                            .append(".txt");
 
-  std::ofstream os(file_out_name.c_str());
-  std::copy(result.second.begin(), result.second.end(), std::ostream_iterator<char>(os));
-  os.close();
-
+  db::write_buffer_to_file(result.second,file_out_name);
+			   
   std::cout << "Wrote file:" << file_out_name << "\n";
 
   return process_exit_code::FAILURE;
 } catch (...) {
-  std::cout << "Process exited with error: " << boost::current_exception_diagnostic_information();
+  std::cout << "Process exited with error: " << ::debug::current_exception_diagnostic_information();
   return process_exit_code::UNCAUGHT_EXCEPTION;
 }
 

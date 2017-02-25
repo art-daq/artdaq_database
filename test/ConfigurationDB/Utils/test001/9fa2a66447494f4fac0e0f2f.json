@@ -1,0 +1,202 @@
+{
+"document" : {
+"data" : {
+"NAME" : "DATA_MANAGER_SUPERVISOR_CONFIGURATION",
+"COMMENT" : "Now it lets me set a type on theLinkToDataManagerConfiguration column.",
+"AUTHOR" : "admin",
+"CREATION_TIME" : 1483996189,
+"COL_TYPES" : {
+"SUPERVISOR_UID" : "VARCHAR2",
+"LINK_TO_DATA_MANAGER_CONFIGURATION" : "VARCHAR2",
+"LINK_TO_DATA_MANAGER_GROUP_ID" : "VARCHAR2",
+"COMMENT_DESCRIPTION" : "VARCHAR2",
+"AUTHOR" : "VARCHAR2",
+"RECORD_INSERTION_TIME" : "TIMESTAMP WITH TIMEZONE"
+},
+"DATA_SET" : [
+{
+"SUPERVISOR_UID" : "ARTDataManagerSupervisor0",
+"LINK_TO_DATA_MANAGER_CONFIGURATION" : "DataManagerConfiguration",
+"LINK_TO_DATA_MANAGER_GROUP_ID" : "ART_S0_DataManager0",
+"COMMENT_DESCRIPTION" : "",
+"AUTHOR" : "admin",
+"RECORD_INSERTION_TIME" : "1479419572"
+},
+{
+"SUPERVISOR_UID" : "ARTDataManagerSupervisor1",
+"LINK_TO_DATA_MANAGER_CONFIGURATION" : "DataManagerConfiguration",
+"LINK_TO_DATA_MANAGER_GROUP_ID" : "ART_S1_DataManager0",
+"COMMENT_DESCRIPTION" : "",
+"AUTHOR" : "admin",
+"RECORD_INSERTION_TIME" : "1479419572"
+},
+{
+"SUPERVISOR_UID" : "ARTDataManagerSupervisor2",
+"LINK_TO_DATA_MANAGER_CONFIGURATION" : "DataManagerConfiguration",
+"LINK_TO_DATA_MANAGER_GROUP_ID" : "ART_S2_DataManager0",
+"COMMENT_DESCRIPTION" : "No Comment",
+"AUTHOR" : "admin",
+"RECORD_INSERTION_TIME" : "1483996189"
+},
+{
+"SUPERVISOR_UID" : "ARTDataManagerSupervisor3",
+"LINK_TO_DATA_MANAGER_CONFIGURATION" : "DataManagerConfiguration",
+"LINK_TO_DATA_MANAGER_GROUP_ID" : "ART_S3_DataManager0",
+"COMMENT_DESCRIPTION" : "No Comment",
+"AUTHOR" : "admin",
+"RECORD_INSERTION_TIME" : "1483996189"
+}
+]
+},
+"metadata" : {
+"comments" : {
+"empty" : "empty"
+}
+},
+"search" : [
+{
+"name" : "find any",
+"query" : "not defined"
+}
+]
+},
+"origin" : {
+"format" : "json"
+},
+"version" : "0",
+"configurations" : [
+{
+"name" : "notprovided",
+"assigned" : "Mon Feb  6 18:45:30 2017"
+},
+{
+"name" : "lcls2Configuration_v0",
+"assigned" : "Mon Feb  6 18:45:31 2017"
+},
+{
+"name" : "lcls2Configuration_v1",
+"assigned" : "Tue Feb  7 10:34:06 2017"
+},
+{
+"name" : "lcls2Configuration_v2",
+"assigned" : "Tue Feb  7 10:36:00 2017"
+},
+{
+"name" : "lcls2Configuration_v3",
+"assigned" : "Tue Feb  7 10:38:14 2017"
+},
+{
+"name" : "lcls2Configuration_v4",
+"assigned" : "Tue Feb  7 10:55:45 2017"
+},
+{
+"name" : "lcls2Configuration_v5",
+"assigned" : "Tue Feb  7 10:58:30 2017"
+},
+{
+"name" : "lcls2Configuration_v6",
+"assigned" : "Fri Feb 10 11:42:47 2017"
+},
+{
+"name" : "ConfigGroupWizToLatest_v0",
+"assigned" : "Fri Feb 10 11:43:32 2017"
+},
+{
+"name" : "lcls2Configuration_v7",
+"assigned" : "Tue Feb 14 11:30:48 2017"
+},
+{
+"name" : "lcls2Configuration_v8",
+"assigned" : "Tue Feb 14 11:44:20 2017"
+},
+{
+"name" : "lcls2Configuration_v9",
+"assigned" : "Tue Feb 14 11:52:24 2017"
+},
+{
+"name" : "lcls2Configuration_v10",
+"assigned" : "Tue Feb 14 11:57:20 2017"
+},
+{
+"name" : "lcls2Configuration_v11",
+"assigned" : "Tue Feb 14 12:01:58 2017"
+},
+{
+"name" : "lcls2Configuration_v12",
+"assigned" : "Tue Feb 14 12:13:42 2017"
+}
+],
+"aliases" : {
+"active" : [
+
+],
+"history" : [
+
+]
+},
+"changelog" : "empty",
+"bookkeeping" : {
+"isdeleted" : false,
+"isreadonly" : true,
+"created" : "Tue Dec 29 18:19:25 2015",
+"updates" : [
+{
+"addToGlobalConfig" : "Mon Feb  6 18:45:30 2017"
+},
+{
+"setVersion" : "Mon Feb  6 18:45:30 2017"
+},
+{
+"setConfigurableEntity" : "Mon Feb  6 18:45:30 2017"
+},
+{
+"addToGlobalConfig" : "Mon Feb  6 18:45:31 2017"
+},
+{
+"addToGlobalConfig" : "Tue Feb  7 10:34:06 2017"
+},
+{
+"addToGlobalConfig" : "Tue Feb  7 10:36:00 2017"
+},
+{
+"addToGlobalConfig" : "Tue Feb  7 10:38:14 2017"
+},
+{
+"addToGlobalConfig" : "Tue Feb  7 10:55:45 2017"
+},
+{
+"addToGlobalConfig" : "Tue Feb  7 10:58:30 2017"
+},
+{
+"addToGlobalConfig" : "Fri Feb 10 11:42:47 2017"
+},
+{
+"addToGlobalConfig" : "Fri Feb 10 11:43:32 2017"
+},
+{
+"addToGlobalConfig" : "Tue Feb 14 11:30:48 2017"
+},
+{
+"addToGlobalConfig" : "Tue Feb 14 11:44:20 2017"
+},
+{
+"addToGlobalConfig" : "Tue Feb 14 11:52:24 2017"
+},
+{
+"addToGlobalConfig" : "Tue Feb 14 11:57:20 2017"
+},
+{
+"addToGlobalConfig" : "Tue Feb 14 12:01:58 2017"
+},
+{
+"addToGlobalConfig" : "Tue Feb 14 12:13:42 2017"
+}
+]
+},
+"configurable_entity" : {
+"name" : "OTSROOT"
+},
+"_id" : {
+"_oid" : "9fa2a66447494f4fac0e0f2f"
+}
+}

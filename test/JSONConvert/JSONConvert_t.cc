@@ -1,4 +1,3 @@
-#include <boost/exception/diagnostic_information.hpp>
 #include <fstream>
 #include <iostream>
 #include <streambuf>
@@ -51,7 +50,7 @@ int main(int argc, char* argv[]) try {
   return process_exit_code::SUCCESS;
 
 } catch (...) {
-  std::cerr << "Process exited with error: " << boost::current_exception_diagnostic_information();
+  std::cerr << "Process exited with error: " << ::debug::current_exception_diagnostic_information();
   return process_exit_code::UNCAUGHT_EXCEPTION;
 }
 

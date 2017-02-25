@@ -37,7 +37,7 @@ SearchIndex::~SearchIndex() {
     _close();
   } catch (...) {
     TRACE_(10, "Exception in StorageProvider::FileSystemDB::~SearchIndex() "
-                   << boost::current_exception_diagnostic_information());
+                   << ::debug::current_exception_diagnostic_information());
   }
 }
 
@@ -384,7 +384,7 @@ bool SearchIndex::addDocument(JsonData const& document, object_id_t const& ouid)
     }
 
     TRACE_(5, "Exception in StorageProvider::FileSystemDB::index::addDocument() "
-                  << boost::current_exception_diagnostic_information());
+                  << ::debug::current_exception_diagnostic_information());
   }
 
   return false;
@@ -447,7 +447,7 @@ bool SearchIndex::removeDocument(JsonData const& document, object_id_t const& ou
     }
 
     TRACE_(6, "Exception in StorageProvider::FileSystemDB::index::removeDocument() "
-                  << boost::current_exception_diagnostic_information());
+                  << ::debug::current_exception_diagnostic_information());
   }
 
   return false;
@@ -455,19 +455,13 @@ bool SearchIndex::removeDocument(JsonData const& document, object_id_t const& ou
 
 bool SearchIndex::_create(boost::filesystem::path const& index_path) {
   try {
-    std::ofstream os(index_path.c_str());
-
     auto json = std::string{
         "{\"ouid\":[], \"version\":{},\"configurations.name\":{}, \"entities.name\":{}, \"aliases.active.name\":{}, \"runs.name\":{} }"};
 
-    std::copy(json.begin(), json.end(), std::ostream_iterator<char>(os));
-
-    os.close();
-
-    return true;
+    return db::write_buffer_to_file(json,{index_path.c_str()});    
   } catch (...) {
     TRACE_(11, "Exception in StorageProvider::FileSystemDB::SearchIndex::_create() "
-                   << boost::current_exception_diagnostic_information());
+                   << ::debug::current_exception_diagnostic_information());
     return false;
   }
 }
@@ -496,11 +490,9 @@ bool SearchIndex::_open(boost::filesystem::path const& index_path) {
                                         << index_path.c_str() << ">";
   }
 
-  std::ifstream is(index_path.c_str());
 
-  std::string json((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-
-  is.close();
+  auto json=std::string{};
+  db::read_buffer_from_file(json,{index_path.c_str()});
 
   TRACE_(3, "StorageProvider::FileSystemDB::index::_open() json=<" << json << ">");
 
@@ -527,11 +519,11 @@ bool SearchIndex::_rebuild(boost::filesystem::path const& index_path) {
   try {
     if (!_create(index_path))
       TRACE_(13, "Exception in StorageProvider::FileSystemDB::index::_rebuild() "
-                     << boost::current_exception_diagnostic_information());
+                     << ::debug::current_exception_diagnostic_information());
 
     if (!_open(index_path))
       TRACE_(13, "Exception in StorageProvider::FileSystemDB::index::_rebuild() "
-                     << boost::current_exception_diagnostic_information());
+                     << ::debug::current_exception_diagnostic_information());
 
     auto files = dbfs::list_files_in_directory(index_path.parent_path(), "");
 
@@ -560,7 +552,7 @@ bool SearchIndex::_rebuild(boost::filesystem::path const& index_path) {
     TRACE_(13,
            "StorageProvider::FileSystemDB::index::_rebuild() Failed to "
            "rebuild SearchIndex; error:"
-               << boost::current_exception_diagnostic_information());
+               << ::debug::current_exception_diagnostic_information());
     return false;
   }
 }
@@ -584,20 +576,15 @@ bool SearchIndex::_close() {
   TRACE_(4, "StorageProvider::FileSystemDB::index::_close() json=<" << json << ">");
 
   try {
-    std::ofstream os(_path.c_str());
-
-    std::copy(json.begin(), json.end(), std::ostream_iterator<char>(os));
-
-    os.close();
-
+    auto result=db::write_buffer_to_file(json,{_path.c_str()});    
     TRACE_(4, "StorageProvider::FileSystemDB::index::_close() Closed SearchIndex.");
-
-    return true;
+    
+    return result;
   } catch (...) {
     TRACE_(4,
            "StorageProvider::FileSystemDB::index::_close() Failed to write "
            "SearchIndex; error:"
-               << boost::current_exception_diagnostic_information());
+               << ::debug::current_exception_diagnostic_information());
     return false;
   }
 }

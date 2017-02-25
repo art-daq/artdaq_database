@@ -3,6 +3,8 @@
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/JsonDocument/common.h"
 
+#include <boost/filesystem.hpp>
+
 #ifdef TRACE_NAME
 #undef TRACE_NAME
 #endif
@@ -195,28 +197,30 @@ bool JSONDocument::equals(JSONDocument const& other) const {
 }
 
 JSONDocument JSONDocument::loadFromFile(std::string const& fileName) try {
-  if (fileName.empty()) throw invalid_argument("JSONDocument") << "Failed calling loadFromFile(): File name is empty.";
-
-  std::ifstream is;
-  is.open(fileName.c_str());
-
-  if (!is.good()) {
-    is.close();
-
-    throw invalid_argument("JSONDocument") << "Failed calling loadFromFile(): Failed opening a JSON file=" << fileName;
-  }
-
-  std::string json_buffer((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-
-  is.close();
-
-  if (json_buffer.empty())
-    throw invalid_argument("JSONDocument") << "Failed calling loadFromFile(): File is empty; file=" << fileName;
+  auto json_buffer=std::string{};
+  
+  if(!db::read_buffer_from_file(json_buffer, fileName))
+       throw invalid_argument("JSONDocument") << "Failed calling loadFromFile(): Failed opening a JSON file=" << fileName;
 
   return {json_buffer};
 } catch (std::exception& ex) {
   throw runtime_error("JSONDocument") << "Failed calling loadFromFile(): Caught exception:" << ex.what();
 }
+
+bool JSONDocument::saveToFile(std::string const& fileName)try {
+  if (fileName.empty()) throw invalid_argument("JSONDocument") << "Failed calling saveToFile(): File name is empty.";
+
+  if (boost::filesystem::exists(fileName)){
+    boost::filesystem::copy_file(fileName,std::string{fileName}+".bak",boost::filesystem::copy_option::overwrite_if_exists);
+  }
+  
+  auto buffer=to_string();  
+
+  return db::write_buffer_to_file(buffer,fileName);
+} catch (std::exception& ex) {
+  throw runtime_error("JSONDocument") << "Failed calling saveToFile(): Caught exception:" << ex.what();  
+}
+
 
 JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& document) {
   _overlay.reset(nullptr);
