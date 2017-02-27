@@ -215,6 +215,10 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
     return process_exit_code::HELP;
   }
 
+  if (vm.count(apiliteral::option::result)) {
+    resultFileName(vm[apiliteral::option::result].as<std::string>());
+  }else {resultFileName("${HOME}/${0}.result.out");}
+  
   if (vm.count(apiliteral::option::searchquery)) {
     auto json = vm[apiliteral::option::searchquery].as<std::string>();
     std::ifstream is(json.c_str());
@@ -265,10 +269,6 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
     queryFilter(vm[apiliteral::option::searchfilter].as<std::string>());
   }
   
-  if (vm.count(apiliteral::option::result)) {
-    resultFileName(vm[apiliteral::option::result].as<std::string>());
-  }else {resultFileName("${HOME}/${0}.result.out");}
-
   return process_exit_code::SUCCESS;
 }
 

@@ -673,7 +673,7 @@ void write_documents(ManageDocumentOperation const& options, std::list<JsonData>
     return providers.at(name);
   };
 
-  TRACE_(2, "write_documents: writing " << document_list.size() << "documents.");
+  TRACE_(2, "write_documents: writing " << document_list.size() << " documents.");
 
   for (auto const& document : document_list) {
     JSONDocumentBuilder builder{{document}};
