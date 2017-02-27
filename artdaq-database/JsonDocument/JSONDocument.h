@@ -15,9 +15,11 @@ using artdaq::database::json::value_t;
 using artdaq::database::basictypes::JsonData;
 
 class JSONDocumentBuilder;
+class JSONDocumentMigrator;
 
 class JSONDocument final {
   friend class JSONDocumentBuilder;
+  friend class JSONDocumentMigrator;
 
  public:
   JSONDocument(JsonData const&); 

@@ -31,17 +31,33 @@ namespace dbdr = artdaq::database::docrecord;
 
 namespace jsonliteral = artdaq::database::dataformats::literal;
 
+using namespace artdaq::database::sharedtypes;
+
 JSONDocumentMigrator::JSONDocumentMigrator(JSONDocument const& document)
     : _document(document){}
 
 JSONDocumentMigrator::operator JSONDocument() const {
-  TRACE_(3, "JSONDocumentMigrator() begin");
   JSONDocumentBuilder builder{};
   
 
   builder.createFromData(_document);
   
-  TRACE_(3, "JSONDocumentMigrator() end");
+  auto version=jsn::object_t{};
+  version[jsonliteral::name]= _document.findChildValue(jsonliteral::version);  
+  builder.setVersion({version});
+  
+  auto entity= _document.findChildDocument("configurable_entity");  
+  builder.addEntity(entity);
+
+  jsn::value_t configs=_document.findChildValue(jsonliteral::configurations);
+  
+  for(auto const& config: unwrap(configs).value_as<jsn::array_t>()){
+    builder.addConfiguration({config});
+  }
+  
+  jsn::value_t oid=_document.findChildValue("_id._oid");
+  builder.setObjectID(db::to_id(unwrap(oid).value_as<std::string>()));    
+    
   return  builder.extract();
 }
     

@@ -2,20 +2,6 @@
 
 #include "artdaq-database/ConfigurationDB/common.h"
 #include "artdaq-database/ConfigurationDB/conftoolifc.h"
-/*
-#include "artdaq-database/BasicTypes/basictypes.h"
-#include "artdaq-database/ConfigurationDB/configuration_common.h"
-#include "artdaq-database/ConfigurationDB/dispatch_common.h"
-
-#include "artdaq-database/JsonDocument/JSONDocument.h"
-#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
-#include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
-#include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb_index.h"
-
-#include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
-
-#include "artdaq-database/DataFormats/Json/json_reader.h"
-*/
 
 namespace db = artdaq::database;
 namespace bpo = boost::program_options;
