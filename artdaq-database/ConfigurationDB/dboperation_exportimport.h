@@ -43,6 +43,8 @@ void ExportImport();
 }
 
 }  // namespace configuration
+void set_default_locale();
+
 }  // namespace database
 }  // namespace artdaq
 #endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_EXPORTIMPORT_H_ */

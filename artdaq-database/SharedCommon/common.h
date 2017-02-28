@@ -2,11 +2,12 @@
 #define _ARTDAQ_DATABASE_COMMON_H_
 
 #include <algorithm>
+#include <chrono>
 #include <cstddef>
 #include <cstdio>
-#include <chrono>
 #include <fstream>
 #include <functional>
+#include <iomanip>
 #include <iostream>
 #include <iterator>
 #include <memory>
@@ -17,7 +18,6 @@
 #include <tuple>
 #include <type_traits>
 #include <vector>
-#include <iomanip>
 
 #include <boost/core/demangle.hpp>
 #include <boost/lexical_cast.hpp>

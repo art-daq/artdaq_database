@@ -14,6 +14,7 @@ class ovlId final : public ovlKeyValue {
  public:
   ovlId(object_t::key_type const& /*key*/, value_t& /*oid*/);
 
+  bool newId();
   // defaults
   ovlId(ovlId&&) = default;
   ~ovlId() = default;

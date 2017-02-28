@@ -5,7 +5,7 @@
 
 namespace artdaq {
 namespace database {
-namespace basictypes {  
+namespace basictypes {
 class JsonData;
 }
 namespace docrecord {
@@ -22,7 +22,7 @@ class JSONDocument final {
   friend class JSONDocumentMigrator;
 
  public:
-  JSONDocument(JsonData const&); 
+  JSONDocument(JsonData const&);
   JSONDocument(std::string const&);
   JSONDocument(value_t const&);
   JSONDocument();
@@ -35,9 +35,9 @@ class JSONDocument final {
   JSONDocument deleteChild(path_t const&);
   // returns found child
   JSONDocument findChild(path_t const&) const;
-  //returns found child value as a document
+  // returns found child value as a document
   JSONDocument findChildDocument(path_t const&) const;
-  
+
   // returns added child
   JSONDocument appendChild(JSONDocument const&, path_t const&);
   // returns removed child
@@ -45,7 +45,6 @@ class JSONDocument final {
 
   std::string to_string() const;
   std::string value() { return JSONDocument::value(self()); };
-  bool isReadonly() const;
 
   bool equals(JSONDocument const&) const;
 
@@ -57,11 +56,10 @@ class JSONDocument final {
 
   // utilities
   bool saveToFile(std::string const&);
-  
+
   static std::string value(JSONDocument const&);
   static std::string value_at(JSONDocument const&, std::size_t);
   static JSONDocument loadFromFile(std::string const&);
-  
 
   // defaults
   ~JSONDocument() = default;

@@ -28,9 +28,9 @@ class ovlFixedList final : public ovlKeyValue {
   result_t add(ElementUPtr_t&);
   result_t remove(ElementUPtr_t&);
 
-  typename List_t::const_iterator begin() const {return _list.begin();}
-  typename List_t::const_iterator end() const {return _list.end();}
-  
+  typename List_t::const_iterator begin() const { return _list.begin(); }
+  typename List_t::const_iterator end() const { return _list.end(); }
+
   // overrides
   std::string to_string() const override;
 

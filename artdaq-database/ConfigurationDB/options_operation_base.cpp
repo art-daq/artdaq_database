@@ -32,7 +32,8 @@ std::string expand_environment_variables(std::string var);
 }
 }
 
-OperationBase::OperationBase(std::string const& process_name) : _process_name{process_name},_provider{_getProviderFromURI()}{}
+OperationBase::OperationBase(std::string const& process_name)
+    : _process_name{process_name}, _provider{_getProviderFromURI()} {}
 
 std::string const& OperationBase::operation() const {
   confirm(!_operation.empty());
@@ -131,9 +132,7 @@ std::string const& OperationBase::queryFilter(std::string const& query_payload) 
   return _query_payload;
 }
 
-std::string const& OperationBase::processName() const{
-  return _process_name;
-}
+std::string const& OperationBase::processName() const { return _process_name; }
 
 std::string const& OperationBase::resultFileName() const {
   confirm(!_result_file_name.empty());
@@ -141,16 +140,16 @@ std::string const& OperationBase::resultFileName() const {
   return _result_file_name;
 }
 
-std::string const& OperationBase::resultFileName(std::string const& result_file_name){
+std::string const& OperationBase::resultFileName(std::string const& result_file_name) {
   confirm(!result_file_name.empty());
 
-  _result_file_name= db::expand_environment_variables(result_file_name);
-  
+  _result_file_name = db::expand_environment_variables(result_file_name);
+
   TRACE_(14, "Options: resultFileName args result_file_name=<" << _result_file_name << ">.");
 
   return _result_file_name;
 }
-  
+
 JsonData OperationBase::query_filter_to_JsonData() const {
   if (queryFilter() != apiliteral::notprovided) {
     return {queryFilter()};
@@ -217,8 +216,10 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
 
   if (vm.count(apiliteral::option::result)) {
     resultFileName(vm[apiliteral::option::result].as<std::string>());
-  }else {resultFileName("${HOME}/${0}.result.out");}
-  
+  } else {
+    resultFileName("${HOME}/${0}.result.out");
+  }
+
   if (vm.count(apiliteral::option::searchquery)) {
     auto json = vm[apiliteral::option::searchquery].as<std::string>();
     std::ifstream is(json.c_str());
@@ -268,7 +269,7 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
   if (vm.count(apiliteral::option::searchfilter)) {
     queryFilter(vm[apiliteral::option::searchfilter].as<std::string>());
   }
-  
+
   return process_exit_code::SUCCESS;
 }
 
@@ -276,7 +277,7 @@ void OperationBase::readJsonData(JsonData const& data) {
   TRACE_(14, "OperationBase::readJsonData() data=<" << data << ">");
   confirm(!data.empty());
   TRACE_(14, "OperationBase::readJsonData() not empty=<" << data << ">");
-  confirm(data.json_buffer != apiliteral::notprovided);  
+  confirm(data.json_buffer != apiliteral::notprovided);
   TRACE_(14, "OperationBase::readJsonData() object=<" << data << ">");
 
   using namespace artdaq::database::json;

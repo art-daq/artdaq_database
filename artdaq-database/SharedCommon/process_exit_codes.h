@@ -13,11 +13,10 @@ namespace trace_mode {
 constexpr auto modeM = 1LL;
 
 #ifndef NDEBUG
-constexpr auto modeS = 0LL;
+constexpr auto modeS = 1LL;
 #else
-constexpr auto modeS = 0LL;
+constexpr auto modeS = 1LL;
 #endif
-
 }
 
 #endif  // _PROCESS_EXIT_CODES_H_

@@ -115,7 +115,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::setObjectID(JSONDocument const& object
 
   JSONDocument copy(objectId);
   auto id = std::make_unique<ovl::ovlId>(jsonliteral::id, copy.findChildValue(jsonliteral::id));
-  
+
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->swap(id));
 
@@ -129,13 +129,11 @@ JSONDocumentBuilder& JSONDocumentBuilder::setObjectID(JSONDocument const& object
   return self();
 }
 
-JSONDocument JSONDocumentBuilder::getObjectID() const {
-  return { _overlay->id().to_string()};
-}
+JSONDocument JSONDocumentBuilder::getObjectID() const { return {_overlay->id().to_string()}; }
 
-std::string JSONDocumentBuilder::getObjectOUID() const{
-    return { _overlay->id().oid()};
-}
+std::string JSONDocumentBuilder::getObjectOUID() const { return {_overlay->id().oid()}; }
+
+bool JSONDocumentBuilder::newObjectID() { return {_overlay->id().newId()}; }
 
 JSONDocumentBuilder& JSONDocumentBuilder::setVersion(JSONDocument const& version) try {
   TRACE_(6, "setVersion() args  version=<" << version << ">");
@@ -159,8 +157,9 @@ JSONDocumentBuilder& JSONDocumentBuilder::setVersion(JSONDocument const& version
 JSONDocumentBuilder& JSONDocumentBuilder::setCollection(JSONDocument const& collection) try {
   TRACE_(6, "collection() args  collection=<" << collection << ">");
 
-  auto copy =collection.findChild(jsonliteral::collection);
-  auto ovl = std::make_unique<ovl::ovlCollection>(jsonliteral::collection, copy.findChildValue(jsonliteral::collection));
+  auto copy = collection.findChild(jsonliteral::collection);
+  auto ovl =
+      std::make_unique<ovl::ovlCollection>(jsonliteral::collection, copy.findChildValue(jsonliteral::collection));
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->setCollection(ovl));
@@ -244,21 +243,23 @@ JSONDocumentBuilder& JSONDocumentBuilder::markDeleted() try {
   return self();
 }
 
+bool JSONDocumentBuilder::isReadonlyOrDeleted() const { return _overlay->isReadonlyOrDeleted(); }
+
 std::list<std::string> JSONDocumentBuilder::extractTags() const {
-  auto retValue =std::list<std::string>{};
-  
-  retValue.push_back( std::string(jsonliteral::version).append(":").append(_overlay->version().string_value()));
+  auto retValue = std::list<std::string>{};
+
+  retValue.push_back(std::string(jsonliteral::version).append(":").append(_overlay->version().string_value()));
 
   auto const& configurations = _overlay->configurations();
-  
-  for(auto const& configuration:configurations){
-    retValue.push_back( std::string(jsonliteral::configuration).append(":").append(configuration.name()));
+
+  for (auto const& configuration : configurations) {
+    retValue.push_back(std::string(jsonliteral::configuration).append(":").append(configuration.name()));
   }
 
   auto const& entities = _overlay->entities();
-  
-  for(auto const& entity:entities){
-    retValue.push_back( std::string(jsonliteral::entity).append(":").append(entity.name()));
+
+  for (auto const& entity : entities) {
+    retValue.push_back(std::string(jsonliteral::entity).append(":").append(entity.name()));
   }
 
   return retValue;

@@ -109,7 +109,7 @@ std::vector<std::string> utl::split_path(std::string const& path) {
   if (!tokens.empty()) {
     std::ostringstream oss;
     for (auto const& token : tokens) oss << "\"" << token << "\",";
-  } 
+  }
 
   return tokens;
 }
@@ -150,8 +150,7 @@ std::string JSONDocument::writeJson() const {
 
 std::string JSONDocument::to_string() const { return writeJson(); }
 
-JSONDocument::JSONDocument(JsonData const& data)
-    : _value{readJson(data)}, _cached_json_buffer(data) {}
+JSONDocument::JSONDocument(JsonData const& data) : _value{readJson(data)}, _cached_json_buffer(data) {}
 
 JSONDocument::JSONDocument(std::string const& json) : _value{readJson(json)}, _cached_json_buffer(json) {}
 
@@ -182,8 +181,6 @@ value_t const& JSONDocument::getPayloadValueForKey(object_t::key_type const& key
   return _value;
 }
 
-bool JSONDocument::isReadonly() const { return false; }
-
 bool JSONDocument::equals(JSONDocument const& other) const {
   auto result = jsn::operator==(_value, other._value);
 
@@ -197,30 +194,30 @@ bool JSONDocument::equals(JSONDocument const& other) const {
 }
 
 JSONDocument JSONDocument::loadFromFile(std::string const& fileName) try {
-  auto json_buffer=std::string{};
-  
-  if(!db::read_buffer_from_file(json_buffer, fileName))
-       throw invalid_argument("JSONDocument") << "Failed calling loadFromFile(): Failed opening a JSON file=" << fileName;
+  auto json_buffer = std::string{};
+
+  if (!db::read_buffer_from_file(json_buffer, fileName))
+    throw invalid_argument("JSONDocument") << "Failed calling loadFromFile(): Failed opening a JSON file=" << fileName;
 
   return {json_buffer};
 } catch (std::exception& ex) {
   throw runtime_error("JSONDocument") << "Failed calling loadFromFile(): Caught exception:" << ex.what();
 }
 
-bool JSONDocument::saveToFile(std::string const& fileName)try {
+bool JSONDocument::saveToFile(std::string const& fileName) try {
   if (fileName.empty()) throw invalid_argument("JSONDocument") << "Failed calling saveToFile(): File name is empty.";
 
-  if (boost::filesystem::exists(fileName)){
-    boost::filesystem::copy_file(fileName,std::string{fileName}+".bak",boost::filesystem::copy_option::overwrite_if_exists);
+  if (boost::filesystem::exists(fileName)) {
+    boost::filesystem::copy_file(fileName, std::string{fileName} + ".bak",
+                                 boost::filesystem::copy_option::overwrite_if_exists);
   }
-  
-  auto buffer=to_string();  
 
-  return db::write_buffer_to_file(buffer,fileName);
+  auto buffer = to_string();
+
+  return db::write_buffer_to_file(buffer, fileName);
 } catch (std::exception& ex) {
-  throw runtime_error("JSONDocument") << "Failed calling saveToFile(): Caught exception:" << ex.what();  
+  throw runtime_error("JSONDocument") << "Failed calling saveToFile(): Caught exception:" << ex.what();
 }
-
 
 JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& document) {
   _overlay.reset(nullptr);

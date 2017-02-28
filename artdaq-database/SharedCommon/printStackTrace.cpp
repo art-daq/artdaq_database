@@ -17,7 +17,7 @@
 #include "artdaq-database/SharedCommon/printStackTrace.h"
 #include "artdaq-database/SharedCommon/process_exit_codes.h"
 
-#include <boost/exception/diagnostic_information.hpp> 
+#include <boost/exception/diagnostic_information.hpp>
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME

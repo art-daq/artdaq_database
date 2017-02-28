@@ -26,6 +26,17 @@ bool ovlId::init(value_t& parent) try {
   throw;
 }
 
+bool ovlId::newId() try {
+  auto& obj = object_value();
+  obj[jsonliteral::oid] = generate_oid();
+  confirm(obj.count(jsonliteral::oid) == 1);
+
+  return true;
+} catch (...) {
+  confirm(false);
+  throw;
+}
+
 std::string& ovlId::oid() { return value_as<std::string>(jsonliteral::oid); }
 
 std::string& ovlId::oid(std::string const& id) {

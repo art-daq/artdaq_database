@@ -26,7 +26,9 @@ using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocument;
 
 void prov::writeDocument(ManageDocumentOperation const& options, JsonData const& insert_payload) {
-  if (options.operation().compare(apiliteral::operation::writedocument) != 0) {
+  if (options.operation().compare(apiliteral::operation::writedocument) != 0
+    && options.operation().compare(apiliteral::operation::overwritedocument)!=0
+  ) {
     throw runtime_error("write_document") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
@@ -49,7 +51,7 @@ void prov::writeDocument(ManageDocumentOperation const& options, JsonData const&
 JsonData prov::readDocument(ManageDocumentOperation const& options, JsonData const& search_payload) {
   TRACE_(16, "readDocument(): begin");
 
-  auto collection = readDocuments(options,search_payload);
+  auto collection = readDocuments(options, search_payload);
 
   TRACE_(16, "read_document: "
                  << "Search returned " << collection.size() << " results.");
@@ -65,7 +67,7 @@ JsonData prov::readDocument(ManageDocumentOperation const& options, JsonData con
   return data;
 }
 
-std::list<JsonData> prov::readDocuments(ManageDocumentOperation const& options, JsonData const& search_payload){
+std::list<JsonData> prov::readDocuments(ManageDocumentOperation const& options, JsonData const& search_payload) {
   if (options.operation().compare(apiliteral::operation::readdocument) != 0) {
     throw runtime_error("read_documents") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
@@ -85,10 +87,9 @@ std::list<JsonData> prov::readDocuments(ManageDocumentOperation const& options, 
   TRACE_(16, "read_documents: "
                  << "Search returned " << collection.size() << " results.");
 
-  
   TRACE_(16, "readDocuments(): end");
 
-  return collection;  
+  return collection;
 }
 
 JsonData prov::findConfigurations(ManageDocumentOperation const& options, JsonData const& search_payload) {
@@ -138,7 +139,7 @@ JsonData prov::findConfigurations(ManageDocumentOperation const& options, JsonDa
   oss << "{ \"search\": [";
 
   for (auto const& global_config : global_configs) {
-    auto doc = JSONDocument{global_config };
+    auto doc = JSONDocument{global_config};
 
     auto global_config_name = JSONDocument::value(doc.findChild("filter").value());
 
@@ -146,7 +147,7 @@ JsonData prov::findConfigurations(ManageDocumentOperation const& options, JsonDa
 
     oss << printComma() << "{";
     oss << "\"name\" :\"" << global_config_name << "\",";
-    oss << "\"query\" :" << global_config ;
+    oss << "\"query\" :" << global_config;
     oss << "}";
   }
 
@@ -195,7 +196,7 @@ JsonData prov::configurationComposition(ManageDocumentOperation const& options, 
   oss << "{ \"search\": [\n";
 
   for (auto const& query_payload : query_payloads) {
-    auto filter_json = JSONDocument{query_payload }.findChild("filter").value();
+    auto filter_json = JSONDocument{query_payload}.findChild("filter").value();
 
     auto results = std::smatch();
 
@@ -215,7 +216,7 @@ JsonData prov::configurationComposition(ManageDocumentOperation const& options, 
 
     oss << printComma() << "{";
     oss << "\"name\" :\"" << results[1].str() << ":" << results[3].str() << "\",";
-    oss << "\"query\" :" << query_payload ;
+    oss << "\"query\" :" << query_payload;
     oss << "}\n";
   }
 
@@ -266,7 +267,7 @@ JsonData prov::findVersions(ManageDocumentOperation const& options, JsonData con
   oss << "{ \"search\": [";
 
   for (auto const& config_version : config_versions) {
-    auto filter_json = JSONDocument{config_version }.findChild("filter").value();
+    auto filter_json = JSONDocument{config_version}.findChild("filter").value();
 
     auto results = std::smatch();
 
@@ -287,7 +288,7 @@ JsonData prov::findVersions(ManageDocumentOperation const& options, JsonData con
     oss << printComma() << "{";
     oss << "\"name\" :\"" << results[1].str() /*<< ":" << results[3].str()*/
         << "\",";
-    oss << "\"query\" :" << config_version ;
+    oss << "\"query\" :" << config_version;
     oss << "}";
   }
 
@@ -335,7 +336,7 @@ JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData con
   oss << "{ \"search\": [";
 
   for (auto const& config_entity : config_entities) {
-    auto filter_json = JSONDocument{config_entity }.findChild("filter").value();
+    auto filter_json = JSONDocument{config_entity}.findChild("filter").value();
     TRACE_(18, "operation_findentities: filter_json=<" << filter_json << '>');
 
     auto results = std::smatch();
@@ -359,7 +360,7 @@ JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData con
     oss << printComma() << "{";
     oss << "\"name\" :\"" << results[2].str() /*<< ":" << results[3].str()*/
         << "\",";
-    oss << "\"query\" :" << config_entity ;
+    oss << "\"query\" :" << config_entity;
     oss << "}";
   }
 
@@ -384,7 +385,7 @@ JsonData prov::assignConfiguration(ManageDocumentOperation const& options, JsonD
 
   auto search =
       JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collection() + "\"}"};
-  TRACE_(20, "operation_addconfig: args search_payload=<" << search<< ">");
+  TRACE_(20, "operation_addconfig: args search_payload=<" << search << ">");
 
   auto document = ucon::readDocument(new_options, search);
   auto json_document = JSONDocument{document};
@@ -430,7 +431,7 @@ JsonData prov::removeConfiguration(ManageDocumentOperation const& options, JsonD
 
   auto search =
       JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collection() + "\"}"};
-  TRACE_(20, "operation_addconfig: args search_payload=<" << search<< ">");
+  TRACE_(20, "operation_addconfig: args search_payload=<" << search << ">");
 
   auto document = ucon::readDocument(new_options, search);
   auto json_document = JSONDocument{document};
@@ -495,12 +496,12 @@ JsonData prov::listCollections(ManageDocumentOperation const& options, JsonData 
   oss << "{ \"search\": [\n";
 
   for (auto const& collection_name : collection_names) {
-    auto name = JSONDocument{collection_name }.findChild("collection").value();
+    auto name = JSONDocument{collection_name}.findChild("collection").value();
     TRACE_(18, "operation_listcollections: collection=<" << name << '>');
 
     oss << printComma() << "{";
     oss << "\"name\" :\"" << name << "\",";
-    oss << "\"query\" :" << collection_name ;
+    oss << "\"query\" :" << collection_name;
     oss << "}\n";
   }
 
@@ -545,12 +546,12 @@ JsonData prov::listDatabases(ManageDocumentOperation const& options, JsonData co
   oss << "{ \"search\": [\n";
 
   for (auto const& database_name : database_names) {
-    auto name = JSONDocument{database_name }.findChild("database").value();
+    auto name = JSONDocument{database_name}.findChild("database").value();
     TRACE_(18, "operation_listdatabases: database=<" << name << '>');
 
     oss << printComma() << "{";
     oss << "\"name\" :\"" << name << "\",";
-    oss << "\"query\" :" << database_name ;
+    oss << "\"query\" :" << database_name;
     oss << "}\n";
   }
 
@@ -583,11 +584,11 @@ JsonData prov::readDbInfo(ManageDocumentOperation const& options, JsonData const
 
   auto const database_metadata = search_results.begin();
 
-  TRACE_(20, "operation_readdbinfo: database_metadata =<" << *database_metadata  << ">");
+  TRACE_(20, "operation_readdbinfo: database_metadata =<" << *database_metadata << ">");
 
   std::ostringstream oss;
   oss << "{ \"search\":\n";
-  oss << *database_metadata ;
+  oss << *database_metadata;
   oss << "\n}";
 
   return {oss.str()};

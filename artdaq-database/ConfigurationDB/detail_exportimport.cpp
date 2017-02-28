@@ -98,7 +98,8 @@ result_t cfd::write_document_file(ManageDocumentOperation const& options, std::s
 #ifdef _WRITE_DEBUG_FILE_
   std::cout << "Returned buffer:\n" << result.second << "\n";
 
-  auto file_out_name = std::string(artdaq::database::mkdir(tmpdir)).append("/")
+  auto file_out_name = std::string(artdaq::database::mkdir(tmpdir))
+                           .append("/")
                            .append(option::appname)
                            .append("-")
                            .append(options.operation())
@@ -106,7 +107,7 @@ result_t cfd::write_document_file(ManageDocumentOperation const& options, std::s
                            .append(basename((char*)file_src_name.c_str()))
                            .append(".txt");
 
-  db::write_buffer_to_file(result,file_out_name);
+  db::write_buffer_to_file(result, file_out_name);
 
   std::cout << "Wrote file:" << file_out_name << "\n";
 #endif  //_WRITE_DEBUG_FILE_
@@ -123,7 +124,6 @@ void cfd::export_configuration(ManageDocumentOperation const&, std::string&) {
 void cfd::import_configuration(ManageDocumentOperation const&, std::string&) {
   throw runtime_error("import_configuration") << "import_configuration: is not implemented";
 }
-
 
 void cftd::ExportImport() {
   TRACE_CNTL("name", TRACE_NAME);

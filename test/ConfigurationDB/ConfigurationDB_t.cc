@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) try {
   impl::enable_trace();
 
   debug::registerUngracefullExitHandlers();
-  artdaq::database::useFakeTime(true);
+  //artdaq::database::useFakeTime(true);
 #endif
 
   std::unique_ptr<db::configuration::OperationBase> options;

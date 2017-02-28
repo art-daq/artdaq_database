@@ -34,9 +34,9 @@ class ovlMovableList final : public ovlKeyValue {
   // ops
   result_t operator==(ovlMovableList const&) const;
 
-  typename List_t::const_iterator begin() const {return _active.begin();}
-  typename List_t::const_iterator end() const {return _active.end();}
-  
+  typename List_t::const_iterator begin() const { return _active.begin(); }
+  typename List_t::const_iterator end() const { return _active.end(); }
+
  private:
   List_t make_list(array_t& /*list*/);
   bool init(value_t& /*parent*/);

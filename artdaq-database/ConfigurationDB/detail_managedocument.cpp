@@ -54,7 +54,8 @@ typedef void (*provider_store_t)(Options const& /*options*/, JsonData const& /*i
 typedef JsonData (*provider_call_t)(Options const& /*options*/, JsonData const& /*task_payload*/);
 
 void write_document(Options const& options, std::string& conf) {
-  confirm(options.operation().compare(apiliteral::operation::writedocument) == 0);
+  confirm(options.operation().compare(apiliteral::operation::writedocument) == 0 ||
+          options.operation().compare(apiliteral::operation::overwritedocument) == 0);
 
   TRACE_(2, "write_document: begin");
 
@@ -150,13 +151,18 @@ void write_document(Options const& options, std::string& conf) {
   if (options.format() != data_format_t::db && options.format() != data_format_t::gui) {
     builder.createFromData(data);
   } else {
+    if (builder.isReadonlyOrDeleted() && options.operation().compare(apiliteral::operation::writedocument) == 0)
+      builder.newObjectID();
+
     filter = std::string{", \"filter\":"} + builder.getObjectID().to_string();
   }
 
-  builder.addConfiguration({options.configuration_to_JsonData()});
-  builder.setVersion({options.version_to_JsonData()});
-  builder.setCollection({options.collection_to_JsonData()});
-  builder.addEntity({options.entity_to_JsonData()});
+  if (!builder.isReadonlyOrDeleted()) {
+    builder.addConfiguration({options.configuration_to_JsonData()});
+    builder.setVersion({options.version_to_JsonData()});
+    builder.setCollection({options.collection_to_JsonData()});
+    builder.addEntity({options.entity_to_JsonData()});
+  }
 
   auto insert_payload =
       JsonData{"{\"document\":" + builder.to_string() + filter + ", \"collection\":\"" + options.collection() + "\"}"};
@@ -568,7 +574,7 @@ void mark_document_readonly(Options const& options, std::string& conf) {
 
   builder.markReadonly();
 
-  newOptions.operation(apiliteral::operation::writedocument);
+  newOptions.operation(apiliteral::operation::overwritedocument);
   newOptions.format(data_format_t::db);
 
   auto updated = builder.to_string();
@@ -608,7 +614,7 @@ void mark_document_deleted(Options const& options, std::string& conf) {
 
   builder.markDeleted();
 
-  newOptions.operation(apiliteral::operation::writedocument);
+  newOptions.operation(apiliteral::operation::overwritedocument);
   newOptions.format(data_format_t::db);
 
   auto updated = builder.to_string();
@@ -637,9 +643,9 @@ void read_documents(ManageDocumentOperation const& options, std::list<JsonData>&
   validate_dbprovider_name(options.provider());
 
   std::ostringstream oss;
-  oss << "{" << quoted_(jsonliteral::filter) <<  ":" << options.query_filter_to_JsonData() << ",";
-  oss << quoted_(jsonliteral::collection) << ":" <<  quoted_(options.collection()) << "}";  
-  
+  oss << "{" << quoted_(jsonliteral::filter) << ":" << options.query_filter_to_JsonData() << ",";
+  oss << quoted_(jsonliteral::collection) << ":" << quoted_(options.collection()) << "}";
+
   auto search_payload = oss.str();
 
   TRACE_(3, "read_documents: search_payload=<" << search_payload << ">");
@@ -677,6 +683,8 @@ void write_documents(ManageDocumentOperation const& options, std::list<JsonData>
 
   for (auto const& document : document_list) {
     JSONDocumentBuilder builder{{document}};
+
+    if (builder.isReadonlyOrDeleted()) builder.newObjectID();
 
     std::ostringstream oss;
     oss << "{" << quoted_(jsonliteral::document) << ":" << document.json_buffer << ",";

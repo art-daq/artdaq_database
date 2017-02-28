@@ -16,6 +16,7 @@ std::string db::make_database_metadata(std::string const& name, std::string cons
   oss << "document"_quoted << ":" << "{";
   oss << "name"_quoted     << ":" << quoted_(name) << ",";
   oss << "uri"_quoted      << ":" << quoted_(uri)  << ",";
+  oss << "locale"_quoted      << ":" << quoted_(apiliteral::database_format_locale)  << ",";
   oss << "create_time"_quoted << ":" << quoted_(timestamp())  << ",";
   oss << "create_user"_quoted << ":" << quoted_(expand_environment_variables("$USER"))  << ",";
   oss << "uname"_quoted << ":" << unamejson() << ",";

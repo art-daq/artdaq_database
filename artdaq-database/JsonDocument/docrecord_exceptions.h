@@ -5,7 +5,7 @@
 namespace artdaq {
 namespace database {
 namespace docrecord {
-  
+
 class notfound_exception : public cet::exception {
  public:
   explicit notfound_exception(std::string const& category_) : cet::exception(category_) {}

@@ -26,7 +26,9 @@ using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocument;
 
 void prov::writeDocument(ManageDocumentOperation const& options, JsonData const& insert_payload) {
-  if (options.operation().compare(apiliteral::operation::writedocument) != 0) {
+  if (options.operation().compare(apiliteral::operation::writedocument) != 0
+    && options.operation().compare(apiliteral::operation::overwritedocument)!=0
+  ) {
     throw runtime_error("write_document") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
@@ -49,7 +51,7 @@ void prov::writeDocument(ManageDocumentOperation const& options, JsonData const&
 JsonData prov::readDocument(ManageDocumentOperation const& options, JsonData const& search_payload) {
   TRACE_(16, "readDocument(): begin");
 
-  auto collection = readDocuments(options,search_payload);
+  auto collection = readDocuments(options, search_payload);
 
   TRACE_(16, "read_document: "
                  << "Search returned " << collection.size() << " results.");
@@ -85,10 +87,9 @@ std::list<JsonData> prov::readDocuments(ManageDocumentOperation const& options, 
   TRACE_(16, "read_documents: "
                  << "Search returned " << collection.size() << " results.");
 
-
   TRACE_(16, "readDocuments(): end");
 
-  return collection;  
+  return collection;
 }
 JsonData prov::findConfigurations(ManageDocumentOperation const& options, JsonData const& search_payload) {
   if (options.operation().compare(apiliteral::operation::findconfigs) != 0) {
@@ -196,7 +197,7 @@ JsonData prov::configurationComposition(ManageDocumentOperation const& options, 
   oss << "{ \"search\": [\n";
 
   for (auto const& query_payload : query_payloads) {
-    auto filter_json = JSONDocument{query_payload }.findChild("filter").value();
+    auto filter_json = JSONDocument{query_payload}.findChild("filter").value();
 
     auto results = std::smatch();
 
@@ -267,7 +268,7 @@ JsonData prov::findVersions(ManageDocumentOperation const& options, JsonData con
   oss << "{ \"search\": [";
 
   for (auto const& config_version : config_versions) {
-    auto filter_json = JSONDocument{config_version }.findChild("filter").value();
+    auto filter_json = JSONDocument{config_version}.findChild("filter").value();
 
     auto results = std::smatch();
 
@@ -336,7 +337,7 @@ JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData con
   oss << "{ \"search\": [";
 
   for (auto const& config_entity : config_entities) {
-    auto filter_json = JSONDocument{config_entity }.findChild("filter").value();
+    auto filter_json = JSONDocument{config_entity}.findChild("filter").value();
     TRACE_(18, "operation_findentities: filter_json=<" << filter_json << '>');
 
     auto results = std::smatch();
@@ -385,7 +386,7 @@ JsonData prov::assignConfiguration(ManageDocumentOperation const& options, JsonD
 
   auto search =
       JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collection() + "\"}"};
-  TRACE_(20, "operation_addconfig: args search_payload=<" << search<< ">");
+  TRACE_(20, "operation_addconfig: args search_payload=<" << search << ">");
 
   auto document = mongo::readDocument(new_options, search);
   auto json_document = JSONDocument{document};
@@ -430,7 +431,7 @@ JsonData prov::removeConfiguration(ManageDocumentOperation const& options, JsonD
 
   auto search =
       JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collection() + "\"}"};
-  TRACE_(20, "operation_addconfig: args search_payload=<" << search<< ">");
+  TRACE_(20, "operation_addconfig: args search_payload=<" << search << ">");
 
   auto document = mongo::readDocument(new_options, search);
   auto json_document = JSONDocument{document};
@@ -545,7 +546,7 @@ JsonData prov::listDatabases(ManageDocumentOperation const& options, JsonData co
   oss << "{ \"search\": [\n";
 
   for (auto const& database_name : database_names) {
-    auto name = JSONDocument{database_name }.findChild("database").value();
+    auto name = JSONDocument{database_name}.findChild("database").value();
     TRACE_(18, "operation_listdatabases: database=<" << name << '>');
 
     oss << printComma() << "{";

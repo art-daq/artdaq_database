@@ -106,18 +106,19 @@ bool db::read_buffer_from_file(std::string& buffer, std::string const& file_in_n
   confirm(buffer.empty());
 
   std::ifstream is(file_in_name);
-  
+
   if (!is.good()) {
     is.close();
 
-    throw invalid_argument("read_buffer_from_file") << "Failed calling read_buffer_from_file(): Failed opening a file=" << file_in_name;
-  }  
+    throw invalid_argument("read_buffer_from_file") << "Failed calling read_buffer_from_file(): Failed opening a file="
+                                                    << file_in_name;
+  }
 
   std::stringstream ss;
   ss << is.rdbuf();
   is.close();
 
-  buffer=std::move(ss.str());
+  buffer = std::move(ss.str());
 
   return true;
 } catch (...) {
@@ -198,7 +199,7 @@ std::string const& db::tarbzip2base64_to_dir(std::string const& bzip2base64, std
 
 bool db::extract_collectionname_from_filename(std::string const& file_name, std::string& collection_name) {
   confirm(!file_name.empty());
-  
+
   boost::filesystem::path p(file_name);
 
   if (p.extension().string() != apiliteral::dbexport_extension) return false;

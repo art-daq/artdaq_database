@@ -42,7 +42,7 @@ class OperationBase {
   std::string const& queryFilter(std::string const&);
 
   std::string const& processName() const;
-  
+
   std::string const& resultFileName() const;
   std::string const& resultFileName(std::string const&);
 
@@ -70,7 +70,7 @@ class OperationBase {
   data_format_t _data_format = {data_format_t::unknown};
   std::string _collection_name = {apiliteral::notprovided};
   std::string _query_payload = {apiliteral::notprovided};
-  
+
   std::string _result_file_name = {apiliteral::notprovided};
 };
 
