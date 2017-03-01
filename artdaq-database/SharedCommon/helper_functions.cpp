@@ -1,14 +1,19 @@
 #include "artdaq-database/SharedCommon/common.h"
 #include "artdaq-database/SharedCommon/helper_functions.h"
 #include "artdaq-database/SharedCommon/shared_exceptions.h"
+#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 
 #include <sys/utsname.h>
 #include <wordexp.h>
 #include <fstream>
 #include <regex>
+#include <clocale>
+#include <ctime>
 
 namespace db = artdaq::database;
 using namespace artdaq::database;
+
+namespace apiliteral = db::configapi::literal;
 
 std::string db::filter_jsonstring(std::string const& str) {
   confirm(!str.empty());
@@ -29,15 +34,19 @@ bool db::useFakeTime(bool useFakeTime = false) {
   return _useFakeTime;
 }
 
+void db::set_default_locale(){
+  std::setlocale(LC_ALL,apiliteral::database_format_locale);
+}
+
 std::string db::timestamp() {
   auto now = std::chrono::system_clock::now();
   std::time_t time = std::chrono::system_clock::to_time_t(now);
-  auto result = std::string(std::ctime(&time));
-  result.pop_back();
-
-  if (useFakeTime()) return "Mon Feb  8 14:00:30 2016";
-
-  return result;
+  char buff[100];
+  std::strftime(buff,sizeof(buff),apiliteral::timestamp_format, std::localtime(&time));
+  
+  if (useFakeTime()) return apiliteral::timestamp_faketime;
+  
+  return {buff};
 }
 
 std::string db::unamejson() {
@@ -136,11 +145,11 @@ std::string db::expand_environment_variables(std::string var) {
   for (size_t i = 0; i < p.we_wordc; i++) oss << w[i] << "/";
 
   ::wordfree(&p);
-  
-  auto result=oss.str();
-  
+
+  auto result = oss.str();
+
   if (result.back() == '/') result.pop_back();  // remove trailing slash
-  
+
   return result;
 }
 

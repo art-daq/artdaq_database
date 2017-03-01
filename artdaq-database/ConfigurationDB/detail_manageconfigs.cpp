@@ -70,8 +70,7 @@ void assign_configuration(Options const& options, std::string& configs) {
     return providers.at(name);
   };
 
-  auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
+  auto search_result = dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -116,8 +115,7 @@ void remove_configuration(Options const& options, std::string& configs) {
     return providers.at(name);
   };
 
-  auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
+  auto search_result = dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -202,8 +200,7 @@ void find_configurations(Options const& options, std::string& configs) {
     return providers.at(name);
   };
 
-  auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
+  auto search_result = dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -280,8 +277,7 @@ void configuration_composition(Options const& options, std::string& filters) {
     return providers.at(name);
   };
 
-  auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
+  auto search_result = dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};

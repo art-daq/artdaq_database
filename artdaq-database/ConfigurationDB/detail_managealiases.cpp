@@ -71,8 +71,7 @@ void find_version_aliases(Options const& options, std::string& configs) {
     return providers.at(name);
   };
 
-  auto search_result =
-      dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
+  auto search_result = dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -157,7 +156,7 @@ void add_version_alias(Options const& options, std::string& conf) {
   newOptions.operation(apiliteral::operation::writedocument);
   newOptions.format(data_format_t::db);
 
-  auto updated = builder.to_string();  
+  auto updated = builder.to_string();
   write_document(newOptions, updated);
 
   newOptions.operation(apiliteral::operation::readdocument);
@@ -195,7 +194,7 @@ void remove_version_alias(Options const& options, std::string& conf) {
   newOptions.operation(apiliteral::operation::writedocument);
   newOptions.format(data_format_t::db);
 
-  auto updated = builder.to_string();  
+  auto updated = builder.to_string();
   write_document(newOptions, updated);
 
   newOptions.operation(apiliteral::operation::readdocument);

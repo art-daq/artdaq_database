@@ -30,7 +30,6 @@ class JSONDocumentBuilder final {
   JSONDocumentBuilder& setVersion(JSONDocument const&);
   JSONDocumentBuilder& setCollection(JSONDocument const&);
 
-
   JSONDocumentBuilder& removeAlias(JSONDocument const&);
   JSONDocumentBuilder& removeConfiguration(JSONDocument const&);
   JSONDocumentBuilder& removeEntity(JSONDocument const&);
@@ -39,13 +38,15 @@ class JSONDocumentBuilder final {
   JSONDocumentBuilder& markDeleted();
   JSONDocumentBuilder& setObjectID(JSONDocument const&);
 
+  bool newObjectID();
+  bool isReadonlyOrDeleted() const;
+
   JSONDocument getObjectID() const;
-  
+
   std::string getObjectOUID() const;
 
-
   std::list<std::string> extractTags() const;
-  
+
   JSONDocument& extract() { return _document; }
 
   result_t comapreUsingOverlays(JSONDocumentBuilder const&) const;

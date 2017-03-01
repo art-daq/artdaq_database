@@ -58,6 +58,8 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::INVALID_ARGUMENT | 1;
   }
 
+  if (database_uri.back() == '/') database_uri.pop_back();  // remove trailing slash
+
   auto database_path = database_uri.substr(strlen(DBI::literal::FILEURI));
   database_path = db::expand_environment_variables(database_path);
 

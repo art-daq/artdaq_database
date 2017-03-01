@@ -194,10 +194,10 @@ struct ConfigurationInterface final {
       opts.operation(apiliteral::operation::findconfigs);
       opts.format(data_format_t::gui);
 
-      if (!mongosearch.empty()){
-        if (opts.provider() == apiliteral::provider::mongo && mongosearch!="*" ){
+      if (!mongosearch.empty()) {
+        if (opts.provider() == apiliteral::provider::mongo && mongosearch != "*") {
           opts.configuration(mongosearch);
-        } else if(opts.provider() == apiliteral::provider::filesystem){
+        } else if (opts.provider() == apiliteral::provider::filesystem) {
           opts.configuration(mongosearch);
         }
       }

@@ -29,7 +29,7 @@ ovlDatabaseRecord::ovlDatabaseRecord(value_t& record)
 ovlDocument& ovlDatabaseRecord::document() { return *_document; }
 
 result_t ovlDatabaseRecord::swap(ovlDocumentUPtr_t& document) {
-  if (isReadonly()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
 
   return _document->ovlKeyValue::swap(document.get());
 }
@@ -39,7 +39,7 @@ ovlComments& ovlDatabaseRecord::comments() { return *_comments; }
 result_t ovlDatabaseRecord::swap(ovlCommentsUPtr_t& comments) {
   confirm(comments);
 
-  if (isReadonly()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
 
   return _comments->ovlKeyValue::swap(comments.get());
 }
@@ -49,7 +49,7 @@ ovlOrigin& ovlDatabaseRecord::origin() { return *_origin; }
 result_t ovlDatabaseRecord::swap(ovlOriginUPtr_t& origin) {
   confirm(origin);
 
-  if (isReadonly()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
 
   return _origin->ovlKeyValue::swap(origin.get());
 }
@@ -59,7 +59,7 @@ ovlVersion& ovlDatabaseRecord::version() { return *_version; }
 result_t ovlDatabaseRecord::swap(ovlVersionUPtr_t& version) {
   confirm(version);
 
-  if (isReadonly()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
 
   return _version->ovlKeyValue::swap(version.get());
 }
@@ -67,7 +67,7 @@ result_t ovlDatabaseRecord::swap(ovlVersionUPtr_t& version) {
 result_t ovlDatabaseRecord::swap(ovlConfigurationTypeUPtr_t& configtype) {
   confirm(configtype);
 
-  if (isReadonly()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
 
   return _configurationtype->ovlKeyValue::swap(configtype.get());
 }
@@ -75,7 +75,7 @@ result_t ovlDatabaseRecord::swap(ovlConfigurationTypeUPtr_t& configtype) {
 result_t ovlDatabaseRecord::swap(ovlCollectionUPtr_t& collection) {
   confirm(collection);
 
-  if (isReadonly()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
 
   return _collection->ovlKeyValue::swap(collection.get());
 }
@@ -91,7 +91,7 @@ ovlId& ovlDatabaseRecord::id() { return *_id; }
 result_t ovlDatabaseRecord::swap(ovlIdUPtr_t& id) {
   confirm(id);
 
-  if (isReadonly()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
 
   return _id->ovlKeyValue::swap(id.get());
 }
@@ -118,18 +118,17 @@ std::string ovlDatabaseRecord::to_string() const {
   return oss.str();
 }
 
-bool& ovlDatabaseRecord::isReadonly() { return _bookkeeping->isReadonly(); }
-bool const& ovlDatabaseRecord::isReadonly() const { return _bookkeeping->isReadonly(); }
+bool ovlDatabaseRecord::isReadonlyOrDeleted() const { return _bookkeeping->isReadonly() || _bookkeeping->isDeleted(); }
 
 result_t ovlDatabaseRecord::markReadonly() {
-  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
 
   _bookkeeping->markReadonly(true);
 
   return Success();
 }
 result_t ovlDatabaseRecord::markDeleted() {
-  //if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+  // if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
 
   _bookkeeping->markDeleted(true);
 
@@ -139,7 +138,7 @@ result_t ovlDatabaseRecord::markDeleted() {
 result_t ovlDatabaseRecord::addConfiguration(ovlConfigurationUPtr_t& configuration) {
   confirm(configuration);
 
-  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
 
   auto update = std::string("addConfiguration");
 
@@ -153,7 +152,7 @@ result_t ovlDatabaseRecord::addConfiguration(ovlConfigurationUPtr_t& configurati
 result_t ovlDatabaseRecord::removeConfiguration(ovlConfigurationUPtr_t& configuration) {
   confirm(configuration);
 
-  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
 
   auto update = std::string("removeConfiguration");
 
@@ -167,7 +166,7 @@ result_t ovlDatabaseRecord::removeConfiguration(ovlConfigurationUPtr_t& configur
 result_t ovlDatabaseRecord::addAlias(ovlAliasUPtr_t& alias) {
   confirm(alias);
 
-  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
 
   auto update = std::string("addAlias");
 
@@ -181,7 +180,7 @@ result_t ovlDatabaseRecord::addAlias(ovlAliasUPtr_t& alias) {
 result_t ovlDatabaseRecord::removeAlias(ovlAliasUPtr_t& alias) {
   confirm(alias);
 
-  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
 
   auto update = std::string("removeAlias");
 
@@ -195,11 +194,10 @@ result_t ovlDatabaseRecord::removeAlias(ovlAliasUPtr_t& alias) {
 result_t ovlDatabaseRecord::setVersion(ovlVersionUPtr_t& version) {
   confirm(version);
 
-  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
 
-  if(_version->string_value().compare(version->string_value())==0)
-   return Success(msg_Ignored);
-  
+  if (_version->string_value().compare(version->string_value()) == 0) return Success(msg_Ignored);
+
   auto result = swap(version);
 
   if (!result.first) return result;
@@ -212,11 +210,10 @@ result_t ovlDatabaseRecord::setVersion(ovlVersionUPtr_t& version) {
 result_t ovlDatabaseRecord::setConfigurationType(ovlConfigurationTypeUPtr_t& configurationtype) {
   confirm(configurationtype);
 
-  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
 
-  if(_configurationtype->string_value().compare(configurationtype->string_value())==0)
-   return Success(msg_Ignored);
-  
+  if (_configurationtype->string_value().compare(configurationtype->string_value()) == 0) return Success(msg_Ignored);
+
   auto result = swap(configurationtype);
 
   if (!result.first) return result;
@@ -229,11 +226,10 @@ result_t ovlDatabaseRecord::setConfigurationType(ovlConfigurationTypeUPtr_t& con
 result_t ovlDatabaseRecord::setCollection(ovlCollectionUPtr_t& collection) {
   confirm(collection);
 
-  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
 
-  if(_collection->string_value().compare(collection->string_value())==0)
-   return Success(msg_Ignored);
-  
+  if (_collection->string_value().compare(collection->string_value()) == 0) return Success(msg_Ignored);
+
   auto result = swap(collection);
 
   if (!result.first) return result;
@@ -246,7 +242,7 @@ result_t ovlDatabaseRecord::setCollection(ovlCollectionUPtr_t& collection) {
 result_t ovlDatabaseRecord::addEntity(ovlEntityUPtr_t& entity) {
   confirm(entity);
 
-  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
 
   auto update = std::string("addEntity");
 
@@ -260,7 +256,7 @@ result_t ovlDatabaseRecord::addEntity(ovlEntityUPtr_t& entity) {
 result_t ovlDatabaseRecord::removeEntity(ovlEntityUPtr_t& entity) {
   confirm(entity);
 
-  if (_bookkeeping->isReadonly()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
 
   auto update = std::string("removeEntity");
 

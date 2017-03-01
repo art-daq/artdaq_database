@@ -34,7 +34,7 @@ class ManageDocumentOperation final : public OperationBase {
 
   std::string const& run() const;
   std::string const& run(std::string const&);
-  
+
   std::string const& configuration() const;
   std::string const& configuration(std::string const&);
 

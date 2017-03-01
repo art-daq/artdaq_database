@@ -18,7 +18,7 @@ using artdaq::database::json::JsonWriter;
 using namespace artdaq::database;
 using namespace artdaq::database::docrecord;
 
-namespace dbdr=artdaq::database::docrecord;
+namespace dbdr = artdaq::database::docrecord;
 
 std::string print_visitor(value_t const&);
 
@@ -120,7 +120,7 @@ JSONDocument JSONDocument::findChild(path_t const& path) const try {
   throw;
 }
 
-//returns found child value as a document
+// returns found child value as a document
 JSONDocument JSONDocument::findChildDocument(path_t const& path) const try {
   TRACE_(6, "findChildDocument() begin json_buffer=<" << cached_json_buffer() << ">");
   TRACE_(6, "findChildDocument() args  path=<" << path << ">");
@@ -129,12 +129,11 @@ JSONDocument JSONDocument::findChildDocument(path_t const& path) const try {
 
   auto const& found_value = findChildValue(path);
 
-  if(type(found_value) != type_t::OBJECT) {
-      throw notfound_exception("JSONDocument")
-          << "Failed calling findChildDocument(): Search failed for" << path
-          << ", value_t is not object_t; value=" << print_visitor(found_value);    
-  }    
-    
+  if (type(found_value) != type_t::OBJECT) {
+    throw notfound_exception("JSONDocument") << "Failed calling findChildDocument(): Search failed for" << path
+                                             << ", value_t is not object_t; value=" << print_visitor(found_value);
+  }
+
   auto returnValue = JSONDocument(found_value);
 
   TRACE_(6, "findChildDocument() resultDocument=<" << returnValue.cached_json_buffer() << ">");
@@ -196,11 +195,11 @@ JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t con
   TRACE_(4, "replaceChild() old child value=" << print_visitor(replaced_value));
   TRACE_(4, "replaceChild() resultDocument=<" << cached_json_buffer() << ">");
   TRACE_(4, "replaceChild() Replace succeeded.");
-  
+
   auto obj = object_t{};
-  obj[path]=replaced_value;
+  obj[path] = replaced_value;
   value_t returnValue = obj;
-  
+
   return JSONDocument(returnValue);
 } catch (std::exception& ex) {
   TRACE_(4, "replaceChild() Replace failed; Error:" << ex.what());

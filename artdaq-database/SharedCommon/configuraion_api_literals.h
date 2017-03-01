@@ -6,17 +6,20 @@ namespace database {
 namespace result {
 constexpr auto msg_EmptyFilter = "{\"message\":\"empty_filter\"}";
 constexpr auto msg_EmptyDocument = "{\"message\":\"Json document is empty\"}";
-constexpr auto msg_SystemCallFailed = "{\"message\":\"Unable to call system() from this API; check if either set-user-ID or set-group-ID check if either set-user-ID or set-group-ID \"}";
+constexpr auto msg_SystemCallFailed =
+    "{\"message\":\"Unable to call system() from this API; check if either set-user-ID or set-group-ID check if either "
+    "set-user-ID or set-group-ID \"}";
 }
 namespace configapi {
 namespace literal {
 
 constexpr auto operations = "operations";
-  
+
 namespace operation {
 constexpr auto writeconfiguration = "globalconfstore";
 constexpr auto readconfiguration = "globalconfload";
 
+constexpr auto overwritedocument = "overwritedocument";
 constexpr auto writedocument = "store";
 constexpr auto readdocument = "load";
 
@@ -31,10 +34,8 @@ constexpr auto findentities = "findentities";
 constexpr auto addentity = "addentity";
 constexpr auto rmentity = "rmentity";
 
-
 constexpr auto markdeleted = "markdeleted";
 constexpr auto markreadonly = "markreadonly";
-
 
 constexpr auto confcomposition = "buildfilter";
 constexpr auto assignconfig = "addconfig";
@@ -120,7 +121,15 @@ constexpr auto bzip2base64 = "ascii.tar.bzip2.base64";
 constexpr auto tmpdirprefix = "/tmp/adb";
 constexpr auto dbexport_extension = ".tar-bzip2-base64";
 
-constexpr auto database_format_version=2;
+constexpr auto database_format_version = 2;
+
+constexpr auto database_format_locale="en_US.UTF-8";
+
+constexpr auto timestamp_format= "%a %b %d %H:%M:%S %Y";
+//constexpr auto timestamp_format= "%FT%T%z";
+constexpr auto timestamp_faketime="Mon Feb  8 14:00:30 2016";
+
+  
 }
 }  // namespace configapi
 }  // namespace database

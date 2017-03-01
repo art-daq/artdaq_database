@@ -56,7 +56,9 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
 
     auto idx = std::size_t{0};
 
-    std::for_each(std::sregex_iterator(conf.begin(), conf.end(), std::regex{"(#include\\s)([^'\"]*)"}), std::sregex_iterator(),
+    auto regex =   std::regex{"(#include\\s)([^'\"]*)"};
+    
+    std::for_each(std::sregex_iterator(conf.begin(), conf.end(),regex), std::sregex_iterator(),
                   [&conf, &idx](auto& m) { conf.replace(m.position(), m.length(), "fhicl_pound_include_" + std::to_string(idx++) + ":"); });
 
     ::fhicl::intermediate_table fhicl_table;

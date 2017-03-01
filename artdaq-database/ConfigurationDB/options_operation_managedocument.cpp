@@ -163,7 +163,7 @@ void ManageDocumentOperation::readJsonData(JsonData const& data) {
     run(boost::get<std::string>(dataAST.at(apiliteral::option::run)));
   } catch (...) {
   }
-  
+
   try {
     sourceFileName(boost::get<std::string>(dataAST.at(apiliteral::option::source)));
   } catch (...) {
@@ -193,7 +193,7 @@ void ManageDocumentOperation::readJsonData(JsonData const& data) {
       run(boost::get<std::string>(filterAST.at(apiliteral::filter::runs)));
     } catch (...) {
     }
-    
+
   } catch (...) {
     TRACE_(1, "Options() no filter provided <" << data << ">");
   }
@@ -215,7 +215,7 @@ int ManageDocumentOperation::readProgramOptions(bpo::variables_map const& vm) {
   if (vm.count(apiliteral::option::run)) {
     run(vm[apiliteral::option::run].as<std::string>());
   }
-  
+
   if (vm.count(apiliteral::option::configuration)) {
     configuration(vm[apiliteral::option::configuration].as<std::string>());
   }
@@ -236,7 +236,7 @@ bpo::options_description ManageDocumentOperation::makeProgramOptions() const {
 
   opts.add_options()(make_opt_name(apiliteral::option::version, "v").c_str(), bpo::value<std::string>(), "Version");
   opts.add_options()(make_opt_name(apiliteral::option::run, "r").c_str(), bpo::value<std::string>(), "Run");
-  
+
   opts.add_options()(make_opt_name(apiliteral::option::entity, "e").c_str(), bpo::value<std::string>(),
                      "Configurable-entity name");
   opts.add_options()(make_opt_name(apiliteral::option::configuration, "g").c_str(), bpo::value<std::string>(),
@@ -299,7 +299,7 @@ JsonData ManageDocumentOperation::query_filter_to_JsonData() const {
   if (run() != apiliteral::notprovided)
     docAST[apiliteral::filter::runs] = run();
   */
-  
+
   if (docAST.empty()) {
     return {apiliteral::empty_json};
   }

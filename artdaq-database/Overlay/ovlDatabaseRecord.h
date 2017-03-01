@@ -98,9 +98,9 @@ class ovlDatabaseRecord final : public ovlKeyValue {
   // ops
   result_t operator==(ovlDatabaseRecord const&) const;
 
+  bool isReadonlyOrDeleted() const;
+
   // delegates
-  bool& isReadonly();
-  bool const& isReadonly() const;
   result_t markReadonly();
   result_t markDeleted();
 

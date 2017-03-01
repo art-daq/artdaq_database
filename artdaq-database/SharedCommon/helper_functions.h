@@ -2,28 +2,50 @@
 #define _ARTDAQ_DATABASE_DATAFORMATS_COMMON_HEALPERFUNCTIONS_H_
 
 #include <cassert>
+#include <iostream>
 #include <iterator>
+#include <memory>
 #include <sstream>
 #include <string>
-#include <iostream>
 
 #include "artdaq-database/SharedCommon/shared_datatypes.h"
 
-namespace debug { std::string getStackTrace();}
+namespace debug {
+std::string getStackTrace();
+}
 
 #ifndef NDEBUG
-#define confirm(expr) \
-if((expr) ==false) {\
-  std::cerr << "Failed Assertion:" << ::debug::getStackTrace();\
-  }\
-  assert(expr)
+template <typename T>
+inline void confirm(std::unique_ptr<T> const& expr) {
+  if (!expr) {
+    std::cerr << "Failed Assertion:" << ::debug::getStackTrace();
+  }
+  assert(expr);
+}
+
+inline void confirm(bool expr) {
+  if (!expr) {
+    std::cerr << "Failed Assertion:" << ::debug::getStackTrace();
+  }
+  assert(expr);
+}
 #else
 #include "artdaq-database/SharedCommon/shared_exceptions.h"
-#define confirm(expr) \
-if((expr) ==false) { \
-  auto msg = ::debug::getStackTrace();\
-  std::cerr << "Failed Assertion:" << msg;\
-  throw artdaq::database::runtime_exception("Failed assertion") << ::debug::getStackTrace();\
+template <typename T>
+inline void confirm(std::unique_ptr<T> const& expr) {
+  if (!expr) {
+    auto msg = ::debug::getStackTrace();
+    std::cerr << "Failed Assertion:" << msg;
+    throw artdaq::database::runtime_exception("Failed assertion") << ::debug::getStackTrace();
+  }
+}
+
+inline void confirm(bool expr) {
+  if (!expr) {
+    auto msg = ::debug::getStackTrace();
+    std::cerr << "Failed Assertion:" << msg;
+    throw artdaq::database::runtime_exception("Failed assertion") << ::debug::getStackTrace();
+  }
 }
 #endif
 
@@ -38,6 +60,7 @@ std::string operator"" _quoted(const char* /*text*/, std::size_t);
 std::string debrace(std::string /*s*/);
 std::string dequote(std::string /*s*/);
 std::string debracket(std::string /*s*/);
+void set_default_locale();
 
 bool equal(std::string const&, std::string const&);
 bool not_equal(std::string const&, std::string const&);

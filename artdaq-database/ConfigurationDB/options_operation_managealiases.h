@@ -35,7 +35,7 @@ class ManageAliasesOperation final : public OperationBase {
 
   std::string const& run() const;
   std::string const& run(std::string const&);
-  
+
   std::string const& configuration() const;
   std::string const& configuration(std::string const&);
 
@@ -62,9 +62,8 @@ class ManageAliasesOperation final : public OperationBase {
 
   std::string _configuration = {apiliteral::notprovided};
   std::string _configuration_alias = {apiliteral::notprovided};
-  
-  std::string _run = {apiliteral::notprovided};
 
+  std::string _run = {apiliteral::notprovided};
 };
 
 namespace debug {
