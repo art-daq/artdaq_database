@@ -4,6 +4,7 @@
 #include <cassert>
 #include <iostream>
 #include <iterator>
+#include <memory>
 #include <sstream>
 #include <string>
 
@@ -14,19 +15,38 @@ std::string getStackTrace();
 }
 
 #ifndef NDEBUG
-#define confirm(expr)                                             \
-  if ((expr) == false) {                                          \
-    std::cerr << "Failed Assertion:" << ::debug::getStackTrace(); \
-  }                                                               \
-  assert(expr)
+template <typename T>
+inline void confirm(std::unique_ptr<T> const& expr) {
+  if (!expr) {
+    std::cerr << "Failed Assertion:" << ::debug::getStackTrace();
+  }
+  assert(expr);
+}
+
+inline void confirm(bool expr) {
+  if (!expr) {
+    std::cerr << "Failed Assertion:" << ::debug::getStackTrace();
+  }
+  assert(expr);
+}
 #else
 #include "artdaq-database/SharedCommon/shared_exceptions.h"
-#define confirm(expr)                                                                          \
-  if ((expr) == false) {                                                                       \
-    auto msg = ::debug::getStackTrace();                                                       \
-    std::cerr << "Failed Assertion:" << msg;                                                   \
-    throw artdaq::database::runtime_exception("Failed assertion") << ::debug::getStackTrace(); \
+template <typename T>
+inline void confirm(std::unique_ptr<T> const& expr) {
+  if (!expr) {
+    auto msg = ::debug::getStackTrace();
+    std::cerr << "Failed Assertion:" << msg;
+    throw artdaq::database::runtime_exception("Failed assertion") << ::debug::getStackTrace();
   }
+}
+
+inline void confirm(bool expr) {
+  if (!expr) {
+    auto msg = ::debug::getStackTrace();
+    std::cerr << "Failed Assertion:" << msg;
+    throw artdaq::database::runtime_exception("Failed assertion") << ::debug::getStackTrace();
+  }
+}
 #endif
 
 namespace artdaq {

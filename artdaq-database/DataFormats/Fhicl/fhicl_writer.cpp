@@ -89,7 +89,9 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
 
   buffer.reserve(buffer.size() + 512);
 
-  std::for_each(std::sregex_iterator(buffer.begin(), buffer.end(), std::regex{"(#include\\s*:)([^\"]*)"}), std::sregex_iterator(),
+  auto regex = std::regex{"(#include\\s*:)([^\"]*)"};
+  
+  std::for_each(std::sregex_iterator(buffer.begin(), buffer.end(),regex), std::sregex_iterator(),
                 [&buffer](auto& m) { buffer.replace(m.position(), m.length(), "#include "); });
 
   out.swap(buffer);
