@@ -19,9 +19,8 @@ std::string expand_environment_variables(std::string var);
 
 template <typename OPTS>
 result_t conftool_impl(std::unique_ptr<OPTS>& options, int argc, char* argv[]) {
-  
   db::set_default_locale();
-  
+
   auto desc = options->makeProgramOptions();
 
   bpo::variables_map vm;

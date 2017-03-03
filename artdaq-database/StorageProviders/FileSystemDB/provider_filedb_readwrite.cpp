@@ -12,11 +12,11 @@ template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonData const& arg) {
   TRACE_(3, "FileSystemDB::readDocument() begin");
-  TRACE_(3, "FileSystemDB::readDocument() args=<" << arg<< ">");
+  TRACE_(3, "FileSystemDB::readDocument() args=<" << arg << ">");
 
   auto returnCollection = std::list<JsonData>();
 
-  auto arg_document = JSONDocument{arg };
+  auto arg_document = JSONDocument{arg};
 
   auto filter_document = JSONDocument{};
 
@@ -63,8 +63,8 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonDa
   for (auto const& oid : oids) {
     auto doc_path = boost::filesystem::path(dir_name.c_str()).append(oid).replace_extension(".json");
 
-    auto json=std::string{};
-    db::read_buffer_from_file(json,{doc_path.c_str()});
+    auto json = std::string{};
+    db::read_buffer_from_file(json, {doc_path.c_str()});
 
     TRACE_(3, "FileSystemDB::readDocument() found_document=<" << json << ">");
 
@@ -77,9 +77,9 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonDa
 template <>
 object_id_t StorageProvider<JsonData, FileSystemDB>::writeDocument(JsonData const& arg) {
   TRACE_(4, "FileSystemDB::writeDocument() begin");
-  TRACE_(4, "FileSystemDB::writeDocument() args=<" << arg<< ">");
+  TRACE_(4, "FileSystemDB::writeDocument() args=<" << arg << ">");
 
-  auto arg_document = JSONDocument{arg };
+  auto arg_document = JSONDocument{arg};
 
   auto user_document = arg_document.findChildDocument(jsonliteral::document);
 
@@ -126,9 +126,8 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeDocument(JsonData cons
 
   if (oid == object_id_t{ouid_invalid}) {
     oid = generate_oid();
-    TRACE_(4, "FileSystemDB::writeDocument() Using generated oid=<" << oid << ">");    
+    TRACE_(4, "FileSystemDB::writeDocument() Using generated oid=<" << oid << ">");
   }
-
 
   auto id = to_id(oid);
 
@@ -155,9 +154,9 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeDocument(JsonData cons
   auto json = builder.to_string();
 
   TRACE_(4, "FileSystemDB::writeDocument() json=<" << json << ">.");
-  
-  db::write_buffer_to_file(json,filename);
-  
+
+  db::write_buffer_to_file(json, filename);
+
   auto index_path = boost::filesystem::path(filename.c_str()).parent_path().append(dbfsl::search_index);
 
   SearchIndex search_index(index_path);

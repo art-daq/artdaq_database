@@ -3,8 +3,8 @@
 
 #include "artdaq-database/StorageProviders/storage_providers.h"
 
-#include <vector>
 #include <boost/filesystem.hpp>
+#include <vector>
 
 namespace artdaq {
 namespace database {

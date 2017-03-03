@@ -1,6 +1,6 @@
+#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 #include "artdaq-database/SharedCommon/helper_functions.h"
 #include "artdaq-database/StorageProviders/storage_providers.h"
-#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 
 #include <sstream>
 
@@ -10,7 +10,7 @@ namespace apiliteral = db::configapi::literal;
 std::string db::make_database_metadata(std::string const& name, std::string const& uri) {
   confirm(!name.empty());
   confirm(!uri.empty());
-  
+
   // clang-format off
   std::ostringstream oss;
   oss << "document"_quoted << ":" << "{";
@@ -21,7 +21,7 @@ std::string db::make_database_metadata(std::string const& name, std::string cons
   oss << "create_user"_quoted << ":" << quoted_(expand_environment_variables("$USER"))  << ",";
   oss << "uname"_quoted << ":" << unamejson() << ",";
   oss << "database_format"_quoted << ":" << apiliteral::database_format_version;
-  oss << "}";  
+  oss << "}";
   // clang-format on
 
   return oss.str();

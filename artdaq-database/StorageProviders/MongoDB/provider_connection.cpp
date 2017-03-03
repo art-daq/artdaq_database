@@ -46,7 +46,8 @@ using artdaq::database::mongo::MongoDB;
 using artdaq::database::basictypes::JsonData;
 
 DBConfig::DBConfig()
-    : uri{std::string{literal::MONGOURI} + literal::hostname + ":" + std::to_string(literal::port) + "/" + literal::db_name} {
+    : uri{std::string{literal::MONGOURI} + literal::hostname + ":" + std::to_string(literal::port) + "/" +
+          literal::db_name} {
   auto tmpURI =
       getenv("ARTDAQ_DATABASE_URI") ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
 

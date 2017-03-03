@@ -141,8 +141,7 @@ std::string const& ManageAliasesOperation::configurationAlias(std::string const&
   confirm(!global_configuration_alias.empty());
 
   if (global_configuration_alias.empty()) {
-    throw runtime_error("Options") << "Invalid global configuration alias; "
-                                      "global configuration alias is empty.";
+    throw runtime_error("Options") << "Invalid global configuration alias; global configuration alias is empty.";
   }
 
   TRACE_(10, "Options: Updating global configuration alias from " << _configuration_alias << " to "

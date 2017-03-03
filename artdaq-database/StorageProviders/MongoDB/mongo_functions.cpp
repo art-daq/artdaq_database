@@ -3,9 +3,8 @@
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 #include "artdaq-database/StorageProviders/common.h"
 
-#include "artdaq-database/SharedCommon/sharedcommon_common.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
-
+#include "artdaq-database/SharedCommon/sharedcommon_common.h"
 
 #include <bsoncxx/builder/basic/helpers.hpp>
 #include <bsoncxx/builder/stream/array.hpp>
@@ -52,11 +51,11 @@ using artdaq::database::docrecord::JSONDocument;
 namespace jsonliteral = artdaq::database::dataformats::literal;
 
 bsoncxx::types::value extract_value_from_document(bsoncxx::document::value const& document, std::string const& key) {
-    auto view = document.view();
-    auto element = view.find(key);
+  auto view = document.view();
+  auto element = view.find(key);
 
-    if (element == view.end())
-      throw runtime_error("MongoDB") << "Search JsonData is missing the \"" << key << "\" element.";
+  if (element == view.end())
+    throw runtime_error("MongoDB") << "Search JsonData is missing the \"" << key << "\" element.";
 
-    return element->get_value();
+  return element->get_value();
 }

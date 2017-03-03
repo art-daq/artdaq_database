@@ -216,13 +216,13 @@ json2fcldb::operator fcl::value_t() try {
     return fcl::value_t(unwrap(self_value).value_as<const double>());
   } else if (self_value.type() == typeid(std::string)) {
     return fcl::value_t(unwrap(self_value).value_as<const std::string>());
-  }else if (self_value.type() == typeid(jsn::object_t)) {    
+  } else if (self_value.type() == typeid(jsn::object_t)) {
     return fcl::value_t(operator fcl::atom_t().value);
-  }else if (self_value.type() == typeid(jsn::array_t)) {    
+  } else if (self_value.type() == typeid(jsn::array_t)) {
     return fcl::value_t(operator fcl::atom_t().value);
   }
 
-  return fcl::value_t(std::string(literal::unknown)+::debug::demangle(self_value.type().name()));
+  return fcl::value_t(std::string(literal::unknown) + ::debug::demangle(self_value.type().name()));
 } catch (std::exception const&) {
   throw;
 }

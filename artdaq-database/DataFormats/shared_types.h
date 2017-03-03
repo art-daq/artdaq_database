@@ -70,10 +70,10 @@ using any_value_of = boost::variant<VALUE, value_of<VALUE, ANNOTATION>>;
 template <typename TYPE>
 struct vector_of {
   using value_type = TYPE;
-  
-  template<typename... Ts>
-  using container_type= std::list<Ts...>;
-  
+
+  template <typename... Ts>
+  using container_type = std::list<Ts...>;
+
   using collection_type = container_type<value_type>;
 
   using const_iterator = typename collection_type::const_iterator;
@@ -209,7 +209,8 @@ struct table_of : vector_of<KVP> {
 };
 
 template <typename TABLE_OF, typename VECTOR_OF>
-using variant_value_of = boost::variant<boost::recursive_wrapper<TABLE_OF>, boost::recursive_wrapper<VECTOR_OF>, std::string, double, int, bool>;
+using variant_value_of = boost::variant<boost::recursive_wrapper<TABLE_OF>, boost::recursive_wrapper<VECTOR_OF>,
+                                        std::string, double, int, bool>;
 
 template <typename A>
 struct unwrapper {
@@ -222,18 +223,18 @@ struct unwrapper {
   T& value_as(std::string const& /*child*/);
 
   template <typename O>
-  auto& value(std::string const& key){
-    return  boost::get<O>(any).at(key);
-  } 
-  
+  auto& value(std::string const& key) {
+    return boost::get<O>(any).at(key);
+  }
+
   template <typename O, typename T>
   auto& value(std::string const& key) try {
-    return  boost::get<O>(any).at(key);
-  }catch(std::out_of_range &){
+    return boost::get<O>(any).at(key);
+  } catch (std::out_of_range&) {
     confirm(!key.empty());
-    return boost::get<O>(any)[key]=T{};
+    return boost::get<O>(any)[key] = T{};
   }
-  
+
   A& any;
 };
 
