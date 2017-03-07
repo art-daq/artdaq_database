@@ -27,7 +27,7 @@ T& dbt::unwrapper<object_t>::value_as(std::string const& name) try {
   confirm(!name.empty());
 
   return boost::get<T>(any.at(name));
-} catch (std::exception &e) {
+} catch (std::exception& e) {
   throw;
 }
 

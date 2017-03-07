@@ -23,11 +23,11 @@ template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, UconDB>::readDocument(JsonData const& arg) {
   TRACE_(3, "UconDB::readDocument() begin");
-  TRACE_(3, "UconDB::readDocument() args=<" << arg<< ">");
+  TRACE_(3, "UconDB::readDocument() args=<" << arg << ">");
 
   auto returnCollection = std::list<JsonData>();
 
-  auto arg_document = JSONDocument{arg };
+  auto arg_document = JSONDocument{arg};
 
   auto filter_document = JSONDocument{};
 
@@ -71,12 +71,14 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::readDocument(JsonData con
 
     try {
       oids.push_back(unwrap(id).value_as<std::string>(jsonliteral::oid));
-    } catch (...) {}
+    } catch (...) {
+    }
 
     try {
       auto& oidvals = unwrap(id).value_as<array_t>(jsonliteral::in);
       for (auto& oidval : oidvals) oids.push_back(unwrap(oidval).value_as<std::string>(jsonliteral::oid));
-    } catch (...) {}
+    } catch (...) {
+    }
 
   } catch (...) {
     auto filter_json = filter_document.to_string();
@@ -97,9 +99,9 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::readDocument(JsonData con
 template <>
 object_id_t StorageProvider<JsonData, UconDB>::writeDocument(JsonData const& arg) {
   TRACE_(4, "UconDB::writeDocument() begin");
-  TRACE_(4, "UconDB::writeDocument() args=<" << arg<< ">");
+  TRACE_(4, "UconDB::writeDocument() args=<" << arg << ">");
 
-  auto arg_document = JSONDocument{arg };
+  auto arg_document = JSONDocument{arg};
 
   auto user_document = arg_document.findChildDocument(jsonliteral::document);
 

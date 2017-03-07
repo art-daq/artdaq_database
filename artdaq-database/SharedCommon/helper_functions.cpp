@@ -1,14 +1,14 @@
 #include "artdaq-database/SharedCommon/common.h"
+#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 #include "artdaq-database/SharedCommon/helper_functions.h"
 #include "artdaq-database/SharedCommon/shared_exceptions.h"
-#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 
 #include <sys/utsname.h>
 #include <wordexp.h>
-#include <fstream>
-#include <regex>
 #include <clocale>
 #include <ctime>
+#include <fstream>
+#include <regex>
 
 namespace db = artdaq::database;
 using namespace artdaq::database;
@@ -34,18 +34,16 @@ bool db::useFakeTime(bool useFakeTime = false) {
   return _useFakeTime;
 }
 
-void db::set_default_locale(){
-  std::setlocale(LC_ALL,apiliteral::database_format_locale);
-}
+void db::set_default_locale() { std::setlocale(LC_ALL, apiliteral::database_format_locale); }
 
 std::string db::timestamp() {
   auto now = std::chrono::system_clock::now();
   std::time_t time = std::chrono::system_clock::to_time_t(now);
   char buff[100];
-  std::strftime(buff,sizeof(buff),apiliteral::timestamp_format, std::localtime(&time));
-  
+  std::strftime(buff, sizeof(buff), apiliteral::timestamp_format, std::localtime(&time));
+
   if (useFakeTime()) return apiliteral::timestamp_faketime;
-  
+
   return {buff};
 }
 

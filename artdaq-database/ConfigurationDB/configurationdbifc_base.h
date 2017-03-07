@@ -101,7 +101,7 @@ class MakeSerializable final {
   CONF _conf;
 };
 
-template <typename CONF, template <typename ARG=CONF> class SERIALIZABLE>
+template <typename CONF, template <typename ARG = CONF> class SERIALIZABLE>
 class ConfigurationSerializer final {
   static_assert(std::is_pointer<CONF>::value || std::is_reference<CONF>::value,
                 "Template parameter must be either a pointer or reference type");

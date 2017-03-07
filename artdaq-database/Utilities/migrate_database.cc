@@ -95,9 +95,9 @@ int main(int argc, char* argv[]) try {
           std::cout << " -> failed\n";
           continue;
         }
-        
-	JSONDocumentBuilder builder{JSONDocumentMigrator{{source}}};
-	builder.setCollection({"{\"collection\":\""s+collection_name+"\"}"});
+
+        JSONDocumentBuilder builder{JSONDocumentMigrator{{source}}};
+        builder.setCollection({"{\"collection\":\""s + collection_name + "\"}"});
 
         oss.str("");
         oss.clear();

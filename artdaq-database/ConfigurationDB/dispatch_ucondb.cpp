@@ -26,9 +26,8 @@ using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocument;
 
 void prov::writeDocument(ManageDocumentOperation const& options, JsonData const& insert_payload) {
-  if (options.operation().compare(apiliteral::operation::writedocument) != 0
-    && options.operation().compare(apiliteral::operation::overwritedocument)!=0
-  ) {
+  if (options.operation().compare(apiliteral::operation::writedocument) != 0 &&
+      options.operation().compare(apiliteral::operation::overwritedocument) != 0) {
     throw runtime_error("write_document") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
@@ -53,8 +52,7 @@ JsonData prov::readDocument(ManageDocumentOperation const& options, JsonData con
 
   auto collection = readDocuments(options, search_payload);
 
-  TRACE_(16, "read_document: "
-                 << "Search returned " << collection.size() << " results.");
+  TRACE_(16, "read_document: Search returned " << collection.size() << " results.");
 
   if (collection.size() != 1) {
     throw runtime_error("read_document") << "Search returned " << collection.size() << " results.";
@@ -84,8 +82,7 @@ std::list<JsonData> prov::readDocuments(ManageDocumentOperation const& options, 
 
   auto collection = provider->readDocument(search_payload);
 
-  TRACE_(16, "read_documents: "
-                 << "Search returned " << collection.size() << " results.");
+  TRACE_(16, "read_documents: Search returned " << collection.size() << " results.");
 
   TRACE_(16, "readDocuments(): end");
 

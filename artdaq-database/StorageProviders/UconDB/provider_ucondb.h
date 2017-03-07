@@ -38,7 +38,7 @@ class UconDB final {
     friend std::shared_ptr<UconDB> UconDB::create(DBConfig const& config);
     PassKeyIdiom() {}
   };
-  
+
   explicit UconDB(DBConfig const& config, PassKeyIdiom const&);
 
   std::string& connection();

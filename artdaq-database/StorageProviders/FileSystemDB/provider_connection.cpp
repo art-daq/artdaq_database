@@ -4,8 +4,8 @@
 
 #include "artdaq-database/SharedCommon/sharedcommon_common.h"
 
-#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/BasicTypes/basictypes.h"
+#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 
 /*
 #include <wordexp.h>
@@ -33,22 +33,24 @@ using artdaq::database::docrecord::JSONDocument;
 
 namespace jsonliteral = artdaq::database::dataformats::literal;
 
+DBConfig::DBConfig()
+    : uri{std::string{literal::FILEURI} + "${ARTDAQ_DATABASE_DATADIR}/filesystemdb" + "/" + literal::db_name} {
+  auto tmpURI =
+      getenv("ARTDAQ_DATABASE_URI") ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
 
-  DBConfig::DBConfig() : uri{std::string{literal::FILEURI} + "${ARTDAQ_DATABASE_DATADIR}/filesystemdb" + "/" + literal::db_name} {
-    auto tmpURI = getenv("ARTDAQ_DATABASE_URI") ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
+  if (tmpURI.back() == '/') tmpURI.pop_back();  // remove trailing slash
 
-    if (tmpURI.back() == '/') tmpURI.pop_back();  // remove trailing slash
+  auto prefixURI = std::string{literal::FILEURI};
 
-    auto prefixURI = std::string{literal::FILEURI};
+  if (tmpURI.length() > prefixURI.length() && std::equal(prefixURI.begin(), prefixURI.end(), tmpURI.begin()))
+    uri = tmpURI;
+}
 
-    if (tmpURI.length() > prefixURI.length() && std::equal(prefixURI.begin(), prefixURI.end(), tmpURI.begin())) uri = tmpURI;
-  }
+DBConfig::DBConfig(std::string uri_) : uri{uri_} { confirm(!uri_.empty()); }
 
-  DBConfig::DBConfig(std::string uri_) : uri{uri_} { confirm(!uri_.empty()); }
+FileSystemDB::FileSystemDB(DBConfig const& config, PassKeyIdiom const&)
+    : _config{config}, _client{_config.connectionURI()}, _connection{_config.connectionURI() + "/"} {}
 
-   FileSystemDB::FileSystemDB(DBConfig const& config, PassKeyIdiom const&)
-      : _config{config}, _client{_config.connectionURI()}, _connection{_config.connectionURI() + "/"} {}
-  
 std::string& FileSystemDB::connection() {
   auto collection = _connection + system_metadata;
   collection = expand_environment_variables(collection);
@@ -64,15 +66,16 @@ std::string& FileSystemDB::connection() {
   std::ostringstream oss;
   oss << "{";
   oss << make_database_metadata("artdaq", expand_environment_variables(_config.connectionURI())) << ",";
-  oss <<  db::quoted_(jsonliteral::id) << ": { ";
-  oss <<  db::quoted_(jsonliteral::oid) << ":" << db::quoted_(oid) << "}";  
+  oss << db::quoted_(jsonliteral::id) << ": { ";
+  oss << db::quoted_(jsonliteral::oid) << ":" << db::quoted_(oid) << "}";
   oss << "}";
 
-  auto filename = mkdir(collection)+ "/" + oid + ".json";
+  auto filename = mkdir(collection) + "/" + oid + ".json";
 
-  db::write_buffer_to_file(oss.str(),filename);
-  
-  TRACE_(5, "StorageProvider::FileSystemDB::connection created metadata record id=" << oid << ", path=" << path.c_str());
+  db::write_buffer_to_file(oss.str(), filename);
+
+  TRACE_(5, "StorageProvider::FileSystemDB::connection created metadata record id=" << oid
+                                                                                    << ", path=" << path.c_str());
 
   return _connection;
 }

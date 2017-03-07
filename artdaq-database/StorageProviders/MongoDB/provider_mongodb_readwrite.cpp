@@ -12,11 +12,11 @@ template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::readDocument(JsonData const& arg) {
   TRACE_(3, "MongoDB::readDocument() begin");
-  TRACE_(3, "MongoDB::readDocument() args=<" << arg<< ">");
+  TRACE_(3, "MongoDB::readDocument() args=<" << arg << ">");
 
   auto returnCollection = std::list<JsonData>();
 
-  auto arg_document = JSONDocument{arg };
+  auto arg_document = JSONDocument{arg};
 
   auto filter_document = arg_document.findChildDocument(jsonliteral::filter);
 
@@ -59,9 +59,9 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::readDocument(JsonData co
 template <>
 object_id_t StorageProvider<JsonData, MongoDB>::writeDocument(JsonData const& arg) {
   TRACE_(4, "MongoDB::writeDocument() begin");
-  TRACE_(4, "MongoDB::writeDocument() args=<" << arg<< ">");
+  TRACE_(4, "MongoDB::writeDocument() args=<" << arg << ">");
 
-  auto arg_document = JSONDocument{arg };
+  auto arg_document = JSONDocument{arg};
 
   auto user_document = arg_document.findChildDocument(jsonliteral::document);
 
@@ -104,12 +104,12 @@ object_id_t StorageProvider<JsonData, MongoDB>::writeDocument(JsonData const& ar
     isNew = false;
     TRACE_(4, "MongoDB::writeDocument() Using provided oid=<" << oid << ">");
   } catch (...) {
-        TRACE_(4, "MongoDB::writeDocument() No filter found; filter_document =<" << filter_document << ">");
+    TRACE_(4, "MongoDB::writeDocument() No filter found; filter_document =<" << filter_document << ">");
   }
 
   if (oid == object_id_t{ouid_invalid}) {
     oid = generate_oid();
-    TRACE_(4, "MongoDB::writeDocument() Using generated oid=<" << oid << ">");    
+    TRACE_(4, "MongoDB::writeDocument() Using generated oid=<" << oid << ">");
   }
 
   auto id = to_id(oid);
