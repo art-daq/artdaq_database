@@ -262,8 +262,13 @@ result_t json::write_configuration(std::string const& query_payload, std::string
 
     auto tmp_dir_name = db::make_temp_dir();
 
-    db::tarbzip2base64_to_dir(tmp_dir_name, tarbzip2_base64);
+    auto file_name = tmp_dir_name + "/userdata" + apiliteral::dbexport_extension;
 
+    if(!db::write_buffer_to_file(tarbzip2_base64,file_name))
+         return Failure(make_error_msg("Unable to write userdata"));
+    
+    db::tarbzip2base64_to_dir(file_name,tmp_dir_name);
+        
     std::ostringstream oss;
 
     for (auto const& file_name : list_files(tmp_dir_name)) {
@@ -357,7 +362,16 @@ result_t json::read_configuration(std::string const& query_payload, std::string&
 
     oss.str("");
     oss.clear();
-    oss << "{\"collection.tar.bzip2.base64\":\"" << db::dir_to_tarbzip2base64(tmp_dir_name, buffer) << "\"}";
+
+    
+    auto file_name = tmp_dir_name + "/userdata" + apiliteral::dbexport_extension;
+    
+    db::dir_to_tarbzip2base64(tmp_dir_name, file_name);
+    
+    if(!db::read_buffer_from_file(buffer,file_name))
+         return Failure(make_error_msg("Unable to read userdata"));
+    
+    oss << "{\"collection.tar.bzip2.base64\":\"" << buffer << "\"}";
 
     db::delete_temp_dir(tmp_dir_name);
 

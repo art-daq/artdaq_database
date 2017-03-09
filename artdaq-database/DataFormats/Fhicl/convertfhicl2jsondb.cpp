@@ -278,11 +278,15 @@ json2fcldb::operator fcl::atom_t() try {
     }
 
     case ::fhicl::NUMBER: {
-      if (self_data.type() == typeid(int))
+      if(self_data.type() == typeid(std::string)){
+	auto value = boost::get<std::string>(self_data);
+	fcl_value.value = need_quotes(value) ? quoted_(value) : value;
+      } else if (self_data.type() == typeid(int)){
         fcl_value.value = boost::get<int>(self_data);
-      else
+      }else{
         fcl_value.value = boost::get<double>(self_data);
-
+      }
+      
       break;
     }
 

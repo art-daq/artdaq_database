@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export artdaq_database_version=v1_04_06
+export artdaq_database_version=v1_04_15
 
 conftool_log_dir=${ARTDAQ_DATABASE_LOGS}
 
@@ -263,7 +263,7 @@ function import_global_config()
   return 3
  fi
 
- tmp_file_name=config.${global_config_name}.tar.bzip2.base64
+ tmp_file_name="/tmp/config.${global_config_name}.tar.bzip2.base64"
 
  tar cjf - ${config_dir}/*  -C ${config_dir} |base64 --wrap=0 > ${tmp_file_name}
 

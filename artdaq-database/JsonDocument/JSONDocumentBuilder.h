@@ -34,6 +34,9 @@ class JSONDocumentBuilder final {
   JSONDocumentBuilder& removeConfiguration(JSONDocument const&);
   JSONDocumentBuilder& removeEntity(JSONDocument const&);
 
+  JSONDocumentBuilder& removeAllConfigurations();
+  JSONDocumentBuilder& removeAllEntities();
+
   JSONDocumentBuilder& markReadonly();
   JSONDocumentBuilder& markDeleted();
   JSONDocumentBuilder& setObjectID(JSONDocument const&);

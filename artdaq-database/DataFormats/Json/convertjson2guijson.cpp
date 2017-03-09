@@ -367,7 +367,7 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
 
             try {
               children_metadata.value_as<object_t>()[literal::annotation] =
-                  unwrap(child).value_as<const std::string>(literal::annotation);
+                  artdaq::database::annotate(unwrap(child).value_as<const std::string>(literal::annotation));
             } catch (...) {
               children_metadata.value_as<object_t>()[literal::annotation] = std::string(literal::whitespace);
             }
@@ -401,8 +401,8 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
             new_metadata_node.value_as<object_t>()[literal::type] = type_name;
             new_metadata_node.value_as<object_t>()[literal::comment] =
                 unwrap(child).value_as<const std::string>(literal::comment);
-            new_metadata_node.value_as<object_t>()[literal::annotation] =
-                unwrap(child).value_as<const std::string>(literal::annotation);
+            new_metadata_node.value_as<object_t>()[literal::annotation] =artdaq::database::annotate(
+                unwrap(child).value_as<const std::string>(literal::annotation));
 
             data_node.value_as<object_t>().push_back(data_t{node_name, child_value});
           }
