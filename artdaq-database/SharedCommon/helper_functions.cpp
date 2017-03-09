@@ -96,6 +96,15 @@ std::string db::debracket(std::string s) {
     return s;
 }
 
+std::string db::annotate(std::string const& s){
+  auto str=db::trim(s);
+  
+  if(str[0] == '#' || str.empty())
+    return str;
+  
+  return std::string{"#"}.append(str);
+}
+
 std::string db::generate_oid() {
   std::ifstream is("/proc/sys/kernel/random/uuid");
 

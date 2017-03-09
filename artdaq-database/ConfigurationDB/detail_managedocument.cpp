@@ -150,13 +150,19 @@ void write_document(Options const& options, std::string& conf) {
 
   if (options.format() != data_format_t::db && options.format() != data_format_t::gui) {
     builder.createFromData(data);
-  } else {
+  } else if(options.format() == data_format_t::gui){      
+      builder.newObjectID();       
+      builder.removeAllConfigurations();
+      builder.removeAllEntities();
+      
+      filter = std::string{", \"filter\":"} + builder.getObjectID().to_string();
+  }else {
     if (builder.isReadonlyOrDeleted() && options.operation().compare(apiliteral::operation::writedocument) == 0)
-      builder.newObjectID();
-
+      builder.newObjectID();   
+    
     filter = std::string{", \"filter\":"} + builder.getObjectID().to_string();
   }
-
+  
   if (!builder.isReadonlyOrDeleted()) {
     builder.addConfiguration({options.configuration_to_JsonData()});
     builder.setVersion({options.version_to_JsonData()});
