@@ -58,7 +58,13 @@ std::string db::relative_path_from_collection_name(std::string const& collection
   auto retValue = std::string{collection_name};
   auto begin = retValue.begin();
   auto end = retValue.begin();
-  std::advance(end, retValue.rfind('.') - 1);
+  
+  auto pos= retValue.rfind('.');
+  
+  if(pos==std::string::npos)
+    return retValue;
+    
+  std::advance(end, pos - 1);
   std::replace(begin, end, '.', '/');
 
   return retValue;

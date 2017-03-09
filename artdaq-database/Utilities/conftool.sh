@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export artdaq_database_version=v1_04_15
+export artdaq_database_version=v1_04_16
 
 conftool_log_dir=${ARTDAQ_DATABASE_LOGS}
 
