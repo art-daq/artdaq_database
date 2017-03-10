@@ -1,5 +1,5 @@
-#include "test/common.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
+#include "test/common.h"
 
 namespace bpo = boost::program_options;
 using namespace artdaq::database;
@@ -14,8 +14,8 @@ int main(int argc, char* argv[]) try {
 
   bpo::options_description desc = descstr.str();
 
-  desc.add_options()("config,c", bpo::value<std::string>(), "Configuration file.")("outputformat,f", bpo::value<std::string>(),
-                                                                                   "Output file format.")("help,h", "produce help message");
+  desc.add_options()("config,c", bpo::value<std::string>(), "Configuration file.")(
+      "outputformat,f", bpo::value<std::string>(), "Output file format.")("help,h", "produce help message");
 
   bpo::variables_map vm;
 
@@ -41,8 +41,8 @@ int main(int argc, char* argv[]) try {
 
   auto file_name = vm["config"].as<std::string>();
 
-  auto json=std::string{};
-  db::read_buffer_from_file(json,file_name);
+  auto json = std::string{};
+  db::read_buffer_from_file(json, file_name);
 
   namespace jsn = artdaq::database::json;
 

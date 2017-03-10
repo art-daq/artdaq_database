@@ -55,7 +55,7 @@ class SearchIndex final {
   void _removeEntity(object_id_t const&, std::string const&);
   void _removeVersionAlias(object_id_t const&, std::string const&);
   void _removeRun(object_id_t const&, std::string const&);
-  
+
   std::vector<object_id_t> _matchVersion(std::string const&) const;
   std::vector<object_id_t> _matchVersionAlias(std::string const&) const;
   std::vector<object_id_t> _matchConfiguration(std::string const&) const;
@@ -74,7 +74,8 @@ class SearchIndex final {
   std::vector<std::pair<std::string, std::string>> _indexed_filtered_innerjoin_over_ouid(std::string const&,
                                                                                          std::string const&,
                                                                                          std::string const&) const;
-  std::vector<std::string> _filtered_attribute_list(std::string const& attribute, std::string const& attribute_with) const;
+  std::vector<std::string> _filtered_attribute_list(std::string const& attribute,
+                                                    std::string const& attribute_with) const;
 
  private:
   bool _open(boost::filesystem::path const&);
@@ -92,7 +93,7 @@ class SearchIndex final {
 bool shouldAutoRebuildSearchIndex(bool = false);
 
 template <typename TYPE>
-void SearchIndex::_make_unique_sorted(jsn::array_t& ouids) const{
+void SearchIndex::_make_unique_sorted(jsn::array_t& ouids) const {
   auto tmp = std::vector<std::string>{};
 
   tmp.reserve(ouids.size());

@@ -30,7 +30,9 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
   using artdaq::database::fhicl::fhicl_generator_grammar;
   using artdaq::database::fhicljson::valuetuple_t;
 
-  auto get_SubNode = [](auto& parent, auto const& child_name) -> auto const& { return boost::get<jsn::object_t>(parent.at(child_name)); };
+  auto get_SubNode = [](auto& parent, auto const& child_name) -> auto const& {
+    return boost::get<jsn::object_t>(parent.at(child_name));
+  };
 
   auto const& data_node = get_SubNode(json_object, literal::data);
   auto const& metadata_node = get_SubNode(json_object, literal::metadata);
@@ -90,8 +92,8 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
   buffer.reserve(buffer.size() + 512);
 
   auto regex = std::regex{"(#include\\s*:)([^\"]*)"};
-  
-  std::for_each(std::sregex_iterator(buffer.begin(), buffer.end(),regex), std::sregex_iterator(),
+
+  std::for_each(std::sregex_iterator(buffer.begin(), buffer.end(), regex), std::sregex_iterator(),
                 [&buffer](auto& m) { buffer.replace(m.position(), m.length(), "#include "); });
 
   out.swap(buffer);

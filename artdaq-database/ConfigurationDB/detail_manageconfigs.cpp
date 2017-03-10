@@ -155,8 +155,7 @@ void create_configuration(std::string const& operations, std::string& configs) {
 
   if (!reader.read(operations, operations_ast)) {
     TRACE_(11,
-           "create_configuration() Failed to create an AST from "
-           "operations JSON.");
+           "create_configuration() Failed to create an AST from operations JSON.");
 
     throw runtime_error("create_configuration") << "Failed to create an AST from operations JSON.";
   }

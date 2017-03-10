@@ -216,13 +216,13 @@ json2fcldb::operator fcl::value_t() try {
     return fcl::value_t(unwrap(self_value).value_as<const double>());
   } else if (self_value.type() == typeid(std::string)) {
     return fcl::value_t(unwrap(self_value).value_as<const std::string>());
-  }else if (self_value.type() == typeid(jsn::object_t)) {    
+  } else if (self_value.type() == typeid(jsn::object_t)) {
     return fcl::value_t(operator fcl::atom_t().value);
-  }else if (self_value.type() == typeid(jsn::array_t)) {    
+  } else if (self_value.type() == typeid(jsn::array_t)) {
     return fcl::value_t(operator fcl::atom_t().value);
   }
 
-  return fcl::value_t(std::string(literal::unknown)+::debug::demangle(self_value.type().name()));
+  return fcl::value_t(std::string(literal::unknown) + ::debug::demangle(self_value.type().name()));
 } catch (std::exception const&) {
   throw;
 }
@@ -278,11 +278,15 @@ json2fcldb::operator fcl::atom_t() try {
     }
 
     case ::fhicl::NUMBER: {
-      if (self_data.type() == typeid(int))
+      if(self_data.type() == typeid(std::string)){
+	auto value = boost::get<std::string>(self_data);
+	fcl_value.value = need_quotes(value) ? quoted_(value) : value;
+      } else if (self_data.type() == typeid(int)){
         fcl_value.value = boost::get<int>(self_data);
-      else
+      }else{
         fcl_value.value = boost::get<double>(self_data);
-
+      }
+      
       break;
     }
 

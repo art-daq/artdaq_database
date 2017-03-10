@@ -60,6 +60,8 @@ std::string operator"" _quoted(const char* /*text*/, std::size_t);
 std::string debrace(std::string /*s*/);
 std::string dequote(std::string /*s*/);
 std::string debracket(std::string /*s*/);
+std::string annotate(std::string const& /*s*/);
+
 void set_default_locale();
 
 bool equal(std::string const&, std::string const&);

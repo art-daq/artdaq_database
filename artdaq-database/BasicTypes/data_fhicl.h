@@ -23,12 +23,11 @@ struct FhiclData final {
   FhiclData(JsonData const&);
   operator JsonData() const;
   operator std::string const&() const;
-  
+
   static constexpr auto type_version() { return "V100"; }
 
-  std::string fhicl_buffer="";
-  std::string fhicl_file_name="notprovided";
-
+  std::string fhicl_buffer = "";
+  std::string fhicl_file_name = "notprovided";
 };
 
 std::istream& operator>>(std::istream&, artdaq::database::basictypes::FhiclData&);

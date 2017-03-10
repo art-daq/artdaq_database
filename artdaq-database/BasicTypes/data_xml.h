@@ -15,7 +15,7 @@ namespace basictypes {
 
 struct JsonData;
 
-struct XmlData final{
+struct XmlData final {
   XmlData(std::string const&);
 
   XmlData() = default;

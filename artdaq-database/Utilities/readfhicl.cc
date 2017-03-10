@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) try {
   }
 
   auto file_name = vm["config"].as<std::string>();
-  
+
   std::ifstream is(file_name);
   std::string conf((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
   is.close();
@@ -72,10 +72,11 @@ int main(int argc, char* argv[]) try {
 
   conf.reserve(conf.size() + 512);
 
-  auto regex= std::regex{"(#include\\s)([^'\"]*)"};
-  
-  std::for_each(std::sregex_iterator(conf.begin(), conf.end(),regex), std::sregex_iterator(),
-                [&conf, &idx](auto& m) { conf.replace(m.position(), m.length(), "fhicl_pound_include_" + std::to_string(idx++) + ":"); });
+  auto regex = std::regex{"(#include\\s)([^'\"]*)"};
+
+  std::for_each(std::sregex_iterator(conf.begin(), conf.end(), regex), std::sregex_iterator(), [&conf, &idx](auto& m) {
+    conf.replace(m.position(), m.length(), "fhicl_pound_include_" + std::to_string(idx++) + ":");
+  });
 
   std::cout << "input\n" << conf << "\n";
 

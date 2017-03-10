@@ -13,7 +13,7 @@ namespace artdaq {
 namespace database {
 namespace basictypes {
 
-struct JsonData final{
+struct JsonData final {
   JsonData(std::string const&);
 
   template <typename TYPE>
@@ -26,7 +26,7 @@ struct JsonData final{
   operator std::string&();
 
   bool empty() const;
-  
+
   static constexpr auto type_version() { return "V1.0.0"; }
 
   std::string json_buffer;
@@ -38,6 +38,5 @@ std::istream& operator>>(std::istream&, artdaq::database::basictypes::JsonData&)
 }  // namespace basictypes
 }  // namespace database
 }  // namespace artdaq
-
 
 #endif /* _ARTDAQ_DATABASE_BASICTYPES_JSON_H_ */

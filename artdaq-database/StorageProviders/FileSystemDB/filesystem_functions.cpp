@@ -1,5 +1,5 @@
-#include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
 #include "artdaq-database/SharedCommon/sharedcommon_common.h"
+#include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
 
 #include <wordexp.h>
 #include <boost/filesystem.hpp>
@@ -40,11 +40,14 @@ std::string dbfs::mkdir(std::string const& d) {
       auto mask = boost::filesystem::perms::owner_write | boost::filesystem::perms::owner_read;
 
       if ((boost::filesystem::status(path).permissions() & mask) != mask) {
-        TRACE_(11, "StorageProvider::FileSystemDB Directory  <" << dir << "> has wrong permissions; needs to be owner readable and writable");
-        throw runtime_error("FileSystemDB") << "Directory  <" << dir << "> has wrong permissions; needs to be owner readable and writable";
+        TRACE_(11, "StorageProvider::FileSystemDB Directory  <"
+                       << dir << "> has wrong permissions; needs to be owner readable and writable");
+        throw runtime_error("FileSystemDB") << "Directory  <" << dir
+                                            << "> has wrong permissions; needs to be owner readable and writable";
       }
     } else {
-      TRACE_(11, "StorageProvider::FileSystemDB Failed creating a directory, sometging in the way path=<" << dir << ">");
+      TRACE_(11, "StorageProvider::FileSystemDB Failed creating a directory, sometging in the way path=<" << dir
+                                                                                                          << ">");
       throw runtime_error("FileSystemDB") << "Failed creating a directory, sometging in the way path=<" << dir << ">";
     }
   }
@@ -53,23 +56,27 @@ std::string dbfs::mkdir(std::string const& d) {
 
   if (!boost::filesystem::create_directories(path, ec)) {
     if (ec != boost::system::errc::success) {
-      TRACE_(11, "StorageProvider::FileSystemDB Failed creating a directory path=<" << dir << "> error code=" << ec.message());
-      throw runtime_error("FileSystemDB") << "Failed creating a directory path=<" << dir << "> error code=" << ec.message();
+      TRACE_(11, "StorageProvider::FileSystemDB Failed creating a directory path=<" << dir
+                                                                                    << "> error code=" << ec.message());
+      throw runtime_error("FileSystemDB") << "Failed creating a directory path=<" << dir
+                                          << "> error code=" << ec.message();
     }
   }
 
-
   ec.clear();
 
-/*
- auto perms = boost::filesystem::perms::add_perms | boost::filesystem::perms::owner_write | boost::filesystem::perms::owner_read;
- boost::filesystem::permissions(path, perms, ec);
+  /*
+   auto perms = boost::filesystem::perms::add_perms | boost::filesystem::perms::owner_write |
+   boost::filesystem::perms::owner_read;
+   boost::filesystem::permissions(path, perms, ec);
 
-  if (ec != boost::system::errc::success) {
-    TRACE_(11, "StorageProvider::FileSystemDB Failed enforcing directory permissions for path=<" << dir << "> error code=" << ec.message());
-    throw runtime_error("FileSystemDB") << "Failed enforcing directory permissions for path=<" << dir << "> error code=" << ec.message();
-  }
-*/
+    if (ec != boost::system::errc::success) {
+      TRACE_(11, "StorageProvider::FileSystemDB Failed enforcing directory permissions for path=<" << dir << "> error
+   code=" << ec.message());
+      throw runtime_error("FileSystemDB") << "Failed enforcing directory permissions for path=<" << dir << "> error
+   code=" << ec.message();
+    }
+  */
   return dir;
 }
 
@@ -87,12 +94,15 @@ std::list<std::string> dbfs::find_subdirs(std::string const& d) {
   auto path = boost::filesystem::path(dir.c_str());
 
   if (!boost::filesystem::exists(boost::filesystem::status(path))) {
-    TRACE_(11, "StorageProvider::FileSystemDB Failed searching for subdirectories, directory does not exist path=<" << dir << ">");
-    throw runtime_error("FileSystemDB") << "Failed searching for subdirectories, directory does not exist path=<" << dir << ">";
+    TRACE_(11, "StorageProvider::FileSystemDB Failed searching for subdirectories, directory does not exist path=<"
+                   << dir << ">");
+    throw runtime_error("FileSystemDB") << "Failed searching for subdirectories, directory does not exist path=<" << dir
+                                        << ">";
   }
 
   if (!boost::filesystem::is_directory(path)) {
-    TRACE_(11, "StorageProvider::FileSystemDB Failed searching for subdirectories, not a directory path=<" << dir << ">");
+    TRACE_(11, "StorageProvider::FileSystemDB Failed searching for subdirectories, not a directory path=<" << dir
+                                                                                                           << ">");
     throw runtime_error("FileSystemDB") << "Failed searching for subdirectories, not a directory path=<" << dir << ">";
   }
 
@@ -100,7 +110,8 @@ std::list<std::string> dbfs::find_subdirs(std::string const& d) {
 
   for (boost::filesystem::directory_iterator dir_iter(path); dir_iter != end_iter; ++dir_iter) {
     if (!boost::filesystem::is_directory(dir_iter->status())) continue;
-    TRACE_(11, "StorageProvider::FileSystemDB Found subdirectory, path=<" << dir_iter->path().filename().string() << ">");
+    TRACE_(11, "StorageProvider::FileSystemDB Found subdirectory, path=<" << dir_iter->path().filename().string()
+                                                                          << ">");
 
     returnValue.emplace_back(dir_iter->path().filename().string());
   }
@@ -122,8 +133,10 @@ std::list<object_id_t> dbfs::find_documents(std::string const& d) {
   auto path = boost::filesystem::path(dir.c_str());
 
   if (!boost::filesystem::exists(boost::filesystem::status(path))) {
-    TRACE_(11, "StorageProvider::FileSystemDB Failed searching for documents, directory does not exist path=<" << dir << ">");
-    throw runtime_error("FileSystemDB") << "Failed searching fo documents, directory does not exist path=<" << dir << ">";
+    TRACE_(11, "StorageProvider::FileSystemDB Failed searching for documents, directory does not exist path=<" << dir
+                                                                                                               << ">");
+    throw runtime_error("FileSystemDB") << "Failed searching fo documents, directory does not exist path=<" << dir
+                                        << ">";
   }
 
   if (!boost::filesystem::is_directory(path)) {
@@ -165,7 +178,8 @@ file_paths_t dbfs::list_files_in_directory(boost::filesystem::path const& path, 
 
   if (!boost::filesystem::exists(boost::filesystem::status(path))) {
     TRACE_(11, "StorageProvider::FileSystemDB Directory does not exist, path=<" << path.string() << ">");
-    throw runtime_error("FileSystemDB") << "StorageProvider::FileSystemDB Directory does not exist, path=<" << path.string() << ">";
+    throw runtime_error("FileSystemDB") << "StorageProvider::FileSystemDB Directory does not exist, path=<"
+                                        << path.string() << ">";
   }
 
   if (!boost::filesystem::is_directory(path)) {
@@ -188,10 +202,9 @@ file_paths_t dbfs::list_files_in_directory(boost::filesystem::path const& path, 
   return result;
 }
 
+bool dbfs::check_if_file_exists(std::string const& f) {
+  confirm(!f.empty());
 
-bool dbfs::check_if_file_exists(std::string const& f){
-    confirm(!f.empty());
-
-    std::ifstream in(f.c_str());
-    return in.good();
+  std::ifstream in(f.c_str());
+  return in.good();
 }

@@ -7,9 +7,7 @@ namespace db = artdaq::database;
 namespace bpo = boost::program_options;
 namespace impl = db::configuration::json;
 
-
 using Options = db::configuration::ManageDocumentOperation;
-
 
 int main(int argc, char* argv[]) try {
 #if 1
@@ -20,7 +18,7 @@ int main(int argc, char* argv[]) try {
   artdaq::database::useFakeTime(true);
 #endif
 
-  //artdaq::database::filesystem::index::shouldAutoRebuildSearchIndex(true);
+  // artdaq::database::filesystem::index::shouldAutoRebuildSearchIndex(true);
 
   auto options = std::make_unique<Options>(argv[0]);
 
@@ -38,7 +36,7 @@ int main(int argc, char* argv[]) try {
       options->operation().compare(apiliteral::operation::readconfiguration) == 0) {
     db::write_buffer_to_file(returned, options->resultFileName());
     std::cout << "Wrote file:" << options->resultFileName() << "\n";
-  
+
     return process_exit_code::SUCCESS;
   } else if (options->operation().compare(apiliteral::operation::writedocument) == 0 ||
              options->operation().compare(apiliteral::operation::writeconfiguration) == 0) {

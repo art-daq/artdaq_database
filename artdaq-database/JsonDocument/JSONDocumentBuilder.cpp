@@ -110,6 +110,20 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeConfiguration(JSONDocument const
   return self();
 }
 
+JSONDocumentBuilder& JSONDocumentBuilder::removeAllConfigurations() try {
+  TRACE_(5, "removeAllConfigurations()");
+
+  _overlay->configurations().wipe();  
+  _document.writeJson();
+
+  return self();
+} catch (std::exception const& ex) {
+  TRACE_(5, "removeAllConfigurations() Exception:" << ex.what());
+  ThrowOnFailure(CallUndo());
+  return self();
+}
+
+
 JSONDocumentBuilder& JSONDocumentBuilder::setObjectID(JSONDocument const& objectId) try {
   TRACE_(8, "setObjectID() args  objectId=<" << objectId << ">");
 
@@ -210,6 +224,21 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeEntity(JSONDocument const& entit
 
   return self();
 }
+
+
+JSONDocumentBuilder& JSONDocumentBuilder::removeAllEntities() try {
+  TRACE_(5, "removeAllEntities()");
+    
+  _overlay->entities().wipe();
+  _document.writeJson();
+
+  return self();
+} catch (std::exception const& ex) {
+  TRACE_(5, "removeAllEntities() Exception:" << ex.what());
+  ThrowOnFailure(CallUndo());
+  return self();
+}
+
 
 JSONDocumentBuilder& JSONDocumentBuilder::markReadonly() try {
   TRACE_(6, "markReadonly()");

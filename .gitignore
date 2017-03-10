@@ -1,3 +1,4 @@
 test/logs
 *.sublime-*
 .kdev4
+proxychains.conf
