@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_database  v1_04_16
+parent artdaq_database  v1_04_17
 defaultqual	e10:s41
 
 # These optional lines define the installed directories where
@@ -20,23 +20,30 @@ perllib  product_dir
 #
 product		version		optional
 artdaq_utilities -
-mongodb 	v3_2_7c
-TRACE           v3_07_00	-	optional
-swig            v3_0_10		-	optional
+mongodb 	v3_2_7d
+TRACE           v3_07_02	-	optional
+swig            v3_0_12		-	optional
 nodejs		v4_5_0		-	optional
-python          v2_7_11         -       optional
+python          v2_7_11         s41     optional
+python          v2_7_11         s43     optional
+python          v2_7_11         s44     optional
+python          v2_7_13b        s46     optional
 cetbuildtools	v5_06_06	-	only_for_build
 end_product_list
 
 # -nq- means there is no qualifier
 # a "-" means the dependent product is not required by the parent and will not be setup
-qualifier	artdaq_utilities	mongodb		TRACE	swig	  nodejs	python	notes
-e10:s44:debug   a_u_intf_v1:e10:s44:debug   	e10:debug:s44   -nq-	e10:debug -nq-		-nq-	-std=c++14
-e10:s44:prof    a_u_intf_v1:e10:s44:prof		e10:prof:s44	-nq-	e10:prof  -nq-		-nq-	-std=c++14
-e10:s43:debug   a_u_intf_v1:e10:s43:debug   	e10:debug:s43	-nq-	e10:debug -nq-		-nq-	-std=c++14
-e10:s43:prof    a_u_intf_v1:e10:s43:prof		e10:prof:s43	-nq-	e10:prof  -nq-		-nq-	-std=c++14
-e10:s41:debug   a_u_intf_v1:e10:s41:debug   	e10:debug:s41	-nq-	e10:debug -nq-		-nq-	-std=c++14
-e10:s41:prof    a_u_intf_v1:e10:s41:prof		e10:prof:s41	-nq-	e10:prof  -nq-		-nq-	-std=c++14
+qualifier	artdaq_utilities       	   mongodb     	   TRACE  swig	       nodejs	python	notes
+e14:s46:debug   a_u_intf_v1:e14:s46:debug  e14:debug:s46   -nq-	  e14:debug    -nq-	-nq-	-std=c++14
+e14:s46:prof    a_u_intf_v1:e14:s46:prof   e14:prof:s46	   -nq-	  e14:prof     -nq-	-nq-	-std=c++14
+e10:s46:debug   a_u_intf_v1:e10:s46:debug  e10:debug:s46   -nq-	  e10:debug    -nq-	-nq-	-std=c++14
+e10:s46:prof    a_u_intf_v1:e10:s46:prof   e10:prof:s46	   -nq-	  e10:prof     -nq-	-nq-	-std=c++14
+e10:s44:debug   a_u_intf_v1:e10:s44:debug  e10:debug:s44   -nq-	  e10:debug    -nq-	-nq-	-std=c++14
+e10:s44:prof    a_u_intf_v1:e10:s44:prof   e10:prof:s44	   -nq-	  e10:prof     -nq-	-nq-	-std=c++14
+e10:s43:debug   a_u_intf_v1:e10:s43:debug  e10:debug:s43   -nq-	  e10:debug    -nq-	-nq-	-std=c++14
+e10:s43:prof    a_u_intf_v1:e10:s43:prof   e10:prof:s43	   -nq-	  e10:prof     -nq-	-nq-	-std=c++14
+e10:s41:debug   a_u_intf_v1:e10:s41:debug  e10:debug:s41   -nq-	  e10:debug    -nq-	-nq-	-std=c++14
+e10:s41:prof    a_u_intf_v1:e10:s41:prof   e10:prof:s41	   -nq-	  e10:prof     -nq-	-nq-	-std=c++14
 
 end_qualifier_list
 
