@@ -82,6 +82,9 @@ add_subdirectory(test)
 # source
 add_subdirectory(artdaq-database)
 
+# doc- Documentation
+add_subdirectory(doc)
+
 # ups - table and config files
 add_subdirectory(ups)
 
