@@ -29,7 +29,7 @@ namespace literal = artdaq::database::dataformats::literal;
 
 std::string include("fhicl_pound_include");
 std::string quoted_(std::string const& text) { return "\"" + text + "\""; }
-bool need_quotes(std::string const& text) { return text.find_first_of(" .%()/") != std::string::npos; }
+bool need_quotes(std::string const& text) { return text.find_first_of(" .%()/-\\") != std::string::npos; }
 
 fcl2jsondb::fcl2jsondb(args_tuple_t args)
     : self{std::get<0>(args)}, parent{std::get<1>(args)}, comments{std::get<2>(args)}, opts{std::get<3>(args)} {}
@@ -79,7 +79,8 @@ fcl2jsondb::operator datapair_t() try {
     confirm(linenum > -1);
 
     auto comment = annotation_at(linenum);
-    if (!comment.empty() && comment.at(0) != '/') return comment;
+    
+    if (!comment.empty() && comment.at(0) != '/' && comment.find("#include ") == std::string::npos) return comment;
 
     return literal::whitespace;
   };
@@ -215,7 +216,8 @@ json2fcldb::operator fcl::value_t() try {
   } else if (self_value.type() == typeid(double)) {
     return fcl::value_t(unwrap(self_value).value_as<const double>());
   } else if (self_value.type() == typeid(std::string)) {
-    return fcl::value_t(unwrap(self_value).value_as<const std::string>());
+    auto value=unwrap(self_value).value_as<const std::string>();
+    return fcl::value_t(need_quotes(value) ? quoted_(value) : value);
   } else if (self_value.type() == typeid(jsn::object_t)) {
     return fcl::value_t(operator fcl::atom_t().value);
   } else if (self_value.type() == typeid(jsn::array_t)) {
@@ -343,7 +345,7 @@ json2fcldb::operator fcl::atom_t() try {
   auto const& name = self_key;
   auto const& comment = boost::get<std::string>(metadata_object.at(literal::comment));
 
-  auto fcl_key = fcl::key_t(name, comment);
+  auto fcl_key = fcl::key_t(name, (comment.find("#include ") == std::string::npos?comment:std::string{literal::whitespace}));
 
   if (type != ::fhicl::TABLE && !override_comment)  // table does not have annotation
     fcl_value.annotation = boost::get<std::string>(metadata_object.at(literal::annotation));

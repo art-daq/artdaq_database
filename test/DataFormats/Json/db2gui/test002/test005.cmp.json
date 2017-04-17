@@ -120,44 +120,44 @@
 "expected_fragments_per_event" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "first_fragment_receiver_rank" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "fragment_receiver_count" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "mpi_buffer_count" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "print_event_store_stats" : {
 "type" : "bool",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "use_art" : {
 "type" : "bool",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "verbose" : {
 "type" : "bool",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 },
 "max_fragment_size_words" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "metrics" : {
 "type" : "table",
@@ -170,22 +170,22 @@
 "fileName" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "level" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "metricPluginType" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "uniquify" : {
 "type" : "bool",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 }
@@ -208,14 +208,14 @@
 "SelectEvents" : {
 "type" : "sequence",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 },
 "module_type" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 }
@@ -243,12 +243,12 @@
 "module_type" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "nth" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 },
@@ -259,12 +259,12 @@
 "module_type" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "nth" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 }
@@ -273,22 +273,22 @@
 "my_output_modules" : {
 "type" : "sequence",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "p1" : {
 "type" : "sequence",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "pmod2" : {
 "type" : "sequence",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "pmod3" : {
 "type" : "sequence",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "producers" : {
 "type" : "table",
@@ -302,7 +302,7 @@
 "process_name" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "services" : {
 "type" : "table",
@@ -320,22 +320,22 @@
 "first_data_receiver_rank" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "max_fragment_size_words" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "mpi_buffer_count" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "service_provider" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 },
@@ -346,12 +346,12 @@
 "errorOnFailureToPut" : {
 "type" : "bool",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "fileMode" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 }
@@ -364,22 +364,22 @@
 "fragment_type_map" : {
 "type" : "sequence",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "module_type" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "resume_after_timeout" : {
 "type" : "bool",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "waiting_time" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 }

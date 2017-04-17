@@ -72,6 +72,8 @@ struct TestData {
   const int _version = (srand(time(NULL)), rand() % 99999 + 100000);
 
   int _oldConfigCount = 0;
+  
+  int rand_version() {return (srand(time(NULL)), rand() % 88888 + 111111);}
 };
 
 using namespace ots;
@@ -86,7 +88,7 @@ BOOST_AUTO_TEST_CASE(configure_tests) {
 }
 
 BOOST_AUTO_TEST_CASE(write_document) {
-  std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();
+  std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();  
   auto ifc = DatabaseConfigurationInterface();
 
   cfg1->getView().version = fixture.version();
@@ -226,6 +228,43 @@ BOOST_AUTO_TEST_CASE(find_latest_configuration_version) {
    std::cout << "\nGot latest version" <<  std::to_string(version) << "\n";
 
    return;
+}
+
+BOOST_AUTO_TEST_CASE(overwrite_document) {
+  auto ifc = DatabaseConfigurationInterface();
+
+  auto oldJson=std::string{"{\n\"oldJson\" : 321\n}"};
+  auto version=fixture.rand_version();
+  std::shared_ptr<ConfigurationBase> w1 = std::make_shared<TestConfiguration001>();  
+  w1->getView().fillFromJSON(oldJson);
+  w1->getView().version = version;
+  auto result = ifc.saveActiveVersion(w1.get());
+  BOOST_CHECK_EQUAL(result, 0);
+  
+  std::shared_ptr<ConfigurationBase> r1 = std::make_shared<TestConfiguration001>();
+  result = ifc.fill(r1.get(), version);
+  BOOST_CHECK_EQUAL(result, 0);
+  BOOST_CHECK_EQUAL(r1->getView()._json,oldJson);  
+
+  std::shared_ptr<ConfigurationBase> w2 = std::make_shared<TestConfiguration001>();
+  w2->getView().version = version;
+  result = ifc.saveActiveVersion(w2.get(),true);
+  BOOST_CHECK_EQUAL(result, 0);
+
+  r1 = std::make_shared<TestConfiguration001>();
+  result = ifc.fill(r1.get(), version);
+  BOOST_CHECK_EQUAL(result, 0);
+  BOOST_CHECK_EQUAL(r1->getView()._json,w2->getView()._json);  
+  
+  std::shared_ptr<ConfigurationBase> r2 = std::make_shared<TestConfiguration001>();
+  result = ifc.fill(r2.get(), version);
+  BOOST_CHECK_EQUAL(result, 0);
+  BOOST_CHECK_EQUAL(r2->getView()._json,w2->getView()._json);  
+
+  std::shared_ptr<ConfigurationBase> cfg = std::make_shared<TestConfiguration001>();
+  BOOST_CHECK_EQUAL(r2->getView()._json,cfg->getView()._json);  
+ 
+  return;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

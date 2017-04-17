@@ -47,7 +47,7 @@ cet_make_exec(migrate_database
   ${Boost_PROGRAM_OPTIONS_LIBRARY} 
 )
 
-cet_script(conftool.sh)
+cet_script(conftool.py)
 
 install_headers()
 install_source()

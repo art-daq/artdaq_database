@@ -26,6 +26,7 @@ class JSONDocumentBuilder final {
   JSONDocumentBuilder& addAlias(JSONDocument const&);
   JSONDocumentBuilder& addConfiguration(JSONDocument const&);
   JSONDocumentBuilder& addEntity(JSONDocument const&);
+  JSONDocumentBuilder& addRun(JSONDocument const&);
 
   JSONDocumentBuilder& setVersion(JSONDocument const&);
   JSONDocumentBuilder& setCollection(JSONDocument const&);

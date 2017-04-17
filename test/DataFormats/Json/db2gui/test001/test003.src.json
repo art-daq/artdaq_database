@@ -34,7 +34,7 @@
 "fhicl_pound_include_0" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "rce_standard" : {
 "type" : "table",
@@ -43,12 +43,12 @@
 "metrics" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "max_fragment_size_words" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "fragment_receiver" : {
 "type" : "table",
@@ -57,12 +57,12 @@
 "mpi_buffer_count" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "mpi_sync_interval" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 }
 }
 }
@@ -71,37 +71,37 @@
 "daq" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "fhicl_pound_include_1" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "fhicl_pound_include_2" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "rce_standard" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "rce04_standard" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "rce04_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "rce04_standard.fragment_receiver.board_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 }
 }
 },
@@ -113,17 +113,17 @@
 "rce05_standard" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "rce05_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "rce05_standard.fragment_receiver.board_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 }
 }
 }

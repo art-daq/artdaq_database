@@ -50,10 +50,15 @@ using artdaq::database::docrecord::JSONDocument;
 
 namespace jsonliteral = artdaq::database::dataformats::literal;
 
+
 // bsoncxx::types::value extract_value_from_document(bsoncxx::document::value const& document, std::string const& key);
 namespace artdaq {
 namespace database {
-
+  
+namespace mongo {  
+  JsonData rewrite_query_with_regex(JsonData const &,std::vector<std::string> const &);
+} // namespace mongo
+  
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonData const& search) {
@@ -62,6 +67,13 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
 
   TRACE_(4, "MongoDB::findConfigurations() begin");
   TRACE_(4, "MongoDB::findConfigurations() args data=<" << search << ">");
+
+  auto fields= std::vector<std::string>{};
+  fields.emplace_back("configurations.name");
+  
+  auto regex_search= mongo::rewrite_query_with_regex(search,fields);
+  
+  TRACE_(4, "MongoDB::findConfigurations() regex_search data=<" << regex_search << ">");
 
   auto filter = bsoncxx::builder::core(false);
 
@@ -93,7 +105,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
     auto collection = _provider->connection().collection(collection_name);
 
     auto configuration_filter = bsoncxx::builder::core(false);
-    auto bson_document = bsoncxx::from_json(search.json_buffer);
+    auto bson_document = bsoncxx::from_json(regex_search.json_buffer);
     configuration_filter.concatenate(bson_document.view());
 
     auto cursor = collection.distinct("configurations.name", configuration_filter.view_document());
@@ -278,10 +290,18 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
 
   auto collection = _provider->connection().collection(collection_name);
 
+  auto search=JsonData{bsoncxx::to_json(extract_value("filter"))};
+
+  auto fields= std::vector<std::string>{};
+  fields.emplace_back("entities.name");
+  auto regex_search= mongo::rewrite_query_with_regex(search,fields);
+  TRACE_(7, "MongoDB::findVersions() args regex_search=<" << regex_search << ">");
+  
   mongocxx::pipeline stages;
   bbs::document project_stage;
-  auto match_stage = bsoncxx::builder::core(false);
-  match_stage.concatenate(extract_value("filter").get_document().value);
+  auto match_stage = bsoncxx::builder::core(false);    
+  auto bson_search = bsoncxx::from_json(regex_search.json_buffer);
+  match_stage.concatenate(bson_search.view());
 
   project_stage << "_id" << 0 << "version"
                 << "$version"

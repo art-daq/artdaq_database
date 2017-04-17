@@ -206,6 +206,25 @@ JSONDocumentBuilder& JSONDocumentBuilder::addEntity(JSONDocument const& entity) 
   return self();
 }
 
+JSONDocumentBuilder& JSONDocumentBuilder::addRun(JSONDocument const& run) try {
+  TRACE_(9, "addRun() args  run=<" << run << ">");
+
+  JSONDocument copy(run);
+  auto ovl = overlay<ovl::ovlRun>(copy, jsonliteral::runs);
+
+  ThrowOnFailure(SaveUndo());
+  ThrowOnFailure(_overlay->addRun(ovl));
+
+  _document.writeJson();
+
+  return self();
+} catch (std::exception const& ex) {
+  TRACE_(9, "addRun() Exception:" << ex.what());
+  ThrowOnFailure(CallUndo());
+
+  return self();
+}
+
 JSONDocumentBuilder& JSONDocumentBuilder::removeEntity(JSONDocument const& entity) try {
   TRACE_(9, "removeEntity() args  entity=<" << entity << ">");
 

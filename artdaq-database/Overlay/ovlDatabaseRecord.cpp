@@ -253,6 +253,20 @@ result_t ovlDatabaseRecord::addEntity(ovlEntityUPtr_t& entity) {
   return _bookkeeping->postUpdate(update, entity);
 }
 
+result_t ovlDatabaseRecord::addRun(ovlRunUPtr_t& run) {
+  confirm(run);
+
+  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
+
+  auto update = std::string("addRun");
+
+  auto result = _runs->add(run);
+
+  if (!result.first) return result;
+
+  return _bookkeeping->postUpdate(update, run);
+}
+  
 result_t ovlDatabaseRecord::removeEntity(ovlEntityUPtr_t& entity) {
   confirm(entity);
 

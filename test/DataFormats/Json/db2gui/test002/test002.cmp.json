@@ -39,69 +39,69 @@
 "board_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "event_builder_count" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "first_event_builder_rank" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "fragment_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "fragment_type" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "generator" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "mpi_buffer_count" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "mpi_sync_interval" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "nADCcounts" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "random_seed" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "sleep_on_stop_us" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "throttle_usecs" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 },
 "max_fragment_size_words" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "metrics" : {
 "type" : "table",
@@ -114,22 +114,22 @@
 "fileName" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "level" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "metricPluginType" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "uniquify" : {
 "type" : "bool",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 }

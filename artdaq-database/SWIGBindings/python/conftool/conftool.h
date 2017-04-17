@@ -3,7 +3,10 @@
 
 typedef std::pair<bool, std::string> result_t;
 
+void set_default_locale();
+
 result_t read_document(std::string const& query_payload);                                     // manage doc
+
 result_t write_document(std::string const& query_payload, std::string const& json_document);  // managedoc
 result_t mark_document_readonly(std::string const& query_payload);                            // manage doc
 result_t mark_document_deleted(std::string const& query_payload);                             // manage doc
@@ -14,9 +17,12 @@ result_t remove_entity(std::string const& query_payload);                       
 
 result_t add_version_alias(std::string const& query_payload);
 result_t remove_version_alias(std::string const& query_payload);
+
 result_t find_version_aliases(std::string const& query_payload);
+/*
 result_t add_configuration_alias(std::string const& query_payload);     // manage configs
 result_t remove_configuration_alias(std::string const& query_payload);  // manage configs
+*/
 
 result_t find_configurations(std::string const& query_payload);        // manage configs
 result_t configuration_composition(std::string const& query_payload);  // manage configs
@@ -38,5 +44,7 @@ result_t list_databases(std::string const& query_payload);    // metadata
 result_t read_dbinfo(std::string const& query_payload);       // metadata
 result_t list_collections(std::string const& query_payload);  // metadata
 
+result_t fhicl_to_json(std::string const& fcl, std::string const& filename); // utility function
+result_t json_to_fhicl(std::string const& jsn, std::string& filename); // utility function
 void enable_trace();
-void set_default_locale();
+

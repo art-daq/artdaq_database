@@ -24,8 +24,11 @@ class DatabaseConfigurationInterface : public ConfigurationInterface {
   int fill(ConfigurationBase* /*configuration*/, int /*version*/) const noexcept;
 
   // write configuration to database
-  int saveActiveVersion(const ConfigurationBase* /*configuration*/) const noexcept;
+  int saveActiveVersion(const ConfigurationBase* /*configuration*/, bool /*overwrite*/ = false ) const noexcept;
 
+  //mark configuration as read-only in database
+  int markActiveVersionReadonly(const ConfigurationBase* /*configuration*/) const noexcept;
+  
   // find the latest configuration version by configuration type
   int findLatestVersion(const ConfigurationBase* /*configuration*/) const noexcept;
 

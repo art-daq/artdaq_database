@@ -68,6 +68,7 @@ int main(int argc, char* argv[]) try {
   std::string conf((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
   is.close();
 
+  /*
   auto idx = std::size_t{0};
 
   conf.reserve(conf.size() + 512);
@@ -79,10 +80,11 @@ int main(int argc, char* argv[]) try {
   });
 
   std::cout << "input\n" << conf << "\n";
-
+  */
+  
   ::fhicl::intermediate_table fhicl_table;
 
-  ::shims::isSnippetMode(true);
+  //::shims::isSnippetMode(true);
 
   parse_document(conf, fhicl_table);
 

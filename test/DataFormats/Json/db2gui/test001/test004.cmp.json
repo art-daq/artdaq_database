@@ -129,7 +129,7 @@
 "fhicl_pound_include_0" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp_standard" : {
 "type" : "table",
@@ -138,12 +138,12 @@
 "metrics" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "max_fragment_size_words" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "fragment_receiver" : {
 "type" : "table",
@@ -152,22 +152,22 @@
 "mpi_buffer_count" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "mpi_sync_interval" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "first_event_builder_rank" : {
 "type" : "number",
 "comment" : "# These two variables will be calculated by DAQInterface...",
-"annotation" : " "
+"annotation":""
 },
 "event_builder_count" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "generator" : {
 "type" : "string",
@@ -258,7 +258,7 @@
 "ALL_channel_control" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ALL_led_threshold" : {
 "type" : "number",
@@ -288,47 +288,47 @@
 "ALL_cfd_parameters" : {
 "type" : "number",
 "comment" : "#Leave alone unless you know what you^re doing!",
-"annotation" : " "
+"annotation":""
 },
 "ALL_p_window" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ALL_i2_window" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ALL_m1_window" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ALL_m2_window" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ALL_d_window" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ALL_i1_window" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ALL_disc_width" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ALL_baseline_start" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ALL_bias_config" : {
 "type" : "number",
@@ -338,67 +338,67 @@
 "c2c_control" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "c2c_master_intr_control" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "comm_clock_control" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "comm_led_config" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "comm_led_input" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "qi_dac_config" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "qi_dac_control" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "mon_config" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "mon_select" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "mon_gpio" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "mon_control" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "c2c_slave_intr_control" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "gpio_output_width" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "front_panel_config" : {
 "type" : "number",
@@ -408,42 +408,42 @@
 "dsp_led_config" : {
 "type" : "number",
 "comment" : "# standard config?",
-"annotation" : " "
+"annotation":""
 },
 "dsp_led_input" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "baseline_delay" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "diag_channel_input" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "qi_config" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "qi_delay" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "qi_pulse_width" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "external_gate_width" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 }
 }
 }
@@ -454,222 +454,222 @@
 "daq" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "fhicl_pound_include_1" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "fhicl_pound_include_2" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp_standard" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp01_standard" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp01_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp01_standard.fragment_receiver.board_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp01_standard.fragment_receiver.board_ip" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp01_standard.fragment_receiver.HardwareConfig.module_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp02_standard" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp02_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp02_standard.fragment_receiver.board_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp02_standard.fragment_receiver.board_ip" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp02_standard.fragment_receiver.HardwareConfig.module_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp03_standard" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp03_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp03_standard.fragment_receiver.board_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp03_standard.fragment_receiver.board_ip" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp03_standard.fragment_receiver.HardwareConfig.module_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp04_standard" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp04_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp04_standard.fragment_receiver.board_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp04_standard.fragment_receiver.board_ip" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp04_standard.fragment_receiver.HardwareConfig.module_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp05_standard" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp05_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp05_standard.fragment_receiver.board_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp05_standard.fragment_receiver.board_ip" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp05_standard.fragment_receiver.HardwareConfig.module_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp06_standard" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp06_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp06_standard.fragment_receiver.board_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp06_standard.fragment_receiver.board_ip" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp06_standard.fragment_receiver.HardwareConfig.module_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp07_standard" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp07_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp07_standard.fragment_receiver.board_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp07_standard.fragment_receiver.board_ip" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp07_standard.fragment_receiver.HardwareConfig.module_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp08_standard" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp08_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp08_standard.fragment_receiver.board_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp08_standard.fragment_receiver.board_ip" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 },
 "ssp08_standard.fragment_receiver.HardwareConfig.module_id" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation":""
 }
 }
 },
@@ -700,7 +700,7 @@
 "name" : "fhicl_pound_include_0",
 "comment" : " ",
 "value" : "metrics.fcl",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "table",
@@ -712,14 +712,14 @@
 "name" : "metrics",
 "comment" : " ",
 "value" : "@local::metrics",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "max_fragment_size_words",
 "comment" : " ",
 "value" : 262144,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "table",
@@ -731,28 +731,28 @@
 "name" : "mpi_buffer_count",
 "comment" : " ",
 "value" : 16,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "mpi_sync_interval",
 "comment" : " ",
 "value" : 24000,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "first_event_builder_rank",
 "comment" : "# These two variables will be calculated by DAQInterface...",
 "value" : -1,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "event_builder_count",
 "comment" : " ",
 "value" : -1,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "string",
@@ -876,7 +876,7 @@
 "name" : "ALL_channel_control",
 "comment" : " ",
 "value" : 1,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
@@ -918,63 +918,63 @@
 "name" : "ALL_cfd_parameters",
 "comment" : "#Leave alone unless you know what you^re doing!",
 "value" : 6144,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ALL_p_window",
 "comment" : " ",
 "value" : 32,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ALL_i2_window",
 "comment" : " ",
 "value" : 500,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ALL_m1_window",
 "comment" : " ",
 "value" : 10,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ALL_m2_window",
 "comment" : " ",
 "value" : 10,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ALL_d_window",
 "comment" : " ",
 "value" : 20,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ALL_i1_window",
 "comment" : " ",
 "value" : 500,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ALL_disc_width",
 "comment" : " ",
 "value" : 10,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ALL_baseline_start",
 "comment" : " ",
 "value" : 0,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
@@ -988,91 +988,91 @@
 "name" : "c2c_control",
 "comment" : " ",
 "value" : 7,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "c2c_master_intr_control",
 "comment" : " ",
 "value" : 0,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "comm_clock_control",
 "comment" : " ",
 "value" : 1,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "comm_led_config",
 "comment" : " ",
 "value" : 0,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "comm_led_input",
 "comment" : " ",
 "value" : 0,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "qi_dac_config",
 "comment" : " ",
 "value" : 0,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "qi_dac_control",
 "comment" : " ",
 "value" : 1,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "mon_config",
 "comment" : " ",
 "value" : 1241088,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "mon_select",
 "comment" : " ",
 "value" : 16776960,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "mon_gpio",
 "comment" : " ",
 "value" : 0,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "mon_control",
 "comment" : " ",
 "value" : 65537,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "c2c_slave_intr_control",
 "comment" : " ",
 "value" : 0,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "gpio_output_width",
 "comment" : " ",
 "value" : 4096,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
@@ -1086,56 +1086,56 @@
 "name" : "dsp_led_config",
 "comment" : "# standard config?",
 "value" : 0,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "dsp_led_input",
 "comment" : " ",
 "value" : 0,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "baseline_delay",
 "comment" : " ",
 "value" : 5,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "diag_channel_input",
 "comment" : " ",
 "value" : 0,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "qi_config",
 "comment" : " ",
 "value" : 268377856,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "qi_delay",
 "comment" : " ",
 "value" : 0,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "qi_pulse_width",
 "comment" : " ",
 "value" : 0,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "external_gate_width",
 "comment" : " ",
 "value" : 32768,
-"annotation" : " "
+"annotation":""
 }
 ]
 }
@@ -1148,308 +1148,308 @@
 "name" : "daq",
 "comment" : " ",
 "value" : "@local::ssp_standard",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "string",
 "name" : "fhicl_pound_include_1",
 "comment" : " ",
 "value" : "ssp_expert_run_options.fcl",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "string",
 "name" : "fhicl_pound_include_2",
 "comment" : " ",
 "value" : "user_run_options.fcl",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "table",
 "name" : "ssp_standard",
 "comment" : " ",
 "value" : "@local::daq",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "string",
 "name" : "ssp01_standard",
 "comment" : " ",
 "value" : "@local::ssp_standard",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp01_standard.fragment_receiver.fragment_id",
 "comment" : " ",
 "value" : 0,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp01_standard.fragment_receiver.board_id",
 "comment" : " ",
 "value" : 0,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "string",
 "name" : "ssp01_standard.fragment_receiver.board_ip",
 "comment" : " ",
 "value" : "192.168.1.109",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp01_standard.fragment_receiver.HardwareConfig.module_id",
 "comment" : " ",
 "value" : 1,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "string",
 "name" : "ssp02_standard",
 "comment" : " ",
 "value" : "@local::ssp_standard",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp02_standard.fragment_receiver.fragment_id",
 "comment" : " ",
 "value" : 1,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp02_standard.fragment_receiver.board_id",
 "comment" : " ",
 "value" : 1,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "string",
 "name" : "ssp02_standard.fragment_receiver.board_ip",
 "comment" : " ",
 "value" : "192.168.1.117",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp02_standard.fragment_receiver.HardwareConfig.module_id",
 "comment" : " ",
 "value" : 2,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "string",
 "name" : "ssp03_standard",
 "comment" : " ",
 "value" : "@local::ssp_standard",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp03_standard.fragment_receiver.fragment_id",
 "comment" : " ",
 "value" : 2,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp03_standard.fragment_receiver.board_id",
 "comment" : " ",
 "value" : 2,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "string",
 "name" : "ssp03_standard.fragment_receiver.board_ip",
 "comment" : " ",
 "value" : "192.168.1.113",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp03_standard.fragment_receiver.HardwareConfig.module_id",
 "comment" : " ",
 "value" : 3,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "string",
 "name" : "ssp04_standard",
 "comment" : " ",
 "value" : "@local::ssp_standard",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp04_standard.fragment_receiver.fragment_id",
 "comment" : " ",
 "value" : 3,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp04_standard.fragment_receiver.board_id",
 "comment" : " ",
 "value" : 3,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "string",
 "name" : "ssp04_standard.fragment_receiver.board_ip",
 "comment" : " ",
 "value" : "192.168.1.110",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp04_standard.fragment_receiver.HardwareConfig.module_id",
 "comment" : " ",
 "value" : 4,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "string",
 "name" : "ssp05_standard",
 "comment" : " ",
 "value" : "@local::ssp_standard",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp05_standard.fragment_receiver.fragment_id",
 "comment" : " ",
 "value" : 4,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp05_standard.fragment_receiver.board_id",
 "comment" : " ",
 "value" : 4,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "string",
 "name" : "ssp05_standard.fragment_receiver.board_ip",
 "comment" : " ",
 "value" : "192.168.1.114",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp05_standard.fragment_receiver.HardwareConfig.module_id",
 "comment" : " ",
 "value" : 5,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "string",
 "name" : "ssp06_standard",
 "comment" : " ",
 "value" : "@local::ssp_standard",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp06_standard.fragment_receiver.fragment_id",
 "comment" : " ",
 "value" : 5,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp06_standard.fragment_receiver.board_id",
 "comment" : " ",
 "value" : 5,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "string",
 "name" : "ssp06_standard.fragment_receiver.board_ip",
 "comment" : " ",
 "value" : "192.168.1.106",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp06_standard.fragment_receiver.HardwareConfig.module_id",
 "comment" : " ",
 "value" : 6,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "string",
 "name" : "ssp07_standard",
 "comment" : " ",
 "value" : "@local::ssp_standard",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp07_standard.fragment_receiver.fragment_id",
 "comment" : " ",
 "value" : 6,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp07_standard.fragment_receiver.board_id",
 "comment" : " ",
 "value" : 6,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "string",
 "name" : "ssp07_standard.fragment_receiver.board_ip",
 "comment" : " ",
 "value" : "192.168.1.105",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp07_standard.fragment_receiver.HardwareConfig.module_id",
 "comment" : " ",
 "value" : 7,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "string",
 "name" : "ssp08_standard",
 "comment" : " ",
 "value" : "@local::ssp_standard",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp08_standard.fragment_receiver.fragment_id",
 "comment" : " ",
 "value" : 7,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp08_standard.fragment_receiver.board_id",
 "comment" : " ",
 "value" : 7,
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "string",
 "name" : "ssp08_standard.fragment_receiver.board_ip",
 "comment" : " ",
 "value" : "192.168.1.105",
-"annotation" : " "
+"annotation":""
 },
 {
 "type" : "number",
 "name" : "ssp08_standard.fragment_receiver.HardwareConfig.module_id",
 "comment" : " ",
 "value" : 8,
-"annotation" : " "
+"annotation":""
 }
 ]
 },

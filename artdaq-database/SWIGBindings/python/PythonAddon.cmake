@@ -55,7 +55,10 @@ macro (create_python_addon)
 
     set(PIA_ADDON_LIBNAME _${PIA_ADDON_NAME})
 
-    install (FILES ${LIBRARY_OUTPUT_PATH}/${PIA_ADDON_LIBNAME}.so DESTINATION ${flavorqual_dir}/lib/)
+    install (FILES ${LIBRARY_OUTPUT_PATH}/${PIA_ADDON_LIBNAME}.so 
+      PERMISSIONS OWNER_EXECUTE OWNER_READ GROUP_EXECUTE GROUP_READ 
+      DESTINATION ${flavorqual_dir}/python/)
+      
     install (FILES ${CMAKE_CURRENT_BINARY_DIR}/${PIA_ADDON_NAME}.py DESTINATION ${flavorqual_dir}/python/)
 
     add_custom_command(TARGET ${PIA_ADDON_LIBNAME} POST_BUILD 

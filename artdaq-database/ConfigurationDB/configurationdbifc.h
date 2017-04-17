@@ -6,6 +6,7 @@
 #include "artdaq-database/ConfigurationDB/configurationdbifc_base.h"
 #pragma GCC diagnostic pop
 
+#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "options_operation_manageconfigs.h"
 
 using debug::demangle;
@@ -81,6 +82,115 @@ struct ConfigurationInterface final {
     return {false, {e.what()}};
   }
 
+  //==============================================================================
+  // overwrite configuration version to database
+  template <typename CONF, typename TYPE>
+  cf::result_t overwriteVersion(CONF configuration, std::string const& version, std::string const& entity) const
+      noexcept try {
+    confirm(!version.empty());
+
+    constexpr auto apifunctname = "ConfigurationInterface::updateVersion";
+
+    if (version.empty()) throw artdaq::database::invalid_option_exception(apifunctname) << "Version is empty";
+
+    auto serializer = ConfigurationSerializer<CONF, MakeSerializable>::wrap(configuration);
+
+    auto opts = ManageDocumentOperation{apiname};
+
+    opts.collection(serializer.configurationName());
+    opts.version(version);
+    if (!entity.empty()) opts.entity(entity);
+
+    auto buffer = std::string{};
+
+    opts.format(data_format_t::db);
+    opts.operation(apiliteral::operation::readdocument);
+
+    auto apiCallResult = impl::read_document(opts, buffer);
+
+    if (!apiCallResult.first) throw artdaq::database::runtime_exception(apifunctname) << apiCallResult.second;
+    
+    if (std::is_same<TYPE, JsonData>::value) {
+      opts.format(data_format_t::json);
+    } else if (std::is_same<TYPE, FhiclData>::value) {
+      opts.format(data_format_t::fhicl);
+    } else {
+      throw artdaq::database::invalid_option_exception(apifunctname)
+          << "Unsupported storage format " << demangle(typeid(TYPE).name()) << ",  use either JsonData or FhiclData.";
+    }
+    
+    auto data = TYPE{{"{}"}};
+
+    auto writeResult = serializer.template writeDocument<TYPE>(data);
+    
+    if (!writeResult.first) throw artdaq::database::runtime_exception(apifunctname) << writeResult.second;
+    
+    auto wraped_data = JsonData{std::string("{\"data\":").append(data).append("}")};
+    
+    std::ostringstream oss;    
+    oss << db::docrecord::JSONDocumentBuilder().createFromData(wraped_data);
+
+    auto newRecord=jsn::object_t{};
+    
+    if(!db::json::JsonReader{}.read(oss.str(), newRecord))
+       throw artdaq::database::runtime_exception(apifunctname) << "Not a JSON object" << oss.str();
+
+    auto dbRecord=jsn::object_t{};
+       
+    if(!db::json::JsonReader{}.read(buffer, dbRecord))
+       throw artdaq::database::runtime_exception(apifunctname) << "Not a JSON object" << buffer;
+       
+    dbRecord[jsonliteral::document].swap(newRecord[jsonliteral::document]);
+    
+    buffer.clear();
+    
+    if(!db::json::JsonWriter{}.write(dbRecord,buffer))
+       throw artdaq::database::runtime_exception(apifunctname) << "Not a JSON object" << buffer;
+           
+    opts.operation(apiliteral::operation::overwritedocument);
+    opts.format(data_format_t::db);
+
+    apiCallResult = impl::write_document(opts, buffer);
+
+    if (!apiCallResult.first) throw artdaq::database::runtime_exception(apifunctname) << apiCallResult.second;
+
+    return apiCallResult;
+  } catch (std::exception const& e) {
+    return {false, {e.what()}};
+  }
+  
+  //==============================================================================
+  // marks configuration version as read-only in database
+  template <typename CONF, typename TYPE>
+  cf::result_t markVersionReadonly(CONF configuration, std::string const& version, std::string const& entity) const
+      noexcept try {
+    confirm(!version.empty());
+
+    constexpr auto apifunctname = "ConfigurationInterface::markVersionReadonly";
+
+    if (version.empty()) throw artdaq::database::invalid_option_exception(apifunctname) << "Version is empty";
+
+    auto serializer = ConfigurationSerializer<CONF, MakeSerializable>::wrap(configuration);
+
+    auto opts = ManageDocumentOperation{apiname};
+
+    opts.operation(apiliteral::operation::markreadonly);
+    opts.collection(serializer.configurationName());
+    opts.version(version);
+
+    if (!entity.empty()) opts.entity(entity);
+
+    auto apiCallResult = impl::mark_document_readonly(opts);
+
+    if (!apiCallResult.first) throw artdaq::database::runtime_exception(apifunctname) << apiCallResult.second;
+
+    return apiCallResult;
+  } catch (std::exception const& e) {
+    return {false, {e.what()}};
+  }
+  
+  
+  
   //==============================================================================
   // loads configuration version from database
   template <typename CONF, typename TYPE>

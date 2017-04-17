@@ -137,6 +137,7 @@ bool db::read_buffer_from_file(std::string& buffer, std::string const& file_in_n
 
 std::string db::make_temp_dir() {
   auto tmp_dir_name = std::string{apiliteral::tmpdirprefix};
+  srand(time(NULL));
   tmp_dir_name.append(std::to_string(rand() % 9000000 + 1000000));
 
   auto system_cmd = std::string{"mkdir -p "};
