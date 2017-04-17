@@ -21,7 +21,7 @@ perllib  product_dir
 product		version		optional
 artdaq_utilities -
 mongodb 	v3_2_7d
-boost           v1_61_0        
+boost           v1_63_0a        
 TRACE           v3_07_02	-	optional
 swig            v3_0_12		-	optional
 nodejs		v4_5_0		-	optional
