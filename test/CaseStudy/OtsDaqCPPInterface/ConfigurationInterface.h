@@ -13,7 +13,7 @@ struct ConfigurationView {
     _json = newjson;
     return 0;
   }
-  std::string _json = "{ \"testJSON\" : 123 }";
+  std::string _json = "{\n\"testJSON\" : 123\n}";
   int version = 1;
 };
 

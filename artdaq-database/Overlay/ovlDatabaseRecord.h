@@ -113,6 +113,8 @@ class ovlDatabaseRecord final : public ovlKeyValue {
   result_t addEntity(ovlEntityUPtr_t& /*entity*/);
   result_t removeEntity(ovlEntityUPtr_t& /*entity*/);
 
+  result_t addRun(ovlRunUPtr_t& /*run*/);
+
   result_t setVersion(ovlVersionUPtr_t& /*version*/);
   result_t setCollection(ovlCollectionUPtr_t& /*version*/);
   result_t setConfigurationType(ovlConfigurationTypeUPtr_t& /*configtype*/);

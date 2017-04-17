@@ -1,7 +1,10 @@
 #include "artdaq-database/ConfigurationDB/configurationdb.h"
+#include "artdaq-database/DataFormats/Fhicl/fhicljsondb.h"
+
 #include "conftool.h"
 
 namespace impl = artdaq::database::configuration::json;
+namespace fjlib=artdaq::database::fhicljson;
 
 result_t read_document(std::string const& query_payload) {
   set_default_locale();
@@ -107,6 +110,14 @@ result_t write_configuration(std::string const& query_payload, std::string const
   return impl::write_configuration(query_payload, json_document);
 }
 
+
+result_t find_version_aliases(std::string const& query_payload) {
+  set_default_locale();
+
+  return impl::find_version_aliases(query_payload);
+}
+
+/*
 result_t add_configuration_alias(std::string const& query_payload) {
   set_default_locale();
 
@@ -118,6 +129,7 @@ result_t remove_configuration_alias(std::string const& query_payload) {
 
   return impl::remove_configuration_alias(query_payload);
 }
+*/
 
 result_t export_configuration(std::string const& query_payload) {
   set_default_locale();
@@ -172,6 +184,21 @@ result_t import_collection(std::string const& query_payload) {
 
   return impl::import_collection(query_payload);
 }
+
+result_t fhicl_to_json(std::string const& fcl, std::string const& filename) {
+    set_default_locale();
+    auto retValue = std::string{};
+    auto result=fjlib::fhicl_to_json(fcl,filename, retValue);
+    return {result,retValue};
+}
+
+result_t json_to_fhicl(std::string const& jsn, std::string& filename) {
+    set_default_locale();
+    auto retValue = std::string{};
+    auto result=fjlib::json_to_fhicl(jsn,retValue,filename);
+    return {result,retValue};
+}
+
 
 void enable_trace() { return impl::enable_trace(); }
 

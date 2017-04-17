@@ -86,44 +86,44 @@
 "expected_fragments_per_event" : {
 "type" : "number",
 "comment" : "zxcv ",
-"annotation" : "zxcv "
+"annotation" : "#zxcv"
 },
 "first_fragment_receiver_rank" : {
 "type" : "number",
 "comment" : "zxcv ",
-"annotation" : "zxcv "
+"annotation" : "#zxcv"
 },
 "fragment_receiver_count" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "mpi_buffer_count" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "print_event_store_stats" : {
 "type" : "bool",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "use_art" : {
 "type" : "bool",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "verbose" : {
 "type" : "bool",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 },
 "max_fragment_size_words" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "metrics" : {
 "type" : "table",
@@ -136,22 +136,22 @@
 "fileName" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : "//demoe"
+"annotation" : "#//demoe"
 },
 "level" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "metricPluginType" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "uniquify" : {
 "type" : "bool",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 }
@@ -174,14 +174,14 @@
 "SelectEvents" : {
 "type" : "sequence",
 "comment" : "#Failure 5 not a satom ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 },
 "module_type" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 }
@@ -207,7 +207,7 @@
 "nth" : {
 "type" : "number",
 "comment" : "#//Success 5 right of satom",
-"annotation" : " "
+"annotation" : ""
 }
 }
 },
@@ -218,12 +218,12 @@
 "module_type" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "nth" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : "//#Success 4 right of satom"
+"annotation" : "#//#Success 4 right of satom"
 }
 }
 }
@@ -232,24 +232,24 @@
 "my_output_modules" : {
 "type" : "sequence",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "pmod2" : {
 "type" : "sequence",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "pmod3" : {
 "type" : "sequence",
 "comment" : "#Failure 2 not a satom ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 },
 "process_name" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "services" : {
 "type" : "table",
@@ -262,7 +262,7 @@
 "fileMode" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 },
@@ -282,22 +282,22 @@
 "first_data_receiver_rank" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "max_fragment_size_words" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "mpi_buffer_count" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "service_provider" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 }
@@ -312,17 +312,17 @@
 "module_type" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "resume_after_timeout" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "waiting_time" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 }

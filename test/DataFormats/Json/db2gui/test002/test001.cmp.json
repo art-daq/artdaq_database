@@ -88,69 +88,69 @@
 "event_builder_count" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "event_queue_depth" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "event_queue_wait_time" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "expected_events_per_bunch" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "file_duration" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "file_event_count" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "file_size_MB" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "first_event_builder_rank" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "mpi_buffer_count" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "onmon_event_prescale" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "print_event_store_stats" : {
 "type" : "bool",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "xmlrpc_client_list" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 },
 "max_fragment_size_words" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "metrics" : {
 "type" : "table",
@@ -163,22 +163,22 @@
 "fileName" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "level" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "metricPluginType" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "uniquify" : {
 "type" : "bool",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 }
@@ -215,12 +215,12 @@
 "module_type" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "nth" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 },
@@ -231,12 +231,12 @@
 "module_type" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "nth" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 }
@@ -245,22 +245,22 @@
 "p1" : {
 "type" : "sequence",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "p2" : {
 "type" : "sequence",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "pmod2" : {
 "type" : "sequence",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "pmod3" : {
 "type" : "sequence",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "producers" : {
 "type" : "table",
@@ -273,12 +273,12 @@
 "instance_name" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "module_type" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 }
@@ -289,7 +289,7 @@
 "process_name" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "services" : {
 "type" : "table",
@@ -302,12 +302,12 @@
 "max_fragment_size_words" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 },
 "service_provider" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 },
@@ -318,7 +318,7 @@
 "fileMode" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 }
@@ -331,7 +331,7 @@
 "module_type" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 }

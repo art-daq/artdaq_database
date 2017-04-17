@@ -40,12 +40,13 @@ int DatabaseConfigurationInterface::fill(ConfigurationBase* configuration, int v
 }
 
 // write configuration to database
-int DatabaseConfigurationInterface::saveActiveVersion(const ConfigurationBase* configuration) const noexcept {
+int DatabaseConfigurationInterface::saveActiveVersion(const ConfigurationBase* configuration, bool overwrite) const noexcept {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
 
   auto versionstring = std::to_string(configuration->getViewVersion());
 
-  auto result =
+  auto result = overwrite ? 
+      ifc.template overwriteVersion<decltype(configuration), JsonData>(configuration, versionstring, default_entity) :
       ifc.template storeVersion<decltype(configuration), JsonData>(configuration, versionstring, default_entity);
 
   if (result.first) return 0;
@@ -56,6 +57,25 @@ int DatabaseConfigurationInterface::saveActiveVersion(const ConfigurationBase* c
 
   return -1;
 }
+
+//mark configuration as read-only in database
+int DatabaseConfigurationInterface::markActiveVersionReadonly(const ConfigurationBase* configuration) const noexcept{
+  auto ifc = db::ConfigurationInterface{default_dbprovider};
+
+  auto versionstring = std::to_string(configuration->getViewVersion());
+
+  auto result =
+      ifc.template markVersionReadonly<decltype(configuration), JsonData>(configuration, versionstring, default_entity);
+
+  if (result.first) return 0;
+
+  std::cout << "DBI Error:" << result.second << "\n";
+
+  confirm(result.first);
+
+  return -1;
+}
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wreturn-type"
 

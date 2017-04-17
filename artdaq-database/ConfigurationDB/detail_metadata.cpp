@@ -61,6 +61,7 @@ void list_databases(Options const& options, std::string& configs) {
   TRACE_(11, "list_databases args options=<" << options << ">");
 
   validate_dbprovider_name(options.provider());
+  TRACE_(11, "list_databases: valid");
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers = std::map<std::string, provider_listdatabases_t>{
@@ -68,6 +69,8 @@ void list_databases(Options const& options, std::string& configs) {
         {apiliteral::provider::filesystem, cf::filesystem::listDatabases},
         {apiliteral::provider::ucon, cf::ucon::listDatabases}};
 
+  TRACE_(11, "list_databases: end");
+	
     return providers.at(name);
   };
 
@@ -118,9 +121,13 @@ void list_databases(Options const& options, std::string& configs) {
 
         TRACE_(11, "list_databases() Found database=<" << value << ">.");
 
-        os << value << ", ";
+        os << value << ",";
       }
       returnValue = os.str();
+
+      if(returnValue.back()==',')
+	returnValue.pop_back();
+      
       returnValueChanged = true;
       break;
     }
@@ -155,8 +162,6 @@ void read_dbinfo(Options const& options, std::string& filters) {
 
   switch (options.format()) {
     default:
-    case data_format_t::db:
-    case data_format_t::json:
     case data_format_t::unknown:
     case data_format_t::fhicl:
     case data_format_t::xml: {
@@ -165,7 +170,9 @@ void read_dbinfo(Options const& options, std::string& filters) {
       }
       break;
     }
-
+    
+    case data_format_t::db:
+    case data_format_t::json:
     case data_format_t::gui: {
       returnValue = search_result;
       returnValueChanged = true;
@@ -240,10 +247,13 @@ void list_collections(Options const& options, std::string& collections) {
 
         TRACE_(11, "list_collections() Found collection=<" << value << ">.");
 
-        os << value << ", ";
+        os << value << ",";
       }
       returnValue = os.str();
 
+      if(returnValue.back()==',')
+	returnValue.pop_back();
+      
       returnValueChanged = true;
       break;
     }

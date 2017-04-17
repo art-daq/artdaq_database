@@ -129,7 +129,7 @@
                         "fhicl_pound_include_0" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp_standard" : {
                             "type" : "table", 
@@ -138,12 +138,12 @@
                                 "metrics" : {
                                     "type" : "string", 
                                     "comment" : " ", 
-                                    "annotation" : " "
+                                    "annotation":""
                                 }, 
                                 "max_fragment_size_words" : {
                                     "type" : "number", 
                                     "comment" : " ", 
-                                    "annotation" : " "
+                                    "annotation":""
                                 }, 
                                 "fragment_receiver" : {
                                     "type" : "table", 
@@ -152,22 +152,22 @@
                                         "mpi_buffer_count" : {
                                             "type" : "number", 
                                             "comment" : " ", 
-                                            "annotation" : " "
+                                            "annotation":""
                                         }, 
                                         "mpi_sync_interval" : {
                                             "type" : "number", 
                                             "comment" : " ", 
-                                            "annotation" : " "
+                                            "annotation":""
                                         }, 
                                         "first_event_builder_rank" : {
                                             "type" : "number", 
                                             "comment" : "# These two variables will be calculated by DAQInterface...", 
-                                            "annotation" : " "
+                                            "annotation":""
                                         }, 
                                         "event_builder_count" : {
                                             "type" : "number", 
                                             "comment" : " ", 
-                                            "annotation" : " "
+                                            "annotation":""
                                         }, 
                                         "generator" : {
                                             "type" : "string", 
@@ -258,7 +258,7 @@
                                                 "ALL_channel_control" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "ALL_led_threshold" : {
                                                     "type" : "number", 
@@ -288,47 +288,47 @@
                                                 "ALL_cfd_parameters" : {
                                                     "type" : "number", 
                                                     "comment" : "#Leave alone unless you know what you^re doing!", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "ALL_p_window" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "ALL_i2_window" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "ALL_m1_window" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "ALL_m2_window" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "ALL_d_window" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "ALL_i1_window" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "ALL_disc_width" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "ALL_baseline_start" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "ALL_bias_config" : {
                                                     "type" : "number", 
@@ -338,67 +338,67 @@
                                                 "c2c_control" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "c2c_master_intr_control" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "comm_clock_control" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "comm_led_config" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "comm_led_input" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "qi_dac_config" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "qi_dac_control" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "mon_config" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "mon_select" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "mon_gpio" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "mon_control" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "c2c_slave_intr_control" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "gpio_output_width" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "front_panel_config" : {
                                                     "type" : "number", 
@@ -408,42 +408,42 @@
                                                 "dsp_led_config" : {
                                                     "type" : "number", 
                                                     "comment" : "# standard config?", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "dsp_led_input" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "baseline_delay" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "diag_channel_input" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "qi_config" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "qi_delay" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "qi_pulse_width" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }, 
                                                 "external_gate_width" : {
                                                     "type" : "number", 
                                                     "comment" : " ", 
-                                                    "annotation" : " "
+                                                    "annotation":""
                                                 }
                                             }
                                         }
@@ -454,222 +454,222 @@
                         "daq" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "fhicl_pound_include_1" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "fhicl_pound_include_2" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp_standard" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp01_standard" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp01_standard.fragment_receiver.fragment_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp01_standard.fragment_receiver.board_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp01_standard.fragment_receiver.board_ip" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp01_standard.fragment_receiver.HardwareConfig.module_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp02_standard" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp02_standard.fragment_receiver.fragment_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp02_standard.fragment_receiver.board_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp02_standard.fragment_receiver.board_ip" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp02_standard.fragment_receiver.HardwareConfig.module_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp03_standard" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp03_standard.fragment_receiver.fragment_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp03_standard.fragment_receiver.board_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp03_standard.fragment_receiver.board_ip" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp03_standard.fragment_receiver.HardwareConfig.module_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp04_standard" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp04_standard.fragment_receiver.fragment_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp04_standard.fragment_receiver.board_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp04_standard.fragment_receiver.board_ip" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp04_standard.fragment_receiver.HardwareConfig.module_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp05_standard" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp05_standard.fragment_receiver.fragment_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp05_standard.fragment_receiver.board_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp05_standard.fragment_receiver.board_ip" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp05_standard.fragment_receiver.HardwareConfig.module_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp06_standard" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp06_standard.fragment_receiver.fragment_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp06_standard.fragment_receiver.board_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp06_standard.fragment_receiver.board_ip" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp06_standard.fragment_receiver.HardwareConfig.module_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp07_standard" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp07_standard.fragment_receiver.fragment_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp07_standard.fragment_receiver.board_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp07_standard.fragment_receiver.board_ip" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp07_standard.fragment_receiver.HardwareConfig.module_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp08_standard" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp08_standard.fragment_receiver.fragment_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp08_standard.fragment_receiver.board_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp08_standard.fragment_receiver.board_ip" : {
                             "type" : "string", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }, 
                         "ssp08_standard.fragment_receiver.HardwareConfig.module_id" : {
                             "type" : "number", 
                             "comment" : " ", 
-                            "annotation" : " "
+                            "annotation":""
                         }
                     }
                 }, 

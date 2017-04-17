@@ -21,7 +21,7 @@
 "module_type" : {
 "type" : "string",
 "comment" : "#Success 1  above satom",
-"annotation" : " "
+"annotation":""
 },
 "resume_after_timeout" : {
 "type" : "bool",

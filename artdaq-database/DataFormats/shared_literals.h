@@ -30,6 +30,8 @@ constexpr auto value = "value";
 constexpr auto string = "string";
 constexpr auto type = "type";
 constexpr auto whitespace = " ";
+constexpr auto nullstring = "";
+
 constexpr auto empty = "empty";
 constexpr auto comment = "comment";
 constexpr auto annotation = "annotation";

@@ -118,9 +118,13 @@ void find_version_aliases(Options const& options, std::string& configs) {
 
         TRACE_(11, "find_version_aliases() Found alias=<" << value << ">.");
 
-        os << value << ", ";
+        os << value << ",";
       }
       returnValue = os.str();
+      
+      if(returnValue.back()==',')
+	returnValue.pop_back();
+      
       returnValueChanged = true;
       break;
     }

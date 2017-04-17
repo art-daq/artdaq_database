@@ -179,7 +179,7 @@ void db2gui::operator()(json_node_t& gui_node) const {
           object[literal::annotation] = (hasMetadata ? metadata_node.annotation() : std::string{" "});
         } catch (std::out_of_range const& ex) {
           TRACE_(11, "json_db_to_gui() missing annotation for string data; key" << data_node.value<data_t>().key);
-          object[literal::annotation] = std::string{literal::whitespace};
+          object[literal::annotation] = std::string{literal::nullstring};
         }
       }
 
@@ -369,7 +369,7 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
               children_metadata.value_as<object_t>()[literal::annotation] =
                   artdaq::database::annotate(unwrap(child).value_as<const std::string>(literal::annotation));
             } catch (...) {
-              children_metadata.value_as<object_t>()[literal::annotation] = std::string(literal::whitespace);
+              children_metadata.value_as<object_t>()[literal::annotation] = std::string(literal::nullstring);
             }
 
             TRACE_(15, "json_gui_to_db() operator() switch ARRAY sequence");

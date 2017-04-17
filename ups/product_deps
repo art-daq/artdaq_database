@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_database  v1_04_17
+parent artdaq_database  v1_04_18
 defaultqual	e10:s46
 
 # These optional lines define the installed directories where
@@ -21,6 +21,7 @@ perllib  product_dir
 product		version		optional
 artdaq_utilities -
 mongodb 	v3_2_7d
+boost           v1_61_0        
 TRACE           v3_07_02	-	optional
 swig            v3_0_12		-	optional
 nodejs		v4_5_0		-	optional
@@ -32,19 +33,19 @@ end_product_list
 
 # -nq- means there is no qualifier
 # a "-" means the dependent product is not required by the parent and will not be setup
-qualifier	artdaq_utilities       	   mongodb     	   TRACE  swig	       nodejs	python	notes
-e14:s48:debug   a_u_intf_v1:e14:s48:debug  e14:debug:s48   -nq-	  e14:debug    -nq-	-nq-	-std=c++14
-e14:s48:prof    a_u_intf_v1:e14:s48:prof   e14:prof:s48	   -nq-	  e14:prof     -nq-	-nq-	-std=c++14
-e10:s48:debug   a_u_intf_v1:e10:s48:debug  e10:debug:s48   -nq-	  e10:debug    -nq-	-nq-	-std=c++14
-e10:s48:prof    a_u_intf_v1:e10:s48:prof   e10:prof:s48	   -nq-	  e10:prof     -nq-	-nq-	-std=c++14
-e14:s47:debug   a_u_intf_v1:e14:s47:debug  e14:debug:s47   -nq-	  e14:debug    -nq-	-nq-	-std=c++14
-e14:s47:prof    a_u_intf_v1:e14:s47:prof   e14:prof:s47	   -nq-	  e14:prof     -nq-	-nq-	-std=c++14
-e10:s47:debug   a_u_intf_v1:e10:s47:debug  e10:debug:s47   -nq-	  e10:debug    -nq-	-nq-	-std=c++14
-e10:s47:prof    a_u_intf_v1:e10:s47:prof   e10:prof:s47	   -nq-	  e10:prof     -nq-	-nq-	-std=c++14
-e14:s46:debug   a_u_intf_v1:e14:s46:debug  e14:debug:s46   -nq-	  e14:debug    -nq-	-nq-	-std=c++14
-e14:s46:prof    a_u_intf_v1:e14:s46:prof   e14:prof:s46	   -nq-	  e14:prof     -nq-	-nq-	-std=c++14
-e10:s46:debug   a_u_intf_v1:e10:s46:debug  e10:debug:s46   -nq-	  e10:debug    -nq-	-nq-	-std=c++14
-e10:s46:prof    a_u_intf_v1:e10:s46:prof   e10:prof:s46	   -nq-	  e10:prof     -nq-	-nq-	-std=c++14
+qualifier	artdaq_utilities       	   mongodb     	   boost 	TRACE	swig	     nodejs	python	notes
+e14:s48:debug   a_u_intf_v1:e14:s48:debug  e14:debug:s48   e14:debug	-nq-	e14:debug    -nq-	-nq-	-std=c++14
+e14:s48:prof    a_u_intf_v1:e14:s48:prof   e14:prof:s48	   e14:prof	-nq-	e14:prof     -nq-	-nq-	-std=c++14
+e10:s48:debug   a_u_intf_v1:e10:s48:debug  e10:debug:s48   e10:debug	-nq-	e10:debug    -nq-	-nq-	-std=c++14
+e10:s48:prof    a_u_intf_v1:e10:s48:prof   e10:prof:s48	   e10:prof	-nq-	e10:prof     -nq-	-nq-	-std=c++14
+e14:s47:debug   a_u_intf_v1:e14:s47:debug  e14:debug:s47   e14:debug	-nq-	e14:debug    -nq-	-nq-	-std=c++14
+e14:s47:prof    a_u_intf_v1:e14:s47:prof   e14:prof:s47	   e14:prof	-nq-	e14:prof     -nq-	-nq-	-std=c++14
+e10:s47:debug   a_u_intf_v1:e10:s47:debug  e10:debug:s47   e10:debug	-nq-	e10:debug    -nq-	-nq-	-std=c++14
+e10:s47:prof    a_u_intf_v1:e10:s47:prof   e10:prof:s47	   e10:prof	-nq-	e10:prof     -nq-	-nq-	-std=c++14
+e14:s46:debug   a_u_intf_v1:e14:s46:debug  e14:debug:s46   e14:debug	-nq-	e14:debug    -nq-	-nq-	-std=c++14
+e14:s46:prof    a_u_intf_v1:e14:s46:prof   e14:prof:s46	   e14:prof	-nq-	e14:prof     -nq-	-nq-	-std=c++14
+e10:s46:debug   a_u_intf_v1:e10:s46:debug  e10:debug:s46   e10:debug	-nq-	e10:debug    -nq-	-nq-	-std=c++14
+e10:s46:prof    a_u_intf_v1:e10:s46:prof   e10:prof:s46	   e10:prof	-nq-	e10:prof     -nq-	-nq-	-std=c++14
 
 end_qualifier_list
 

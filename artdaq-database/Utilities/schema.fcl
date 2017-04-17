@@ -1,0 +1,66 @@
+artdaq_processes:
+[
+  {
+    collection:RCEs
+    pattern:"(.*)((rce)(\\d+)(_hw_cfg))(\\.fcl$)"
+  },
+  {
+    collection:SSPs
+    pattern:"(.*)((ssp)(\\d+)(_hw_cfg))(\\.fcl$)"
+  },
+  {
+    collection:PENs
+    pattern:"(.*)((pen)(\\d+)(_hw_cfg))(\\.fcl$)"
+  },
+  {
+    collection:Components
+    pattern:"(.*)((component)(\\d+)(_hw_cfg))(\\.fcl$)"
+  },
+  {
+    collection:Components
+    pattern:"(.*)((component)(\\d*))(\\.fcl$)"
+  },  
+  {
+    collection:EventBuilders
+    pattern:"(.*)((EventBuilder)(\\d+))(\\.fcl$)"
+  },
+  {
+    collection:Aggregators
+    pattern: "(.*)((Aggregator)(\\d+))(\\.fcl$)"
+  },
+  {
+    collection:expert_options
+    pattern: "(.*)((rce_expert_run_options|ssp_expert_run_options|user_run_options)(\\d*))(\\.fcl$)"
+  }
+]
+
+artdaq_includes: 
+[ 
+  {
+    collection:common_code
+    pattern:"(.*)common_code\\/(.*[^\\d])(\\d*)(\\.fcl$)"
+  }
+]
+
+run_history: 
+{
+  collection:RunHistory
+  
+  entity:{
+    name_rule:"match.group(3)+delim+match.group(4)+delim+match.group(5)"
+    delim:"-"
+  }
+    
+  patterns:
+  [  
+    "(.*)((BoardReader_TOY\\d+|BoardReader)_(.*[^_])_(\\d+))(\\.fcl$)",
+    "(.*)((EventBuilder)_(.*[^_])_(\\d+))(\\.fcl$)",
+    "(.*)((Aggregator)_(.*[^_])_(\\d+))(\\.fcl$)",
+    "(.*)((metadata)(.*[^\\d])(\\d*))(\\.fcl$)"
+  ]
+}
+
+system_layout: {
+    collection:SystemLayout
+    pattern:"(.*)((schema)(\\d*))(\\.fcl$)"
+}

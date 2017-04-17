@@ -164,10 +164,20 @@ void write_document(Options const& options, std::string& conf) {
   }
   
   if (!builder.isReadonlyOrDeleted()) {
-    builder.addConfiguration({options.configuration_to_JsonData()});
-    builder.setVersion({options.version_to_JsonData()});
-    builder.setCollection({options.collection_to_JsonData()});
-    builder.addEntity({options.entity_to_JsonData()});
+//      if(options.configuration()!=jsonliteral::notprovided)
+	builder.addConfiguration({options.configuration_to_JsonData()});
+      
+//      if(options.version()!=jsonliteral::notprovided)
+	builder.setVersion({options.version_to_JsonData()});
+      
+//      if(options.collection()!=jsonliteral::notprovided)
+	builder.setCollection({options.collection_to_JsonData()});
+    
+//      if(options.entity()!=jsonliteral::notprovided)
+	builder.addEntity({options.entity_to_JsonData()});
+	
+        if(options.run()!=jsonliteral::notprovided)
+	  builder.addRun({options.run_to_JsonData()});
   }
 
   auto insert_payload =
@@ -375,10 +385,14 @@ void find_versions(Options const& options, std::string& versions) {
 
       for (auto const& entity : entities) {
         TRACE_(4, "find_entities() Found entity=<" << entity << ">.");
-        os << entity << ", ";
+        os << entity << ",";
       }
 
       returnValue = os.str();
+
+      if(returnValue.back()==',')
+	returnValue.pop_back();
+      
       returnValueChanged = true;
       break;
     }
@@ -455,10 +469,14 @@ void find_entities(Options const& options, std::string& entities) {
 
       for (auto const& entity : entities) {
         TRACE_(5, "find_entities() Found entity=<" << entity << ">.");
-        os << entity << ", ";
+        os << entity << ",";
       }
 
       returnValue = os.str();
+
+      if(returnValue.back()==',')
+	returnValue.pop_back();
+      
       returnValueChanged = true;
       break;
     }
