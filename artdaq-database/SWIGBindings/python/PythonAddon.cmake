@@ -24,7 +24,7 @@ if(CAN_BUILD)
   FIND_PACKAGE(PythonLibs)  
   INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
 
-#  find_ups_product(python v2_7_11)
+  find_ups_product(python v2_7_11)
   INCLUDE_DIRECTORIES($ENV{PYTHON_INCLUDE})
 endif(CAN_BUILD)
 

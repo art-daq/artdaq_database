@@ -16,9 +16,20 @@ fhicl_schema='schema.fcl'
 
 def __copy_default_schema():
   if os.path.isfile(fhicl_schema):
-    return  
-  path=os.path.dirname(os.path.realpath(__file__))
-  shutil.copyfile(path+'/'+fhicl_schema,fhicl_schema)
+    return
+
+  schema='schema.fcl'
+  
+  try:
+    schema=os.environ['ARTDAQ_DATABASE_CONFDIR']+'/' +fhicl_schema
+  except KeyError:    
+    schema=os.path.dirname(os.path.realpath(__file__))+'/../conf'+ fhicl_schema
+
+  if not os.path.isfile(fhicl_schema):
+    print ('File not found', schema)
+    sys.exit(1)
+  
+  shutil.copyfile(schema,fhicl_schema)
 
 def __report_error(result):
   print >> sys.stderr, 'Error:' + result[1]
@@ -403,7 +414,7 @@ if __name__ == "__main__":
     print 'Error: Unrecognised API function.'
     print 'Avaialble functions:'
     print  functions_list
-    sys.exit(-1)
+    sys.exit(1)
     
   getattr(conftoolg, 'enable_trace')()
   result = getattr(conftoolg, sys.argv[1])(*sys.argv[2:len(sys.argv)])
@@ -413,5 +424,5 @@ if __name__ == "__main__":
     sys.exit(0)
   else:
     __report_error(result)
-    sys.exit(-1)
+    sys.exit(1)
         
