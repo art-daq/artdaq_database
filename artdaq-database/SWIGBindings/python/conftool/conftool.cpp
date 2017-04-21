@@ -170,7 +170,7 @@ result_t export_database(std::string const& query_payload) {
 result_t import_database(std::string const& query_payload) {
   set_default_locale();
 
-  return impl::export_database(query_payload);
+  return impl::import_database(query_payload);
 }
 
 result_t export_collection(std::string const& query_payload) {
