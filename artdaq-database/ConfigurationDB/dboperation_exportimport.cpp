@@ -175,7 +175,7 @@ result_t json::import_database(std::string const& query_payload) noexcept {
       oss << dirname << "/" << collection << apiliteral::dbexport_extension;
       options.sourceFileName(oss.str());
 
-      TRACE_(10, "export_database: importing collection=" << collection << " to file=" << options.sourceFileName());
+      TRACE_(10, "import_database: importing collection=" << collection << " to file=" << options.sourceFileName());
 
       auto result = opts::import_collection(options);
 
@@ -418,6 +418,8 @@ result_t json::export_collection(std::string const& query_payload) noexcept {
 
     detail::read_documents(options, document_list);
 
+    if(document_list.empty()) return Failure(make_error_msg(options.collection() +" is empty.") );
+    
     TRACE_(10, "export_collection: found " << document_list.size() << "documents.");
 
     auto tmp_dir_name = db::make_temp_dir();
@@ -492,6 +494,8 @@ result_t json::import_collection(std::string const& query_payload) noexcept {
 
     if (!error_message.empty()) return Failure(make_error_msg(error_message));
 
+    if(document_list.empty()) return Failure(make_error_msg(options.collection() +" is empty." ) );
+    
     detail::write_documents(options, document_list);
 
     oss.str("");

@@ -125,7 +125,9 @@ object_id_t StorageProvider<JsonData, MongoDB>::writeDocument(JsonData const& ar
   auto filter_json = filter_document.to_string();
 
   auto filter_bsondoc = bsoncxx::from_json(filter_json);
-
+  
+  if(!isNew && collection.count(filter_bsondoc.view())==0) isNew =true;
+    
   if (isNew) {
     auto result = collection.insert_one(user_bsondoc.view());
 
@@ -147,7 +149,7 @@ object_id_t StorageProvider<JsonData, MongoDB>::writeDocument(JsonData const& ar
 
   auto result = collection.replace_one(filter_bsondoc.view(), user_bsondoc.view());
 
-  TRACE_(4, "MongoDB::writeDocument() Modified " << result->modified_count() << "document.");
+  TRACE_(4, "MongoDB::writeDocument() Modified " << result->modified_count() << " document(s).");
 
   return id;
 }

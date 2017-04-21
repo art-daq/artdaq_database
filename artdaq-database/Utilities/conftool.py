@@ -273,6 +273,8 @@ def archiveConfiguration(configuration_name,run_number,entity_userdata_map):
     print 'Error: Run ' +str(run_number) + " already archived."
     return False
   
+  __copy_default_schema()
+  
   for entry in entity_userdata_map:
     query = json.loads('{"operation" : "store", "dataformat":"fhicl", "filter":{}}')  
     query['filter']['configurations.name']=version
@@ -380,6 +382,22 @@ def readDatabaseInfo():
   
   return result[1]
 
+def exportDatabase():
+  print ('ARTDAQ_DATABASE_URI',os.environ['ARTDAQ_DATABASE_URI'])
+  result = conftoolg.export_database('{"operation" : "exportdatabase", "dataformat":"json", "source": ".",  "filter":{}}')
+  if result[0] is not True:
+    __report_error(result)
+
+  return result[0]
+
+def importDatabase():
+  print ('ARTDAQ_DATABASE_URI',os.environ['ARTDAQ_DATABASE_URI'])
+  result = conftoolg.import_database('{"operation" : "importdatabase", "dataformat":"json", "source": ".", "filter":{}}')
+  if result[0] is not True:
+    __report_error(result)
+
+  return result[0]
+
 def help():
   print 'Usage: conftool.py [operation] [config name prefix]'
   print ''
@@ -390,6 +408,8 @@ def help():
   print ' conftool.py getListOfAvailableRunConfigurationPrefixes'
   print ' conftool.py getListOfAvailableRunConfigurations'
   print ' conftool.py getListOfAvailableRunConfigurations demo_'
+  print ' conftool.py exportDatabase #writes archives into the current directory'
+  print ' conftool.py importDatabase #reads archives from the current directory'
   print ' conftool.py listDatabases'
   print ' conftool.py listCollections'
   print ' conftool.py readDatabaseInfo'

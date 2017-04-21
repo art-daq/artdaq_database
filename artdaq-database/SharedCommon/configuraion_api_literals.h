@@ -6,6 +6,7 @@ namespace database {
 namespace result {
 constexpr auto msg_EmptyFilter = "{\"message\":\"empty_filter\"}";
 constexpr auto msg_EmptyDocument = "{\"message\":\"Json document is empty\"}";
+
 constexpr auto msg_SystemCallFailed =
     "{\"message\":\"Unable to call system() from this API; check if either set-user-ID or set-group-ID check if either "
     "set-user-ID or set-group-ID \"}";

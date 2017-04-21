@@ -174,7 +174,7 @@ std::string const& db::dir_to_tarbzip2base64(std::string const& tmp_dir_name, st
                                                  << bzip2base64;
 
   std::ostringstream oss;
-  oss << "tar cjf - " << tmp_dir_name << "/* -C " << tmp_dir_name;
+  oss << "tar cjf - " << tmp_dir_name << "/* -C " << tmp_dir_name << " 2>/dev/null";
   oss << "|base64 --wrap=0 > " << bzip2base64;
 
   if (0 != system(oss.str().c_str())) {
