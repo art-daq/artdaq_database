@@ -14,6 +14,8 @@ import shutil
 
 fhicl_schema='schema.fcl'
 
+artdaq_database_uri=None
+
 def __copy_default_schema():
   if os.path.isfile(fhicl_schema):
     return
@@ -43,6 +45,10 @@ def __get_prefix(config):
   match = re.match(r'(.*[^\d])(\d+$)', config)
   return match.group(1) if match else config
 
+def __ends_on_5digitnumber(config):
+   match = re.match(r'.*[^\d](\d{5}$)', config)
+   return True if match else False
+  
 def __increment_config_name(config):
   config = __remove_run(config)  
   match = re.match(r'(.*[^\d])(\d+$)', config)
@@ -180,7 +186,6 @@ def __getLatestConfiguration(configNamePrefix):
 def getLatestConfiguration(configNamePrefix):
   return dict((cfg[0],cfg[1]) for cfg in __getLatestConfiguration(configNamePrefix))
 
-#std::map<std::string /*entityName*/, std::string /*FHiCL document*/> getLatestConfiguration(std::string const& configNamePrefix); 
 def importConfiguration(configNamePrefix):
   config = __latest_config_name(configNamePrefix)
 
@@ -222,6 +227,10 @@ def exportConfiguration(configNamePrefix):
   entity_name=0
   user_data=1
   collection=2
+
+  if not __ends_on_5digitnumber(configNamePrefix):
+    print 'Error: Configuration does not have five digits at the end.'
+    return False
 
   cfgs = __getLatestConfiguration(configNamePrefix)
   
@@ -270,7 +279,7 @@ def archiveConfiguration(configuration_name,run_number,entity_userdata_map):
   version=str(run_number)+"/"+configuration_name
   
   if version in listVersions('RunHistory'):
-    print 'Error: Run ' +str(run_number) + " already archived."
+    print 'Error: Run ' +str(run_number) + ' already archived.'
     return False
   
   __copy_default_schema()
@@ -284,13 +293,19 @@ def archiveConfiguration(configuration_name,run_number,entity_userdata_map):
     query['filter']['runs.name']=str(run_number) 
   
     result=__write_document(query,entity_userdata_map[entry])
+
     if result[0] is not True:
       return False
 
   return True  
 
+def archiveRunConfiguration(config,run_number):  
+  try:
+    artdaq_database_uri=os.environ['ARTDAQ_DATABASE_URI']
+  except KeyError:
+    print 'Error: ARTDAQ_DATABASE_URI is not set.'
+    return False
 
-def archiveRunConfiguration(config,run_number):
   schema =__read_schema()
 
   fhicl_finder = __find_files(str(run_number),'*.fcl')
@@ -299,7 +314,13 @@ def archiveRunConfiguration(config,run_number):
 
   entity_userdata_map=__create_entity_userdata_map(composition)
 
+  os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri+'_archive'
+  print 'Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI']
+
   result=archiveConfiguration(config,run_number,entity_userdata_map)
+
+  os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri
+  print 'Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI']
 
   if result is not True:
      return False
@@ -399,26 +420,32 @@ def importDatabase():
   return result[0]
 
 def help():
-  print 'Usage: conftool.py [operation] [config name prefix]'
+  print 'Usage: conftool2.py [operation] [config name prefix]'
   print ''
   print 'Example:'
-  print ' conftool.py exportConfiguration demo_safemode'
-  print ' conftool.py importConfiguration demo_safemode'
-  print ' conftool.py archiveRunConfiguration demo_safemode 23 #where 23 is the run number'
-  print ' conftool.py getListOfAvailableRunConfigurationPrefixes'
-  print ' conftool.py getListOfAvailableRunConfigurations'
-  print ' conftool.py getListOfAvailableRunConfigurations demo_'
-  print ' conftool.py exportDatabase #writes archives into the current directory'
-  print ' conftool.py importDatabase #reads archives from the current directory'
-  print ' conftool.py listDatabases'
-  print ' conftool.py listCollections'
-  print ' conftool.py readDatabaseInfo'
+  print ' conftool2.py exportConfiguration demo_safemode00003'
+  print ' conftool2.py importConfiguration demo_safemode'
+  print ' conftool2.py archiveRunConfiguration demo_safemode 23 #where 23 is the run number'
+  print ' conftool2.py getListOfAvailableRunConfigurationPrefixes'
+  print ' conftool2.py getListOfAvailableRunConfigurations'
+  print ' conftool2.py getListOfAvailableRunConfigurations demo_'
+#  print ' conftool2.py exportDatabase #writes archives into the current directory'
+#  print ' conftool2.py importDatabase #reads archives from the current directory'
+  print ' conftool2.py listDatabases'
+  print ' conftool2.py listCollections'
+  print ' conftool2.py readDatabaseInfo'
   return True
  
 if __name__ == "__main__":
   if len(sys.argv)==1 or sys.argv[1] in ['--h','-h','h','--help','-help','help','--info','info']:
     help()
     sys.exit(0)
+  
+  try:
+    artdaq_database_uri=os.environ['ARTDAQ_DATABASE_URI']
+  except KeyError:    
+    print 'Error: ARTDAQ_DATABASE_URI is not set.'
+    sys.exit(1)
   
   if sys.argv[1] in [o[0] for o in inspect.getmembers(sys.modules[__name__]) if inspect.isfunction(o[1])]:        
     getattr(conftoolg, 'enable_trace')()
@@ -445,4 +472,3 @@ if __name__ == "__main__":
   else:
     __report_error(result)
     sys.exit(1)
-        
