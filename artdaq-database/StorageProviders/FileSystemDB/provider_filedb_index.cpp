@@ -1,6 +1,7 @@
 #include "artdaq-database/SharedCommon/sharedcommon_common.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb_index.h"
+#include "artdaq-database/DataFormats/Json/json_types_impl.h"
 #include "artdaq-database/StorageProviders/common.h"
 
 #include <fstream>
@@ -1303,6 +1304,7 @@ void dbfsi::debug::enable() {
   TRACE_(0, "artdaq::database::filesystem::index trace_enable");
 }
 
+/*
 using artdaq::database::sharedtypes::unwrap;
 using artdaq::database::sharedtypes::unwrapper;
 
@@ -1319,7 +1321,7 @@ T const& unwrapper<const jsn::value_t>::value_as() {
 
   return boost::get<V>(any);
 }
-
+*/
 bool dbfsi::shouldAutoRebuildSearchIndex(bool rebuild) {
   static const bool _shouldAutoRebuildSearchIndex = rebuild;
   return _shouldAutoRebuildSearchIndex;
