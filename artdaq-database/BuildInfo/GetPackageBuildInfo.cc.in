@@ -7,7 +7,7 @@ namespace artdaqdatabase {
 artdaq::PackageBuildInfo GetPackageBuildInfo::getPackageBuildInfo() {
   artdaq::PackageBuildInfo pkg;
   pkg.setPackageName("artdaq-database");
-  pkg.setPackageVersion("@version@");
+  pkg.setPackageVersion("@version_with_git@");
   pkg.setBuildTimestamp("@utcDateTime@");
   return pkg;
 }

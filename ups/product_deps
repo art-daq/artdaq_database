@@ -26,7 +26,7 @@ python          v2_7_13b	s47
 python          v2_7_13d	s48
 swig            v3_0_12		-		only_for_build
 nodejs		v4_5_0		-		only_for_build
-cetbuildtools	v5_06_06	-		only_for_build
+cetbuildtools	v5_08_01	-		only_for_build
 
 end_product_list
 
