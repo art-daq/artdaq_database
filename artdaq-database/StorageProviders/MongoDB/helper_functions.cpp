@@ -1,5 +1,6 @@
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
+#include "artdaq-database/DataFormats/Json/json_types_impl.h"
 #include "artdaq-database/SharedCommon/sharedcommon_common.h"
 
 #ifdef TRACE_NAME
@@ -10,17 +11,6 @@
 
 namespace artdaq {
 namespace database {
-namespace sharedtypes {
-using artdaq::database::sharedtypes::unwrapper;
-
-template <>
-template <typename T>
-T& unwrapper<jsn::value_t>::value_as() {
-  return boost::get<T>(any);
-}
-  
-}
-
 namespace mongo {  
 
 using namespace artdaq::database;
@@ -50,7 +40,7 @@ JsonData rewrite_query_with_regex(JsonData const &query,
     if(query_ast.count(field)==0)
       continue;
     
-    auto value =  unwrap(query_ast.at(field)).value_as<std::string>();
+    auto value = unwrap(query_ast.at(field)).value_as<std::string>();
 	    
     if (value.back() != '*')
       continue;

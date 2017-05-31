@@ -1,5 +1,6 @@
 #include "artdaq-database/DataFormats/common.h"
 
+#include "artdaq-database/DataFormats/Json/json_types_impl.h"
 #include "artdaq-database/DataFormats/Fhicl/convertfhicl2jsondb.h"
 #include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
 #include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
@@ -358,20 +359,6 @@ json2fcldb::operator fcl::atom_t() try {
 
 using artdaq::database::sharedtypes::unwrap;
 using artdaq::database::sharedtypes::unwrapper;
-
-template <>
-template <typename T>
-T& unwrapper<jsn::value_t>::value_as() {
-  return boost::get<T>(any);
-}
-
-template <>
-template <typename T>
-T const& unwrapper<const jsn::value_t>::value_as() {
-  using V = typename std::remove_const<T>::type;
-
-  return boost::get<V>(any);
-}
 
 template <>
 template <typename T>

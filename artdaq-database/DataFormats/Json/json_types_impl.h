@@ -60,4 +60,14 @@ T& dbt::unwrapper<value_t>::value_as() try {
   throw;
 }
 
+template <>
+template <typename T>
+T const& dbt::unwrapper<const value_t>::value_as() try {
+  using V = typename std::remove_const<T>::type;
+
+  return boost::get<V>(any);
+}catch (...) {
+  throw;
+}
+
 #endif /* _ARTDAQ_DATABASE_JSONTYPES_IMPL_H_ */
