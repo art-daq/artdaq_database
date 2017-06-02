@@ -5,7 +5,7 @@
 #include  <cstdio>
 #include "artdaq-database/BuildInfo/printStackTrace.h"
 #include "artdaq-database/BuildInfo/process_exit_codes.h"
-#include "boost/program_options.hpp"
+#include <boost/program_options.hpp>
 #include "cetlib/coded_exception.h"
 
 #include "artdaq-database/BasicTypes/basictypes.h"

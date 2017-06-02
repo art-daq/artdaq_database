@@ -8,7 +8,7 @@
 #include "artdaq-database/Overlay/JSONDocumentOverlay.h"
 
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
-#include "boost/program_options.hpp"
+#include <boost/program_options.hpp>
 
 namespace bpo = boost::program_options;
 using artdaq::database::docrecord::JSONDocument;

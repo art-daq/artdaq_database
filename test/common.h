@@ -6,7 +6,7 @@
 #include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 #include "artdaq-database/SharedCommon/helper_functions.h"
 
-#include "boost/program_options.hpp"
+#include <boost/program_options.hpp>
 
 constexpr auto tmpdir = "/tmp/artdaqtest";
 

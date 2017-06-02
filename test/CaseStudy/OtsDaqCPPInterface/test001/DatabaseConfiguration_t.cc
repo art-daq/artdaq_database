@@ -1,6 +1,6 @@
 #define BOOST_TEST_MODULE (databaseconfiguration test)
 
-#include "boost/test/auto_unit_test.hpp"
+#include <boost/test/auto_unit_test.hpp>
 
 #include <time.h> /* time */
 #include <cassert>
