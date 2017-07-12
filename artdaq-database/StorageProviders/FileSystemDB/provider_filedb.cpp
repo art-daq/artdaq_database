@@ -31,7 +31,8 @@ using artdaq::database::basictypes::JsonData;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocument;
 
-namespace jsonliteral = artdaq::database::dataformats::literal;
+namespace jsonliteral = db::dataformats::literal;
+namespace apiliteral = db::configapi::literal;
 
 namespace artdaq {
 namespace database {
@@ -40,6 +41,16 @@ template <>
 std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigurations(JsonData const& query_payload) {
   confirm(!query_payload.empty());
   auto returnCollection = std::list<JsonData>();
+
+  using timestamp_t = unsigned long long;
+  using ordered_timestamps_t = std::set<timestamp_t>;
+  using config_timestamps_t = std::map<std::string, ordered_timestamps_t>;
+  auto config_timestamps = config_timestamps_t();
+
+  auto reverse_timestamp_cmp = [](const timestamp_t& a, const timestamp_t& b) { return a > b; };
+  using timestamp_configs_t = std::multimap<timestamp_t, std::string, decltype(reverse_timestamp_cmp)>;
+
+  auto timestamp_configs = timestamp_configs_t(reverse_timestamp_cmp);
 
   TRACE_(5, "FileSystemDB::findConfigurations() begin");
   TRACE_(5, "FileSystemDB::findConfigurations() args data=<" << query_payload << ">");
@@ -64,24 +75,36 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigurations(
 
     TRACE_(5, "FileSystemDB::findConfigurations() search returned " << configentityname_pairs.size()
                                                                     << " configurations.");
-
     for (auto const& configentityname_pair : configentityname_pairs) {
+      auto const& name = configentityname_pair.first;
       std::ostringstream oss;
-
-      oss << "{";
-      // oss << "\"collection\" : \"" << collection_name << "\",";
-      oss << "\"dbprovider\" : \"filesystem\",";
-      oss << "\"dataformat\" : \"gui\",";
-      oss << "\"operation\" : \"buildfilter\",";
-      oss << "\"filter\" : {";
-      oss << "\"configurations.name\" : \"" << configentityname_pair.first << "\"";
-      oss << "}";
-      oss << "}";
-
-      TRACE_(5, "FileSystemDB::findConfigurations() found document=<" << oss.str() << ">");
-
-      returnCollection.emplace_back(oss.str());
+      oss << "{" << db::quoted_(apiliteral::filter::configurations) << ":" << db::quoted_(name) << "}";
+      auto timestamps = search_index.getConfigurationAssignedTimestamps(oss.str());
+      for (auto const& assigned : timestamps) {
+        config_timestamps[name].insert(
+            std::chrono::duration_cast<std::chrono::seconds>(db::to_timepoint(assigned).time_since_epoch()).count());
+      }
     }
+  }
+
+  for (auto const& cfg : config_timestamps) timestamp_configs.emplace(*cfg.second.rbegin(), cfg.first);
+
+  // keys are sorted the reverse chronological order
+  for (auto const& cfg : timestamp_configs) {
+    std::ostringstream oss;
+    oss << "{";
+    // oss << db::quoted_(apiliteral::option::collection) <<":" << db::quoted_(collection_name) << ",";
+
+    oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem)<< ",";
+    oss << db::quoted_(apiliteral::option::format) << ":" <<  db::quoted_(apiliteral::format::gui) << ",";
+    oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::confcomposition)<< ",";
+    oss << db::quoted_(apiliteral::option::searchfilter) << ":" << "{";
+    oss << db::quoted_(apiliteral::filter::configurations) << ": " << db::quoted_(cfg.second);
+    oss << "}";
+    oss << "}";
+    TRACE_(5, "FileSystemDB::findConfigurations() found document=<" << oss.str() << ">");
+
+    returnCollection.emplace_back(oss.str());
   }
 
   return returnCollection;
@@ -123,13 +146,13 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::configurationCompos
       std::ostringstream oss;
 
       oss << "{";
-      oss << "\"collection\" : \"" << collection_name << "\",";
-      oss << "\"dbprovider\" : \"filesystem\",";
-      oss << "\"dataformat\" : \"gui\",";
-      oss << "\"operation\" : \"load\",";
-      oss << "\"filter\" : {";
-      oss << "\"configurations.name\" : \"" << configentityname_pair.first << "\"";
-      oss << ", \"entities.name\" : \"" << configentityname_pair.second << "\"";
+      oss << db::quoted_(apiliteral::option::collection) <<":" << db::quoted_(collection_name) << ",";
+      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem)<<",";
+      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui)<<",";
+      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument)<<",";
+      oss << db::quoted_(apiliteral::option::searchfilter) << ":" << "{";
+      oss << db::quoted_(apiliteral::filter::configurations) << ":" << db::quoted_(configentityname_pair.first);
+      oss <<"," << db::quoted_(apiliteral::filter::entities)<< ":" << db::quoted_(configentityname_pair.second);
       oss << "}";
       oss << "}";
 
@@ -156,8 +179,8 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findVersions(JsonDa
 
   auto query_payload_document = JSONDocument{filter};
 
-  auto collection_name = query_payload_document.findChild("collection").value();
-  auto query_payload = query_payload_document.findChild("filter").value();
+  auto collection_name = query_payload_document.findChild(apiliteral::option::collection).value();
+  auto query_payload = query_payload_document.findChild(apiliteral::option::searchfilter).value();
 
   auto collection = _provider->connection() + collection_name;
   collection = expand_environment_variables(collection);
@@ -178,25 +201,24 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findVersions(JsonDa
     return returnCollection;
   }
 
-  if (search_ast.count("configurations.name") == 0) {
+  if (search_ast.count(apiliteral::filter::configurations) == 0) {
     auto versionentityname_pairs = search_index.findVersionsByEntityName(query_payload);
 
     TRACE_(7,
-           "FileSystemDB::findVersionsByEntityName() "
-           "search returned "
+           "FileSystemDB::findVersionsByEntityName() search returned "
                << versionentityname_pairs.size() << " configurations.");
 
     for (auto const& versionentityname_pair : versionentityname_pairs) {
       std::ostringstream oss;
 
       oss << "{";
-      oss << "\"collection\" : \"" << collection_name << "\",";
-      oss << "\"dbprovider\" : \"filesystem\",";
-      oss << "\"dataformat\" : \"gui\",";
-      oss << "\"operation\" : \"load\",";
-      oss << "\"filter\" : {";
-      oss << "\"version\" : \"" << versionentityname_pair.second << "\"";
-      oss << ", \"entities.name\" : \"" << versionentityname_pair.first << "\"";
+      oss << db::quoted_(apiliteral::option::collection) <<":" << db::quoted_(collection_name) << ",";
+      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem)<<",";
+      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui)<<",";
+      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument)<<",";
+      oss << db::quoted_(apiliteral::option::searchfilter) << ":" << "{";
+      oss << db::quoted_(apiliteral::filter::version) << ":" << db::quoted_(versionentityname_pair.second);
+      oss <<"," << db::quoted_(apiliteral::filter::entities) << ":" << db::quoted_(versionentityname_pair.first);
       oss << "}";
       oss << "}";
 
@@ -208,7 +230,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findVersions(JsonDa
     auto entityName = std::string{"notprovided"};
 
     try {
-      entityName = boost::get<std::string>(search_ast.at("entities.name"));
+      entityName = boost::get<std::string>(search_ast.at(apiliteral::filter::entities));
 
       TRACE_(7, "FileSystemDB::findVersionsByGlobalConfigName"
                     << " Found entity filter=<" << entityName << ">.");
@@ -227,13 +249,13 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findVersions(JsonDa
       std::ostringstream oss;
 
       oss << "{";
-      oss << "\"collection\" : \"" << collection_name << "\",";
-      oss << "\"dbprovider\" : \"filesystem\",";
-      oss << "\"dataformat\" : \"gui\",";
-      oss << "\"operation\" : \"load\",";
-      oss << "\"filter\" : {";
-      oss << "\"version\" : \"" << versionentityname_pair.second << "\"";
-      oss << ", \"entities.name\" : \"" << entityName << "\"";
+      oss << db::quoted_(apiliteral::option::collection) <<":" << db::quoted_(collection_name) << ",";
+      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem)<<",";
+      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui)<<",";
+      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument)<<",";
+      oss << db::quoted_(apiliteral::option::searchfilter) << ":" << "{";
+      oss << db::quoted_(apiliteral::filter::version) << ":" << db::quoted_(versionentityname_pair.second);
+      oss <<"," << db::quoted_(apiliteral::filter::entities) << ":" << db::quoted_(entityName);
       oss << "}";
       oss << "}";
 
@@ -255,7 +277,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findEntities(JsonDa
   TRACE_(9, "FileSystemDB::findEntities() args data=<" << filter << ">");
 
   auto query_payload_document = JSONDocument{filter};
-  auto query_payload = query_payload_document.findChild("filter").value();
+  auto query_payload = query_payload_document.findChild(apiliteral::option::searchfilter).value();
 
   auto collection = _provider->connection();
   collection = expand_environment_variables(collection);
@@ -289,12 +311,12 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findEntities(JsonDa
       std::ostringstream oss;
 
       oss << "{";
-      oss << "\"collection\" : \"" << collection_name << "\",";
-      oss << "\"dbprovider\" : \"filesystem\",";
-      oss << "\"dataformat\" : \"gui\",";
-      oss << "\"operation\" : \"findversions\",";
-      oss << "\"filter\" : {";
-      oss << "\"entities.name\" : \"" << configentity_name << "\"";
+      oss << db::quoted_(apiliteral::option::collection) <<":" << db::quoted_(collection_name) << ",";
+      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem)<<",";
+      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui)<<",";
+      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::findversions)<<",";
+      oss << db::quoted_(apiliteral::option::searchfilter) << ":" << "{";
+      oss << db::quoted_(apiliteral::filter::entities) << ":" << db::quoted_(configentity_name);
       oss << "}";
       oss << "}";
 
@@ -332,11 +354,11 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listCollections(Jso
     std::ostringstream oss;
 
     oss << "{";
-    oss << "\"collection\" : \"" << collection_name << "\",";
-    oss << "\"dbprovider\" : \"filesystem\",";
-    oss << "\"dataformat\" : \"gui\",";
-    oss << "\"operation\" : \"findversions\",";
-    oss << "\"filter\" : { }";
+    oss << db::quoted_(apiliteral::option::collection) <<":" << db::quoted_(collection_name) << ",";
+    oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem)<<",";
+    oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui)<<",";
+    oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::findversions)<<",";
+    oss << db::quoted_(apiliteral::option::searchfilter)<< ":" << apiliteral::empty_json ;
     oss << "}";
 
     TRACE_(12, "FileSystemDB::listCollections() found document=<" << oss.str() << ">");
@@ -383,10 +405,10 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listDatabases(JsonD
 
     std::ostringstream oss;
     oss << "{";
-    oss << "\"database\" : \"" << database_name << "\",";
-    oss << "\"dbprovider\" : \"filesystem\",";
-    oss << "\"dataformat\" : \"gui\",";
-    oss << "\"filter\" : {}";
+    oss << db::quoted_(apiliteral::database) << ":" << db::quoted_(database_name) << ",";
+    oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem)<<",";
+    oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui)<<",";
+    oss << db::quoted_(apiliteral::option::searchfilter)<< ":" << apiliteral::empty_json;
     oss << "}";
 
     TRACE_(9, "FileSystemDB::listDatabases() found document=<" << oss.str() << ">");

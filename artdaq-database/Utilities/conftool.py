@@ -420,20 +420,20 @@ def importDatabase():
   return result[0]
 
 def help():
-  print 'Usage: conftool2.py [operation] [config name prefix]'
+  print 'Usage: conftool.py [operation] [config name prefix]'
   print ''
   print 'Example:'
-  print ' conftool2.py exportConfiguration demo_safemode00003'
-  print ' conftool2.py importConfiguration demo_safemode'
-  print ' conftool2.py archiveRunConfiguration demo_safemode 23 #where 23 is the run number'
-  print ' conftool2.py getListOfAvailableRunConfigurationPrefixes'
-  print ' conftool2.py getListOfAvailableRunConfigurations'
-  print ' conftool2.py getListOfAvailableRunConfigurations demo_'
-#  print ' conftool2.py exportDatabase #writes archives into the current directory'
-#  print ' conftool2.py importDatabase #reads archives from the current directory'
-  print ' conftool2.py listDatabases'
-  print ' conftool2.py listCollections'
-  print ' conftool2.py readDatabaseInfo'
+  print ' conftool.py exportConfiguration demo_safemode00003'
+  print ' conftool.py importConfiguration demo_safemode'
+  print ' conftool.py archiveRunConfiguration demo_safemode 23 #where 23 is the run number'
+  print ' conftool.py getListOfAvailableRunConfigurationPrefixes'
+  print ' conftool.py getListOfAvailableRunConfigurations'
+  print ' conftool.py getListOfAvailableRunConfigurations demo_'
+#  print ' conftool.py exportDatabase #writes archives into the current directory'
+#  print ' conftool.py importDatabase #reads archives from the current directory'
+  print ' conftool.py listDatabases'
+  print ' conftool.py listCollections'
+  print ' conftool.py readDatabaseInfo'
   return True
  
 if __name__ == "__main__":

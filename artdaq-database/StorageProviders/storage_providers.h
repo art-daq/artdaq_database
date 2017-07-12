@@ -6,6 +6,7 @@
 #include <string>
 
 #include "artdaq-database/SharedCommon/shared_datatypes.h"
+#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 
 namespace artdaq {
 namespace database {
