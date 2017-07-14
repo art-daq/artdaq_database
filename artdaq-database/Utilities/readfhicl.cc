@@ -4,7 +4,8 @@
 #include <cstddef>
 #include <iterator>
 #include <regex>
-#include "boost/program_options.hpp"
+#include <boost/program_options.hpp>
+
 #include "cetlib/includer.h"
 #include "fhiclcpp/extended_value.h"
 #include "fhiclcpp/intermediate_table.h"

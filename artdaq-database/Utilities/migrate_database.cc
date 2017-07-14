@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) try {
         }
 
         JSONDocumentBuilder builder{JSONDocumentMigrator{{source}}};
-        builder.setCollection({"{\"collection\":\""s + collection_name + "\"}"});
+        builder.setCollection({"{db::quoted_(apiliteral::option::collection):\""s + collection_name + "\"}"});
 
         oss.str("");
         oss.clear();

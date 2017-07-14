@@ -48,31 +48,42 @@ using artdaq::database::basictypes::JsonData;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocument;
 
-namespace jsonliteral = artdaq::database::dataformats::literal;
+namespace jsonliteral = db::dataformats::literal;
+namespace apiliteral = db::configapi::literal;
 
-
-// bsoncxx::types::value extract_value_from_document(bsoncxx::document::value const& document, std::string const& key);
+// bsoncxx::types::value extract_value_from_document(bsoncxx::document::value
+// const& document, std::string const& key);
 namespace artdaq {
 namespace database {
-  
-namespace mongo {  
-  JsonData rewrite_query_with_regex(JsonData const &,std::vector<std::string> const &);
-} // namespace mongo
-  
+
+namespace mongo {
+JsonData rewrite_query_with_regex(JsonData const&, std::vector<std::string> const&);
+}  // namespace mongo
+
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonData const& search) {
   confirm(!search.empty());
   auto returnCollection = std::list<JsonData>();
 
+  using timestamp_t = unsigned long long;
+  using ordered_timestamps_t = std::set<timestamp_t>;
+  using config_timestamps_t = std::map<std::string, ordered_timestamps_t>;
+  auto config_timestamps = config_timestamps_t();
+
+  auto reverse_timestamp_cmp = [](const timestamp_t& a, const timestamp_t& b) { return a > b; };
+  using timestamp_configs_t = std::multimap<timestamp_t, std::string, decltype(reverse_timestamp_cmp)>;
+
+  auto timestamp_configs = timestamp_configs_t(reverse_timestamp_cmp);
+
   TRACE_(4, "MongoDB::findConfigurations() begin");
   TRACE_(4, "MongoDB::findConfigurations() args data=<" << search << ">");
 
-  auto fields= std::vector<std::string>{};
-  fields.emplace_back("configurations.name");
-  
-  auto regex_search= mongo::rewrite_query_with_regex(search,fields);
-  
+  auto fields = std::vector<std::string>{};
+  fields.emplace_back(apiliteral::filter::configurations);
+
+  auto regex_search = mongo::rewrite_query_with_regex(search, fields);
+
   TRACE_(4, "MongoDB::findConfigurations() regex_search data=<" << regex_search << ">");
 
   auto filter = bsoncxx::builder::core(false);
@@ -86,7 +97,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
   for (auto const& collectionDescriptor : collectionDescriptors) {
     TRACE_(4, "MongoDB::findConfigurations() found collection=<" << bsoncxx::to_json(collectionDescriptor) << ">");
 
-    auto element_name = collectionDescriptor.find("name");
+    auto element_name = collectionDescriptor.find(jsonliteral::name);
 
     if (element_name == collectionDescriptor.end())
       throw runtime_error("MongoDB") << "MongoDB returned invalid database collection descriptor.";
@@ -97,48 +108,92 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
 
     if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
 
-    TRACE_(4,
-           "MongoDB::findConfigurations() querying "
-           "collection_name=<"
-               << collection_name << ">");
+    TRACE_(4, "MongoDB::findConfigurations() querying collection_name=<" << collection_name << ">");
 
     auto collection = _provider->connection().collection(collection_name);
 
-    auto configuration_filter = bsoncxx::builder::core(false);
-    auto bson_document = bsoncxx::from_json(regex_search.json_buffer);
-    configuration_filter.concatenate(bson_document.view());
+    mongocxx::pipeline stages;
 
-    auto cursor = collection.distinct("configurations.name", configuration_filter.view_document());
+    auto match_stage = bsoncxx::builder::core(false);
+    auto bson_document = bsoncxx::from_json(regex_search.json_buffer);
+    match_stage.concatenate(bson_document.view());
+
+    bbs::document project_stage;
+    project_stage << "_id" << 0 << "name"
+                  << "$configurations.name"
+                  << "assigned"
+                  << "$configurations.assigned";
+
+    bbs::document group_stage;
+    group_stage << "_id" << open_document << "name"
+                << "$name"
+                << "assigned"
+                << "$assigned" << close_document;
+
+    bbs::document sort_stage;
+    sort_stage << "name" << 1 << "assigned" << 1;
+
+    stages.match(match_stage.view_document())
+        .project(project_stage.view())
+        .group(group_stage.view())
+        .sort(sort_stage.view());
+
+    TRACE_(4, "MongoDB::findConfigurations() query_payload =<" << bsoncxx::to_json(stages.view()) << ">");
+
+    auto cursor = collection.aggregate(stages);
 
     for (auto const& view : cursor) {
       TRACE_(4, "MongoDB::findConfigurations() looping over cursor =<" << bsoncxx::to_json(view) << ">");
 
-      auto element_values = view.find("values");
+      auto tmp_element_id = view.find(jsonliteral::id);
 
-      if (element_values == collectionDescriptor.end())
-        throw runtime_error("MongoDB") << "MongoDB returned invalid database search.";
+      if (tmp_element_id == collectionDescriptor.end())
+        throw runtime_error("MongoDB") << "MongoDB returned invalid database search, \"_id\" is missing.";
 
-      auto configuration_name_array = element_values->get_array();
+      auto tmp_document_id = tmp_element_id->get_document();
 
-      if (configuration_name_array.value.empty()) break;
+      auto tmp_view_id = tmp_document_id.view();
 
-      for (auto const& configuration_name : configuration_name_array.value) {
-        std::ostringstream oss;
-        oss << "{";
-        // oss << "\"collection\" : \"" << collection_name << "\",";
-        oss << "\"dbprovider\" : \"mongo\",";
-        oss << "\"dataformat\" : \"gui\",";
-        oss << "\"operation\" : \"buildfilter\",";
-        oss << "\"filter\" : {";
-        auto name_json = bsoncxx::to_json(configuration_name.get_value());
-        oss << "\"configurations.name\" : " << name_json;
-        oss << "}";
-        oss << "}";
-        TRACE_(4, "MongoDB::findConfigurations() found document=<" << oss.str() << ">");
+      auto tmp_config_names = tmp_view_id.find(jsonliteral::name);
 
-        returnCollection.emplace_back(oss.str());
+      if (tmp_config_names == collectionDescriptor.end())
+        throw runtime_error("MongoDB") << "MongoDB returned invalid database search, \"_id.name\" is missing.";
+
+      auto tmp_config_assigned = tmp_view_id.find(jsonliteral::assigned);
+
+      if (tmp_config_assigned == collectionDescriptor.end())
+        throw runtime_error("MongoDB") << "MongoDB returned invalid database search, \"_id.assigned\" is missing.";
+
+      for (auto const& tmp_config_name : tmp_config_names->get_array().value) {
+        auto name = bsoncxx::to_json(tmp_config_name.get_value());
+
+        for (auto const& config_assigned : tmp_config_assigned->get_array().value) {
+          auto assigned = db::dequote(bsoncxx::to_json(config_assigned.get_value()));
+
+          config_timestamps[name].insert(
+              std::chrono::duration_cast<std::chrono::seconds>(db::to_timepoint(assigned).time_since_epoch()).count());
+        }
       }
     }
+  }
+
+  for (auto const& cfg : config_timestamps) timestamp_configs.emplace(*cfg.second.rbegin(), cfg.first);
+
+  // keys are sorted the reverse chronological order
+  for (auto const& cfg : timestamp_configs) {
+    std::ostringstream oss;
+    oss << "{";
+    // oss << db::quoted_(apiliteral::option::collection) <<":" << db::quoted_(collection_name) << ",";
+    oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::mongo)<<",";
+    oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui)<<",";
+    oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::confcomposition)<<",";
+    oss << db::quoted_(apiliteral::option::searchfilter) << ":" << "{";
+    oss << db::quoted_(apiliteral::filter::configurations) << ": " << cfg.second;
+    oss << "}";
+    oss << "}";
+    TRACE_(4, "MongoDB::findConfigurations() found document=<" << oss.str() << ">");
+
+    returnCollection.emplace_back(oss.str());
   }
 
   return returnCollection;
@@ -166,7 +221,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
                                                                        << ">");
 
     // auto view = collectionDescriptor.view();
-    auto element_name = collectionDescriptor.find("name");
+    auto element_name = collectionDescriptor.find(jsonliteral::name);
 
     if (element_name == collectionDescriptor.end())
       throw runtime_error("MongoDB") << "MongoDB returned invalid database collection descriptor.";
@@ -177,10 +232,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
 
     if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
 
-    TRACE_(5,
-           "MongoDB::configurationComposition() querying "
-           "collection_name=<"
-               << collection_name << ">");
+    TRACE_(5, "MongoDB::configurationComposition() querying collection_name=<" << collection_name << ">");
 
     auto collection = _provider->connection().collection(collection_name);
     auto bson_document = bsoncxx::from_json(search.json_buffer);
@@ -195,7 +247,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
       return element->get_value();
     };
 
-    auto configuration_name_expected = bsoncxx::to_json(extract_value("configurations.name"));
+    auto configuration_name_expected = bsoncxx::to_json(extract_value(apiliteral::filter::configurations));
     TRACE_(5, "MongoDB::configurationComposition()  configuration_name_expected=<" << configuration_name_expected
                                                                                    << ">");
 
@@ -240,13 +292,13 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
 
           std::ostringstream oss;
           oss << "{";
-          oss << "\"collection\" : \"" << collection_name << "\",";
-          oss << "\"dbprovider\" : \"mongo\",";
-          oss << "\"dataformat\" : \"gui\",";
-          oss << "\"operation\" : \"load\",";
-          oss << "\"filter\" : {";
-          oss << "\"configurations.name\" : " << configuration_name;
-          oss << ", \"entities.name\" : " << entity_name;
+          oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) <<",";
+          oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::mongo)<<",";
+          oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui)<<",";
+          oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument)<<",";
+          oss << db::quoted_(apiliteral::option::searchfilter) << ":" << "{";
+          oss << db::quoted_(apiliteral::filter::configurations) << ": " << configuration_name;
+          oss <<"," << db::quoted_(apiliteral::filter::entities) << ": " << entity_name;
           oss << "}";
           oss << "}";
 
@@ -286,20 +338,20 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
     return element->get_value();
   };
 
-  auto collection_name = dequote(bsoncxx::to_json(extract_value("collection")));
+  auto collection_name = dequote(bsoncxx::to_json(extract_value(apiliteral::option::collection)));
 
   auto collection = _provider->connection().collection(collection_name);
 
-  auto search=JsonData{bsoncxx::to_json(extract_value("filter"))};
+  auto search = JsonData{bsoncxx::to_json(extract_value(apiliteral::option::searchfilter))};
 
-  auto fields= std::vector<std::string>{};
-  fields.emplace_back("entities.name");
-  auto regex_search= mongo::rewrite_query_with_regex(search,fields);
+  auto fields = std::vector<std::string>{};
+  fields.emplace_back(apiliteral::filter::entities);
+  auto regex_search = mongo::rewrite_query_with_regex(search, fields);
   TRACE_(7, "MongoDB::findVersions() args regex_search=<" << regex_search << ">");
-  
+
   mongocxx::pipeline stages;
   bbs::document project_stage;
-  auto match_stage = bsoncxx::builder::core(false);    
+  auto match_stage = bsoncxx::builder::core(false);
   auto bson_search = bsoncxx::from_json(regex_search.json_buffer);
   match_stage.concatenate(bson_search.view());
 
@@ -325,13 +377,13 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
 
       std::ostringstream oss;
       oss << "{";
-      oss << "\"collection\" : \"" << collection_name << "\",";
-      oss << "\"dbprovider\" : \"mongo\",";
-      oss << "\"dataformat\" : \"gui\",";
-      oss << "\"operation\" : \"load\",";
-      oss << "\"filter\" : {";
-      oss << "\"version\" : " << version_name;
-      oss << ", \"entities.name\" : " << entity_name;
+      oss << db::quoted_(apiliteral::option::collection) <<":" << db::quoted_(collection_name) << ",";
+      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::mongo)<<",";
+      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui)<<",";
+      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument)<<",";
+      oss << db::quoted_(apiliteral::option::searchfilter) << ":" << "{";
+      oss << db::quoted_(apiliteral::filter::version) << ": " << version_name;
+      oss <<"," << db::quoted_(apiliteral::filter::entities) << ": " << entity_name;
       oss << "}";
       oss << "}";
 
@@ -374,7 +426,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
   for (auto const& collectionDescriptor : collectionDescriptors) {
     TRACE_(9, "MongoDB::findEntities() found collection=<" << bsoncxx::to_json(collectionDescriptor) << ">");
 
-    auto element_name = collectionDescriptor.find("name");
+    auto element_name = collectionDescriptor.find(jsonliteral::name);
 
     if (element_name == collectionDescriptor.end())
       throw runtime_error("MongoDB") << "MongoDB returned invalid database collection descriptor.";
@@ -385,10 +437,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
 
     if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
 
-    TRACE_(9,
-           "MongoDB::findEntities() querying "
-           "collection_name=<"
-               << collection_name << ">");
+    TRACE_(9, "MongoDB::findEntities() querying collection_name=<" << collection_name << ">");
 
     auto collection = _provider->connection().collection(collection_name);
     auto bson_document = bsoncxx::from_json(search.json_buffer);
@@ -397,7 +446,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
     bbs::document project_stage;
     auto match_stage = bsoncxx::builder::core(false);
 
-    match_stage.concatenate(extract_value("filter").get_document().value);
+    match_stage.concatenate(extract_value(apiliteral::option::searchfilter).get_document().value);
 
     project_stage << "_id" << 0 << "entities"
                   << "$entities.name";
@@ -429,12 +478,12 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
 
         std::ostringstream oss;
         oss << "{";
-        oss << "\"collection\" : \"" << collection_name << "\",";
-        oss << "\"dbprovider\" : \"mongo\",";
-        oss << "\"dataformat\" : \"gui\",";
-        oss << "\"operation\" : \"findversions\",";
-        oss << "\"filter\" : {";
-        oss << "\"entities.name\" : " << entity_name;
+        oss << db::quoted_(apiliteral::option::collection) <<":" << db::quoted_(collection_name) << ",";
+        oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::mongo)<<",";
+        oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui)<<",";
+        oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::findversions)<<",";
+        oss << db::quoted_(apiliteral::option::searchfilter) << ":" << "{";
+        oss << db::quoted_(apiliteral::filter::entities) << ": " << entity_name;
         oss << "}";
         oss << "}";
 
@@ -477,7 +526,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listCollections(JsonData
   for (auto const& collectionDescriptor : collectionDescriptors) {
     TRACE_(9, "MongoDB::listCollections() found collection=<" << bsoncxx::to_json(collectionDescriptor) << ">");
 
-    auto element_name = collectionDescriptor.find("name");
+    auto element_name = collectionDescriptor.find(jsonliteral::name);
 
     if (element_name == collectionDescriptor.end())
       throw runtime_error("MongoDB") << "MongoDB returned invalid database collection descriptor.";
@@ -488,18 +537,15 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listCollections(JsonData
 
     if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
 
-    TRACE_(9,
-           "MongoDB::listCollections() found "
-           "collection_name=<"
-               << collection_name << ">");
+    TRACE_(9, "MongoDB::listCollections() found collection_name=<" << collection_name << ">");
 
     std::ostringstream oss;
     oss << "{";
-    oss << "\"collection\" : \"" << collection_name << "\",";
-    oss << "\"dbprovider\" : \"mongo\",";
-    oss << "\"dataformat\" : \"gui\",";
-    oss << "\"operation\" : \"findversions\",";
-    oss << "\"filter\" : {}";
+    oss << db::quoted_(apiliteral::option::collection) <<":" << db::quoted_(collection_name) << ",";
+    oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::mongo)<<",";
+    oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui)<<",";
+    oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::findversions)<<",";
+    oss << db::quoted_(apiliteral::option::searchfilter)<< ":" <<apiliteral::empty_json;
     oss << "}";
 
     TRACE_(9, "MongoDB::listCollections() found document=<" << oss.str() << ">");
@@ -523,7 +569,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listDatabases(JsonData c
   for (auto const& databaseDescriptor : databaseDescriptors) {
     TRACE_(9, "MongoDB::listDatabases() found databases=<" << bsoncxx::to_json(databaseDescriptor) << ">");
 
-    auto element_name = databaseDescriptor.find("name");
+    auto element_name = databaseDescriptor.find(jsonliteral::name);
 
     if (element_name == databaseDescriptor.end())
       throw runtime_error("MongoDB") << "MongoDB returned invalid database descriptor.";
@@ -538,10 +584,10 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listDatabases(JsonData c
 
     std::ostringstream oss;
     oss << "{";
-    oss << "\"database\" : \"" << database_name << "\",";
-    oss << "\"dbprovider\" : \"mongo\",";
-    oss << "\"dataformat\" : \"gui\",";
-    oss << "\"filter\" : {}";
+    oss << db::quoted_(apiliteral::database) << ":" << db::quoted_(database_name) << ",";
+    oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::mongo)<<",";
+    oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui)<<",";
+    oss << db::quoted_(apiliteral::option::searchfilter)<< ":"<< apiliteral::empty_json;
     oss << "}";
 
     TRACE_(9, "MongoDB::listDatabases() found document=<" << oss.str() << ">");
@@ -558,8 +604,8 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::databaseMetadata(JsonDat
 
   std::ostringstream oss;
   oss << "{";
-  oss << "\"collection\":\"" << system_metadata << "\",";
-  oss << "\"filter\":{}";
+  oss << db::quoted_(apiliteral::option::collection)<< ":" << db::quoted_(system_metadata) << ",";
+  oss << db::quoted_(apiliteral::option::searchfilter)<< ":" << apiliteral::empty_json;
   oss << "}";
   return readDocument(JsonData{oss.str()});
 }

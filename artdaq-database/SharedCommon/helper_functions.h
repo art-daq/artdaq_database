@@ -7,6 +7,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <chrono>
 
 #include "artdaq-database/SharedCommon/shared_datatypes.h"
 
@@ -51,8 +52,12 @@ inline void confirm(bool expr) {
 
 namespace artdaq {
 namespace database {
+using std::chrono::system_clock;
+
 std::string filter_jsonstring(std::string const& str);
 std::string timestamp();
+system_clock::time_point to_timepoint(std::string const& strtime);
+
 bool useFakeTime(bool);
 std::string quoted_(std::string const& /*text*/);
 std::string bool_(bool /*bool*/);

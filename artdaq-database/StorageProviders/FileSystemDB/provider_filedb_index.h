@@ -35,6 +35,7 @@ class SearchIndex final {
   bool addDocument(JsonData const&, object_id_t const&);
   bool removeDocument(JsonData const&, object_id_t const&);
 
+  std::vector<std::string> getConfigurationAssignedTimestamps(JsonData const&);
   // deleted
   SearchIndex() = delete;
   SearchIndex& operator=(SearchIndex const&) = delete;
@@ -45,6 +46,8 @@ class SearchIndex final {
   void _addVersion(object_id_t const&, std::string const&);
   void _addId(object_id_t const&);
   void _addConfiguration(object_id_t const&, std::string const&);
+  void _addConfigurationAssigned(timestamp_t const&, std::string const&);
+
   void _addEntity(object_id_t const&, std::string const&);
   void _addVersionAlias(object_id_t const&, std::string const&);
   void _addRun(object_id_t const&, std::string const&);
@@ -52,6 +55,7 @@ class SearchIndex final {
   void _removeVersion(object_id_t const&, std::string const&);
   void _removeId(object_id_t const&);
   void _removeConfiguration(object_id_t const&, std::string const&);
+  void _removeConfigurationAssigned(timestamp_t const&, std::string const&);
   void _removeEntity(object_id_t const&, std::string const&);
   void _removeVersionAlias(object_id_t const&, std::string const&);
   void _removeRun(object_id_t const&, std::string const&);

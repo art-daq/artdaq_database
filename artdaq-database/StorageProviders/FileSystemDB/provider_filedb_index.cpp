@@ -1,8 +1,10 @@
+#include "artdaq-database/DataFormats/Json/json_types_impl.h"
 #include "artdaq-database/SharedCommon/sharedcommon_common.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb_index.h"
-#include "artdaq-database/DataFormats/Json/json_types_impl.h"
 #include "artdaq-database/StorageProviders/common.h"
+
+#include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb_headers.h"
 
 #include <fstream>
 #include "artdaq-database/BasicTypes/data_json.h"
@@ -24,9 +26,11 @@ namespace dbfs = db::filesystem;
 namespace dbfsi = dbfs::index;
 namespace jsn = db::json;
 
-using artdaq::database::json::JsonReader;
-using artdaq::database::json::JsonWriter;
-using artdaq::database::sharedtypes::unwrap;
+using db::json::JsonReader;
+using db::json::JsonWriter;
+using db::sharedtypes::unwrap;
+
+namespace apiliteral = db::configapi::literal;
 
 typedef std::vector<object_id_t> (SearchIndex::*matching_function_t)(std::string const&) const;
 
@@ -55,9 +59,7 @@ std::vector<object_id_t> SearchIndex::findDocumentIDs(JsonData const& search) {
   object_t search_ast;
 
   if (!reader.read(search, search_ast)) {
-    TRACE_(5,
-           "StorageProvider::FileSystemDB::index::findDocumentIDs() Failed "
-           "to create an AST from search.");
+    TRACE_(5, "StorageProvider::FileSystemDB::index::findDocumentIDs() Failed to create an AST from search.");
     return ouids;
   }
 
@@ -73,14 +75,14 @@ std::vector<object_id_t> SearchIndex::findDocumentIDs(JsonData const& search) {
   }
 
   auto runMatchingFunction = [](std::string const& name) {
-    auto matching_function_map =
-        std::map<std::string, matching_function_t>{{"version", &SearchIndex::_matchVersion},
-                                                   {"configurations.name", &SearchIndex::_matchConfiguration},
-                                                   {"entities.name", &SearchIndex::_matchEntity},
-                                                   {"runs.name", &SearchIndex::_matchRun},
-                                                   {"aliases.active.name", &SearchIndex::_matchVersionAlias},
-                                                   {"$oid", &SearchIndex::_matchObjectId},
-                                                   {"_id", &SearchIndex::_matchObjectIds}};
+    auto matching_function_map = std::map<std::string, matching_function_t>{
+        {apiliteral::filter::version, &SearchIndex::_matchVersion},
+        {apiliteral::filter::configurations, &SearchIndex::_matchConfiguration},
+        {apiliteral::filter::entities, &SearchIndex::_matchEntity},
+        {apiliteral::filter::runs, &SearchIndex::_matchRun},
+        {apiliteral::filter::version_aliases, &SearchIndex::_matchVersionAlias},
+        {jsonliteral::oid, &SearchIndex::_matchObjectId},
+        {jsonliteral::id, &SearchIndex::_matchObjectIds}};
 
     return matching_function_map.at(name);
   };
@@ -100,18 +102,16 @@ std::vector<object_id_t> SearchIndex::findDocumentIDs(JsonData const& search) {
       auto writer = JsonWriter{};
       auto json = std::string();
       if (!writer.write(value, json)) {
-        TRACE_(5,
-               "StorageProvider::FileSystemDB::index::findDocumentIDs() "
-               "Failed to write an AST to json, key=<"
-                   << search_criterion.key << ">.");
+        TRACE_(5, "StorageProvider::FileSystemDB::index::findDocumentIDs() Failed to write an AST to json, key=<"
+                      << search_criterion.key << ">.");
         throw runtime_error("FileSystemDB") << "StorageProvider::FileSystemDB::index::findDocumentIDs() Failed "
                                                "to write an AST to json.";
       }
 
       TRACE_(5,
              "StorageProvider::FileSystemDB::index::findDocumentIDs() search_criterion.value.type() == "
-             "typeid(jsn::object_t),"
-                 << " key=<" << search_criterion.key << ">");
+             "typeid(jsn::object_t), key=<"
+                 << search_criterion.key << ">");
 
       auto matches = (this->*runMatchingFunction(search_criterion.key))(json);
 
@@ -127,10 +127,8 @@ std::vector<object_id_t> SearchIndex::findDocumentIDs(JsonData const& search) {
     std::unique_copy(ouids.begin(), ouids.end(), back_inserter(unique_ouids));
     ouids.swap(unique_ouids);
 
-    TRACE_(5,
-           "StorageProvider::FileSystemDB::index::findDocumentIDs() "
-           "criteria_count=1 found "
-               << ouids.size() << " documents.");
+    TRACE_(5, "StorageProvider::FileSystemDB::index::findDocumentIDs() criteria_count=1 found " << ouids.size()
+                                                                                                << " documents.");
 
   } else {
     auto groupby_map = std::map<object_id_t, int>{};
@@ -155,10 +153,8 @@ std::vector<object_id_t> SearchIndex::findDocumentIDs(JsonData const& search) {
     std::unique_copy(returnValue.begin(), returnValue.end(), back_inserter(unique_ouids));
     ouids.swap(unique_ouids);
 
-    TRACE_(5,
-           "StorageProvider::FileSystemDB::index::findDocumentIDs() "
-           "criteria_count="
-               << criteria_count << ", max_count=" << max_count << ", found " << ouids.size() << " documents.");
+    TRACE_(5, "StorageProvider::FileSystemDB::index::findDocumentIDs() criteria_count="
+                  << criteria_count << ", max_count=" << max_count << ", found " << ouids.size() << " documents.");
   }
 
   TRACE_(5, "StorageProvider::FileSystemDB::index::findDocumentIDs() returning " << ouids.size() << " documents.");
@@ -176,28 +172,24 @@ std::vector<object_id_t> SearchIndex::findDocumentIDs(JsonData const& search) {
 std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByGlobalConfigName(JsonData const& search) {
   confirm(!search.empty());
   auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
-  TRACE_(5,
-         "StorageProvider::FileSystemDB::index::"
-         "findVersionsByGlobalConfigName() begin");
-  TRACE_(5,
-         "StorageProvider::FileSystemDB::index::"
-         "findVersionsByGlobalConfigName() args search=<"
-             << search << ">.");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByGlobalConfigName() begin");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByGlobalConfigName() args search=<" << search << ">.");
 
   auto reader = JsonReader{};
 
   object_t search_ast;
 
   if (!reader.read(search, search_ast)) {
-    TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByGlobalConfigName()"
-                  << " Failed to create an AST from search.");
+    TRACE_(
+        5,
+        "StorageProvider::FileSystemDB::index::findVersionsByGlobalConfigName() Failed to create an AST from search.");
     return returnCollection;
   }
 
   auto configNameFilter = std::string{};
 
   try {
-    configNameFilter = boost::get<std::string>(search_ast.at("configurations.name"));
+    configNameFilter = boost::get<std::string>(search_ast.at(apiliteral::filter::configurations));
 
     TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByGlobalConfigName()"
                   << " Found global configuration filter=<" << configNameFilter << ">.");
@@ -205,7 +197,8 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByGlob
   } catch (...) {
   }
 
-  return _indexed_filtered_innerjoin_over_ouid("version", "configurations.name", configNameFilter);
+  return _indexed_filtered_innerjoin_over_ouid(apiliteral::filter::version, apiliteral::filter::configurations,
+                                               configNameFilter);
 }
 
 std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByEntityName(JsonData const& search) {
@@ -227,7 +220,7 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByEnti
   auto entityNameFilter = std::string{"notprovided"};
 
   try {
-    entityNameFilter = boost::get<std::string>(search_ast.at("entities.name"));
+    entityNameFilter = boost::get<std::string>(search_ast.at(apiliteral::filter::entities));
 
     TRACE_(5, "StorageProvider::FileSystemDB::index::findVersionsByEntityName()"
                   << " Found entity filter=<" << entityNameFilter << ">.");
@@ -235,7 +228,8 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByEnti
   } catch (...) {
   }
 
-  return _indexed_filtered_innerjoin_over_ouid("version", "entities.name", entityNameFilter);
+  return _indexed_filtered_innerjoin_over_ouid(apiliteral::filter::version, apiliteral::filter::entities,
+                                               entityNameFilter);
 }
 
 std::vector<std::string> SearchIndex::findEntities(JsonData const& search) {
@@ -257,48 +251,89 @@ std::vector<std::string> SearchIndex::findEntities(JsonData const& search) {
   auto entityNameFilter = std::string{};
 
   try {
-    entityNameFilter = boost::get<std::string>(search_ast.at("entities.name"));
+    entityNameFilter = boost::get<std::string>(search_ast.at(apiliteral::filter::entities));
 
-    TRACE_(5, "StorageProvider::FileSystemDB::index::findEntities()"
-                  << " Found filter=<" << entityNameFilter << ">.");
+    TRACE_(5, "StorageProvider::FileSystemDB::index::findEntities() Found filter=<" << entityNameFilter << ">.");
 
   } catch (...) {
   }
 
-  return _filtered_attribute_list("entities.name", entityNameFilter);
+  return _filtered_attribute_list(apiliteral::filter::entities, entityNameFilter);
 }
 
 std::vector<std::pair<std::string, std::string>> SearchIndex::findAllGlobalConfigurations(JsonData const& search) {
   confirm(!search.empty());
   auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
-  TRACE_(5,
-         "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations("
-         ") begin");
-  TRACE_(5,
-         "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations("
-         ") args search=<"
-             << search << ">.");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations() begin");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations() args search=<" << search << ">.");
 
   auto reader = JsonReader{};
 
   object_t search_ast;
 
   if (!reader.read(search, search_ast)) {
-    TRACE_(5, "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations()"
-                  << " Failed to create an AST from search.");
+    TRACE_(5,
+           "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations() Failed to create an AST from search.");
     return returnCollection;
   }
 
   auto configFilter = std::string{};
 
   try {
-    configFilter = boost::get<std::string>(search_ast.at("configurations.name"));
-    TRACE_(5, "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations()"
-                  << " Found filter=<" << configFilter << ">.");
+    configFilter = boost::get<std::string>(search_ast.at(apiliteral::filter::configurations));
+    TRACE_(5, "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations() Found filter=<" << configFilter
+                                                                                                   << ">.");
   } catch (...) {
   }
 
-  return _indexed_filtered_innerjoin_over_ouid("entities.name", "configurations.name", configFilter);
+  return _indexed_filtered_innerjoin_over_ouid(apiliteral::filter::entities, apiliteral::filter::configurations,
+                                               configFilter);
+}
+
+std::vector<std::string> SearchIndex::getConfigurationAssignedTimestamps(JsonData const& search) {
+  confirm(!search.empty());
+  auto returnCollection = std::vector<std::string>{};
+  TRACE_(5, "StorageProvider::FileSystemDB::index::getConfigurationAssignedTimestamps() begin");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::getConfigurationAssignedTimestamps() args search=<" << search
+                                                                                                       << ">.");
+  auto reader = JsonReader{};
+
+  object_t search_ast;
+
+  if (!reader.read(search, search_ast)) {
+    TRACE_(5, "StorageProvider::FileSystemDB::index::getConfigurationAssignedTimestamps() "
+                  << "Failed to create an AST from search.");
+    return returnCollection;
+  }
+
+  auto configFilter = std::string{};
+
+  try {
+    configFilter = boost::get<std::string>(search_ast.at(apiliteral::filter::configurations));
+    TRACE_(5, "StorageProvider::FileSystemDB::index::getConfigurationAssignedTimestamps() Found filter=<"
+                  << configFilter << ">.");
+  } catch (...) {
+  }
+
+  try {
+    auto const& config_list = boost::get<jsn::object_t>(_index.at("configurations.assigned"));
+
+    auto const& config_timestamps = boost::get<jsn::array_t>(config_list.at(configFilter));
+
+    returnCollection.reserve(config_timestamps.size());
+
+    for (auto const& timespamp : config_timestamps) {
+      returnCollection.push_back(unwrap(timespamp).value_as<const std::string>());
+    }
+
+    TRACE_(15, "StorageProvider::FileSystemDB::index::getConfigurationAssignedTimestamps() Found "
+                   << returnCollection.size() << " timespamps");
+
+  } catch (std::out_of_range const&) {
+    TRACE_(14, "StorageProvider::FileSystemDB::index::getConfigurationAssignedTimestamps() SearchIndex is corrupt");
+  }
+
+  return returnCollection;
 }
 
 bool SearchIndex::addDocument(JsonData const& document, object_id_t const& ouid) {
@@ -314,9 +349,7 @@ bool SearchIndex::addDocument(JsonData const& document, object_id_t const& ouid)
   object_t doc_ast;
 
   if (!reader.read(document, doc_ast)) {
-    TRACE_(5,
-           "StorageProvider::FileSystemDB::index::addDocument() Failed to "
-           "create an AST from document.");
+    TRACE_(5, "StorageProvider::FileSystemDB::index::addDocument() Failed to create an AST from document.");
     return false;
   }
 
@@ -327,53 +360,50 @@ bool SearchIndex::addDocument(JsonData const& document, object_id_t const& ouid)
 
     _addId(ouid);
 
-    auto version = boost::get<std::string>(doc_ast.at("version"));
+    auto version = boost::get<std::string>(doc_ast.at(jsonliteral::version));
 
     _addVersion(ouid, version);
 
-    auto configs = boost::get<jsn::array_t>(doc_ast.at("configurations"));
+    auto configs = boost::get<jsn::array_t>(doc_ast.at(jsonliteral::configurations));
 
     for (auto const& config : configs) {
-      auto configuration = boost::get<std::string>(boost::get<jsn::object_t>(config).at("name"));
+      auto configuration = boost::get<std::string>(boost::get<jsn::object_t>(config).at(jsonliteral::name));
       _addConfiguration(ouid, configuration);
+
+      auto assigned = boost::get<std::string>(boost::get<jsn::object_t>(config).at(jsonliteral::assigned));
+      _addConfigurationAssigned(assigned, configuration);
     }
 
     try {
-      auto entities = boost::get<jsn::array_t>(doc_ast.at("entities"));
+      auto entities = boost::get<jsn::array_t>(doc_ast.at(jsonliteral::entities));
 
       for (auto const& entity : entities) {
-        auto entity_name = boost::get<std::string>(boost::get<jsn::object_t>(entity).at("name"));
+        auto entity_name = boost::get<std::string>(boost::get<jsn::object_t>(entity).at(jsonliteral::name));
         _addEntity(ouid, entity_name);
       }
     } catch (...) {
-      TRACE_(5,
-             "StorageProvider::FileSystemDB::index::addDocument() Failed to "
-             "add entities.");
+      TRACE_(5, "StorageProvider::FileSystemDB::index::addDocument() Failed to add entities.");
     }
 
     try {
-      auto aliasesnode = boost::get<jsn::object_t>(doc_ast.at("aliases"));
-      auto aliases = boost::get<jsn::array_t>(aliasesnode.at("active"));
+      auto aliasesnode = boost::get<jsn::object_t>(doc_ast.at(jsonliteral::aliases));
+      auto aliases = boost::get<jsn::array_t>(aliasesnode.at(jsonliteral::active));
       for (auto const& alias : aliases) {
-        auto alias_name = boost::get<std::string>(boost::get<jsn::object_t>(alias).at("name"));
+        auto alias_name = boost::get<std::string>(boost::get<jsn::object_t>(alias).at(jsonliteral::name));
         _addVersionAlias(ouid, alias_name);
       }
     } catch (...) {
-      TRACE_(5,
-             "StorageProvider::FileSystemDB::index::addDocument() Failed to "
-             "add aliases.");
+      TRACE_(5, "StorageProvider::FileSystemDB::index::addDocument() Failed to add aliases.");
     }
 
     try {
-      auto runs = boost::get<jsn::array_t>(doc_ast.at("runs"));
+      auto runs = boost::get<jsn::array_t>(doc_ast.at(jsonliteral::runs));
       for (auto const& run : runs) {
-        auto run_name = boost::get<std::string>(boost::get<jsn::object_t>(run).at("name"));
+        auto run_name = boost::get<std::string>(boost::get<jsn::object_t>(run).at(jsonliteral::name));
         _addRun(ouid, run_name);
       }
     } catch (...) {
-      TRACE_(5,
-             "StorageProvider::FileSystemDB::index::addDocument() Failed to "
-             "add run.");
+      TRACE_(5, "StorageProvider::FileSystemDB::index::addDocument() Failed to add run.");
     }
 
     return true;
@@ -403,9 +433,7 @@ bool SearchIndex::removeDocument(JsonData const& document, object_id_t const& ou
   object_t doc_ast;
 
   if (!reader.read(document, doc_ast)) {
-    TRACE_(6,
-           "StorageProvider::FileSystemDB::index::removeDocument() Failed "
-           "to create an AST from document.");
+    TRACE_(6, "StorageProvider::FileSystemDB::index::removeDocument() Failed to create an AST from document.");
     return false;
   }
 
@@ -416,27 +444,30 @@ bool SearchIndex::removeDocument(JsonData const& document, object_id_t const& ou
 
     _removeId(ouid);
 
-    auto version = boost::get<std::string>(doc_ast.at("version"));
+    auto version = boost::get<std::string>(doc_ast.at(jsonliteral::version));
 
     _removeVersion(ouid, version);
 
-    auto configs = boost::get<jsn::array_t>(doc_ast.at("configurations"));
+    auto configs = boost::get<jsn::array_t>(doc_ast.at(jsonliteral::configurations));
 
     for (auto const& config : configs) {
-      auto configuration = boost::get<std::string>(boost::get<jsn::object_t>(config).at("name"));
+      auto configuration = boost::get<std::string>(boost::get<jsn::object_t>(config).at(jsonliteral::name));
       _removeConfiguration(ouid, configuration);
+
+      auto assigned = boost::get<std::string>(boost::get<jsn::object_t>(config).at(jsonliteral::assigned));
+      _removeConfigurationAssigned(assigned, configuration);
     }
 
-    auto aliasesnode = boost::get<jsn::object_t>(doc_ast.at("aliases"));
-    auto aliases = boost::get<jsn::array_t>(aliasesnode.at("active"));
+    auto aliasesnode = boost::get<jsn::object_t>(doc_ast.at(jsonliteral::aliases));
+    auto aliases = boost::get<jsn::array_t>(aliasesnode.at(jsonliteral::active));
     for (auto const& alias : aliases) {
-      auto alias_name = boost::get<std::string>(boost::get<jsn::object_t>(alias).at("name"));
+      auto alias_name = boost::get<std::string>(boost::get<jsn::object_t>(alias).at(jsonliteral::name));
       _removeConfiguration(ouid, alias_name);
     }
 
-    auto runs = boost::get<jsn::array_t>(doc_ast.at("runs"));
+    auto runs = boost::get<jsn::array_t>(doc_ast.at(jsonliteral::runs));
     for (auto const& run : runs) {
-      auto run_name = boost::get<std::string>(boost::get<jsn::object_t>(run).at("name"));
+      auto run_name = boost::get<std::string>(boost::get<jsn::object_t>(run).at(jsonliteral::name));
       _removeRun(ouid, run_name);
     }
     return true;
@@ -455,9 +486,7 @@ bool SearchIndex::removeDocument(JsonData const& document, object_id_t const& ou
 
 bool SearchIndex::_create(boost::filesystem::path const& index_path) {
   try {
-    auto json = std::string{
-        "{\"ouid\":[], \"version\":{},\"configurations.name\":{}, \"entities.name\":{}, \"aliases.active.name\":{}, "
-        "\"runs.name\":{} }"};
+    auto json = std::string{apiliteral::empty_filesystem_index};
 
     return db::write_buffer_to_file(json, {index_path.c_str()});
   } catch (...) {
@@ -476,9 +505,9 @@ bool SearchIndex::_open(boost::filesystem::path const& index_path) {
            "StorageProvider::FileSystemDB::SearchIndex SearchIndex was "
            "aready opened, path=<"
                << index_path.c_str() << ">");
-    throw runtime_error("FileSystemDB") << "StorageProvider::FileSystemDB::SearchIndex SearchIndex was aready "
-                                           "opened, path=<"
-                                        << index_path.c_str() << ">";
+    throw runtime_error("FileSystemDB")
+        << "StorageProvider::FileSystemDB::SearchIndex SearchIndex was already opened, path=<" << index_path.c_str()
+        << ">";
   }
 
   if (!boost::filesystem::exists(boost::filesystem::status(index_path)) && !_create(index_path)) {
@@ -486,9 +515,9 @@ bool SearchIndex::_open(boost::filesystem::path const& index_path) {
            "StorageProvider::FileSystemDB::SearchIndex Failed creating "
            "SearchIndex, path=<"
                << index_path.c_str() << ">");
-    throw runtime_error("FileSystemDB") << "StorageProvider::FileSystemDB::SearchIndex Failed creating "
-                                           "SearchIndex, path=<"
-                                        << index_path.c_str() << ">";
+    throw runtime_error("FileSystemDB")
+        << "StorageProvider::FileSystemDB::SearchIndex Failed creating SearchIndex, path=<" << index_path.c_str()
+        << ">";
   }
 
   auto json = std::string{};
@@ -567,9 +596,7 @@ bool SearchIndex::_close() {
   auto json = std::string();
 
   if (!writer.write(_index, json)) {
-    TRACE_(4,
-           "StorageProvider::FileSystemDB::index::_close() Failed to close "
-           "SearchIndex.");
+    TRACE_(4, "StorageProvider::FileSystemDB::index::_close() Failed to close SearchIndex.");
     return false;
   }
 
@@ -581,10 +608,8 @@ bool SearchIndex::_close() {
 
     return result;
   } catch (...) {
-    TRACE_(4,
-           "StorageProvider::FileSystemDB::index::_close() Failed to write "
-           "SearchIndex; error:"
-               << ::debug::current_exception_diagnostic_information());
+    TRACE_(4, "StorageProvider::FileSystemDB::index::_close() Failed to write SearchIndex; error:"
+                  << ::debug::current_exception_diagnostic_information());
     return false;
   }
 }
@@ -615,7 +640,7 @@ void SearchIndex::_addId(object_id_t const& ouid) {
   TRACE_(7, "StorageProvider::FileSystemDB::index::_addId() begin");
   TRACE_(7, "StorageProvider::FileSystemDB::index::_addId() args ouid=<" << ouid << ">.");
 
-  auto& ouids = boost::get<jsn::array_t>(_index.at("ouid"));
+  auto& ouids = boost::get<jsn::array_t>(_index.at(jsonliteral::ouid));
   ouids.push_back(ouid);
 
   _make_unique_sorted<std::string>(ouids);
@@ -627,12 +652,9 @@ void SearchIndex::_addConfiguration(object_id_t const& ouid, std::string const& 
 
   TRACE_(7, "StorageProvider::FileSystemDB::index::_addConfiguration() begin");
   TRACE_(7, "StorageProvider::FileSystemDB::index::_addConfiguration() args ouid=<" << ouid << ">.");
-  TRACE_(7,
-         "StorageProvider::FileSystemDB::index::_addConfiguration() args "
-         "configuration=<"
-             << configuration << ">.");
+  TRACE_(7, "StorageProvider::FileSystemDB::index::_addConfiguration() args configuration=<" << configuration << ">.");
 
-  auto& configurations = boost::get<jsn::object_t>(_index.at("configurations.name"));
+  auto& configurations = boost::get<jsn::object_t>(_index.at(apiliteral::filter::configurations));
   auto& configuration_ouid_list = configurations[configuration];
 
   if (configuration_ouid_list.type() == typeid(bool)) configuration_ouid_list = jsn::array_t{};
@@ -643,21 +665,35 @@ void SearchIndex::_addConfiguration(object_id_t const& ouid, std::string const& 
   _make_unique_sorted<std::string>(ouids);
 }
 
+void SearchIndex::_addConfigurationAssigned(timestamp_t const& timespamp, std::string const& configuration) {
+  confirm(!timespamp.empty());
+  confirm(!configuration.empty());
+
+  TRACE_(7, "StorageProvider::FileSystemDB::index::_addConfigurationAssigned() begin");
+  TRACE_(7, "StorageProvider::FileSystemDB::index::_addConfigurationAssigned() args timespamp=<" << timespamp << ">.");
+  TRACE_(7, "StorageProvider::FileSystemDB::index::_addConfigurationAssigned() args configuration=<" << configuration
+                                                                                                     << ">.");
+
+  auto& configurations = boost::get<jsn::object_t>(_index.at("configurations.assigned"));
+  auto& configuration_timestamp_list = configurations[configuration];
+
+  if (configuration_timestamp_list.type() == typeid(bool)) configuration_timestamp_list = jsn::array_t{};
+
+  auto& timespamps = boost::get<jsn::array_t>(configuration_timestamp_list);
+  timespamps.push_back(timespamp);
+
+  _make_unique_sorted<timestamp_t>(timespamps);
+}
+
 void SearchIndex::_addEntity(object_id_t const& ouid, std::string const& entity) {
   confirm(!ouid.empty());
   confirm(!entity.empty());
 
   TRACE_(7, "StorageProvider::FileSystemDB::index::_addEntity() begin");
-  TRACE_(7,
-         "StorageProvider::FileSystemDB::index::_addEntity() "
-         "args ouid=<"
-             << ouid << ">.");
-  TRACE_(7,
-         "StorageProvider::FileSystemDB::index::_addEntity() "
-         "args entity=<"
-             << entity << ">.");
+  TRACE_(7, "StorageProvider::FileSystemDB::index::_addEntity() args ouid=<" << ouid << ">.");
+  TRACE_(7, "StorageProvider::FileSystemDB::index::_addEntity() args entity=<" << entity << ">.");
 
-  auto& entities = boost::get<jsn::object_t>(_index.at("entities.name"));
+  auto& entities = boost::get<jsn::object_t>(_index.at(apiliteral::filter::entities));
   auto& entity_ouid_list = entities[entity];
 
   if (entity_ouid_list.type() == typeid(bool)) entity_ouid_list = jsn::array_t{};
@@ -673,16 +709,10 @@ void SearchIndex::_addVersionAlias(object_id_t const& ouid, std::string const& v
   confirm(!veralias.empty());
 
   TRACE_(7, "StorageProvider::FileSystemDB::index::_addVersionAlias() begin");
-  TRACE_(7,
-         "StorageProvider::FileSystemDB::index::_addVersionAlias() "
-         "args ouid=<"
-             << ouid << ">.");
-  TRACE_(7,
-         "StorageProvider::FileSystemDB::index::_addVersionAlias() "
-         "args veralias=<"
-             << veralias << ">.");
+  TRACE_(7, "StorageProvider::FileSystemDB::index::_addVersionAlias() args ouid=<" << ouid << ">.");
+  TRACE_(7, "StorageProvider::FileSystemDB::index::_addVersionAlias() args veralias=<" << veralias << ">.");
 
-  auto& aliases = boost::get<jsn::object_t>(_index.at("aliases.active.name"));
+  auto& aliases = boost::get<jsn::object_t>(_index.at(apiliteral::filter::version_aliases));
   auto& alias_ouid_list = aliases[veralias];
 
   if (alias_ouid_list.type() == typeid(bool)) alias_ouid_list = jsn::array_t{};
@@ -698,16 +728,10 @@ void SearchIndex::_addRun(object_id_t const& ouid, std::string const& run) {
   confirm(!run.empty());
 
   TRACE_(7, "StorageProvider::FileSystemDB::index::_addRun() begin");
-  TRACE_(7,
-         "StorageProvider::FileSystemDB::index::_addRun() "
-         "args ouid=<"
-             << ouid << ">.");
-  TRACE_(7,
-         "StorageProvider::FileSystemDB::index::_addRun() "
-         "args run=<"
-             << run << ">.");
+  TRACE_(7, "StorageProvider::FileSystemDB::index::_addRun() args ouid=<" << ouid << ">.");
+  TRACE_(7, "StorageProvider::FileSystemDB::index::_addRun() args run=<" << run << ">.");
 
-  auto& runs = boost::get<jsn::object_t>(_index.at("runs.name"));
+  auto& runs = boost::get<jsn::object_t>(_index.at(apiliteral::filter::runs));
   auto& runs_ouid_list = runs[run];
 
   if (runs_ouid_list.type() == typeid(bool)) runs_ouid_list = jsn::array_t{};
@@ -726,7 +750,7 @@ std::vector<object_id_t> SearchIndex::_matchVersion(std::string const& version) 
   TRACE_(14, "StorageProvider::FileSystemDB::index::_matchVersion() begin");
   TRACE_(14, "StorageProvider::FileSystemDB::index::_matchVersion() args version=<" << version << ">.");
 
-  auto const& versions = boost::get<jsn::object_t>(_index.at("version"));
+  auto const& versions = boost::get<jsn::object_t>(_index.at(jsonliteral::version));
 
   try {
     auto const& version_ouid_list = boost::get<jsn::array_t>(versions.at(version));
@@ -740,10 +764,7 @@ std::vector<object_id_t> SearchIndex::_matchVersion(std::string const& version) 
                    << ouids.size() << " documents where version=" << version);
 
   } catch (std::out_of_range const&) {
-    TRACE_(14,
-           "StorageProvider::FileSystemDB::index::_matchVersion() Version "
-           "not found, version=<"
-               << version << ">.");
+    TRACE_(14, "StorageProvider::FileSystemDB::index::_matchVersion() Version not found, version=<" << version << ">.");
   }
 
   return ouids;
@@ -755,7 +776,7 @@ std::vector<object_id_t> SearchIndex::getObjectIds() const {
   TRACE_(14, "StorageProvider::FileSystemDB::index::getObjectIds() begin");
 
   try {
-    auto const& ouid_list = boost::get<jsn::array_t>(_index.at("ouid"));
+    auto const& ouid_list = boost::get<jsn::array_t>(_index.at(jsonliteral::ouid));
 
     ouids.reserve(ouid_list.size());
 
@@ -779,7 +800,7 @@ std::vector<object_id_t> SearchIndex::_matchVersionAlias(std::string const& vera
   TRACE_(14, "StorageProvider::FileSystemDB::index::_matchVersionAlias() begin");
   TRACE_(14, "StorageProvider::FileSystemDB::index::_matchVersionAlias() args version=<" << veralias << ">.");
 
-  auto const& versions = boost::get<jsn::object_t>(_index.at("aliases.active.name"));
+  auto const& versions = boost::get<jsn::object_t>(_index.at(apiliteral::filter::version_aliases));
 
   try {
     auto const& veralias_ouid_list = boost::get<jsn::array_t>(versions.at(veralias));
@@ -793,10 +814,8 @@ std::vector<object_id_t> SearchIndex::_matchVersionAlias(std::string const& vera
                    << ouids.size() << " documents where veralias=" << veralias);
 
   } catch (std::out_of_range const&) {
-    TRACE_(14,
-           "StorageProvider::FileSystemDB::index::_matchVersionAlias() Version "
-           "not found, veralias=<"
-               << veralias << ">.");
+    TRACE_(14, "StorageProvider::FileSystemDB::index::_matchVersionAlias() Version not found, veralias=<" << veralias
+                                                                                                          << ">.");
   }
 
   return ouids;
@@ -810,7 +829,7 @@ std::vector<object_id_t> SearchIndex::_matchRun(std::string const& run) const {
   TRACE_(14, "StorageProvider::FileSystemDB::index::_matchRun() begin");
   TRACE_(14, "StorageProvider::FileSystemDB::index::_matchRun() args version=<" << run << ">.");
 
-  auto const& versions = boost::get<jsn::object_t>(_index.at("runs.name"));
+  auto const& versions = boost::get<jsn::object_t>(_index.at(apiliteral::filter::runs));
 
   try {
     auto const& run_ouid_list = boost::get<jsn::array_t>(versions.at(run));
@@ -824,10 +843,7 @@ std::vector<object_id_t> SearchIndex::_matchRun(std::string const& run) const {
                                                                           << " documents where run=" << run);
 
   } catch (std::out_of_range const&) {
-    TRACE_(14,
-           "StorageProvider::FileSystemDB::index::_matchRun() Version "
-           "not found, run=<"
-               << run << ">.");
+    TRACE_(14, "StorageProvider::FileSystemDB::index::_matchRun() Run not found, run=<" << run << ">.");
   }
 
   return ouids;
@@ -839,12 +855,10 @@ std::vector<object_id_t> SearchIndex::_matchConfiguration(std::string const& con
   confirm(!configuration.empty());
 
   TRACE_(15, "StorageProvider::FileSystemDB::index::_matchConfiguration() begin");
-  TRACE_(15,
-         "StorageProvider::FileSystemDB::index::_matchConfiguration() args "
-         "configuration=<"
-             << configuration << ">.");
+  TRACE_(15, "StorageProvider::FileSystemDB::index::_matchConfiguration() args configuration=<" << configuration
+                                                                                                << ">.");
 
-  auto const& versions = boost::get<jsn::object_t>(_index.at("configurations.name"));
+  auto const& versions = boost::get<jsn::object_t>(_index.at(apiliteral::filter::configurations));
 
   try {
     auto const& configuration_ouid_list = boost::get<jsn::array_t>(versions.at(configuration));
@@ -858,10 +872,8 @@ std::vector<object_id_t> SearchIndex::_matchConfiguration(std::string const& con
                    << ouids.size() << " documents where configuration=" << configuration);
 
   } catch (std::out_of_range const&) {
-    TRACE_(15,
-           "StorageProvider::FileSystemDB::index::_matchConfiguration() "
-           "Configuration not found, configuration=<"
-               << configuration << ">.");
+    TRACE_(15, "StorageProvider::FileSystemDB::index::_matchConfiguration() Configuration not found, configuration=<"
+                   << configuration << ">.");
   }
 
   return ouids;
@@ -873,12 +885,9 @@ std::vector<object_id_t> SearchIndex::_matchEntity(std::string const& entity) co
   confirm(!entity.empty());
 
   TRACE_(15, "StorageProvider::FileSystemDB::index::_matchEntity() begin");
-  TRACE_(15,
-         "StorageProvider::FileSystemDB::index::_matchEntity() "
-         "args entities=<"
-             << entity << ">.");
+  TRACE_(15, "StorageProvider::FileSystemDB::index::_matchEntity() args entities=<" << entity << ">.");
 
-  auto const& entities = boost::get<jsn::object_t>(_index.at("entities.name"));
+  auto const& entities = boost::get<jsn::object_t>(_index.at(apiliteral::filter::entities));
 
   try {
     auto const& entity_ouid_list = boost::get<jsn::array_t>(entities.at(entity));
@@ -888,15 +897,11 @@ std::vector<object_id_t> SearchIndex::_matchEntity(std::string const& entity) co
     for (auto const& entity_ouid : entity_ouid_list) {
       ouids.push_back(unwrap(entity_ouid).value_as<const std::string>());
     }
-    TRACE_(15,
-           "StorageProvider::FileSystemDB::index::_matchEntity("
-           ") Found "
-               << ouids.size() << " documents where entity=" << entity);
+    TRACE_(15, "StorageProvider::FileSystemDB::index::_matchEntity() Found " << ouids.size()
+                                                                             << " documents where entity=" << entity);
   } catch (std::out_of_range const&) {
-    TRACE_(15,
-           "StorageProvider::FileSystemDB::index::_matchEntity("
-           ") Configuration entity not found, entity=<"
-               << entity << ">.");
+    TRACE_(15, "StorageProvider::FileSystemDB::index::_matchEntity() Configuration entity not found, entity=<" << entity
+                                                                                                               << ">.");
   }
 
   return ouids;
@@ -910,7 +915,7 @@ void SearchIndex::_removeVersion(object_id_t const& old_ouid, std::string const&
   TRACE_(7, "StorageProvider::FileSystemDB::index::_removeVersion() args ouid=<" << old_ouid << ">.");
   TRACE_(7, "StorageProvider::FileSystemDB::index::_removeVersion() args version=<" << version << ">.");
 
-  auto& versions = boost::get<jsn::object_t>(_index.at("version"));
+  auto& versions = boost::get<jsn::object_t>(_index.at(apiliteral::filter::version));
 
   try {
     auto& version_ouid_list = boost::get<jsn::array_t>(versions.at(version));
@@ -922,19 +927,13 @@ void SearchIndex::_removeVersion(object_id_t const& old_ouid, std::string const&
       if (this_ouid != old_ouid) {
         new_version_ouid_list.push_back(this_ouid);
       } else {
-        TRACE_(7,
-               "StorageProvider::FileSystemDB::index::_removeVersion() "
-               "removed ouid=<"
-                   << old_ouid << ">.");
+        TRACE_(7, "StorageProvider::FileSystemDB::index::_removeVersion() removed ouid=<" << old_ouid << ">.");
       }
     }
 
     version_ouid_list.swap(new_version_ouid_list);
   } catch (std::out_of_range const&) {
-    TRACE_(7,
-           "StorageProvider::FileSystemDB::index::_removeVersion() Version "
-           "not found, version=<"
-               << version << ">.");
+    TRACE_(7, "StorageProvider::FileSystemDB::index::_removeVersion() Version not found, version=<" << version << ">.");
   }
 }
 
@@ -944,7 +943,7 @@ void SearchIndex::_removeId(object_id_t const& old_ouid) {
   TRACE_(7, "StorageProvider::FileSystemDB::index::_removeId() begin");
   TRACE_(7, "StorageProvider::FileSystemDB::index::_removeId() args ouid=<" << old_ouid << ">.");
 
-  auto& ouid_list = boost::get<jsn::array_t>(_index.at("ouid"));
+  auto& ouid_list = boost::get<jsn::array_t>(_index.at(jsonliteral::ouid));
 
   try {
     auto new_ouid_list = jsn::array_t{};
@@ -955,18 +954,12 @@ void SearchIndex::_removeId(object_id_t const& old_ouid) {
       if (this_ouid != old_ouid) {
         new_ouid_list.push_back(this_ouid);
       } else {
-        TRACE_(7,
-               "StorageProvider::FileSystemDB::index::_removeId() "
-               "removed ouid=<"
-                   << old_ouid << ">.");
+        TRACE_(7, "StorageProvider::FileSystemDB::index::_removeId() removed ouid=<" << old_ouid << ">.");
       }
     }
     ouid_list.swap(new_ouid_list);
   } catch (std::out_of_range const&) {
-    TRACE_(7,
-           "StorageProvider::FileSystemDB::index::_removeId() ouid "
-           "not found, ouid=<"
-               << old_ouid << ">.");
+    TRACE_(7, "StorageProvider::FileSystemDB::index::_removeId() ouid not found, ouid=<" << old_ouid << ">.");
   }
 }
 
@@ -978,7 +971,7 @@ void SearchIndex::_removeVersionAlias(object_id_t const& old_ouid, std::string c
   TRACE_(7, "StorageProvider::FileSystemDB::index::_removeVersionAlias() args ouid=<" << old_ouid << ">.");
   TRACE_(7, "StorageProvider::FileSystemDB::index::_removeVersionAlias() args veralias=<" << veralias << ">.");
 
-  auto& veraliass = boost::get<jsn::object_t>(_index.at("aliases.active.name"));
+  auto& veraliass = boost::get<jsn::object_t>(_index.at(apiliteral::filter::version_aliases));
 
   try {
     auto& veralias_ouid_list = boost::get<jsn::array_t>(veraliass.at(veralias));
@@ -990,18 +983,13 @@ void SearchIndex::_removeVersionAlias(object_id_t const& old_ouid, std::string c
       if (this_ouid != old_ouid) {
         new_veralias_ouid_list.push_back(this_ouid);
       } else {
-        TRACE_(7,
-               "StorageProvider::FileSystemDB::index::_removeVersionAlias() "
-               "removed ouid=<"
-                   << old_ouid << ">.");
+        TRACE_(7, "StorageProvider::FileSystemDB::index::_removeVersionAlias() removed ouid=<" << old_ouid << ">.");
       }
     }
     veralias_ouid_list.swap(new_veralias_ouid_list);
   } catch (std::out_of_range const&) {
-    TRACE_(7,
-           "StorageProvider::FileSystemDB::index::_removeVersionAlias() VersionAlias "
-           "not found, veralias=<"
-               << veralias << ">.");
+    TRACE_(7, "StorageProvider::FileSystemDB::index::_removeVersionAlias() VersionAlias not found, veralias=<"
+                  << veralias << ">.");
   }
 }
 
@@ -1013,7 +1001,7 @@ void SearchIndex::_removeRun(object_id_t const& old_ouid, std::string const& run
   TRACE_(7, "StorageProvider::FileSystemDB::index::_removeRun() args ouid=<" << old_ouid << ">.");
   TRACE_(7, "StorageProvider::FileSystemDB::index::_removeRun() args run=<" << run << ">.");
 
-  auto& runs = boost::get<jsn::object_t>(_index.at("runs.name"));
+  auto& runs = boost::get<jsn::object_t>(_index.at(apiliteral::filter::runs));
 
   try {
     auto& run_ouid_list = boost::get<jsn::array_t>(runs.at(run));
@@ -1025,18 +1013,12 @@ void SearchIndex::_removeRun(object_id_t const& old_ouid, std::string const& run
       if (this_ouid != old_ouid) {
         new_run_ouid_list.push_back(this_ouid);
       } else {
-        TRACE_(7,
-               "StorageProvider::FileSystemDB::index::_removeRun() "
-               "removed ouid=<"
-                   << old_ouid << ">.");
+        TRACE_(7, "StorageProvider::FileSystemDB::index::_removeRun() removed ouid=<" << old_ouid << ">.");
       }
     }
     run_ouid_list.swap(new_run_ouid_list);
   } catch (std::out_of_range const&) {
-    TRACE_(7,
-           "StorageProvider::FileSystemDB::index::_removeRun() Run "
-           "not found, run=<"
-               << run << ">.");
+    TRACE_(7, "StorageProvider::FileSystemDB::index::_removeRun() Run not found, run=<" << run << ">.");
   }
 }
 
@@ -1076,7 +1058,7 @@ std::vector<object_id_t> SearchIndex::_matchObjectIds(std::string const& objecti
     TRACE(16, "StorageProvider::FileSystemDB::index::_matchObjectIds() found %lu ouids.", ouid_list.size());
 
     for (auto& ouid_entry : ouid_list) {
-      auto ouid = boost::get<std::string>(boost::get<jsn::object_t>(ouid_entry).at("$oid"));
+      auto ouid = boost::get<std::string>(boost::get<jsn::object_t>(ouid_entry).at(jsonliteral::oid));
       TRACE(16, "StorageProvider::FileSystemDB::index::_matchObjectIds() found ouid=<%s>.", ouid.c_str());
       ouids.push_back(ouid);
     }
@@ -1085,7 +1067,7 @@ std::vector<object_id_t> SearchIndex::_matchObjectIds(std::string const& objecti
   }
 
   try {
-    auto ouid = boost::get<std::string>(boost::get<jsn::object_t>(objectids_ast).at("$oid"));
+    auto ouid = boost::get<std::string>(boost::get<jsn::object_t>(objectids_ast).at(jsonliteral::oid));
     TRACE(16, "StorageProvider::FileSystemDB::index::_matchObjectIds() found ouid=<%s>.", ouid.c_str());
     ouids.push_back(ouid);
   } catch (...) {
@@ -1096,18 +1078,17 @@ std::vector<object_id_t> SearchIndex::_matchObjectIds(std::string const& objecti
 
   return ouids;
 }
+
 void SearchIndex::_removeConfiguration(object_id_t const& old_ouid, std::string const& configuration) {
   confirm(!old_ouid.empty());
   confirm(!configuration.empty());
 
   TRACE_(8, "StorageProvider::FileSystemDB::index::_removeConfiguration() begin");
   TRACE_(8, "StorageProvider::FileSystemDB::index::_removeConfiguration() args ouid=<" << old_ouid << ">.");
-  TRACE_(8,
-         "StorageProvider::FileSystemDB::index::_removeConfiguration() args "
-         "configuration=<"
-             << configuration << ">.");
+  TRACE_(8, "StorageProvider::FileSystemDB::index::_removeConfiguration() args configuration=<" << configuration
+                                                                                                << ">.");
 
-  auto& configurations = boost::get<jsn::object_t>(_index.at("configurations.name"));
+  auto& configurations = boost::get<jsn::object_t>(_index.at(apiliteral::filter::configurations));
 
   try {
     auto& configuration_ouid_list = boost::get<jsn::array_t>(configurations.at(configuration));
@@ -1119,18 +1100,48 @@ void SearchIndex::_removeConfiguration(object_id_t const& old_ouid, std::string 
       if (this_ouid != old_ouid) {
         new_configuration_ouid_list.push_back(this_ouid);
       } else {
-        TRACE_(8,
-               "StorageProvider::FileSystemDB::index::_removeConfiguration()"
-               " removed ouid=<"
-                   << old_ouid << ">.");
+        TRACE_(8, "StorageProvider::FileSystemDB::index::_removeConfiguration() removed ouid=<" << old_ouid << ">.");
       }
     }
     configuration_ouid_list.swap(new_configuration_ouid_list);
   } catch (std::out_of_range const&) {
-    TRACE_(8,
-           "StorageProvider::FileSystemDB::index::_removeConfiguration() "
-           "Configuration not found, configuration=<"
-               << configuration << ">.");
+    TRACE_(8, "StorageProvider::FileSystemDB::index::_removeConfiguration() Configuration not found, configuration=<"
+                  << configuration << ">.");
+  }
+}
+
+void SearchIndex::_removeConfigurationAssigned(timestamp_t const& old_timestamp, std::string const& configuration) {
+  confirm(!old_timestamp.empty());
+  confirm(!configuration.empty());
+
+  TRACE_(8, "StorageProvider::FileSystemDB::index::_removeConfigurationAssigned() begin");
+  TRACE_(8, "StorageProvider::FileSystemDB::index::_removeConfigurationAssigned() args timestamp=<" << old_timestamp
+                                                                                                    << ">.");
+  TRACE_(8, "StorageProvider::FileSystemDB::index::_removeConfigurationAssigned() args configuration=<" << configuration
+                                                                                                        << ">.");
+
+  auto& configurations = boost::get<jsn::object_t>(_index.at("configurations.assigned"));
+
+  try {
+    auto& configuration_timestamp_list = boost::get<jsn::array_t>(configurations.at(configuration));
+    auto new_configuration_timestamp_list = jsn::array_t{};
+
+    for (auto& configuration_timestamp : configuration_timestamp_list) {
+      auto this_timestamp = unwrap(configuration_timestamp).value_as<timestamp_t>();
+
+      if (this_timestamp != old_timestamp) {
+        new_configuration_timestamp_list.push_back(this_timestamp);
+      } else {
+        TRACE_(8, "StorageProvider::FileSystemDB::index::_removeConfigurationAssigned() removed timespamp=<"
+                      << old_timestamp << ">.");
+      }
+    }
+    configuration_timestamp_list.swap(new_configuration_timestamp_list);
+  } catch (std::out_of_range const&) {
+    TRACE_(
+        8,
+        "StorageProvider::FileSystemDB::index::_removeConfigurationAssigned() Configuration not found, configuration=<"
+            << configuration << ">.");
   }
 }
 
@@ -1138,19 +1149,11 @@ void SearchIndex::_removeEntity(object_id_t const& old_ouid, std::string const& 
   confirm(!old_ouid.empty());
   confirm(!entity.empty());
 
-  TRACE_(8,
-         "StorageProvider::FileSystemDB::index::_removeEntity() "
-         "begin");
-  TRACE_(8,
-         "StorageProvider::FileSystemDB::index::_removeEntity() "
-         "args ouid=<"
-             << old_ouid << ">.");
-  TRACE_(8,
-         "StorageProvider::FileSystemDB::index::_removeEntity() "
-         "args entity=<"
-             << entity << ">.");
+  TRACE_(8, "StorageProvider::FileSystemDB::index::_removeEntity() begin");
+  TRACE_(8, "StorageProvider::FileSystemDB::index::_removeEntity() args ouid=<" << old_ouid << ">.");
+  TRACE_(8, "StorageProvider::FileSystemDB::index::_removeEntity() args entity=<" << entity << ">.");
 
-  auto& entities = boost::get<jsn::object_t>(_index.at("entities.name"));
+  auto& entities = boost::get<jsn::object_t>(_index.at(apiliteral::filter::entities));
 
   try {
     auto& entity_ouid_list = boost::get<jsn::array_t>(entities.at(entity));
@@ -1162,18 +1165,13 @@ void SearchIndex::_removeEntity(object_id_t const& old_ouid, std::string const& 
       if (this_ouid != old_ouid) {
         new_entity_ouid_list.push_back(this_ouid);
       } else {
-        TRACE_(8,
-               "StorageProvider::FileSystemDB::index::_"
-               "_removeEntity() removed ouid=<"
-                   << old_ouid << ">.");
+        TRACE_(8, "StorageProvider::FileSystemDB::index::_removeEntity() removed ouid=<" << old_ouid << ">.");
       }
     }
     entity_ouid_list.swap(new_entity_ouid_list);
   } catch (std::out_of_range const&) {
-    TRACE_(8,
-           "StorageProvider::FileSystemDB::index::_removeEntity("
-           ") Configuration not found, entity=<"
-               << entity << ">.");
+    TRACE_(8, "StorageProvider::FileSystemDB::index::_removeEntity() Configuration not found, entity=<" << entity
+                                                                                                        << ">.");
   }
 }
 
@@ -1193,8 +1191,8 @@ void SearchIndex::_build_ouid_map(std::map<std::string, std::string>& map, std::
     }
   }
 
-  TRACE_(5, "StorageProvider::FileSystemDB::index::_build_ouid2entity_map()"
-                << " ouid2entity_map has " << ouid_map.size() << " entries.");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::_build_ouid2entity_map() ouid2entity_map has " << ouid_map.size()
+                                                                                                  << " entries.");
 
   map.swap(ouid_map);
 }
@@ -1232,8 +1230,8 @@ std::vector<std::string> SearchIndex::_filtered_attribute_list(std::string const
     returnCollection.push_back(ouid_array_element.key);
   }
 
-  TRACE_(5, "StorageProvider::FileSystemDB::index::_filtered_attribute_list()"
-                << " filtered_attribute_list has " << returnCollection.size() << " entries.");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::_filtered_attribute_list() filtered_attribute_list has "
+                << returnCollection.size() << " entries.");
 
   return returnCollection;
 }
@@ -1265,10 +1263,8 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::_indexed_filtered_
   for (auto& right_element : right_table) {
     if (!acceptValue(right_element.key)) continue;
 
-    TRACE_(5,
-           "StorageProvider::FileSystemDB::index::_indexed_filtered_"
-           "innerjoin_over_ouid()"
-               << " accepted value  " << right_element.key << " begins with " << right_begins_with);
+    TRACE_(5, "StorageProvider::FileSystemDB::index::_indexed_filtered_innerjoin_over_ouid() accepted value  "
+                  << right_element.key << " begins with " << right_begins_with);
 
     auto& right_ouid_list = boost::get<jsn::array_t>(right_element.value);
 
@@ -1287,10 +1283,8 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::_indexed_filtered_
 
   if (!unique_ouids.empty()) returnCollection.swap(unique_ouids);
 
-  TRACE_(5,
-         "StorageProvider::FileSystemDB::index::_indexed_filtered_innerjoin_"
-         "over_ouid()"
-             << " returnCollection has " << returnCollection.size() << " entries.");
+  TRACE_(5, "StorageProvider::FileSystemDB::index::_indexed_filtered_innerjoin_over_ouid() returnCollection has "
+                << returnCollection.size() << " entries.");
 
   return returnCollection;
 }

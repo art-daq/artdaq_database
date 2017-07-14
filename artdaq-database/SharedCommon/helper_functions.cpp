@@ -4,7 +4,9 @@
 #include "artdaq-database/SharedCommon/shared_exceptions.h"
 
 #include <sys/utsname.h>
+#include <time.h>
 #include <wordexp.h>
+#include <chrono>
 #include <clocale>
 #include <ctime>
 #include <fstream>
@@ -45,6 +47,20 @@ std::string db::timestamp() {
   if (useFakeTime()) return apiliteral::timestamp_faketime;
 
   return {buff};
+}
+
+std::chrono::system_clock::time_point db::to_timepoint(std::string const& strtime) {
+  confirm(!strtime.empty());
+
+  if (strtime.empty()) throw std::invalid_argument("Failed calling to_timepoint(): Invalid strtime; strtime is empty");
+
+  auto timeinfo = std::tm();
+
+  if (strptime(strtime.c_str(), apiliteral::timestamp_format, &timeinfo) != NULL)
+    return std::chrono::system_clock::from_time_t(std::mktime(&timeinfo));
+
+  throw std::invalid_argument(std::string("Failed calling to_timepoint(): format mismatch; format=<") +
+                              apiliteral::timestamp_format + ">, timestamp=<" + strtime + ">");
 }
 
 std::string db::unamejson() {
@@ -96,12 +112,11 @@ std::string db::debracket(std::string s) {
     return s;
 }
 
-std::string db::annotate(std::string const& s){
-  auto str=db::trim(s);
-  
-  if(str[0] == '#' || str.empty())
-    return str;
-  
+std::string db::annotate(std::string const& s) {
+  auto str = db::trim(s);
+
+  if (str[0] == '#' || str.empty()) return str;
+
   return std::string{"#"}.append(str);
 }
 

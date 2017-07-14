@@ -15,6 +15,7 @@ namespace configapi {
 namespace literal {
 
 constexpr auto operations = "operations";
+constexpr auto database = "database";
 
 namespace operation {
 constexpr auto writeconfiguration = "globalconfstore";
@@ -103,6 +104,10 @@ constexpr auto run = "run";
 constexpr auto configuration_alias = "configuration_alias";
 }
 
+namespace format {
+constexpr auto gui = "gui";
+}
+
 namespace msg {
 constexpr auto empty_filter = "Search filter is empty";
 constexpr auto empty_document = "Json document is empty";
@@ -117,6 +122,11 @@ constexpr auto notprovided = "notprovided";
 constexpr auto apiname = "artdaq_database";
 constexpr auto empty_json = "{ }";
 constexpr auto empty_search_result = "{\"search\":[ ]}";
+
+constexpr auto empty_filesystem_index =
+    "{\"ouid\":[], \"version\":{},\"configurations.name\":{}, "
+    "\"entities.name\":{},\"aliases.active.name\":{}, "
+    "\"runs.name\":{},\"configurations.assigned\":{} }";
 
 constexpr auto bzip2base64 = "ascii.tar.bzip2.base64";
 constexpr auto tmpdirprefix = "/tmp/adb";
