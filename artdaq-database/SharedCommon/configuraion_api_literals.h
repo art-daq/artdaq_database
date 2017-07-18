@@ -136,9 +136,11 @@ constexpr auto database_format_version = 2;
 
 constexpr auto database_format_locale = "en_US.UTF-8";
 
-constexpr auto timestamp_format = "%a %b %d %H:%M:%S %Y";
-// constexpr auto timestamp_format= "%FT%T%z";
-constexpr auto timestamp_faketime = "Mon Feb  8 14:00:30 2016";
+constexpr auto timestamp_format_old = "%a %b %d %H:%M:%S %Y";
+constexpr auto timestamp_format= "%FT%T%z";
+constexpr auto timestamp_faketime_old = "Mon Feb  8 14:00:30 2016";
+constexpr auto timestamp_faketime = "2017-07-18T12:48:10-0500";
+
 }
 }  // namespace configapi
 }  // namespace database

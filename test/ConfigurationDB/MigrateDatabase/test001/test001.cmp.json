@@ -64,7 +64,7 @@
 "format" : "json",
 "source" : "template",
 "name" : "notprovided",
-"created" : "Mon Feb  8 14:00:30 2016",
+"created" : "2017-07-18T12:48:10-0500",
 "rawdata" : [
 
 ]
@@ -73,7 +73,7 @@
 "entities" : [
 {
 "name" : "OTSROOT",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10-0500"
 }
 ],
 "configurations" : [
@@ -145,23 +145,23 @@
 "updates" : [
 {
 "event" : "setVersion",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10-0500",
 "value" : {
 "name" : "0",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10-0500"
 }
 },
 {
 "event" : "addEntity",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10-0500",
 "value" : {
 "name" : "OTSROOT",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10-0500"
 }
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10-0500",
 "value" : {
 "name" : "notprovided",
 "assigned" : "Mon Feb  6 18:45:30 2017"
@@ -169,7 +169,7 @@
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10-0500",
 "value" : {
 "name" : "lcls2Configuration_v0",
 "assigned" : "Mon Feb  6 18:45:31 2017"
@@ -177,7 +177,7 @@
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10-0500",
 "value" : {
 "name" : "lcls2Configuration_v1",
 "assigned" : "Tue Feb  7 10:34:06 2017"
@@ -185,7 +185,7 @@
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10-0500",
 "value" : {
 "name" : "lcls2Configuration_v2",
 "assigned" : "Tue Feb  7 10:36:00 2017"
@@ -193,7 +193,7 @@
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10-0500",
 "value" : {
 "name" : "lcls2Configuration_v3",
 "assigned" : "Tue Feb  7 10:38:14 2017"
@@ -201,7 +201,7 @@
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10-0500",
 "value" : {
 "name" : "lcls2Configuration_v4",
 "assigned" : "Tue Feb  7 10:55:45 2017"
@@ -209,7 +209,7 @@
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10-0500",
 "value" : {
 "name" : "lcls2Configuration_v5",
 "assigned" : "Tue Feb  7 10:58:30 2017"
@@ -217,7 +217,7 @@
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10-0500",
 "value" : {
 "name" : "lcls2Configuration_v6",
 "assigned" : "Fri Feb 10 11:42:47 2017"
@@ -225,7 +225,7 @@
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10-0500",
 "value" : {
 "name" : "ConfigGroupWizToLatest_v0",
 "assigned" : "Fri Feb 10 11:43:32 2017"
@@ -233,7 +233,7 @@
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10-0500",
 "value" : {
 "name" : "lcls2Configuration_v7",
 "assigned" : "Tue Feb 14 11:30:48 2017"
@@ -241,7 +241,7 @@
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10-0500",
 "value" : {
 "name" : "lcls2Configuration_v8",
 "assigned" : "Tue Feb 14 11:44:20 2017"
@@ -249,7 +249,7 @@
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10-0500",
 "value" : {
 "name" : "lcls2Configuration_v9",
 "assigned" : "Tue Feb 14 11:52:24 2017"
@@ -257,7 +257,7 @@
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10-0500",
 "value" : {
 "name" : "lcls2Configuration_v10",
 "assigned" : "Tue Feb 14 11:57:20 2017"
@@ -265,7 +265,7 @@
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10-0500",
 "value" : {
 "name" : "lcls2Configuration_v11",
 "assigned" : "Tue Feb 14 12:01:58 2017"
@@ -273,14 +273,14 @@
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10-0500",
 "value" : {
 "name" : "lcls2Configuration_v12",
 "assigned" : "Tue Feb 14 12:13:42 2017"
 }
 }
 ],
-"created" : "Mon Feb  8 14:00:30 2016"
+"created" : "2017-07-18T12:48:10-0500"
 },
 "_id" : {
 "$oid" : "9fa2a66447494f4fac0e0f2f"
