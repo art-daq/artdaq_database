@@ -29,18 +29,18 @@
 "updates": [
 {
 "event" : "addAlias",
-"timestamp" : "2017-07-18T12:48:10-0500",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "alias01",
-"assigned" : "2017-07-18T12:48:10-0500"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "removeAlias",
-"timestamp" : "2017-07-18T12:48:10-0500",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "alias03",
-"assigned" : "2017-07-18T12:48:10-0500"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 }
 ]

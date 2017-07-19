@@ -17,20 +17,20 @@
 "active" : [
 {
 "name" : "alias012",
-"assigned" : "2017-07-18T12:48:10-0500",
+"assigned" : "2017-07-18T12:48:10.123-0500",
 "removed" : "Sat Jan 14 01:43:22 2017"
 },
 {
 "name" : "alias02",
-"assigned" : "2017-07-18T12:48:10-0500",
+"assigned" : "2017-07-18T12:48:10.123-0500",
 "removed" : "Sat Jan 14 01:43:22 2017"
 }
 ],
 "history" : [
 {
 "name" : "alias01",
-"assigned" : "2017-07-18T12:48:10-0500",
-"removed" : "2017-07-18T12:48:10-0500"
+"assigned" : "2017-07-18T12:48:10.123-0500",
+"removed" : "2017-07-18T12:48:10.123-0500"
 },
 {
 "name" : "alias0444",
@@ -46,18 +46,18 @@
 "updates" : [
 {
 "event" : "addAlias",
-"timestamp" : "2017-07-18T12:48:10-0500",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "alias01",
-"assigned" : "2017-07-18T12:48:10-0500"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "removeAlias",
-"timestamp" : "2017-07-18T12:48:10-0500",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "alias01",
-"assigned" : "2017-07-18T12:48:10-0500"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
@@ -84,11 +84,11 @@
 "entities" : [
 {
 "name" : "boardreader01",
-"assigned" : "2017-07-18T12:48:10-0500"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 },
 {
 "name" : "boardreader02",
-"assigned" : "2017-07-18T12:48:10-0500"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 ],
 "runs" : [
@@ -100,7 +100,7 @@
 "configurations" : [
 {
 "name" : "test",
-"assigned" : "2017-07-18T12:48:10-0500"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 ],
 "comments" : [

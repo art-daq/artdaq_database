@@ -1,3 +1,3 @@
 { "search":
-{"document":{"name":"artdaq","uri":"filesystemdb:///home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/databases/filesystemdb/test_db/","create_time":"Tue Dec 20 16:04:54 2016"},"_id": { "$oid":"b5e6c206beca4dd5ba8a832a"}}
+{"document":{"name":"artdaq","uri":"filesystemdb:///home/lukhanin/scratch/current/artdaq-demo-base/build_artdaq-utilities-database/databases/filesystemdb/test_db","locale":"en_US.UTF-8","create_time":"2017-07-18T20:39:43.412-0500","create_user":"lukhanin","uname":{"sysname":"Linux","nodename":"woof.fnal.gov","release":"3.10.0-514.16.1.el7.x86_64","version":"#1 SMP Wed Apr 12 07:10:20 CDT 2017","machine":"x86_64"},"database_format":3},"_id": { "$oid":"5b40d949f7354a6db35fb5c7"}}
 }

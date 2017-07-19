@@ -56,6 +56,7 @@ using std::chrono::system_clock;
 
 std::string filter_jsonstring(std::string const& str);
 std::string timestamp();
+std::string to_string(system_clock::time_point const& tp);
 system_clock::time_point to_timepoint(std::string const& strtime);
 
 bool useFakeTime(bool);

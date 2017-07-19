@@ -741,7 +741,7 @@
 },
 {
 "name" : "notprovided",
-"assigned" : "2017-07-18T12:48:10-0500"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 ],
 "configurations" : [
@@ -813,51 +813,51 @@
 },
 {
 "event" : "addAlias",
-"timestamp" : "2017-07-18T12:48:10-0500",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "@TEST_ALIAS_NAME@",
-"assigned" : "2017-07-18T12:48:10-0500",
-"removed" : "2017-07-18T12:48:10-0500"
+"assigned" : "2017-07-18T12:48:10.123-0500",
+"removed" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "2017-07-18T12:48:10-0500",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "notprovided",
-"assigned" : "2017-07-18T12:48:10-0500"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "setVersion",
-"timestamp" : "2017-07-18T12:48:10-0500",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "version004",
-"assigned" : "2017-07-18T12:48:10-0500"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "setCollection",
-"timestamp" : "2017-07-18T12:48:10-0500",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "artdaq_Aggregator",
-"assigned" : "2017-07-18T12:48:10-0500"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "addEntity",
-"timestamp" : "2017-07-18T12:48:10-0500",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "notprovided",
-"assigned" : "2017-07-18T12:48:10-0500"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "setCollection",
-"timestamp" : "2017-07-18T12:48:10-0500",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "artdaq_Aggregator",
-"assigned" : "2017-07-18T12:48:10-0500"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 }
 ],
@@ -871,8 +871,8 @@
 "active" : [
 {
 "name" : "@TEST_ALIAS_NAME@",
-"assigned" : "2017-07-18T12:48:10-0500",
-"removed" : "2017-07-18T12:48:10-0500"
+"assigned" : "2017-07-18T12:48:10.123-0500",
+"removed" : "2017-07-18T12:48:10.123-0500"
 }
 ],
 "history" : [
