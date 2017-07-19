@@ -77,6 +77,25 @@ std::chrono::system_clock::time_point db::to_timepoint(std::string const& strtim
                               apiliteral::timestamp_format + ">, timestamp=<" + strtime + ">");
 }
 
+std::string db::confirm_iso8601_timestamp(std::string const& strtime) {
+  confirm(!strtime.empty());
+  
+  if (strtime.empty())
+    throw std::invalid_argument("Failed calling confirm_iso8601_timestamp(): Invalid strtime; strtime is empty");
+
+  if (strtime.at(0) == '2') {
+    return strtime;
+  } else {
+    auto timeinfo = std::tm();
+    if (strptime(strtime.c_str(), apiliteral::timestamp_format_old, &timeinfo) != NULL) {
+      timeinfo.tm_isdst = -1;
+      return db::to_string(std::chrono::system_clock::from_time_t(std::mktime(&timeinfo)));
+    }
+    throw std::invalid_argument(std::string("Failed calling confirm_iso8601_timestamp(): format mismatch; format=<") +
+                                apiliteral::timestamp_format_old + ">, timestamp=<" + strtime + ">");
+  }
+}
+
 std::string db::unamejson() {
   struct utsname thisuname;
   if (uname(&thisuname) == -1) {
