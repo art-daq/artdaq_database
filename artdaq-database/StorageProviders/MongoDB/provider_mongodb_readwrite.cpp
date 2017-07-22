@@ -40,7 +40,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::readDocument(JsonData co
 
   TRACE_(3, "MongoDB::readDocument() query_payload=<" << filter_json << ">");
 
-  auto filter_bsondoc = bsoncxx::from_json(filter_json);
+  auto filter_bsondoc = compat::from_json(filter_json);
 
   auto size = collection.count(filter_bsondoc.view());
 
@@ -49,9 +49,9 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::readDocument(JsonData co
   auto cursor = collection.find(filter_bsondoc.view());
 
   for (auto& doc : cursor) {
-    TRACE_(3, "MongoDB::readDocument() found_document=<" << artdaq::database::mongo::to_json(doc) << ">");
+    TRACE_(3, "MongoDB::readDocument() found_document=<" << compat::to_json(doc) << ">");
 
-    returnCollection.emplace_back(artdaq::database::mongo::to_json(doc));
+    returnCollection.emplace_back(compat::to_json(doc));
   }
   return returnCollection;
 }
@@ -118,20 +118,20 @@ object_id_t StorageProvider<JsonData, MongoDB>::writeDocument(JsonData const& ar
   builder.setObjectID({id});
   builder.setCollection({to_json(jsonliteral::collection, collection_name)});
 
-  auto user_bsondoc = bsoncxx::from_json(builder.to_string());
+  auto user_bsondoc = compat::from_json(builder.to_string());
 
   auto collection = _provider->connection().collection(collection_name);
 
   auto filter_json = filter_document.to_string();
 
-  auto filter_bsondoc = bsoncxx::from_json(filter_json);
+  auto filter_bsondoc = compat::from_json(filter_json);
   
   if(!isNew && collection.count(filter_bsondoc.view())==0) isNew =true;
     
   if (isNew) {
     auto result = collection.insert_one(user_bsondoc.view());
 
-    oid = extract_oid(bsoncxx::to_json(result->inserted_id()));
+    oid = extract_oid(compat::to_json(result->inserted_id()));
 
     id = to_id(oid);
 

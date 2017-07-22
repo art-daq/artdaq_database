@@ -48,7 +48,7 @@ class MongoDB final {
 
  private:
   DBConfig _config;
-  mongocxx::instance _instance;
+  mongocxx::instance& _instance;
   mongocxx::client _client;
   mongocxx::database _connection;
 };

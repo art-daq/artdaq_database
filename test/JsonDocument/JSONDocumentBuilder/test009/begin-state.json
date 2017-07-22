@@ -8,7 +8,7 @@
 "format" : "json",
 "name" : "notprovided",
 "source" : "template",
-"created" : "Fri Jan 13 16:01:37 2017",
+"created" : "2017-07-18T12:48:10.123-0500",
 "rawdata" : [
 
 ]
@@ -42,7 +42,7 @@
 "bookkeeping" : {
 "isreadonly" : false,
 "isdeleted" : false,
-"created" : "Fri Jan 13 16:01:37 2017",
+"created" : "2017-07-18T12:48:10.123-0500",
 "updates" : [
 {
 "event" : "addAlias",
@@ -325,7 +325,7 @@ expected:
 "format" : "json",
 "name" : "notprovided",
 "source" : "template",
-"created" : "Fri Jan 13 16:01:37 2017",
+"created" : "2017-07-18T12:48:10.123-0500",
 "rawdata" : [
 
 ]
@@ -354,7 +354,7 @@ expected:
 "bookkeeping" : {
 "isreadonly" : false,
 "isdeleted" : false,
-"created" : "Fri Jan 13 16:01:37 2017",
+"created" : "2017-07-18T12:48:10.123-0500",
 "updates" : [
 {
 "event" : "addAlias",
