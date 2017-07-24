@@ -1,5 +1,3 @@
-include_directories("$ENV{MONGODB_INC}/libbson-1.0")
-
 cet_make(
   LIBRARIES
   artdaq-database_SharedCommon

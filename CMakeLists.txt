@@ -66,16 +66,16 @@ endif()
 include(NodeJSAddon)
 
 # MongoDB Libraries
-set(BSONCXXLIB bsoncxx)
-set(MONGOCXXLIB mongocxx)
-#find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_LIB} )
-#find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_LIB} )
+#set(BSONCXXLIB bsoncxx)
+#set(MONGOCXXLIB mongocxx)
+find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_LIB} )
+find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_LIB} )
 
 # testing
 add_subdirectory(test)
 
 # source
-add_subdirectory(mongo-cxx)
+#add_subdirectory(mongo-cxx)
 
 add_subdirectory(artdaq-database)
 
