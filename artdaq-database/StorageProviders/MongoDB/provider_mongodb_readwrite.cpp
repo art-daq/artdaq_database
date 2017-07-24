@@ -49,9 +49,9 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::readDocument(JsonData co
   auto cursor = collection.find(filter_bsondoc.view());
 
   for (auto& doc : cursor) {
-    TRACE_(3, "MongoDB::readDocument() found_document=<" << compat::to_json(doc) << ">");
+    TRACE_(3, "MongoDB::readDocument() found_document=<" << compat::to_json_unescaped(doc) << ">");
 
-    returnCollection.emplace_back(compat::to_json(doc));
+    returnCollection.emplace_back(compat::to_json_unescaped(doc));
   }
   return returnCollection;
 }

@@ -106,6 +106,7 @@ template <typename T>
 constexpr std::uint8_t static_cast_as_uint8_t(T const& t) {
   return static_cast<std::uint8_t>(t);
 }
+std::string replace_all(std::string const& , std::string const& , std::string const& );
 
 }  // namespace database
 }  // artdaq

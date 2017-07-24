@@ -578,7 +578,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listDatabases(JsonData c
 
     auto database_name = dequote(compat::to_json(string_value));
 
-    if (database_name == "local") continue;
+    if (database_name == "local" || database_name == "admin") continue;
 
     TRACE_(9, "MongoDB::listDatabases() found database_name=<" << database_name << ">");
 

@@ -79,7 +79,7 @@ std::chrono::system_clock::time_point db::to_timepoint(std::string const& strtim
 
 std::string db::confirm_iso8601_timestamp(std::string const& strtime) {
   confirm(!strtime.empty());
-  
+
   if (strtime.empty())
     throw std::invalid_argument("Failed calling confirm_iso8601_timestamp(): Invalid strtime; strtime is empty");
 
@@ -274,4 +274,22 @@ std::string db::to_upper(std::string const& c) {
   auto s = c;
   std::transform(s.begin(), s.end(), s.begin(), ::toupper);
   return s;
+}
+
+std::string db::replace_all(std::string const& source, std::string const& match, std::string const& replacement) {
+  auto retValue = std::string{};
+  auto match_len = match.size();
+  retValue.reserve(match_len);
+
+  std::size_t last, first = 0;
+
+  while (std::string::npos != (last = source.find(match, first))) {
+    retValue.append(source, first, last - first);
+    retValue.append(replacement);
+    first = last + match_len;
+  }
+
+  retValue.append(source, first, std::string::npos);
+  
+  return retValue;
 }
