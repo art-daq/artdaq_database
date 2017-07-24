@@ -27,7 +27,7 @@
 "source" : "template",
 "name" : "notprovided",
 "format" : "json",
-"created" : "Mon Feb  8 14:00:30 2016",
+"created" : "2017-07-18T12:48:10.123-0500",
 "rawdata" : [
 
 ]
@@ -36,13 +36,13 @@
 "entities" : [
 {
 "name" : "notprovided",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 ],
 "configurations" : [
 {
 "name" : "notprovided",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 ],
 "changelog" : "notprovided",
@@ -52,86 +52,86 @@
 "updates" : [
 {
 "event" : "addConfiguration",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "notprovided",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "setVersion",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "@TEST_VERSION_NAME@",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "setCollection",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "testManageDocuments",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "addEntity",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "notprovided",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "setCollection",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "testManageDocuments",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "notprovided",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "setVersion",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "@TEST_VERSION_NAME@",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "setCollection",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "testManageDocuments",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "addEntity",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "@TEST_ENTITY_NAME@",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "setCollection",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "testManageDocuments",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 }
 ],
-"created" : "Mon Feb  8 14:00:30 2016"
+"created" : "2017-07-18T12:48:10.123-0500"
 },
 "_id" : {
 "$oid" : "f28e659e7a8c4b1e8d98f999"

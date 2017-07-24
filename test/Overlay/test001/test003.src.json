@@ -13,7 +13,7 @@
 "format":"json",
 "name":"notprovided",
 "source":"template",
-"created":"Fri Jan 13 16:01:37 2017",
+"created":"2017-07-18T12:48:10.123-0500",
 "rawdata": [
 ]
 },
@@ -25,22 +25,22 @@
 "bookkeeping": {
 "isreadonly":false,
 "isdeleted":false,
-"created":"Fri Jan 13 16:01:37 2017",
+"created":"2017-07-18T12:48:10.123-0500",
 "updates": [
 {
 "event" : "addAlias",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "alias01",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "removeAlias",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "alias01",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 }
 ]

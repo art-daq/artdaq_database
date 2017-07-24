@@ -95,7 +95,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
   auto collectionDescriptors = _provider->connection().list_collections(filter.view_document());
 
   for (auto const& collectionDescriptor : collectionDescriptors) {
-    TRACE_(4, "MongoDB::findConfigurations() found collection=<" << bsoncxx::to_json(collectionDescriptor) << ">");
+    TRACE_(4, "MongoDB::findConfigurations() found collection=<" << compat::to_json(collectionDescriptor) << ">");
 
     auto element_name = collectionDescriptor.find(jsonliteral::name);
 
@@ -104,7 +104,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
 
     auto string_value = element_name->get_value();
 
-    auto collection_name = dequote(bsoncxx::to_json(string_value));
+    auto collection_name = dequote(compat::to_json(string_value));
 
     if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
 
@@ -115,7 +115,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
     mongocxx::pipeline stages;
 
     auto match_stage = bsoncxx::builder::core(false);
-    auto bson_document = bsoncxx::from_json(regex_search.json_buffer);
+    auto bson_document = compat::from_json(regex_search.json_buffer);
     match_stage.concatenate(bson_document.view());
 
     bbs::document project_stage;
@@ -138,12 +138,12 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
         .group(group_stage.view())
         .sort(sort_stage.view());
 
-    TRACE_(4, "MongoDB::findConfigurations() query_payload =<" << bsoncxx::to_json(stages.view()) << ">");
+    TRACE_(4, "MongoDB::findConfigurations() query_payload =<" << compat::to_json(stages.view_array()) << ">");
 
     auto cursor = collection.aggregate(stages);
 
     for (auto const& view : cursor) {
-      TRACE_(4, "MongoDB::findConfigurations() looping over cursor =<" << bsoncxx::to_json(view) << ">");
+      TRACE_(4, "MongoDB::findConfigurations() looping over cursor =<" << compat::to_json(view) << ">");
 
       auto tmp_element_id = view.find(jsonliteral::id);
 
@@ -165,10 +165,10 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
         throw runtime_error("MongoDB") << "MongoDB returned invalid database search, \"_id.assigned\" is missing.";
 
       for (auto const& tmp_config_name : tmp_config_names->get_array().value) {
-        auto name = bsoncxx::to_json(tmp_config_name.get_value());
+        auto name = compat::to_json(tmp_config_name.get_value());
 
         for (auto const& config_assigned : tmp_config_assigned->get_array().value) {
-          auto assigned = db::dequote(bsoncxx::to_json(config_assigned.get_value()));
+          auto assigned = db::dequote(compat::to_json(config_assigned.get_value()));
 
           config_timestamps[name].insert(
               std::chrono::duration_cast<std::chrono::seconds>(db::to_timepoint(assigned).time_since_epoch()).count());
@@ -217,7 +217,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
   auto collectionDescriptors = _provider->connection().list_collections(filter.view_document());
 
   for (auto const& collectionDescriptor : collectionDescriptors) {
-    TRACE_(5, "MongoDB::configurationComposition() found collection=<" << bsoncxx::to_json(collectionDescriptor)
+    TRACE_(5, "MongoDB::configurationComposition() found collection=<" << compat::to_json(collectionDescriptor)
                                                                        << ">");
 
     // auto view = collectionDescriptor.view();
@@ -228,14 +228,14 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
 
     auto string_value = element_name->get_value();
 
-    auto collection_name = dequote(bsoncxx::to_json(string_value));
+    auto collection_name = dequote(compat::to_json(string_value));
 
     if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
 
     TRACE_(5, "MongoDB::configurationComposition() querying collection_name=<" << collection_name << ">");
 
     auto collection = _provider->connection().collection(collection_name);
-    auto bson_document = bsoncxx::from_json(search.json_buffer);
+    auto bson_document = compat::from_json(search.json_buffer);
 
     auto extract_value = [&bson_document](auto const& name) {
       auto view = bson_document.view();
@@ -247,7 +247,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
       return element->get_value();
     };
 
-    auto configuration_name_expected = bsoncxx::to_json(extract_value(apiliteral::filter::configurations));
+    auto configuration_name_expected = compat::to_json(extract_value(apiliteral::filter::configurations));
     TRACE_(5, "MongoDB::configurationComposition()  configuration_name_expected=<" << configuration_name_expected
                                                                                    << ">");
 
@@ -267,12 +267,12 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
 
     stages.match(match_stage.view_document()).project(project_stage.view());  //.sort(sort_stage.view());
 
-    TRACE_(5, "MongoDB::configurationComposition()  query_payload=<" << bsoncxx::to_json(stages.view()) << ">");
+    TRACE_(5, "MongoDB::configurationComposition()  query_payload=<" << compat::to_json(stages.view_array()) << ">");
 
     auto cursor = collection.aggregate(stages);
 
     for (auto const& view : cursor) {
-      TRACE_(5, "MongoDB::configurationComposition()  value=<" << bsoncxx::to_json(view) << ">");
+      TRACE_(5, "MongoDB::configurationComposition()  value=<" << compat::to_json(view) << ">");
 
       auto configurations_value = view.find("configurations");
       auto entities_value = view.find("entities");
@@ -285,8 +285,8 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
 
       for (auto const& configuration : configurations.value) {
         for (auto const& entity : entities.value) {
-          auto configuration_name = bsoncxx::to_json(configuration.get_value());
-          auto entity_name = bsoncxx::to_json(entity.get_value());
+          auto configuration_name = compat::to_json(configuration.get_value());
+          auto entity_name = compat::to_json(entity.get_value());
 
           if (configuration_name != configuration_name_expected) continue;
 
@@ -326,7 +326,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
   TRACE_(7, "MongoDB::findVersions() begin");
   TRACE_(7, "MongoDB::findVersions() args data=<" << query_payload << ">");
 
-  auto bson_document = bsoncxx::from_json(query_payload.json_buffer);
+  auto bson_document = compat::from_json(query_payload.json_buffer);
 
   auto extract_value = [&bson_document](auto const& name) {
     auto view = bson_document.view();
@@ -338,11 +338,11 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
     return element->get_value();
   };
 
-  auto collection_name = dequote(bsoncxx::to_json(extract_value(apiliteral::option::collection)));
+  auto collection_name = dequote(compat::to_json(extract_value(apiliteral::option::collection)));
 
   auto collection = _provider->connection().collection(collection_name);
 
-  auto search = JsonData{bsoncxx::to_json(extract_value(apiliteral::option::searchfilter))};
+  auto search = JsonData{compat::to_json(extract_value(apiliteral::option::searchfilter))};
 
   auto fields = std::vector<std::string>{};
   fields.emplace_back(apiliteral::filter::entities);
@@ -352,7 +352,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
   mongocxx::pipeline stages;
   bbs::document project_stage;
   auto match_stage = bsoncxx::builder::core(false);
-  auto bson_search = bsoncxx::from_json(regex_search.json_buffer);
+  auto bson_search = compat::from_json(regex_search.json_buffer);
   match_stage.concatenate(bson_search.view());
 
   project_stage << "_id" << 0 << "version"
@@ -362,18 +362,18 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
 
   stages.match(match_stage.view_document()).project(project_stage.view());
 
-  TRACE_(5, "MongoDB::findVersions()  query_payload=<" << bsoncxx::to_json(stages.view()) << ">");
+  TRACE_(5, "MongoDB::findVersions()  query_payload=<" << compat::to_json(stages.view_array()) << ">");
 
   auto cursor = collection.aggregate(stages);
 
   for (auto const& view : cursor) {
     auto version = view.find("version");
-    auto version_name = bsoncxx::to_json(version->get_value());
+    auto version_name = compat::to_json(version->get_value());
 
     auto entities = view.find("entities")->get_array();
 
     for (auto const& entity : entities.value) {
-      auto entity_name = bsoncxx::to_json(entity.get_value());
+      auto entity_name = compat::to_json(entity.get_value());
 
       std::ostringstream oss;
       oss << "{";
@@ -405,7 +405,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
   TRACE_(9, "MongoDB::findEntities() begin");
   TRACE_(9, "MongoDB::findEntities() args data=<" << search << ">");
 
-  auto bson_document = bsoncxx::from_json(search.json_buffer);
+  auto bson_document = compat::from_json(search.json_buffer);
 
   auto extract_value = [&bson_document](auto const& name) {
     auto view = bson_document.view();
@@ -424,7 +424,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
   auto collectionDescriptors = _provider->connection().list_collections(filter.view_document());
 
   for (auto const& collectionDescriptor : collectionDescriptors) {
-    TRACE_(9, "MongoDB::findEntities() found collection=<" << bsoncxx::to_json(collectionDescriptor) << ">");
+    TRACE_(9, "MongoDB::findEntities() found collection=<" << compat::to_json(collectionDescriptor) << ">");
 
     auto element_name = collectionDescriptor.find(jsonliteral::name);
 
@@ -433,14 +433,14 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
 
     auto string_value = element_name->get_value();
 
-    auto collection_name = dequote(bsoncxx::to_json(string_value));
+    auto collection_name = dequote(compat::to_json(string_value));
 
     if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
 
     TRACE_(9, "MongoDB::findEntities() querying collection_name=<" << collection_name << ">");
 
     auto collection = _provider->connection().collection(collection_name);
-    auto bson_document = bsoncxx::from_json(search.json_buffer);
+    auto bson_document = compat::from_json(search.json_buffer);
 
     mongocxx::pipeline stages;
     bbs::document project_stage;
@@ -453,7 +453,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
 
     stages.match(match_stage.view_document()).project(project_stage.view());
 
-    TRACE_(9, "MongoDB::findEntities()  query_payload=<" << bsoncxx::to_json(stages.view()) << ">");
+    TRACE_(9, "MongoDB::findEntities()  query_payload=<" << compat::to_json(stages.view_array()) << ">");
     auto cursor = collection.aggregate(stages);
 
     auto seenValues = std::list<std::string>{};
@@ -467,12 +467,12 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
     };
 
     for (auto const& view : cursor) {
-      TRACE_(9, "MongoDB::findEntities()  value=<" << bsoncxx::to_json(view) << ">");
+      TRACE_(9, "MongoDB::findEntities()  value=<" << compat::to_json(view) << ">");
 
       auto entities = view.find("entities")->get_array();
 
       for (auto const& entity : entities.value) {
-        auto entity_name = bsoncxx::to_json(entity.get_value());
+        auto entity_name = compat::to_json(entity.get_value());
 
         if (!isNew(entity_name)) continue;
 
@@ -524,7 +524,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listCollections(JsonData
   auto collectionDescriptors = _provider->connection().list_collections(filter.view_document());
 
   for (auto const& collectionDescriptor : collectionDescriptors) {
-    TRACE_(9, "MongoDB::listCollections() found collection=<" << bsoncxx::to_json(collectionDescriptor) << ">");
+    TRACE_(9, "MongoDB::listCollections() found collection=<" << compat::to_json(collectionDescriptor) << ">");
 
     auto element_name = collectionDescriptor.find(jsonliteral::name);
 
@@ -533,7 +533,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listCollections(JsonData
 
     auto string_value = element_name->get_value();
 
-    auto collection_name = dequote(bsoncxx::to_json(string_value));
+    auto collection_name = dequote(compat::to_json(string_value));
 
     if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
 
@@ -567,7 +567,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listDatabases(JsonData c
   mongocxx::cursor databaseDescriptors = _provider->list_databases();
 
   for (auto const& databaseDescriptor : databaseDescriptors) {
-    TRACE_(9, "MongoDB::listDatabases() found databases=<" << bsoncxx::to_json(databaseDescriptor) << ">");
+    TRACE_(9, "MongoDB::listDatabases() found databases=<" << compat::to_json(databaseDescriptor) << ">");
 
     auto element_name = databaseDescriptor.find(jsonliteral::name);
 
@@ -576,9 +576,9 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listDatabases(JsonData c
 
     auto string_value = element_name->get_value();
 
-    auto database_name = dequote(bsoncxx::to_json(string_value));
+    auto database_name = dequote(compat::to_json(string_value));
 
-    if (database_name == "local") continue;
+    if (database_name == "local" || database_name == "admin") continue;
 
     TRACE_(9, "MongoDB::listDatabases() found database_name=<" << database_name << ">");
 

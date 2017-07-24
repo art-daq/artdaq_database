@@ -67,63 +67,63 @@
 "configurations" : [
 {
 "name" : "notprovided",
-"assigned" : "Mon Feb  6 18:45:30 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 },
 {
 "name" : "lcls2Configuration_v0",
-"assigned" : "Mon Feb  6 18:45:31 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 },
 {
 "name" : "lcls2Configuration_v1",
-"assigned" : "Tue Feb  7 10:34:06 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 },
 {
 "name" : "lcls2Configuration_v2",
-"assigned" : "Tue Feb  7 10:36:00 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 },
 {
 "name" : "lcls2Configuration_v3",
-"assigned" : "Tue Feb  7 10:38:14 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 },
 {
 "name" : "lcls2Configuration_v4",
-"assigned" : "Tue Feb  7 10:55:45 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 },
 {
 "name" : "lcls2Configuration_v5",
-"assigned" : "Tue Feb  7 10:58:30 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 },
 {
 "name" : "lcls2Configuration_v6",
-"assigned" : "Fri Feb 10 11:42:47 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 },
 {
 "name" : "ConfigGroupWizToLatest_v0",
-"assigned" : "Fri Feb 10 11:43:32 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 },
 {
 "name" : "lcls2Configuration_v7",
-"assigned" : "Tue Feb 14 11:30:48 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 },
 {
 "name" : "lcls2Configuration_v8",
-"assigned" : "Tue Feb 14 11:44:20 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 },
 {
 "name" : "lcls2Configuration_v9",
-"assigned" : "Tue Feb 14 11:52:24 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 },
 {
 "name" : "lcls2Configuration_v10",
-"assigned" : "Tue Feb 14 11:57:20 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 },
 {
 "name" : "lcls2Configuration_v11",
-"assigned" : "Tue Feb 14 12:01:58 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 },
 {
 "name" : "lcls2Configuration_v12",
-"assigned" : "Tue Feb 14 12:13:42 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 ],
 "aliases" : {
@@ -138,58 +138,58 @@
 "bookkeeping" : {
 "isdeleted" : false,
 "isreadonly" : true,
-"created" : "Tue Dec 29 18:19:25 2015",
+"created" : "2017-07-18T12:48:10.123-0500",
 "updates" : [
 {
-"addToGlobalConfig" : "Mon Feb  6 18:45:30 2017"
+"addToGlobalConfig" : "2017-07-18T12:48:10.123-0500"
 },
 {
-"setVersion" : "Mon Feb  6 18:45:30 2017"
+"setVersion" : "2017-07-18T12:48:10.123-0500"
 },
 {
-"setConfigurableEntity" : "Mon Feb  6 18:45:30 2017"
+"setConfigurableEntity" : "2017-07-18T12:48:10.123-0500"
 },
 {
-"addToGlobalConfig" : "Mon Feb  6 18:45:31 2017"
+"addToGlobalConfig" : "2017-07-18T12:48:10.123-0500"
 },
 {
-"addToGlobalConfig" : "Tue Feb  7 10:34:06 2017"
+"addToGlobalConfig" : "2017-07-18T12:48:10.123-0500"
 },
 {
-"addToGlobalConfig" : "Tue Feb  7 10:36:00 2017"
+"addToGlobalConfig" : "2017-07-18T12:48:10.123-0500"
 },
 {
-"addToGlobalConfig" : "Tue Feb  7 10:38:14 2017"
+"addToGlobalConfig" : "2017-07-18T12:48:10.123-0500"
 },
 {
-"addToGlobalConfig" : "Tue Feb  7 10:55:45 2017"
+"addToGlobalConfig" : "2017-07-18T12:48:10.123-0500"
 },
 {
-"addToGlobalConfig" : "Tue Feb  7 10:58:30 2017"
+"addToGlobalConfig" : "2017-07-18T12:48:10.123-0500"
 },
 {
-"addToGlobalConfig" : "Fri Feb 10 11:42:47 2017"
+"addToGlobalConfig" : "2017-07-18T12:48:10.123-0500"
 },
 {
-"addToGlobalConfig" : "Fri Feb 10 11:43:32 2017"
+"addToGlobalConfig" : "2017-07-18T12:48:10.123-0500"
 },
 {
-"addToGlobalConfig" : "Tue Feb 14 11:30:48 2017"
+"addToGlobalConfig" : "2017-07-18T12:48:10.123-0500"
 },
 {
-"addToGlobalConfig" : "Tue Feb 14 11:44:20 2017"
+"addToGlobalConfig" : "2017-07-18T12:48:10.123-0500"
 },
 {
-"addToGlobalConfig" : "Tue Feb 14 11:52:24 2017"
+"addToGlobalConfig" : "2017-07-18T12:48:10.123-0500"
 },
 {
-"addToGlobalConfig" : "Tue Feb 14 11:57:20 2017"
+"addToGlobalConfig" : "2017-07-18T12:48:10.123-0500"
 },
 {
-"addToGlobalConfig" : "Tue Feb 14 12:01:58 2017"
+"addToGlobalConfig" : "2017-07-18T12:48:10.123-0500"
 },
 {
-"addToGlobalConfig" : "Tue Feb 14 12:13:42 2017"
+"addToGlobalConfig" : "2017-07-18T12:48:10.123-0500"
 }
 ]
 },

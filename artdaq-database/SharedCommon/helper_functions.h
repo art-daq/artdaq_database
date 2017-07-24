@@ -56,7 +56,9 @@ using std::chrono::system_clock;
 
 std::string filter_jsonstring(std::string const& str);
 std::string timestamp();
+std::string to_string(system_clock::time_point const& tp);
 system_clock::time_point to_timepoint(std::string const& strtime);
+std::string confirm_iso8601_timestamp(std::string const& strtime);
 
 bool useFakeTime(bool);
 std::string quoted_(std::string const& /*text*/);
@@ -104,6 +106,7 @@ template <typename T>
 constexpr std::uint8_t static_cast_as_uint8_t(T const& t) {
   return static_cast<std::uint8_t>(t);
 }
+std::string replace_all(std::string const& , std::string const& , std::string const& );
 
 }  // namespace database
 }  // artdaq

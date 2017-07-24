@@ -45,6 +45,11 @@ using artdaq::database::mongo::DBConfig;
 using artdaq::database::mongo::MongoDB;
 using artdaq::database::basictypes::JsonData;
 
+mongocxx::instance& getInstance(){ 
+  static mongocxx::instance _instance{};
+  return _instance;  
+}
+
 DBConfig::DBConfig()
     : uri{std::string{literal::MONGOURI} + literal::hostname + ":" + std::to_string(literal::port) + "/" +
           literal::db_name} {
@@ -60,9 +65,10 @@ DBConfig::DBConfig(std::string uri_) : uri{uri_} { confirm(!uri_.empty()); }
 
 MongoDB::MongoDB(DBConfig const& config, PassKeyIdiom const&)
     : _config{config},
-      _instance{},
+      _instance{getInstance()},
       _client{mongocxx::uri{_config.connectionURI()}},
-      _connection{_client[_client.uri().database()]} {}
+      _connection{_client[_client.uri().database()]} {
+      }
 
 mongocxx::cursor MongoDB::list_databases() {
   connection();
@@ -77,12 +83,12 @@ mongocxx::database& MongoDB::connection() {
 
   if (collection.count(filter.view_document()) > 0) return _connection;
 
-  auto bson_document = bsoncxx::from_json(
+  auto bson_document = compat::from_json(
       "{" + make_database_metadata("artdaq", expand_environment_variables(_config.connectionURI())) + "}");
 
   auto result = collection.insert_one(bson_document.view());
 
-  auto object_id = object_id_t(bsoncxx::to_json(result->inserted_id()));
+  auto object_id = object_id_t(compat::to_json(result->inserted_id()));
 
   TRACE_(5, "StorageProvider::MongoDB::connection created metadata record id=" << object_id);
 
