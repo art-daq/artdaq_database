@@ -483,9 +483,13 @@ result_t json::import_collection(std::string const& query_payload) noexcept {
     auto document_list = std::list<JsonData>{};
 
     for (auto const& file_name : list_files(tmp_dir_name)) {
-      document_list.emplace_back("");
-      if (!db::read_buffer_from_file(document_list.back().json_buffer, file_name))
+     
+      auto buffer=std::string();
+
+      if (!db::read_buffer_from_file(buffer, file_name))
         oss << "Failed to import " << file_name << "\n";
+      
+      document_list.emplace_back(JSONDocumentBuilder(buffer).to_string());
     }
 
     db::delete_temp_dir(tmp_dir_name);

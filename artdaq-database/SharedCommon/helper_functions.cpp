@@ -40,9 +40,16 @@ void db::set_default_locale() { std::setlocale(LC_ALL, apiliteral::database_form
 
 std::string db::timestamp() {
   auto now = std::chrono::system_clock::now();
-  std::time_t time = std::chrono::system_clock::to_time_t(now);
-  char buff[100];
+  return db::to_string(now);
+}
+
+std::string db::to_string(std::chrono::system_clock::time_point const& tp) {
+  std::time_t time = std::chrono::system_clock::to_time_t(tp);
+  char buff[40];
   std::strftime(buff, sizeof(buff), apiliteral::timestamp_format, std::localtime(&time));
+  auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch()).count() % 1000;
+  snprintf(buff + 30, 4, "%03ld", milliseconds);
+  strncpy(buff + 20, buff + 30, 3);
 
   if (useFakeTime()) return apiliteral::timestamp_faketime;
 
@@ -51,16 +58,42 @@ std::string db::timestamp() {
 
 std::chrono::system_clock::time_point db::to_timepoint(std::string const& strtime) {
   confirm(!strtime.empty());
-
   if (strtime.empty()) throw std::invalid_argument("Failed calling to_timepoint(): Invalid strtime; strtime is empty");
 
   auto timeinfo = std::tm();
+  auto milliseconds = std::chrono::milliseconds(atoi(strtime.substr(20, 3).c_str()));
 
-  if (strptime(strtime.c_str(), apiliteral::timestamp_format, &timeinfo) != NULL)
-    return std::chrono::system_clock::from_time_t(std::mktime(&timeinfo));
+  auto tmptime = strtime;
+  tmptime.at(20) = '0';
+  tmptime.at(21) = '0';
+  tmptime.at(22) = '0';
+
+  if (strptime(tmptime.c_str(), apiliteral::timestamp_format, &timeinfo) != NULL) {
+    timeinfo.tm_isdst = -1;
+    return std::chrono::system_clock::from_time_t(std::mktime(&timeinfo)) + milliseconds;
+  }
 
   throw std::invalid_argument(std::string("Failed calling to_timepoint(): format mismatch; format=<") +
                               apiliteral::timestamp_format + ">, timestamp=<" + strtime + ">");
+}
+
+std::string db::confirm_iso8601_timestamp(std::string const& strtime) {
+  confirm(!strtime.empty());
+
+  if (strtime.empty())
+    throw std::invalid_argument("Failed calling confirm_iso8601_timestamp(): Invalid strtime; strtime is empty");
+
+  if (strtime.at(0) == '2') {
+    return strtime;
+  } else {
+    auto timeinfo = std::tm();
+    if (strptime(strtime.c_str(), apiliteral::timestamp_format_old, &timeinfo) != NULL) {
+      timeinfo.tm_isdst = -1;
+      return db::to_string(std::chrono::system_clock::from_time_t(std::mktime(&timeinfo)));
+    }
+    throw std::invalid_argument(std::string("Failed calling confirm_iso8601_timestamp(): format mismatch; format=<") +
+                                apiliteral::timestamp_format_old + ">, timestamp=<" + strtime + ">");
+  }
 }
 
 std::string db::unamejson() {
@@ -241,4 +274,22 @@ std::string db::to_upper(std::string const& c) {
   auto s = c;
   std::transform(s.begin(), s.end(), s.begin(), ::toupper);
   return s;
+}
+
+std::string db::replace_all(std::string const& source, std::string const& match, std::string const& replacement) {
+  auto retValue = std::string{};
+  auto match_len = match.size();
+  retValue.reserve(match_len);
+
+  std::size_t last, first = 0;
+
+  while (std::string::npos != (last = source.find(match, first))) {
+    retValue.append(source, first, last - first);
+    retValue.append(replacement);
+    first = last + match_len;
+  }
+
+  retValue.append(source, first, std::string::npos);
+  
+  return retValue;
 }

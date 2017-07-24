@@ -1,12 +1,22 @@
 { "search":
 {
     "_id" : {
-        "$oid" : "5859b2581a72ba61c1632371"
+        "$oid" : "596eb85f5ea04636af002bc1"
     }, 
     "document" : {
         "name" : "artdaq", 
-        "uri" : "mongodb://127.0.0.1:27017/test_db/", 
-        "create_time" : "Tue Dec 20 16:36:08 2016"
+        "uri" : "mongodb://127.0.0.1:27017/test_db", 
+        "locale" : "en_US.UTF-8", 
+        "create_time" : "2017-07-18T20:39:43.538-0500", 
+        "create_user" : "lukhanin", 
+        "uname" : {
+            "sysname" : "Linux", 
+            "nodename" : "woof.fnal.gov", 
+            "release" : "3.10.0-514.16.1.el7.x86_64", 
+            "version" : "#1 SMP Wed Apr 12 07:10:20 CDT 2017", 
+            "machine" : "x86_64"
+        }, 
+        "database_format" : 3
     }
 }
 }

@@ -8,7 +8,8 @@ using namespace artdaq::database::result;
 using result_t = artdaq::database::result_t;
 using artdaq::database::sharedtypes::unwrap;
 
-ovlTimeStamp::ovlTimeStamp(object_t::key_type const& key, value_t& ts) : ovlKeyValue(key, ts) {}
+ovlTimeStamp::ovlTimeStamp(object_t::key_type const& key, value_t& ts)
+    : ovlKeyValue(key, (ts=confirm_iso8601_timestamp(unwrap(ts).value_as<std::string>()),ts)) {}
 
 std::string& ovlTimeStamp::timestamp() { return string_value(); }
 

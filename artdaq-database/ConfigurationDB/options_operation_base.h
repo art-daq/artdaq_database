@@ -25,6 +25,8 @@ namespace apiliteral = artdaq::database::configapi::literal;
 class OperationBase {
  public:
   OperationBase(std::string const& process_name);
+  virtual ~OperationBase();
+
   std::string const& operation() const;
   std::string const& operation(std::string const&);
 
@@ -58,7 +60,6 @@ class OperationBase {
   virtual void readJsonData(JsonData const&);
 
   virtual JsonData writeJsonData() const;
-
  private:
   std::string _getProviderFromURI();
 

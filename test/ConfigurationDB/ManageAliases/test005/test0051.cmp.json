@@ -406,7 +406,7 @@
 },
 {
 "name" : "notprovided",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 ],
 "configurations" : [
@@ -462,100 +462,100 @@
 },
 {
 "event" : "addAlias",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "@TEST_ALIAS_NAME@",
-"assigned" : "Mon Feb  8 14:00:30 2016",
-"removed" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500",
+"removed" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "notprovided",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "setVersion",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "version001",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "setCollection",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "artdaq_Aggregator",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "addEntity",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "notprovided",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "setCollection",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "artdaq_Aggregator",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "removeAlias",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "@TEST_ALIAS_NAME@",
-"assigned" : "Mon Feb  8 14:00:30 2016",
-"removed" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500",
+"removed" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "notprovided",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "setVersion",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "version001",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "setCollection",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "artdaq_Aggregator",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "addEntity",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "notprovided",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "setCollection",
-"timestamp" : "Mon Feb  8 14:00:30 2016",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "artdaq_Aggregator",
-"assigned" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 }
 ],
@@ -569,8 +569,8 @@
 "history" : [
 {
 "name" : "@TEST_ALIAS_NAME@",
-"assigned" : "Mon Feb  8 14:00:30 2016",
-"removed" : "Mon Feb  8 14:00:30 2016"
+"assigned" : "2017-07-18T12:48:10.123-0500",
+"removed" : "2017-07-18T12:48:10.123-0500"
 }
 ]
 },
