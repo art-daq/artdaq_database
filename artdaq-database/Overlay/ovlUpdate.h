@@ -4,12 +4,16 @@
 #include "artdaq-database/Overlay/common.h"
 #include "artdaq-database/Overlay/ovlKeyValue.h"
 #include "artdaq-database/Overlay/ovlTimeStamp.h"
+#include "artdaq-database/Overlay/ovlKeyValueTimeStamp.h"
 
 namespace artdaq {
 namespace database {
 namespace overlay {
 namespace jsonliteral = artdaq::database::dataformats::literal;
 using namespace artdaq::database::result;
+
+using ovlUpdateEntry = ovlKeyValueTimeStamp<DOCUMENT_COMPARE_MUTE_UPDATE_VALUES>;
+using ovlUpdateEntryUPtr_t = std::unique_ptr<ovlUpdateEntry>;
 
 class ovlUpdate final : public ovlKeyValue {
  public:
@@ -25,8 +29,8 @@ class ovlUpdate final : public ovlKeyValue {
   std::string& timestamp();
   std::string const& timestamp() const;
 
-  ovlKeyValue& what();
-  ovlKeyValue const& what() const;
+  ovlUpdateEntry& what();
+  ovlUpdateEntry const& what() const;
 
   // overrides
   std::string to_string() const override;
@@ -35,12 +39,12 @@ class ovlUpdate final : public ovlKeyValue {
   result_t operator==(ovlUpdate const&) const;
 
  private:
-  ovlKeyValue map_what(value_t& /*value*/);
+  ovlUpdateEntry map_what(value_t& /*value*/);
   ovlTimeStamp map_timestamp(value_t& /*value*/);
 
  private:
   ovlTimeStamp _timestamp;
-  ovlKeyValue _what;
+  ovlUpdateEntry _what;
 };
 
 using ovlUpdateUPtr_t = std::unique_ptr<ovlUpdate>;

@@ -64,6 +64,9 @@ using ovlRunsUPtr_t = std::unique_ptr<ovlRuns>;
 using ovlComments = ovlFixedList<ovlComment, DOCUMENT_COMPARE_MUTE_COMMENTS>;
 using ovlCommentsUPtr_t = std::unique_ptr<ovlComments>;
 
+using ovlUpdateEntry = ovlKeyValueTimeStamp<DOCUMENT_COMPARE_MUTE_UPDATE_VALUES>;
+using ovlUpdateEntryUPtr_t = std::unique_ptr<ovlUpdateEntry>;
+
 class ovlDatabaseRecord final : public ovlKeyValue {
  public:
   ovlDatabaseRecord(value_t& record);

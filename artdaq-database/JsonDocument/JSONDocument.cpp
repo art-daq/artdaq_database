@@ -316,7 +316,7 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) try {
 
   TRACE_(3, "deleteChild() deleted child value=" << print_visitor(deleted_value));
   TRACE_(3, "deleteChild() resultDocument=<" << cached_json_buffer() << ">");
-  TRACE_(3, "deleteChild() Insert succeeded.");
+  TRACE_(3, "deleteChild() Delete succeeded.");
   //    if (path == "_id") std::replace(return_json.begin(), return_json.end(), '$', '_');
 
   return JSONDocument(deleted_value);

@@ -5,6 +5,8 @@
 #endif
 #define TRACE_NAME "MongoDB:RDWRT_C"
 
+#include <mongocxx/options/update.hpp>
+
 namespace artdaq {
 namespace database {
 
@@ -78,13 +80,17 @@ object_id_t StorageProvider<JsonData, MongoDB>::writeDocument(JsonData const& ar
   try {
     collection_name = user_document.findChild(jsonliteral::collection).value();
   } catch (...) {
-    TRACE_(4, "MongoDB::writeDocument() User document must have the collection element.");
+    TRACE_(4,
+           "MongoDB::writeDocument() User document must have the collection "
+           "element.");
   }
 
   if (collection_name.empty()) try {
       collection_name = filter_document.findChild(jsonliteral::collection).value();
     } catch (...) {
-      TRACE_(4, "MongoDB::writeDocument() Filter should have the collection element.");
+      TRACE_(4,
+             "MongoDB::writeDocument() Filter should have the collection "
+             "element.");
     }
 
   if (collection_name.empty()) collection_name = arg_document.findChild(jsonliteral::collection).value();
@@ -118,38 +124,48 @@ object_id_t StorageProvider<JsonData, MongoDB>::writeDocument(JsonData const& ar
   builder.setObjectID({id});
   builder.setCollection({to_json(jsonliteral::collection, collection_name)});
 
-  auto user_bsondoc = compat::from_json(builder.to_string());
-
   auto collection = _provider->connection().collection(collection_name);
 
   auto filter_json = filter_document.to_string();
 
   auto filter_bsondoc = compat::from_json(filter_json);
-  
-  if(!isNew && collection.count(filter_bsondoc.view())==0) isNew =true;
-    
+
+  auto found = collection.count(filter_bsondoc.view());
+
+  if (!isNew && found == 0) isNew = true;
+
   if (isNew) {
+    auto user_bsondoc = compat::from_json(builder.to_string());
     auto result = collection.insert_one(user_bsondoc.view());
-
     oid = extract_oid(compat::to_json(result->inserted_id()));
-
     id = to_id(oid);
-
     TRACE_(4, "MongoDB::writeDocument() Inserted _id=<" << id << ">");
 
     return id;
   }
 
-  auto size = collection.count(filter_bsondoc.view());
-  TRACE_(4, "MongoDB::writeDocument() Found " << size << " document(s).");
+  TRACE_(4, "MongoDB::writeDocument() Found " << found << " document(s).");
 
-  if (size > 1)
+  if (found > 1)
     throw runtime_error("MongoDB") << "MongoDB failed inserting data, search filter is too wide; filter= <"
-                                   << filter_json << ">, returned count=" << size << ".";
+                                   << filter_json << ">, returned count=" << found << ".";
+  {
+    auto user_doc = builder.extract();
+    user_doc.deleteChild(jsonliteral::id);
+    auto user_bsondoc = compat::from_json(user_doc.to_string());
+    auto result = collection.insert_one(user_bsondoc.view());
+    oid = extract_oid(compat::to_json(result->inserted_id()));
+    id = to_id(oid);
 
-  auto result = collection.replace_one(filter_bsondoc.view(), user_bsondoc.view());
+    TRACE_(4, "MongoDB::writeDocument() Inserted _id=<" << id << ">");
+  }
 
-  TRACE_(4, "MongoDB::writeDocument() Modified " << result->modified_count() << " document(s).");
+  TRACE_(4, "MongoDB::writeDocument() Deleting documents matching filter=<" << compat::to_json(filter_bsondoc.view())
+                                                                            << ">");
+
+  auto result = collection.delete_one(filter_bsondoc.view());
+
+  TRACE_(4, "MongoDB::writeDocument() Deleted " << result->deleted_count() << " document(s).");
 
   return id;
 }

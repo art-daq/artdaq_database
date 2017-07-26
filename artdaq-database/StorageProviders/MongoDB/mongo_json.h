@@ -14,7 +14,6 @@ inline bsoncxx::document::value from_json(std::string json) { return bsoncxx::fr
 std::string to_json(bsoncxx::types::value value);
 std::string to_json_unescaped(bsoncxx::types::value value);
 std::string to_json_unescaped(bsoncxx::document::view view);
-
 }
 }  // namespace mongo
 }  // namespace database

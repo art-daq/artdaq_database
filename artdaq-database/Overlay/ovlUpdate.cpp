@@ -20,9 +20,9 @@ std::string& ovlUpdate::timestamp() { return _timestamp.timestamp(); }
 
 std::string const& ovlUpdate::timestamp() const { return _timestamp.timestamp(); }
 
-ovlKeyValue& ovlUpdate::what() { return _what; }
+ovlUpdateEntry& ovlUpdate::what() { return _what; }
 
-ovlKeyValue const& ovlUpdate::what() const { return _what; }
+ovlUpdateEntry const& ovlUpdate::what() const { return _what; }
 
 std::string ovlUpdate::to_string() const {
   std::ostringstream oss;
@@ -46,13 +46,13 @@ ovlTimeStamp ovlUpdate::map_timestamp(value_t& value) {
   return ovlTimeStamp(jsonliteral::timestamp, obj.at(jsonliteral::timestamp));
 }
 
-ovlKeyValue ovlUpdate::map_what(value_t& value) {
+ovlUpdateEntry ovlUpdate::map_what(value_t& value) {
   confirm(type(value) == type_t::OBJECT);
   auto& obj = object_value();
 
   confirm(obj.count(jsonliteral::value) == 1);
 
-  return ovlKeyValue(jsonliteral::value, obj.at(jsonliteral::value));
+  return ovlUpdateEntry(jsonliteral::value, obj.at(jsonliteral::value));
 }
 
 result_t ovlUpdate::operator==(ovlUpdate const& other) const {
