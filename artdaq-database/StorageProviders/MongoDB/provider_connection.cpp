@@ -45,9 +45,9 @@ using artdaq::database::mongo::DBConfig;
 using artdaq::database::mongo::MongoDB;
 using artdaq::database::basictypes::JsonData;
 
-mongocxx::instance& getInstance(){ 
+mongocxx::instance& getInstance() {
   static mongocxx::instance _instance{};
-  return _instance;  
+  return _instance;
 }
 
 DBConfig::DBConfig()
@@ -67,8 +67,7 @@ MongoDB::MongoDB(DBConfig const& config, PassKeyIdiom const&)
     : _config{config},
       _instance{getInstance()},
       _client{mongocxx::uri{_config.connectionURI()}},
-      _connection{_client[_client.uri().database()]} {
-      }
+      _connection{_client[_client.uri().database()]} {}
 
 mongocxx::cursor MongoDB::list_databases() {
   connection();

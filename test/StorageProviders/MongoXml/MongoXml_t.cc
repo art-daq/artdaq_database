@@ -375,6 +375,7 @@ bool test_update(std::string const& source_xml, std::string const& compare_xml,s
 
   object_id = provider->writeDocument(json);
 
+  search = JsonData{"{\"filter\":" + object_id + ", \"collection\":\"" + collection + "\"}"};
   results = provider->readDocument(search);
 
   if (results.size() != 1) {

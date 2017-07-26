@@ -355,7 +355,8 @@ bool test_update(std::string const& source_fcl, std::string const& compare_fcl, 
                   collection + "\"}"};
 
   object_id = provider->writeDocument(json);
-
+  
+  search = JsonData{"{\"filter\":" + object_id + ", \"collection\":\"" + collection + "\"}"};
   results = provider->readDocument(search);
 
   if (results.size() != 1) {
