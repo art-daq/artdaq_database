@@ -1,0 +1,35 @@
+# The mongodbserver service unit file
+#
+# Quick HowTo:
+# 1. Copy this file to /etc/systemd/system/mongodbserver@<database>.service
+# 2. Run `systemctl daemon-reload`
+# 3. Run `systemctl enable mongodbserver@<database>.service`
+# 5. Run `systemctl start mongodbserver@<database>.service`
+# 
+# 6. Check status `systemctl status mongodbserver@:<database>.service`
+# 7. Stop `systemctl stop mongodbserver@<database>.service`
+
+
+[Unit]
+Description=Mongo database service
+After=syslog.target network.target
+
+[Service]
+Type=forking
+User=pduser
+Group=pduser
+
+EnvironmentFile=/daq/database/%i/mongod.env
+#ExecStartPre=/daq/database/mongod-ctrl.sh clean 
+ExecStart=/daq/database/mongod-ctrl.sh start 
+ExecStop=/daq/database/mongod-ctrl.sh stop 
+#ExecStopPost=/daq/database/mongod-ctrl.sh clean 
+PIDFile=/daq/database/%i/var/tmp/mongod.pid
+
+
+Restart=always
+RestartSec=300
+
+[Install]
+WantedBy=multi-user.target
+

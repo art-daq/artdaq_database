@@ -1,0 +1,33 @@
+# Quick HowTo:
+# 1. Copy this file to /etc/systemd/system/webconfigeditor@<database>.service
+# 2. Run `systemctl daemon-reload`
+# 3. Run `systemctl enable webconfigeditor@<database>.service`
+# 5. Run `systemctl start webconfigeditor@<database>.service`
+# 
+# 6. Check status `systemctl status webconfigeditor@<database>.service`
+# 7. Stop `systemctl stop webconfigeditor@<database>.service`
+
+[Unit]
+Description=WebConfigEditor service
+After=syslog.target network.target
+
+[Service]
+Type=forking
+User=pduser
+Group=pduser
+
+EnvironmentFile=/daq/database/%i/webconfigeditor.env
+#Environment=NODE_ENV=production
+#ExecStartPre=/daq/database/webconfigeditor-ctrl.sh clean 
+ExecStart=/daq/database/webconfigeditor-ctrl.sh start 
+ExecStop=/daq/database/webconfigeditor-ctrl.sh stop 
+#ExecStopPost=/daq/database/webconfigeditor-ctrl.sh clean 
+PIDFile=/daq/database/%i/var/tmp/webconfigeditor.pid
+
+
+Restart=always
+RestartSec=300
+
+[Install]
+WantedBy=multi-user.target
+
