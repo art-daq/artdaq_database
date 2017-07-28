@@ -1,1 +1,1 @@
-add_subdirectory(NodeJSAddons)
+#add_subdirectory(NodeJSAddons)

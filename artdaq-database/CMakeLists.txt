@@ -1,5 +1,7 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+install(DIRECTORY deployment-scripts DESTINATION ${product}/${version})
+
 add_subdirectory(BuildInfo)
 add_subdirectory(SharedCommon)
 

@@ -276,7 +276,13 @@ json2fcldb::operator fcl::atom_t() try {
     }
 
     case ::fhicl::BOOL: {
-      fcl_value.value = boost::get<bool>(self_data);
+      if(self_data.type() == typeid(std::string)){
+	auto value = boost::get<std::string>(self_data);
+	fcl_value.value = need_quotes(value) ? quoted_(value) : value;
+      } else {      
+	fcl_value.value = boost::get<bool>(self_data);
+      }
+      
       break;
     }
 

@@ -49,6 +49,7 @@ cet_report_compiler_flags()
 find_ups_boost  ( v1_57_0 )
 find_ups_product( cetbuildtools v5_08_00 )
 find_ups_product( artdaq_utilities v1_02_00 )
+#find_ups_product( art v2_07_03 )
 find_ups_product( cetpkgsupport v1_11_00 )
 find_ups_product( fhiclcpp v3_20_01 )
 find_ups_product( mongodb v3_4_6 )
@@ -63,7 +64,7 @@ endif()
 
 
 # Build Node Addons
-include(NodeJSAddon)
+#include(NodeJSAddon)
 
 # MongoDB Libraries
 #set(BSONCXXLIB bsoncxx)

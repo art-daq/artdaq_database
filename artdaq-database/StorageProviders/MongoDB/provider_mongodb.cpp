@@ -79,6 +79,25 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
   TRACE_(4, "MongoDB::findConfigurations() begin");
   TRACE_(4, "MongoDB::findConfigurations() args data=<" << search << ">");
 
+  auto search_document = compat::from_json(search.json_buffer);
+
+  auto extract_value = [&search_document](auto const& name) {
+      auto view = search_document.view();
+      auto element = view.find(name);
+
+      if (element == view.end())
+        throw runtime_error("MongoDB") << "Search JsonData is missing the \"" << name << "\" element.";
+
+      return element->get_value();
+  };
+
+  auto configuration_name_expected = db::dequote(compat::to_json(extract_value(apiliteral::filter::configurations)));
+  
+  if(configuration_name_expected.back()=='*')
+    configuration_name_expected.pop_back();
+    
+  TRACE_(5, "MongoDB::findConfigurations()  configuration_name_expected=<" << configuration_name_expected
+                                                                                   << ">");
   auto fields = std::vector<std::string>{};
   fields.emplace_back(apiliteral::filter::configurations);
 
@@ -144,20 +163,32 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
         if (tmp_config_name == collectionDescriptor.end())
           throw runtime_error("MongoDB")
               << "MongoDB returned invalid database search, \"configurations.name\" is missing.";
-        auto name = db::dequote(compat::to_json(tmp_config_name->get_value()));
+
+        auto name = db::replace_all(db::dequote(compat::to_json(tmp_config_name->get_value())),"\\/", "/");
 
         auto tmp_config_assigned = configuration.find(jsonliteral::assigned);
         if (tmp_config_assigned == collectionDescriptor.end())
           throw runtime_error("MongoDB")
               << "MongoDB returned invalid database search, \"configurations.assigned\" is missing.";
         auto assigned = db::dequote(compat::to_json(tmp_config_assigned->get_value()));
+	
+	if(configuration_name_expected == name) {
+	  config_timestamps.clear();
+	  
+	  config_timestamps[name].insert(
+            std::chrono::duration_cast<std::chrono::seconds>(db::to_timepoint(assigned).time_since_epoch()).count());
 
+	  goto exact_match;
+	}
+	
         config_timestamps[name].insert(
             std::chrono::duration_cast<std::chrono::seconds>(db::to_timepoint(assigned).time_since_epoch()).count());
       }
     }
   }
 
+exact_match:
+  
   for (auto const& cfg : config_timestamps) timestamp_configs.emplace(*cfg.second.rbegin(), cfg.first);
 
   // keys are sorted the reverse chronological order
