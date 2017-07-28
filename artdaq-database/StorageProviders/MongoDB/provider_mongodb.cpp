@@ -181,6 +181,9 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
 	  goto exact_match;
 	}
 	
+	if (!std::equal(configuration_name_expected.begin(),
+	  configuration_name_expected.end(), name.begin())) continue;
+
         config_timestamps[name].insert(
             std::chrono::duration_cast<std::chrono::seconds>(db::to_timepoint(assigned).time_since_epoch()).count());
       }
