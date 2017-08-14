@@ -10,7 +10,7 @@ namespace overlay {
 namespace jsonliteral = artdaq::database::dataformats::literal;
 using namespace artdaq::database::result;
 
-template <typename T, int mask>
+template <typename T, std::uint32_t mask>
 class ovlMovableList final : public ovlKeyValue {
   using List_t = array_t::container_type<T>;
   using ElementUPtr_t = std::unique_ptr<T>;
@@ -48,14 +48,14 @@ class ovlMovableList final : public ovlKeyValue {
   List_t _history;
 };
 
-template <typename T, int mask>
+template <typename T, std::uint32_t mask>
 ovlMovableList<T, mask>::ovlMovableList(object_t::key_type const& key, value_t& object)
     : ovlKeyValue(key, object),
       _initOK(init(object)),
       _active(make_list(ovlKeyValue::value_as<array_t>(jsonliteral::active))),
       _history(make_list(ovlKeyValue::value_as<array_t>(jsonliteral::history))) {}
 
-template <typename T, int mask>
+template <typename T, std::uint32_t mask>
 bool ovlMovableList<T, mask>::init(value_t& parent) try {
   confirm(type(parent) == type_t::OBJECT);
 
@@ -71,13 +71,13 @@ bool ovlMovableList<T, mask>::init(value_t& parent) try {
   throw;
 }
 
-template <typename T, int mask>
+template <typename T, std::uint32_t mask>
 void ovlMovableList<T, mask>::wipe() {
   _active = ovlMovableList::List_t{};
   _history = ovlMovableList::List_t{};
 }
 
-template <typename T, int mask>
+template <typename T, std::uint32_t mask>
 result_t ovlMovableList<T, mask>::add(ElementUPtr_t& newEntry) {
   confirm(newEntry);
 
@@ -97,7 +97,7 @@ result_t ovlMovableList<T, mask>::add(ElementUPtr_t& newEntry) {
   return Success(msg_Added);
 }
 
-template <typename T, int mask>
+template <typename T, std::uint32_t mask>
 result_t ovlMovableList<T, mask>::remove(ElementUPtr_t& oldEntry) {
   confirm(oldEntry);
 
@@ -135,7 +135,7 @@ result_t ovlMovableList<T, mask>::remove(ElementUPtr_t& oldEntry) {
   return Success(msg_Removed);
 }
 
-template <typename T, int mask>
+template <typename T, std::uint32_t mask>
 std::string ovlMovableList<T, mask>::to_string() const {
   std::ostringstream oss;
   oss << "{" << quoted_(key()) << ": {";
@@ -153,7 +153,7 @@ std::string ovlMovableList<T, mask>::to_string() const {
   return oss.str();
 }
 
-template <typename T, int mask>
+template <typename T, std::uint32_t mask>
 typename ovlMovableList<T, mask>::List_t ovlMovableList<T, mask>::make_list(array_t& entries) {
   auto returnValue = ovlMovableList::List_t{};
 
@@ -162,7 +162,7 @@ typename ovlMovableList<T, mask>::List_t ovlMovableList<T, mask>::make_list(arra
   return returnValue;
 }
 
-template <typename T, int mask>
+template <typename T, std::uint32_t mask>
 result_t ovlMovableList<T, mask>::operator==(ovlMovableList const& other) const {
   if ((useCompareMask() & mask) == mask) return Success();
 

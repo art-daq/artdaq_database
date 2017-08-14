@@ -10,7 +10,7 @@ namespace overlay {
 namespace jsonliteral = artdaq::database::dataformats::literal;
 using namespace artdaq::database::result;
 
-template <typename T, int mask>
+template <typename T, std::uint32_t mask>
 class ovlFixedList final : public ovlKeyValue {
   using List_t = array_t::container_type<T>;
   using ElementUPtr_t = std::unique_ptr<T>;
@@ -47,11 +47,11 @@ class ovlFixedList final : public ovlKeyValue {
   List_t _list;
 };
 
-template <typename T, int mask>
+template <typename T, std::uint32_t mask>
 ovlFixedList<T, mask>::ovlFixedList(object_t::key_type const& key, value_t& entries)
     : ovlKeyValue(key, entries), _list(make_list(ovlKeyValue::array_value())) {}
 
-template <typename T, int mask>
+template <typename T, std::uint32_t mask>
 std::string ovlFixedList<T, mask>::to_string() const {
   std::ostringstream oss;
   oss << "{" << quoted_(key()) << ": [";
@@ -65,7 +65,7 @@ std::string ovlFixedList<T, mask>::to_string() const {
   return oss.str();
 }
 
-template <typename T, int mask>
+template <typename T, std::uint32_t mask>
 void ovlFixedList<T, mask>::wipe() {  
   auto& entries = ovlKeyValue::array_value();  
   auto empty=array_t{};  
@@ -74,7 +74,7 @@ void ovlFixedList<T, mask>::wipe() {
   _list = make_list(entries);
 }
 
-template <typename T, int mask>
+template <typename T, std::uint32_t mask>
 typename ovlFixedList<T, mask>::List_t ovlFixedList<T, mask>::make_list(array_t& entries) {
   auto returnValue = ovlFixedList<T, mask>::List_t{};
 
@@ -83,7 +83,7 @@ typename ovlFixedList<T, mask>::List_t ovlFixedList<T, mask>::make_list(array_t&
   return returnValue;
 }
 
-template <typename T, int mask>
+template <typename T, std::uint32_t mask>
 result_t ovlFixedList<T, mask>::add(std::unique_ptr<T>& newEntry) {
   confirm(newEntry);
 
@@ -103,7 +103,7 @@ result_t ovlFixedList<T, mask>::add(std::unique_ptr<T>& newEntry) {
   return Success(msg_Added);
 }
 
-template <typename T, int mask>
+template <typename T, std::uint32_t mask>
 result_t ovlFixedList<T, mask>::remove(std::unique_ptr<T>& oldEntry) {
   confirm(oldEntry);
 
@@ -131,7 +131,7 @@ result_t ovlFixedList<T, mask>::remove(std::unique_ptr<T>& oldEntry) {
   return Success(msg_Removed);
 }
 
-template <typename T, int mask>
+template <typename T, std::uint32_t mask>
 result_t ovlFixedList<T, mask>::operator==(ovlFixedList const& other) const {
   if ((useCompareMask() & mask) == mask) return Success();
 

@@ -29,7 +29,7 @@ struct json_parser_grammar : qi::grammar<Iter, object_t(), ascii::space_type> {
 
     array_rule = '[' >> -(value_rule % ',') >> ']';
 
-    value_rule = object_rule | array_rule | quoted_string | (qi::int_ >> !qi::lit('.')) | qi::double_ | qi::bool_;
+    value_rule = object_rule | array_rule | quoted_string | (qi::long_ >> !qi::lit('.')) | qi::double_ | qi::bool_;
 
     start = object_rule;
 

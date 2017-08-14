@@ -27,8 +27,8 @@ struct compare_visitor : public boost::static_visitor<bool> {
   bool operator()(object_t const& first, object_t const& second) const { return (first == second).first; }
   bool operator()(array_t const& first, array_t const& second) const { return (first == second).first; }
   bool operator()(std::string const& first, std::string const& second) const { return (first.compare(second) == 0); }
-  bool operator()(double const& first, double const& second) const { return (first == second); }
-  bool operator()(int const& first, int const& second) const { return (first == second); }
+  bool operator()(decimal const& first, decimal const& second) const { return (first == second); }
+  bool operator()(integer const& first, integer const& second) const { return (first == second); }
   bool operator()(bool const& first, bool const& second) const { return (first == second); }
   template <typename A1, typename A2>
   bool operator()(A1 const&, A2 const&) const {

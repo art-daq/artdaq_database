@@ -58,14 +58,14 @@ fcl2jsondb::operator datapair_t() try {
 
   object[literal::type] = fcl::tag_as_string(value.tag);
 
-  auto parse_linenum = [](std::string const& str) -> int {
+  auto parse_linenum = [](std::string const& str) -> linenum_t {
     if (str.empty()) return -1;
 
     auto tmp = str.substr(str.find_last_of(":") + 1);
-    return boost::lexical_cast<int>(tmp);
+    return boost::lexical_cast<linenum_t>(tmp);
   };
 
-  auto annotation_at = [this](int linenum) -> std::string {
+  auto annotation_at = [this](linenum_t linenum) -> std::string {
     confirm(linenum > -1);
 
     if (comments.empty() || linenum < 1) return literal::whitespace;
@@ -76,7 +76,7 @@ fcl2jsondb::operator datapair_t() try {
     return artdaq::database::filter_jsonstring(search->second);
   };
 
-  auto comment_at = [&annotation_at](int linenum) -> std::string {
+  auto comment_at = [&annotation_at](linenum_t linenum) -> std::string {
     confirm(linenum > -1);
 
     auto comment = annotation_at(linenum);
@@ -86,7 +86,7 @@ fcl2jsondb::operator datapair_t() try {
     return literal::whitespace;
   };
 
-  auto add_comment = [&object](auto& func, std::string field, int linenum) {
+  auto add_comment = [&object](auto& func, std::string field, linenum_t linenum) {
     confirm(linenum > -1);
 
     auto result = func(linenum);
@@ -134,14 +134,14 @@ fcl2jsondb::operator datapair_t() try {
       std::string str = fcl_value::atom_t(value);
 
       if (fcl::isDouble(str)) {
-        auto dbl = boost::lexical_cast<double>(str);
+        auto dbl = boost::lexical_cast<decimal>(str);
 
         if (std::fmod(dbl, static_cast<decltype(dbl)>(1.0)) == 0.0)
-          pair.data.value = int(dbl);
+          pair.data.value = integer(dbl);
         else
           pair.data.value = dbl;
       } else {
-        pair.data.value = boost::lexical_cast<int>(str);
+        pair.data.value = boost::lexical_cast<integer>(str);
       }
 
       break;
@@ -212,10 +212,10 @@ json2fcldb::operator fcl::value_t() try {
 
   if (self_value.type() == typeid(bool)) {
     return fcl::value_t(unwrap(self_value).value_as<const bool>());
-  } else if (self_value.type() == typeid(int)) {
-    return fcl::value_t(unwrap(self_value).value_as<const int>());
-  } else if (self_value.type() == typeid(double)) {
-    return fcl::value_t(unwrap(self_value).value_as<const double>());
+  } else if (self_value.type() == typeid(integer)) {
+    return fcl::value_t(unwrap(self_value).value_as<const integer>());
+  } else if (self_value.type() == typeid(decimal)) {
+    return fcl::value_t(unwrap(self_value).value_as<const decimal>());
   } else if (self_value.type() == typeid(std::string)) {
     auto value=unwrap(self_value).value_as<const std::string>();
     return fcl::value_t(need_quotes(value) ? quoted_(value) : value);
@@ -290,10 +290,10 @@ json2fcldb::operator fcl::atom_t() try {
       if(self_data.type() == typeid(std::string)){
 	auto value = boost::get<std::string>(self_data);
 	fcl_value.value = need_quotes(value) ? quoted_(value) : value;
-      } else if (self_data.type() == typeid(int)){
-        fcl_value.value = boost::get<int>(self_data);
+      } else if (self_data.type() == typeid(integer)){
+        fcl_value.value = boost::get<integer>(self_data);
       }else{
-        fcl_value.value = boost::get<double>(self_data);
+        fcl_value.value = boost::get<decimal>(self_data);
       }
       
       break;

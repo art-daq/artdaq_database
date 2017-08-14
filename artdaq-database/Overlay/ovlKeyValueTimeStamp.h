@@ -11,7 +11,7 @@ namespace overlay {
 namespace jsonliteral = artdaq::database::dataformats::literal;
 using namespace artdaq::database::result;
 
-template <int mask, bool A = true, bool R = false>
+template <std::uint32_t mask, bool A = true, bool R = false>
 class ovlKeyValueTimeStamp final : public ovlKeyValue {
  public:
   ovlKeyValueTimeStamp(object_t::key_type const& /*key*/, value_t& /*value*/);
@@ -45,11 +45,11 @@ class ovlKeyValueTimeStamp final : public ovlKeyValue {
   ovlTimeStampUPtr_t _removed;
 };
 
-template <int mask, bool A, bool R>
+template <std::uint32_t mask, bool A, bool R>
 ovlKeyValueTimeStamp<mask, A, R>::ovlKeyValueTimeStamp(object_t::key_type const& key, value_t& value)
     : ovlKeyValue(key, value), _initOK(init(value)), _assigned(map_assigned(value)), _removed(map_assigned(value)) {}
 
-template <int mask, bool A, bool R>
+template <std::uint32_t mask, bool A, bool R>
 bool ovlKeyValueTimeStamp<mask, A, R>::init(value_t& parent) try {
   confirm(type(parent) == type_t::OBJECT);
 
@@ -73,17 +73,17 @@ bool ovlKeyValueTimeStamp<mask, A, R>::init(value_t& parent) try {
   throw;
 }
 
-template <int mask, bool A, bool R>
+template <std::uint32_t mask, bool A, bool R>
 std::string& ovlKeyValueTimeStamp<mask, A, R>::name() {
   return value_as<std::string>(jsonliteral::name);
 }
 
-template <int mask, bool A, bool R>
+template <std::uint32_t mask, bool A, bool R>
 std::string const& ovlKeyValueTimeStamp<mask, A, R>::name() const {
   return value_as<std::string>(jsonliteral::name);
 }
 
-template <int mask, bool A, bool R>
+template <std::uint32_t mask, bool A, bool R>
 std::string& ovlKeyValueTimeStamp<mask, A, R>::name(std::string const& name) {
   confirm(!name.empty());
 
@@ -94,21 +94,21 @@ std::string& ovlKeyValueTimeStamp<mask, A, R>::name(std::string const& name) {
   return returnValue;
 }
 
-template <int mask, bool A, bool R>
+template <std::uint32_t mask, bool A, bool R>
 std::string& ovlKeyValueTimeStamp<mask, A, R>::assigned() {
   confirm(A);
 
   return _assigned->timestamp();
 }
 
-template <int mask, bool A, bool R>
+template <std::uint32_t mask, bool A, bool R>
 std::string& ovlKeyValueTimeStamp<mask, A, R>::removed() {
   confirm(R);
 
   return _removed->timestamp();
 }
 
-template <int mask, bool A, bool R>
+template <std::uint32_t mask, bool A, bool R>
 std::string ovlKeyValueTimeStamp<mask, A, R>::to_string() const {
   std::ostringstream oss;
   oss << "{";
@@ -122,7 +122,7 @@ std::string ovlKeyValueTimeStamp<mask, A, R>::to_string() const {
   return oss.str();
 }
 
-template <int mask, bool A, bool R>
+template <std::uint32_t mask, bool A, bool R>
 ovlTimeStampUPtr_t ovlKeyValueTimeStamp<mask, A, R>::map_assigned(value_t& value) {
   confirm(type(value) == type_t::OBJECT);
 
@@ -135,7 +135,7 @@ ovlTimeStampUPtr_t ovlKeyValueTimeStamp<mask, A, R>::map_assigned(value_t& value
   return std::make_unique<ovlTimeStamp>(jsonliteral::assigned, obj.at(jsonliteral::assigned));
 }
 
-template <int mask, bool A, bool R>
+template <std::uint32_t mask, bool A, bool R>
 ovlTimeStampUPtr_t ovlKeyValueTimeStamp<mask, A, R>::map_removed(value_t& value) {
   confirm(type(value) == type_t::OBJECT);
 
@@ -148,7 +148,7 @@ ovlTimeStampUPtr_t ovlKeyValueTimeStamp<mask, A, R>::map_removed(value_t& value)
   return std::make_unique<ovlTimeStamp>(jsonliteral::removed, obj.at(jsonliteral::removed));
 }
 
-template <int mask, bool A, bool R>
+template <std::uint32_t mask, bool A, bool R>
 result_t ovlKeyValueTimeStamp<mask, A, R>::operator==(ovlKeyValueTimeStamp const& other) const {
   std::ostringstream oss;
   oss << "\n" << key() << " records disagree.";
