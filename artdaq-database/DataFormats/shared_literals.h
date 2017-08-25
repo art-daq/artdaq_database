@@ -35,6 +35,8 @@ constexpr auto nullstring = "";
 constexpr auto empty = "empty";
 constexpr auto comment = "comment";
 constexpr auto annotation = "annotation";
+constexpr auto protection = "protection";
+
 constexpr auto children = "children";
 constexpr auto name = "name";
 constexpr auto values = "values";

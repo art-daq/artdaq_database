@@ -9,20 +9,20 @@
 "EVDSavePath" : "/data2/lbnedaq/eventDisplay/",
 "ChannelMapFile" : "/data/lbnedaq/lbne-artdaq-standard/lbne-artdaq/lbne-artdaq/OnlineMonitoring/detailedMap.txt",
 "ImageType" : ".png",
-"InitialMonitoringUpdate" : 30,
-"MonitoringRefreshRate" : 500,
-"EventDisplayRefreshRate" : 30,
-"DetailedMonitoring" : false,
-"ScopeMonitoring" : false,
-"DriftVelocity" : 0.9,
-"CollectionPedestal" : 550,
-"MicroslicePreBuffer" : 5,
-"MicrosliceTriggerLength" : 5
+"InitialMonitoringUpdate" : "30",
+"MonitoringRefreshRate" : "500",
+"EventDisplayRefreshRate" : "30",
+"DetailedMonitoring" : "false",
+"ScopeMonitoring" : "false",
+"DriftVelocity" : "0.900000",
+"CollectionPedestal" : "550",
+"MicroslicePreBuffer" : "5",
+"MicrosliceTriggerLength" : "5"
 },
 "OnlineMonitoring_detailed" : "@local::OnlineMonitoring_standard",
-"OnlineMonitoring_detailed.DetailedMonitoring" : true,
+"OnlineMonitoring_detailed.DetailedMonitoring" : "true",
 "OnlineMonitoring_scope" : "@local::OnlineMonitoring_standard",
-"OnlineMonitoring_scope.ScopeMonitoring" : true
+"OnlineMonitoring_scope.ScopeMonitoring" : "true"
 },
 "main" : {
 "process_name" : "DAQ"

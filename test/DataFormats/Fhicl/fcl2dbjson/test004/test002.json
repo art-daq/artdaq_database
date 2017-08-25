@@ -8,45 +8,45 @@
 "services" : {
 "scheduler" : {
 "fileMode" : "NOMERGE",
-"errorOnFailureToPut" : false
+"errorOnFailureToPut" : "false"
 },
 "NetMonTransportServiceInterface" : {
 "service_provider" : "NetMonTransportService",
 "destinations" : {
 "d4" : {
 "transferPluginType" : "MPI",
-"destination_rank" : 4,
-"max_fragment_size_words" : 2097152,
+"destination_rank" : "4",
+"max_fragment_size_words" : "2097152",
 "host_map" : [
 {
-"rank" : 0,
+"rank" : "0",
 "host" : "mu2edaq01.fnal.gov",
-"portOffset" : 5300
+"portOffset" : "5300"
 },
 {
-"rank" : 1,
+"rank" : "1",
 "host" : "mu2edaq01.fnal.gov",
-"portOffset" : 5310
+"portOffset" : "5310"
 },
 {
-"rank" : 2,
+"rank" : "2",
 "host" : "mu2edaq01.fnal.gov",
-"portOffset" : 5320
+"portOffset" : "5320"
 },
 {
-"rank" : 3,
+"rank" : "3",
 "host" : "mu2edaq01.fnal.gov",
-"portOffset" : 5330
+"portOffset" : "5330"
 },
 {
-"rank" : 4,
+"rank" : "4",
 "host" : "mu2edaq01.fnal.gov",
-"portOffset" : 5340
+"portOffset" : "5340"
 },
 {
-"rank" : 5,
+"rank" : "5",
 "host" : "mu2edaq01.fnal.gov",
-"portOffset" : 5350
+"portOffset" : "5350"
 }
 ]
 }
@@ -55,84 +55,84 @@
 },
 "daq" : {
 "event_builder" : {
-"expected_fragments_per_event" : 2,
-"use_art" : true,
-"print_event_store_stats" : true,
-"max_incomplete_events" : 75,
-"verbose" : false,
-"send_requests" : true,
+"expected_fragments_per_event" : "2",
+"use_art" : "true",
+"print_event_store_stats" : "true",
+"max_incomplete_events" : "75",
+"verbose" : "false",
+"send_requests" : "true",
 "sources" : {
 "s0" : {
 "transferPluginType" : "MPI",
-"source_rank" : 0,
-"max_fragment_size_words" : 2097152,
+"source_rank" : "0",
+"max_fragment_size_words" : "2097152",
 "host_map" : [
 {
-"rank" : 0,
+"rank" : "0",
 "host" : "mu2edaq01.fnal.gov",
-"portOffset" : 5300
+"portOffset" : "5300"
 },
 {
-"rank" : 1,
+"rank" : "1",
 "host" : "mu2edaq01.fnal.gov",
-"portOffset" : 5310
+"portOffset" : "5310"
 },
 {
-"rank" : 2,
+"rank" : "2",
 "host" : "mu2edaq01.fnal.gov",
-"portOffset" : 5320
+"portOffset" : "5320"
 },
 {
-"rank" : 3,
+"rank" : "3",
 "host" : "mu2edaq01.fnal.gov",
-"portOffset" : 5330
+"portOffset" : "5330"
 },
 {
-"rank" : 4,
+"rank" : "4",
 "host" : "mu2edaq01.fnal.gov",
-"portOffset" : 5340
+"portOffset" : "5340"
 },
 {
-"rank" : 5,
+"rank" : "5",
 "host" : "mu2edaq01.fnal.gov",
-"portOffset" : 5350
+"portOffset" : "5350"
 }
 ]
 },
 "s1" : {
 "transferPluginType" : "MPI",
-"source_rank" : 1,
-"max_fragment_size_words" : 2097152,
+"source_rank" : "1",
+"max_fragment_size_words" : "2097152",
 "host_map" : [
 {
-"rank" : 0,
+"rank" : "0",
 "host" : "mu2edaq01.fnal.gov",
-"portOffset" : 5300
+"portOffset" : "5300"
 },
 {
-"rank" : 1,
+"rank" : "1",
 "host" : "mu2edaq01.fnal.gov",
-"portOffset" : 5310
+"portOffset" : "5310"
 },
 {
-"rank" : 2,
+"rank" : "2",
 "host" : "mu2edaq01.fnal.gov",
-"portOffset" : 5320
+"portOffset" : "5320"
 },
 {
-"rank" : 3,
+"rank" : "3",
 "host" : "mu2edaq01.fnal.gov",
-"portOffset" : 5330
+"portOffset" : "5330"
 },
 {
-"rank" : 4,
+"rank" : "4",
 "host" : "mu2edaq01.fnal.gov",
-"portOffset" : 5340
+"portOffset" : "5340"
 },
 {
-"rank" : 5,
+"rank" : "5",
 "host" : "mu2edaq01.fnal.gov",
-"portOffset" : 5350
+"portOffset" : "5350"
 }
 ]
 }
@@ -141,9 +141,9 @@
 "metrics" : {
 "evbFile" : {
 "metricPluginType" : "file",
-"level" : 3,
+"level" : "3",
 "fileName" : "/tmp/eventbuilder/evb_%UID%_metrics.log",
-"uniquify" : true
+"uniquify" : "true"
 }
 }
 },
@@ -162,11 +162,11 @@
 "filters" : {
 "prescaleMod2" : {
 "module_type" : "NthEvent",
-"nth" : 2
+"nth" : "2"
 },
 "prescaleMod3" : {
 "module_type" : "NthEvent",
-"nth" : 3
+"nth" : "3"
 }
 },
 "pmod2" : [
@@ -181,8 +181,8 @@
 },
 "source" : {
 "module_type" : "DemoInput",
-"waiting_time" : 2500000,
-"resume_after_timeout" : true
+"waiting_time" : "2500000",
+"resume_after_timeout" : "true"
 },
 "process_name" : "DAQ"
 }

@@ -5,10 +5,10 @@
 "fhicl_pound_include_0" : "metrics.fcl",
 "rce_standard" : {
 "metrics" : "@local::metrics",
-"max_fragment_size_words" : 1048576,
+"max_fragment_size_words" : "1048576",
 "fragment_receiver" : {
-"mpi_buffer_count" : 16,
-"mpi_sync_interval" : 24000
+"mpi_buffer_count" : "16",
+"mpi_sync_interval" : "24000"
 }
 },
 "daq" : "@local::rce_standard",
@@ -16,13 +16,13 @@
 "fhicl_pound_include_2" : "user_run_options.fcl",
 "rce_standard" : "@local::daq",
 "rce04_standard" : "@local::rce_standard",
-"rce04_standard.fragment_receiver.fragment_id" : 104,
-"rce04_standard.fragment_receiver.board_id" : 4
+"rce04_standard.fragment_receiver.fragment_id" : "104",
+"rce04_standard.fragment_receiver.board_id" : "4"
 },
 "main" : {
 "rce05_standard" : "@local::rce_standard",
-"rce05_standard.fragment_receiver.fragment_id" : 105,
-"rce05_standard.fragment_receiver.board_id" : 5
+"rce05_standard.fragment_receiver.fragment_id" : "105",
+"rce05_standard.fragment_receiver.board_id" : "5"
 }
 },
 "metadata" : {

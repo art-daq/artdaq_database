@@ -132,7 +132,8 @@ std::string db::debrace(std::string s) {
 }
 
 std::string db::dequote(std::string s) {
-  if (s[0] == '\"' && s[s.length() - 1] == '\"')
+  if ( (s[0] == '\"' && s[s.length() - 1] == '\"') 
+    || (s[0] == '\'' && s[s.length() - 1] == '\'') )
     return s.substr(1, s.length() - 2);
   else
     return s;

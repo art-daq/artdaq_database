@@ -26,7 +26,8 @@ ENDIF()
 set(CMAKE_MODULE_PATH
     $ENV{ARTDAQ_UTILITIES_DIR}/Modules
     $ENV{CETBUILDTOOLS_DIR}/Modules
-    ${CMAKE_MODULE_PATH})
+    ${CMAKE_MODULE_PATH}
+    ${CMAKE_SOURCE_DIR}/built-in)
 
 include(CetCMakeEnv)
 
@@ -51,7 +52,7 @@ find_ups_product( cetbuildtools v5_08_00 )
 find_ups_product( artdaq_utilities v1_02_00 )
 #find_ups_product( art v2_07_03 )
 find_ups_product( cetpkgsupport v1_11_00 )
-find_ups_product( fhiclcpp v3_20_01 )
+#find_ups_product( fhiclcpp v3_20_01 )
 find_ups_product( mongodb v3_4_6 )
 find_ups_product( TRACE v3_06_07 )
 find_ups_product( swig v3_0_12 )
@@ -62,6 +63,8 @@ if(BTYPE_UC STREQUAL DEBUG)
   add_definitions(-DDEBUGME)
 endif()
 
+# buil-in libraries
+include(BuiltinFHICLCPP)
 
 # Build Node Addons
 #include(NodeJSAddon)
@@ -76,8 +79,6 @@ find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_LIB} )
 add_subdirectory(test)
 
 # source
-#add_subdirectory(mongo-cxx)
-
 add_subdirectory(artdaq-database)
 
 # doc- Documentation

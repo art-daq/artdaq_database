@@ -8,33 +8,33 @@
 "services" : {
 "scheduler" : {
 "fileMode" : "NOMERGE",
-"errorOnFailureToPut" : false
+"errorOnFailureToPut" : "false"
 },
 "NetMonTransportServiceInterface" : {
 "service_provider" : "NetMonTransportService",
-"first_data_receiver_rank" : 4,
-"mpi_buffer_count" : 8,
-"max_fragment_size_words" : 2097152,
-"data_receiver_count" : 1
+"first_data_receiver_rank" : "4",
+"mpi_buffer_count" : "8",
+"max_fragment_size_words" : "2097152",
+"data_receiver_count" : "1"
 }
 },
 "daq" : {
-"max_fragment_size_words" : 2097152,
+"max_fragment_size_words" : "2097152",
 "event_builder" : {
-"mpi_buffer_count" : 16,
-"first_fragment_receiver_rank" : 0,
-"fragment_receiver_count" : 2,
-"expected_fragments_per_event" : 2,
-"use_art" : true,
-"print_event_store_stats" : true,
-"verbose" : false
+"mpi_buffer_count" : "16",
+"first_fragment_receiver_rank" : "0",
+"fragment_receiver_count" : "2",
+"expected_fragments_per_event" : "2",
+"use_art" : "true",
+"print_event_store_stats" : "true",
+"verbose" : "false"
 },
 "metrics" : {
 "evbFile" : {
 "metricPluginType" : "file",
-"level" : 3,
+"level" : "3",
 "fileName" : "/tmp/eventbuilder/evb_%UID%_metrics.log",
-"uniquify" : true
+"uniquify" : "true"
 }
 }
 },
@@ -59,11 +59,11 @@
 "filters" : {
 "prescaleMod2" : {
 "module_type" : "NthEvent",
-"nth" : 2
+"nth" : "2"
 },
 "prescaleMod3" : {
 "module_type" : "NthEvent",
-"nth" : 3
+"nth" : "3"
 }
 },
 "p1" : [
@@ -81,31 +81,31 @@
 },
 "source" : {
 "module_type" : "RawInput",
-"waiting_time" : 2500000,
-"resume_after_timeout" : true,
+"waiting_time" : "2500000",
+"resume_after_timeout" : "true",
 "fragment_type_map" : [
 [
-1,
+"1",
 "missed"
 ],
 [
-3,
+"3",
 "V1720"
 ],
 [
-4,
+"4",
 "V1724"
 ],
 [
-6,
+"6",
 "TOY1"
 ],
 [
-7,
+"7",
 "TOY2"
 ],
 [
-8,
+"8",
 "ASCII"
 ]
 ]

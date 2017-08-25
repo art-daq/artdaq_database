@@ -54,6 +54,12 @@ namespace artdaq {
 namespace database {
 using std::chrono::system_clock;
 
+enum class quotation_type_t {
+  NONE=0,
+  SINGLE=1,
+  DOUBLE
+};
+
 std::string filter_jsonstring(std::string const& str);
 std::string timestamp();
 std::string to_string(system_clock::time_point const& tp);
@@ -68,6 +74,9 @@ std::string debrace(std::string /*s*/);
 std::string dequote(std::string /*s*/);
 std::string debracket(std::string /*s*/);
 std::string annotate(std::string const& /*s*/);
+
+quotation_type_t quotation_type(std::string /*s*/);
+std::string quoted(const std::string&);
 
 void set_default_locale();
 
