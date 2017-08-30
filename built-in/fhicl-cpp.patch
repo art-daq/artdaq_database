@@ -1,5 +1,5 @@
 diff --git a/fhiclcpp/extended_value.h b/fhiclcpp/extended_value.h
-index 484038d..96dcd7c 100644
+index 484038d..bee0847 100644
 --- a/fhiclcpp/extended_value.h
 +++ b/fhiclcpp/extended_value.h
 @@ -11,10 +11,12 @@
@@ -15,7 +15,7 @@ index 484038d..96dcd7c 100644
  
  // ----------------------------------------------------------------------
  
-@@ -24,8 +26,72 @@ namespace fhicl {
+@@ -24,8 +26,86 @@ namespace fhicl {
    };
  }
  
@@ -42,7 +42,10 @@ index 484038d..96dcd7c 100644
 +};
 +
 +auto rtrim_whitespace = [](auto const &str) {
++  constexpr auto single_quote = '\'';
 +  constexpr auto double_quote = '\"';
++  constexpr auto back_slash = '\\';
++
 +  constexpr auto double_slashes = "//";
 +  constexpr auto space_char = ' ';
 +  constexpr auto skip_chars = "# \n\r\t";
@@ -50,12 +53,23 @@ index 484038d..96dcd7c 100644
 +  if (str.empty())
 +    return str;
 +
++  if (str[0] == single_quote) {
++    auto pos = str.find(single_quote, 1);
++
++    if (pos == std::string::npos)
++      throw exception(cant_find, "missing a closing single quote in str=" + str);
++
++    return str.substr(0, pos + 1);
++  }
++
 +  if (str[0] == double_quote) {
 +    auto pos = str.find(double_quote, 1);
 +
++    while (str[pos -1]==back_slash) pos = str.find(double_quote, pos+1);
++       
 +    if (pos == std::string::npos)
-+      throw exception(cant_find, "missing a double quote in str=" + str);
-+
++      throw exception(cant_find, "missing a closing double quote in str=" + str);
++    
 +    return str.substr(0, pos + 1);
 +  }
 +  
@@ -89,7 +103,7 @@ index 484038d..96dcd7c 100644
  class fhicl::extended_value
  {
  public:
-@@ -34,35 +100,31 @@ public:
+@@ -34,35 +114,31 @@ public:
    typedef  std::vector<extended_value>            sequence_t;
    typedef  shims::map<std::string, extended_value>  table_t;
  
@@ -138,7 +152,7 @@ index 484038d..96dcd7c 100644
    { }
  
    bool
-@@ -94,11 +156,12 @@ public:
+@@ -94,11 +170,12 @@ public:
    operator table_t() const
    { return boost::any_cast<table_t>(value); }
  
@@ -217,7 +231,7 @@ index 10a400e..618427b 100644
  #pragma clang diagnostic pop
  #endif
 diff --git a/fhiclcpp/parse_shims.h b/fhiclcpp/parse_shims.h
-index ace640b..848cbea 100644
+index ace640b..9eb40ea 100644
 --- a/fhiclcpp/parse_shims.h
 +++ b/fhiclcpp/parse_shims.h
 @@ -49,7 +49,7 @@ struct catchall_parser : ::boost::spirit::qi::primitive_parser<catchall_parser>
@@ -225,7 +239,7 @@ index ace640b..848cbea 100644
  
      Iterator it = first;
 -    while (it != last && (std::isalnum(*it) || *it == '_' || *it == ':' || *it == '@')) ++it;
-+    while (it != last && (std::isalnum(*it) || *it == '_' || *it == ':' || *it == '.' || *it == '[' || *it == ']' || *it == '@')) ++it;
++    while (it != last && (std::isalnum(*it) || *it == '_' || *it == ':' || *it == '.' || *it == '@')) ++it;
  
      if (it != last && !maximally_munched_ass(*it)) return false;
  
