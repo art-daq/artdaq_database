@@ -60,23 +60,27 @@ enum class quotation_type_t {
   DOUBLE
 };
 
-std::string filter_jsonstring(std::string const& str);
 std::string timestamp();
 std::string to_string(system_clock::time_point const& tp);
 system_clock::time_point to_timepoint(std::string const& strtime);
 std::string confirm_iso8601_timestamp(std::string const& strtime);
 
 bool useFakeTime(bool);
-std::string quoted_(std::string const& /*text*/);
 std::string bool_(bool /*bool*/);
+
+std::string quoted_(std::string const& /*text*/, const char /*qchar*/ ='\"');
 std::string operator"" _quoted(const char* /*text*/, std::size_t);
+
 std::string debrace(std::string /*s*/);
 std::string dequote(std::string /*s*/);
 std::string debracket(std::string /*s*/);
 std::string annotate(std::string const& /*s*/);
 
-quotation_type_t quotation_type(std::string /*s*/);
-std::string quoted(const std::string&);
+quotation_type_t quotation_type(std::string /*text*/);
+
+template <quotation_type_t Q> 
+std::string quoted(std::string const& text){return quoted_(text);}
+
 
 void set_default_locale();
 

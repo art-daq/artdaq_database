@@ -1,17 +1,3 @@
-evbFile:{
-  fileName:"/tmp/eventbuilder/evb_%UID%_metrics.log" 
-  level:3 
-  metricPluginType1:"file" 
-  metricPluginType2:"file" 
-  metricPluginType3:"fi\"le" 
-  metricPluginType4:"fi\'le" 
-  metricPluginType5:"fi\"le" 
-  metricPluginType6:"fi\\\"le" uniquify:true
-  
-}
-
-
-
 
 services: {
   scheduler: {
@@ -44,14 +30,7 @@ daq: {
   }
   metrics: {
     evbFile: {
-      metricPluginType1: "file"#test
-      metricPluginType2: 'file' #test
-      metricPluginType3: 'fi"le'//test
-      metricPluginType4: "fi'le" //test
-
-      metricPluginType5: "fi"le" //test
-      metricPluginType6: 'fi'le' //test
-
+      metricPluginType: "file"
       level: 3
       fileName: "/tmp/eventbuilder/evb_%UID%_metrics.log" //demoe
       uniquify: true

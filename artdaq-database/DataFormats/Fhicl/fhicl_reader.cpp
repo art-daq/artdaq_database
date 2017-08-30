@@ -3,6 +3,7 @@
 #include "artdaq-database/DataFormats/Fhicl/convertfhicl2jsondb.h"
 #include "artdaq-database/DataFormats/Fhicl/fhicl_reader.h"
 #include "artdaq-database/DataFormats/Fhicl/fhicl_types.h"
+#include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
 #include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
 #include "artdaq-database/DataFormats/Json/json_types.h"
 
@@ -13,6 +14,7 @@
 #define TRACE_NAME "FCL:FclReader_C"
 
 namespace jsn = artdaq::database::json;
+namespace fcl = artdaq::database::fhicl;
 
 namespace literal = artdaq::database::dataformats::literal;
 
@@ -162,7 +164,13 @@ bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
       array.push_back(jsn::object_t());
       auto& object = boost::get<jsn::object_t>(array.back());
       object.push_back(jsn::data_t::make(literal::linenum, comment.first));
-      object.push_back(jsn::data_t::make(literal::value, artdaq::database::filter_jsonstring(comment.second)));
+
+      if(fcl::from_json_string(fcl::to_json_string(comment.second))!=comment.second){
+	  TRACE_(3,"Warning non reversable convertion\nbegin" <<comment.second);
+	  TRACE_(3,"convd" << fcl::to_json_string(comment.second));
+	  TRACE_(3,"restd" << fcl::from_json_string(fcl::to_json_string(comment.second)));
+      }
+      object.push_back(jsn::data_t::make(literal::value, fcl::to_json_string(comment.second)));
     }
 
     json_array.swap(array);

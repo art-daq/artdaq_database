@@ -31,6 +31,8 @@ struct array_t : sharedtypes::vector_of<value_t> {};
 
 enum struct type_t { NOTSET = 0, VALUE, DATA, OBJECT, ARRAY };
 
+std::string to_string(type_t t);
+
 struct print_visitor : public boost::static_visitor<std::string> {
   std::string operator()(object_t const&) const { return "object(...)"; }
   std::string operator()(array_t const&) const { return "array(...)"; }

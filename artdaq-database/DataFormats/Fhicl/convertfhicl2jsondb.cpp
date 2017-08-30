@@ -1,10 +1,11 @@
 #include "artdaq-database/DataFormats/common.h"
 
-#include "artdaq-database/DataFormats/Json/json_types_impl.h"
 #include "artdaq-database/DataFormats/Fhicl/convertfhicl2jsondb.h"
 #include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
 #include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
+#include "artdaq-database/DataFormats/Json/json_types_impl.h"
 #include "artdaq-database/SharedCommon/printStackTrace.h"
+#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 
 #include <boost/variant/get.hpp>
 #include <cmath>
@@ -28,6 +29,7 @@ using artdaq::database::fhicljson::fcl2jsondb;
 using artdaq::database::fhicljson::json2fcldb;
 
 namespace literal = artdaq::database::dataformats::literal;
+namespace apiliteral = artdaq::database::configapi::literal;
 
 std::string include("fhicl_pound_include");
 bool need_quotes(std::string const& text) { return text.find_first_of(" .%()/-\\") != std::string::npos; }
@@ -68,68 +70,83 @@ fcl2jsondb::operator datapair_t() try {
   auto annotation_at = [this](linenum_t linenum) -> std::string {
     confirm(linenum > -1);
 
-    if (comments.empty() || linenum < 1) return literal::whitespace;
+    if (comments.empty() || linenum < 1) return apiliteral::nullstring;
 
     auto search = comments.find(linenum);
-    if (comments.end() == search) return literal::whitespace;
+    if (comments.end() == search) return apiliteral::nullstring;
 
-    return artdaq::database::filter_jsonstring(search->second);
+    return search->second;
   };
 
   auto comment_at = [&annotation_at](linenum_t linenum) -> std::string {
     confirm(linenum > -1);
 
     auto comment = annotation_at(linenum);
-    
+
     if (!comment.empty() && comment.at(0) != '/' && comment.find("#include ") == std::string::npos) return comment;
 
-    return literal::whitespace;
+    return apiliteral::nullstring;
   };
 
-  auto add_comment = [&object](auto& func, std::string field, linenum_t linenum) {
+  auto add_comment_annotation = [&object](auto& func, std::string field, linenum_t linenum) {
     confirm(linenum > -1);
 
     auto result = func(linenum);
 
-    if (!result.empty()) object[field] = result;
+    if (!result.empty()) 
+      object[field] = fcl::to_json_string(result);
+    else
+      object[field] =std::string{apiliteral::nullstring};
   };
 
   auto linenum = parse_linenum(value.src_info);
 
   if (key.find("fhicl_pound_include_") != std::string::npos) {
-    object[literal::comment] = std::string{literal::whitespace};
-    object[literal::annotation] = std::string{literal::whitespace};
+    object[literal::comment] = std::string{apiliteral::nullstring};
+    object[literal::annotation] = std::string{apiliteral::nullstring};
   } else {
-    add_comment(comment_at, literal::comment, linenum - 1);
+    add_comment_annotation(comment_at, literal::comment, linenum - 1);
 
-    if (value.tag != ::fhicl::TABLE) add_comment(annotation_at, literal::annotation, linenum);
+    if (value.tag != ::fhicl::TABLE) add_comment_annotation(annotation_at, literal::annotation, linenum);
   }
 
-/* object[literal::protection] = fcl::protection_as_string(value.protection);  
-   TRACE_(2, "fcl2jsondb() value type=<" << fcl::tag_as_string(value.tag) << ">, protection=<"<<fcl::protection_as_string(value.protection) <<">");
-*/  
+  if (value.protection != ::fhicl::Protection::NONE) {
+    object[literal::protection] = fcl::protection_as_string(value.protection);
+    TRACE_(2, "fcl2jsondb() value type=<" << fcl::tag_as_string(value.tag) << ">, protection=<"
+                                          << fcl::protection_as_string(value.protection) << ">");
+  }
 
   switch (value.tag) {
     default:
       throw ::fhicl::exception(::fhicl::parse_error, literal::name) << ("Failure while parsing fcl node name=" + key);
-//NIL, BOOL, NUMBER, COMPLEX, STRING
+    // NIL, BOOL, NUMBER, COMPLEX, STRING
     case ::fhicl::UNKNOWN:
     case ::fhicl::NIL:
     case ::fhicl::BOOL:
-    case ::fhicl::NUMBER:        
+    case ::fhicl::NUMBER:
     case ::fhicl::COMPLEX:
-    case ::fhicl::TABLEID:{
+    case ::fhicl::TABLEID: {
       pair.data.value = value.raw_value;
       break;
     }
-    
-    case ::fhicl::STRING:{
-      pair.data.value = value.raw_value;
-      object[literal::type] = fcl::tag_as_string(value.tag);
 
+    case ::fhicl::STRING: {
+      pair.data.value = fcl::to_json_string(db::dequote(value.raw_value));
+
+      switch (db::quotation_type(value.raw_value)) {
+        case db::quotation_type_t::NONE:
+          object[literal::type] = std::string{literal::string_unquoted};
+          break;
+        case db::quotation_type_t::SINGLE:
+          object[literal::type] = std::string{literal::string_singlequoted};
+          break;
+        case db::quotation_type_t::DOUBLE:
+          object[literal::type] = std::string{literal::string_doublequoted};
+          break;
+      }
       break;
-    }  
-    
+    }
+
     case ::fhicl::SEQUENCE: {
       pair.data.value = jsn::array_t();
       pair.metadata_<jsn::object_t>()[literal::children] = jsn::object_t();
@@ -191,7 +208,7 @@ json2fcldb::operator fcl::value_t() try {
   } else if (self_value.type() == typeid(decimal)) {
     return fcl::value_t(unwrap(self_value).value_as<const decimal>());
   } else if (self_value.type() == typeid(std::string)) {
-    auto value=unwrap(self_value).value_as<const std::string>();
+    auto value = unwrap(self_value).value_as<const std::string>();
     return fcl::value_t(need_quotes(value) ? db::quoted_(value) : value);
   } else if (self_value.type() == typeid(jsn::object_t)) {
     return fcl::value_t(operator fcl::atom_t().value);
@@ -213,8 +230,7 @@ json2fcldb::operator fcl::atom_t() try {
 
   auto type_name = boost::get<std::string>(metadata_object.at(literal::type));
 
-  TRACE_(2, "json2fcldb() key=<" << self_key << ">"
-                                 << " type=<" << type_name << ">");
+  TRACE_(2, "json2fcldb() key=<" << self_key << "> type=<" << type_name << ">");
 
   auto override_comment = false;
 
@@ -231,7 +247,8 @@ json2fcldb::operator fcl::atom_t() try {
     auto fcl_value = fcl::value_t();
 
     fcl_value.value = db::quoted_(boost::get<std::string>(self_data));
-
+    fcl_value.annotation=apiliteral::nullstring;
+    
     return {fcl_key, fcl_value};
   }
 
@@ -241,36 +258,50 @@ json2fcldb::operator fcl::atom_t() try {
 
   switch (type) {
     case ::fhicl::UNKNOWN:
-    case ::fhicl::NIL:
+    case ::fhicl::NIL: {
+      fcl_value.value = boost::get<std::string>(self_data);
+      break;
+    }
+
     case ::fhicl::STRING: {
-      auto value = boost::get<std::string>(self_data);
-      fcl_value.value = need_quotes(value) ? db::quoted_(value) : value;
-      
+      auto value = fcl::from_json_string(boost::get<std::string>(self_data));
+
+      if (type_name == literal::string)
+        fcl_value.value = need_quotes(value) ? db::quoted_(value) : value;
+      else if (type_name == literal::string_unquoted)
+        fcl_value.value = value;
+      else if (type_name == literal::string_singlequoted)
+        fcl_value.value = db::quoted_(value, '\'');
+      else if (type_name == literal::string_doublequoted)
+        fcl_value.value = db::quoted_(value, '\"');
+      else
+        fcl_value.value = need_quotes(value) ? db::quoted_(value) : value;
+
       break;
     }
 
     case ::fhicl::BOOL: {
-      if(self_data.type() == typeid(std::string)){
-	fcl_value.value = boost::get<std::string>(self_data);
-      } else {      
-	fcl_value.value = boost::get<bool>(self_data);
+      if (self_data.type() == typeid(std::string)) {
+        fcl_value.value = boost::get<std::string>(self_data);
+      } else {
+        fcl_value.value = boost::get<bool>(self_data);
       }
-      
+
       break;
     }
 
     case ::fhicl::NUMBER: {
-      if(self_data.type() == typeid(std::string)){
-	fcl_value.value = boost::get<std::string>(self_data);
-      } else if (self_data.type() == typeid(integer)){
+      if (self_data.type() == typeid(std::string)) {
+        fcl_value.value = boost::get<std::string>(self_data);
+      } else if (self_data.type() == typeid(integer)) {
         fcl_value.value = boost::get<integer>(self_data);
-      }else{
+      } else {
         fcl_value.value = boost::get<decimal>(self_data);
       }
-      
+
       break;
     }
-    case ::fhicl::TABLEID: 
+    case ::fhicl::TABLEID:
     case ::fhicl::COMPLEX: {
       fcl_value.value = boost::get<std::string>(self_data);
 
@@ -295,6 +326,7 @@ json2fcldb::operator fcl::atom_t() try {
       }
       break;
     }
+
     case ::fhicl::TABLE: {
       fcl_value.value = fcl::table_t();
       auto& table = unwrap(fcl_value).value_as<fcl::table_t>();
@@ -315,17 +347,21 @@ json2fcldb::operator fcl::atom_t() try {
     }
   }
 
-  auto const& name = self_key;
-  auto const& comment = boost::get<std::string>(metadata_object.at(literal::comment));
-  /*auto const& protection = boost::get<std::string>(metadata_object.at(literal::protection));
-    if(protection!="" && protection!="@none"){
-    name.append(" ").append(protection);    
-  }*/
-      
-  auto fcl_key = fcl::key_t(name, (comment.find("#include ") == std::string::npos?comment:std::string{literal::whitespace}));
+  auto name = self_key;
+  auto const comment = fcl::from_json_string(boost::get<std::string>(metadata_object.at(literal::comment)));
+
+  if (metadata_object.count(literal::protection) == 1) {
+    auto const& protection = boost::get<std::string>(metadata_object.at(literal::protection));
+    if (protection != "@none") {
+      name.append(" ").append(protection);
+    }
+  }
+
+  auto fcl_key =
+      fcl::key_t(name, (comment.find("#include ") == std::string::npos ? comment : std::string{apiliteral::nullstring}));
 
   if (type != ::fhicl::TABLE && !override_comment)  // table does not have annotation
-    fcl_value.annotation = boost::get<std::string>(metadata_object.at(literal::annotation));
+    fcl_value.annotation = fcl::from_json_string(boost::get<std::string>(metadata_object.at(literal::annotation)));
 
   return {fcl_key, fcl_value};
 

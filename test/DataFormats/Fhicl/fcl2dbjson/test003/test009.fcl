@@ -1,0 +1,22 @@
+ 
+#include "file.fcl" 
+ 
+#include "/doc/test/file.fcl" 
+#comment i
+i: 14 //14
+ 
+#include "/doc/test2/file.fcl" 
+#comment t 
+t: .68 // .68
+#comment pi
+pi: 3.1415926 # 3.1415926
+ 
+#include "/doc/test4/file.fcl" 
+ 
+#include "/doc/test3/file.fcl" 
+#comment x
+x: 1.23e2 //1.23e2
+#comment y 
+y: -0.45600E+3 // -0.45600E+3
+#comment @erase 
+p: @erase // @erase

@@ -1,0 +1,20 @@
+#comment i
+i: 14 //14
+#comment t 
+t: .68 // .68
+#comment pi
+pi: 3.1415926 # 3.1415926
+#comment x
+x: 1.23e2 //1.23e2
+#comment y 
+y: -0.45600E+3 // -0.45600E+3
+#comment z
+z: -infinity # -infinity
+#comment c1
+c1: (1,2) # (1,2)
+#comment c2
+c2: (1.23,-0.45600E+3) # (1.23,-0.45600E+3)
+#comment a
+a: @nil # @nil
+#comment q
+q: [1, "(1.23,-0.45600E+3)", "a b", "a b", @nil, true] # [ 1,(1.23,-0.45600E+3), 'a b', "a b", @nil, true ]

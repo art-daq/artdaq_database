@@ -124,281 +124,281 @@
 "comment" : "#prolog",
 "children" : {
 "fhicl_pound_include_0" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce_standard" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "metrics" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "max_fragment_size_words" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "fragment_receiver" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "mpi_buffer_count" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "mpi_sync_interval" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "first_event_builder_rank" : {
 "type" : "number",
 "comment" : "# These two variables will be calculated by DAQInterface...",
-"annotation" : " "
+"annotation" : ""
 },
 "event_builder_count" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "generator" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "fragment_type" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "sleep_on_stop_us" : {
 "type" : "number",
 "comment" : "#    board_id: -1",
-"annotation" : " "
+"annotation" : ""
 },
 "number_of_microslices_per_millislice" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce_client_host_port" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce_client_timeout_usecs" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce_xml_config_file" : {
-"type" : "string",
-"comment" : " ",
+"type" : "string_singlequoted",
+"comment" : "",
 "annotation" : "# Configuration file"
 },
 "rce_daq_mode" : {
-"type" : "string",
+"type" : "string_singlequoted",
 "comment" : "# Configuration file",
 "annotation" : "# Can be one of Burst, Scope, Trigger"
 },
 "rce_feb_emulation_mode" : {
 "type" : "bool",
 "comment" : "# Can be one of Burst, Scope, Trigger",
-"annotation" : " "
+"annotation" : ""
 },
 "receiver_debug_level" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "receiver_tick_period_usecs" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "reporting_interval_fragments" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "reporting_interval_time" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "raw_buffer_size" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "raw_buffer_precommit" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "use_fragments_as_raw_buffer" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "data_timeout_usecs" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 }
 }
 }
 }
 },
 "daq" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "fhicl_pound_include_1" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "fhicl_pound_include_2" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce_standard" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce00_standard" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce00_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce00_standard.fragment_receiver.board_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce00_standard.fragment_receiver.rce_client_host_addr" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce00_standard.fragment_receiver.receive_port" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce01_standard" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce01_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce01_standard.fragment_receiver.board_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce01_standard.fragment_receiver.rce_client_host_addr" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce01_standard.fragment_receiver.receive_port" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce02_standard" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce02_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce02_standard.fragment_receiver.board_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce02_standard.fragment_receiver.rce_client_host_addr" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce02_standard.fragment_receiver.receive_port" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce03_standard" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce03_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce03_standard.fragment_receiver.board_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce03_standard.fragment_receiver.rce_client_host_addr" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce03_standard.fragment_receiver.receive_port" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce04_standard" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce04_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce04_standard.fragment_receiver.board_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce04_standard.fragment_receiver.rce_client_host_addr" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce04_standard.fragment_receiver.receive_port" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 }
 }
 },
@@ -407,279 +407,279 @@
 "comment" : "#main",
 "children" : {
 "rce05_standard" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce05_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce05_standard.fragment_receiver.board_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce05_standard.fragment_receiver.rce_client_host_addr" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce05_standard.fragment_receiver.receive_port" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce06_standard" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce06_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce06_standard.fragment_receiver.board_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce06_standard.fragment_receiver.rce_client_host_addr" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce06_standard.fragment_receiver.receive_port" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce07_standard" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce07_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce07_standard.fragment_receiver.board_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce07_standard.fragment_receiver.rce_client_host_addr" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce07_standard.fragment_receiver.receive_port" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce08_standard" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce08_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce08_standard.fragment_receiver.board_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce08_standard.fragment_receiver.rce_client_host_addr" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce08_standard.fragment_receiver.receive_port" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce09_standard" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce09_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce09_standard.fragment_receiver.board_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce09_standard.fragment_receiver.rce_client_host_addr" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce09_standard.fragment_receiver.receive_port" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce10_standard" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce10_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce10_standard.fragment_receiver.board_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce10_standard.fragment_receiver.rce_client_host_addr" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce10_standard.fragment_receiver.receive_port" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce11_standard" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce11_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce11_standard.fragment_receiver.board_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce11_standard.fragment_receiver.rce_client_host_addr" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce11_standard.fragment_receiver.receive_port" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce12_standard" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce12_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce12_standard.fragment_receiver.board_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce12_standard.fragment_receiver.rce_client_host_addr" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce12_standard.fragment_receiver.receive_port" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce13_standard" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce13_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce13_standard.fragment_receiver.board_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce13_standard.fragment_receiver.rce_client_host_addr" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce13_standard.fragment_receiver.receive_port" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce14_standard" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce14_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce14_standard.fragment_receiver.board_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce14_standard.fragment_receiver.rce_client_host_addr" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce14_standard.fragment_receiver.receive_port" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce15_standard" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce15_standard.fragment_receiver.fragment_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce15_standard.fragment_receiver.board_id" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "rce15_standard.fragment_receiver.rce_client_host_addr" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "rce15_standard.fragment_receiver.receive_port" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 }
 }
 }
@@ -688,7 +688,7 @@
 "comments" : [
 {
 "linenum" : 2,
-"value" : "#include |metrics.fcl|"
+"value" : "#include \"metrics.fcl\""
 },
 {
 "linenum" : 15,
@@ -704,7 +704,7 @@
 },
 {
 "linenum" : 28,
-"value" : "# rce_client_host_addr: |0.0.0.0|"
+"value" : "# rce_client_host_addr: \"0.0.0.0\""
 },
 {
 "linenum" : 33,
@@ -724,23 +724,23 @@
 },
 {
 "linenum" : 55,
-"value" : "# Since users will typically expect the block to be called |daq|"
+"value" : "# Since users will typically expect the block to be called \"daq\""
 },
 {
 "linenum" : 56,
-"value" : "# rather than |rce_standard|, we need to alias daq to rce_standard,"
+"value" : "# rather than \"rce_standard\", we need to alias daq to rce_standard,"
 },
 {
 "linenum" : 57,
-"value" : "# put the user^s changes in, and then alias rce_standard back to daq"
+"value" : "# put the user's changes in, and then alias rce_standard back to daq"
 },
 {
 "linenum" : 61,
-"value" : "#include |rce_expert_run_options.fcl|"
+"value" : "#include \"rce_expert_run_options.fcl\""
 },
 {
 "linenum" : 62,
-"value" : "#include |user_run_options.fcl|"
+"value" : "#include \"user_run_options.fcl\""
 }
 ],
 "origin" : {

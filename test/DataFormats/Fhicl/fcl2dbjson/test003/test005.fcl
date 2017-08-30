@@ -1,0 +1,26 @@
+#comment a1	tab
+a1: "abc" //a1
+#comment a2 x"double quoted string"x
+a2: "a
+b\nc" 
+#comment a3 x'single quoted string'x
+a3: "a	b\tc" //a3 #a3
+#comment a4 x\nnew linex
+a4: "a\tb	c" #a4 "//a4 ":" :: :
+#comment a5 x\ttabx
+a5: "a\\a" #a5 "//a5!@#$%^&*()_+-={}[]|;,<>.~"
+#comment a6 x\rreturnx
+a6: "a'b\'c" //a6 'a6'
+#comment b1 ->\ \\ \\\ ' " \' \"<-
+b1: 'abc' //b1
+#comment b2 ->// \ // \ // \\ //<-
+b2: 'a
+b\nc' 
+#comment b3 ->'' "" \"\" \'\'<-
+b3: 'a	b\tc' //b3 #b3
+#comment b4 ->\t\n\r\'\"<-
+b4: 'a\tb	c' #b4 "//b4
+#comment b5 ->	t	t<-
+b5: 'a\\a' #b5 "//b5"
+#comment b6 \\ // \\ // \\ // `` \`\`
+b6: 'a"b\"c' //b6 'b6'

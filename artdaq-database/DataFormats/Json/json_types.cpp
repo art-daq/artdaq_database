@@ -95,6 +95,23 @@ std::pair<bool, std::string> operator==(object_t const& first, object_t const& s
 
   return std::make_pair(true, noerror);
 }
+
+std::string to_string(type_t t){
+  switch(t){
+    case type_t::NOTSET:
+      return "NOTSET";
+    case type_t::VALUE:
+      return "VALUE";
+    case type_t::DATA:
+      return "DATA";
+    case type_t::OBJECT:
+      return "OBJECT";
+    case type_t::ARRAY:
+      return "ARRAY";      
+  }
+  return "NOTSET";
+}
+
 }
 }  // namespace database
 }  // namespace artdaq

@@ -1,0 +1,134 @@
+{
+   "document":{
+      "data":{
+         "prolog":{
+
+         },
+         "main":{
+            "s1":[
+               "1",
+               {
+                  "a":"1",
+                  "b":"2"
+               }
+            ]
+         }
+      },
+      "metadata":{
+         "prolog":{
+            "type":"table",
+            "comment":"#prolog",
+            "children":{
+
+            }
+         },
+         "main":{
+            "type":"table",
+            "comment":"#main",
+            "children":{
+               "s1":{
+                  "type":"sequence",
+                  "comment":" ",
+                  "annotation" : "",
+                  "children":{
+                     "0":{
+                        "type":"number",
+                        "comment":" ",
+                        "annotation" : ""
+                     },
+                     "1":{
+                        "type":"table",
+                        "comment":" ",
+                        "children":{
+                           "a":{
+                              "type":"number",
+                              "comment":" ",
+                              "annotation" : ""
+                           },
+                           "b":{
+                              "type":"number",
+                              "comment":" ",
+                              "annotation" : ""
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "converted":{
+         "guidata":[
+            {
+               "type":"table",
+               "name":"prolog",
+               "comment":"#prolog",
+               "children":[
+
+               ]
+            },
+            {
+               "type":"table",
+               "name":"main",
+               "comment":"#main",
+               "children":[
+                  {
+                     "type":"sequence",
+                     "name":"s1",
+                     "comment":" ",
+                     "children":[
+                        {
+                           "type":"number",
+                           "name":"0",
+                           "comment":" ",
+                           "value":"1",
+                           "annotation" : ""
+                        },
+                        {
+                           "type":"table",
+                           "name":"1",
+                           "comment":" ",
+                           "children":[
+                              {
+                                 "type":"number",
+                                 "name":"a",
+                                 "comment":" ",
+                                 "value":"1",
+                                 "annotation" : ""
+                              },
+                              {
+                                 "type":"number",
+                                 "name":"b",
+                                 "comment":" ",
+                                 "value":"2",
+                                 "annotation" : ""
+                              }
+                           ]
+                        }
+                     ]
+                  }
+               ]
+            }
+         ]
+      }
+   },
+   "comments":[
+      {
+         "linenum":0,
+         "value":"No comments"
+      }
+   ],
+   "origin":{
+      "format":"fhicl",
+      "name":"notprovided",
+      "source":"fhicl_to_json",
+      "timestamp":"2017-07-18T12:48:10.123-0500"
+   },
+   "version":"notprovided",
+   "entities":[
+
+   ],
+   "configurations":[
+
+   ]
+}

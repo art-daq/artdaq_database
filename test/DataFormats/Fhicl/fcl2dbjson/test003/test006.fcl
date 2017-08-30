@@ -1,0 +1,6 @@
+#comment hex1
+hex1: 0xffff //0xffff
+#comment hex2 
+hex2: 0xFfFfFf // 0xFfFfFf
+#comment hex3
+hex3: 0xDeAdBEEF # 0xDeAdBEEF

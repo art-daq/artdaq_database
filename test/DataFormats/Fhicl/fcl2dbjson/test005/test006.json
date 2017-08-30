@@ -127,51 +127,51 @@
 "children" : {
 "services" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "scheduler" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "fileMode" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "errorOnFailureToPut" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "NetMonTransportServiceInterface" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "service_provider" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "first_data_receiver_rank" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "mpi_buffer_count" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "max_fragment_size_words" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "data_receiver_count" : {
 "type" : "number",
-"comment" : " ",
+"comment" : "",
 "annotation" : "# 2"
 }
 }
@@ -180,81 +180,81 @@
 },
 "daq" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "max_fragment_size_words" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "event_builder" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "mpi_buffer_count" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "first_fragment_receiver_rank" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "fragment_receiver_count" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "expected_fragments_per_event" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "use_art" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "print_event_store_stats" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "verbose" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "metrics" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "evbFile" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "metricPluginType" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "level" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "fileName" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "uniquify" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 }
 }
 }
@@ -264,35 +264,35 @@
 },
 "outputs" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "rootMPIOutput" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "module_type" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "SelectEvents" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "SelectEvents" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
 "0" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "1" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 }
@@ -304,55 +304,55 @@
 },
 "physics" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "analyzers" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 
 }
 },
 "producers" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 
 }
 },
 "filters" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "prescaleMod2" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "module_type" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "nth" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "prescaleMod3" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "module_type" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "nth" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 }
 }
 }
@@ -360,45 +360,45 @@
 },
 "p1" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
 
 }
 },
 "pmod2" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
 "0" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "pmod3" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
 "0" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "my_output_modules" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
 "0" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 }
@@ -406,127 +406,127 @@
 },
 "source" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "module_type" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "waiting_time" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "resume_after_timeout" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "fragment_type_map" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
 "0" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
 "0" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "1" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "1" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
 "0" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "1" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "2" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
 "0" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "1" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "3" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
 "0" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "1" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "4" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
 "0" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "1" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "5" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
 "0" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "1" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 }
@@ -535,9 +535,9 @@
 }
 },
 "process_name" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 }
@@ -558,7 +558,7 @@
 },
 {
 "linenum" : 44,
-"value" : "#outputCommands: [ |keep *|, |drop artdaq::Fragments_daq_V1720_*|, |drop artdaq::Fragments_daq_V1724_*| ]"
+"value" : "#outputCommands: [ \"keep *\", \"drop artdaq::Fragments_daq_V1720_*\", \"drop artdaq::Fragments_daq_V1724_*\" ]"
 },
 {
 "linenum" : 46,
@@ -570,7 +570,7 @@
 },
 {
 "linenum" : 48,
-"value" : "#  fileName: |/tmp/artdaqdemo_eb00_r%06r_sr%02s_%to.root|"
+"value" : "#  fileName: \"/tmp/artdaqdemo_eb00_r%06r_sr%02s_%to.root\""
 },
 {
 "linenum" : 49,
@@ -582,7 +582,7 @@
 },
 {
 "linenum" : 51,
-"value" : "#  #outputCommands: [ |keep *|, |drop artdaq::Fragments_daq_V1720_*|, |drop artdaq::Fragments_daq_V1724_*| ]"
+"value" : "#  #outputCommands: [ \"keep *\", \"drop artdaq::Fragments_daq_V1720_*\", \"drop artdaq::Fragments_daq_V1724_*\" ]"
 },
 {
 "linenum" : 52,

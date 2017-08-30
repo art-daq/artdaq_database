@@ -27,10 +27,16 @@ constexpr auto source = "source";
 constexpr auto format = "format";
 constexpr auto file = "file";
 constexpr auto value = "value";
+
+
+constexpr auto nil = "nil";
 constexpr auto string = "string";
+constexpr auto boolean = "bool";
+constexpr auto complex = "complex";
+constexpr auto number = "number";
+constexpr auto tableid = "tableid";
+
 constexpr auto type = "type";
-constexpr auto whitespace = " ";
-constexpr auto nullstring = "";
 
 constexpr auto empty = "empty";
 constexpr auto comment = "comment";
@@ -83,6 +89,10 @@ constexpr auto notprovided = "notprovided";
 
 constexpr auto filter = "filter";
 constexpr auto ouid = "ouid";
+
+constexpr auto string_singlequoted="string_singlequoted";
+constexpr auto string_doublequoted="string_doublequoted";
+constexpr auto string_unquoted="string_unquoted";
 
 namespace regex {
 constexpr auto parse_decimal = "-?\\d*\\.?\\d+e[+-]?\\d+";

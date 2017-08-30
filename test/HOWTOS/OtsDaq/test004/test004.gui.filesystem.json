@@ -59,7 +59,7 @@
                "seq":{
                   "type":"sequence",
                   "comment":" ",
-                  "annotation":" "
+                  "annotation" : ""
                }
             }
          },
@@ -70,7 +70,7 @@
                "seq":{
                   "type":"sequence",
                   "comment":" ",
-                  "annotation":" "
+                  "annotation" : ""
                }
             }
          },
@@ -81,7 +81,7 @@
                "seq":{
                   "type":"sequence",
                   "comment":" ",
-                  "annotation":" "
+                  "annotation" : ""
                }
             }
          },
@@ -92,7 +92,7 @@
                "seq":{
                   "type":"sequence",
                   "comment":" ",
-                  "annotation":" "
+                  "annotation" : ""
                }
             }
          }

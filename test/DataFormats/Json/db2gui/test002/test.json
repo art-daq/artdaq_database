@@ -88,69 +88,69 @@
                      "event_builder_count":{
                         "type":"number",
                         "comment":" ",
-                        "annotation":" "
+                        "annotation" : ""
                      },
                      "event_queue_depth":{
                         "type":"number",
                         "comment":" ",
-                        "annotation":" "
+                        "annotation" : ""
                      },
                      "event_queue_wait_time":{
                         "type":"number",
                         "comment":" ",
-                        "annotation":" "
+                        "annotation" : ""
                      },
                      "expected_events_per_bunch":{
                         "type":"number",
                         "comment":" ",
-                        "annotation":" "
+                        "annotation" : ""
                      },
                      "file_duration":{
                         "type":"number",
                         "comment":" ",
-                        "annotation":" "
+                        "annotation" : ""
                      },
                      "file_event_count":{
                         "type":"number",
                         "comment":" ",
-                        "annotation":" "
+                        "annotation" : ""
                      },
                      "file_size_MB":{
                         "type":"number",
                         "comment":" ",
-                        "annotation":" "
+                        "annotation" : ""
                      },
                      "first_event_builder_rank":{
                         "type":"number",
                         "comment":" ",
-                        "annotation":" "
+                        "annotation" : ""
                      },
                      "mpi_buffer_count":{
                         "type":"number",
                         "comment":" ",
-                        "annotation":" "
+                        "annotation" : ""
                      },
                      "onmon_event_prescale":{
                         "type":"number",
                         "comment":" ",
-                        "annotation":" "
+                        "annotation" : ""
                      },
                      "print_event_store_stats":{
                         "type":"bool",
                         "comment":" ",
-                        "annotation":" "
+                        "annotation" : ""
                      },
                      "xmlrpc_client_list":{
                         "type":"string",
                         "comment":" ",
-                        "annotation":" "
+                        "annotation" : ""
                      }
                   }
                },
                "max_fragment_size_words":{
                   "type":"number",
                   "comment":" ",
-                  "annotation":" "
+                  "annotation" : ""
                },
                "metrics":{
                   "type":"table",
@@ -163,22 +163,22 @@
                            "fileName":{
                               "type":"string",
                               "comment":" ",
-                              "annotation":" "
+                              "annotation" : ""
                            },
                            "level":{
                               "type":"number",
                               "comment":" ",
-                              "annotation":" "
+                              "annotation" : ""
                            },
                            "metricPluginType":{
                               "type":"string",
                               "comment":" ",
-                              "annotation":" "
+                              "annotation" : ""
                            },
                            "uniquify":{
                               "type":"bool",
                               "comment":" ",
-                              "annotation":" "
+                              "annotation" : ""
                            }
                         }
                      }
@@ -215,12 +215,12 @@
                            "module_type":{
                               "type":"string",
                               "comment":" ",
-                              "annotation":" "
+                              "annotation" : ""
                            },
                            "nth":{
                               "type":"number",
                               "comment":" ",
-                              "annotation":" "
+                              "annotation" : ""
                            }
                         }
                      },
@@ -231,12 +231,12 @@
                            "module_type":{
                               "type":"string",
                               "comment":" ",
-                              "annotation":" "
+                              "annotation" : ""
                            },
                            "nth":{
                               "type":"number",
                               "comment":" ",
-                              "annotation":" "
+                              "annotation" : ""
                            }
                         }
                      }
@@ -245,22 +245,22 @@
                "p1":{
                   "type":"sequence",
                   "comment":" ",
-                  "annotation":" "
+                  "annotation" : ""
                },
                "p2":{
                   "type":"sequence",
                   "comment":" ",
-                  "annotation":" "
+                  "annotation" : ""
                },
                "pmod2":{
                   "type":"sequence",
                   "comment":" ",
-                  "annotation":" "
+                  "annotation" : ""
                },
                "pmod3":{
                   "type":"sequence",
                   "comment":" ",
-                  "annotation":" "
+                  "annotation" : ""
                },
                "producers":{
                   "type":"table",
@@ -273,12 +273,12 @@
                            "instance_name":{
                               "type":"string",
                               "comment":" ",
-                              "annotation":" "
+                              "annotation" : ""
                            },
                            "module_type":{
                               "type":"string",
                               "comment":" ",
-                              "annotation":" "
+                              "annotation" : ""
                            }
                         }
                      }
@@ -289,7 +289,7 @@
          "process_name":{
             "type":"string",
             "comment":" ",
-            "annotation":" "
+            "annotation" : ""
          },
          "services":{
             "type":"table",
@@ -302,12 +302,12 @@
                      "max_fragment_size_words":{
                         "type":"number",
                         "comment":" ",
-                        "annotation":" "
+                        "annotation" : ""
                      },
                      "service_provider":{
                         "type":"string",
                         "comment":" ",
-                        "annotation":" "
+                        "annotation" : ""
                      }
                   }
                },
@@ -318,7 +318,7 @@
                      "fileMode":{
                         "type":"string",
                         "comment":" ",
-                        "annotation":" "
+                        "annotation" : ""
                      }
                   }
                }
@@ -331,7 +331,7 @@
                "module_type":{
                   "type":"string",
                   "comment":" ",
-                  "annotation":" "
+                  "annotation" : ""
                }
             }
          }
@@ -359,84 +359,84 @@
                            "name":"event_builder_count",
                            "comment":" ",
                            "value":2,
-                           "annotation":" "
+                           "annotation" : ""
                         },
                         {
                            "type":"number",
                            "name":"event_queue_depth",
                            "comment":" ",
                            "value":2,
-                           "annotation":" "
+                           "annotation" : ""
                         },
                         {
                            "type":"number",
                            "name":"event_queue_wait_time",
                            "comment":" ",
                            "value":1,
-                           "annotation":" "
+                           "annotation" : ""
                         },
                         {
                            "type":"number",
                            "name":"expected_events_per_bunch",
                            "comment":" ",
                            "value":1,
-                           "annotation":" "
+                           "annotation" : ""
                         },
                         {
                            "type":"number",
                            "name":"file_duration",
                            "comment":" ",
                            "value":0,
-                           "annotation":" "
+                           "annotation" : ""
                         },
                         {
                            "type":"number",
                            "name":"file_event_count",
                            "comment":" ",
                            "value":0,
-                           "annotation":" "
+                           "annotation" : ""
                         },
                         {
                            "type":"number",
                            "name":"file_size_MB",
                            "comment":" ",
                            "value":8000,
-                           "annotation":" "
+                           "annotation" : ""
                         },
                         {
                            "type":"number",
                            "name":"first_event_builder_rank",
                            "comment":" ",
                            "value":2,
-                           "annotation":" "
+                           "annotation" : ""
                         },
                         {
                            "type":"number",
                            "name":"mpi_buffer_count",
                            "comment":" ",
                            "value":8,
-                           "annotation":" "
+                           "annotation" : ""
                         },
                         {
                            "type":"number",
                            "name":"onmon_event_prescale",
                            "comment":" ",
                            "value":1,
-                           "annotation":" "
+                           "annotation" : ""
                         },
                         {
                            "type":"bool",
                            "name":"print_event_store_stats",
                            "comment":" ",
                            "value":true,
-                           "annotation":" "
+                           "annotation" : ""
                         },
                         {
                            "type":"string",
                            "name":"xmlrpc_client_list",
                            "comment":" ",
                            "value":";http://topol.fnal.gov:5205/RPC2,3;http://topol.fnal.gov:5206/RPC2,3;http://topol.fnal.gov:5235/RPC2,4;http://topol.fnal.gov:5236/RPC2,4;http://topol.fnal.gov:5265/RPC2,5;http://topol.fnal.gov:5266/RPC2,5",
-                           "annotation":" "
+                           "annotation" : ""
                         }
                      ]
                   },
@@ -445,7 +445,7 @@
                      "name":"max_fragment_size_words",
                      "comment":" ",
                      "value":2097152,
-                     "annotation":" "
+                     "annotation" : ""
                   },
                   {
                      "type":"table",
@@ -461,28 +461,28 @@
                                  "name":"fileName",
                                  "comment":" ",
                                  "value":"/tmp/aggregator/agg_%UID%_metrics.log",
-                                 "annotation":" "
+                                 "annotation" : ""
                               },
                               {
                                  "type":"number",
                                  "name":"level",
                                  "comment":" ",
                                  "value":44,
-                                 "annotation":" "
+                                 "annotation" : ""
                               },
                               {
                                  "type":"string",
                                  "name":"metricPluginType",
                                  "comment":" ",
                                  "value":"file",
-                                 "annotation":" "
+                                 "annotation" : ""
                               },
                               {
                                  "type":"bool",
                                  "name":"uniquify",
                                  "comment":" ",
                                  "value":true,
-                                 "annotation":" "
+                                 "annotation" : ""
                               }
                            ],
                            "type":"table",
@@ -528,14 +528,14 @@
                                  "name":"module_type",
                                  "comment":" ",
                                  "value":"NthEvent",
-                                 "annotation":" "
+                                 "annotation" : ""
                               },
                               {
                                  "type":"number",
                                  "name":"nth",
                                  "comment":" ",
                                  "value":2,
-                                 "annotation":" "
+                                 "annotation" : ""
                               }
                            ]
                         },
@@ -549,14 +549,14 @@
                                  "name":"module_type",
                                  "comment":" ",
                                  "value":"NthEvent",
-                                 "annotation":" "
+                                 "annotation" : ""
                               },
                               {
                                  "type":"number",
                                  "name":"nth",
                                  "comment":" ",
                                  "value":3,
-                                 "annotation":" "
+                                 "annotation" : ""
                               }
                            ]
                         }
@@ -609,14 +609,14 @@
                                  "name":"instance_name",
                                  "comment":" ",
                                  "value":"ArtdaqDemo",
-                                 "annotation":" "
+                                 "annotation" : ""
                               },
                               {
                                  "type":"string",
                                  "name":"module_type",
                                  "comment":" ",
                                  "value":"ArtdaqDemoBuildInfo",
-                                 "annotation":" "
+                                 "annotation" : ""
                               }
                            ]
                         }
@@ -629,7 +629,7 @@
                "name":"process_name",
                "comment":" ",
                "value":"DAQAG",
-               "annotation":" "
+               "annotation" : ""
             },
             {
                "type":"table",
@@ -646,14 +646,14 @@
                            "name":"max_fragment_size_words",
                            "comment":" ",
                            "value":2097152,
-                           "annotation":" "
+                           "annotation" : ""
                         },
                         {
                            "type":"string",
                            "name":"service_provider",
                            "comment":" ",
                            "value":"NetMonTransportService",
-                           "annotation":" "
+                           "annotation" : ""
                         }
                      ]
                   },
@@ -667,7 +667,7 @@
                            "name":"fileMode",
                            "comment":" ",
                            "value":"NOMERGE",
-                           "annotation":" "
+                           "annotation" : ""
                         }
                      ]
                   }
@@ -683,7 +683,7 @@
                      "name":"module_type",
                      "comment":" ",
                      "value":"NetMonInput",
-                     "annotation":" "
+                     "annotation" : ""
                   }
                ]
             }

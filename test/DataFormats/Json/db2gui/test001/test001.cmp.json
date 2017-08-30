@@ -1,105 +1,143 @@
 {
-"document" : {
-"data" : {
-"tt" : [
-"mm",
-1,
-[
-"aa",
-"zz"
-],
-{
-"xx" : true
-}
-]
-},
-"metadata" : {
-"source" : {
-"type" : "table",
-"comment" : " ",
-"children" : {
-"module_type" : {
-"type" : "string",
-"comment" : "#Success 1  above satom",
-"annotation":""
-},
-"resume_after_timeout" : {
-"type" : "bool",
-"comment" : " ",
-"annotation" : "#Success 3 right of satom"
-},
-"waiting_time" : {
-"type" : "number",
-"comment" : " ",
-"annotation" : "//Success 2 right of satom"
-}
-}
-}
-},
-"search" : [
-{
-"name" : "find any",
-"query" : "not defined"
-}
-],
-"converted" : {
-"guidata" : [
-{
-"type" : "sequence",
-"name" : "tt",
-"comment" : " ",
-"children" : [
-"mm",
-1,
-[
-"aa",
-"zz"
-],
-{
-"xx" : true
-}
-]
-}
-]
-}
-},
-"origin" : {
- 
-"format" : "json"
- 
-},
-"version" : "version",
-"configurations" : [
-{
-"name" : "config-003",
-"assigned" : "Tue Mar  8 21:34:36 2016"
-}
-],
-"aliases" : {
-"active" : [
+   "document":{
+      "data":{
+         "tt":[
+            "mm",
+            1,
+            [
+               "aa",
+               "zz"
+            ],
+            {
+               "xx":true
+            }
+         ]
+      },
+      "metadata":{
+         "source":{
+            "type":"table",
+            "comment":" ",
+            "children":{
+               "module_type":{
+                  "type":"string",
+                  "comment":"#Success 1  above satom",
+                  "annotation":""
+               },
+               "resume_after_timeout":{
+                  "type":"bool",
+                  "comment":" ",
+                  "annotation":"#Success 3 right of satom"
+               },
+               "waiting_time":{
+                  "type":"number",
+                  "comment":" ",
+                  "annotation":"//Success 2 right of satom"
+               }
+            }
+         }
+      },
+      "search":[
+         {
+            "name":"find any",
+            "query":"not defined"
+         }
+      ],
+      "converted":{
+         "guidata":[
+            {
+               "type":"sequence",
+               "name":"tt",
+               "comment":" ",
+               "children":[
+                  {
+                     "type":"string",
+                     "name":"0",
+                     "comment":" ",
+                     "value":"mm",
+                     "annotation" : ""
+                  },
+                  {
+                     "type":"string",
+                     "name":"1",
+                     "comment":" ",
+                     "value":1,
+                     "annotation" : ""
+                  },
+                  {
+                     "type":"sequence",
+                     "name":"2",
+                     "comment":" ",
+                     "children":[
+                        {
+                           "type":"string",
+                           "name":"0",
+                           "comment":" ",
+                           "value":"aa",
+                           "annotation" : ""
+                        },
+                        {
+                           "type":"string",
+                           "name":"1",
+                           "comment":" ",
+                           "value":"zz",
+                           "annotation" : ""
+                        }
+                     ]
+                  },
+                  {
+                     "type":"table",
+                     "name":"3",
+                     "comment":" ",
+                     "children":[
+                        {
+                           "type":"string",
+                           "name":"xx",
+                           "comment":" ",
+                           "value":true,
+                           "annotation" : ""
+                        }
+                     ]
+                  }
+               ]
+            }
+         ]
+      }
+   },
+   "origin":{
+      "format":"json"
+   },
+   "version":"version",
+   "configurations":[
+      {
+         "name":"config-003",
+         "assigned":"Tue Mar  8 21:34:36 2016"
+      }
+   ],
+   "aliases":{
+      "active":[
 
-],
-"history" : [
+      ],
+      "history":[
 
-]
-},
-"bookkeeping" : {
-"isdeleted" : false,
-"isreadonly" : true,
-"created" : "Tue Dec 29 18:19:25 2015",
-"updates" : [
-{
-"addToGlobalConfig" : "Tue Mar  8 21:34:36 2016"
-},
-{
-"setVersion" : "Tue Mar  8 21:34:36 2016"
-},
-{
-"setConfigurableEntity" : "Tue Mar  8 21:34:36 2016"
-}
-]
-},
-"entity" : {
-"name" : "any"
-}
+      ]
+   },
+   "bookkeeping":{
+      "isdeleted":false,
+      "isreadonly":true,
+      "created":"Tue Dec 29 18:19:25 2015",
+      "updates":[
+         {
+            "addToGlobalConfig":"Tue Mar  8 21:34:36 2016"
+         },
+         {
+            "setVersion":"Tue Mar  8 21:34:36 2016"
+         },
+         {
+            "setConfigurableEntity":"Tue Mar  8 21:34:36 2016"
+         }
+      ]
+   },
+   "entity":{
+      "name":"any"
+   }
 }

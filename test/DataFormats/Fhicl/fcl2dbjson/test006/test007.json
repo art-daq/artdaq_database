@@ -14,7 +14,7 @@
 "EventDisplayRefreshRate" : "30",
 "DetailedMonitoring" : "false",
 "ScopeMonitoring" : "false",
-"DriftVelocity" : "0.900000",
+"DriftVelocity" : "0.9",
 "CollectionPedestal" : "550",
 "MicroslicePreBuffer" : "5",
 "MicrosliceTriggerLength" : "5"
@@ -35,104 +35,104 @@
 "children" : {
 "OnlineMonitoring_standard" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "module_type" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "DataDirPath" : {
-"type" : "string",
-"comment" : " ",
+"type" : "string_doublequoted",
+"comment" : "",
 "annotation" : "# Where the data is written by the aggregator"
 },
 "MonitorSavePath" : {
-"type" : "string",
-"comment" : " ",
+"type" : "string_doublequoted",
+"comment" : "",
 "annotation" : "# Directory in which to save the monitoring data (looked at by cron job)"
 },
 "EVDSavePath" : {
-"type" : "string",
-"comment" : " ",
+"type" : "string_doublequoted",
+"comment" : "",
 "annotation" : "# Directory in which to save online event display (looked at by cron job)"
 },
 "ChannelMapFile" : {
-"type" : "string",
-"comment" : " ",
+"type" : "string_doublequoted",
+"comment" : "",
 "annotation" : "# The channel map file location"
 },
 "ImageType" : {
-"type" : "string",
-"comment" : " ",
+"type" : "string_doublequoted",
+"comment" : "",
 "annotation" : "# Format to save the images in"
 },
 "InitialMonitoringUpdate" : {
 "type" : "number",
-"comment" : " ",
+"comment" : "",
 "annotation" : "# Time (in s) after the start of a run to save the first set of monitoring plots"
 },
 "MonitoringRefreshRate" : {
 "type" : "number",
-"comment" : " ",
+"comment" : "",
 "annotation" : "# Time (in s) between each refresh of the monitoring plots"
 },
 "EventDisplayRefreshRate" : {
 "type" : "number",
-"comment" : " ",
+"comment" : "",
 "annotation" : "# Time (in s) between each refresh of the online event display"
 },
 "DetailedMonitoring" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : "# Switch to turn on and off ^detailed monitoring^, which saves much more information (but is much slower)"
+"comment" : "",
+"annotation" : "# Switch to turn on and off 'detailed monitoring', which saves much more information (but is much slower)"
 },
 "ScopeMonitoring" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : "# Switch to set whether or not the DAQ is being run in ^scope mode^"
+"comment" : "",
+"annotation" : "# Switch to set whether or not the DAQ is being run in 'scope mode'"
 },
 "DriftVelocity" : {
 "type" : "number",
-"comment" : " ",
+"comment" : "",
 "annotation" : "#mm/us                         # The electron drift velocity (used for scaling EVD axes)"
 },
 "CollectionPedestal" : {
 "type" : "number",
-"comment" : " ",
+"comment" : "",
 "annotation" : "#ADC                           # The average pedestal of the collection wires (used for subtraction when making online EVDs)"
 },
 "MicroslicePreBuffer" : {
 "type" : "number",
-"comment" : " ",
+"comment" : "",
 "annotation" : "# The number of microslices buffer and saved before a trigger"
 },
 "MicrosliceTriggerLength" : {
 "type" : "number",
-"comment" : " ",
+"comment" : "",
 "annotation" : "# The number of microslices saved after a trigger has occurred"
 }
 }
 },
 "OnlineMonitoring_detailed" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "OnlineMonitoring_detailed.DetailedMonitoring" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "OnlineMonitoring_scope" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "OnlineMonitoring_scope.ScopeMonitoring" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 }
 }
 },
@@ -141,9 +141,9 @@
 "comment" : "#main",
 "children" : {
 "process_name" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 }
@@ -188,11 +188,11 @@
 },
 {
 "linenum" : 25,
-"value" : "# Switch to turn on and off ^detailed monitoring^, which saves much more information (but is much slower)"
+"value" : "# Switch to turn on and off 'detailed monitoring', which saves much more information (but is much slower)"
 },
 {
 "linenum" : 27,
-"value" : "# Switch to set whether or not the DAQ is being run in ^scope mode^"
+"value" : "# Switch to set whether or not the DAQ is being run in 'scope mode'"
 },
 {
 "linenum" : 29,

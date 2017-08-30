@@ -44,7 +44,8 @@
 "module_type" : "NetMonOutput",
 "SelectEvents" : {
 "SelectEvents" : [
-
+"pmod2",
+"pmod3"
 ]
 }
 }
@@ -61,13 +62,13 @@
 }
 },
 "pmod2" : [
-
+"prescaleMod2"
 ],
 "pmod3" : [
-
+"prescaleMod3"
 ],
 "my_output_modules" : [
-
+"netMonOutput"
 ]
 },
 "source" : {
@@ -92,50 +93,50 @@
 "children" : {
 "services" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "scheduler" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "fileMode" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "user" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "NetMonTransportServiceInterface" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "service_provider" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "first_data_receiver_rank" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "mpi_buffer_count" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "max_fragment_size_words" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "data_receiver_count" : {
 "type" : "number",
-"comment" : " ",
+"comment" : "",
 "annotation" : "# 2"
 }
 }
@@ -146,81 +147,81 @@
 },
 "daq" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "max_fragment_size_words" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "event_builder" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "mpi_buffer_count" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "first_fragment_receiver_rank" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "fragment_receiver_count" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "expected_fragments_per_event" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "use_art" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "print_event_store_stats" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "verbose" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "metrics" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "evbFile" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "metricPluginType" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "level" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "fileName" : {
-"type" : "string",
-"comment" : " ",
+"type" : "string_doublequoted",
+"comment" : "",
 "annotation" : "//demoe"
 },
 "uniquify" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 }
 }
 }
@@ -230,16 +231,16 @@
 },
 "outputs" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "netMonOutput" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "module_type" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "SelectEvents" : {
 "type" : "table",
@@ -248,9 +249,18 @@
 "SelectEvents" : {
 "type" : "sequence",
 "comment" : "#Failure 5 not a satom ",
-"annotation" : " ",
+"annotation" : "",
 "children" : {
-
+"0" : {
+"type" : "string_unquoted",
+"comment" : "#Failure 5 not a satom ",
+"annotation" : ""
+},
+"1" : {
+"type" : "string_unquoted",
+"comment" : "#Failure 5 not a satom ",
+"annotation" : ""
+}
 }
 }
 }
@@ -261,40 +271,40 @@
 },
 "physics" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "filters" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "prescaleMod2" : {
 "type" : "table",
 "comment" : "#Failure 4 not a satom ",
 "children" : {
 "module_type" : {
-"type" : "string",
-"comment" : " ",
+"type" : "string_unquoted",
+"comment" : "",
 "annotation" : "#//Success 5 right of satom"
 },
 "nth" : {
 "type" : "number",
 "comment" : "#//Success 5 right of satom",
-"annotation" : " "
+"annotation" : ""
 }
 }
 },
 "prescaleMod3" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "module_type" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "nth" : {
 "type" : "number",
-"comment" : " ",
+"comment" : "",
 "annotation" : "//#Success 4 right of satom"
 }
 }
@@ -303,55 +313,67 @@
 },
 "pmod2" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
-
+"0" : {
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
+}
 }
 },
 "pmod3" : {
 "type" : "sequence",
 "comment" : "#Failure 2 not a satom ",
-"annotation" : " ",
+"annotation" : "",
 "children" : {
-
+"0" : {
+"type" : "string_unquoted",
+"comment" : "#Failure 2 not a satom ",
+"annotation" : ""
+}
 }
 },
 "my_output_modules" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
-
+"0" : {
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
+}
 }
 }
 }
 },
 "source" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "module_type" : {
-"type" : "string",
+"type" : "string_unquoted",
 "comment" : "#Success 1  above satom",
-"annotation" : " "
+"annotation" : ""
 },
 "waiting_time" : {
 "type" : "number",
-"comment" : " ",
+"comment" : "",
 "annotation" : "//Success 2 right of satom"
 },
 "resume_after_timeout" : {
 "type" : "bool",
-"comment" : " ",
+"comment" : "",
 "annotation" : "#Success 3 right of satom"
 }
 }
 },
 "process_name" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 }

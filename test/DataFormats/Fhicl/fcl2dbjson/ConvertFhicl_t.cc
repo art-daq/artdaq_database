@@ -115,7 +115,12 @@ bool test_convert2fcl(std::string const& input, std::string const& compare) {
   auto output = std::string();
   auto filename = std::string();
 
-  if (!fhicljson::json_to_fhicl(input, output,filename)) return false;
+  if (!fhicljson::json_to_fhicl(input, output, filename)) {
+    std::cout << "Convertion failed. \n";
+    std::cerr << "input:\n" << input << "\n";
+    std::cerr << "output:\n" << output << "\n";
+    return false;
+  };
 
   if (output == compare)
     return true;
@@ -123,6 +128,14 @@ bool test_convert2fcl(std::string const& input, std::string const& compare) {
     std::cout << "Convertion failed. \n";
     std::cerr << "output:\n" << output << "\n";
     std::cerr << "expected:\n" << compare << "\n";
+
+    auto mismatch = std::mismatch(compare.begin(), compare.end(), output.begin());
+    std::cerr << "File sizes (exp,ret)=(" << std::distance(compare.begin(), compare.end()) << ","
+              << std::distance(output.begin(), output.end()) << ")\n";
+
+    std::cerr << "First mismatch at position " << std::distance(compare.begin(), mismatch.first) << ", (exp,ret)=(0x"
+              << std::hex << (unsigned int)*mismatch.first << ",0x" << (unsigned int)*mismatch.second << ")\n";
+    
   }
 
   return false;
@@ -137,8 +150,10 @@ bool test_convert2json(std::string const& input, std::string const& compare) {
 
   std::cout << "Convertion started. \n";
 
-  if (!fhicljson::fhicl_to_json(input,filename, output)) {
+  if (!fhicljson::fhicl_to_json(input, filename, output)) {
     std::cout << "Convertion failed. \n";
+    std::cerr << "input:\n" << input << "\n";
+    std::cerr << "output:\n" << output << "\n";
     return false;
   }
 
@@ -163,11 +178,21 @@ bool test_roundconvertfcl(std::string const& input, std::string const& compare) 
   auto filename = std::string("notprovided");
 
   try {
-    if (!fhicljson::fhicl_to_json(input,filename, tmp)) return false;
+    if (!fhicljson::fhicl_to_json(input, filename, tmp)) {
+      std::cout << "Convertion failed. \n";
+      std::cerr << "input:\n" << input << "\n";
+      std::cerr << "tmp:\n" << tmp << "\n";
+      return false;
+    }
 
     std::cout << "fhicl_to_json succeeded.\n";
 
-    if (!fhicljson::json_to_fhicl(tmp, output,filename)) return false;
+    if (!fhicljson::json_to_fhicl(tmp, output, filename)) {
+      std::cout << "Convertion failed. \n";
+      std::cerr << "tmp:\n" << tmp << "\n";
+      std::cerr << "output:\n" << output << "\n";
+      return false;
+    };
 
     std::cout << "json_to_fhicl succeeded.\n";
 
@@ -186,6 +211,13 @@ bool test_roundconvertfcl(std::string const& input, std::string const& compare) 
     std::cerr << "output:\n" << output << "\n";
     std::cerr << "expected:\n" << compare << "\n";
     std::cerr << "tmp:\n" << tmp << "\n";
+
+    auto mismatch = std::mismatch(compare.begin(), compare.end(), output.begin());
+    std::cerr << "File sizes (exp,ret)=(" << std::distance(compare.begin(), compare.end()) << ","
+              << std::distance(output.begin(), output.end()) << ")\n";
+
+    std::cerr << "First mismatch at position " << std::distance(compare.begin(), mismatch.first) << ", (exp,ret)=(0x"
+              << std::hex << (unsigned int)*mismatch.first << ",0x" << (unsigned int)*mismatch.second << ")\n";
   }
 
   return false;
@@ -200,11 +232,22 @@ bool test_roundconvertjson(std::string const& input, std::string const& compare)
   auto filename = std::string();
 
   try {
-    if (!fhicljson::json_to_fhicl(input,tmp,filename)) return false;
+    if (!fhicljson::json_to_fhicl(input, tmp, filename)) {
+      std::cout << "Convertion failed. \n";
+      std::cerr << "input:\n" << input << "\n";
+      std::cerr << "tmp:\n" << tmp << "\n";
+      return false;
+    }
 
     std::cout << "json_to_fhicl succeeded.\n";
 
-    if (!fhicljson::fhicl_to_json(tmp, filename,output)) return false;
+    if (!fhicljson::fhicl_to_json(tmp, filename, output)) {
+      std::cout << "Convertion failed. \n";
+      std::cerr << "tmp:\n" << tmp << "\n";
+      std::cerr << "output:\n" << output << "\n";
+      return false;
+    };
+
     std::cout << "fhicl_to_json succeeded.\n";
 
   } catch (...) {
@@ -224,8 +267,8 @@ bool test_roundconvertjson(std::string const& input, std::string const& compare)
     std::cerr << "expected:\n" << compare << "\n";
     std::cerr << "tmp:\n" << tmp << "\n";
 
-  auto filename=std::string{"/tmp/test.json"};  
-  db::write_buffer_to_file(output,filename);
+    auto filename = std::string{"/tmp/test.json"};
+    db::write_buffer_to_file(output, filename);
   }
 
   return false;
