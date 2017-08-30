@@ -1,46 +1,46 @@
- 
-daq: {
- 
-max_fragment_size_words: 2097152  
- 
-fragment_receiver: {
- 
-mpi_buffer_count: 16  
- 
-mpi_sync_interval: 50  
- 
-first_event_builder_rank: 2  
- 
-event_builder_count: 2  
- 
-generator: ToySimulator  
- 
-fragment_type: TOY1  
- 
-fragment_id: 0  
- 
-board_id: 0  
- 
-random_seed: 9542  
- 
-sleep_on_stop_us: 500000  
- 
-nADCcounts: 40  
- 
-throttle_usecs: 100000  
 
-} 
+daq: {
+
+max_fragment_size_words: 2097152 
+
+fragment_receiver: {
+
+mpi_buffer_count: 16 
+
+mpi_sync_interval: 50 
+
+first_event_builder_rank: 2 
+
+event_builder_count: 2 
+
+generator: ToySimulator 
+
+fragment_type: TOY1 
+
+fragment_id: 0 
+
+board_id: 0 
+
+random_seed: 9542 
+
+sleep_on_stop_us: 500000 
+
+nADCcounts: 40 
+
+throttle_usecs: 100000 
+
+}
 metrics: {
- 
+
 brFile: {
- 
-metricPluginType: file  
- 
-level: 3  
- 
-fileName: "/tmp/boardreader/br_%UID%_metrics.log"  
- 
-uniquify: true  
+
+metricPluginType: "file" 
+
+level: 3 
+
+fileName: "/tmp/boardreader/br_%UID%_metrics.log" 
+
+uniquify: true 
 
 }
 }
