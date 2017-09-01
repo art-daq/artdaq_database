@@ -17,6 +17,10 @@ artdaq_processes:
     pattern:"(.*)((component)(\d+)(_hw_cfg))(\.fcl$)"
   },
   {
+    collection:Timing
+    pattern:"(.*)((timing)(\d*)(_hw_cfg))(\.fcl$)"
+  },  
+  {
     collection:Components
     pattern:"(.*)((component)(\d*))(\.fcl$)"
   },  

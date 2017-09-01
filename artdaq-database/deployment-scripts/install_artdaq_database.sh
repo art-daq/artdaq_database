@@ -511,11 +511,17 @@ for testfile in $(find ${ARTDAQ_DATABASE_DIR}/testdata -name  "np04_teststand*ta
   fi
   printf "Info: Current directory $(pwd) has $(find . -name "*.fcl" |wc -l) fcl files\n"
 
+  printf "Info: Comparing comparing the original with the exported files.\n"
+  printf "#----------------------- compare begin--------------------------------------------\n"
+  diff -I "\s*#.*" -BZNb -W 80 -q  -r --suppress-common-lines ${tmpdir}/${tmpname} ${tmpdir}/${tmpname}-export
+  printf "#----------------------- compare details-------------------------------------------\n"
+  diff -I "\s*#.*" -BZNb -W 80 -y -r --suppress-common-lines ${tmpdir}/${tmpname} ${tmpdir}/${tmpname}-export  
+  printf "#----------------------- compare end----------------------------------------------\n"  
 done
 
 printf "\nInfo: Running conftool.py tests\n"
   
-test1=("\"listCollections\"" "\"['SystemLayout', 'RCEs', 'SSPs', 'expert_options', 'Components', 'Aggregators', 'EventBuilders', 'common_code']\"")
+test1=("\"listCollections\"" "\"['SystemLayout', 'RCEs', 'SSPs', 'expert_options', 'Components', 'Timing', 'Aggregators', 'EventBuilders', 'common_code']\"")
 test2=("\"listDatabases\"" "\"['cern_pddaq_db']\"")
 test3=("\"getListOfAvailableRunConfigurationPrefixes\"" "\"['np04_teststand_tests']\"")
 test4=("\"getListOfAvailableRunConfigurations\"" "\"['np04_teststand_tests00001']\"")
@@ -623,6 +629,51 @@ done
 
 return $rc_success
 }
+
+function update_crontab(){
+  printf "\nInfo: Updating user's crontab\n"  
+  local crontab_file="/tmp/artdaq_database-${timestamp}.crontab"
+  
+  crontab_bin=$(command -v crontab)
+  if [ -z "$crontab_bin" ] &&  [ ! -x ${crontab_bin} ]; then
+	printf "Error: crontab was not installed. Aborting.\n"; return $rc_failure; else
+        printf "Info: crontab found: '${crontab_bin}'\n"
+  fi
+  
+  printf "#-----------------------old crontab begin------------------------\n"
+  cat ${crontab_file}
+  printf "#-----------------------old contents end-------------------------\n"
+
+  crontab -l > ${crontab_file}
+  
+  cat ${crontab_file} | grep -v backup_artdaq_database.sh > ${crontab_file}.new
+  echo "30 01 * * * ${DATABASE_BASE_DIR}/backup_artdaq_database.sh ${ACTIVE_DATABASEBASE_NAME} >>${DATABASE_BASE_DIR}/database-backup-${ACTIVE_DATABASEBASE_NAME}.log 2>&1" >> ${crontab_file}.new
+  #echo "*/5 * * * * ${DATABASE_BASE_DIR}/backup_artdaq_database.sh ${ACTIVE_DATABASEBASE_NAME} >>${DATABASE_BASE_DIR}/database-backup-${ACTIVE_DATABASEBASE_NAME}.log 2>&1" >> ${crontab_file}.new
+  printf "#-----------------------new crontab begin------------------------\n"
+  cat ${crontab_file}.new
+  printf "#-----------------------new contents end-------------------------\n"
+  crontab -r
+  crontab ${crontab_file}.new
+  printf "#-----------------------current crontab begin------------------------\n"
+  crontab -l
+  printf "#-----------------------current contents end-------------------------\n"
+  
+  printf "Info: Performing inital backup\n"
+  ${DATABASE_BASE_DIR}/backup_artdaq_database.sh ${ACTIVE_DATABASEBASE_NAME} >>${DATABASE_BASE_DIR}/database-backup-${ACTIVE_DATABASEBASE_NAME}.log
+  printf "Info: Backup size \n$(du -hs ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/backup/*)\n"
+  printf "Info: Listing archive files\n"
+  ls -al $(find ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/backup ./ -name "*tar-bzip2-base64") 
+  
+  local file_cout=$(find ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/backup ./ -name "*tar-bzip2-base64" |wc -l)
+  
+  if [ $file_cout -ne 9 ]; then
+     printf "Error: Partial backup.\n"
+     return $rc_failure
+  fi
+
+  return $rc_success;
+}
+
 function main_program(){
 printf "\nInfo: Running main_program\n"
 
@@ -670,7 +721,7 @@ if [[  $? -ne $rc_success ]]; then
   check_mongod_instance
   if [[  $? -ne $rc_success ]]; then 
       echo -e "\e[31;7;5mError: failed accessing mongo database.\e[0m"
-      read -p "Resume script ? " answer
+#     read -p "Resume script ? " answer
       stop_mongod_instance
       return $rc_failure
   fi 
@@ -699,7 +750,15 @@ if [[  $? -ne $rc_success ]]; then
    fi 
 fi
 
+update_crontab
+if [[ $? -ne $rc_success ]]; then 
+   echo -e "\e[31;7;5mError: failed updating crontab.\e[0m"; return $rc_failure
+fi
+
+
 local error_count=0
+
+read -p "Resume script ? " answer
 
 stop_webeditor_instance
 if [[  $? -ne $rc_success ]]; then 
@@ -734,6 +793,7 @@ echo -e "\e[0;7;5mInfo: Installation succeeded.\e[0m"
 
 return $rc_success
 }
+
 
 function pull_products(){
 cd /nfs/sw/artdaq/download  
