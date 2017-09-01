@@ -2,11 +2,12 @@
 #----------------------------------------------------------------
 # Configuration parameters
 #----------------------------------------------------------------
-ARTDAQ_UPS_QUAL="e14:prof:s50"
+#ARTDAQ_UPS_QUAL="e14:prof:s50"
+ARTDAQ_UPS_QUAL="e14:debug:s50"
 WEBEDITOR_UPS_VER=v1_00_09a
 ARTDAQ_DB_UPS_VER=v1_04_27
 
-ARTDAQ_BASE_DIR=/nfs/sw/artdaq
+ARTDAQ_BASE_DIR=/scratch/lukhanin/nfs/sw/artdaq
 ACTIVE_DATABASEBASE_NAME=cern_pddaq_v3x_db
 
 #----------------------------------------------------------------
@@ -400,7 +401,9 @@ function start_webeditor_instance(){
 printf "Info: Starting webconfigeditor instance\n"
 
 source <(sed -E -n 's/[^#]+/export &/ p'  ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/webconfigeditor.env)
-
+cd ${ARTDAQ_NODE_SERVER_DIR}
+chmod a+x ${ARTDAQ_NODE_SERVER_DIR}/setupNodeServer.sh
+${ARTDAQ_NODE_SERVER_DIR}/setupNodeServer.sh
 ${DATABASE_BASE_DIR}/webconfigeditor-ctrl.sh start
 RC=$?
 if [ $RC -ne 0 ]; then
@@ -414,6 +417,12 @@ return $rc_success
 function check_mongod_instance(){
 export ARTDAQ_DATABASE_URI="mongodb://127.0.0.1:${MONGOD_PORT}/cern_pddaq_db"
 source <(sed -E -n 's/[^#]+/export &/ p'  ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/mongod.env)
+
+conftool_bin=$(command -v conftool.py)
+if [ -z "conftool_bin" ] &&  [ ! -x ${conftool_bin} ]; then
+	printf "Error: conftool.py was not setup. Aborting.\n"; return $rc_failure; else
+        printf "Info: conftool found: '${conftool_bin}'\n"
+fi
 
 failed_test_count=0
 conftool_commands=(readDatabaseInfo listDatabases)
@@ -458,22 +467,33 @@ return $rc_success
 
 function run_conftool_tests(){
 export ARTDAQ_DATABASE_URI="mongodb://127.0.0.1:${MONGOD_PORT}/cern_pddaq_db"
-  
+#rm -rf ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/var/tmp/artdaqdb_test_data-*
 rm -rf /tmp/artdaqdb_test_data-*
 
 printf "\nInfo: Initializing database\n"
 
+conftool_bin=$(command -v conftool.py)
+if [ -z "conftool_bin" ] &&  [ ! -x ${conftool_bin} ]; then
+	printf "Error: conftool.py was not setup. Aborting.\n"; return $rc_failure; else
+        printf "Info: conftool found: '${conftool_bin}'\n"
+fi
+
 tmpdir="/tmp/artdaqdb_test_data-${timestamp}"
-for testfile in $(find ${ARTDAQ_DATABASE_DIR}/testdata -name  "np04_teststand*.taz" -type f -print);do 
+for testfile in $(find ${ARTDAQ_DATABASE_DIR}/testdata -name  "np04_teststand*taz" -type f -print);do 
   tmpname=$(basename ${testfile})
   tmpname=${tmpname%.taz}
+  mkdir -p ${tmpdir}/${tmpname}
   
   printf "\nInfo: Unpacking ${tmpname} to ${tmpdir}/${tmpname}\n"
-  mkdir -p ${tmpdir}/${tmpname}; cd ${tmpdir}/${tmpname}
-  tar xfz ${testfile} -C ${tmpdir}/${tmpname}
-  cp ${ARTDAQ_DATABASE_FQ_DIR}/conf/schema.fcl ${tmpdir}/${tmpname}/
+  cp ${ARTDAQ_DATABASE_FQ_DIR}/conf/schema.fcl ${tmpdir}/${tmpname}/  
+  tar xfz ${testfile} -C ${tmpdir}/${tmpname} --no-acls --no-selinux --no-selinux
+  sync
+  
+  cd ${tmpdir}/${tmpname}
 
-  printf "Info: Importing test configuration ${tmpname} from ${tmpdir}/${tmpname}\n"
+  printf "Info: Importing test configuration ${tmpname} from $(pwd)\n"
+  printf "Info: Current directory $(pwd) has $(find . -type f -name "*.fcl" -print |wc -l) fcl files\n"
+
   conftool.py importConfiguration ${tmpname}
   RC=$?
   if [ $RC -ne 0 ]; then
@@ -489,6 +509,8 @@ for testfile in $(find ${ARTDAQ_DATABASE_DIR}/testdata -name  "np04_teststand*.t
   if [ $RC -ne 0 ]; then
     printf "Error: Failed calling conftool.py exportConfiguration ${tmpname}00001.\n"
   fi
+  printf "Info: Current directory $(pwd) has $(find . -name "*.fcl" |wc -l) fcl files\n"
+
 done
 
 printf "\nInfo: Running conftool.py tests\n"
@@ -648,6 +670,7 @@ if [[  $? -ne $rc_success ]]; then
   check_mongod_instance
   if [[  $? -ne $rc_success ]]; then 
       echo -e "\e[31;7;5mError: failed accessing mongo database.\e[0m"
+      read -p "Resume script ? " answer
       stop_mongod_instance
       return $rc_failure
   fi 
@@ -667,8 +690,8 @@ if [[  $? -ne $rc_success ]]; then
    stop_mongod_instance
    return $rc_failure;else
    
-   check_webeditor_instance
-   if [[  $? -ne $rc_success ]]; then 
+   check_webeditor_instance   
+   if [[  $? -ne $rc_success ]]; then    
       echo -e "\e[31;7;5mError: failed accessing webconfigeditor.\e[0m"
       stop_webeditor_instance
       stop_mongod_instance

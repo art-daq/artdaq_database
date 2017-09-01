@@ -98,6 +98,7 @@ def __find_files(directory, pattern):
 	filename = os.path.join(root, basename)
 	yield filename
 
+
 def __read_fhicl_schema():
   with open(fhicl_schema,'r') as fhicl_file:
     return fhicl_file.read()
@@ -117,7 +118,7 @@ def __configuration_composition_reader(config,layout,files):
   for f in files: 
     for l in ['artdaq_processes','artdaq_includes']:
       for d in layout[l]:
-	match = re.match(d['pattern'], f)
+	match = re.match(d['pattern'].encode('ascii'), f)
 	if match:
 	  entity_userdata_map=((d['collection'].encode('ascii'), match.group(2), f ))
 	  yield entity_userdata_map
@@ -207,7 +208,7 @@ def importConfiguration(configNamePrefix):
   result=__write_document(query,__read_fhicl_schema())  
   if result[0] is not True:
     return False
-  
+ 
   for entry in cfg_composition:
     query = json.loads('{"operation" : "store", "dataformat":"fhicl", "filter":{}}')  
     query['filter']['configurations.name']=config
