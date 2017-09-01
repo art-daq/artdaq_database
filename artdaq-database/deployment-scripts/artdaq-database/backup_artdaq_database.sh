@@ -5,6 +5,7 @@
 #examples:
 #10 01 * * * /daq/database/backup_artdaq_database.sh cern_pddaq_v2_db  >>/daq/database/database-backup-cern_pddaq_v2_db.log 2>&1
 #20 01 * * * /daq/database/backup_artdaq_database.sh cern_pddaq_v3_db  >>/daq/database/database-backup-cern_pddaq_v3_db.log 2>&1
+#30 01 * * * /daq/database/backup_artdaq_database.sh cern_pddaq_v3x_db >>/daq/database/database-backup-cern_pddaq_v3x_db.log 2>&1
 
 
 

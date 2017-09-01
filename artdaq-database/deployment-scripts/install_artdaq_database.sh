@@ -358,7 +358,7 @@ function copy_shell_scripts(){
 #----------------------------------------------------------------
 #-----------------------copy shell scripts-----------------------
 filenames=(${ARTDAQ_DATABASE_DIR}/deployment-scripts/artdaq-database/\
-{initd_functions,backup_artdaq_database.sh,webconfigeditor-ctrl.sh,mongod-ctrl.sh})
+{initd_functions,backup_artdaq_database.sh,webconfigeditor-ctrl.sh,mongod-ctrl.sh,setup_database.sh})
 #----------------------------------------------------------------
 for filename in ${filenames[@]}
 do 
