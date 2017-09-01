@@ -1,5 +1,5 @@
 artdaq_database      v1_04_27        artdaq_database-1.04.27-slf7-x86_64-e14-s50-prof.tar.bz2     -f Linux64bit+3.10-2.17    -q e14:s50:prof    
-artdaq_node_server   v1_00_09a       artdaq_node_server-1.00.09a-slf7-x86_64-e14-s50-prof.tar.bz2 -f Linux64bit+3.10-2.17    -q e14:s50:prof    
+artdaq_node_server   v1_00_09        artdaq_node_server-1.00.09-slf7-x86_64-e14-s50-prof.tar.bz2 -f Linux64bit+3.10-2.17    -q e14:s50:prof    
 artdaq_utilities     v1_02_04        artdaq_utilities-1.02.04-slf7-x86_64-a_u_intf_v1-e14-s50-prof.tar.bz2 -f Linux64bit+3.10-2.17    -q a_u_intf_v1:e14:s50:prof
 boost                v1_63_0b        boost-1.63.0b-sl7-x86_64-e14-prof.tar.bz2                    -f Linux64bit+3.10-2.17    -q e14:prof        
 cetlib_except        v1_01_02        cetlib_except-1.01.02-slf7-x86_64-e14-prof.tar.bz2           -f Linux64bit+3.10-2.17    -q e14:prof        

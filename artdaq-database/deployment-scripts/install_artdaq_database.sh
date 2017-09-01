@@ -1,22 +1,38 @@
 #!/bin/bash
 #----------------------------------------------------------------
-# Configuration parameters
+# Current default configuration parameters, which can be 
+# overriden in $HOME/artdaq_database.env file if it exits. 
+# Main program starts at the bottom of this file.
 #----------------------------------------------------------------
-#ARTDAQ_UPS_QUAL="e14:prof:s50"
-ARTDAQ_UPS_QUAL="e14:debug:s50"
-WEBEDITOR_UPS_VER=v1_00_09a
+ARTDAQ_UPS_QUAL="e14:prof:s50"
 ARTDAQ_DB_UPS_VER=v1_04_27
+
+WEBEDITOR_UPS_VER=v1_00_09
 
 ARTDAQ_BASE_DIR=/scratch/lukhanin/nfs/sw/artdaq
 ACTIVE_DATABASEBASE_NAME=cern_pddaq_v3x_db
 
+ARTDAQ_DB_MANIFEST_URL="http://scisoft.fnal.gov/scisoft/packages/artdaq_database/v1_04_27/artdaq_database-1.04.27-Linux64bit%2B3.10-2.17-s50-e14-prof_MANIFEST.txt"
+ARTDAQ_DB_PULL_PRODUCTS="slf7 artdaq_database-v1_04_27 s50-e14 prof"
+
+
 #----------------------------------------------------------------
-# Optional configuration parameters
+# Optional configuration parameters, which can be 
+# overriden in $HOME/artdaq_database.env file if it exits. 
+# Main program starts at the bottom of this file.
+#----------------------------------------------------------------
+MONGOD_PORT=27037
+WEBEDITOR_BASE_PORT=8880
+INACTIVE_DATABASEBASES="cern_pddaq_v2_db cern_pddaq_v3_db"
+
+
+
+#----------------------------------------------------------------
+# Implementaion
+# Main program starts at the bottom of this file.
 #----------------------------------------------------------------
 WEBEDITOR_UPS_QUAL=${ARTDAQ_UPS_QUAL}
 ARTDAQ_DB_UPS_QUAL=${ARTDAQ_UPS_QUAL}
-
-INACTIVE_DATABASEBASES="cern_pddaq_v2_db cern_pddaq_v3_db"
 
 #ARTDAQ_BASE_DIR=/nfs/rscratch/daq/artdaq
 
@@ -24,14 +40,12 @@ DATABASE_BASE_DIR=$(dirname ${ARTDAQ_BASE_DIR})/database
 PRODUCTS_BASE_DIR=${ARTDAQ_BASE_DIR}/products
 #PRODUCTS_BASE_DIR=/scratch/products
 
-MONGOD_PORT=27037
-WEBEDITOR_BASE_PORT=8880
+required_tools_list=(wget tar bzip2 gunzip sed find id basename crontab cat cut uniq tee)
 
-#----------------------------------------------------------------
-# Implementaion
 #----------------------------------------------------------------
 rc_success=0 
 rc_failure=1
+user_prompts=true
 
 timestamp=$(date -d "today" +"%Y%m%d%H%M%S")
 dblist=(${INACTIVE_DATABASEBASES} ${ACTIVE_DATABASEBASE_NAME})
@@ -41,11 +55,6 @@ run_as_group=$(id -g -n ${run_as_user})
 
 source ${PRODUCTS_BASE_DIR}/setup
 unsetup_all  >/dev/null 2>&1 
-
-printf "Info: Configuring artdaq_database services to run using the following credentials:\n"
-printf "\t\tuser=${run_as_user}, group=${run_as_group}\n"
-
-user_prompts=false
 
 function have_artdaq_database() {
 #----------------------------------------------------------------
@@ -364,7 +373,7 @@ filenames=(${ARTDAQ_DATABASE_DIR}/deployment-scripts/artdaq-database/\
 for filename in ${filenames[@]}
 do 
     if [ ! -f ${filename} ]; then
-        printf "Error: ${filename} not found! Aborting.\n"; return $rc_failure ; else
+        printf "Error: ${filename} is not found! Aborting.\n"; return $rc_failure ; else
         cp ${filename} ${DATABASE_BASE_DIR}
         printf "Info: coppied ${filename} to ${DATABASE_BASE_DIR}"
     fi
@@ -758,7 +767,7 @@ fi
 
 local error_count=0
 
-read -p "Resume script ? " answer
+#read -p "Resume script ? " answer
 
 stop_webeditor_instance
 if [[  $? -ne $rc_success ]]; then 
@@ -796,17 +805,152 @@ return $rc_success
 
 
 function pull_products(){
-cd /nfs/sw/artdaq/download  
-wget http://scisoft.fnal.gov/scisoft/bundles/tools/pullProducts
-chmod a+x pullProducts 
+local download_dir=${ARTDAQ_BASE_DIR}/download
+local products_dir=${ARTDAQ_BASE_DIR}/products
 
-cp artdaq_database-1.04.27-Linux64bit+3.10-2.17-s50-e14-*_MANIFEST.txt /nfs/sw/artdaq/download
-./pullProducts -l ../products slf7 artdaq_database-v1_04_27 s50-e14 debug
-./pullProducts -l ../products slf7 artdaq_database-v1_04_27 s50-e14 prof
+wget "http://scisoft.fnal.gov"
+if [ $? -ne 0 ]; then
+  printf "Error: scisoft.fnal.gov is not accessible, configure your webproxy settings and try again.\n"
+  printf "Examples: export http_proxy=http://np04-webgw1.cern.ch:3128\n"
+  printf "	    export https_proxy=https://np04-webgw1.cern.ch:3128\n"
+  return $rc_failure; else
+  rm -f index.html*
+fi
 
-source /nfs/sw/artdaq/products/setup
-setup artdaq_database v1_04_27 -q e14:prof:s50 
+for tool_name in ${required_tools_list[@]} ; do
+  tool_bin=$(command -v ${tool_name})
+  if [ -z "${tool_bin}" ] &&  [ ! -x ${tool_bin} ]; then
+	printf "Error: ${tool_name} was not installed. Aborting.\n"; return $rc_failure
+  fi
+done
+
+if [ -z ${ARTDAQ_DB_MANIFEST_URL+x} ]; then
+   printf "Error: ARTDAQ_DB_MANIFEST_URL is unset. Aborting.\n";return $rc_failure;  else
+   echo "Info: ARTDAQ_DB_MANIFEST_URL is set to '${ARTDAQ_DB_MANIFEST_URL}'"
+fi
+
+if [ -z ${ARTDAQ_DB_PULL_PRODUCTS+x} ]; then
+   printf "Error: ARTDAQ_DB_PULL_PRODUCTS is unset. Aborting.\n";return $rc_failure;  else
+   printf "Info: ARTDAQ_DB_PULL_PRODUCTS is set to '${ARTDAQ_DB_PULL_PRODUCTS}'\n"
+fi
+
+if [ ! -d ${products_dir} ]; then 
+  mkdir -p ${products_dir}
+  if [ $? -ne 0 ]; then
+    printf "Error: Failed creating ${products_dir}. Aborting.\n"; return $rc_failure
+  fi
+fi
+  
+if [ ! -d ${download_dir} ]; then 
+  mkdir -p ${download_dir}
+  if [ $? -ne 0 ]; then
+    printf "Error: Failed creating ${download_dir}. Aborting.\n"; return $rc_failure
+  fi  
+fi
+
+cd ${download_dir}
+
+if [ ! -f ${download_dir}/pullProducts ]; then
+  echo "Info: ${download_dir}/pullProducts is not found! Downloading."
+  wget http://scisoft.fnal.gov/scisoft/bundles/tools/pullProducts
+  chmod a+x pullProducts 
+  if [ $? -ne 0 ]; then
+    printf "Error: Failed creating ${download_dir}/pullProducts. Aborting.\n"; return $rc_failure
+  fi
+fi
+
+echo "Info: Downloading a local copy of the artdaq_database product manifest."
+rm ${download_dir}/artdaq_database*_MANIFEST.txt*
+wget ${ARTDAQ_DB_MANIFEST_URL}
+if [ $? -ne 0 ]; then
+  printf "Error: Failed downloading ${ARTDAQ_DB_MANIFEST_URL}. Aborting.\n"; return $rc_failure
+fi
+
+rm ${download_dir}/artdaq_database-*.tar.bz2
+rm ${download_dir}/artdaq_node_server-*.tar.bz2
+
+./pullProducts -l ../products ${ARTDAQ_DB_PULL_PRODUCTS}
+if [ $? -ne 0 ]; then
+  printf "Error: Failed pulling artdaq_database product bundle. Aborting.\n"; return $rc_failure
+fi
+
+ 
+local ARTDAQ_DB_CUR_VER=$(grep artdaq_database ${products_dir}/artdaq_node_server/${WEBEDITOR_UPS_VER}/ups/artdaq_node_server.table |cut -d' ' -f7|uniq)
+
+if [ ! "${ARTDAQ_DB_CUR_VER}" == "${ARTDAQ_DB_UPS_VER}" ]; then
+  printf "Info: Updating the version of artdaq_database in artdaq_node_server.table from ${ARTDAQ_DB_CUR_VER} to ${ARTDAQ_DB_UPS_VER}.\n" 
+
+  sed -i "s/${ARTDAQ_DB_CUR_VER}/${ARTDAQ_DB_UPS_VER}/g" ${products_dir}/artdaq_node_server/${WEBEDITOR_UPS_VER}/ups/artdaq_node_server.table
+  if [ $? -ne 0 ]; then
+    printf "Error: Failed updating the version of artdaq_database in artdaq_node_server.table. Do this manually. Aborting.\n"; return $rc_failure
+  fi
+
+  ARTDAQ_DB_CUR_VER=$(grep artdaq_database ${products_dir}/artdaq_node_server/${WEBEDITOR_UPS_VER}/ups/artdaq_node_server.table |cut -d' ' -f7|uniq)
+
+  if [ "${ARTDAQ_DB_CUR_VER}" == "${ARTDAQ_DB_UPS_VER}" ]; then
+    printf "Info: Update succeeded.\n"; else
+    printf "Error: Failed updating the version of artdaq_database in artdaq_node_server.table. Do this manually. Aborting.\n"; return $rc_failure
+  fi
+fi
+  
+sed -i "s/8080/${WEBEDITOR_BASE_PORT}/g" ${products_dir}/artdaq_node_server/${WEBEDITOR_UPS_VER}/config.json
+
+source ${PRODUCTS_BASE_DIR}/setup
+unsetup_all  >/dev/null 2>&1 
+
+
+have_artdaq_database
+if [[ $? -ne $rc_success ]]; then 
+   echo -e "\e[31;7;5mError: artdaq_database product is not installed.\e[0m"; return $rc_failure
+fi
+
+have_artdaq_node_server
+if [[ $? -ne $rc_success ]]; then 
+   echo -e "\e[31;7;5mError: have_artdaq_node_server product is not installed.\e[0m"; return $rc_failure
+fi
 }
+
+
+#----------------------------------------------------------------
+# Main program starts here.
+#----------------------------------------------------------------
+
+ARTDAQ_DB_ENV="$HOME/artdaq_database.env"
+
+reset
+printf "#-----------------------INSTALLING ARTDAQ DATABASE-----------------\n"
+
+if [ ! -f ${ARTDAQ_DB_ENV} ]; then
+  echo "Warning: ${ARTDAQ_DB_ENV} is not found! Using reasonable defaults."; else
+  echo "Info: Found ${ARTDAQ_DB_ENV} found! Sourcing it."
+  printf "#-----------------------file contents begin----------------------\n"
+  cat ${ARTDAQ_DB_ENV}
+  printf "#-----------------------file contents end------------------------\n"  
+  source <(sed -E -n 's/[^#]+/export &/ p' ${ARTDAQ_DB_ENV})
+fi
+
+printf "\n\nAre you capturing the output with tee?\n Example: ./install_artdaq_database.sh | tee install.log\n"
+
+while $user_prompts; do
+    read answer
+    case $answer in
+        YesIam!* ) break;;
+        [Nn]* ) echo "Aborting installation...."; exit $rc_failure;;
+        * ) echo "Please answer \"YesIam!\" or \"no\".";;
+    esac
+done
+
+printf "\n\n"
+read -p "Press CTRL-C to abort or any key to resume this script." answer
+
+pull_products
+if [[ $? -ne $rc_success ]]; then 
+  exit $?
+fi
+
+printf "Info: Configuring artdaq_database services to run using the following credentials:\n"
+printf "\t\tuser=${run_as_user}, group=${run_as_group}\n"
 
 main_program
 exit $?
+
