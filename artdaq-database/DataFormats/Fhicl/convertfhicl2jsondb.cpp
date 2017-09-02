@@ -208,7 +208,7 @@ json2fcldb::operator fcl::value_t() try {
   } else if (self_value.type() == typeid(decimal)) {
     return fcl::value_t(unwrap(self_value).value_as<const decimal>());
   } else if (self_value.type() == typeid(std::string)) {
-    auto value = unwrap(self_value).value_as<const std::string>();
+    auto value = fcl::from_json_string(unwrap(self_value).value_as<const std::string>());
     return fcl::value_t(need_quotes(value) ? db::quoted_(value) : value);
   } else if (self_value.type() == typeid(jsn::object_t)) {
     return fcl::value_t(operator fcl::atom_t().value);

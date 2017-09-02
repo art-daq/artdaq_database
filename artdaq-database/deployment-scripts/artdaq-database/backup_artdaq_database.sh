@@ -70,6 +70,8 @@ DBBACKUP_DIR="${MONGOD_BASE_DIR}/${MONGOD_DATABASE_NAME}/backup/$(date +%Y%m%d%H
 DBBACKUP_LIST="cern_pddaq_db cern_pddaq_db_archive"
 
 #exit $rc_failure
+unset http_proxy
+unset https_proxy
 
 echo "DATABASE_NAME is ${MONGOD_DATABASE_NAME}"
 for dbname in ${DBBACKUP_LIST};

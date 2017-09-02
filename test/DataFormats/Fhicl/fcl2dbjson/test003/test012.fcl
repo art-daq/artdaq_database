@@ -1,0 +1,4 @@
+#test pattern
+pattern: "(.*)common_code\/(.*[^\d])(\d*)(\.fcl$)" #test pattern1
+#test patterns
+patterns: ["(.*)((BoardReader_TOY\d+|BoardReader)_(.*[^_])_(\d+))(\.fcl$)", "(.*)((EventBuilder)_(.*[^_])_(\d+))(\.fcl$)", "(.*)((Aggregator)_(.*[^_])_(\d+))(\.fcl$)", "(.*)((metadata)(.*[^\d])(\d*))(\.fcl$)"] 

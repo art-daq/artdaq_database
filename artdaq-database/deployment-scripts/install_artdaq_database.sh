@@ -34,12 +34,6 @@ INACTIVE_DATABASEBASES="cern_pddaq_v2_db cern_pddaq_v3_db"
 WEBEDITOR_UPS_QUAL=${ARTDAQ_UPS_QUAL}
 ARTDAQ_DB_UPS_QUAL=${ARTDAQ_UPS_QUAL}
 
-#ARTDAQ_BASE_DIR=/nfs/rscratch/daq/artdaq
-
-DATABASE_BASE_DIR=$(dirname ${ARTDAQ_BASE_DIR})/database
-PRODUCTS_BASE_DIR=${ARTDAQ_BASE_DIR}/products
-#PRODUCTS_BASE_DIR=/scratch/products
-
 required_tools_list=(wget tar bzip2 gunzip sed find id basename crontab cat cut uniq tee)
 
 #----------------------------------------------------------------
@@ -132,7 +126,7 @@ printf "\nInfo: Creating ${disable_services_file}\n"
 
 echo "#!/bin/bash" > ${disable_services_file}
 for db in ${dblist[@]}
-  do for action in stop disable 
+  do for action in stop status disable 
     do for service in webconfigeditor mongodbserver
       do echo systemctl ${action} ${service}@${db}.service >> ${disable_services_file}
     done
@@ -615,7 +609,7 @@ echo "#!/bin/bash" > ${enable_services_file}
 for service in webconfigeditor mongodbserver; do
   echo "cp ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/systemd/${service}@${ACTIVE_DATABASEBASE_NAME}.service /etc/systemd/system/" >> ${enable_services_file}
   echo "systemctl daemon-reload" >> ${enable_services_file}  
-  for action in enable start ; do
+  for action in enable start status; do
       echo systemctl ${action} ${service}@${ACTIVE_DATABASEBASE_NAME}.service >> ${enable_services_file}
   done
 done
@@ -749,8 +743,15 @@ if [[  $? -ne $rc_success ]]; then
    stop_webeditor_instance
    stop_mongod_instance
    return $rc_failure;else
+
+   local retry_counter=0
+   local max_retry_count=6
    
-   check_webeditor_instance   
+   until check_webeditor_instance || [ $retry_counter -eq $max_retry_count ]; do
+      sleep $(( retry_counter++ ))
+   done
+
+   check_webeditor_instance
    if [[  $? -ne $rc_success ]]; then    
       echo -e "\e[31;7;5mError: failed accessing webconfigeditor.\e[0m"
       stop_webeditor_instance
@@ -791,6 +792,13 @@ enable_services
 if [[ $? -ne $rc_success ]]; then 
    echo -e "\e[31;7;5mError: failed enabling services.\e[0m"; return $rc_failure
 fi
+
+local retry_counter=0
+local max_retry_count=6
+   
+until check_webeditor_instance || [ $retry_counter -eq $max_retry_count ]; do
+   sleep $(( retry_counter++ ))
+done
 
 check_webeditor_instance
 if [[  $? -ne $rc_success ]]; then 
@@ -930,18 +938,29 @@ if [ ! -f ${ARTDAQ_DB_ENV} ]; then
 fi
 
 printf "\n\nAre you capturing the output with tee?\n Example: ./install_artdaq_database.sh | tee install.log\n"
+printf "\nPlease answer \"YesIam!\" or \"no\"."
 
 while $user_prompts; do
     read answer
     case $answer in
-        YesIam!* ) break;;
+        [YesIam!]* ) break;;
         [Nn]* ) echo "Aborting installation...."; exit $rc_failure;;
         * ) echo "Please answer \"YesIam!\" or \"no\".";;
     esac
 done
 
 printf "\n\n"
-read -p "Press CTRL-C to abort or any key to resume this script." answer
+printf "During the installation you will be prompted to run two shell scripts as root.\n"
+printf "Open another console and run them before resuming this script.\n"
+printf "Review the output from both scripts.\n"
+printf "Confirm that webconfigeditor and mongodbserver services are reported as \"active (running)\"\n"
+printf "after you have ran the second script (/tmp/enable_services-${timestamp}.sh).\n"
+printf "\n\n"
+
+read -p "Press CTRL-C to abort or any other key to resume this script." answer
+
+DATABASE_BASE_DIR=$(dirname ${ARTDAQ_BASE_DIR})/database
+PRODUCTS_BASE_DIR=${ARTDAQ_BASE_DIR}/products
 
 pull_products
 if [[ $? -ne $rc_success ]]; then 
