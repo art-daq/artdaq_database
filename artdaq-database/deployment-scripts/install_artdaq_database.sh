@@ -10,10 +10,10 @@ ARTDAQ_DB_UPS_VER=v1_04_27
 WEBEDITOR_UPS_VER=v1_00_09
 
 ARTDAQ_BASE_DIR=/scratch/lukhanin/nfs/sw/artdaq
-ACTIVE_DATABASEBASE_NAME=cern_pddaq_v3x_db
+ARTDAQ_DB_NAME=cern_pddaq_v3x_db
 
-ARTDAQ_DB_MANIFEST_URL="http://scisoft.fnal.gov/scisoft/packages/artdaq_database/v1_04_27/artdaq_database-1.04.27-Linux64bit%2B3.10-2.17-s50-e14-prof_MANIFEST.txt"
-ARTDAQ_DB_PULL_PRODUCTS="slf7 artdaq_database-v1_04_27 s50-e14 prof"
+ARTDAQ_DB_MANIFESTURL="http://scisoft.fnal.gov/scisoft/packages/artdaq_database/v1_04_27/artdaq_database-1.04.27-Linux64bit%2B3.10-2.17-s50-e14-prof_MANIFEST.txt"
+ARTDAQ_DB_PULLPRODUCTS="slf7 artdaq_database-v1_04_27 s50-e14 prof"
 
 
 #----------------------------------------------------------------
@@ -23,7 +23,7 @@ ARTDAQ_DB_PULL_PRODUCTS="slf7 artdaq_database-v1_04_27 s50-e14 prof"
 #----------------------------------------------------------------
 MONGOD_PORT=27037
 WEBEDITOR_BASE_PORT=8880
-INACTIVE_DATABASEBASES="cern_pddaq_v2_db cern_pddaq_v3_db"
+INACTIVE_DATABASES="cern_pddaq_v2_db cern_pddaq_v3_db"
 
 
 
@@ -42,7 +42,7 @@ rc_failure=1
 user_prompts=true
 
 timestamp=$(date -d "today" +"%Y%m%d%H%M%S")
-dblist=(${INACTIVE_DATABASEBASES} ${ACTIVE_DATABASEBASE_NAME})
+dblist=(${INACTIVE_DATABASES} ${ARTDAQ_DB_NAME})
 
 run_as_user=$(id -u -n )
 run_as_group=$(id -g -n ${run_as_user})
@@ -56,9 +56,9 @@ function have_artdaq_database() {
 printf "\nInfo: Verifying availability of artdaq_database\n"
 #----------------------------------------------------------------
 
-if [ -z ${ACTIVE_DATABASEBASE_NAME+x} ]; then
-        printf "Error: ACTIVE_DATABASEBASE_NAME is unset. Aborting.\n";return $rc_failure;  else
-        printf "Info: ACTIVE_DATABASEBASE_NAME is set to '${ACTIVE_DATABASEBASE_NAME}'\n"
+if [ -z ${ARTDAQ_DB_NAME+x} ]; then
+        printf "Error: ARTDAQ_DB_NAME is unset. Aborting.\n";return $rc_failure;  else
+        printf "Info: ARTDAQ_DB_NAME is set to '${ARTDAQ_DB_NAME}'\n"
 fi
 
 if [ -z ${ARTDAQ_DB_UPS_VER+x} ]; then
@@ -172,12 +172,12 @@ if [ $RC -ne 0 ]; then
     printf "Info: Created ${DATABASE_BASE_DIR}"
 fi
 
-mkdir -p ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/{systemd,var/tmp,logs,data,webconfigeditor}
+mkdir -p ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/{systemd,var/tmp,logs,data,webconfigeditor}
 RC=$?
 if [ $RC -ne 0 ]; then
     printf "Error: Failed creating subdirectories in ${DATABASE_BASE_DIR}. Aborting.\n"; return $rc_failure; else
     printf "Info: Created subdirectories in ${DATABASE_BASE_DIR}:\n"
-    printf "$(find ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME} -type d -print)\n"
+    printf "$(find ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME} -type d -print)\n"
 fi
 
 return $rc_success
@@ -187,7 +187,7 @@ return $rc_success
 function create_database_configs(){
 #----------------------------------------------------------------
 #-----------------------mongod.env-------------------------------
-filename="${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/mongod.env"
+filename="${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/mongod.env"
 #----------------------------------------------------------------
 touch ${filename}
 RC=$?
@@ -195,7 +195,7 @@ if [ $RC -ne 0 ]; then
     printf "Error: Failed creating ${filename}. Aborting.\n"; return $rc_failure;
 fi
 cat <<EOF > ${filename}
-MONGOD_DATABASE_NAME=${ACTIVE_DATABASEBASE_NAME}
+MONGOD_DATABASE_NAME=${ARTDAQ_DB_NAME}
 MONGOD_BASE_DIR=${DATABASE_BASE_DIR}
 MONGOD_PORT=${MONGOD_PORT}
 MONGOD_UPS_VER=v3_4_6
@@ -213,7 +213,7 @@ fi
 
 #----------------------------------------------------------------
 #-----------------------webconfigeditor.env----------------------
-filename="${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/webconfigeditor.env"
+filename="${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/webconfigeditor.env"
 #----------------------------------------------------------------
 touch ${filename}
 RC=$?
@@ -222,7 +222,7 @@ if [ $RC -ne 0 ]; then
 fi
 
 cat <<EOF > ${filename}
-MONGOD_DATABASE_NAME=${ACTIVE_DATABASEBASE_NAME}
+MONGOD_DATABASE_NAME=${ARTDAQ_DB_NAME}
 MONGOD_BASE_DIR=${DATABASE_BASE_DIR}
 MONGOD_PORT=${MONGOD_PORT}
 WEBEDITOR_BASE_PORT=${WEBEDITOR_BASE_PORT}
@@ -247,7 +247,7 @@ printf "\t\tuser=${run_as_user}, group=${run_as_group}\n";
 
 #----------------------------------------------------------------
 #-----------------------webconfigeditor@.service-----------------
-filename="${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/systemd/webconfigeditor@${ACTIVE_DATABASEBASE_NAME}.service"
+filename="${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/systemd/webconfigeditor@${ARTDAQ_DB_NAME}.service"
 #----------------------------------------------------------------
 touch ${filename}
 RC=$?
@@ -256,13 +256,13 @@ if [ $RC -ne 0 ]; then
 fi
 cat <<EOF > ${filename}
 # Quick HowTo:
-# 1. Copy this file to /etc/systemd/system/webconfigeditor@${ACTIVE_DATABASEBASE_NAME}.service
+# 1. Copy this file to /etc/systemd/system/webconfigeditor@${ARTDAQ_DB_NAME}.service
 # 2. Run "systemctl daemon-reload"
-# 3. Run "systemctl enable webconfigeditor@${ACTIVE_DATABASEBASE_NAME}.service"
-# 5. Run "systemctl start webconfigeditor@${ACTIVE_DATABASEBASE_NAME}.service"
+# 3. Run "systemctl enable webconfigeditor@${ARTDAQ_DB_NAME}.service"
+# 5. Run "systemctl start webconfigeditor@${ARTDAQ_DB_NAME}.service"
 # 
-# 6. Check status "systemctl status webconfigeditor@${ACTIVE_DATABASEBASE_NAME}.service"
-# 7. Stop "systemctl stop webconfigeditor@${ACTIVE_DATABASEBASE_NAME}.service"
+# 6. Check status "systemctl status webconfigeditor@${ARTDAQ_DB_NAME}.service"
+# 7. Stop "systemctl stop webconfigeditor@${ARTDAQ_DB_NAME}.service"
 
 [Unit]
 Description=WebConfigEditor service
@@ -301,7 +301,7 @@ fi
 
 #----------------------------------------------------------------
 #-----------------------mongodbserver@.service-----------------
-filename="${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/systemd/mongodbserver@${ACTIVE_DATABASEBASE_NAME}.service"
+filename="${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/systemd/mongodbserver@${ARTDAQ_DB_NAME}.service"
 #----------------------------------------------------------------
 touch ${filename}
 RC=$?
@@ -312,13 +312,13 @@ cat <<EOF > ${filename}
 # The mongodbserver service unit file
 #
 # Quick HowTo:
-# 1. Copy this file to /etc/systemd/system/mongodbserver@${ACTIVE_DATABASEBASE_NAME}.service
+# 1. Copy this file to /etc/systemd/system/mongodbserver@${ARTDAQ_DB_NAME}.service
 # 2. Run "systemctl daemon-reload"
-# 3. Run "systemctl enable mongodbserver@${ACTIVE_DATABASEBASE_NAME}.service"
-# 5. Run "systemctl start mongodbserver@${ACTIVE_DATABASEBASE_NAME}.service"
+# 3. Run "systemctl enable mongodbserver@${ARTDAQ_DB_NAME}.service"
+# 5. Run "systemctl start mongodbserver@${ARTDAQ_DB_NAME}.service"
 # 
-# 6. Check status "systemctl status mongodbserver@${ACTIVE_DATABASEBASE_NAME}.service"
-# 7. Stop "systemctl stop mongodbserver@${ACTIVE_DATABASEBASE_NAME}.service"
+# 6. Check status "systemctl status mongodbserver@${ARTDAQ_DB_NAME}.service"
+# 7. Stop "systemctl stop mongodbserver@${ARTDAQ_DB_NAME}.service"
 
 
 [Unit]
@@ -376,7 +376,7 @@ chmod a+rx ${DATABASE_BASE_DIR}/*.sh >/dev/null 2>&1
 find ${DATABASE_BASE_DIR} -name  "*.sh" -type f -print |\
   xargs -n 1 sed -i "s|/daq/artdaq|${ARTDAQ_BASE_DIR}|g; \
 		     s|/daq/database|${DATABASE_BASE_DIR}|g;\
-		     s|cern_pddaq_v2_db|${ACTIVE_DATABASEBASE_NAME}|g"
+		     s|cern_pddaq_v2_db|${ARTDAQ_DB_NAME}|g"
 RC=$?
 if [ $RC -ne 0 ]; then
     printf "Error: Failed migrating systemd shell scripts. Aborting.\n"; return $rc_failure;else
@@ -389,7 +389,7 @@ return $rc_success
 function start_mongod_instance(){
 printf "Info: Starting mongod server instance\n"
 
-source <(sed -E -n 's/[^#]+/export &/ p'  ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/mongod.env)
+source <(sed -E -n 's/[^#]+/export &/ p'  ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/mongod.env)
 
 ${DATABASE_BASE_DIR}/mongod-ctrl.sh start
 RC=$?
@@ -403,7 +403,7 @@ return $rc_success
 function start_webeditor_instance(){
 printf "Info: Starting webconfigeditor instance\n"
 
-source <(sed -E -n 's/[^#]+/export &/ p'  ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/webconfigeditor.env)
+source <(sed -E -n 's/[^#]+/export &/ p'  ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/webconfigeditor.env)
 cd ${ARTDAQ_NODE_SERVER_DIR}
 chmod a+x ${ARTDAQ_NODE_SERVER_DIR}/setupNodeServer.sh
 ${ARTDAQ_NODE_SERVER_DIR}/setupNodeServer.sh
@@ -419,7 +419,7 @@ return $rc_success
 
 function check_mongod_instance(){
 export ARTDAQ_DATABASE_URI="mongodb://127.0.0.1:${MONGOD_PORT}/cern_pddaq_db"
-source <(sed -E -n 's/[^#]+/export &/ p'  ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/mongod.env)
+source <(sed -E -n 's/[^#]+/export &/ p'  ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/mongod.env)
 
 conftool_bin=$(command -v conftool.py)
 if [ -z "conftool_bin" ] &&  [ ! -x ${conftool_bin} ]; then
@@ -455,7 +455,7 @@ return $rc_success
 
 function check_webeditor_instance(){
 printf "Info: Checking webconfigeditor instance\n"
-source <(sed -E -n 's/[^#]+/export &/ p'  ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/webconfigeditor.env)
+source <(sed -E -n 's/[^#]+/export &/ p'  ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/webconfigeditor.env)
 
 ${DATABASE_BASE_DIR}/webconfigeditor-ctrl.sh status
 RC=$?
@@ -470,7 +470,7 @@ return $rc_success
 
 function run_conftool_tests(){
 export ARTDAQ_DATABASE_URI="mongodb://127.0.0.1:${MONGOD_PORT}/cern_pddaq_db"
-#rm -rf ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/var/tmp/artdaqdb_test_data-*
+#rm -rf ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/var/tmp/artdaqdb_test_data-*
 rm -rf /tmp/artdaqdb_test_data-*
 
 printf "\nInfo: Initializing database\n"
@@ -571,7 +571,7 @@ return $rc_success
 
 function stop_mongod_instance(){
 printf "Info: Stopping mongod server instance\n"
-source <(sed -E -n 's/[^#]+/export &/ p'  ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/mongod.env)
+source <(sed -E -n 's/[^#]+/export &/ p'  ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/mongod.env)
 
 ${DATABASE_BASE_DIR}/mongod-ctrl.sh stop
 RC=$?
@@ -586,7 +586,7 @@ return $rc_success
 
 function stop_webeditor_instance(){
 printf "Info: Stopping webconfigeditor instance\n"
-source <(sed -E -n 's/[^#]+/export &/ p'  ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/webconfigeditor.env)
+source <(sed -E -n 's/[^#]+/export &/ p'  ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/webconfigeditor.env)
 
 ${DATABASE_BASE_DIR}/webconfigeditor-ctrl.sh stop
 RC=$?
@@ -607,10 +607,10 @@ printf "\nInfo: Creating ${enable_services_file}\n"
 #----------------------------------------------------------------
 echo "#!/bin/bash" > ${enable_services_file}
 for service in webconfigeditor mongodbserver; do
-  echo "cp ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/systemd/${service}@${ACTIVE_DATABASEBASE_NAME}.service /etc/systemd/system/" >> ${enable_services_file}
+  echo "cp ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/systemd/${service}@${ARTDAQ_DB_NAME}.service /etc/systemd/system/" >> ${enable_services_file}
   echo "systemctl daemon-reload" >> ${enable_services_file}  
   for action in enable start status; do
-      echo systemctl ${action} ${service}@${ACTIVE_DATABASEBASE_NAME}.service >> ${enable_services_file}
+      echo systemctl ${action} ${service}@${ARTDAQ_DB_NAME}.service >> ${enable_services_file}
   done
 done
 
@@ -650,8 +650,8 @@ function update_crontab(){
   crontab -l > ${crontab_file}
   
   cat ${crontab_file} | grep -v backup_artdaq_database.sh > ${crontab_file}.new
-  echo "30 01 * * * ${DATABASE_BASE_DIR}/backup_artdaq_database.sh ${ACTIVE_DATABASEBASE_NAME} >>${DATABASE_BASE_DIR}/database-backup-${ACTIVE_DATABASEBASE_NAME}.log 2>&1" >> ${crontab_file}.new
-  #echo "*/5 * * * * ${DATABASE_BASE_DIR}/backup_artdaq_database.sh ${ACTIVE_DATABASEBASE_NAME} >>${DATABASE_BASE_DIR}/database-backup-${ACTIVE_DATABASEBASE_NAME}.log 2>&1" >> ${crontab_file}.new
+  echo "30 01 * * * ${DATABASE_BASE_DIR}/backup_artdaq_database.sh ${ARTDAQ_DB_NAME} >>${DATABASE_BASE_DIR}/database-backup-${ARTDAQ_DB_NAME}.log 2>&1" >> ${crontab_file}.new
+  #echo "*/5 * * * * ${DATABASE_BASE_DIR}/backup_artdaq_database.sh ${ARTDAQ_DB_NAME} >>${DATABASE_BASE_DIR}/database-backup-${ARTDAQ_DB_NAME}.log 2>&1" >> ${crontab_file}.new
   printf "#-----------------------new crontab begin------------------------\n"
   cat ${crontab_file}.new
   printf "#-----------------------new contents end-------------------------\n"
@@ -662,12 +662,12 @@ function update_crontab(){
   printf "#-----------------------current contents end-------------------------\n"
   
   printf "Info: Performing inital backup\n"
-  ${DATABASE_BASE_DIR}/backup_artdaq_database.sh ${ACTIVE_DATABASEBASE_NAME} >>${DATABASE_BASE_DIR}/database-backup-${ACTIVE_DATABASEBASE_NAME}.log
-  printf "Info: Backup size \n$(du -hs ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/backup/*)\n"
+  ${DATABASE_BASE_DIR}/backup_artdaq_database.sh ${ARTDAQ_DB_NAME} >>${DATABASE_BASE_DIR}/database-backup-${ARTDAQ_DB_NAME}.log
+  printf "Info: Backup size \n$(du -hs ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/backup/*)\n"
   printf "Info: Listing archive files\n"
-  ls -al $(find ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/backup ./ -name "*tar-bzip2-base64") 
+  ls -al $(find ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/backup ./ -name "*tar-bzip2-base64") 
   
-  local file_cout=$(find ${DATABASE_BASE_DIR}/${ACTIVE_DATABASEBASE_NAME}/backup ./ -name "*tar-bzip2-base64" |wc -l)
+  local file_cout=$(find ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/backup ./ -name "*tar-bzip2-base64" |wc -l)
   
   if [ $file_cout -ne 9 ]; then
      printf "Error: Partial backup.\n"
@@ -832,14 +832,14 @@ for tool_name in ${required_tools_list[@]} ; do
   fi
 done
 
-if [ -z ${ARTDAQ_DB_MANIFEST_URL+x} ]; then
-   printf "Error: ARTDAQ_DB_MANIFEST_URL is unset. Aborting.\n";return $rc_failure;  else
-   echo "Info: ARTDAQ_DB_MANIFEST_URL is set to '${ARTDAQ_DB_MANIFEST_URL}'"
+if [ -z ${ARTDAQ_DB_MANIFESTURL+x} ]; then
+   printf "Error: ARTDAQ_DB_MANIFESTURL is unset. Aborting.\n";return $rc_failure;  else
+   echo "Info: ARTDAQ_DB_MANIFESTURL is set to '${ARTDAQ_DB_MANIFESTURL}'"
 fi
 
-if [ -z ${ARTDAQ_DB_PULL_PRODUCTS+x} ]; then
-   printf "Error: ARTDAQ_DB_PULL_PRODUCTS is unset. Aborting.\n";return $rc_failure;  else
-   printf "Info: ARTDAQ_DB_PULL_PRODUCTS is set to '${ARTDAQ_DB_PULL_PRODUCTS}'\n"
+if [ -z ${ARTDAQ_DB_PULLPRODUCTS+x} ]; then
+   printf "Error: ARTDAQ_DB_PULLPRODUCTS is unset. Aborting.\n";return $rc_failure;  else
+   printf "Info: ARTDAQ_DB_PULLPRODUCTS is set to '${ARTDAQ_DB_PULLPRODUCTS}'\n"
 fi
 
 if [ ! -d ${products_dir} ]; then 
@@ -869,15 +869,15 @@ fi
 
 echo "Info: Downloading a local copy of the artdaq_database product manifest."
 rm ${download_dir}/artdaq_database*_MANIFEST.txt*
-wget ${ARTDAQ_DB_MANIFEST_URL}
+wget ${ARTDAQ_DB_MANIFESTURL}
 if [ $? -ne 0 ]; then
-  printf "Error: Failed downloading ${ARTDAQ_DB_MANIFEST_URL}. Aborting.\n"; return $rc_failure
+  printf "Error: Failed downloading ${ARTDAQ_DB_MANIFESTURL}. Aborting.\n"; return $rc_failure
 fi
 
 rm ${download_dir}/artdaq_database-*.tar.bz2
 rm ${download_dir}/artdaq_node_server-*.tar.bz2
 
-./pullProducts -l ../products ${ARTDAQ_DB_PULL_PRODUCTS}
+./pullProducts -l ../products ${ARTDAQ_DB_PULLPRODUCTS}
 if [ $? -ne 0 ]; then
   printf "Error: Failed pulling artdaq_database product bundle. Aborting.\n"; return $rc_failure
 fi
