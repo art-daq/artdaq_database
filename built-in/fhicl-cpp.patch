@@ -1,0 +1,245 @@
+diff --git a/fhiclcpp/extended_value.h b/fhiclcpp/extended_value.h
+index 484038d..bee0847 100644
+--- a/fhiclcpp/extended_value.h
++++ b/fhiclcpp/extended_value.h
+@@ -11,10 +11,12 @@
+ #include "fhiclcpp/Protection.h"
+ #include "fhiclcpp/fwd.h"
+ #include "stdmap_shims.h"
++#include "fhiclcpp/exception.h"
+ 
+ #include <map>
+ #include <string>
+ #include <vector>
++#include <utility>
+ 
+ // ----------------------------------------------------------------------
+ 
+@@ -24,8 +26,86 @@ namespace fhicl {
+   };
+ }
+ 
+-// ----------------------------------------------------------------------
++namespace fhicl {
++namespace detail {
++using fhicl::exception;
++using fhicl::error;
++
++using wrapped_value_t = std::pair<boost::any, std::string>;
++
++auto unwrap_value = [](auto value) {
++  if (value.type() == typeid(wrapped_value_t))
++    return boost::any_cast<wrapped_value_t>(value).first;
++  else
++    return value;
++};
++
++auto unwrap_raw_value = [](auto value) {
++  if (value.type() == typeid(wrapped_value_t))
++    return boost::any_cast<wrapped_value_t>(value).second;
++  else
++    return std::string{};
++};
++
++auto rtrim_whitespace = [](auto const &str) {
++  constexpr auto single_quote = '\'';
++  constexpr auto double_quote = '\"';
++  constexpr auto back_slash = '\\';
++
++  constexpr auto double_slashes = "//";
++  constexpr auto space_char = ' ';
++  constexpr auto skip_chars = "# \n\r\t";
++
++  if (str.empty())
++    return str;
++
++  if (str[0] == single_quote) {
++    auto pos = str.find(single_quote, 1);
++
++    if (pos == std::string::npos)
++      throw exception(cant_find, "missing a closing single quote in str=" + str);
++
++    return str.substr(0, pos + 1);
++  }
++
++  if (str[0] == double_quote) {
++    auto pos = str.find(double_quote, 1);
++
++    while (str[pos -1]==back_slash) pos = str.find(double_quote, pos+1);
++       
++    if (pos == std::string::npos)
++      throw exception(cant_find, "missing a closing double quote in str=" + str);
++    
++    return str.substr(0, pos + 1);
++  }
++  
++  auto pos = str.find(double_slashes);
++
++  if (pos == std::string::npos) {
++    pos = str.find_first_of(skip_chars);
++
++    if (pos == std::string::npos)
++      return str;
++  } else {
++    auto pos1 = str.find_first_of(skip_chars);
++
++    if (pos1 != std::string::npos)
++      pos = std::min(pos, pos1);
++  }
++
++  while (str[--pos] == space_char && pos != 0)
++    ;
++
++  return str.substr(0, pos + 1);
++};
++
++auto wrap_value = [](auto value, auto raw_value) {
++  return std::make_pair(value, rtrim_whitespace(raw_value));
++};
++} // namespace detail
++} // namespace fhicl
+ 
++// ----------------------------------------------------------------------
+ class fhicl::extended_value
+ {
+ public:
+@@ -34,35 +114,31 @@ public:
+   typedef  std::vector<extended_value>            sequence_t;
+   typedef  shims::map<std::string, extended_value>  table_t;
+ 
+-  extended_value()
+-    : in_prolog( false )
+-    , tag      ( UNKNOWN )
+-    , value    ()
+-    , src_info ()
+-    , protection (Protection::NONE)
+-  { }
++  extended_value()=default;
+ 
+   extended_value(bool       in_prolog,
+                  value_tag  tag,
+                  boost::any value,
+                  Protection  protection,
+                  std::string const& src = {})
+-    : in_prolog( in_prolog )
+-    , tag      ( tag )
+-    , value    ( value )
+-    , src_info ( src )
+-    , protection (protection)
++    : in_prolog{in_prolog}
++    , tag      {tag }
++    , value    {fhicl::detail::unwrap_value(value)}
++    , raw_value{fhicl::detail::unwrap_raw_value(value)}
++    , src_info {src}
++    , protection {protection}
+   { }
+ 
+   extended_value(bool       in_prolog,
+                  value_tag  tag,
+                  boost::any value,
+                  std::string const& src = {})
+-    : in_prolog( in_prolog )
+-    , tag      ( tag )
+-    , value    ( value )
+-    , src_info ( src )
+-    , protection (Protection::NONE)
++    : in_prolog{in_prolog}
++    , tag      {tag}
++    , value    {fhicl::detail::unwrap_value(value)}
++    , raw_value{fhicl::detail::unwrap_raw_value(value)}
++    , src_info {src}
++    , protection {Protection::NONE}
+   { }
+ 
+   bool
+@@ -94,11 +170,12 @@ public:
+   operator table_t() const
+   { return boost::any_cast<table_t>(value); }
+ 
+-  bool       in_prolog;
+-  value_tag  tag;
+-  boost::any value;
+-  std::string src_info;
+-  Protection protection;
++  bool       in_prolog{false};
++  value_tag  tag{UNKNOWN};
++  boost::any value{};
++  std::string raw_value{};  
++  std::string src_info{};
++  Protection protection{Protection::NONE};
+ 
+ };  // extended_value
+ 
+diff --git a/fhiclcpp/parse.cc b/fhiclcpp/parse.cc
+index 10a400e..618427b 100644
+--- a/fhiclcpp/parse.cc
++++ b/fhiclcpp/parse.cc
+@@ -195,10 +195,12 @@ namespace {
+             value_tag t,
+             boost::any v,
+             FwdIter pos,
++	    FwdIter last,
+             cet::includer const & s)
+   {
+     std::string const src_info = s.src_whereis(pos);
+-    return extended_value(b, t, v, src_info);
++    boost::any wv= fhicl::detail::wrap_value(v,std::string(pos,last));
++    return extended_value(b, t,wv,src_info);
+   }
+ 
+   complex_t
+@@ -731,24 +733,25 @@ fhicl::document_parser<FwdIter, Skip>::document_parser(cet::includer const & s)
+ #pragma clang diagnostic ignored "-Wunsequenced"
+ #endif
+   value =
+-    ((iter_pos >> vp.nil    ) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), NIL     , qi::_2, qi::_1, ref(s)) ] |
+-     (iter_pos >> vp.boolean) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), BOOL    , qi::_2, qi::_1, ref(s)) ] |
+-     (iter_pos >> vp.number ) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), NUMBER  , qi::_2, qi::_1, ref(s)) ] |
+-     (iter_pos >> vp.complex) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), COMPLEX , qi::_2, qi::_1, ref(s)) ] |
+-     (iter_pos >> vp.string ) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), STRING  , qi::_2, qi::_1, ref(s)) ] |
++    ((iter_pos >> vp.nil >> iter_pos) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), NIL     , qi::_2, qi::_1, qi::_3, ref(s)) ] |
++     (iter_pos >> vp.boolean >> iter_pos) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), BOOL    , qi::_2, qi::_1, qi::_3, ref(s)) ] |
++     (iter_pos >> vp.number >> iter_pos) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), NUMBER  , qi::_2, qi::_1, qi::_3, ref(s)) ] |
++     (iter_pos >> vp.complex >> iter_pos) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), COMPLEX , qi::_2, qi::_1, qi::_3, ref(s)) ] |
++     (iter_pos >> vp.string >> iter_pos) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), STRING  , qi::_2, qi::_1, qi::_3, ref(s)) ] |
+      (iter_pos >> localref)
+-     [ _val = phx::bind(&local_lookup<iter_t>,
+-                        qi::_2, ref(tbl), ref(in_prolog),
+-                        qi::_1, ref(s)) ] |
+-     (iter_pos >> dbref)
+-     [ _val = phx::bind(&database_lookup<iter_t>,
+-                        qi::_2, ref(tbl), ref(in_prolog),
+-                        qi::_1, ref(s)) ] |
+-     (iter_pos >> vp.id    ) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), TABLEID , qi::_2, qi::_1, ref(s)) ] |
+-     (iter_pos >> sequence ) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), SEQUENCE, qi::_2, qi::_1, ref(s)) ] |
+-     (iter_pos >> table    ) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), TABLE   , qi::_2, qi::_1, ref(s)) ] |
+-     (iter_pos >> vp.catchall ) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), STRING  , qi::_2, qi::_1, ref(s)) ]
++	[ _val = phx::bind(&local_lookup<iter_t>,
++			    qi::_2, ref(tbl), ref(in_prolog),
++			    qi::_1, ref(s)) ] |
++     (iter_pos >> dbref )
++	[ _val = phx::bind(&database_lookup<iter_t>,
++			    qi::_2, ref(tbl), ref(in_prolog),
++			    qi::_1, ref(s)) ] |
++     (iter_pos >> vp.id  >> iter_pos) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), TABLEID , qi::_2, qi::_1, qi::_3, ref(s)) ] |
++     (iter_pos >> sequence >> iter_pos) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), SEQUENCE, qi::_2, qi::_1, qi::_3, ref(s)) ] |
++     (iter_pos >> table  >>iter_pos) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), TABLE   , qi::_2, qi::_1, qi::_3, ref(s)) ] |
++     (iter_pos >> vp.catchall >> iter_pos) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), STRING  , qi::_2, qi::_1, qi::_3, ref(s)) ]
+     );
++
+ #ifdef __clang__
+ #pragma clang diagnostic pop
+ #endif
+diff --git a/fhiclcpp/parse_shims.h b/fhiclcpp/parse_shims.h
+index ace640b..9eb40ea 100644
+--- a/fhiclcpp/parse_shims.h
++++ b/fhiclcpp/parse_shims.h
+@@ -49,7 +49,7 @@ struct catchall_parser : ::boost::spirit::qi::primitive_parser<catchall_parser>
+     if (!::shims::isSnippetMode()) return false;
+ 
+     Iterator it = first;
+-    while (it != last && (std::isalnum(*it) || *it == '_' || *it == ':' || *it == '@')) ++it;
++    while (it != last && (std::isalnum(*it) || *it == '_' || *it == ':' || *it == '.' || *it == '@')) ++it;
+ 
+     if (it != last && !maximally_munched_ass(*it)) return false;
+ 

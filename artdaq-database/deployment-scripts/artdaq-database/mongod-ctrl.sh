@@ -3,6 +3,9 @@
 rc_success=0 
 rc_failure=1
 
+unset http_proxy
+unset https_proxy
+
 if [ -z ${MONGOD_DATABASE_NAME+x} ]; then
         echo "Error: MONGOD_DATABASE_NAME is unset. Aborting."; exit $rc_failure;  else
         echo "Info: MONGOD_DATABASE_NAME is set to '$MONGOD_DATABASE_NAME'";

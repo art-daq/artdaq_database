@@ -10,95 +10,95 @@
 "prolog":{
 "type":"table","comment":"#prolog","children":{
 "fhicl_pound_include_0":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"ssp_standard":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"daq":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"fhicl_pound_include_1":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"fhicl_pound_include_2":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"ssp01_standard":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"ssp01_standard.fragment_receiver.fragment_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp01_standard.fragment_receiver.board_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp01_standard.fragment_receiver.board_ip":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"ssp01_standard.fragment_receiver.HardwareConfig.module_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp02_standard":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"ssp02_standard.fragment_receiver.fragment_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp02_standard.fragment_receiver.board_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp02_standard.fragment_receiver.board_ip":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"ssp02_standard.fragment_receiver.HardwareConfig.module_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp03_standard":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"ssp03_standard.fragment_receiver.fragment_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp03_standard.fragment_receiver.board_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp03_standard.fragment_receiver.board_ip":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"ssp03_standard.fragment_receiver.HardwareConfig.module_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp04_standard":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"ssp04_standard.fragment_receiver.fragment_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp04_standard.fragment_receiver.board_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp04_standard.fragment_receiver.board_ip":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"ssp04_standard.fragment_receiver.HardwareConfig.module_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp05_standard":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"ssp05_standard.fragment_receiver.fragment_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp05_standard.fragment_receiver.board_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp05_standard.fragment_receiver.board_ip":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"ssp05_standard.fragment_receiver.HardwareConfig.module_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp06_standard":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"ssp06_standard.fragment_receiver.fragment_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp06_standard.fragment_receiver.board_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp06_standard.fragment_receiver.board_ip":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"ssp06_standard.fragment_receiver.HardwareConfig.module_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp07_standard":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"ssp07_standard.fragment_receiver.fragment_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp07_standard.fragment_receiver.board_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp07_standard.fragment_receiver.board_ip":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"ssp07_standard.fragment_receiver.HardwareConfig.module_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp08_standard":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"ssp08_standard.fragment_receiver.fragment_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp08_standard.fragment_receiver.board_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 ,"ssp08_standard.fragment_receiver.board_ip":{
-"type":"string","comment":" ","annotation":" "}
+"type":"string","comment":" ","annotation" : ""}
 ,"ssp08_standard.fragment_receiver.HardwareConfig.module_id":{
-"type":"number","comment":" ","annotation":" "}
+"type":"number","comment":" ","annotation" : ""}
 }
 }
 ,"main":{
@@ -111,21 +111,21 @@
 ],"converted":{
 "guidata":[{
 "type":"table","name":"prolog","comment":"#prolog","children":[{
-"type":"string","name":"fhicl_pound_include_0","comment":" ","value":"metrics.fcl","annotation":" "}
+"type":"string","name":"fhicl_pound_include_0","comment":" ","value":"metrics.fcl","annotation" : ""}
 ,{
 "type":"table","name":"ssp_standard","comment":" ","children":[{
-"type":"string","name":"metrics","comment":" ","value":"@local::metrics","annotation":" "}
+"type":"string","name":"metrics","comment":" ","value":"@local::metrics","annotation" : ""}
 ,{
-"type":"number","name":"max_fragment_size_words","comment":" ","value":262144,"annotation":" "}
+"type":"number","name":"max_fragment_size_words","comment":" ","value":262144,"annotation" : ""}
 ,{
 "type":"table","name":"fragment_receiver","comment":" ","children":[{
-"type":"number","name":"mpi_buffer_count","comment":" ","value":16,"annotation":" "}
+"type":"number","name":"mpi_buffer_count","comment":" ","value":16,"annotation" : ""}
 ,{
-"type":"number","name":"mpi_sync_interval","comment":" ","value":24000,"annotation":" "}
+"type":"number","name":"mpi_sync_interval","comment":" ","value":24000,"annotation" : ""}
 ,{
-"type":"number","name":"first_event_builder_rank","comment":"# These two variables will be calculated by DAQInterface...","value":-1,"annotation":" "}
+"type":"number","name":"first_event_builder_rank","comment":"# These two variables will be calculated by DAQInterface...","value":-1,"annotation" : ""}
 ,{
-"type":"number","name":"event_builder_count","comment":" ","value":-1,"annotation":" "}
+"type":"number","name":"event_builder_count","comment":" ","value":-1,"annotation" : ""}
 ,{
 "type":"string","name":"generator","comment":" ","value":"SSP","annotation":"###Don^t edit these lines"}
 ,{
@@ -160,7 +160,7 @@
 "type":"number","name":"TimestampRate","comment":" ","value":7,"annotation":"#0=292.969kHz"}
 ]}
 ,{
-"type":"number","name":"ALL_channel_control","comment":" ","value":1,"annotation":" "}
+"type":"number","name":"ALL_channel_control","comment":" ","value":1,"annotation" : ""}
 ,{
 "type":"number","name":"ALL_led_threshold","comment":" ","value":100,"annotation":"#Leading edge trigger threshold in ADC"}
 ,{
@@ -172,160 +172,160 @@
 ,{
 "type":"number","name":"ALL_readout_pretrigger","comment":"#Number of ADC samples to read out","value":50,"annotation":"#Of which before trigger time"}
 ,{
-"type":"number","name":"ALL_cfd_parameters","comment":"#Leave alone unless you know what you^re doing!","value":6144,"annotation":" "}
+"type":"number","name":"ALL_cfd_parameters","comment":"#Leave alone unless you know what you^re doing!","value":6144,"annotation" : ""}
 ,{
-"type":"number","name":"ALL_p_window","comment":" ","value":32,"annotation":" "}
+"type":"number","name":"ALL_p_window","comment":" ","value":32,"annotation" : ""}
 ,{
-"type":"number","name":"ALL_i2_window","comment":" ","value":500,"annotation":" "}
+"type":"number","name":"ALL_i2_window","comment":" ","value":500,"annotation" : ""}
 ,{
-"type":"number","name":"ALL_m1_window","comment":" ","value":10,"annotation":" "}
+"type":"number","name":"ALL_m1_window","comment":" ","value":10,"annotation" : ""}
 ,{
-"type":"number","name":"ALL_m2_window","comment":" ","value":10,"annotation":" "}
+"type":"number","name":"ALL_m2_window","comment":" ","value":10,"annotation" : ""}
 ,{
-"type":"number","name":"ALL_d_window","comment":" ","value":20,"annotation":" "}
+"type":"number","name":"ALL_d_window","comment":" ","value":20,"annotation" : ""}
 ,{
-"type":"number","name":"ALL_i1_window","comment":" ","value":500,"annotation":" "}
+"type":"number","name":"ALL_i1_window","comment":" ","value":500,"annotation" : ""}
 ,{
-"type":"number","name":"ALL_disc_width","comment":" ","value":10,"annotation":" "}
+"type":"number","name":"ALL_disc_width","comment":" ","value":10,"annotation" : ""}
 ,{
-"type":"number","name":"ALL_baseline_start","comment":" ","value":0,"annotation":" "}
+"type":"number","name":"ALL_baseline_start","comment":" ","value":0,"annotation" : ""}
 ,{
 "type":"number","name":"ALL_bias_config","comment":"#ALL_bias_config:           0x00040E21 # 26.5V","value":265488,"annotation":"# 24.5V"}
 ,{
-"type":"number","name":"c2c_control","comment":" ","value":7,"annotation":" "}
+"type":"number","name":"c2c_control","comment":" ","value":7,"annotation" : ""}
 ,{
-"type":"number","name":"c2c_master_intr_control","comment":" ","value":0,"annotation":" "}
+"type":"number","name":"c2c_master_intr_control","comment":" ","value":0,"annotation" : ""}
 ,{
-"type":"number","name":"comm_clock_control","comment":" ","value":1,"annotation":" "}
+"type":"number","name":"comm_clock_control","comment":" ","value":1,"annotation" : ""}
 ,{
-"type":"number","name":"comm_led_config","comment":" ","value":0,"annotation":" "}
+"type":"number","name":"comm_led_config","comment":" ","value":0,"annotation" : ""}
 ,{
-"type":"number","name":"comm_led_input","comment":" ","value":0,"annotation":" "}
+"type":"number","name":"comm_led_input","comment":" ","value":0,"annotation" : ""}
 ,{
-"type":"number","name":"qi_dac_config","comment":" ","value":0,"annotation":" "}
+"type":"number","name":"qi_dac_config","comment":" ","value":0,"annotation" : ""}
 ,{
-"type":"number","name":"qi_dac_control","comment":" ","value":1,"annotation":" "}
+"type":"number","name":"qi_dac_control","comment":" ","value":1,"annotation" : ""}
 ,{
-"type":"number","name":"mon_config","comment":" ","value":1241088,"annotation":" "}
+"type":"number","name":"mon_config","comment":" ","value":1241088,"annotation" : ""}
 ,{
-"type":"number","name":"mon_select","comment":" ","value":16776960,"annotation":" "}
+"type":"number","name":"mon_select","comment":" ","value":16776960,"annotation" : ""}
 ,{
-"type":"number","name":"mon_gpio","comment":" ","value":0,"annotation":" "}
+"type":"number","name":"mon_gpio","comment":" ","value":0,"annotation" : ""}
 ,{
-"type":"number","name":"mon_control","comment":" ","value":65537,"annotation":" "}
+"type":"number","name":"mon_control","comment":" ","value":65537,"annotation" : ""}
 ,{
-"type":"number","name":"c2c_slave_intr_control","comment":" ","value":0,"annotation":" "}
+"type":"number","name":"c2c_slave_intr_control","comment":" ","value":0,"annotation" : ""}
 ,{
-"type":"number","name":"gpio_output_width","comment":" ","value":4096,"annotation":" "}
+"type":"number","name":"gpio_output_width","comment":" ","value":4096,"annotation" : ""}
 ,{
 "type":"number","name":"front_panel_config","comment":" ","value":4369,"annotation":"# standard config?"}
 ,{
-"type":"number","name":"dsp_led_config","comment":"# standard config?","value":0,"annotation":" "}
+"type":"number","name":"dsp_led_config","comment":"# standard config?","value":0,"annotation" : ""}
 ,{
-"type":"number","name":"dsp_led_input","comment":" ","value":0,"annotation":" "}
+"type":"number","name":"dsp_led_input","comment":" ","value":0,"annotation" : ""}
 ,{
-"type":"number","name":"baseline_delay","comment":" ","value":5,"annotation":" "}
+"type":"number","name":"baseline_delay","comment":" ","value":5,"annotation" : ""}
 ,{
-"type":"number","name":"diag_channel_input","comment":" ","value":0,"annotation":" "}
+"type":"number","name":"diag_channel_input","comment":" ","value":0,"annotation" : ""}
 ,{
-"type":"number","name":"qi_config","comment":" ","value":268377856,"annotation":" "}
+"type":"number","name":"qi_config","comment":" ","value":268377856,"annotation" : ""}
 ,{
-"type":"number","name":"qi_delay","comment":" ","value":0,"annotation":" "}
+"type":"number","name":"qi_delay","comment":" ","value":0,"annotation" : ""}
 ,{
-"type":"number","name":"qi_pulse_width","comment":" ","value":0,"annotation":" "}
+"type":"number","name":"qi_pulse_width","comment":" ","value":0,"annotation" : ""}
 ,{
-"type":"number","name":"external_gate_width","comment":" ","value":32768,"annotation":" "}
+"type":"number","name":"external_gate_width","comment":" ","value":32768,"annotation" : ""}
 ]}
 ]}
 ]}
 ,{
-"type":"string","name":"daq","comment":" ","value":"@local::ssp_standard","annotation":" "}
+"type":"string","name":"daq","comment":" ","value":"@local::ssp_standard","annotation" : ""}
 ,{
-"type":"string","name":"fhicl_pound_include_1","comment":" ","value":"ssp_expert_run_options.fcl","annotation":" "}
+"type":"string","name":"fhicl_pound_include_1","comment":" ","value":"ssp_expert_run_options.fcl","annotation" : ""}
 ,{
-"type":"string","name":"fhicl_pound_include_2","comment":" ","value":"user_run_options.fcl","annotation":" "}
+"type":"string","name":"fhicl_pound_include_2","comment":" ","value":"user_run_options.fcl","annotation" : ""}
 ,{
-"type":"table","name":"ssp_standard","comment":" ","value":"@local::daq","annotation":" "}
+"type":"table","name":"ssp_standard","comment":" ","value":"@local::daq","annotation" : ""}
 ,{
-"type":"string","name":"ssp01_standard","comment":" ","value":"@local::ssp_standard","annotation":" "}
+"type":"string","name":"ssp01_standard","comment":" ","value":"@local::ssp_standard","annotation" : ""}
 ,{
-"type":"number","name":"ssp01_standard.fragment_receiver.fragment_id","comment":" ","value":"123","annotation":" "}
+"type":"number","name":"ssp01_standard.fragment_receiver.fragment_id","comment":" ","value":"123","annotation" : ""}
 ,{
-"type":"number","name":"ssp01_standard.fragment_receiver.board_id","comment":" ","value":0,"annotation":" "}
+"type":"number","name":"ssp01_standard.fragment_receiver.board_id","comment":" ","value":0,"annotation" : ""}
 ,{
-"type":"string","name":"ssp01_standard.fragment_receiver.board_ip","comment":" ","value":"192.168.1.109","annotation":" "}
+"type":"string","name":"ssp01_standard.fragment_receiver.board_ip","comment":" ","value":"192.168.1.109","annotation" : ""}
 ,{
-"type":"number","name":"ssp01_standard.fragment_receiver.HardwareConfig.module_id","comment":" ","value":1,"annotation":" "}
+"type":"number","name":"ssp01_standard.fragment_receiver.HardwareConfig.module_id","comment":" ","value":1,"annotation" : ""}
 ,{
-"type":"string","name":"ssp02_standard","comment":" ","value":"@local::ssp_standard","annotation":" "}
+"type":"string","name":"ssp02_standard","comment":" ","value":"@local::ssp_standard","annotation" : ""}
 ,{
-"type":"number","name":"ssp02_standard.fragment_receiver.fragment_id","comment":" ","value":1,"annotation":" "}
+"type":"number","name":"ssp02_standard.fragment_receiver.fragment_id","comment":" ","value":1,"annotation" : ""}
 ,{
-"type":"number","name":"ssp02_standard.fragment_receiver.board_id","comment":" ","value":1,"annotation":" "}
+"type":"number","name":"ssp02_standard.fragment_receiver.board_id","comment":" ","value":1,"annotation" : ""}
 ,{
-"type":"string","name":"ssp02_standard.fragment_receiver.board_ip","comment":" ","value":"192.168.1.117","annotation":" "}
+"type":"string","name":"ssp02_standard.fragment_receiver.board_ip","comment":" ","value":"192.168.1.117","annotation" : ""}
 ,{
-"type":"number","name":"ssp02_standard.fragment_receiver.HardwareConfig.module_id","comment":" ","value":2,"annotation":" "}
+"type":"number","name":"ssp02_standard.fragment_receiver.HardwareConfig.module_id","comment":" ","value":2,"annotation" : ""}
 ,{
-"type":"string","name":"ssp03_standard","comment":" ","value":"@local::ssp_standard","annotation":" "}
+"type":"string","name":"ssp03_standard","comment":" ","value":"@local::ssp_standard","annotation" : ""}
 ,{
-"type":"number","name":"ssp03_standard.fragment_receiver.fragment_id","comment":" ","value":2,"annotation":" "}
+"type":"number","name":"ssp03_standard.fragment_receiver.fragment_id","comment":" ","value":2,"annotation" : ""}
 ,{
-"type":"number","name":"ssp03_standard.fragment_receiver.board_id","comment":" ","value":2,"annotation":" "}
+"type":"number","name":"ssp03_standard.fragment_receiver.board_id","comment":" ","value":2,"annotation" : ""}
 ,{
-"type":"string","name":"ssp03_standard.fragment_receiver.board_ip","comment":" ","value":"192.168.1.113","annotation":" "}
+"type":"string","name":"ssp03_standard.fragment_receiver.board_ip","comment":" ","value":"192.168.1.113","annotation" : ""}
 ,{
-"type":"number","name":"ssp03_standard.fragment_receiver.HardwareConfig.module_id","comment":" ","value":3,"annotation":" "}
+"type":"number","name":"ssp03_standard.fragment_receiver.HardwareConfig.module_id","comment":" ","value":3,"annotation" : ""}
 ,{
-"type":"string","name":"ssp04_standard","comment":" ","value":"@local::ssp_standard","annotation":" "}
+"type":"string","name":"ssp04_standard","comment":" ","value":"@local::ssp_standard","annotation" : ""}
 ,{
-"type":"number","name":"ssp04_standard.fragment_receiver.fragment_id","comment":" ","value":3,"annotation":" "}
+"type":"number","name":"ssp04_standard.fragment_receiver.fragment_id","comment":" ","value":3,"annotation" : ""}
 ,{
-"type":"number","name":"ssp04_standard.fragment_receiver.board_id","comment":" ","value":3,"annotation":" "}
+"type":"number","name":"ssp04_standard.fragment_receiver.board_id","comment":" ","value":3,"annotation" : ""}
 ,{
-"type":"string","name":"ssp04_standard.fragment_receiver.board_ip","comment":" ","value":"192.168.1.110","annotation":" "}
+"type":"string","name":"ssp04_standard.fragment_receiver.board_ip","comment":" ","value":"192.168.1.110","annotation" : ""}
 ,{
-"type":"number","name":"ssp04_standard.fragment_receiver.HardwareConfig.module_id","comment":" ","value":4,"annotation":" "}
+"type":"number","name":"ssp04_standard.fragment_receiver.HardwareConfig.module_id","comment":" ","value":4,"annotation" : ""}
 ,{
-"type":"string","name":"ssp05_standard","comment":" ","value":"@local::ssp_standard","annotation":" "}
+"type":"string","name":"ssp05_standard","comment":" ","value":"@local::ssp_standard","annotation" : ""}
 ,{
-"type":"number","name":"ssp05_standard.fragment_receiver.fragment_id","comment":" ","value":4,"annotation":" "}
+"type":"number","name":"ssp05_standard.fragment_receiver.fragment_id","comment":" ","value":4,"annotation" : ""}
 ,{
-"type":"number","name":"ssp05_standard.fragment_receiver.board_id","comment":" ","value":4,"annotation":" "}
+"type":"number","name":"ssp05_standard.fragment_receiver.board_id","comment":" ","value":4,"annotation" : ""}
 ,{
-"type":"string","name":"ssp05_standard.fragment_receiver.board_ip","comment":" ","value":"192.168.1.114","annotation":" "}
+"type":"string","name":"ssp05_standard.fragment_receiver.board_ip","comment":" ","value":"192.168.1.114","annotation" : ""}
 ,{
-"type":"number","name":"ssp05_standard.fragment_receiver.HardwareConfig.module_id","comment":" ","value":5,"annotation":" "}
+"type":"number","name":"ssp05_standard.fragment_receiver.HardwareConfig.module_id","comment":" ","value":5,"annotation" : ""}
 ,{
-"type":"string","name":"ssp06_standard","comment":" ","value":"@local::ssp_standard","annotation":" "}
+"type":"string","name":"ssp06_standard","comment":" ","value":"@local::ssp_standard","annotation" : ""}
 ,{
-"type":"number","name":"ssp06_standard.fragment_receiver.fragment_id","comment":" ","value":5,"annotation":" "}
+"type":"number","name":"ssp06_standard.fragment_receiver.fragment_id","comment":" ","value":5,"annotation" : ""}
 ,{
-"type":"number","name":"ssp06_standard.fragment_receiver.board_id","comment":" ","value":5,"annotation":" "}
+"type":"number","name":"ssp06_standard.fragment_receiver.board_id","comment":" ","value":5,"annotation" : ""}
 ,{
-"type":"string","name":"ssp06_standard.fragment_receiver.board_ip","comment":" ","value":"192.168.1.106","annotation":" "}
+"type":"string","name":"ssp06_standard.fragment_receiver.board_ip","comment":" ","value":"192.168.1.106","annotation" : ""}
 ,{
-"type":"number","name":"ssp06_standard.fragment_receiver.HardwareConfig.module_id","comment":" ","value":6,"annotation":" "}
+"type":"number","name":"ssp06_standard.fragment_receiver.HardwareConfig.module_id","comment":" ","value":6,"annotation" : ""}
 ,{
-"type":"string","name":"ssp07_standard","comment":" ","value":"@local::ssp_standard","annotation":" "}
+"type":"string","name":"ssp07_standard","comment":" ","value":"@local::ssp_standard","annotation" : ""}
 ,{
-"type":"number","name":"ssp07_standard.fragment_receiver.fragment_id","comment":" ","value":6,"annotation":" "}
+"type":"number","name":"ssp07_standard.fragment_receiver.fragment_id","comment":" ","value":6,"annotation" : ""}
 ,{
-"type":"number","name":"ssp07_standard.fragment_receiver.board_id","comment":" ","value":6,"annotation":" "}
+"type":"number","name":"ssp07_standard.fragment_receiver.board_id","comment":" ","value":6,"annotation" : ""}
 ,{
-"type":"string","name":"ssp07_standard.fragment_receiver.board_ip","comment":" ","value":"192.168.1.105","annotation":" "}
+"type":"string","name":"ssp07_standard.fragment_receiver.board_ip","comment":" ","value":"192.168.1.105","annotation" : ""}
 ,{
-"type":"number","name":"ssp07_standard.fragment_receiver.HardwareConfig.module_id","comment":" ","value":7,"annotation":" "}
+"type":"number","name":"ssp07_standard.fragment_receiver.HardwareConfig.module_id","comment":" ","value":7,"annotation" : ""}
 ,{
-"type":"string","name":"ssp08_standard","comment":" ","value":"@local::ssp_standard","annotation":" "}
+"type":"string","name":"ssp08_standard","comment":" ","value":"@local::ssp_standard","annotation" : ""}
 ,{
-"type":"number","name":"ssp08_standard.fragment_receiver.fragment_id","comment":" ","value":7,"annotation":" "}
+"type":"number","name":"ssp08_standard.fragment_receiver.fragment_id","comment":" ","value":7,"annotation" : ""}
 ,{
-"type":"number","name":"ssp08_standard.fragment_receiver.board_id","comment":" ","value":7,"annotation":" "}
+"type":"number","name":"ssp08_standard.fragment_receiver.board_id","comment":" ","value":7,"annotation" : ""}
 ,{
-"type":"string","name":"ssp08_standard.fragment_receiver.board_ip","comment":" ","value":"192.168.1.105","annotation":" "}
+"type":"string","name":"ssp08_standard.fragment_receiver.board_ip","comment":" ","value":"192.168.1.105","annotation" : ""}
 ,{
-"type":"number","name":"ssp08_standard.fragment_receiver.HardwareConfig.module_id","comment":" ","value":8,"annotation":" "}
+"type":"number","name":"ssp08_standard.fragment_receiver.HardwareConfig.module_id","comment":" ","value":8,"annotation" : ""}
 ]}
 ,{
 "type":"table","name":"main","comment":"#main","children":[]}

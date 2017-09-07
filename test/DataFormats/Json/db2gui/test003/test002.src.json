@@ -86,12 +86,12 @@
 "expected_fragments_per_event" : {
 "type" : "number",
 "comment" : "zxcv ",
-"annotation" : "zxcv "
+"annotation" : "#zxcv"
 },
 "first_fragment_receiver_rank" : {
 "type" : "number",
 "comment" : "zxcv ",
-"annotation" : "zxcv "
+"annotation" : "#zxcv"
 },
 "fragment_receiver_count" : {
 "type" : "number",
@@ -136,7 +136,7 @@
 "fileName" : {
 "type" : "string",
 "comment" : " ",
-"annotation" : "//demoe"
+"annotation" : "#//demoe"
 },
 "level" : {
 "type" : "number",
@@ -174,7 +174,19 @@
 "SelectEvents" : {
 "type" : "sequence",
 "comment" : "#Failure 5 not a satom ",
+"annotation" : "",
+"children" : {
+"0" : {
+"type" : "string",
+"comment" : " ",
 "annotation" : ""
+},
+"1" : {
+"type" : "string",
+"comment" : " ",
+"annotation" : ""
+}
+}
 }
 }
 },
@@ -223,7 +235,7 @@
 "nth" : {
 "type" : "number",
 "comment" : " ",
-"annotation" : "//#Success 4 right of satom"
+"annotation" : "#//#Success 4 right of satom"
 }
 }
 }
@@ -232,17 +244,38 @@
 "my_output_modules" : {
 "type" : "sequence",
 "comment" : " ",
+"annotation" : "",
+"children" : {
+"0" : {
+"type" : "string",
+"comment" : " ",
 "annotation" : ""
+}
+}
 },
 "pmod2" : {
 "type" : "sequence",
 "comment" : " ",
+"annotation" : "",
+"children" : {
+"0" : {
+"type" : "string",
+"comment" : " ",
 "annotation" : ""
+}
+}
 },
 "pmod3" : {
 "type" : "sequence",
 "comment" : "#Failure 2 not a satom ",
+"annotation" : "",
+"children" : {
+"0" : {
+"type" : "string",
+"comment" : " ",
 "annotation" : ""
+}
+}
 }
 }
 },

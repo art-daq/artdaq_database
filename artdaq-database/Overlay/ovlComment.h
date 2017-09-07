@@ -19,9 +19,9 @@ class ovlComment final : public ovlKeyValue {
   ~ovlComment() = default;
 
   // accessors
-  int& linenum();
+  integer& linenum();
   std::string& text();
-  int const& linenum() const;
+  integer const& linenum() const;
   std::string const& text() const;
 
   // overridess

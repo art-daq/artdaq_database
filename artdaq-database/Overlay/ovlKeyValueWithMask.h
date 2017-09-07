@@ -11,7 +11,7 @@ namespace jsonliteral = artdaq::database::dataformats::literal;
 using namespace artdaq::database::result;
 using artdaq::database::sharedtypes::unwrap;
 
-template <int mask>
+template <std::uint32_t mask>
 class ovlKeyValueWithMask : public ovlKeyValue {
  public:
   ovlKeyValueWithMask(object_t::key_type const& /*key*/, value_t& /*object*/);
@@ -24,11 +24,11 @@ class ovlKeyValueWithMask : public ovlKeyValue {
   result_t operator==(ovlKeyValueWithMask const&) const;
 };
 
-template <int mask>
+template <std::uint32_t mask>
 ovlKeyValueWithMask<mask>::ovlKeyValueWithMask(object_t::key_type const& key, value_t& value)
     : ovlKeyValue(key, value) {}
 
-template <int mask>
+template <std::uint32_t mask>
 result_t ovlKeyValueWithMask<mask>::operator==(ovlKeyValueWithMask const& other) const {
   return ((useCompareMask() & mask) == mask) ? Success() : self() == other.self();
 }

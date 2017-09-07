@@ -189,14 +189,14 @@
                "name":"@xmlns:xsi",
                "comment":" ",
                "value":"http://www.w3.org/2001/XMLSchema-instance",
-               "annotation":" "
+               "annotation" : ""
             },
             {
                "type":"string",
                "name":"@xsi:noNamespaceSchemaLocation",
                "comment":" ",
                "value":"../../ConfigurationBase.xsd",
-               "annotation":" "
+               "annotation" : ""
             },
             {
                "type":"table",
@@ -208,14 +208,14 @@
                      "name":"COMMENT_DESCRIPTION",
                      "comment":" ",
                      "value":"null",
-                     "annotation":" "
+                     "annotation" : ""
                   },
                   {
                      "type":"string",
                      "name":"CREATED_BY_USER",
                      "comment":" ",
                      "value":"null",
-                     "annotation":" "
+                     "annotation" : ""
                   },
                   {
                      "type":"sequence",
@@ -378,14 +378,14 @@
                            "name":"KIND_OF_PART",
                            "comment":" ",
                            "value":"Detector ROOT",
-                           "annotation":" "
+                           "annotation" : ""
                         },
                         {
                            "type":"string",
                            "name":"NAME_LABEL",
                            "comment":" ",
                            "value":"CMS--ROOT",
-                           "annotation":" "
+                           "annotation" : ""
                         }
                      ]
                   },
@@ -394,7 +394,7 @@
                      "name":"VERSION",
                      "comment":" ",
                      "value":"0",
-                     "annotation":" "
+                     "annotation" : ""
                   }
                ]
             },
@@ -413,28 +413,28 @@
                            "name":"LOCATION",
                            "comment":" ",
                            "value":"CERN P5",
-                           "annotation":" "
+                           "annotation" : ""
                         },
                         {
                            "type":"string",
                            "name":"RUN_BEGIN_TIMESTAMP",
                            "comment":" ",
                            "value":"2013-01-29 17:22:10",
-                           "annotation":" "
+                           "annotation" : ""
                         },
                         {
                            "type":"string",
                            "name":"RUN_NUMBER",
                            "comment":" ",
                            "value":"1",
-                           "annotation":" "
+                           "annotation" : ""
                         },
                         {
                            "type":"string",
                            "name":"RUN_TYPE",
                            "comment":" ",
                            "value":"DefaultConfigurations",
-                           "annotation":" "
+                           "annotation" : ""
                         }
                      ]
                   },
@@ -448,14 +448,14 @@
                            "name":"EXTENSION_TABLE_NAME",
                            "comment":" ",
                            "value":"DEFAULT_CONFIGURATIONS",
-                           "annotation":" "
+                           "annotation" : ""
                         },
                         {
                            "type":"string",
                            "name":"NAME",
                            "comment":" ",
                            "value":"DefaultConfigurations",
-                           "annotation":" "
+                           "annotation" : ""
                         }
                      ]
                   }

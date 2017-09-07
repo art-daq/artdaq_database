@@ -19,6 +19,4 @@ add_subdirectory(test005)
 add_subdirectory(test006)
 add_subdirectory(test007)
 
-add_subdirectory(test008)
-
 install_source()

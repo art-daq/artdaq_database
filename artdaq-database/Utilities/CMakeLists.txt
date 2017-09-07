@@ -47,6 +47,14 @@ cet_make_exec(migrate_database
   ${Boost_PROGRAM_OPTIONS_LIBRARY} 
 )
 
+cet_make_exec(fixtestjson
+  LIBRARIES
+  artdaq-database_SharedCommon
+  artdaq-database_DataFormats_Fhicl
+  ${Boost_PROGRAM_OPTIONS_LIBRARY}
+)
+
+
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/schema.fcl DESTINATION ${flavorqual_dir}/conf/)
 
 cet_script(conftool.py)

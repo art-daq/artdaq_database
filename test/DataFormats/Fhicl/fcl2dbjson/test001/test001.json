@@ -12,30 +12,30 @@
 "user" : {
 "NetMonTransportServiceInterface" : {
 "service_provider" : "NetMonTransportService",
-"first_data_receiver_rank" : 6,
-"mpi_buffer_count" : 8,
-"max_fragment_size_words" : 2097152,
-"data_receiver_count" : 1
+"first_data_receiver_rank" : "6",
+"mpi_buffer_count" : "8",
+"max_fragment_size_words" : "2097152",
+"data_receiver_count" : "1"
 }
 }
 },
 "daq" : {
-"max_fragment_size_words" : 2097152,
+"max_fragment_size_words" : "2097152",
 "event_builder" : {
-"mpi_buffer_count" : 16,
-"first_fragment_receiver_rank" : 0,
-"fragment_receiver_count" : 2,
-"expected_fragments_per_event" : 2,
-"use_art" : true,
-"print_event_store_stats" : true,
-"verbose" : false
+"mpi_buffer_count" : "16",
+"first_fragment_receiver_rank" : "0",
+"fragment_receiver_count" : "2",
+"expected_fragments_per_event" : "2",
+"use_art" : "true",
+"print_event_store_stats" : "true",
+"verbose" : "false"
 },
 "metrics" : {
 "evbFile" : {
 "metricPluginType" : "file",
-"level" : 3,
+"level" : "3",
 "fileName" : "/tmp/eventbuilder/evb_%UID%_metrics.log",
-"uniquify" : true
+"uniquify" : "true"
 }
 }
 },
@@ -54,11 +54,11 @@
 "filters" : {
 "prescaleMod2" : {
 "module_type" : "NthEvent",
-"nth" : 2
+"nth" : "2"
 },
 "prescaleMod3" : {
 "module_type" : "NthEvent",
-"nth" : 3
+"nth" : "3"
 }
 },
 "pmod2" : [
@@ -73,8 +73,8 @@
 },
 "source" : {
 "module_type" : "RawInput",
-"waiting_time" : 900,
-"resume_after_timeout" : true
+"waiting_time" : "900",
+"resume_after_timeout" : "true"
 },
 "process_name" : "DAQ"
 }
@@ -93,50 +93,50 @@
 "children" : {
 "services" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "scheduler" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "fileMode" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "user" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "NetMonTransportServiceInterface" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "service_provider" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "first_data_receiver_rank" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "mpi_buffer_count" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "max_fragment_size_words" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "data_receiver_count" : {
 "type" : "number",
-"comment" : " ",
+"comment" : "",
 "annotation" : "# 2"
 }
 }
@@ -147,81 +147,81 @@
 },
 "daq" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "max_fragment_size_words" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "event_builder" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "mpi_buffer_count" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "first_fragment_receiver_rank" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "fragment_receiver_count" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "expected_fragments_per_event" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "use_art" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "print_event_store_stats" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "verbose" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "metrics" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "evbFile" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "metricPluginType" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "level" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "fileName" : {
-"type" : "string",
-"comment" : " ",
+"type" : "string_doublequoted",
+"comment" : "",
 "annotation" : "//demoe"
 },
 "uniquify" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 }
 }
 }
@@ -231,16 +231,16 @@
 },
 "outputs" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "netMonOutput" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "module_type" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "SelectEvents" : {
 "type" : "table",
@@ -249,17 +249,17 @@
 "SelectEvents" : {
 "type" : "sequence",
 "comment" : "#Failure 5 not a satom ",
-"annotation" : " ",
+"annotation" : "",
 "children" : {
 "0" : {
-"type" : "string",
+"type" : "string_unquoted",
 "comment" : "#Failure 5 not a satom ",
-"annotation" : " "
+"annotation" : ""
 },
 "1" : {
-"type" : "string",
+"type" : "string_unquoted",
 "comment" : "#Failure 5 not a satom ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 }
@@ -271,40 +271,40 @@
 },
 "physics" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "filters" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "prescaleMod2" : {
 "type" : "table",
 "comment" : "#Failure 4 not a satom ",
 "children" : {
 "module_type" : {
-"type" : "string",
-"comment" : " ",
+"type" : "string_unquoted",
+"comment" : "",
 "annotation" : "#//Success 5 right of satom"
 },
 "nth" : {
 "type" : "number",
 "comment" : "#//Success 5 right of satom",
-"annotation" : " "
+"annotation" : ""
 }
 }
 },
 "prescaleMod3" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "module_type" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "nth" : {
 "type" : "number",
-"comment" : " ",
+"comment" : "",
 "annotation" : "//#Success 4 right of satom"
 }
 }
@@ -313,37 +313,37 @@
 },
 "pmod2" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
 "0" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "pmod3" : {
 "type" : "sequence",
 "comment" : "#Failure 2 not a satom ",
-"annotation" : " ",
+"annotation" : "",
 "children" : {
 "0" : {
-"type" : "string",
+"type" : "string_unquoted",
 "comment" : "#Failure 2 not a satom ",
-"annotation" : " "
+"annotation" : ""
 }
 }
 },
 "my_output_modules" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
 "0" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 }
@@ -351,29 +351,29 @@
 },
 "source" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "module_type" : {
-"type" : "string",
+"type" : "string_unquoted",
 "comment" : "#Success 1  above satom",
-"annotation" : " "
+"annotation" : ""
 },
 "waiting_time" : {
 "type" : "number",
-"comment" : " ",
+"comment" : "",
 "annotation" : "//Success 2 right of satom"
 },
 "resume_after_timeout" : {
 "type" : "bool",
-"comment" : " ",
+"comment" : "",
 "annotation" : "#Success 3 right of satom"
 }
 }
 },
 "process_name" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 }
@@ -402,7 +402,7 @@
 },
 {
 "linenum" : 46,
-"value" : "#outputCommands: [ |keep *|, |drop artdaq::Fragments_daq_V1720_*|, |drop artdaq::Fragments_daq_V1724_*| ]"
+"value" : "#outputCommands: [ \"keep *\", \"drop artdaq::Fragments_daq_V1720_*\", \"drop artdaq::Fragments_daq_V1724_*\" ]"
 },
 {
 "linenum" : 48,
@@ -414,7 +414,7 @@
 },
 {
 "linenum" : 50,
-"value" : "#  fileName: |/tmp/artdaqdemo_eb04_r%06r_sr%02s_%to.root|"
+"value" : "#  fileName: \"/tmp/artdaqdemo_eb04_r%06r_sr%02s_%to.root\""
 },
 {
 "linenum" : 51,
@@ -426,7 +426,7 @@
 },
 {
 "linenum" : 53,
-"value" : "#  #outputCommands: [ |keep *|, |drop artdaq::Fragments_daq_V1720_*|, |drop artdaq::Fragments_daq_V1724_*| ]"
+"value" : "#  #outputCommands: [ \"keep *\", \"drop artdaq::Fragments_daq_V1720_*\", \"drop artdaq::Fragments_daq_V1724_*\" ]"
 },
 {
 "linenum" : 54,
@@ -478,7 +478,7 @@
 },
 {
 "linenum" : 91,
-"value" : "// fragment_type_map: [[1, |missed|], [3, |V1720|], [4, |V1724|], [6, |TOY1|], [7, |TOY2|], [8, |ASCII|]]"
+"value" : "// fragment_type_map: [[1, \"missed\"], [3, \"V1720\"], [4, \"V1724\"], [6, \"TOY1\"], [7, \"TOY2\"], [8, \"ASCII\"]]"
 }
 ],
 "origin" : {

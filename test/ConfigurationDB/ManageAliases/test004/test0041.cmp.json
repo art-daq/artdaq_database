@@ -1,6 +1,6 @@
 {
 "_id" : {
-"$oid" : "464a07bd29d44781885afb0b"
+"$oid" : "59a7219e5ea04659e163a5a3"
 },
 "document" : {
 "data" : {
@@ -14,31 +14,31 @@
 },
 "NetMonTransportServiceInterface" : {
 "service_provider" : "NetMonTransportService",
-"max_fragment_size_words" : 2097152
+"max_fragment_size_words" : "2097152"
 }
 },
 "daq" : {
-"max_fragment_size_words" : 2097152,
+"max_fragment_size_words" : "2097152",
 "aggregator" : {
-"mpi_buffer_count" : 8,
-"first_event_builder_rank" : 2,
-"event_builder_count" : 2,
-"expected_events_per_bunch" : 1,
-"print_event_store_stats" : true,
-"event_queue_depth" : 2,
-"event_queue_wait_time" : 1,
-"onmon_event_prescale" : 1,
+"mpi_buffer_count" : "8",
+"first_event_builder_rank" : "2",
+"event_builder_count" : "2",
+"expected_events_per_bunch" : "1",
+"print_event_store_stats" : "true",
+"event_queue_depth" : "2",
+"event_queue_wait_time" : "1",
+"onmon_event_prescale" : "1",
 "xmlrpc_client_list" : ";http://topol.fnal.gov:5205/RPC2,3;http://topol.fnal.gov:5206/RPC2,3;http://topol.fnal.gov:5235/RPC2,4;http://topol.fnal.gov:5236/RPC2,4;http://topol.fnal.gov:5265/RPC2,5;http://topol.fnal.gov:5266/RPC2,5",
-"file_size_MB" : 8000,
-"file_duration" : 0,
-"file_event_count" : 0
+"file_size_MB" : "8000.0",
+"file_duration" : "0",
+"file_event_count" : "0"
 },
 "metrics" : {
 "aggFile" : {
 "metricPluginType" : "file",
-"level" : 3,
+"level" : "3",
 "fileName" : "/tmp/aggregator/agg_%UID%_metrics.log",
-"uniquify" : true
+"uniquify" : "true"
 }
 }
 },
@@ -61,11 +61,11 @@
 "filters" : {
 "prescaleMod2" : {
 "module_type" : "NthEvent",
-"nth" : 2
+"nth" : "2"
 },
 "prescaleMod3" : {
 "module_type" : "NthEvent",
-"nth" : 3
+"nth" : "3"
 }
 },
 "p1" : [
@@ -98,32 +98,32 @@
 "children" : {
 "services" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "scheduler" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "fileMode" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "NetMonTransportServiceInterface" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "service_provider" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "max_fragment_size_words" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 }
 }
 }
@@ -131,106 +131,106 @@
 },
 "daq" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "max_fragment_size_words" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "aggregator" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "mpi_buffer_count" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "first_event_builder_rank" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "event_builder_count" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "expected_events_per_bunch" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "print_event_store_stats" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "event_queue_depth" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "event_queue_wait_time" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "onmon_event_prescale" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "xmlrpc_client_list" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "file_size_MB" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "file_duration" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "file_event_count" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "metrics" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "aggFile" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "metricPluginType" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "level" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 },
 "fileName" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_doublequoted",
+"comment" : "",
+"annotation" : ""
 },
 "uniquify" : {
 "type" : "bool",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 }
 }
 }
@@ -240,50 +240,50 @@
 },
 "source" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "module_type" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "outputs" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 
 }
 },
 "physics" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "analyzers" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 
 }
 },
 "producers" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "BuildInfo" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "module_type" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "instance_name" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 }
@@ -291,37 +291,37 @@
 },
 "filters" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "prescaleMod2" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "module_type" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "nth" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "prescaleMod3" : {
 "type" : "table",
-"comment" : " ",
+"comment" : "",
 "children" : {
 "module_type" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 },
 "nth" : {
 "type" : "number",
-"comment" : " ",
-"annotation" : " "
+"comment" : "",
+"annotation" : ""
 }
 }
 }
@@ -329,54 +329,54 @@
 },
 "p1" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
 
 }
 },
 "p2" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
 "0" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "pmod2" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
 "0" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 },
 "pmod3" : {
 "type" : "sequence",
-"comment" : " ",
-"annotation" : " ",
+"comment" : "",
+"annotation" : "",
 "children" : {
 "0" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 }
 }
 },
 "process_name" : {
-"type" : "string",
-"comment" : " ",
-"annotation" : " "
+"type" : "string_unquoted",
+"comment" : "",
+"annotation" : ""
 }
 }
 }
@@ -392,8 +392,8 @@
 "format" : "fhicl",
 "name" : "notprovided",
 "source" : "fhicl_to_json",
-"timestamp" : "Wed Feb 22 22:58:50 2017",
-"created" : "Wed Feb 22 22:58:50 2017",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
+"created" : "2017-07-18T12:48:10.123-0500",
 "rawdata" : [
 
 ]
@@ -402,17 +402,17 @@
 "entities" : [
 {
 "name" : "Aggregator_topol03252016-222027",
-"assigned" : "Wed Feb 22 22:58:51 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 },
 {
 "name" : "notprovided",
-"assigned" : "2017-07-18T12:48:10.123-0500"
+"assigned" : "2017-08-30T15:35:41.891-0500"
 }
 ],
 "configurations" : [
 {
 "name" : "notprovided",
-"assigned" : "Wed Feb 22 22:58:50 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 ],
 "changelog" : "notprovided",
@@ -422,103 +422,71 @@
 "updates" : [
 {
 "event" : "addConfiguration",
-"timestamp" : "Wed Feb 22 22:58:50 2017",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "notprovided",
-"assigned" : "Wed Feb 22 22:58:50 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "setVersion",
-"timestamp" : "Wed Feb 22 22:58:50 2017",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "version001",
-"assigned" : "Wed Feb 22 22:58:50 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "setCollection",
-"timestamp" : "Wed Feb 22 22:58:50 2017",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "artdaq_Aggregator",
-"assigned" : "Wed Feb 22 22:58:50 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "addEntity",
-"timestamp" : "Wed Feb 22 22:58:51 2017",
+"timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
 "name" : "Aggregator_topol03252016-222027",
-"assigned" : "Wed Feb 22 22:58:51 2017"
-}
-},
-{
-"event" : "setCollection",
-"timestamp" : "Wed Feb 22 22:58:51 2017",
-"value" : {
-"name" : "artdaq_Aggregator",
-"assigned" : "Wed Feb 22 22:58:51 2017"
+"assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "addAlias",
-"timestamp" : "2017-07-18T12:48:10.123-0500",
+"timestamp" : "2017-08-30T15:35:41.724-0500",
 "value" : {
 "name" : "@TEST_ALIAS_NAME@",
-"assigned" : "2017-07-18T12:48:10.123-0500",
-"removed" : "2017-07-18T12:48:10.123-0500"
+"assigned" : "2017-08-30T15:35:41.724-0500",
+"removed" : "2017-08-30T15:35:41.724-0500"
 }
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "2017-07-18T12:48:10.123-0500",
+"timestamp" : "2017-08-30T15:35:41.820-0500",
 "value" : {
 "name" : "notprovided",
-"assigned" : "2017-07-18T12:48:10.123-0500"
-}
-},
-{
-"event" : "setVersion",
-"timestamp" : "2017-07-18T12:48:10.123-0500",
-"value" : {
-"name" : "version001",
-"assigned" : "2017-07-18T12:48:10.123-0500"
-}
-},
-{
-"event" : "setCollection",
-"timestamp" : "2017-07-18T12:48:10.123-0500",
-"value" : {
-"name" : "artdaq_Aggregator",
-"assigned" : "2017-07-18T12:48:10.123-0500"
+"assigned" : "2017-08-30T15:35:41.820-0500"
 }
 },
 {
 "event" : "addEntity",
-"timestamp" : "2017-07-18T12:48:10.123-0500",
+"timestamp" : "2017-08-30T15:35:41.891-0500",
 "value" : {
 "name" : "notprovided",
-"assigned" : "2017-07-18T12:48:10.123-0500"
-}
-},
-{
-"event" : "setCollection",
-"timestamp" : "2017-07-18T12:48:10.123-0500",
-"value" : {
-"name" : "artdaq_Aggregator",
-"assigned" : "2017-07-18T12:48:10.123-0500"
+"assigned" : "2017-08-30T15:35:41.891-0500"
 }
 }
 ],
-"created" : "Wed Feb 22 22:58:50 2017"
+"created" : "2017-07-18T12:48:10.123-0500"
 },
 "collection" : "artdaq_Aggregator",
 "aliases" : {
 "active" : [
 {
 "name" : "@TEST_ALIAS_NAME@",
-"assigned" : "2017-07-18T12:48:10.123-0500",
-"removed" : "2017-07-18T12:48:10.123-0500"
+"assigned" : "2017-08-30T15:35:41.724-0500",
+"removed" : "2017-08-30T15:35:41.724-0500"
 }
 ],
 "history" : [

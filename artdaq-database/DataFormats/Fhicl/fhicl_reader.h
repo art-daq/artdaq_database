@@ -16,7 +16,7 @@ namespace fhicl {
 using namespace boost::spirit;
 
 using comment_t = std::string;
-using linenum_t = int;
+using linenum_t = integer;
 using comments_t = std::map<linenum_t, comment_t>;
 using linenum_comment_t = std::pair<linenum_t, comment_t>;
 

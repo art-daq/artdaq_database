@@ -11,11 +11,11 @@ using artdaq::database::sharedtypes::unwrap;
 
 ovlComment::ovlComment(object_t::key_type const& key, value_t& comment) : ovlKeyValue(key, comment) {}
 
-int& ovlComment::linenum() { return value_as<int>(jsonliteral::linenum); }
+integer& ovlComment::linenum() { return value_as<integer>(jsonliteral::linenum); }
 
 std::string& ovlComment::text() { return value_as<std::string>(jsonliteral::value); }
 
-int const& ovlComment::linenum() const { return value_as<int>(jsonliteral::linenum); }
+integer const& ovlComment::linenum() const { return value_as<integer>(jsonliteral::linenum); }
 
 std::string const& ovlComment::text() const { return value_as<std::string>(jsonliteral::value); }
 

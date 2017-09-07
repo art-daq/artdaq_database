@@ -13,6 +13,12 @@ std::string unescape(std::string const& str);
 std::string tag_as_string(::fhicl::value_tag);
 ::fhicl::value_tag string_as_tag(std::string);
 
+std::string protection_as_string(::fhicl::Protection);
+::fhicl::Protection string_as_protection(std::string);
+
+std::string to_json_string(std::string const& str);
+std::string from_json_string(std::string const& str);
+
 }  // namespace fhicl
 }  // namespace database
 }  // artdaq

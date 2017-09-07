@@ -1,9 +1,12 @@
 #!/bin/bash
 
-#source /daq/database/cern_pddaq_v2_db/webconfigeditor.env
+#source /daq/database/cern_pddaq_v3x_db/webconfigeditor.env
 
 rc_success=0 
 rc_failure=1
+
+unset http_proxy
+unset https_proxy
 
 if [ -z ${MONGOD_DATABASE_NAME+x} ]; then
         echo "Error: MONGOD_DATABASE_NAME is unset. Aborting."; exit $rc_failure;  else
@@ -49,7 +52,6 @@ fi
 if ! [[ ${WEBEDITOR_BASE_PORT} == ?(-)+([0-9]) ]]; then
        echo "Error: WEBEDITOR_BASE_PORT is not a number"; exit $rc_failure;
 fi
-
 
 source /daq/artdaq/products/setup
 #source /daq/database/initd_functions
@@ -203,10 +205,17 @@ case "$1" in
     status -p $WEBEDITOR_PID ${node_bin}
     RETVAL=$?
 
-    if [ "$RETVAL" -eq 0 ]; then 
+    if [ "$RETVAL" -eq 0 ]; then
+        echo Testing URL=http://localhost:${WEBEDITOR_BASE_PORT}/db/client.html 
+        #curl http://localhost:${WEBEDITOR_BASE_PORT}/db/client.html 
         curl http://localhost:${WEBEDITOR_BASE_PORT}/db/client.html -s -f -o /dev/null
         RETVAL=$?
-        [ "$RETVAL" -ne 0 ] && failure "Web Config Editor not running" ||  success "Web Config Editor is running"
+        if [ "$RETVAL" -eq 0 ]; then 
+		echo Web Config Editor is running
+		success "Web Config Editor is running"; else
+                echo Web Config Editor is  not running
+	        failure "Web Config Editor is not running" 
+	fi
     fi
     ;;
   *)

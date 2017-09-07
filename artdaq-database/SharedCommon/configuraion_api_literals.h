@@ -120,6 +120,9 @@ constexpr auto cant_call_system =
 constexpr auto name = "name";
 constexpr auto notprovided = "notprovided";
 constexpr auto apiname = "artdaq_database";
+constexpr auto whitespace = " ";
+constexpr auto nullstring = "";
+
 constexpr auto empty_json = "{ }";
 constexpr auto empty_search_result = "{\"search\":[ ]}";
 

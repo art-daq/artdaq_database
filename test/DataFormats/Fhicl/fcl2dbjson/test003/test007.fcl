@@ -1,0 +1,12 @@
+#comment bool1
+bool1: true //true
+#comment bool2 
+bool2: TRUE // TRUE
+#comment bool3
+bool3: TrUe # TrUe
+#comment bool1
+bool4: false //false
+#comment bool2 
+bool5: FALSE // FALSE
+#comment bool3
+bool6: FaLsE # FaLsE

@@ -97,14 +97,15 @@ class json_node_t final {
   }
 
   template <typename T, typename O>
-  T& makeChild(O const& o) {
+  T& makeChild(O const& o) try{
     using namespace artdaq::database::sharedtypes;
 
     confirm(type() == type_t::OBJECT || type() == type_t::ARRAY);
 
     auto const node_name = unwrap(o).value_as<const std::string>(literal::name);
+    auto const node_type = unwrap(o).value_as<const std::string>(literal::type);
 
-    TRACE_(16, "json_node_t() makeChild() node_name=<" << node_name << ">");
+    TRACE_(16, "json_node_t() makeChild() node_name=<" << node_name << ">, node_type=<" << node_type << ">, this->type()=<" << jsn::to_string(type()) << ">");
 
     if (type() == type_t::OBJECT) {
       object_t& object = value_as<object_t>();
@@ -119,19 +120,29 @@ class json_node_t final {
     }
 
     throw runtime_error("json_node_t") << "Value was not created";
+  }catch(...)
+  {
+    TRACE_(16, "json_node_t() makeChild() failed");
+    throw;
   }
 
   template <typename T, typename O>
-  T& makeChildOfChildren(O const& o) {
+  T& makeChildOfChildren(O const& o) try {
     using namespace artdaq::database::sharedtypes;
 
     confirm(type() == type_t::OBJECT || type() == type_t::ARRAY);
     TRACE_(16, "json_node_t() makeChildOfChildren() node_name=<children>");
 
     object_t& object = value_as<object_t>();
-    object[literal::children] = object_t();
+    
+    if(object.count(literal::children)==0)
+      object[literal::children] = object_t();
 
     return json_node_t{unwrap(object.at(literal::children)).value_as<object_t>()}.makeChild<T, O>(o);
+  }catch(...)
+  {
+    TRACE_(16, "json_node_t() makeChildOfChildren() failed");
+    throw;
   }
 
   type_t type() const {

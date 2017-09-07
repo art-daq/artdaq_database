@@ -17,20 +17,6 @@ using namespace artdaq::database;
 
 namespace apiliteral = db::configapi::literal;
 
-std::string db::filter_jsonstring(std::string const& str) {
-  confirm(!str.empty());
-
-  if (str.empty()) throw std::invalid_argument("Failed calling filter_jsonstring(): Invalid str; str is empty");
-
-  auto retValue = std::string{str.c_str()};
-
-  retValue = std::regex_replace(retValue, std::regex("\""), "|");
-  retValue = std::regex_replace(retValue, std::regex("\'"), "^");
-  retValue = std::regex_replace(retValue, std::regex("\t"), "    ");
-
-  return retValue;
-}
-
 bool db::useFakeTime(bool useFakeTime = false) {
   static bool _useFakeTime = useFakeTime;
   return _useFakeTime;
@@ -118,7 +104,10 @@ std::string db::unamejson() {
   }
 }
 
-std::string db::quoted_(std::string const& text) { return "\"" + text + "\""; }
+std::string db::quoted_(std::string const& text, const char qchar) {
+  confirm((qchar == '\"' || qchar == '\''));
+  return std::string{} + qchar + text + qchar;
+}
 
 std::string db::bool_(bool value) { return (value ? "true" : "false"); }
 
@@ -131,8 +120,17 @@ std::string db::debrace(std::string s) {
     return s;
 }
 
-std::string db::dequote(std::string s) {
+db::quotation_type_t db::quotation_type(std::string s) {
   if (s[0] == '\"' && s[s.length() - 1] == '\"')
+    return db::quotation_type_t::DOUBLE;
+  else if (s[0] == '\'' && s[s.length() - 1] == '\'')
+    return db::quotation_type_t::SINGLE;
+  else
+    return db::quotation_type_t::NONE;
+}
+
+std::string db::dequote(std::string s) {
+  if ((s[0] == '\"' && s[s.length() - 1] == '\"') || (s[0] == '\'' && s[s.length() - 1] == '\''))
     return s.substr(1, s.length() - 2);
   else
     return s;
@@ -148,8 +146,12 @@ std::string db::debracket(std::string s) {
 std::string db::annotate(std::string const& s) {
   auto str = db::trim(s);
 
-  if (str[0] == '#' || str.empty()) return str;
-
+  if (str[0] == '#')
+    return str;
+  
+  if( str.empty() )
+    return apiliteral::nullstring;
+    
   return std::string{"#"}.append(str);
 }
 
@@ -290,6 +292,20 @@ std::string db::replace_all(std::string const& source, std::string const& match,
   }
 
   retValue.append(source, first, std::string::npos);
-  
+
   return retValue;
+}
+
+namespace artdaq {
+namespace database {  
+template <>
+std::string quoted<quotation_type_t::NONE>(std::string const& text) {
+  return text;
+}
+
+template <>
+std::string quoted<quotation_type_t::SINGLE>(std::string const& text) {
+  return quoted_(text, '\'');
+}
+}
 }

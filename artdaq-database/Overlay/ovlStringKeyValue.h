@@ -10,7 +10,7 @@ namespace overlay {
 namespace jsonliteral = artdaq::database::dataformats::literal;
 using namespace artdaq::database::result;
 
-template <int mask>
+template <std::uint32_t mask>
 class ovlStringKeyValue : public ovlKeyValue {
  public:
   ovlStringKeyValue(object_t::key_type const& /*key*/, value_t& /*value*/);
@@ -29,11 +29,11 @@ class ovlStringKeyValue : public ovlKeyValue {
   bool _initOK;
 };
 
-template <int mask>
+template <std::uint32_t mask>
 ovlStringKeyValue<mask>::ovlStringKeyValue(object_t::key_type const& key, value_t& value)
     : ovlKeyValue(key, value), _initOK(init(value)) {}
 
-template <int mask>
+template <std::uint32_t mask>
 bool ovlStringKeyValue<mask>::init(value_t& parent) try {
   confirm(type(parent) == type_t::VALUE);
 
@@ -47,7 +47,7 @@ bool ovlStringKeyValue<mask>::init(value_t& parent) try {
   throw;
 }
 
-template <int mask>
+template <std::uint32_t mask>
 result_t ovlStringKeyValue<mask>::operator==(ovlStringKeyValue const& other) const {
   return ((useCompareMask() & mask) == mask) ? Success() : self() == other.self();
 }
