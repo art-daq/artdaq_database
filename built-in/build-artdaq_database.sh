@@ -22,6 +22,16 @@ build_type=${BUILDTYPE}
 demo_version=${ARTDAQ_DEMO_VERSION}
 
 case ${qual_set} in
+    s50:e14)
+        basequal=e14
+        squal=s50
+        artver=v2_07_03
+        ;;
+    s50:e10)
+        basequal=e10
+        squal=s50
+        artver=v2_07_03
+        ;;
     s48:e14)
         basequal=e14
         squal=s48
@@ -191,7 +201,8 @@ mv ${prodblddir}/*.bz2  $WORKSPACE/copyBack/
 mv ${blddir}/*.bz2  $WORKSPACE/copyBack/
 mv ${blddir}/*.txt  $WORKSPACE/copyBack/
 mv ${blddir}/*.log  $WORKSPACE/copyBack/
-
+mv ${blddir}  $WORKSPACE/copyBack/
+mv ${srcdir}  $WORKSPACE/copyBack/
 
 echo
 echo "cleanup"
