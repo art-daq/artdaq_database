@@ -124,7 +124,7 @@ rm -rf $WORKSPACE/copyBack
 mkdir -p ${srcdir} || exit 1
 mkdir -p ${blddir} || exit 1
 mkdir -p $WORKSPACE/copyBack || exit 1
-mkdir -p $WORKSPACE/products || exit 1
+mkdir -p $WORKSPACE/products
 
 cd ${blddir} || exit 1
 curl --fail --silent --location --insecure -O http://scisoft.fnal.gov/scisoft/bundles/tools/pullProducts || exit 1
