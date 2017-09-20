@@ -16,7 +16,7 @@ bool isDouble(std::string const& str) {
 std::string unescape(std::string const& str) { return std::regex_replace(str, std::regex("\\\""), "\""); }
 
 std::string to_json_string(std::string const& str) {
-  auto oss = std::ostringstream{};
+  std::ostringstream oss;
   for (auto c : str) {
     switch (c) {
       case '"':
@@ -48,7 +48,7 @@ std::string to_json_string(std::string const& str) {
 }
 
 std::string from_json_string(std::string const& str) {
-  auto oss = std::ostringstream{};
+  std::ostringstream oss;
   auto size = str.size();
 
   for (std::size_t pos = 0; pos < size; pos++) {

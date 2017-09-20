@@ -33,6 +33,14 @@ artdaq_processes:
     pattern: "(.*)((Aggregator)(\d+))(\.fcl$)"
   },
   {
+    collection:DataLoggers
+    pattern: "(.*)((DataLogger)(\d+))(\.fcl$)"
+  },
+  {
+    collection:Dispatchers
+    pattern: "(.*)((Dispatcher)(\d+))(\.fcl$)"
+  },
+  {
     collection:expert_options
     pattern: "(.*)((rce_expert_run_options|ssp_expert_run_options|user_run_options)(\d*))(\.fcl$)"
   }
@@ -60,6 +68,8 @@ run_history:
     "(.*)((BoardReader_TOY\d+|BoardReader)_(.*[^_])_(\d+))(\.fcl$)",
     "(.*)((EventBuilder)_(.*[^_])_(\d+))(\.fcl$)",
     "(.*)((Aggregator)_(.*[^_])_(\d+))(\.fcl$)",
+    "(.*)((DataLogger)_(.*[^_])_(\d+))(\.fcl$)",
+    "(.*)((Dispatcher)_(.*[^_])_(\d+))(\.fcl$)",
     "(.*)((metadata)(.*[^\d])(\d*))(\.fcl$)"
   ]
 }
