@@ -5,7 +5,7 @@ cet_make_exec(JSONDocument_t
   ${BSONCXXLIB}
   ${CETLIB}
   ${FHICLCPP}
-  ${SQLITE3}
+  #${SQLITE3}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 ) 
 

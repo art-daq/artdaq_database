@@ -11,7 +11,7 @@ cet_make_exec(BulkOperations_t
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB  
   ${FHICLCPP}
-  ${SQLITE3}
+  #${SQLITE3}
   ${CETLIB}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}  
 ) 

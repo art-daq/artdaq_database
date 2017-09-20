@@ -12,7 +12,7 @@ cet_make(
   LIBRARIES
   cetlib
   cetlib_except
-  ${SQLITE3}
+  #${SQLITE3}
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_REGEX_LIBRARY}
