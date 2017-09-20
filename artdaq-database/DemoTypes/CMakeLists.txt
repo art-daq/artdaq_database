@@ -1,7 +1,7 @@
 cet_make(
   LIBRARIES
-  ${FHICLCPP}
-  ${CETLIB}  
+  #${FHICLCPP}
+  #${CETLIB}  
   )
 
 install_headers()

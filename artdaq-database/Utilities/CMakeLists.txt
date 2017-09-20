@@ -24,9 +24,9 @@ cet_make_exec(readfhicl
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_DataFormats_Fhicl
-  ${FHICLCPP}
+  #${FHICLCPP}
   #${SQLITE3}  
-  ${CETLIB}
+  #${CETLIB}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
@@ -41,9 +41,9 @@ cet_make_exec(migrate_database
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB  
-  ${FHICLCPP}
+  #${FHICLCPP}
   #${SQLITE3}
-  ${CETLIB}
+  #${CETLIB}
   ${Boost_PROGRAM_OPTIONS_LIBRARY} 
 )
 

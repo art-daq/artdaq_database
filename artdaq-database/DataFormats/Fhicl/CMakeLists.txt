@@ -3,7 +3,7 @@ cet_make(
   artdaq-database_SharedCommon
   artdaq-database_DataFormats_Json
   ${FHICLCPP}
-  ${CETLIB}
+  #${CETLIB}
   )
 
 install_headers()
