@@ -22,4 +22,24 @@ cet_make(
   fhicl-cpp/fhiclcpp/detail
   fhicl-cpp/fhiclcpp/types
   fhicl-cpp/fhiclcpp/types/detail
-  ) 
+  EXCLUDE
+  fhicl-cpp/fhiclcpp/ParameterSet.cc
+  fhicl-cpp/fhiclcpp/ParameterSetID.cc
+  fhicl-cpp/fhiclcpp/ParameterSetRegistry.cc
+  fhicl-cpp/fhiclcpp/DatabaseSupport.cc
+  fhicl-cpp/fhiclcpp/coding.cc  
+  fhicl-cpp/fhiclcpp/make_ParameterSet.cc  
+  fhicl-cpp/fhiclcpp/types/DelegatedParameter.cc
+  fhicl-cpp/fhiclcpp/types/OptionalDelegatedParameter.cc
+  fhicl-cpp/fhiclcpp/types/Name.cc  
+  fhicl-cpp/fhiclcpp/types/detail/ValidateThenSet.cc
+  fhicl-cpp/fhiclcpp/types/detail/SearchAllowedConfiguration.cc
+  fhicl-cpp/fhiclcpp/types/detail/PrintAllowedConfiguration.cc
+  fhicl-cpp/fhiclcpp/types/detail/NameStackRegistry.cc
+  fhicl-cpp/fhiclcpp/types/detail/MaybeDisplayParent.cc
+  fhicl-cpp/fhiclcpp/detail/encode_extended_value.cc
+  fhicl-cpp/fhiclcpp/detail/Prettifier.cc
+  fhicl-cpp/fhiclcpp/detail/PrettifierAnnotated.cc
+  fhicl-cpp/fhiclcpp/detail/PrettifierPrefixAnnotated.cc
+  fhicl-cpp/fhiclcpp/detail/KeyAssembler.cc
+) 
