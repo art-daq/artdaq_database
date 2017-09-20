@@ -128,29 +128,30 @@ mkdir -p ${blddir} || exit 1
 mkdir -p $WORKSPACE/copyBack || exit 1
 
 if [ ! -d ${productsdir} ]; then
-  mkdir -p ${productsdir}
+  mkdir -p ${productsdir} || exit 1
 fi
 
 cd ${productsdir} || exit 1
 curl --fail --silent --location --insecure -O http://scisoft.fnal.gov/scisoft/bundles/tools/pullProducts || exit 1
-chmod +x pullProducts
+chmod +x ${productsdir}/pullProducts
 
 # we pull what we can so we don't have to build everything
-./pullProducts ${productsdir} ${flvr} art-${artver} ${basequal} ${build_type}
-./pullProducts ${productsdir} ${flvr} artdaq-${artdaq_ver} ${squal}-${basequal} ${build_type}
-./pullProducts ${productsdir} ${flvr} artdaq_demo-${demo_version} ${squal}-${basequal} ${build_type}
-
-set +x
-source ./setups
-set -x
-
-cd ${blddir} || exit 1
+${productsdir}/pullProducts ${productsdir} ${flvr} art-${artver} ${basequal} ${build_type}
+${productsdir}/pullProducts ${productsdir} ${flvr} artdaq-${artdaq_ver} ${squal}-${basequal} ${build_type}
+${productsdir}/pullProducts ${productsdir} ${flvr} artdaq_demo-${demo_version} ${squal}-${basequal} ${build_type}
 
 # Remove any artdaq_database that came with the bundle
-if [ -d ${blddir}/artdaq_database ]; then
-  echo "Removing ${blddir}/artdaq_database"
-  rm -rf ${blddir}/artdaq_database
+if [ -d ${productsdir}/artdaq_database ]; then
+  echo "Removing ${productsdir}/artdaq_database"
+  rm -rf ${productsdir}/artdaq_database
 fi
+
+set +x
+source ${productsdir}/setups
+set -x
+
+
+cd ${blddir} || exit 1
 
 echo
 echo "begin build"
@@ -173,7 +174,6 @@ else
   build_flag="-d"
 fi
 set +x
-
 
 prodblddir=${blddir}/build-artdaq_database-${squal}${basequal}-${build_type}
 mkdir -p  ${prodblddir}  || exit 1
