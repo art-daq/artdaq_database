@@ -3,7 +3,7 @@ cet_make(
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Json
   artdaq-database_Overlay
-  ${CETLIB}  
+  #${CETLIB}  
   )
 
 install_headers()
