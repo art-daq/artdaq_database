@@ -22,6 +22,26 @@ build_type=${BUILDTYPE}
 demo_version=${ARTDAQ_DEMO_VERSION}
 
 case ${qual_set} in
+    s54:e14)
+	basequal=e14
+	squal=s54
+	artver=v2_08_03
+	;;
+    s54:e10)
+	basequal=e10
+	squal=s54
+	artver=v2_08_03
+	;;	
+    s53:e14)
+	basequal=e14
+	squal=s53
+	artver=v2_08_02
+	;;
+    s53:e10)
+	basequal=e10
+	squal=s53
+	artver=v2_08_02
+	;;
     s50:e14)
         basequal=e14
         squal=s50
@@ -80,6 +100,18 @@ case ${demo_version} in
     ;;
   v2_09_03)
     artdaq_ver=v2_02_03
+    ;;
+  v2_10_00)
+    artdaq_ver=v2_03_00
+    ;;
+  v2_10_00db)
+    artdaq_ver=v2_03_00
+    ;;
+  v2_10_02)
+    artdaq_ver=v2_03_02
+    ;;
+  v2_10_02a)
+    artdaq_ver=v2_03_02a
     ;;
 esac
 
