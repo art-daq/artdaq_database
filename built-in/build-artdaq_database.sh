@@ -116,6 +116,8 @@ set -x
 
 srcdir=${working_dir}/source
 blddir=${working_dir}/build
+productsdir=$WORKSPACE/products
+
 # start with clean directories
 rm -rf ${blddir}
 rm -rf ${srcdir}
@@ -125,18 +127,18 @@ mkdir -p ${srcdir} || exit 1
 mkdir -p ${blddir} || exit 1
 mkdir -p $WORKSPACE/copyBack || exit 1
 
-if [ ! -d $WORKSPACE/products ]; then
-  mkdir -p $WORKSPACE/products
+if [ ! -d ${productsdir} ]; then
+  mkdir -p ${productsdir}
 fi
 
-cd $WORKSPACE/products || exit 1
+cd ${productsdir} || exit 1
 curl --fail --silent --location --insecure -O http://scisoft.fnal.gov/scisoft/bundles/tools/pullProducts || exit 1
 chmod +x pullProducts
 
 # we pull what we can so we don't have to build everything
-./pullProducts ${blddir} ${flvr} art-${artver} ${basequal} ${build_type}
-./pullProducts ${blddir} ${flvr} artdaq-${artdaq_ver} ${squal}-${basequal} ${build_type}
-./pullProducts ${blddir} ${flvr} artdaq_demo-${demo_version} ${squal}-${basequal} ${build_type}
+./pullProducts ${productsdir} ${flvr} art-${artver} ${basequal} ${build_type}
+./pullProducts ${productsdir} ${flvr} artdaq-${artdaq_ver} ${squal}-${basequal} ${build_type}
+./pullProducts ${productsdir} ${flvr} artdaq_demo-${demo_version} ${squal}-${basequal} ${build_type}
 
 set +x
 source ./setups
