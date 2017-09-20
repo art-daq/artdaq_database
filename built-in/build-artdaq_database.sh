@@ -215,8 +215,15 @@ source ${srcdir}/artdaq-database/ups/setup_for_development ${build_flag} ${baseq
 
 ups active
 
+unset RUN_TESTS
 CETPKG_J=$(nproc)
 buildtool -p -j$CETPKG_J 2>&1 |tee ${blddir}/build_artdaq-database.log || \
+ { mv ${blddir}/*.log  $WORKSPACE/copyBack/
+   exit 1 
+ }
+
+export RUN_TESTS=yes
+buildtool -j$CETPKG_J 2>&1 |tee ${blddir}/build_tests_artdaq-database.log || \
  { mv ${blddir}/*.log  $WORKSPACE/copyBack/
    exit 1 
  }

@@ -76,7 +76,14 @@ find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_LIB} )
 find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_LIB} )
 
 # testing
-add_subdirectory(test)
+SET(RUN_TESTS $ENV{RUN_TESTS})
+IF(RUN_TESTS)
+  string(TOUPPER ${RUN_TESTS} RUN_TESTS_UC )
+  if( ${RUN_TESTS_UC} MATCHES "TRUE" )
+    MESSAGE (STATUS "Enable tests")
+    add_subdirectory(test)
+  endif()
+ENDIF()
 
 # source
 add_subdirectory(artdaq-database)
