@@ -222,7 +222,7 @@ buildtool -p -j$CETPKG_J 2>&1 |tee ${blddir}/build_artdaq-database.log || \
    exit 1 
  }
 
-export RUN_TESTS=yes
+export RUN_TESTS=true
 buildtool -j$CETPKG_J 2>&1 |tee ${blddir}/build_tests_artdaq-database.log || \
  { mv ${blddir}/*.log  $WORKSPACE/copyBack/
    exit 1 
