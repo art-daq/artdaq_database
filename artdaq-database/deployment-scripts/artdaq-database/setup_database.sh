@@ -17,3 +17,20 @@ cd ${database_work_dir}
 
 conftool.py
 
+_complete_conftool(){
+  local current_string=${COMP_WORDS[COMP_CWORD]}
+  local complete_list=$(conftool.py |grep -v Usage |grep conftool |cut -d ' ' -f 3)
+
+  if [  ${COMP_WORDS[COMP_CWORD-1]} = "exportConfiguration" ];then
+    complete_list=$(conftool.py getListOfAvailableRunConfigurations)
+  elif [  ${COMP_WORDS[COMP_CWORD-1]} = "getListOfAvailableRunConfigurations" ];then
+    complete_list=$(conftool.py getListOfAvailableRunConfigurationPrefixes)
+  elif [  ${COMP_WORDS[COMP_CWORD-1]} = "importConfiguration" ];then
+    complete_list=$(conftool.py getListOfAvailableRunConfigurationPrefixes)
+  fi
+  
+  COMPREPLY=($(compgen -W '${complete_list[@]}' -- "$current_string"))
+  return 0
+}
+
+complete -F _complete_conftool conftool.py
