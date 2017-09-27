@@ -68,6 +68,14 @@ def __latest_config_name(configNamePrefix):
   if not configs:
     return None
   
+  if __ends_on_5digitnumber(configNamePrefix):
+    configs=list(config for config in configs if configNamePrefix==config)
+  else:
+    configs=list(config for config in configs if re.match(r'(^'+configNamePrefix+')(\d{5}$)', config))
+
+  if not configs:
+    return None 
+  
   configs.sort()
   
   return configs[-1]
@@ -454,7 +462,11 @@ if __name__ == "__main__":
     args = inspect.getargspec(thefunc)
     result = thefunc(*sys.argv[2:len(args[0]) + 2]) if args else thefunc()
 
-    print result    
+    if type(result) is list:
+      print '\n'.join([ str(el) for el in result ])
+    else:
+      print result
+      
     sys.exit(0)
 
   functions_list = [o[0] for o in inspect.getmembers(conftoolg) if inspect.isbuiltin(o[1])]  
