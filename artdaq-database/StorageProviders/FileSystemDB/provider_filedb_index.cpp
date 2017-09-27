@@ -1241,7 +1241,7 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::_indexed_filtered_
   auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
 
   auto acceptValue = [&right_begins_with](auto const& value) {
-    if (value.size() < right_begins_with.size() /*|| value == "notprovided"*/) return false;
+    if (value.size() < (right_begins_with.size() - (right_begins_with.back() == '*')? 1:0)) return false;
 
     auto first(std::begin(right_begins_with)), last(std::end(right_begins_with));
 
