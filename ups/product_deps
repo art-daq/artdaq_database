@@ -21,7 +21,7 @@ perllib  product_dir
 product		version		optional
 artdaq_utilities -
 #art             v2_07_03
-#TRACE           v3_08_01
+#TRACE           v3_09_01
 mongodb 	v3_4_6
 python          v2_7_13b	s46
 python          v2_7_13b	s47
