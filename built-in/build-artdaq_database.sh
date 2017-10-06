@@ -113,6 +113,10 @@ case ${demo_version} in
   v2_10_02a)
     artdaq_ver=v2_03_02a
     ;;
+  v2_10_03)
+    artdaq_ver=v2_03_03
+    ;;
+
 esac
 
 case ${build_type} in
