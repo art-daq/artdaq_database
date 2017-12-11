@@ -6,3 +6,4 @@ proxychains.conf
 #*#
 built-in/fhicl-cpp
 built-in/mongo-cxx
+.editorconfig
