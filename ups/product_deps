@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_database  v1_04_31a
+parent artdaq_database  v1_04_33
 defaultqual	e14:s50
 
 # These optional lines define the installed directories where
@@ -19,9 +19,9 @@ perllib  product_dir
 
 #
 product		version		optional
-artdaq_utilities -
+artdaq_utilities v1_03_01
 #art             v2_07_03
-#TRACE           v3_08_01
+#TRACE           v3_12_00
 mongodb 	v3_4_6
 python          v2_7_13b	s46
 python          v2_7_13b	s47
@@ -29,7 +29,7 @@ python          v2_7_13d	s48
 python          v2_7_13d	s50
 swig            v3_0_12		-		only_for_build
 nodejs		v4_5_0		-		only_for_build
-cetbuildtools	v5_08_01	-		only_for_build
+cetbuildtools	v5_14_04	-		only_for_build
 end_product_list
 
 # -nq- means there is no qualifier
@@ -39,24 +39,24 @@ end_product_list
 #e14:s50:prof    e14:prof  	 	e14:prof 	   e14:prof	-nq-	-nq-	-nq-	   -std=c++14
 
 qualifier	artdaq_utilities      	   mongodb     	   swig		nodejs	python	   notes
-e14:s50:debug   a_u_intf_v1:e14:s50:debug  e14:debug 	   e14:debug	-nq-	-nq-	   -std=c++14
-e14:s50:prof    a_u_intf_v1:e14:s50:prof   e14:prof	   e14:prof	-nq-	-nq-	   -std=c++14
-e14:s48:debug   a_u_intf_v1:e14:s48:debug  e14:debug 	   e14:debug	-nq-	-nq-	   -std=c++14
-e14:s48:prof    a_u_intf_v1:e14:s48:prof   e14:prof	   e14:prof	-nq-	-nq-	   -std=c++14
-e10:s50:debug   a_u_intf_v1:e10:s50:debug  e10:debug 	   e10:debug	-nq-	-nq-	   -std=c++14
-e10:s50:prof    a_u_intf_v1:e10:s50:prof   e10:prof	   e10:prof	-nq-	-nq-	   -std=c++14
-e10:s48:debug   a_u_intf_v1:e10:s48:debug  e10:debug   	   e10:debug	-nq-	-nq-	   -std=c++14
-e10:s48:prof    a_u_intf_v1:e10:s48:prof   e10:prof        e10:prof	-nq-	-nq-	   -std=c++14
-e14:s47:debug   a_u_intf_v1:e14:s47:debug  e14:debug	   e14:debug	-nq-	-nq-	   -std=c++14
-e14:s47:prof    a_u_intf_v1:e14:s47:prof   e14:prof	   e14:prof	-nq-	-nq-	   -std=c++14
-e10:s47:debug   a_u_intf_v1:e10:s47:debug  e10:debug	   e10:debug	-nq-	-nq-	   -std=c++14
-e10:s47:prof    a_u_intf_v1:e10:s47:prof   e10:prof	   e10:prof	-nq-	-nq-	   -std=c++14
-e14:s46:debug   a_u_intf_v1:e14:s46:debug  e14:debug	   e14:debug	-nq-	-nq-	   -std=c++14
-e14:s46:prof    a_u_intf_v1:e14:s46:prof   e14:prof	   e14:prof	-nq-	-nq-	   -std=c++14
-e10:s46:debug   a_u_intf_v1:e10:s46:debug  e10:debug	   e10:debug	-nq-	-nq-	   -std=c++14
-e10:s46:prof    a_u_intf_v1:e10:s46:prof   e10:prof	   e10:prof	-nq-	-nq-	   -std=c++14
-e10:s41:debug   a_u_intf_v1:e10:s41:debug  e10:debug	   e10:debug	-nq-	-nq-	   -std=c++14
-e10:s41:prof    a_u_intf_v1:e10:s41:prof   e10:prof	   e10:prof	-nq-	-nq-	   -std=c++14
+e14:s50:debug   e14:s50:debug  e14:debug 	   e14:debug	-nq-	-nq-	   -std=c++14
+e14:s50:prof    e14:s50:prof   e14:prof	   e14:prof	-nq-	-nq-	   -std=c++14
+e14:s48:debug   e14:s48:debug  e14:debug 	   e14:debug	-nq-	-nq-	   -std=c++14
+e14:s48:prof    e14:s48:prof   e14:prof	   e14:prof	-nq-	-nq-	   -std=c++14
+e10:s50:debug   e10:s50:debug  e10:debug 	   e10:debug	-nq-	-nq-	   -std=c++14
+e10:s50:prof    e10:s50:prof   e10:prof	   e10:prof	-nq-	-nq-	   -std=c++14
+e10:s48:debug   e10:s48:debug  e10:debug   	   e10:debug	-nq-	-nq-	   -std=c++14
+e10:s48:prof    e10:s48:prof   e10:prof        e10:prof	-nq-	-nq-	   -std=c++14
+e14:s47:debug   e14:s47:debug  e14:debug	   e14:debug	-nq-	-nq-	   -std=c++14
+e14:s47:prof    e14:s47:prof   e14:prof	   e14:prof	-nq-	-nq-	   -std=c++14
+e10:s47:debug   e10:s47:debug  e10:debug	   e10:debug	-nq-	-nq-	   -std=c++14
+e10:s47:prof    e10:s47:prof   e10:prof	   e10:prof	-nq-	-nq-	   -std=c++14
+e14:s46:debug   e14:s46:debug  e14:debug	   e14:debug	-nq-	-nq-	   -std=c++14
+e14:s46:prof    e14:s46:prof   e14:prof	   e14:prof	-nq-	-nq-	   -std=c++14
+e10:s46:debug   e10:s46:debug  e10:debug	   e10:debug	-nq-	-nq-	   -std=c++14
+e10:s46:prof    e10:s46:prof   e10:prof	   e10:prof	-nq-	-nq-	   -std=c++14
+e10:s41:debug   e10:s41:debug  e10:debug	   e10:debug	-nq-	-nq-	   -std=c++14
+e10:s41:prof    e10:s41:prof   e10:prof	   e10:prof	-nq-	-nq-	   -std=c++14
 
 end_qualifier_list
 
