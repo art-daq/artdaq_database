@@ -23,11 +23,13 @@ IF (NOT CETBUILDTOOLS_VERSION)
     MESSAGE (FATAL_ERROR "ERROR: setup cetbuildtools to get the cmake modules")
 ENDIF()
 
+set(TOP_CMAKE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
 set(CMAKE_MODULE_PATH
     $ENV{ARTDAQ_UTILITIES_DIR}/Modules
     $ENV{CETBUILDTOOLS_DIR}/Modules
     ${CMAKE_MODULE_PATH}
-    ${CMAKE_SOURCE_DIR}/built-in)
+    ${TOP_CMAKE_SOURCE_DIR}/built-in)
 
 include(CetCMakeEnv)
 
@@ -50,11 +52,14 @@ cet_report_compiler_flags()
 find_ups_boost  ( v1_57_0 )
 find_ups_product( cetbuildtools v5_08_00 )
 find_ups_product( artdaq_utilities v1_02_00 )
+find_ups_product( cetlib v3_00_01 )
+find_ups_product( cetlib_except v1_01_02 )
+
 #find_ups_product( art v2_07_03 )
 find_ups_product( cetpkgsupport v1_11_00 )
 #find_ups_product( fhiclcpp v3_20_01 )
 find_ups_product( mongodb v3_4_6 )
-find_ups_product( TRACE v3_06_07 )
+find_ups_product( TRACE v3_12_00 )
 find_ups_product( swig v3_0_12 )
 
 # Debug streamer.
@@ -90,6 +95,7 @@ add_subdirectory(artdaq-database)
 
 # doc- Documentation
 #add_subdirectory(doc)
+
 
 # ups - table and config files
 add_subdirectory(ups)

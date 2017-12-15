@@ -1,5 +1,7 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+message(STATUS "FHICLCPP='${FHICLCPP}'")
+
 install(DIRECTORY deployment-scripts DESTINATION ${product}/${version})
 cet_script(deployment-scripts/install_artdaq_database.sh)
 
