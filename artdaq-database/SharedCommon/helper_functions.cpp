@@ -229,11 +229,11 @@ db::object_id_t db::extract_oid(std::string const& filter) {
 
   if (results.size() != 2) {
     // we are interested in a second match
-    TRACE_(12, "value()"
-                   << "JSON regex_search() result count=" << results.size());
+    TLOG(12) << "value()"
+                   << "JSON regex_search() result count=" << results.size();
     for (auto const& result : results) {
-      TRACE_(12, "value()"
-                     << "JSON regex_search() result=" << result);
+      TLOG(12) << "value()"
+                     << "JSON regex_search() result=" << result;
     }
 
     throw runtime_error(std::string("Regex search failed, regex_search().size()!=1; JSON buffer: ") + filter);
@@ -253,8 +253,8 @@ db::object_id_t db::extract_oid(std::string const& filter) {
 
   match = dequote(match);
 
-  TRACE_(12, "value()"
-                 << "JSON regex_search() result=" << match);
+  TLOG(12) << "value()"
+                 << "JSON regex_search() result=" << match;
 
   return match;
 }

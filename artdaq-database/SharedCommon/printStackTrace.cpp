@@ -135,12 +135,12 @@ void signalHandler(int signum) {
   }
 
   if (name) {
-    TRACE_(1, "Caught signal " << signum << " (" << name << ")");
+    TLOG(1) << "Caught signal " << signum << " (" << name << ")";
   } else {
-    TRACE_(1, "Caught signal " << signum);
+    TLOG(1) << "Caught signal " << signum;
   }
 
-  TRACE_(1, "" << getStackTrace());
+  TLOG(1) << "" << getStackTrace();
 
   exit(signum);
 }
@@ -156,28 +156,28 @@ void terminateHandler() {
       char funcname[1024];
       int status = 0;
 
-      TRACE_(1, "Terminate called after throwing an instance of \'"
-                    << abi::__cxa_demangle(typeid(ex).name(), funcname, &funcnamesize, &status) << "\'");
+      TLOG(1)<< "Terminate called after throwing an instance of \'"
+                    << abi::__cxa_demangle(typeid(ex).name(), funcname, &funcnamesize, &status) << "\'";
 
-      TRACE_(1, " what(): " << ex.what());
+      TLOG(1)<< " what(): " << ex.what();
 
-      TRACE_(1, " details: " << pending);
+      TLOG(1) << " details: " << pending;
 
     } catch (...) {
-      TRACE_(1, "Terminate called after throwing an instance of unknown exception");
+      TLOG(1) << "Terminate called after throwing an instance of unknown exception";
     }
   } else {
-    TRACE_(1, "Terminate called");
+    TLOG(1) << "Terminate called";
   }
 
-  TRACE_(1, getStackTrace());
+  TLOG(1) << getStackTrace();
 
   exit(SIGTERM);
 }
 
 void uncaughtExceptionHandler() {
-  TRACE_(1, "Unexpected handler function called.");
-  TRACE_(1, getCxaThrowStack());
+  TLOG(1) << "Unexpected handler function called.";
+  TLOG(1) << getCxaThrowStack();
   terminateHandler();
 }
 

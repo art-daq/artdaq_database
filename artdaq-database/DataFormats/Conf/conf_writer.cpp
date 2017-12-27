@@ -20,24 +20,24 @@ bool ConfWriter::write(jsn::object_t const& json_object, std::string& out) {
   confirm(out.empty());
   confirm(!json_object.empty());
 
-  TRACE_(2, "write() begin");
+  TLOG(2) << "write() begin";
 
   auto const& data_node = boost::get<jsn::object_t>(json_object.at(literal::data));
 
   auto result = bool(false);
   auto buffer = std::string();
 
-  TRACE_(2, "write() create conf begin");
+  TLOG(2) << "write() create conf begin";
 
   for (auto const& data[[gnu::unused]] : data_node) {
     // TODO loop over json AST and convert it to XML
   }
 
-  TRACE_(2, "write() create conf end");
+  TLOG(2) << "write() create conf end";
 
   if (result) out.swap(buffer);
 
-  TRACE_(2, "write() end");
+  TLOG(2) << "write() end";
 
   return result;
 }
@@ -48,5 +48,5 @@ void artdaq::database::conf::debug::ConfWriter() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::conf::ConfWriter trace_enable");
+  TLOG(0) <<  "artdaq::database::conf::ConfWriter trace_enable";
 }

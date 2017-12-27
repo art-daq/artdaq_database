@@ -70,13 +70,13 @@ class json_node_t final {
 
     if (_any.which() == 0) {
       auto& value = boost::get<json_any_ref_t>(_any);
-      TRACE_(2, "json_node_t() value_as() any.which()=" << _any.which() << " const value.which()=" << value.which());
+      TLOG(2) << "json_node_t() value_as() any.which()=" << _any.which() << " const value.which()=" << value.which();
 
       return boost::get<T&>(value);
     } else if (_any.which() == 1) {
       auto& value = boost::get<json_any_cref_t>(_any);
-      TRACE_(2, "json_node_t() value_as() const any.which()=" << _any.which()
-                                                              << " const value.which()=" << value.which());
+      TLOG(2) << "json_node_t() value_as() const any.which()=" << _any.which()
+                                                              << " const value.which()=" << value.which();
 
       return boost::get<T const&>(value);
     }
@@ -91,7 +91,7 @@ class json_node_t final {
 
     auto& value = boost::get<json_any_ref_t>(_any);
 
-    TRACE_(2, "json_node_t() value_as() any.which()=" << _any.which() << " value.which()=" << value.which());
+    TLOG(2) << "json_node_t() value_as() any.which()=" << _any.which() << " value.which()=" << value.which();
 
     return boost::get<T&>(value);
   }
@@ -105,7 +105,7 @@ class json_node_t final {
     auto const node_name = unwrap(o).value_as<const std::string>(literal::name);
     auto const node_type = unwrap(o).value_as<const std::string>(literal::type);
 
-    TRACE_(16, "json_node_t() makeChild() node_name=<" << node_name << ">, node_type=<" << node_type << ">, this->type()=<" << jsn::to_string(type()) << ">");
+    TLOG(16)<< "json_node_t() makeChild() node_name=<" << node_name << ">, node_type=<" << node_type << ">, this->type()=<" << jsn::to_string(type()) << ">";
 
     if (type() == type_t::OBJECT) {
       object_t& object = value_as<object_t>();
@@ -122,7 +122,7 @@ class json_node_t final {
     throw runtime_error("json_node_t") << "Value was not created";
   }catch(...)
   {
-    TRACE_(16, "json_node_t() makeChild() failed");
+    TLOG(16)<< "json_node_t() makeChild() failed";
     throw;
   }
 
@@ -131,7 +131,7 @@ class json_node_t final {
     using namespace artdaq::database::sharedtypes;
 
     confirm(type() == type_t::OBJECT || type() == type_t::ARRAY);
-    TRACE_(16, "json_node_t() makeChildOfChildren() node_name=<children>");
+    TLOG(16)<< "json_node_t() makeChildOfChildren() node_name=<children>";
 
     object_t& object = value_as<object_t>();
     
@@ -141,7 +141,7 @@ class json_node_t final {
     return json_node_t{unwrap(object.at(literal::children)).value_as<object_t>()}.makeChild<T, O>(o);
   }catch(...)
   {
-    TRACE_(16, "json_node_t() makeChildOfChildren() failed");
+    TLOG(16)<< "json_node_t() makeChildOfChildren() failed";
     throw;
   }
 

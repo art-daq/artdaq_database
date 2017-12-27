@@ -22,8 +22,8 @@ using artdaq::database::sharedtypes::unwrap;
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, UconDB>::readDocument(JsonData const& arg) {
-  TRACE_(3, "UconDB::readDocument() begin");
-  TRACE_(3, "UconDB::readDocument() args=<" << arg << ">");
+  TLOG(3)<< "UconDB::readDocument() begin";
+  TLOG(3)<< "UconDB::readDocument() args=<" << arg << ">";
 
   auto returnCollection = std::list<JsonData>();
 
@@ -34,7 +34,7 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::readDocument(JsonData con
   try {
     filter_document = arg_document.findChildDocument(jsonliteral::filter);
   } catch (...) {
-    TRACE_(3, "UconDB::readDocument() No filter was found.");
+    TLOG(3)<< "UconDB::readDocument() No filter was found.";
   }
 
   auto collection_name = std::string{};
@@ -42,14 +42,14 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::readDocument(JsonData con
   try {
     collection_name = filter_document.findChild(jsonliteral::collection).value();
   } catch (...) {
-    TRACE_(3, "UconDB::readDocument() Filter must have the collection element.");
+    TLOG(3)<< "UconDB::readDocument() Filter must have the collection element.";
   }
 
   if (collection_name.empty()) collection_name = arg_document.findChild(jsonliteral::collection).value();
 
   confirm(!collection_name.empty());
 
-  TRACE_(3, "UconDB::readDocument() collection_name=<" << collection_name << ">");
+  TLOG(3)<< "UconDB::readDocument() collection_name=<" << collection_name << ">";
 
   auto fl = folders(_provider);
 
@@ -82,7 +82,7 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::readDocument(JsonData con
 
   } catch (...) {
     auto filter_json = filter_document.to_string();
-    TRACE_(3, "UconDB::readDocument() invalid filter_json=<" << filter_json << ">.");
+    TLOG(3)<< "UconDB::readDocument() invalid filter_json=<" << filter_json << ">.";
   }
 
   for (auto const& oid : oids) {
@@ -98,8 +98,8 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::readDocument(JsonData con
 
 template <>
 object_id_t StorageProvider<JsonData, UconDB>::writeDocument(JsonData const& arg) {
-  TRACE_(4, "UconDB::writeDocument() begin");
-  TRACE_(4, "UconDB::writeDocument() args=<" << arg << ">");
+  TLOG(4) << "UconDB::writeDocument() begin";
+  TLOG(4) << "UconDB::writeDocument() args=<" << arg << ">";
 
   auto arg_document = JSONDocument{arg};
 
@@ -110,7 +110,7 @@ object_id_t StorageProvider<JsonData, UconDB>::writeDocument(JsonData const& arg
   try {
     filter_document = arg_document.findChildDocument(jsonliteral::filter);
   } catch (...) {
-    TRACE_(4, "UconDB::writeDocument() No filter was found.");
+    TLOG(4) << "UconDB::writeDocument() No filter was found.";
   }
 
   auto collection_name = std::string{};
@@ -118,20 +118,20 @@ object_id_t StorageProvider<JsonData, UconDB>::writeDocument(JsonData const& arg
   try {
     collection_name = user_document.findChild(jsonliteral::collection).value();
   } catch (...) {
-    TRACE_(4, "UconDB::writeDocument() User document must have the collection element.");
+    TLOG(4) << "UconDB::writeDocument() User document must have the collection element.";
   }
 
   if (collection_name.empty()) try {
       collection_name = filter_document.findChild(jsonliteral::collection).value();
     } catch (...) {
-      TRACE_(4, "UconDB::writeDocument() Filter should have the collection element.");
+      TLOG(4) << "UconDB::writeDocument() Filter should have the collection element.";
     }
 
   if (collection_name.empty()) collection_name = arg_document.findChild(jsonliteral::collection).value();
 
   confirm(!collection_name.empty());
 
-  TRACE_(4, "UconDB::writeDocument() collection_name=<" << collection_name << ">");
+  TLOG(4) << "UconDB::writeDocument() collection_name=<" << collection_name << ">";
 
   auto result = create_folder(_provider, collection_name);
 
@@ -147,17 +147,17 @@ object_id_t StorageProvider<JsonData, UconDB>::writeDocument(JsonData const& arg
 
   try {
     auto oid_json = filter_document.findChild(jsonliteral::id).value();
-    TRACE_(4, "UconDB::writeDocument() Found filter=<" << oid_json << ">");
+    TLOG(4) << "UconDB::writeDocument() Found filter=<" << oid_json << ">";
     oid = extract_oid(oid_json);
   //  isNew = false;
-    TRACE_(4, "UconDB::writeDocument() Using provided oid=<" << oid << ">");
+    TLOG(4) << "UconDB::writeDocument() Using provided oid=<" << oid << ">";
   } catch (...) {
   }
 #endif
 
   if (oid == object_id_t{ouid_invalid}) {
     oid = generate_oid();
-    TRACE_(4, "UconDB::writeDocument() Using generated oid=<" << oid << ">");
+    TLOG(4) << "UconDB::writeDocument() Using generated oid=<" << oid << ">";
   }
 
   auto id = to_id(oid);
@@ -169,7 +169,7 @@ object_id_t StorageProvider<JsonData, UconDB>::writeDocument(JsonData const& arg
 
   auto json = builder.to_string();
 
-  TRACE_(4, "UconDB::writeDocument() json=<" << json << ">.");
+  TLOG(4) << "UconDB::writeDocument() json=<" << json << ">.";
 
   auto tags = builder.extractTags();
 
@@ -181,7 +181,7 @@ object_id_t StorageProvider<JsonData, UconDB>::writeDocument(JsonData const& arg
     throw runtime_error("UconDB") << "UconDB failed inserting data, error=" << result.second;
   }
 
-  TRACE_(4, "UconDB::writeDocument() Created document with oid=<" << oid << ">.");
+  TLOG(4) << "UconDB::writeDocument() Created document with oid=<" << oid << ">.";
 
   return {id};
 }
@@ -194,7 +194,7 @@ void ReadWrite() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::ucon::ReadWrite trace_enable");
+  TLOG(0) <<  "artdaq::database::ucon::ReadWrite trace_enable";
 }
 }
 }  // namespace ucon

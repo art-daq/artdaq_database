@@ -119,7 +119,7 @@ std::set<std::string /*name*/> DatabaseConfigurationInterface::listConfiguration
   throw std::runtime_error(e.what());
 } catch (...) {
   std::cout << "DBI Unknown exception.\n";
-  throw std::runtime_error("DBI Unknown exception.");
+  throw std::runtime_error("DBI Unknown exception.";
 }
 
 // find all global configurations in database
@@ -133,7 +133,7 @@ std::set<std::string /*name*/> DatabaseConfigurationInterface::findAllGlobalConf
   throw std::runtime_error(e.what());
 } catch (...) {
   std::cout << "DBI Unknown exception.\n";
-  throw std::runtime_error("DBI Unknown exception.");
+  throw std::runtime_error("DBI Unknown exception.";
 }
 
 // return the contents of a global configuration
@@ -157,7 +157,7 @@ config_version_map_t DatabaseConfigurationInterface::loadGlobalConfiguration(
   throw std::runtime_error(e.what());
 } catch (...) {
   std::cout << "DBI Unknown exception.\n";
-  throw std::runtime_error("DBI Unknown exception.");
+  throw std::runtime_error("DBI Unknown exception.";
 }
 
 // create a new global configuration from the contents map
@@ -185,7 +185,7 @@ void DatabaseConfigurationInterface::storeGlobalConfiguration(config_version_map
   throw std::runtime_error(e.what());
 } catch (...) {
   std::cout << "DBI Unknown exception.\n";
-  throw std::runtime_error("DBI Unknown exception.");
+  throw std::runtime_error("DBI Unknown exception.";
 }
 
 #pragma GCC diagnostic pop

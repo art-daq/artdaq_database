@@ -20,7 +20,7 @@ bool ConfReader::read(std::string const& in[[gnu::unused]], jsn::object_t& json_
   confirm(!in.empty());
   confirm(json_object.empty());
 
-  TRACE_(2, "read() begin");
+  TLOG(2) << "read() begin";
 
   try {
     auto object = jsn::object_t();
@@ -30,12 +30,12 @@ bool ConfReader::read(std::string const& in[[gnu::unused]], jsn::object_t& json_
 
     json_object.swap(object);
 
-    TRACE_(2, "read() end");
+    TLOG(2) << "read() end";
 
     return true;
 
   } catch (std::exception const& e) {
-    TRACE_(2, "read() Caughtexception message=" << e.what());
+    TLOG(2) << "read() Caughtexception message=" << e.what();
 
     std::cerr << "Caught exception message=" << e.what() << "\n";
     throw;
@@ -48,5 +48,5 @@ void artdaq::database::conf::debug::ConfReader() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::conf::ConfReader trace_enable");
+  TLOG(0) <<  "artdaq::database::conf::ConfReader trace_enable";
 }
