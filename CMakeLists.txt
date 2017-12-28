@@ -59,7 +59,7 @@ find_ups_product( cetlib_except v1_01_02 )
 find_ups_product( cetpkgsupport v1_11_00 )
 #find_ups_product( fhiclcpp v3_20_01 )
 find_ups_product( mongodb v3_4_6 )
-#find_ups_product( TRACE v3_12_00 )
+find_ups_product( TRACE v3_13_01 )
 find_ups_product( swig v3_0_12 )
 
 # Debug streamer.
