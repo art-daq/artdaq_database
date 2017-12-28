@@ -17,9 +17,7 @@ endforeach()
 
 set(FHICLCPP artdaq-database_Fhiclcpp)
 
-find_path(BUILTIN_FHICLCPP_DIR ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp)
-
-if ( (NOT BUILTIN_FHICLCPP_DIR) OR (NOT EXISTS ${BUILTIN_FHICLCPP_DIR}))
+if ( NOT EXISTS ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp )
     message("Downloading fhicl-cpp source")
 
     execute_process(COMMAND rm -rf ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp

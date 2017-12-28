@@ -196,12 +196,12 @@ git clone http://cdcvs.fnal.gov/projects/artdaq-utilities-database ${srcdir}/art
 cd ${srcdir}/artdaq-database
 git checkout develop
 
-git clone http://cdcvs.fnal.gov/projects/fhicl-cpp ${srcdir}/artdaq-database/built-in/fhicl-cpp
-cd ${srcdir}/artdaq-database/built-in/fhicl-cpp
-git checkout tags/v4_05_01
-git apply ${srcdir}/artdaq-database/built-in/fhicl-cpp.patch
-git --no-pager  diff
-git status
+#git clone http://cdcvs.fnal.gov/projects/fhicl-cpp ${srcdir}/artdaq-database/built-in/fhicl-cpp
+#cd ${srcdir}/artdaq-database/built-in/fhicl-cpp
+#git checkout tags/v4_05_01
+#git apply ${srcdir}/artdaq-database/built-in/fhicl-cpp.patch
+#git --no-pager  diff
+#git status
 
 cd ${blddir}
 if [[ "${build_type}" == "prof" ]]; then
