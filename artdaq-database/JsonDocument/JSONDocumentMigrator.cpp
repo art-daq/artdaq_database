@@ -65,5 +65,5 @@ void dbdr::debug::JSONDocumentMigrator() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::JSONDocumentMigrator trace_enable");
+  TLOG(0) <<  "artdaq::database::JSONDocumentMigrator trace_enable";
 }

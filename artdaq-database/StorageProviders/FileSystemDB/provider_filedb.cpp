@@ -52,8 +52,8 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigurations(
 
   auto timestamp_configs = timestamp_configs_t(reverse_timestamp_cmp);
 
-  TRACE_(5, "FileSystemDB::findConfigurations() begin");
-  TRACE_(5, "FileSystemDB::findConfigurations() args data=<" << query_payload << ">");
+  TLOG(5) << "FileSystemDB::findConfigurations() begin";
+  TLOG(5) << "FileSystemDB::findConfigurations() args data=<" << query_payload << ">";
 
   auto collection = _provider->connection();
   collection = expand_environment_variables(collection);
@@ -62,10 +62,10 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigurations(
   auto collection_names = dbfs::find_subdirs(dir_name);
 
   for (auto const& collection_name : collection_names) {
-    TRACE_(5,
+    TLOG(5) <<
            "FileSystemDB::findConfigurations() querying "
            "collection_name=<"
-               << collection_name << ">");
+               << collection_name << ">";
 
     auto index_path = boost::filesystem::path(dir_name.c_str()).append(collection_name).append(dbfsl::search_index);
 
@@ -73,8 +73,8 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigurations(
 
     auto configentityname_pairs = search_index.findAllGlobalConfigurations(query_payload);
 
-    TRACE_(5, "FileSystemDB::findConfigurations() search returned " << configentityname_pairs.size()
-                                                                    << " configurations.");
+    TLOG(5) << "FileSystemDB::findConfigurations() search returned " << configentityname_pairs.size()
+                                                                    << " configurations.";
     for (auto const& configentityname_pair : configentityname_pairs) {
       auto const& name = configentityname_pair.first;
       std::ostringstream oss;
@@ -102,7 +102,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigurations(
     oss << db::quoted_(apiliteral::filter::configurations) << ": " << db::quoted_(cfg.second);
     oss << "}";
     oss << "}";
-    TRACE_(5, "FileSystemDB::findConfigurations() found document=<" << oss.str() << ">");
+    TLOG(5) << "FileSystemDB::findConfigurations() found document=<" << oss.str() << ">";
 
     returnCollection.emplace_back(oss.str());
   }
@@ -116,8 +116,8 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::configurationCompos
   confirm(!query_payload.empty());
   auto returnCollection = std::list<JsonData>();
 
-  TRACE_(6, "FileSystemDB::configurationComposition() begin");
-  TRACE_(6, "FileSystemDB::configurationComposition() args data=<" << query_payload << ">");
+  TLOG(6) << "FileSystemDB::configurationComposition() begin";
+  TLOG(6) << "FileSystemDB::configurationComposition() args data=<" << query_payload << ">";
 
   auto collection = _provider->connection();
   collection = expand_environment_variables(collection);
@@ -126,10 +126,10 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::configurationCompos
   auto collection_names = dbfs::find_subdirs(dir_name);
 
   for (auto const& collection_name : collection_names) {
-    TRACE_(6,
+    TLOG(6) <<
            "FileSystemDB::configurationComposition() "
            "querying collection_name=<"
-               << collection_name << ">");
+               << collection_name << ">";
 
     auto index_path = boost::filesystem::path(dir_name.c_str()).append(collection_name).append(dbfsl::search_index);
 
@@ -137,10 +137,10 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::configurationCompos
 
     auto configentityname_pairs = search_index.findAllGlobalConfigurations(query_payload);
 
-    TRACE_(6,
+    TLOG(6) <<
            "FileSystemDB::configurationComposition() search "
            "returned "
-               << configentityname_pairs.size() << " configurations.");
+               << configentityname_pairs.size() << " configurations.";
 
     for (auto const& configentityname_pair : configentityname_pairs) {
       std::ostringstream oss;
@@ -156,10 +156,10 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::configurationCompos
       oss << "}";
       oss << "}";
 
-      TRACE_(6,
+      TLOG(6) <<
              "FileSystemDB::configurationComposition() "
              "found document=<"
-                 << oss.str() << ">");
+                 << oss.str() << ">";
 
       returnCollection.emplace_back(oss.str());
     }
@@ -174,8 +174,8 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findVersions(JsonDa
   confirm(!filter.empty());
   auto returnCollection = std::list<JsonData>();
 
-  TRACE_(7, "FileSystemDB::findVersions() begin");
-  TRACE_(7, "FileSystemDB::findVersions() args data=<" << filter << ">");
+  TLOG(5) << "FileSystemDB::findVersions() begin";
+  TLOG(5) << "FileSystemDB::findVersions() args data=<" << filter << ">";
 
   auto query_payload_document = JSONDocument{filter};
 
@@ -185,7 +185,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findVersions(JsonDa
   auto collection = _provider->connection() + collection_name;
   collection = expand_environment_variables(collection);
 
-  TRACE_(7, "FileSystemDB::readDocument() collection_path=<" << collection << ">.");
+  TLOG(5) << "FileSystemDB::readDocument() collection_path=<" << collection << ">.";
 
   auto dir_name = dbfs::mkdir(collection).append("/");
 
@@ -196,17 +196,17 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findVersions(JsonDa
   jsn::object_t search_ast;
 
   if (!jsn::JsonReader{}.read(query_payload, search_ast)) {
-    TRACE_(5, "FileSystemDB::index::findVersionsByEntityName()"
-                  << " Failed to create an AST from search.");
+    TLOG(5) << "FileSystemDB::index::findVersionsByEntityName()"
+                  << " Failed to create an AST from search.";
     return returnCollection;
   }
 
   if (search_ast.count(apiliteral::filter::configurations) == 0) {
     auto versionentityname_pairs = search_index.findVersionsByEntityName(query_payload);
 
-    TRACE_(7,
+    TLOG(5) <<
            "FileSystemDB::findVersionsByEntityName() search returned "
-               << versionentityname_pairs.size() << " configurations.");
+               << versionentityname_pairs.size() << " configurations.";
 
     for (auto const& versionentityname_pair : versionentityname_pairs) {
       std::ostringstream oss;
@@ -222,7 +222,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findVersions(JsonDa
       oss << "}";
       oss << "}";
 
-      TRACE_(7, "FileSystemDB::findVersions() found document=<" << oss.str() << ">");
+      TLOG(5) << "FileSystemDB::findVersions() found document=<" << oss.str() << ">";
 
       returnCollection.emplace_back(oss.str());
     }
@@ -232,18 +232,18 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findVersions(JsonDa
     try {
       entityName = boost::get<std::string>(search_ast.at(apiliteral::filter::entities));
 
-      TRACE_(7, "FileSystemDB::findVersionsByGlobalConfigName"
-                    << " Found entity filter=<" << entityName << ">.");
+      TLOG(5) << "FileSystemDB::findVersionsByGlobalConfigName"
+                    << " Found entity filter=<" << entityName << ">.";
 
     } catch (...) {
     }
 
     auto versionentityname_pairs = search_index.findVersionsByGlobalConfigName(query_payload);
 
-    TRACE_(7,
+    TLOG(5) <<
            "FileSystemDB::findVersionsByGlobalConfigName() "
            "search returned "
-               << versionentityname_pairs.size() << " configurations.");
+               << versionentityname_pairs.size() << " configurations.";
 
     for (auto const& versionentityname_pair : versionentityname_pairs) {
       std::ostringstream oss;
@@ -259,7 +259,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findVersions(JsonDa
       oss << "}";
       oss << "}";
 
-      TRACE_(7, "FileSystemDB::findVersions() found document=<" << oss.str() << ">");
+      TLOG(5) << "FileSystemDB::findVersions() found document=<" << oss.str() << ">";
 
       returnCollection.emplace_back(oss.str());
     }
@@ -273,8 +273,8 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findEntities(JsonDa
   confirm(!filter.empty());
   auto returnCollection = std::list<JsonData>();
 
-  TRACE_(9, "FileSystemDB::findEntities() begin");
-  TRACE_(9, "FileSystemDB::findEntities() args data=<" << filter << ">");
+  TLOG(9) << "FileSystemDB::findEntities() begin";
+  TLOG(9) << "FileSystemDB::findEntities() args data=<" << filter << ">";
 
   auto query_payload_document = JSONDocument{filter};
   auto query_payload = query_payload_document.findChild(apiliteral::option::searchfilter).value();
@@ -286,10 +286,10 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findEntities(JsonDa
   auto collection_names = dbfs::find_subdirs(dir_name);
 
   for (auto const& collection_name : collection_names) {
-    TRACE_(9,
+    TLOG(9) <<
            "FileSystemDB::findEntities() querying "
            "collection_name=<"
-               << collection_name << ">");
+               << collection_name << ">";
 
     auto index_path = boost::filesystem::path(dir_name.c_str()).append(collection_name).append(dbfsl::search_index);
 
@@ -305,7 +305,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findEntities(JsonDa
       configentity_names.swap(unique_configentity_names);
     }
 
-    TRACE_(9, "FileSystemDB::findEntities() search returned " << configentity_names.size() << " configurations.");
+    TLOG(9) << "FileSystemDB::findEntities() search returned " << configentity_names.size() << " configurations.";
 
     for (auto const& configentity_name : configentity_names) {
       std::ostringstream oss;
@@ -320,7 +320,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findEntities(JsonDa
       oss << "}";
       oss << "}";
 
-      TRACE_(9, "FileSystemDB::findEntities() found document=<" << oss.str() << ">");
+      TLOG(9) << "FileSystemDB::findEntities() found document=<" << oss.str() << ">";
 
       returnCollection.emplace_back(oss.str());
     }
@@ -334,8 +334,8 @@ template <>
 std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listCollections(JsonData const& query_payload) {
   confirm(!query_payload.empty());
   auto returnCollection = std::list<JsonData>();
-  TRACE_(12, "FileSystemDB::listCollections() begin");
-  TRACE_(12, "FileSystemDB::listCollections() args data=<" << query_payload << ">");
+  TLOG(12) << "FileSystemDB::listCollections() begin";
+  TLOG(12) << "FileSystemDB::listCollections() args data=<" << query_payload << ">";
 
   auto collection = _provider->connection();
   collection = expand_environment_variables(collection);
@@ -346,10 +346,10 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listCollections(Jso
   for (auto const& collection_name : collection_names) {
     if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
 
-    TRACE_(12,
+    TLOG(12) <<
            "FileSystemDB::listCollections() found "
            "collection_name=<"
-               << collection_name << ">");
+               << collection_name << ">";
 
     std::ostringstream oss;
 
@@ -361,7 +361,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listCollections(Jso
     oss << db::quoted_(apiliteral::option::searchfilter)<< ":" << apiliteral::empty_json ;
     oss << "}";
 
-    TRACE_(12, "FileSystemDB::listCollections() found document=<" << oss.str() << ">");
+    TLOG(12) << "FileSystemDB::listCollections() found document=<" << oss.str() << ">";
 
     returnCollection.emplace_back(oss.str());
   }
@@ -374,8 +374,8 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::addConfiguration(Js
   confirm(!query_payload.empty());
   auto returnCollection = std::list<JsonData>();
 
-  TRACE_(8, "FileSystemDB::addConfiguration() begin");
-  TRACE_(8, "FileSystemDB::addConfiguration() args data=<" << query_payload << ">");
+  TLOG(5) << "FileSystemDB::addConfiguration() begin";
+  TLOG(5) << "FileSystemDB::addConfiguration() args data=<" << query_payload << ">";
 
   return returnCollection;
 }
@@ -386,8 +386,8 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listDatabases(JsonD
   confirm(!query_payload.empty());
   auto returnCollection = std::list<JsonData>();
 
-  TRACE_(9, "FileSystemDB::listDatabases() begin");
-  TRACE_(9, "FileSystemDB::listDatabases() args data=<" << query_payload << ">");
+  TLOG(9) << "FileSystemDB::listDatabases() begin";
+  TLOG(9) << "FileSystemDB::listDatabases() args data=<" << query_payload << ">";
 
   auto database = _provider->connection();
 
@@ -397,11 +397,11 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listDatabases(JsonD
   auto database_names = dbfs::find_siblingdirs(database);
 
   for (auto const& database_name : database_names) {
-    TRACE_(9, "FileSystemDB::listDatabases() found databases=<" << database_name << ">");
+    TLOG(9) << "FileSystemDB::listDatabases() found databases=<" << database_name << ">";
 
     if (database_name == "system") continue;
 
-    TRACE_(9, "FileSystemDB::listDatabases() found database_name=<" << database_name << ">");
+    TLOG(9) << "FileSystemDB::listDatabases() found database_name=<" << database_name << ">";
 
     std::ostringstream oss;
     oss << "{";
@@ -411,7 +411,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listDatabases(JsonD
     oss << db::quoted_(apiliteral::option::searchfilter)<< ":" << apiliteral::empty_json;
     oss << "}";
 
-    TRACE_(9, "FileSystemDB::listDatabases() found document=<" << oss.str() << ">");
+    TLOG(9) << "FileSystemDB::listDatabases() found document=<" << oss.str() << ">";
 
     returnCollection.emplace_back(oss.str());
   }
@@ -431,22 +431,22 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::databaseMetadata(
 
   if (collection.find(dbfsl::FILEURI) == 0) collection = collection.substr(strlen(dbfsl::FILEURI));
 
-  TRACE_(3, "FileSystemDB::databaseMetadata() collection_path=<" << collection << ">.");
+  TLOG(3)<< "FileSystemDB::databaseMetadata() collection_path=<" << collection << ">.";
 
   auto oids = dbfs::find_documents(collection);
 
-  TRACE_(3, "FileSystemDB::databaseMetadata() search returned " << oids.size() << " documents.");
+  TLOG(3)<< "FileSystemDB::databaseMetadata() search returned " << oids.size() << " documents.";
 
   for (auto const& oid : oids) {
     auto doc_path = boost::filesystem::path(collection).append(oid).replace_extension(".json");
 
-    TRACE_(3, "FileSystemDB::databaseMetadata() reading document <" << doc_path.c_str() << ">.");
+    TLOG(3)<< "FileSystemDB::databaseMetadata() reading document <" << doc_path.c_str() << ">.";
 
     auto json = std::string{};
 
     db::read_buffer_from_file(json, {doc_path.c_str()});
 
-    TRACE_(3, "FileSystemDB::databaseMetadata() document <" << json << ">.");
+    TLOG(3)<< "FileSystemDB::databaseMetadata() document <" << json << ">.";
 
     returnCollection.emplace_back(json);
   }
@@ -462,7 +462,7 @@ void enable() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::filesystem trace_enable");
+  TLOG(0) <<  "artdaq::database::filesystem trace_enable";
   artdaq::database::filesystem::debug::ReadWrite();
   artdaq::database::filesystem::index::debug::enable();
 }

@@ -101,5 +101,5 @@ void dbcfg::debug::ManageAliases() {
   TRACE_CNTL("modeS", trace_mode::modeS);
 
   dbcfg::debug::detail::ManageAliases();
-  TRACE_(0, "artdaq::database::configuration::ManageAliases trace_enable");
+  TLOG(0) <<  "artdaq::database::configuration::ManageAliases trace_enable";
 }

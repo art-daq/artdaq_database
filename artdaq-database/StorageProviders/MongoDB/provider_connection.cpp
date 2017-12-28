@@ -89,7 +89,7 @@ mongocxx::database& MongoDB::connection() {
 
   auto object_id = object_id_t(compat::to_json(result->inserted_id()));
 
-  TRACE_(5, "StorageProvider::MongoDB::connection created metadata record id=" << object_id);
+  TLOG(5) << "StorageProvider::MongoDB::connection created metadata record id=" << object_id;
 
   return _connection;
 }

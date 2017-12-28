@@ -78,7 +78,7 @@ result_t json::export_database(std::string const& query_payload) noexcept {
     auto options = ManageDocumentOperation{apiliteral::operation::exportdatabase};
     options.readJsonData({query_payload});
 
-    TRACE_(10, "export_database: operation=<" << options << ">");
+    TLOG(10)<< "export_database: operation=<" << options << ">";
 
     confirm(options.operation().compare(apiliteral::operation::exportdatabase) == 0);
 
@@ -113,7 +113,7 @@ result_t json::export_database(std::string const& query_payload) noexcept {
       oss << dirname << "/" << collection << apiliteral::dbexport_extension;
       options.sourceFileName(oss.str());
 
-      TRACE_(10, "export_database: exporting collection=" << collection << " to file=" << options.sourceFileName());
+      TLOG(10)<< "export_database: exporting collection=" << collection << " to file=" << options.sourceFileName();
 
       auto result = opts::export_collection(options);
 
@@ -149,7 +149,7 @@ result_t json::import_database(std::string const& query_payload) noexcept {
     auto options = ManageDocumentOperation{apiliteral::operation::importdatabase};
     options.readJsonData({query_payload});
 
-    TRACE_(10, "import_database: operation=<" << options << ">");
+    TLOG(10)<< "import_database: operation=<" << options << ">";
 
     confirm(options.operation().compare(apiliteral::operation::importdatabase) == 0);
 
@@ -175,7 +175,7 @@ result_t json::import_database(std::string const& query_payload) noexcept {
       oss << dirname << "/" << collection << apiliteral::dbexport_extension;
       options.sourceFileName(oss.str());
 
-      TRACE_(10, "import_database: importing collection=" << collection << " to file=" << options.sourceFileName());
+      TLOG(10)<< "import_database: importing collection=" << collection << " to file=" << options.sourceFileName();
 
       auto result = opts::import_collection(options);
 
@@ -254,7 +254,7 @@ result_t json::write_configuration(std::string const& query_payload, std::string
     auto options = ManageDocumentOperation{apiliteral::operation::writeconfiguration};
     options.readJsonData({query_payload});
 
-    TRACE_(10, "write_configuration: operation=<" << options << ">");
+    TLOG(10)<< "write_configuration: operation=<" << options << ">";
 
     confirm(options.operation().compare(apiliteral::operation::writeconfiguration) == 0);
 
@@ -308,7 +308,7 @@ result_t json::read_configuration(std::string const& query_payload, std::string&
     auto options = ManageDocumentOperation{apiliteral::operation::readconfiguration};
     options.readJsonData({query_payload});
 
-    TRACE_(10, "read_configuration: operation=<" << options << ">");
+    TLOG(10)<< "read_configuration: operation=<" << options << ">";
 
     confirm(options.operation().compare(apiliteral::operation::readconfiguration) == 0);
 
@@ -318,7 +318,7 @@ result_t json::read_configuration(std::string const& query_payload, std::string&
 
     detail::configuration_composition(options, configuration_list);
 
-    TRACE_(10, "read_configuration: configuration_list=<" << configuration_list << ">");
+    TLOG(10)<< "read_configuration: configuration_list=<" << configuration_list << ">";
 
     namespace jsn = artdaq::database::json;
 
@@ -345,7 +345,7 @@ result_t json::read_configuration(std::string const& query_payload, std::string&
 
       tmpOpts.format(options::data_format_t::origin);
 
-      TRACE_(10, "read_configuration: looping over configurations operation=<" << tmpOpts.to_string() << ">");
+      TLOG(10)<< "read_configuration: looping over configurations operation=<" << tmpOpts.to_string() << ">";
 
       auto file_name = tmp_dir_name + "/" + relative_path_from_collection_name(tmpOpts.collection());
 
@@ -379,7 +379,7 @@ result_t json::read_configuration(std::string const& query_payload, std::string&
 
     tarbzip2_base64 = oss.str();
 
-    TRACE_(10, "read_configuration: end");
+    TLOG(10)<< "read_configuration: end";
 
     return Success(tarbzip2_base64);
   } catch (...) {
@@ -404,7 +404,7 @@ result_t json::export_collection(std::string const& query_payload) noexcept {
     auto options = ManageDocumentOperation{apiliteral::operation::exportcollection};
     options.readJsonData({query_payload});
 
-    TRACE_(10, "export_collection: operation=<" << options << ">");
+    TLOG(10)<< "export_collection: operation=<" << options << ">";
 
     confirm(options.operation().compare(apiliteral::operation::exportcollection) == 0);
 
@@ -420,7 +420,7 @@ result_t json::export_collection(std::string const& query_payload) noexcept {
 
     if(document_list.empty()) return Failure(make_error_msg(options.collection() +" is empty.") );
     
-    TRACE_(10, "export_collection: found " << document_list.size() << "documents.");
+    TLOG(10)<< "export_collection: found " << document_list.size() << "documents.";
 
     auto tmp_dir_name = db::make_temp_dir();
 
@@ -442,7 +442,7 @@ result_t json::export_collection(std::string const& query_payload) noexcept {
 
     db::delete_temp_dir(tmp_dir_name);
 
-    TRACE_(3, "export_collection: end");
+    TLOG(3)<< "export_collection: end";
 
     return Success(oss.str());
   } catch (...) {
@@ -467,7 +467,7 @@ result_t json::import_collection(std::string const& query_payload) noexcept {
     auto options = ManageDocumentOperation{apiliteral::operation::importcollection};
     options.readJsonData({query_payload});
 
-    TRACE_(10, "import_collection: operation=<" << options << ">");
+    TLOG(10)<< "import_collection: operation=<" << options << ">";
 
     confirm(options.operation().compare(apiliteral::operation::importcollection) == 0);
 
@@ -507,7 +507,7 @@ result_t json::import_collection(std::string const& query_payload) noexcept {
     oss << "{" << quoted_(apiliteral::option::source) << ":[";
     oss << quoted_(options.sourceFileName()) << "]}";
 
-    TRACE_(3, "import_collection: end");
+    TLOG(3)<< "import_collection: end";
 
     return Success(oss.str());
   } catch (...) {
@@ -524,5 +524,5 @@ void dbcfg::debug::ExportImport() {
 
   dbcfg::debug::detail::ExportImport();
 
-  TRACE_(0, "artdaq::database::configuration::ExportImport trace_enable");
+  TLOG(0) <<  "artdaq::database::configuration::ExportImport trace_enable";
 }

@@ -14,6 +14,6 @@ void cf::validate_dbprovider_name(std::string const& provider) try {
     throw db::runtime_error("validate_dbprovider_name") << "Invalid database provider; database provider=" << provider
                                                         << ".";
 } catch (std::exception& ex) {
-  TRACE_(0, "validate_dbprovider_name() Error:" << ex.what());
+  TLOG(0) <<  "validate_dbprovider_name() Error:" << ex.what();
   throw;
 }

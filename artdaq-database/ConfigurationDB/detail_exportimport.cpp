@@ -71,7 +71,7 @@ namespace cfd = db::configuration::detail;
 result_t cfd::read_document_file(ManageDocumentOperation const& options, std::string const& file_out_name) try {
   confirm(!file_out_name.empty());
 
-  TRACE_(11, "read_configuration: file_name=<" << file_out_name << ">");
+  TLOG(11)<< "read_configuration: file_name=<" << file_out_name << ">";
 
   auto test_document = std::string{};
 
@@ -132,5 +132,5 @@ void cftd::ExportImport() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::ExportImport trace_enable");
+  TLOG(0) <<  "artdaq::database::configuration::ExportImport trace_enable";
 }

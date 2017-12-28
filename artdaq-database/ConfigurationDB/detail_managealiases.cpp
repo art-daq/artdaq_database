@@ -57,8 +57,8 @@ void find_version_aliases(Options const& options, std::string& configs) {
   confirm(configs.empty());
   confirm(options.operation().compare(apiliteral::operation::findversionalias) == 0);
 
-  TRACE_(11, "find_version_aliases: begin");
-  TRACE_(11, "find_version_aliases args options=<" << options << ">");
+  TLOG(11)<< "find_version_aliases: begin";
+  TLOG(11)<< "find_version_aliases args options=<" << options << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -101,14 +101,14 @@ void find_version_aliases(Options const& options, std::string& configs) {
       object_t results_ast;
 
       if (!reader.read(search_result, results_ast)) {
-        TRACE_(11, "find_version_aliases() Failed to create an AST from search results JSON.");
+        TLOG(11)<< "find_version_aliases() Failed to create an AST from search results JSON.";
 
         throw runtime_error("find_version_aliases") << "Failed to create an AST from search results JSON.";
       }
 
       auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
 
-      TRACE_(11, "find_version_aliases: found " << results_list.size() << " results.");
+      TLOG(11)<< "find_version_aliases: found " << results_list.size() << " results.";
 
       std::ostringstream os;
 
@@ -116,7 +116,7 @@ void find_version_aliases(Options const& options, std::string& configs) {
         auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
         auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
 
-        TRACE_(11, "find_version_aliases() Found alias=<" << value << ">.");
+        TLOG(11)<< "find_version_aliases() Found alias=<" << value << ">.";
 
         os << value << ",";
       }
@@ -132,16 +132,16 @@ void find_version_aliases(Options const& options, std::string& configs) {
 
   if (returnValueChanged) configs.swap(returnValue);
 
-  TRACE_(11, "find_version_aliases: end");
+  TLOG(11)<< "find_version_aliases: end";
 }
 
 void add_version_alias(Options const& options, std::string& conf) {
   confirm(conf.empty());
   confirm(options.operation().compare(apiliteral::operation::addversionalias) == 0);
 
-  TRACE_(6, "add_version_alias: begin");
-  TRACE_(6, "add_version_alias args options=<" << options << ">");
-  TRACE_(6, "add_version_alias args conf=<" << conf << ">");
+  TLOG(6) << "add_version_alias: begin";
+  TLOG(6) << "add_version_alias args options=<" << options << ">";
+  TLOG(6) << "add_version_alias args conf=<" << conf << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -171,16 +171,16 @@ void add_version_alias(Options const& options, std::string& conf) {
 
   conf.swap(document);
 
-  TRACE_(6, "add_version_alias end conf=<" << conf << ">");
+  TLOG(6) << "add_version_alias end conf=<" << conf << ">";
 }
 
 void remove_version_alias(Options const& options, std::string& conf) {
   confirm(conf.empty());
   confirm(options.operation().compare(apiliteral::operation::rmversionalias) == 0);
 
-  TRACE_(7, "remove_version_alias: begin");
-  TRACE_(7, "remove_version_alias args options=<" << options << ">");
-  TRACE_(7, "remove_version_alias args conf=<" << conf << ">");
+  TLOG(5) << "remove_version_alias: begin";
+  TLOG(5) << "remove_version_alias args options=<" << options << ">";
+  TLOG(5) << "remove_version_alias args conf=<" << conf << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -210,7 +210,7 @@ void remove_version_alias(Options const& options, std::string& conf) {
 
   conf.swap(document);
 
-  TRACE_(7, "remove_version_alias end conf=<" << conf << ">");
+  TLOG(5) << "remove_version_alias end conf=<" << conf << ">";
 }
 
 }  // namespace detail
@@ -225,5 +225,5 @@ void cftd::ManageAliases() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::configuration::ManageAliases trace_enable");
+  TLOG(0) <<  "artdaq::database::configuration::ManageAliases trace_enable";
 }

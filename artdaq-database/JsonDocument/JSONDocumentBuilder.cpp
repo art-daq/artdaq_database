@@ -34,12 +34,12 @@ JSONDocumentBuilder::JSONDocumentBuilder(JSONDocument const& document)
 
 bool JSONDocumentBuilder::init() {
   auto buff[[gnu::unused]] = _document.writeJson();
-  TRACE_(3, "JSONDocumentBuilder::init() new document=<" << buff << ">");
+  TLOG(3)<< "JSONDocumentBuilder::init() new document=<" << buff << ">";
   return true;
 }
 
 JSONDocumentBuilder& JSONDocumentBuilder::addAlias(JSONDocument const& alias) try {
-  TRACE_(3, "addAlias() args  alias=<" << alias << ">");
+  TLOG(3)<< "addAlias() args  alias=<" << alias << ">";
 
   JSONDocument copy(alias);
   auto ovl = overlay<ovl::ovlAlias>(copy, jsonliteral::alias);
@@ -50,14 +50,14 @@ JSONDocumentBuilder& JSONDocumentBuilder::addAlias(JSONDocument const& alias) tr
 
   return self();
 } catch (std::exception const& ex) {
-  TRACE_(3, "addAlias() Exception:" << ex.what());
+  TLOG(3)<< "addAlias() Exception:" << ex.what();
   ThrowOnFailure(CallUndo());
 
   return self();
 }
 
 JSONDocumentBuilder& JSONDocumentBuilder::removeAlias(JSONDocument const& alias) try {
-  TRACE_(4, "removeAlias() args  alias=<" << alias << ">");
+  TLOG(4) << "removeAlias() args  alias=<" << alias << ">";
 
   JSONDocument copy(alias);
   auto ovl = overlay<ovl::ovlAlias>(copy, jsonliteral::alias);
@@ -68,14 +68,14 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeAlias(JSONDocument const& alias)
 
   return self();
 } catch (std::exception const& ex) {
-  TRACE_(5, "removeAlias() Exception:" << ex.what());
+  TLOG(5) << "removeAlias() Exception:" << ex.what();
   ThrowOnFailure(CallUndo());
 
   return self();
 }
 
 JSONDocumentBuilder& JSONDocumentBuilder::addConfiguration(JSONDocument const& config) try {
-  TRACE_(5, "addConfiguration() args config=<" << config << ">");
+  TLOG(5) << "addConfiguration() args config=<" << config << ">";
 
   JSONDocument copy(config);
   auto ovl = overlay<ovl::ovlConfiguration>(copy, jsonliteral::configuration);
@@ -86,14 +86,14 @@ JSONDocumentBuilder& JSONDocumentBuilder::addConfiguration(JSONDocument const& c
 
   return self();
 } catch (std::exception const& ex) {
-  TRACE_(5, "addConfiguration() Exception:" << ex.what());
+  TLOG(5) << "addConfiguration() Exception:" << ex.what();
   ThrowOnFailure(CallUndo());
 
   return self();
 }
 
 JSONDocumentBuilder& JSONDocumentBuilder::removeConfiguration(JSONDocument const& config) try {
-  TRACE_(5, "removeConfiguration() args  config=<" << config << ">");
+  TLOG(5) << "removeConfiguration() args  config=<" << config << ">";
 
   JSONDocument copy(config);
   auto ovl = overlay<ovl::ovlConfiguration>(copy, jsonliteral::configuration);
@@ -104,28 +104,28 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeConfiguration(JSONDocument const
 
   return self();
 } catch (std::exception const& ex) {
-  TRACE_(5, "removeConfiguration() Exception:" << ex.what());
+  TLOG(5) << "removeConfiguration() Exception:" << ex.what();
   ThrowOnFailure(CallUndo());
 
   return self();
 }
 
 JSONDocumentBuilder& JSONDocumentBuilder::removeAllConfigurations() try {
-  TRACE_(5, "removeAllConfigurations()");
+  TLOG(5) << "removeAllConfigurations()";
 
   _overlay->configurations().wipe();  
   _document.writeJson();
 
   return self();
 } catch (std::exception const& ex) {
-  TRACE_(5, "removeAllConfigurations() Exception:" << ex.what());
+  TLOG(5) << "removeAllConfigurations() Exception:" << ex.what();
   ThrowOnFailure(CallUndo());
   return self();
 }
 
 
 JSONDocumentBuilder& JSONDocumentBuilder::setObjectID(JSONDocument const& objectId) try {
-  TRACE_(8, "setObjectID() args  objectId=<" << objectId << ">");
+  TLOG(5) << "setObjectID() args  objectId=<" << objectId << ">";
 
   JSONDocument copy(objectId);
   auto id = std::make_unique<ovl::ovlId>(jsonliteral::id, copy.findChildValue(jsonliteral::id));
@@ -137,7 +137,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::setObjectID(JSONDocument const& object
 
   return self();
 } catch (std::exception const& ex) {
-  TRACE_(5, "setObjectID() Exception:" << ex.what());
+  TLOG(5) << "setObjectID() Exception:" << ex.what();
   ThrowOnFailure(CallUndo());
 
   return self();
@@ -150,7 +150,7 @@ std::string JSONDocumentBuilder::getObjectOUID() const { return {_overlay->id().
 bool JSONDocumentBuilder::newObjectID() { return {_overlay->id().newId()}; }
 
 JSONDocumentBuilder& JSONDocumentBuilder::setVersion(JSONDocument const& version) try {
-  TRACE_(6, "setVersion() args  version=<" << version << ">");
+  TLOG(6) << "setVersion() args  version=<" << version << ">";
 
   JSONDocument copy(version);
 
@@ -162,14 +162,14 @@ JSONDocumentBuilder& JSONDocumentBuilder::setVersion(JSONDocument const& version
 
   return self();
 } catch (std::exception const& ex) {
-  TRACE_(6, "setVersion() Exception:" << ex.what());
+  TLOG(6) << "setVersion() Exception:" << ex.what();
   ThrowOnFailure(CallUndo());
 
   return self();
 }
 
 JSONDocumentBuilder& JSONDocumentBuilder::setCollection(JSONDocument const& collection) try {
-  TRACE_(6, "collection() args  collection=<" << collection << ">");
+  TLOG(6) << "collection() args  collection=<" << collection << ">";
 
   auto copy = collection.findChild(jsonliteral::collection);
   auto ovl =
@@ -181,14 +181,13 @@ JSONDocumentBuilder& JSONDocumentBuilder::setCollection(JSONDocument const& coll
 
   return self();
 } catch (std::exception const& ex) {
-  TRACE_(6, "collection() Exception:" << ex.what());
   ThrowOnFailure(CallUndo());
 
   return self();
 }
 
 JSONDocumentBuilder& JSONDocumentBuilder::addEntity(JSONDocument const& entity) try {
-  TRACE_(9, "addEntity() args  entity=<" << entity << ">");
+  TLOG(9) << "addEntity() args  entity=<" << entity << ">";
 
   JSONDocument copy(entity);
   auto ovl = overlay<ovl::ovlEntity>(copy, jsonliteral::entity);
@@ -200,14 +199,14 @@ JSONDocumentBuilder& JSONDocumentBuilder::addEntity(JSONDocument const& entity) 
 
   return self();
 } catch (std::exception const& ex) {
-  TRACE_(9, "addEntity() Exception:" << ex.what());
+  TLOG(9) << "addEntity() Exception:" << ex.what();
   ThrowOnFailure(CallUndo());
 
   return self();
 }
 
 JSONDocumentBuilder& JSONDocumentBuilder::addRun(JSONDocument const& run) try {
-  TRACE_(9, "addRun() args  run=<" << run << ">");
+  TLOG(9) << "addRun() args  run=<" << run << ">";
 
   JSONDocument copy(run);
   auto ovl = overlay<ovl::ovlRun>(copy, jsonliteral::runs);
@@ -219,14 +218,14 @@ JSONDocumentBuilder& JSONDocumentBuilder::addRun(JSONDocument const& run) try {
 
   return self();
 } catch (std::exception const& ex) {
-  TRACE_(9, "addRun() Exception:" << ex.what());
+  TLOG(9) << "addRun() Exception:" << ex.what();
   ThrowOnFailure(CallUndo());
 
   return self();
 }
 
 JSONDocumentBuilder& JSONDocumentBuilder::removeEntity(JSONDocument const& entity) try {
-  TRACE_(9, "removeEntity() args  entity=<" << entity << ">");
+  TLOG(9) << "removeEntity() args  entity=<" << entity << ">";
 
   JSONDocument copy(entity);
   auto ovl = overlay<ovl::ovlEntity>(copy, jsonliteral::entity);
@@ -238,7 +237,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeEntity(JSONDocument const& entit
 
   return self();
 } catch (std::exception const& ex) {
-  TRACE_(9, "removeEntity() Exception:" << ex.what());
+  TLOG(9) << "removeEntity() Exception:" << ex.what();
   ThrowOnFailure(CallUndo());
 
   return self();
@@ -246,21 +245,21 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeEntity(JSONDocument const& entit
 
 
 JSONDocumentBuilder& JSONDocumentBuilder::removeAllEntities() try {
-  TRACE_(5, "removeAllEntities()");
+  TLOG(5) << "removeAllEntities()";
     
   _overlay->entities().wipe();
   _document.writeJson();
 
   return self();
 } catch (std::exception const& ex) {
-  TRACE_(5, "removeAllEntities() Exception:" << ex.what());
+  TLOG(5) << "removeAllEntities() Exception:" << ex.what();
   ThrowOnFailure(CallUndo());
   return self();
 }
 
 
 JSONDocumentBuilder& JSONDocumentBuilder::markReadonly() try {
-  TRACE_(6, "markReadonly()");
+  TLOG(6) << "markReadonly()";
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->markReadonly());
@@ -269,14 +268,14 @@ JSONDocumentBuilder& JSONDocumentBuilder::markReadonly() try {
 
   return self();
 } catch (std::exception const& ex) {
-  TRACE_(6, "markReadonly() Exception:" << ex.what());
+  TLOG(6) << "markReadonly() Exception:" << ex.what();
   ThrowOnFailure(CallUndo());
 
   return self();
 }
 
 JSONDocumentBuilder& JSONDocumentBuilder::markDeleted() try {
-  TRACE_(7, "markDeleted()");
+  TLOG(5) << "markDeleted()";
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->markDeleted());
@@ -285,7 +284,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::markDeleted() try {
 
   return self();
 } catch (std::exception const& ex) {
-  TRACE_(7, "markDeleted() Exception:" << ex.what());
+  TLOG(5) << "markDeleted() Exception:" << ex.what();
   ThrowOnFailure(CallUndo());
 
   return self();
@@ -330,5 +329,5 @@ void dbdr::debug::JSONDocumentBuilder() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TRACE_(0, "artdaq::database::JSONDocumentBuilder trace_enable");
+  TLOG(0) <<  "artdaq::database::JSONDocumentBuilder trace_enable";
 }

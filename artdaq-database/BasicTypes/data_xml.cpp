@@ -48,7 +48,7 @@ XmlData::XmlData(JsonData const& document) {
 
   confirm(!document.empty());
 
-  TRACE_(1, "XML document=" << document);
+  TLOG(1) << "XML document=" << document;
 
   auto ex = std::regex({regex::parse_base64data});
 
@@ -65,38 +65,38 @@ XmlData::XmlData(JsonData const& document) {
         document.json_buffer);
 
   auto base64 = std::string(results[0]);
-  TRACE_(2, "XML base64=" << base64);
+  TLOG(2) << "XML base64=" << base64;
 
   auto json = base64_decode(base64);
-  TRACE_(3, "XML  json=" << json);
+  TLOG(3)<< "XML  json=" << json;
 
   JsonData(json).convert_to(*this);
 
-  TRACE_(4, "XML xml=" << xml_buffer);
+  TLOG(4) << "XML xml=" << xml_buffer;
 }
 
 XmlData::operator JsonData() const {
   namespace literal = artdaq::database::dataformats::literal;
 
-  TRACE_(5, "XML xml=" << xml_buffer);
+  TLOG(5) << "XML xml=" << xml_buffer;
 
   auto json = JsonData("");
 
   if (!json.convert_from(*this))
     throw std::runtime_error("XML to JSON convertion error; XML buffer: " + this->xml_buffer);
 
-  TRACE_(6, "XML  json=" << json);
+  TLOG(6) << "XML  json=" << json;
 
   auto collection = std::string("XmlData_") + type_version();
 
   auto base64 = base64_encode(xml_buffer);
-  TRACE_(7, "XML base64=" << base64);
+  TLOG(5) << "XML base64=" << base64;
 
   std::ostringstream os;
 
   os << json;
 
-  TRACE_(8, "XML document=" << os.str());
+  TLOG(5) << "XML document=" << os.str();
 
   return {os.str()};
 }
