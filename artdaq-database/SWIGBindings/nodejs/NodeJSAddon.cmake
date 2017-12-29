@@ -53,13 +53,16 @@ macro (create_nodejs_addon)
 
         file(GLOB NODEJS_ADDON_SOURCES  *.i)
         file(GLOB LIB_SOURCES  *.cpp)
+		file(GLOB SWIG_DEPENDS *.h *.i)
 
         set_source_files_properties (${NODEJS_ADDON_SOURCES} PROPERTIES CPLUSPLUS ON)
         set_source_files_properties (${NODEJS_ADDON_SOURCES} PROPERTIES SWIG_FLAGS "-node")
 
         list(APPEND CNA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR} ${NODE_INCLUDE_DIRS})
 
-        swig_add_module (${CNA_ADDON_NAME} javascript ${NODEJS_ADDON_SOURCES} ${LIB_SOURCES})
+		SET(SWIG_MODULE_${CNA_ADDON_NAME}_EXTRA_DEPS ${SWIG_DEPENDS})
+        #swig_add_module (${CNA_ADDON_NAME} javascript ${NODEJS_ADDON_SOURCES} ${LIB_SOURCES})
+		swig_add_library(${CNA_ADDON_NAME} LANGUAGE javascript SOURCES ${NODEJS_ADDON_SOURCES} ${LIB_SOURCES})
 
         swig_link_libraries (${CNA_ADDON_NAME} ${CNA_LIBRARIES})
 
@@ -75,11 +78,11 @@ macro (create_nodejs_addon)
 
         install (FILES ${LIBRARY_OUTPUT_PATH}/${CNA_ADDON_NAME}.node DESTINATION ${flavorqual_dir}/lib/node_modules/${CNA_ADDON_NAME})
 
-        # add_custom_command(TARGET ${CNA_ADDON_NAME} POST_BUILD 
-        # COMMAND echo "**** Exports for ${LIBRARY_OUTPUT_PATH}/${CNA_ADDON_NAME}.node"
-        # COMMAND echo "**** BEGIN"
-        # COMMAND /usr/bin/nm ${LIBRARY_OUTPUT_PATH}/${CNA_ADDON_NAME}.node | /bin/egrep -e \"^[a-f0-9]{1,16} [T]\" | /usr/bin/c++filt  
-        # COMMAND echo "**** END" )
+        add_custom_command(TARGET ${CNA_ADDON_NAME} POST_BUILD 
+        COMMAND echo "**** Exports for ${LIBRARY_OUTPUT_PATH}/${CNA_ADDON_NAME}.node"
+        COMMAND echo "**** BEGIN"
+        COMMAND /usr/bin/nm ${LIBRARY_OUTPUT_PATH}/${CNA_ADDON_NAME}.node | /bin/egrep -e \"^[a-f0-9]{1,16} [T]\" | /usr/bin/c++filt  
+        COMMAND echo "**** END" )
 
     else(CAN_BUILD)
         message("Compatible versions of Swig or Node.js not found. NOT building ${CNA_ADDON_NAME}")
