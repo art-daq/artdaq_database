@@ -196,11 +196,12 @@ if [ $RC -ne 0 ]; then
    echo "Error: Failed running artdaq_database build. Aborting. "; exit 1
 fi
 
-exit 0
 
 stash_artifacts
 RC=$?
 if [ $RC -ne 0 ]; then
    echo "Error: Failed stashing artdaq_database build artifacts. Aborting. "; exit 1
 fi
+
+exit 0
 
