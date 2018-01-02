@@ -173,8 +173,8 @@ chmod +x ${productsdir}/pullProducts
 
 # we pull what we can so we don't have to build everything
 ${productsdir}/pullProducts ${productsdir} ${flvr} art-${artver} ${basequal} ${build_type}
-${productsdir}/pullProducts ${productsdir} ${flvr} artdaq-${artdaq_ver} ${squal}-${basequal} ${build_type}
-${productsdir}/pullProducts ${productsdir} ${flvr} artdaq_demo-${demo_version} ${squal}-${basequal} ${build_type}
+#${productsdir}/pullProducts ${productsdir} ${flvr} artdaq-${artdaq_ver} ${squal}-${basequal} ${build_type}
+#${productsdir}/pullProducts ${productsdir} ${flvr} artdaq_demo-${demo_version} ${squal}-${basequal} ${build_type}
 
 # Remove any artdaq_database that came with the bundle
 if [ -d ${productsdir}/artdaq_database ]; then
