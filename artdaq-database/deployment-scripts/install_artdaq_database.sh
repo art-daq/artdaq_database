@@ -540,11 +540,11 @@ done
 
 printf "\nInfo: Running conftool.py tests\n"
   
-test1=("\"listCollections\"" "\"['SystemLayout', 'RCEs', 'SSPs', 'expert_options', 'Components', 'Timing', 'Aggregators', 'EventBuilders', 'common_code']\"")
-test2=("\"listDatabases\"" "\"['cern_pddaq_db']\"")
-test3=("\"getListOfAvailableRunConfigurationPrefixes\"" "\"['np04_teststand_tests']\"")
-test4=("\"getListOfAvailableRunConfigurations\"" "\"['np04_teststand_tests00001']\"")
-test5=("\"getListOfAvailableRunConfigurations np04_teststand\"" "\"['np04_teststand_tests00001']\"")
+test1=("\"listCollections\"" "\"SystemLayout\nRCEs\nSSPs\nexpert_options\nComponents\nTiming\nAggregators\nEventBuilders\ncommon_code\"")
+test2=("\"listDatabases\"" "\"cern_pddaq_db\"")
+test3=("\"getListOfAvailableRunConfigurationPrefixes\"" "\"np04_teststand_tests\"")
+test4=("\"getListOfAvailableRunConfigurations\"" "\"np04_teststand_tests00001\"")
+test5=("\"getListOfAvailableRunConfigurations np04_teststand\"" "\"np04_teststand_tests00001\"")
 
 
 tests=(test1[@] test2[@] test3[@] test4[@] test5[@])
@@ -552,7 +552,7 @@ test_cout=${#tests[@]};failed_test_count=0
 for ((i=0; i<${test_cout}; i++)); do
   tmp=${!tests[i]}
   conftool_command=$(echo $tmp |  cut -d\" -f2)
-  conftool_expected_responce=$(echo $tmp |  cut -d\" -f4)
+  conftool_expected_responce=$(printf $(echo $tmp |  cut -d\" -f4))
   
   printf "\nTest #$i \"conftool.py $conftool_command\"\n"
   conftool_response=$(conftool.py ${conftool_command})
