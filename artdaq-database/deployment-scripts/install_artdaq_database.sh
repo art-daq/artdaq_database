@@ -5,32 +5,48 @@
 # Main program starts at the bottom of this file.
 #----------------------------------------------------------------
 ARTDAQ_UPS_QUAL="e14:prof:s50"
-ARTDAQ_DB_UPS_VER=v1_04_27
-
+ARTDAQ_DB_UPS_VER=v1_04_35
 WEBEDITOR_UPS_VER=v1_00_09
 
-ARTDAQ_BASE_DIR=/scratch/lukhanin/nfs/sw/artdaq
+ARTDAQ_BASE_DIR=/mnt/sde/mu2etrg/lukhanin-work10
+#/scratch/lukhanin/nfs/sw/artdaq
 ARTDAQ_DB_NAME=cern_pddaq_v3x_db
-
-ARTDAQ_DB_MANIFESTURL="http://scisoft.fnal.gov/scisoft/packages/artdaq_database/v1_04_27/artdaq_database-1.04.27-Linux64bit%2B3.10-2.17-s50-e14-prof_MANIFEST.txt"
-ARTDAQ_DB_PULLPRODUCTS="slf7 artdaq_database-v1_04_27 s50-e14 prof"
-
 
 #----------------------------------------------------------------
 # Optional configuration parameters, which can be 
 # overriden in $HOME/artdaq_database.env file if it exits. 
 # Main program starts at the bottom of this file.
 #----------------------------------------------------------------
+
 MONGOD_PORT=27037
 WEBEDITOR_BASE_PORT=8880
+
 INACTIVE_DATABASES="cern_pddaq_v2_db cern_pddaq_v3_db"
 
-
+ARTDAQ_DB_PULLPRODUCTS="slf7 artdaq_database-${ARTDAQ_DB_UPS_VER} $(echo $ARTDAQ_UPS_QUAL | cut -d":" -f3 )-$(echo $ARTDAQ_UPS_QUAL | cut -d":" -f1 ) $(echo $ARTDAQ_UPS_QUAL | cut -d":" -f2 )"
 
 #----------------------------------------------------------------
 # Implementaion
 # Main program starts at the bottom of this file.
 #----------------------------------------------------------------
+
+TMP_PAR_LIST=(${ARTDAQ_DB_PULLPRODUCTS})
+
+if [[ "${TMP_PAR_LIST[0]}" == "slf7" ]]; then
+  this_ups_flavor="Linux64bit+3.10-2.17"
+else
+  this_ups_flavor="Linux64bit+2.6-2.12"
+fi
+ 
+ARTDAQ_DB_MANIFEST="artdaq_database-$(echo $ARTDAQ_DB_UPS_VER|sed 's/_/./g'|sed -e 's/^v//')-${this_ups_flavor}-${TMP_PAR_LIST[2]}-${TMP_PAR_LIST[3]}_MANIFEST.txt"
+
+ARTDAQ_DB_MANIFEST_RAW="artdaq_database-build-${this_ups_flavor}-${TMP_PAR_LIST[2]}-${TMP_PAR_LIST[3]}_MANIFEST.txt"
+
+#ARTDAQ_DB_MANIFEST="artdaq_database-build-Linux64bit+3.10-2.17-s50-e14-prof_MANIFEST.txt"
+ARTDAQ_DB_MANIFESTURL="https://cdcvs.fnal.gov/redmine/projects/artdaq-utilities/repository/database/revisions/${ARTDAQ_DB_UPS_VER}/raw/built-in/manifests/${ARTDAQ_DB_MANIFEST_RAW}"
+
+
+
 WEBEDITOR_UPS_QUAL=${ARTDAQ_UPS_QUAL}
 ARTDAQ_DB_UPS_QUAL=${ARTDAQ_UPS_QUAL}
 
@@ -874,8 +890,22 @@ if [ $? -ne 0 ]; then
   printf "Error: Failed downloading ${ARTDAQ_DB_MANIFESTURL}. Aborting.\n"; return $rc_failure
 fi
 
-rm ${download_dir}/artdaq_database-*.tar.bz2
-rm ${download_dir}/artdaq_node_server-*.tar.bz2
+local ups_tar_suffix=${TMP_PAR_LIST[0]}-x86_64-$(echo $ARTDAQ_UPS_QUAL | cut -d":" -f1 )-$(echo $ARTDAQ_UPS_QUAL | cut -d":" -f3 )-$(echo $ARTDAQ_UPS_QUAL | cut -d":" -f2 )
+echo "artdaq_database      ${ARTDAQ_DB_UPS_VER}        artdaq_database-$(echo $ARTDAQ_DB_UPS_VER|sed 's/_/./g'|sed -e 's/^v//')-${ups_tar_suffix}.tar.bz2     -f ${this_ups_flavor}    -q ${ARTDAQ_UPS_QUAL}" > ${ARTDAQ_DB_MANIFEST}
+echo "artdaq_node_server   ${WEBEDITOR_UPS_VER}        artdaq_node_server-$(echo $WEBEDITOR_UPS_VER|sed 's/_/./g'|sed -e 's/^v//')-${ups_tar_suffix}.tar.bz2  -f ${this_ups_flavor}    -q ${ARTDAQ_UPS_QUAL}" >>${ARTDAQ_DB_MANIFEST}
+
+cat ${ARTDAQ_DB_MANIFEST_RAW} >> ${ARTDAQ_DB_MANIFEST}
+if [ $? -ne 0 ]; then
+  printf "Error: Failed moving ${ARTDAQ_DB_MANIFEST_RAW} to ${ARTDAQ_DB_MANIFEST}. Aborting.\n"; return $rc_failure
+fi
+
+printf "#-----------------------ARTDAQ DATABASE MANIFEST-------------------\n"
+cat ${ARTDAQ_DB_MANIFEST}
+printf "#-----------------------ARTDAQ DATABASE MANIFEST-------------------\n"
+
+
+rm ${download_dir}/artdaq_database-*.tar.bz2   >/dev/null 2>&1 
+rm ${download_dir}/artdaq_node_server-*.tar.bz2   >/dev/null 2>&1 
 
 ./pullProducts -l ../products ${ARTDAQ_DB_PULLPRODUCTS}
 if [ $? -ne 0 ]; then
