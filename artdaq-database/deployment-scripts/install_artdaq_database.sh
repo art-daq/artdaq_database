@@ -901,7 +901,7 @@ fi
 
 printf "#-----------------------ARTDAQ DATABASE MANIFEST-------------------\n"
 cat ${ARTDAQ_DB_MANIFEST}
-printf "#-----------------------ARTDAQ DATABASE MANIFEST-------------------\n"
+printf "\n#-----------------------ARTDAQ DATABASE MANIFEST-------------------\n"
 
 
 rm ${download_dir}/artdaq_database-*.tar.bz2   >/dev/null 2>&1 

@@ -90,6 +90,8 @@ IF(RUN_TESTS)
   endif()
 ENDIF()
 
+install(DIRECTORY test/testdata DESTINATION ${product}/${version})
+
 # source
 add_subdirectory(artdaq-database)
 

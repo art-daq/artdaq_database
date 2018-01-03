@@ -22,4 +22,3 @@ add_subdirectory(StorageProviders)
 add_subdirectory(ConfigurationDB)
 add_subdirectory(CaseStudy)
 
-install(DIRECTORY testdata DESTINATION ${product}/${version})
