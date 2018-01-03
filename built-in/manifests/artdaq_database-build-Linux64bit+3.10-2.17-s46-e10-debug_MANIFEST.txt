@@ -1,0 +1,18 @@
+boost                v1_63_0a        boost-1.63.0a-sl7-x86_64-e14-debug.tar.bz2                   -f Linux64bit+3.10-2.17    -q e10:debug       
+cetbuildtools        v5_14_04        cetbuildtools-5.14.04-noarch.tar.bz2                         -f NULL                                       
+cetlib_except        v1_01_00        cetlib_except-1.01.00-slf7-x86_64-e10-debug.tar.bz2          -f Linux64bit+3.10-2.17    -q e10:debug       
+cetlib               v2_02_00        cetlib-2.02.00-slf7-x86_64-e10-debug.tar.bz2                 -f Linux64bit+3.10-2.17    -q e10:debug       
+cetpkgsupport        v1_13_00        cetpkgsupport-1.13.00-noarch.tar.bz2                         -f NULL
+cmake                v3_9_2          cmake-3.9.2-sl7-x86_64.tar.bz2                               -f Linux64bit+3.10-2.17                                                             
+fhiclcpp             v4_05_01        fhiclcpp-4.05.01-slf7-x86_64-e14-debug.tar.bz2               -f Linux64bit+3.10-2.17    -q e10:debug       
+gcc                  v4_9_3a         gcc-4.9.3a-sl7-x86_64.tar.bz2                                -f Linux64bit+3.10-2.17                       
+python               v2_7_13b        python-2.7.13b-sl7-x86_64.tar.bz2                            -f Linux64bit+3.10-2.17                       
+messagefacility      v1_18_03        messagefacility-1.18.03-slf7-x86_64-e10-debug.tar.bz2        -f Linux64bit+3.10-2.17    -q e10:debug       
+mongodb              v3_4_6          mongodb-3.4.6-sl7-x86_64-e14-debug.tar.bz2                   -f Linux64bit+3.10-2.17    -q e10:debug       
+qt                   v5_7_1          qt-5.7.1-sl7-x86_64-e10.tar.bz2                              -f Linux64bit+3.10-2.17    -q e10             
+sqlite               v3_16_02_00a    sqlite-3.16.02.00a-sl7-x86_64.tar.bz2                        -f Linux64bit+3.10-2.17                       
+swig                 v3_0_12         swig-3.0.12-sl7-x86_64-e14-debug.tar.bz2                     -f Linux64bit+3.10-2.17    -q e10:debug       
+tbb                  v2017_3c        tbb-2017.3c-sl7-x86_64-e14-debug.tar.bz2                     -f Linux64bit+3.10-2.17    -q e10:debug       
+TRACE                v3_13_01        TRACE-3.13.01-slf7-x86_64.tar.bz2                            -f Linux64bit+3.10-2.17                       
+ups                  v5_2_0          ups-5.2.0-Linux64bit+3.10-2.17.tar.bz2                       -f Linux64bit+3.10-2.17                       
+nodejs               v4_5_0          nodejs-4.5.0-noarch.tar.bz2                                  -f Linux64bit+3.10-2.17                       
