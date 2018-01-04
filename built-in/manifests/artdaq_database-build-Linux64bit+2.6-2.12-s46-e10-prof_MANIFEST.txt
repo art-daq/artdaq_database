@@ -1,18 +1,18 @@
-boost                v1_63_0a        boost-1.63.0a-slf6-x86_64-e14-prof.tar.bz2                   -f Linux64bit+2.6-2.12    -q e10:prof       
+boost                v1_63_0a        boost-1.63.0a-slf6-x86_64-e10-prof.tar.bz2                   -f Linux64bit+2.6-2.12    -q e10:prof       
 cetbuildtools        v5_14_04        cetbuildtools-5.14.04-noarch.tar.bz2                        -f NULL                                       
 cetlib_except        v1_01_00        cetlib_except-1.01.00-slf6-x86_64-e10-prof.tar.bz2          -f Linux64bit+2.6-2.12    -q e10:prof       
 cetlib               v2_02_00        cetlib-2.02.00-slf6-x86_64-e10-prof.tar.bz2                 -f Linux64bit+2.6-2.12    -q e10:prof       
 cetpkgsupport        v1_13_00        cetpkgsupport-1.13.00-noarch.tar.bz2                        -f NULL
 cmake                v3_9_2          cmake-3.9.2-slf6-x86_64.tar.bz2                              -f Linux64bit+2.6-2.12                                                             
-fhiclcpp             v4_05_01        fhiclcpp-4.05.01-slf6-x86_64-e14-prof.tar.bz2               -f Linux64bit+2.6-2.12    -q e10:prof       
+fhiclcpp             v4_05_01        fhiclcpp-4.05.01-slf6-x86_64-e10-prof.tar.bz2               -f Linux64bit+2.6-2.12    -q e10:prof       
 gcc                  v4_9_3a         gcc-4.9.3a-slf6-x86_64.tar.bz2                               -f Linux64bit+2.6-2.12                       
 python               v2_7_13b        python-2.7.13b-slf6-x86_64.tar.bz2                           -f Linux64bit+2.6-2.12                       
 messagefacility      v1_18_03        messagefacility-1.18.03-slf6-x86_64-e10-prof.tar.bz2        -f Linux64bit+2.6-2.12    -q e10:prof       
-mongodb              v3_4_6          mongodb-3.4.6-slf6-x86_64-e14-prof.tar.bz2                   -f Linux64bit+2.6-2.12    -q e10:prof       
+mongodb              v3_4_6          mongodb-3.4.6-slf6-x86_64-e10-prof.tar.bz2                   -f Linux64bit+2.6-2.12    -q e10:prof       
 qt                   v5_7_1          qt-5.7.1-slf6-x86_64-e10.tar.bz2                             -f Linux64bit+2.6-2.12    -q e10             
 sqlite               v3_16_02_00a    sqlite-3.16.02.00a-slf6-x86_64.tar.bz2                       -f Linux64bit+2.6-2.12                       
-swig                 v3_0_12         swig-3.0.12-slf6-x86_64-e14-prof.tar.bz2                     -f Linux64bit+2.6-2.12    -q e10:prof       
-tbb                  v2017_3c        tbb-2017.3c-slf6-x86_64-e14-prof.tar.bz2                     -f Linux64bit+2.6-2.12    -q e10:prof       
+swig                 v3_0_12         swig-3.0.12-slf6-x86_64-e10-prof.tar.bz2                     -f Linux64bit+2.6-2.12    -q e10:prof       
+tbb                  v2017_3c        tbb-2017.3c-slf6-x86_64-e10-prof.tar.bz2                     -f Linux64bit+2.6-2.12    -q e10:prof       
 TRACE                v3_13_01        TRACE-3.13.01-slf6-x86_64.tar.bz2                           -f Linux64bit+2.6-2.12                       
 ups                  v5_2_0          ups-5.2.0-Linux64bit+2.6-2.12.tar.bz2                      -f Linux64bit+2.6-2.12                       
 nodejs               v4_5_0          nodejs-4.5.0-noarch.tar.bz2                                 -f Linux64bit+2.6-2.12                       
