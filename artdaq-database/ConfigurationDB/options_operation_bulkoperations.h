@@ -31,8 +31,6 @@ class BulkOperations final {
 
   BulkOperations(std::string const&);
 
-  virtual ~BulkOperations() = default;
-
   std::string const& bulkOperations() const;
   std::string const& bulkOperations(std::string const&);
 
