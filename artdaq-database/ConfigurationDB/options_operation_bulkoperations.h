@@ -39,10 +39,10 @@ class BulkOperations final {
   JsonData to_JsonData() const;
   std::string to_string() const;
 
-  virtual bpo::options_description makeProgramOptions() const;
+  bpo::options_description makeProgramOptions() const;
 
-  virtual int readProgramOptions(bpo::variables_map const&);
-  virtual void readJsonData(JsonData const&);
+  int readProgramOptions(bpo::variables_map const&);
+  void readJsonData(JsonData const&);
 
   iterator begin() { return _operations_list.begin(); }
   iterator end() { return _operations_list.end(); }
