@@ -55,16 +55,16 @@ macro (create_python_addon)
 
     set(PIA_ADDON_LIBNAME _${PIA_ADDON_NAME})
 
-    install (FILES ${LIBRARY_OUTPUT_PATH}/${PIA_ADDON_LIBNAME}.so 
+    install (FILES ${TOP_CMAKE_BINARY_DIR}/lib/${PIA_ADDON_LIBNAME}.so 
       PERMISSIONS OWNER_EXECUTE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_READ WORLD_EXECUTE
       DESTINATION ${flavorqual_dir}/python/)
       
     install (FILES ${CMAKE_CURRENT_BINARY_DIR}/${PIA_ADDON_NAME}.py DESTINATION ${flavorqual_dir}/python/)
 
     add_custom_command(TARGET ${PIA_ADDON_LIBNAME} POST_BUILD 
-      COMMAND echo "**** Exports for ${LIBRARY_OUTPUT_PATH}/${PIA_ADDON_LIBNAME}.so"
+      COMMAND echo "**** Exports for ${TOP_CMAKE_BINARY_DIR}/../lib/${PIA_ADDON_LIBNAME}.so"
       COMMAND echo "**** BEGIN"
-      COMMAND /usr/bin/nm ${LIBRARY_OUTPUT_PATH}/${PIA_ADDON_LIBNAME}.so | /bin/egrep -e \"^[a-f0-9]{1,16} [T]\" | /usr/bin/c++filt  
+      COMMAND /usr/bin/nm ${TOP_CMAKE_BINARY_DIR}/lib/${PIA_ADDON_LIBNAME}.so | /bin/egrep -e \"^[a-f0-9]{1,16} [T]\" | /usr/bin/c++filt  
       COMMAND echo "**** END" )
 
     else(CAN_BUILD)
