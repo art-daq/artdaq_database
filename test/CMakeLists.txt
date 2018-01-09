@@ -13,6 +13,9 @@ set(ARTDAQ_DATABASE_AUTH $ENV{ARTDAQ_DATABASE_AUTH})
 
 cet_test_env("FHICL_FILE_PATH=.")
 
+cet_test_env("PATH=${TOP_CMAKE_BINARY_DIR}/bin:$ENV{PATH}")
+cet_test_env("LD_LIBRARY_PATH=${TOP_CMAKE_BINARY_DIR}/lib:$ENV{LD_LIBRARY_PATH}")
+
 #test order is important
 add_subdirectory(JsonDocument)
 add_subdirectory(Overlay)
