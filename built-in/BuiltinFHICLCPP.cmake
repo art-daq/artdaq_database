@@ -33,4 +33,6 @@ if ( NOT EXISTS ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp )
                     WORKING_DIRECTORY  ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp)                    
 endif()
 
+include_directories(built-in/includes)
+
 add_subdirectory(built-in)
