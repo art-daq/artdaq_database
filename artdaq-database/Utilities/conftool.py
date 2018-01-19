@@ -196,6 +196,8 @@ def getLatestConfiguration(configNamePrefix):
   return dict((cfg[0],cfg[1]) for cfg in __getLatestConfiguration(configNamePrefix))
 
 def importConfiguration(configNamePrefix):
+  configNamePrefix=__get_prefix(configNamePrefix)
+
   config = __latest_config_name(configNamePrefix)
 
   config = __increment_config_name(config) if config else __increment_config_name(configNamePrefix)
