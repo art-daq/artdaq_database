@@ -23,7 +23,7 @@ cetlib   	v2_02_00        s46
 cetlib   	v3_00_01        s50
 cetlib   	v3_01_03        s58
 cetlib          v3_01_03        s60
-TRACE           v3_13_01        -
+TRACE           v3_13_02        -
 mongodb 	v3_4_6
 python          v2_7_13b	s46
 python          v2_7_13d	s50
