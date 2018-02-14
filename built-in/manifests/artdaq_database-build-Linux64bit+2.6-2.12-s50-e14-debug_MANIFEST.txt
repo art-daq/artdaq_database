@@ -13,6 +13,6 @@ qt                   v5_7_1          qt-5.7.1-slf6-x86_64-e14.tar.bz2           
 sqlite               v3_16_02_00a    sqlite-3.16.02.00a-slf6-x86_64.tar.bz2                       -f Linux64bit+2.6-2.12                       
 swig                 v3_0_12         swig-3.0.12-slf6-x86_64-e14-debug.tar.bz2                    -f Linux64bit+2.6-2.12    -q e14:debug       
 tbb                  v2017_3c        tbb-2017.3c-slf6-x86_64-e14-debug.tar.bz2                    -f Linux64bit+2.6-2.12    -q e14:debug       
-TRACE                v3_13_02        TRACE-3.13.02-slf6-x86_64.tar.bz2                            -f Linux64bit+2.6-2.12                       
+TRACE                v3_13_04         TRACE-3.13.04-slf6-x86_64.tar.bz2                            -f Linux64bit+2.6-2.12                       
 ups                  v5_2_0          ups-5.2.0-Linux64bit+2.6-2.12.tar.bz2                        -f Linux64bit+2.6-2.12                        
 nodejs               v4_5_0          nodejs-4.5.0-noarch.tar.bz2                                  -f Linux64bit+2.6-2.12                       
