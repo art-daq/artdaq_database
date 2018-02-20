@@ -1,6 +1,6 @@
 set(CTEST_CUSTOM_PRE_TEST "mkdir -p ${CMAKE_BINARY_DIR}/databases/mongodb; \
 printenv ; \
-export PATH=$MONGODB_FQ_DIR:$PATH; \
+PATH=${MONGODB_FQ_DIR}:${PATH}; \
 mongod  \
 --dbpath ${CMAKE_BINARY_DIR}/databases/mongodb \
 --logpath ${CMAKE_BINARY_DIR}/databases/mongod.log \
