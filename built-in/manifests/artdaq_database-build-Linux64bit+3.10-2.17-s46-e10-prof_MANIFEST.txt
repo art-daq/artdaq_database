@@ -3,7 +3,7 @@ cetbuildtools        v7_00_02        cetbuildtools-7.00.02-noarch.tar.bz2       
 cetlib_except        v1_01_00        cetlib_except-1.01.00-slf7-x86_64-e10-prof.tar.bz2          -f Linux64bit+3.10-2.17    -q e10:prof       
 cetlib               v2_02_00        cetlib-2.02.00-slf7-x86_64-e10-prof.tar.bz2                 -f Linux64bit+3.10-2.17    -q e10:prof       
 cetpkgsupport        v1_13_00        cetpkgsupport-1.13.00-noarch.tar.bz2                        -f NULL
-cmake                v3_9_5          cmake-3.9.5-sl7-x86_64.tar.bz2                              -f Linux64bit+3.10-2.17                                                             
+cmake                v3_10_1          cmake-3.10.1-sl7-x86_64.tar.bz2                              -f Linux64bit+3.10-2.17                                                             
 fhiclcpp             v4_03_02        fhiclcpp-4.03.02-slf7-x86_64-e10-prof.tar.bz2               -f Linux64bit+3.10-2.17    -q e10:prof        
 gcc                  v4_9_3a         gcc-4.9.3a-sl7-x86_64.tar.bz2                               -f Linux64bit+3.10-2.17                       
 python               v2_7_13b        python-2.7.13b-sl7-x86_64.tar.bz2                           -f Linux64bit+3.10-2.17                       

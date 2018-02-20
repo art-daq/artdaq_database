@@ -3,7 +3,7 @@ cetbuildtools        v7_00_02        cetbuildtools-7.00.02-noarch.tar.bz2       
 cetlib_except        v1_01_00        cetlib_except-1.01.00-slf6-x86_64-e10-debug.tar.bz2          -f Linux64bit+2.6-2.12    -q e10:debug       
 cetlib               v2_02_00        cetlib-2.02.00-slf6-x86_64-e10-debug.tar.bz2                 -f Linux64bit+2.6-2.12    -q e10:debug       
 cetpkgsupport        v1_13_00        cetpkgsupport-1.13.00-noarch.tar.bz2                         -f NULL
-cmake                v3_9_5          cmake-3.9.5-slf6-x86_64.tar.bz2                               -f Linux64bit+2.6-2.12                                                             
+cmake                v3_10_1         cmake-3.10.1-slf6-x86_64.tar.bz2                               -f Linux64bit+2.6-2.12                                                             
 fhiclcpp             v4_03_02        fhiclcpp-4.03.02-slf6-x86_64-e10-debug.tar.bz2                -f Linux64bit+2.6-2.12    -q e10:debug        
 gcc                  v4_9_3a         gcc-4.9.3a-slf6-x86_64.tar.bz2                                -f Linux64bit+2.6-2.12                       
 python               v2_7_13b        python-2.7.13b-slf6-x86_64.tar.bz2                            -f Linux64bit+2.6-2.12                       
