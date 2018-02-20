@@ -1,7 +1,5 @@
 cet_enable_asserts()
 
-configure_file("CTestCustom.cmake.in" ${CMAKE_BINARY_DIR}/CTestCustom.cmake)
-
 # Make sure tests have correct environment settings.
 include(CetTest)
 
@@ -15,6 +13,10 @@ cet_test_env("FHICL_FILE_PATH=.")
 
 cet_test_env("PATH=${TOP_CMAKE_BINARY_DIR}/bin:$ENV{PATH}")
 cet_test_env("LD_LIBRARY_PATH=${TOP_CMAKE_BINARY_DIR}/lib:$ENV{LD_LIBRARY_PATH}")
+
+find_program(mongod_bin name mongod HINTS $ENV{HOME} $ENV{MONGODB_FQ_DIR})
+
+configure_file("CTestCustom.cmake.in" ${CMAKE_BINARY_DIR}/CTestCustom.cmake)
 
 #test order is important
 add_subdirectory(JsonDocument)

@@ -1,6 +1,6 @@
 set(CTEST_CUSTOM_PRE_TEST "mkdir -p ${CMAKE_BINARY_DIR}/databases/mongodb; \
 printenv ; \
-mongod  \
+${mongod_bin}  \
 --dbpath ${CMAKE_BINARY_DIR}/databases/mongodb \
 --logpath ${CMAKE_BINARY_DIR}/databases/mongod.log \
 --logappend \
