@@ -41,7 +41,7 @@ class MakeSerializable final {
 
  public:
   template <class TYPE>
-  bool writeDocument(TYPE& data) const throw(artdaq::database::exception) try {
+  bool writeDocument(TYPE& data) const  try {
     return writeDocumentImpl(data);
   } catch (std::exception const& e) {
     throw artdaq::database::exception("MakeSerializable::writeDocument")
@@ -53,7 +53,7 @@ class MakeSerializable final {
   }
 
   template <class TYPE>
-  bool readDocument(TYPE const& data) throw(artdaq::database::exception) try {
+  bool readDocument(TYPE const& data)  try {
     return readDocumentImpl(data);
   } catch (std::exception const& e) {
     throw artdaq::database::exception("MakeSerializable::readDocument")
@@ -64,7 +64,7 @@ class MakeSerializable final {
         << "Unable to read " << demangle(typeid(CONF).name()) << " from " << demangle(typeid(TYPE).name()) << ".";
   }
 
-  std::string configurationName() const throw(artdaq::database::exception) try {
+  std::string configurationName() const  try {
     return configurationNameImpl();
   } catch (std::exception const& e) {
     throw artdaq::database::exception("MakeSerializable::configurationName")

@@ -9,9 +9,6 @@
 #undef TRACE_NAME
 #endif
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
-
 #define TRACE_NAME "JSNU:DocUtils_C"
 
 using artdaq::database::json::object_t;
@@ -160,7 +157,7 @@ JSONDocument::JSONDocument() : _value{object_t{}}, _cached_json_buffer(writeJson
 
 std::string const& JSONDocument::cached_json_buffer() const { return _cached_json_buffer; }
 
-void JSONDocument::update_json_buffer() { _cached_json_buffer = std::move(writeJson()); }
+void JSONDocument::update_json_buffer() { _cached_json_buffer = writeJson(); }
 
 value_t const& JSONDocument::getPayloadValueForKey(object_t::key_type const& key) const {
   confirm(!key.empty());
@@ -383,8 +380,6 @@ result_t JSONDocumentBuilder::SaveUndo() { return Success(); }
 result_t JSONDocumentBuilder::CallUndo() noexcept try { return Success(); } catch (...) {
   return Failure();
 }
-
-#pragma GCC diagnostic pop
 
 void dbdr::debug::JSONDocumentUtils() {
   TRACE_CNTL("name", TRACE_NAME);

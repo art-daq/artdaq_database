@@ -189,7 +189,7 @@ JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t con
     return recurse(matchedValue, currentDepth - 1);
   };
 
-  auto replaced_value = std::move(recurse(_value, path_tokens.size() - 1));
+  auto replaced_value = recurse(_value, path_tokens.size() - 1);
   update_json_buffer();
 
   TLOG(4) << "replaceChild() old child value=" << print_visitor(replaced_value);
@@ -257,7 +257,7 @@ JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t cons
     return recurse(matchedValue, currentDepth - 1);
   };
 
-  auto inserted_value = std::move(recurse(_value, path_tokens.size() - 1));
+  auto inserted_value = recurse(_value, path_tokens.size() - 1);
   update_json_buffer();
 
   TLOG(2) << "insertChild() resultDocument=<" << cached_json_buffer() << ">";

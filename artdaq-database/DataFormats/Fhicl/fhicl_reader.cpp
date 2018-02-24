@@ -89,7 +89,7 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
 
       for (auto const& fhicl_element : fhicl_table) {
         if (fhicl_element.second.in_prolog && opts.readProlog) {
-          datapair_t pair = std::move(fcl2jsondb(std::make_tuple(fhicl_element, fhicl_element, comments, opts)));
+          datapair_t pair = std::move(fcl2jsondb(std::forward_as_tuple(fhicl_element, fhicl_element, comments, opts)));
           data.push_back(std::move(pair.first));
           metadata.push_back(std::move(pair.second));
         }
@@ -112,7 +112,7 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
 
       for (auto const& fhicl_element : fhicl_table) {
         if (!fhicl_element.second.in_prolog && opts.readMain) {
-          datapair_t pair = std::move(fcl2jsondb(std::make_tuple(fhicl_element, fhicl_element, comments, opts)));
+          datapair_t pair = std::move(fcl2jsondb(std::forward_as_tuple(fhicl_element, fhicl_element, comments, opts)));
           data.push_back(std::move(pair.first));
           metadata.push_back(std::move(pair.second));
         }

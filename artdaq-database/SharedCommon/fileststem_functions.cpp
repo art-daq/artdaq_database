@@ -124,7 +124,7 @@ bool db::read_buffer_from_file(std::string& buffer, std::string const& file_in_n
   ss << is.rdbuf();
   is.close();
 
-  buffer = std::move(ss.str());
+  buffer = ss.str();
 
   return true;
 } catch (...) {

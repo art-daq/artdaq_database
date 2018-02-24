@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_database  v1_04_44
+parent artdaq_database  v1_04_45
 defaultqual	e14:s50
 
 # These optional lines define the installed directories where
@@ -23,11 +23,11 @@ cetlib   	v2_02_00        s46
 cetlib   	v3_00_01        s50
 cetlib          v3_02_00        s64
 TRACE           v3_13_04        -
-mongodb 	v3_4_6a
+mongodb 	v3_4_6b
 python          v2_7_13b	s46
 python          v2_7_13d	s50
 python          v2_7_14b        s64
-swig            v3_0_12a	-		optional
+swig            v3_0_12b	-		optional
 nodejs		v4_5_0		-		optional
 cetbuildtools	v7_00_02	-		only_for_build
 end_product_list
@@ -35,6 +35,8 @@ end_product_list
 # -nq- means there is no qualifier
 # a "-" means the dependent product is not required by the parent and will not be setup
 qualifier	cetlib		TRACE	mongodb		python	swig		nodejs	notes
+c2:s64:debug   	c2:debug	-nq-	c2:debug 	-nq-	c2:debug	-nq-	-std=c++17
+c2:s64:prof    	c2:prof		-nq-	c2:prof		-nq-	c2:prof		-nq-	-std=c++17
 e15:s64:debug   e15:debug	-nq-	e15:debug 	-nq-	e15:debug	-nq-	-std=c++14
 e15:s64:prof    e15:prof	-nq-	e15:prof	-nq-	e15:prof	-nq-	-std=c++14
 e14:s50:debug   e14:debug	-nq-	e14:debug 	-nq-	e14:debug	-nq-	-std=c++14

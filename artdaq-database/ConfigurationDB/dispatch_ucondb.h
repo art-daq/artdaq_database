@@ -6,7 +6,7 @@
 namespace artdaq {
 namespace database {
 namespace basictypes {
-class JsonData;
+struct JsonData;
 }  // namespace basictypes
 namespace configuration {
 class ManageDocumentOperation;

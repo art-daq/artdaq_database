@@ -145,9 +145,9 @@ JSONDocumentBuilder& JSONDocumentBuilder::setObjectID(JSONDocument const& object
 
 JSONDocument JSONDocumentBuilder::getObjectID() const { return {_overlay->id().to_string()}; }
 
-std::string JSONDocumentBuilder::getObjectOUID() const { return {_overlay->id().oid()}; }
+std::string JSONDocumentBuilder::getObjectOUID() const { return _overlay->id().oid(); }
 
-bool JSONDocumentBuilder::newObjectID() { return {_overlay->id().newId()}; }
+bool JSONDocumentBuilder::newObjectID() { return _overlay->id().newId(); }
 
 JSONDocumentBuilder& JSONDocumentBuilder::setVersion(JSONDocument const& version) try {
   TLOG(6) << "setVersion() args  version=<" << version << ">";

@@ -52,7 +52,7 @@ FhiclData::FhiclData(JsonData const& document) {
 
   TLOG(1) << "FHICL document=" << document;
 
-  auto ex = std::regex({regex::parse_base64data});
+  auto ex = std::regex(regex::parse_base64data);
 
   auto results = std::smatch();
 

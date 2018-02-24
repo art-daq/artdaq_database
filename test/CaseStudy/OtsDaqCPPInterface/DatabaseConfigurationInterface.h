@@ -12,7 +12,7 @@
 
 namespace ots {
 
-class ConfigurationBase;
+struct ConfigurationBase;
 
 class DatabaseConfigurationInterface : public ConfigurationInterface {
  public:
@@ -36,18 +36,17 @@ class DatabaseConfigurationInterface : public ConfigurationInterface {
   std::set<int> getVersions(const ConfigurationBase* /*configuration*/) const noexcept;
 
   // returns a set of all configuration data types
-  std::set<std::string /*name*/> listConfigurationsTypes() const throw(std::runtime_error);
+  std::set<std::string /*name*/> listConfigurationsTypes() const;
 
   // find all global configurations in database
-  std::set<std::string /*name*/> findAllGlobalConfigurations() const throw(std::runtime_error);
+  std::set<std::string /*name*/> findAllGlobalConfigurations() const;
 
   // return the contents of a global configuration
-  config_version_map_t loadGlobalConfiguration(std::string const& /*configuration*/) const
-      throw(std::runtime_error);
+  config_version_map_t loadGlobalConfiguration(std::string const& /*configuration*/) const;
 
   // create a new global configuration from the contents map
   void storeGlobalConfiguration(config_version_map_t const& /*configurationMap*/,
-                                std::string const& /*configuration*/) const throw(std::runtime_error);
+                                std::string const& /*configuration*/) const;
 
  private:
 };

@@ -32,16 +32,27 @@ size_t last_size;
 }
 }
 
+
 extern "C" {
-void __cxa_throw(void* ex, void* info, void (*dest)(void*)) {
+#ifndef __clang__
+  void __cxa_throw(void* ex, void* info, void (*dest)(void*)) {
   using namespace debug::stack;
   last_size = backtrace(last_frames, sizeof last_frames / sizeof(void*));
 
-  static void (*const rethrow)(void*, void*, void (*)(void*)) __attribute__((noreturn)) =
-      (void (*)(void*, void*, void (*)(void*)))dlsym(RTLD_NEXT, "__cxa_throw");
+   __cxa_throw_t* rethrow =  (__cxa_throw_t*)dlsym(RTLD_NEXT, "__cxa_throw");
 
   rethrow(ex, info, dest);
-}
+}    
+#else
+  __attribute__((noreturn)) void __cxa_throw(void * ex,std::type_info *info,void(*dest)(void *)){
+  using namespace debug::stack;
+  last_size = backtrace(last_frames, sizeof last_frames / sizeof(void*));
+  
+  __cxa_throw_t* rethrow =  (__cxa_throw_t*)dlsym(RTLD_NEXT, "__cxa_throw");
+  
+  rethrow(ex, info, dest);
+  }
+#endif  
 }
 
 namespace debug {
@@ -195,7 +206,7 @@ void registerAbortHandler() {
 
 void registerTerminateHandler() { std::set_terminate(terminateHandler); }
 
-void registerUncaughtExceptionHandler() { std::set_unexpected(uncaughtExceptionHandler); }
+void registerUncaughtExceptionHandler() { /*std::set_unexpected(uncaughtExceptionHandler);*/ }
 
 void trace_enable() {
   TRACE_CNTL("name", TRACE_NAME);

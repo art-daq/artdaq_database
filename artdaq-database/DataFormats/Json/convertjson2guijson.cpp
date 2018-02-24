@@ -1,9 +1,6 @@
 #include "artdaq-database/DataFormats/common.h"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
 #include "artdaq-database/DataFormats/Json/convertjson2guijson.h"
-#pragma GCC diagnostic pop
 
 #include "artdaq-database/DataFormats/Json/json_reader.h"
 #include "artdaq-database/DataFormats/Json/json_types_impl.h"
@@ -170,11 +167,11 @@ void db2gui::operator()(json_node_t& gui_node) const {
       auto type_name = std::string(literal::unknown);
 
       if (value.type() == typeid(const object_t)) {
-        type_name = {literal::table};
+        type_name = std::string(literal::table);
         auto object_node = json_node_t{object};
         db2gui{{value}, _metadata_node}(object_node);
       } else if (value.type() == typeid(const array_t)) {
-        type_name = {literal::sequence};
+        type_name = std::string(literal::sequence);
         auto array_node = json_node_t{object};
         db2gui{{value}, (metadata_node.hasMetadata() ? _metadata_node : json_node_t{false})}(array_node);
       } else {

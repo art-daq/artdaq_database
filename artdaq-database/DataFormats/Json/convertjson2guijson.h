@@ -102,8 +102,8 @@ class json_node_t final {
 
     confirm(type() == type_t::OBJECT || type() == type_t::ARRAY);
 
-    auto const node_name = unwrap(o).value_as<const std::string>(literal::name);
-    auto const node_type = unwrap(o).value_as<const std::string>(literal::type);
+    auto const node_name = unwrap(o). template value_as<const std::string>(literal::name);
+    auto const node_type = unwrap(o). template value_as<const std::string>(literal::type);
 
     TLOG(16)<< "json_node_t() makeChild() node_name=<" << node_name << ">, node_type=<" << node_type << ">, this->type()=<" << jsn::to_string(type()) << ">";
 

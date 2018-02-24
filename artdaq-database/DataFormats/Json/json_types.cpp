@@ -18,6 +18,34 @@ template <>
 jsn::array_t& unwrapper<jsn::array_t&>::value_as() {
   return boost::get<jsn::array_t&>(any);
 }
+/*
+template <>
+template <>
+jsn::object_t const& unwrapper<const jsn::object_t>::value_as<const jsn::object_t>(std::string const& name)  try {
+  confirm(!name.empty());
+  return boost::get<jsn::object_t>(any.at(name));
+} catch (...) {
+  throw;
+}
+
+template <>
+template <>
+std::string const& unwrapper<const jsn::object_t>::value_as<const std::string>(std::string const& name)  try {
+  confirm(!name.empty());
+  return boost::get<std::string>(any.at(name));
+} catch (...) {
+  throw;
+}
+
+template <>
+template <>
+jsn::array_t const& unwrapper<const jsn::object_t>::value_as<const jsn::array_t>(std::string const& name)  try {
+  confirm(!name.empty());
+  return boost::get<jsn::array_t>(any.at(name));
+} catch (...) {
+  throw;
+}
+*/
 }  // namespace sharedtypes
 
 namespace json {

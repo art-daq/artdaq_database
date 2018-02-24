@@ -12,7 +12,7 @@ namespace bpo = boost::program_options;
 namespace artdaq {
 namespace database {
 namespace basictypes {
-class JsonData;
+struct JsonData;
 }
 
 namespace configuration {

@@ -10,7 +10,7 @@
 namespace artdaq {
 namespace database {
 namespace basictypes {
-class JsonData;
+struct JsonData;
 }
 
 namespace filesystem {

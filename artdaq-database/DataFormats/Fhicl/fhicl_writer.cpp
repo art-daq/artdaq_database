@@ -54,7 +54,7 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
 
     for (auto const& element : data) {
       valuetuple_t value_tuple = std::forward_as_tuple(element.key, element.value, metadata.at(element.key));
-      fhicl_table.push_back(json2fcldb(std::make_tuple(value_tuple, value_tuple, opts)));
+      fhicl_table.push_back(json2fcldb(std::forward_as_tuple(value_tuple, value_tuple, opts)));
     }
 
     if (data.size()) {
@@ -81,7 +81,7 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
 
     for (auto const& element : data) {
       valuetuple_t value_tuple = std::forward_as_tuple(element.key, element.value, metadata.at(element.key));
-      fhicl_table.push_back(json2fcldb(std::make_tuple(value_tuple, value_tuple, opts)));
+      fhicl_table.push_back(json2fcldb(std::forward_as_tuple(value_tuple, value_tuple, opts)));
     }
 
     fhicl_generator_grammar<decltype(sink)> grammar;

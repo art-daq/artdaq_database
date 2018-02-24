@@ -9,7 +9,7 @@ namespace fhicl {
 namespace literal = artdaq::database::dataformats::literal;
 
 bool isDouble(std::string const& str) {
-  std::regex ex({literal::regex::parse_decimal});
+  std::regex ex(literal::regex::parse_decimal);
   return std::regex_match(str, ex);
 }
 
