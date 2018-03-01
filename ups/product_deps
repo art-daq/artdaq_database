@@ -29,7 +29,7 @@ python          v2_7_13d	s50
 python          v2_7_14b        s64
 swig            v3_0_12b	-		optional
 nodejs		v4_5_0		-		optional
-cetbuildtools	v7_00_02	-		only_for_build
+cetbuildtools	v7_01_00	-		only_for_build
 end_product_list
 
 # -nq- means there is no qualifier
