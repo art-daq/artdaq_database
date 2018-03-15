@@ -50,7 +50,7 @@ FhiclData::FhiclData(JsonData const& document) {
 
   confirm(!document.empty());
 
-  TLOG(1) << "FHICL document=" << document;
+  TLOG(11) << "FHICL document=" << document;
 
   auto ex = std::regex(regex::parse_base64data);
 
@@ -65,20 +65,20 @@ FhiclData::FhiclData(JsonData const& document) {
         << ("JSON to FHICL convertion error, regex_search().size()!=1; JSON buffer: " + document.json_buffer);
 
   auto base64 = std::string(results[0]);
-  TLOG(2) << "FHICL base64=" << base64;
+  TLOG(12) << "FHICL base64=" << base64;
 
   auto json = base64_decode(base64);
-  TLOG(3) << "FHICL  json=" << json;
+  TLOG(13) << "FHICL  json=" << json;
 
   JsonData(json).convert_to(*this);
 
-  TLOG(4) << "FHICL fhicl=" << fhicl_buffer;
+  TLOG(14) << "FHICL fhicl=" << fhicl_buffer;
 }
 
 FhiclData::operator JsonData() const {
   namespace literal = artdaq::database::dataformats::literal;
 
-  TLOG(5) << "FHICL fhicl=" << fhicl_buffer;
+  TLOG(15) << "FHICL fhicl=" << fhicl_buffer;
 
   auto json = JsonData("");
 
@@ -86,18 +86,18 @@ FhiclData::operator JsonData() const {
     throw ::fhicl::exception(::fhicl::parse_error, literal::data)
         << ("FHICL to JSON convertion error; FHICL buffer: " + this->fhicl_buffer);
 
-  TLOG(6)<< "FHICL  json=" << json;
+  TLOG(16)<< "FHICL  json=" << json;
 
   auto collection = std::string("FhiclData_") + type_version();
 
   auto base64 = base64_encode(fhicl_buffer);
-  TLOG(7) << "FHICL base64=" << base64;
+  TLOG(17) << "FHICL base64=" << base64;
 
   std::ostringstream os;
 
   os << json;
 
-  TLOG(5) << "FHICL document=" << os.str();
+  TLOG(15) << "FHICL document=" << os.str();
 
   return {os.str()};
 }

@@ -76,8 +76,8 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
 
   auto timestamp_configs = timestamp_configs_t(reverse_timestamp_cmp);
 
-  TLOG(4) << "MongoDB::findConfigurations() begin";
-  TLOG(4) << "MongoDB::findConfigurations() args data=<" << search << ">";
+  TLOG(14) << "MongoDB::findConfigurations() begin";
+  TLOG(14) << "MongoDB::findConfigurations() args data=<" << search << ">";
 
   auto search_document = compat::from_json(search.json_buffer);
 
@@ -96,14 +96,14 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
   if(configuration_name_expected.back()=='*')
     configuration_name_expected.pop_back();
     
-  TLOG(5) << "MongoDB::findConfigurations()  configuration_name_expected=<" << configuration_name_expected
+  TLOG(15) << "MongoDB::findConfigurations()  configuration_name_expected=<" << configuration_name_expected
                                                                                    << ">";
   auto fields = std::vector<std::string>{};
   fields.emplace_back(apiliteral::filter::configurations);
 
   auto regex_search = mongo::rewrite_query_with_regex(search, fields);
 
-  TLOG(4) << "MongoDB::findConfigurations() regex_search data=<" << regex_search << ">";
+  TLOG(14) << "MongoDB::findConfigurations() regex_search data=<" << regex_search << ">";
 
   auto filter = bsoncxx::builder::core(false);
 
@@ -114,7 +114,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
   auto collectionDescriptors = _provider->connection().list_collections(filter.view_document());
 
   for (auto const& collectionDescriptor : collectionDescriptors) {
-    TLOG(4) << "MongoDB::findConfigurations() found collection=<" << compat::to_json(collectionDescriptor) << ">";
+    TLOG(14) << "MongoDB::findConfigurations() found collection=<" << compat::to_json(collectionDescriptor) << ">";
 
     auto element_name = collectionDescriptor.find(jsonliteral::name);
 
@@ -127,7 +127,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
 
     if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
 
-    TLOG(4) << "MongoDB::findConfigurations() querying collection_name=<" << collection_name << ">";
+    TLOG(14) << "MongoDB::findConfigurations() querying collection_name=<" << collection_name << ">";
 
     auto collection = _provider->connection().collection(collection_name);
 
@@ -143,12 +143,12 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
 
     stages.match(match_stage.view_document()).project(project_stage.view());
 
-    TLOG(4) << "MongoDB::findConfigurations() query_payload =<" << compat::to_json(stages.view_array()) << ">";
+    TLOG(14) << "MongoDB::findConfigurations() query_payload =<" << compat::to_json(stages.view_array()) << ">";
 
     auto cursor = collection.aggregate(stages);
 
     for (auto const& view : cursor) {
-      TLOG(4) << "MongoDB::findConfigurations() looping over cursor =<" << compat::to_json(view) << ">";
+      TLOG(14) << "MongoDB::findConfigurations() looping over cursor =<" << compat::to_json(view) << ">";
 
       auto tmp_configurations = view.find(jsonliteral::configurations);
       if (tmp_configurations == collectionDescriptor.end())
@@ -208,7 +208,7 @@ exact_match:
     oss << db::quoted_(apiliteral::filter::configurations) << ": " << db::quoted_(cfg.second);
     oss << "}";
     oss << "}";
-    TLOG(4) << "MongoDB::findConfigurations() found document=<" << oss.str() << ">";
+    TLOG(14) << "MongoDB::findConfigurations() found document=<" << oss.str() << ">";
 
     returnCollection.emplace_back(oss.str());
   }
@@ -222,8 +222,8 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
   confirm(!search.empty());
   auto returnCollection = std::list<JsonData>();
 
-  TLOG(5) << "MongoDB::configurationComposition() begin";
-  TLOG(5) << "MongoDB::configurationComposition() args data=<" << search << ">";
+  TLOG(15) << "MongoDB::configurationComposition() begin";
+  TLOG(15) << "MongoDB::configurationComposition() args data=<" << search << ">";
 
   auto filter = bsoncxx::builder::core(false);
 
@@ -234,7 +234,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
   auto collectionDescriptors = _provider->connection().list_collections(filter.view_document());
 
   for (auto const& collectionDescriptor : collectionDescriptors) {
-    TLOG(5) << "MongoDB::configurationComposition() found collection=<" << compat::to_json(collectionDescriptor) << ">";
+    TLOG(15) << "MongoDB::configurationComposition() found collection=<" << compat::to_json(collectionDescriptor) << ">";
 
     // auto view = collectionDescriptor.view();
     auto element_name = collectionDescriptor.find(jsonliteral::name);
@@ -248,7 +248,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
 
     if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
 
-    TLOG(5) << "MongoDB::configurationComposition() querying collection_name=<" << collection_name << ">";
+    TLOG(15) << "MongoDB::configurationComposition() querying collection_name=<" << collection_name << ">";
 
     auto collection = _provider->connection().collection(collection_name);
     auto bson_document = compat::from_json(search.json_buffer);
@@ -264,7 +264,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
     };
 
     auto configuration_name_expected = compat::to_json(extract_value(apiliteral::filter::configurations));
-    TLOG(5) << "MongoDB::configurationComposition()  configuration_name_expected=<" << configuration_name_expected
+    TLOG(15) << "MongoDB::configurationComposition()  configuration_name_expected=<" << configuration_name_expected
                                                                                    << ">";
 
     mongocxx::pipeline stages;
@@ -283,12 +283,12 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
 
     stages.match(match_stage.view_document()).project(project_stage.view());  //.sort(sort_stage.view());
 
-    TLOG(5) << "MongoDB::configurationComposition()  query_payload=<" << compat::to_json(stages.view_array()) << ">";
+    TLOG(15) << "MongoDB::configurationComposition()  query_payload=<" << compat::to_json(stages.view_array()) << ">";
 
     auto cursor = collection.aggregate(stages);
 
     for (auto const& view : cursor) {
-      TLOG(5) << "MongoDB::configurationComposition()  value=<" << compat::to_json(view) << ">";
+      TLOG(15) << "MongoDB::configurationComposition()  value=<" << compat::to_json(view) << ">";
 
       auto configurations_value = view.find("configurations");
       auto entities_value = view.find("entities");
@@ -320,7 +320,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
           oss << "}";
           oss << "}";
 
-          TLOG(4) << "MongoDB::configurationComposition() found document=<" << oss.str() << ">";
+          TLOG(14) << "MongoDB::configurationComposition() found document=<" << oss.str() << ">";
 
           returnCollection.emplace_back(oss.str());
         }
@@ -329,7 +329,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
   }
 
   if (returnCollection.empty()) {
-    TLOG(4) << "MongoDB::configurationComposition() No data found for json=<" << search << ">";
+    TLOG(14) << "MongoDB::configurationComposition() No data found for json=<" << search << ">";
   }
 
   return returnCollection;
@@ -341,8 +341,8 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
   confirm(!query_payload.empty());
   auto returnCollection = std::list<JsonData>();
 
-  TLOG(5) << "MongoDB::findVersions() begin";
-  TLOG(5) << "MongoDB::findVersions() args data=<" << query_payload << ">";
+  TLOG(15) << "MongoDB::findVersions() begin";
+  TLOG(15) << "MongoDB::findVersions() args data=<" << query_payload << ">";
 
   auto bson_document = compat::from_json(query_payload.json_buffer);
 
@@ -365,7 +365,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
   auto fields = std::vector<std::string>{};
   fields.emplace_back(apiliteral::filter::entities);
   auto regex_search = mongo::rewrite_query_with_regex(search, fields);
-  TLOG(5) << "MongoDB::findVersions() args regex_search=<" << regex_search << ">";
+  TLOG(15) << "MongoDB::findVersions() args regex_search=<" << regex_search << ">";
 
   mongocxx::pipeline stages;
   bbs::document project_stage;
@@ -380,7 +380,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
 
   stages.match(match_stage.view_document()).project(project_stage.view());
 
-  TLOG(5) << "MongoDB::findVersions()  query_payload=<" << compat::to_json(stages.view_array()) << ">";
+  TLOG(15) << "MongoDB::findVersions()  query_payload=<" << compat::to_json(stages.view_array()) << ">";
 
   auto cursor = collection.aggregate(stages);
 
@@ -407,7 +407,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
       oss << "}";
       oss << "}";
 
-      TLOG(4) << "MongoDB::findVersions() found document=<" << oss.str() << ">";
+      TLOG(14) << "MongoDB::findVersions() found document=<" << oss.str() << ">";
 
       returnCollection.emplace_back(oss.str());
     }
@@ -422,8 +422,8 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
   confirm(!search.empty());
   auto returnCollection = std::list<JsonData>();
 
-  TLOG(9) << "MongoDB::findEntities() begin";
-  TLOG(9) << "MongoDB::findEntities() args data=<" << search << ">";
+  TLOG(19) << "MongoDB::findEntities() begin";
+  TLOG(19) << "MongoDB::findEntities() args data=<" << search << ">";
 
   auto bson_document = compat::from_json(search.json_buffer);
 
@@ -444,7 +444,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
   auto collectionDescriptors = _provider->connection().list_collections(filter.view_document());
 
   for (auto const& collectionDescriptor : collectionDescriptors) {
-    TLOG(9) << "MongoDB::findEntities() found collection=<" << compat::to_json(collectionDescriptor) << ">";
+    TLOG(19) << "MongoDB::findEntities() found collection=<" << compat::to_json(collectionDescriptor) << ">";
 
     auto element_name = collectionDescriptor.find(jsonliteral::name);
 
@@ -457,7 +457,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
 
     if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
 
-    TLOG(9) << "MongoDB::findEntities() querying collection_name=<" << collection_name << ">";
+    TLOG(19) << "MongoDB::findEntities() querying collection_name=<" << collection_name << ">";
 
     auto collection = _provider->connection().collection(collection_name);
     auto bson_document = compat::from_json(search.json_buffer);
@@ -473,7 +473,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
 
     stages.match(match_stage.view_document()).project(project_stage.view());
 
-    TLOG(9) << "MongoDB::findEntities()  query_payload=<" << compat::to_json(stages.view_array()) << ">";
+    TLOG(19) << "MongoDB::findEntities()  query_payload=<" << compat::to_json(stages.view_array()) << ">";
     auto cursor = collection.aggregate(stages);
 
     auto seenValues = std::list<std::string>{};
@@ -487,7 +487,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
     };
 
     for (auto const& view : cursor) {
-      TLOG(9) << "MongoDB::findEntities()  value=<" << compat::to_json(view) << ">";
+      TLOG(19) << "MongoDB::findEntities()  value=<" << compat::to_json(view) << ">";
 
       auto entities = view.find("entities")->get_array();
 
@@ -509,7 +509,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
         oss << "}";
         oss << "}";
 
-        TLOG(9) << "MongoDB::findEntities() found document=<" << oss.str() << ">";
+        TLOG(19) << "MongoDB::findEntities() found document=<" << oss.str() << ">";
 
         returnCollection.emplace_back(oss.str());
       }
@@ -524,8 +524,8 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::addConfiguration(JsonDat
   confirm(!query_payload.empty());
   auto returnCollection = std::list<JsonData>();
 
-  TLOG(5) << "MongoDB::addConfiguration() begin";
-  TLOG(5) << "MongoDB::addConfiguration() args data=<" << query_payload << ">";
+  TLOG(15) << "MongoDB::addConfiguration() begin";
+  TLOG(15) << "MongoDB::addConfiguration() args data=<" << query_payload << ">";
 
   return returnCollection;
 }
@@ -536,8 +536,8 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listCollections(JsonData
   confirm(!query_payload.empty());
   auto returnCollection = std::list<JsonData>();
 
-  TLOG(9) << "MongoDB::listCollections() begin";
-  TLOG(9) << "MongoDB::listCollections() args data=<" << query_payload << ">";
+  TLOG(19) << "MongoDB::listCollections() begin";
+  TLOG(19) << "MongoDB::listCollections() args data=<" << query_payload << ">";
 
   auto filter = bsoncxx::builder::core(false);
   auto query_payload_doc = bbs::document{};
@@ -546,7 +546,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listCollections(JsonData
   auto collectionDescriptors = _provider->connection().list_collections(filter.view_document());
 
   for (auto const& collectionDescriptor : collectionDescriptors) {
-    TLOG(9) << "MongoDB::listCollections() found collection=<" << compat::to_json(collectionDescriptor) << ">";
+    TLOG(19) << "MongoDB::listCollections() found collection=<" << compat::to_json(collectionDescriptor) << ">";
 
     auto element_name = collectionDescriptor.find(jsonliteral::name);
 
@@ -559,7 +559,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listCollections(JsonData
 
     if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
 
-    TLOG(9) << "MongoDB::listCollections() found collection_name=<" << collection_name << ">";
+    TLOG(19) << "MongoDB::listCollections() found collection_name=<" << collection_name << ">";
 
     std::ostringstream oss;
     oss << "{";
@@ -570,7 +570,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listCollections(JsonData
     oss << db::quoted_(apiliteral::option::searchfilter) << ":" << apiliteral::empty_json;
     oss << "}";
 
-    TLOG(9) << "MongoDB::listCollections() found document=<" << oss.str() << ">";
+    TLOG(19) << "MongoDB::listCollections() found document=<" << oss.str() << ">";
 
     returnCollection.emplace_back(oss.str());
   }
@@ -583,13 +583,13 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listDatabases(JsonData c
   confirm(!query_payload.empty());
   auto returnCollection = std::list<JsonData>();
 
-  TLOG(9) << "MongoDB::listDatabases() begin";
-  TLOG(9) << "MongoDB::listDatabases() args data=<" << query_payload << ">";
+  TLOG(19) << "MongoDB::listDatabases() begin";
+  TLOG(19) << "MongoDB::listDatabases() args data=<" << query_payload << ">";
 
   mongocxx::cursor databaseDescriptors = _provider->list_databases();
 
   for (auto const& databaseDescriptor : databaseDescriptors) {
-    TLOG(9) << "MongoDB::listDatabases() found databases=<" << compat::to_json(databaseDescriptor) << ">";
+    TLOG(19) << "MongoDB::listDatabases() found databases=<" << compat::to_json(databaseDescriptor) << ">";
 
     auto element_name = databaseDescriptor.find(jsonliteral::name);
 
@@ -602,7 +602,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listDatabases(JsonData c
 
     if (database_name == "local" || database_name == "admin") continue;
 
-    TLOG(9) << "MongoDB::listDatabases() found database_name=<" << database_name << ">";
+    TLOG(19) << "MongoDB::listDatabases() found database_name=<" << database_name << ">";
 
     std::ostringstream oss;
     oss << "{";
@@ -612,7 +612,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listDatabases(JsonData c
     oss << db::quoted_(apiliteral::option::searchfilter) << ":" << apiliteral::empty_json;
     oss << "}";
 
-    TLOG(9) << "MongoDB::listDatabases() found document=<" << oss.str() << ">";
+    TLOG(19) << "MongoDB::listDatabases() found document=<" << oss.str() << ">";
 
     returnCollection.emplace_back(oss.str());
   }
@@ -641,7 +641,7 @@ void enable() {
   TRACE_CNTL("modeS", trace_mode::modeS);
 
   artdaq::database::mongo::debug::ReadWrite();
-  TLOG(0) <<  "artdaq::database::mongo trace_enable";
+  TLOG(10) <<  "artdaq::database::mongo trace_enable";
 }
 }
 }  // namespace mongo

@@ -28,7 +28,7 @@ bool dbxj::xml_to_json(std::string const& xml, std::string& json) {
   confirm(!xml.empty());
   confirm(json.empty());
 
-  TLOG(2) << "xml_to_json: begin";
+  TLOG(12) << "xml_to_json: begin";
 
   auto result = bool{false};
 
@@ -59,7 +59,7 @@ bool dbxj::xml_to_json(std::string const& xml, std::string& json) {
 
   if (result) json.swap(json1);
 
-  TLOG(2) << "xml_to_json: end";
+  TLOG(12) << "xml_to_json: end";
 
   return result;
 }
@@ -68,18 +68,18 @@ bool dbxj::json_to_xml(std::string const& json, std::string& xml) {
   confirm(!json.empty());
   confirm(xml.empty());
 
-  TLOG(3)<< "json_to_xml: begin";
+  TLOG(13)<< "json_to_xml: begin";
 
   auto result = bool{false};
 
-  TLOG(3)<< "json_to_xml: Reading JSON buffer..";
+  TLOG(13)<< "json_to_xml: Reading JSON buffer..";
 
   auto json_root = jsn::object_t{};
   auto reader = JsonReader{};
   result = reader.read(json, json_root);
 
   if (!result) {
-    TLOG(3)<< "json_to_xml: Unable to read JSON buffer";
+    TLOG(13)<< "json_to_xml: Unable to read JSON buffer";
     return result;
   }
 
@@ -97,7 +97,7 @@ bool dbxj::json_to_xml(std::string const& json, std::string& xml) {
 
   if (result) xml.swap(xml1);
 
-  TLOG(3)<< "json_to_xml: end";
+  TLOG(13)<< "json_to_xml: end";
 
   return result;
 }
@@ -108,5 +108,5 @@ void dbxj::debug::XmlJson() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(0) <<  "artdaq::database::xmljson trace_enable";
+  TLOG(10) <<  "artdaq::database::xmljson trace_enable";
 }

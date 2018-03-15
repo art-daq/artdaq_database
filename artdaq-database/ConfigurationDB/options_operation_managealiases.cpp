@@ -44,7 +44,7 @@ std::string const& ManageAliasesOperation::version(std::string const& version) {
     throw runtime_error("Options") << "Invalid version; version is empty.";
   }
 
-  TLOG(10)<< "Options: Updating version from " << _version << " to " << version << ".";
+  TLOG(20)<< "Options: Updating version from " << _version << " to " << version << ".";
 
   _version = version;
 
@@ -64,7 +64,7 @@ std::string const& ManageAliasesOperation::entity(std::string const& entity) {
     throw runtime_error("Options") << "Invalid configurable entity; entity is empty.";
   }
 
-  TLOG(11)<< "Options: Updating entity from " << _entity << " to " << entity << ".";
+  TLOG(21)<< "Options: Updating entity from " << _entity << " to " << entity << ".";
 
   _entity = entity;
 
@@ -84,7 +84,7 @@ std::string const& ManageAliasesOperation::run(std::string const& run) {
     throw runtime_error("Options") << "Invalid run; run is empty.";
   }
 
-  TLOG(10)<< "Options: Updating run from " << _run << " to " << run << ".";
+  TLOG(20)<< "Options: Updating run from " << _run << " to " << run << ".";
 
   _run = run;
 
@@ -104,7 +104,7 @@ std::string const& ManageAliasesOperation::configuration(std::string const& glob
     throw runtime_error("Options") << "Invalid global config; global config is empty.";
   }
 
-  TLOG(12) << "Options: Updating global_configuration from " << _configuration << " to " << global_configuration << ".";
+  TLOG(22) << "Options: Updating global_configuration from " << _configuration << " to " << global_configuration << ".";
 
   _configuration = global_configuration;
 
@@ -124,7 +124,7 @@ std::string const& ManageAliasesOperation::versionAlias(std::string const& alias
     throw runtime_error("Options") << "Invalid version alias; version alias is empty.";
   }
 
-  TLOG(10)<< "Options: Updating version alias from " << _version_alias << " to " << alias << ".";
+  TLOG(20)<< "Options: Updating version alias from " << _version_alias << " to " << alias << ".";
 
   _version_alias = alias;
 
@@ -144,7 +144,7 @@ std::string const& ManageAliasesOperation::configurationAlias(std::string const&
     throw runtime_error("Options") << "Invalid global configuration alias; global configuration alias is empty.";
   }
 
-  TLOG(10)<< "Options: Updating global configuration alias from " << _configuration_alias << " to "
+  TLOG(20)<< "Options: Updating global configuration alias from " << _configuration_alias << " to "
                                                                   << global_configuration_alias << ".";
 
   _configuration_alias = global_configuration_alias;
@@ -225,7 +225,7 @@ void ManageAliasesOperation::readJsonData(JsonData const& data) {
     }
 
   } catch (...) {
-    TLOG(1) << "Options() no filter provided <" << data << ">";
+    TLOG(11) << "Options() no filter provided <" << data << ">";
   }
 }
 
@@ -386,5 +386,5 @@ void cf::debug::options::ManageAliases() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(0) <<  "artdaq::database::configuration::options::ManageAliases trace_enable";
+  TLOG(10) <<  "artdaq::database::configuration::options::ManageAliases trace_enable";
 }

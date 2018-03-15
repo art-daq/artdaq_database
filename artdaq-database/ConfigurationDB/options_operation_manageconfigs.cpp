@@ -45,7 +45,7 @@ std::string const& ManageConfigsOperation::version(std::string const& version) {
     throw runtime_error("Options") << "Invalid version; version is empty.";
   }
 
-  TLOG(10)<< "Options: Updating version from " << _version << " to " << version << ".";
+  TLOG(20)<< "Options: Updating version from " << _version << " to " << version << ".";
 
   _version = version;
 
@@ -65,7 +65,7 @@ std::string const& ManageConfigsOperation::entity(std::string const& entity) {
     throw runtime_error("Options") << "Invalid configurable entity; entity is empty.";
   }
 
-  TLOG(11)<< "Options: Updating entity from " << _entity << " to " << entity << ".";
+  TLOG(21)<< "Options: Updating entity from " << _entity << " to " << entity << ".";
 
   _entity = entity;
 
@@ -85,7 +85,7 @@ std::string const& ManageConfigsOperation::configuration(std::string const& glob
     throw runtime_error("Options") << "Invalid global config; global config is empty.";
   }
 
-  TLOG(12) << "Options: Updating global_configuration from " << _configuration << " to " << global_configuration << ".";
+  TLOG(22) << "Options: Updating global_configuration from " << _configuration << " to " << global_configuration << ".";
 
   _configuration = global_configuration;
 
@@ -141,7 +141,7 @@ void ManageConfigsOperation::readJsonData(JsonData const& data) {
     }
 
   } catch (...) {
-    TLOG(1) << "Options() no filter provided <" << data << ">";
+    TLOG(11) << "Options() no filter provided <" << data << ">";
   }
 }
 
@@ -291,5 +291,5 @@ void cf::debug::options::ManageConfigs() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(0) <<  "artdaq::database::configuration::options::ManageConfigs trace_enable";
+  TLOG(10) <<  "artdaq::database::configuration::options::ManageConfigs trace_enable";
 }

@@ -119,5 +119,5 @@ void dbcfg::debug::Metadata() {
   TRACE_CNTL("modeS", trace_mode::modeS);
 
   dbcfg::debug::detail::Metadata();
-  TLOG(0) <<  "artdaq::database::configuration::Metadata trace_enable";
+  TLOG(10) <<  "artdaq::database::configuration::Metadata trace_enable";
 }

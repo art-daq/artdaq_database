@@ -57,11 +57,11 @@ void list_databases(Options const& options, std::string& configs) {
   confirm(configs.empty());
   confirm(options.operation().compare(apiliteral::operation::listdatabases) == 0);
 
-  TLOG(11)<< "list_databases: begin";
-  TLOG(11)<< "list_databases args options=<" << options << ">";
+  TLOG(21)<< "list_databases: begin";
+  TLOG(21)<< "list_databases args options=<" << options << ">";
 
   validate_dbprovider_name(options.provider());
-  TLOG(11)<< "list_databases: valid";
+  TLOG(21)<< "list_databases: valid";
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers = std::map<std::string, provider_listdatabases_t>{
@@ -69,7 +69,7 @@ void list_databases(Options const& options, std::string& configs) {
         {apiliteral::provider::filesystem, cf::filesystem::listDatabases},
         {apiliteral::provider::ucon, cf::ucon::listDatabases}};
 
-  TLOG(11)<< "list_databases: end";
+  TLOG(21)<< "list_databases: end";
 	
     return providers.at(name);
   };
@@ -104,14 +104,14 @@ void list_databases(Options const& options, std::string& configs) {
       object_t results_ast;
 
       if (!reader.read(search_result, results_ast)) {
-        TLOG(11)<< "list_databases() Failed to create an AST from search results JSON.";
+        TLOG(21)<< "list_databases() Failed to create an AST from search results JSON.";
 
         throw runtime_error("list_databases") << "Failed to create an AST from search results JSON.";
       }
 
       auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
 
-      TLOG(11)<< "list_databases: found " << results_list.size() << " results.";
+      TLOG(21)<< "list_databases: found " << results_list.size() << " results.";
 
       std::ostringstream os;
 
@@ -119,7 +119,7 @@ void list_databases(Options const& options, std::string& configs) {
         auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
         auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
 
-        TLOG(11)<< "list_databases() Found database=<" << value << ">.";
+        TLOG(21)<< "list_databases() Found database=<" << value << ">.";
 
         os << value << ",";
       }
@@ -135,14 +135,14 @@ void list_databases(Options const& options, std::string& configs) {
 
   if (returnValueChanged) configs.swap(returnValue);
 
-  TLOG(11)<< "list_databases: end";
+  TLOG(21)<< "list_databases: end";
 }
 void read_dbinfo(Options const& options, std::string& filters) {
   confirm(filters.empty());
   confirm(options.operation().compare(apiliteral::operation::readdbinfo) == 0);
 
-  TLOG(12) << "read_dbinfo: begin";
-  TLOG(11)<< "read_dbinfo args options=<" << options << ">";
+  TLOG(22) << "read_dbinfo: begin";
+  TLOG(21)<< "read_dbinfo args options=<" << options << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -182,15 +182,15 @@ void read_dbinfo(Options const& options, std::string& filters) {
 
   if (returnValueChanged) filters.swap(returnValue);
 
-  TLOG(11)<< "read_dbinfo: end";
+  TLOG(21)<< "read_dbinfo: end";
 }
 
 void list_collections(Options const& options, std::string& collections) {
   confirm(collections.empty());
   confirm(options.operation().compare(apiliteral::operation::listcollections) == 0);
 
-  TLOG(13)<< "list_collections: begin";
-  TLOG(13)<< "list_collections args query_payload=<" << options << ">";
+  TLOG(23)<< "list_collections: begin";
+  TLOG(23)<< "list_collections args query_payload=<" << options << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -230,14 +230,14 @@ void list_collections(Options const& options, std::string& collections) {
       object_t results_ast;
 
       if (!reader.read(search_result, results_ast)) {
-        TLOG(11)<< "list_collections() Failed to create an AST from search results JSON.";
+        TLOG(21)<< "list_collections() Failed to create an AST from search results JSON.";
 
         throw runtime_error("list_collections") << "Failed to create an AST from search results JSON.";
       }
 
       auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
 
-      TLOG(11)<< "list_collections: found " << results_list.size() << " results.";
+      TLOG(21)<< "list_collections: found " << results_list.size() << " results.";
 
       std::ostringstream os;
 
@@ -245,7 +245,7 @@ void list_collections(Options const& options, std::string& collections) {
         auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
         auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
 
-        TLOG(11)<< "list_collections() Found collection=<" << value << ">.";
+        TLOG(21)<< "list_collections() Found collection=<" << value << ">.";
 
         os << value << ",";
       }
@@ -261,7 +261,7 @@ void list_collections(Options const& options, std::string& collections) {
 
   if (returnValueChanged) collections.swap(returnValue);
 
-  TLOG(13)<< "list_collections: end";
+  TLOG(23)<< "list_collections: end";
 }
 
 }  // namespace detail
@@ -276,5 +276,5 @@ void cftd::Metadata() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(0) <<  "artdaq::database::configuration::Metadata trace_enable";
+  TLOG(10) <<  "artdaq::database::configuration::Metadata trace_enable";
 }

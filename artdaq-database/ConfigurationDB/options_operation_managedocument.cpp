@@ -44,7 +44,7 @@ std::string const& ManageDocumentOperation::version(std::string const& version) 
     throw runtime_error("Options") << "Invalid version; version is empty.";
   }
 
-  TLOG(10)<< "Options: Updating version from " << _version << " to " << version << ".";
+  TLOG(20)<< "Options: Updating version from " << _version << " to " << version << ".";
 
   _version = version;
 
@@ -64,7 +64,7 @@ std::string const& ManageDocumentOperation::run(std::string const& run) {
     throw runtime_error("Options") << "Invalid run; run is empty.";
   }
 
-  TLOG(10)<< "Options: Updating run from " << _run << " to " << run << ".";
+  TLOG(20)<< "Options: Updating run from " << _run << " to " << run << ".";
 
   _run = run;
 
@@ -83,7 +83,7 @@ std::string const& ManageDocumentOperation::entity(std::string const& entity) {
     throw runtime_error("Options") << "Invalid configurable entity; entity is empty.";
   }
 
-  TLOG(11)<< "Options: Updating entity from " << _entity << " to " << entity << ".";
+  TLOG(21)<< "Options: Updating entity from " << _entity << " to " << entity << ".";
 
   _entity = entity;
 
@@ -103,7 +103,7 @@ std::string const& ManageDocumentOperation::configuration(std::string const& glo
     throw runtime_error("Options") << "Invalid global config; global config is empty.";
   }
 
-  TLOG(12) << "Options: Updating global_configuration from " << _configuration << " to " << global_configuration << ".";
+  TLOG(22) << "Options: Updating global_configuration from " << _configuration << " to " << global_configuration << ".";
 
   _configuration = global_configuration;
 
@@ -123,7 +123,7 @@ std::string const& ManageDocumentOperation::sourceFileName(std::string const& so
     throw runtime_error("Options") << "Invalid source file name; source file name is empty.";
   }
 
-  TLOG(12) << "Options: Updating source_file_name from " << _source_file_name << " to " << source_file_name << ".";
+  TLOG(22) << "Options: Updating source_file_name from " << _source_file_name << " to " << source_file_name << ".";
 
   _source_file_name = source_file_name;
 
@@ -134,7 +134,7 @@ void ManageDocumentOperation::readJsonData(JsonData const& data) {
   confirm(!data.empty());
 
   OperationBase::readJsonData(data);
-  TLOG(12) << "OperationBase::readJsonData <" << data.json_buffer << ">";
+  TLOG(22) << "OperationBase::readJsonData <" << data.json_buffer << ">";
 
   using namespace artdaq::database::json;
   auto dataAST = object_t{};
@@ -195,7 +195,7 @@ void ManageDocumentOperation::readJsonData(JsonData const& data) {
     }
 
   } catch (...) {
-    TLOG(1) << "Options() no filter provided <" << data << ">";
+    TLOG(11) << "Options() no filter provided <" << data << ">";
   }
 }
 
@@ -411,5 +411,5 @@ void cf::debug::options::ManageDocuments() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(0) <<  "artdaq::database::configuration::options::ManageDocuments trace_enable";
+  TLOG(10) <<  "artdaq::database::configuration::options::ManageDocuments trace_enable";
 }

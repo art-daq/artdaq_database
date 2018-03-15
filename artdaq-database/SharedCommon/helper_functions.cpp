@@ -229,10 +229,10 @@ db::object_id_t db::extract_oid(std::string const& filter) {
 
   if (results.size() != 2) {
     // we are interested in a second match
-    TLOG(12) << "value()"
+    TLOG(22) << "value()"
                    << "JSON regex_search() result count=" << results.size();
     for (auto const& result : results) {
-      TLOG(12) << "value()"
+      TLOG(22) << "value()"
                      << "JSON regex_search() result=" << result;
     }
 
@@ -253,7 +253,7 @@ db::object_id_t db::extract_oid(std::string const& filter) {
 
   match = dequote(match);
 
-  TLOG(12) << "value()"
+  TLOG(22) << "value()"
                  << "JSON regex_search() result=" << match;
 
   return match;

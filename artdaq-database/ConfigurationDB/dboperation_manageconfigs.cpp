@@ -176,5 +176,5 @@ void dbcfg::debug::ManageConfigs() {
   TRACE_CNTL("modeS", trace_mode::modeS);
 
   dbcfg::debug::detail::ManageConfigs();
-  TLOG(0) <<  "artdaq::database::configuration::ManageConfigs trace_enable";
+  TLOG(10) <<  "artdaq::database::configuration::ManageConfigs trace_enable";
 }

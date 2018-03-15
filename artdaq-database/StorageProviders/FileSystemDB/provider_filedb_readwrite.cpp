@@ -11,8 +11,8 @@ namespace database {
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonData const& arg) {
-  TLOG(3)<< "FileSystemDB::readDocument() begin";
-  TLOG(3)<< "FileSystemDB::readDocument() args=<" << arg << ">";
+  TLOG(13)<< "FileSystemDB::readDocument() begin";
+  TLOG(13)<< "FileSystemDB::readDocument() args=<" << arg << ">";
 
   auto returnCollection = std::list<JsonData>();
 
@@ -23,7 +23,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonDa
   try {
     filter_document = arg_document.findChildDocument(jsonliteral::filter);
   } catch (...) {
-    TLOG(3)<< "FileSystemDB::readDocument() No filter was found.";
+    TLOG(13)<< "FileSystemDB::readDocument() No filter was found.";
   }
 
   auto collection_name = std::string{};
@@ -31,18 +31,18 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonDa
   try {
     collection_name = filter_document.findChild(jsonliteral::collection).value();
   } catch (...) {
-    TLOG(3)<< "FileSystemDB::readDocument() Filter must have the collection element.";
+    TLOG(13)<< "FileSystemDB::readDocument() Filter must have the collection element.";
   }
 
   if (collection_name.empty()) collection_name = arg_document.findChild(jsonliteral::collection).value();
 
   confirm(!collection_name.empty());
 
-  TLOG(3)<< "FileSystemDB::readDocument() collection_name=<" << collection_name << ">";
+  TLOG(13)<< "FileSystemDB::readDocument() collection_name=<" << collection_name << ">";
 
   auto collection = _provider->connection() + collection_name;
 
-  TLOG(3)<< "FileSystemDB::readDocument() collection_path=<" << collection << ">";
+  TLOG(13)<< "FileSystemDB::readDocument() collection_path=<" << collection << ">";
 
   collection = expand_environment_variables(collection);
 
@@ -54,11 +54,11 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonDa
 
   SearchIndex search_index(index_path);
 
-  TLOG(3)<< "FileSystemDB::readDocument() filter_json=<" << filter_json << ">.";
+  TLOG(13)<< "FileSystemDB::readDocument() filter_json=<" << filter_json << ">.";
 
   auto oids = search_index.findDocumentIDs(filter_json);
 
-  TLOG(3)<< "FileSystemDB::readDocument() search returned " << oids.size() << " documents.";
+  TLOG(13)<< "FileSystemDB::readDocument() search returned " << oids.size() << " documents.";
 
   for (auto const& oid : oids) {
     auto doc_path = boost::filesystem::path(dir_name.c_str()).append(oid).replace_extension(".json");
@@ -66,7 +66,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonDa
     auto json = std::string{};
     db::read_buffer_from_file(json, {doc_path.c_str()});
 
-    TLOG(3)<< "FileSystemDB::readDocument() found_document=<" << json << ">";
+    TLOG(13)<< "FileSystemDB::readDocument() found_document=<" << json << ">";
 
     returnCollection.emplace_back(json);
   }
@@ -76,8 +76,8 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonDa
 
 template <>
 object_id_t StorageProvider<JsonData, FileSystemDB>::writeDocument(JsonData const& arg) {
-  TLOG(4) << "FileSystemDB::writeDocument() begin";
-  TLOG(4) << "FileSystemDB::writeDocument() args=<" << arg << ">";
+  TLOG(14) << "FileSystemDB::writeDocument() begin";
+  TLOG(14) << "FileSystemDB::writeDocument() args=<" << arg << ">";
 
   auto arg_document = JSONDocument{arg};
 
@@ -88,7 +88,7 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeDocument(JsonData cons
   try {
     filter_document = arg_document.findChildDocument(jsonliteral::filter);
   } catch (...) {
-    TLOG(4) << "FileSystemDB::writeDocument() No filter was found.";
+    TLOG(14) << "FileSystemDB::writeDocument() No filter was found.";
   }
 
   auto collection_name = std::string{};
@@ -96,20 +96,20 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeDocument(JsonData cons
   try {
     collection_name = user_document.findChild(jsonliteral::collection).value();
   } catch (...) {
-    TLOG(4) << "FileSystemDB::writeDocument() User document must have the collection element.";
+    TLOG(14) << "FileSystemDB::writeDocument() User document must have the collection element.";
   }
 
   if (collection_name.empty()) try {
       collection_name = filter_document.findChild(jsonliteral::collection).value();
     } catch (...) {
-      TLOG(4) << "FileSystemDB::writeDocument() Filter should have the collection element.";
+      TLOG(14) << "FileSystemDB::writeDocument() Filter should have the collection element.";
     }
 
   if (collection_name.empty()) collection_name = arg_document.findChild(jsonliteral::collection).value();
 
   confirm(!collection_name.empty());
 
-  TLOG(4) << "FileSystemDB::writeDocument() collection_name=<" << collection_name << ">";
+  TLOG(14) << "FileSystemDB::writeDocument() collection_name=<" << collection_name << ">";
 
   auto oid = object_id_t{ouid_invalid};
 
@@ -117,16 +117,16 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeDocument(JsonData cons
 
   try {
     auto oid_json = filter_document.findChild(jsonliteral::id).value();
-    TLOG(4) << "FileSystemDB::writeDocument() Found filter=<" << oid_json << ">";
+    TLOG(14) << "FileSystemDB::writeDocument() Found filter=<" << oid_json << ">";
     oid = extract_oid(oid_json);
     isNew = false;
-    TLOG(4) << "FileSystemDB::writeDocument() Using provided oid=<" << oid << ">";
+    TLOG(14) << "FileSystemDB::writeDocument() Using provided oid=<" << oid << ">";
   } catch (...) {
   }
 
   if (oid == object_id_t{ouid_invalid}) {
     oid = generate_oid();
-    TLOG(4) << "FileSystemDB::writeDocument() Using generated oid=<" << oid << ">";
+    TLOG(14) << "FileSystemDB::writeDocument() Using generated oid=<" << oid << ">";
   }
 
   auto id = to_id(oid);
@@ -139,11 +139,11 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeDocument(JsonData cons
 
   collection = expand_environment_variables(collection);
 
-  TLOG(4) << "FileSystemDB::writeDocument() collection_path=<" << collection << ">";
+  TLOG(14) << "FileSystemDB::writeDocument() collection_path=<" << collection << ">";
 
   auto filename = dbfs::mkdir(collection) + "/" + oid + ".json";
 
-  TLOG(4) << "FileSystemDB::writeDocument() filename=<" << filename << ">.";
+  TLOG(14) << "FileSystemDB::writeDocument() filename=<" << filename << ">.";
 
   if (isNew) {
     if (dbfs::check_if_file_exists(filename))
@@ -153,7 +153,7 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeDocument(JsonData cons
 
   auto json = builder.to_string();
 
-  TLOG(4) << "FileSystemDB::writeDocument() json=<" << json << ">.";
+  TLOG(14) << "FileSystemDB::writeDocument() json=<" << json << ">.";
 
   db::write_buffer_to_file(json, filename);
 
@@ -162,7 +162,7 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeDocument(JsonData cons
   SearchIndex search_index(index_path);
 
   if (!search_index.addDocument(json, oid)) {
-    TLOG(4) << "FileSystemDB::writeDocument() Failed updating SearchIndex.";
+    TLOG(14) << "FileSystemDB::writeDocument() Failed updating SearchIndex.";
   }
 
   return {id};
@@ -176,7 +176,7 @@ void ReadWrite() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(0) <<  "artdaq::database::filesystem::ReadWrite trace_enable";
+  TLOG(10) <<  "artdaq::database::filesystem::ReadWrite trace_enable";
 
   artdaq::database::filesystem::index::debug::enable();
 }

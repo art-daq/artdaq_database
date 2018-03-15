@@ -17,5 +17,5 @@ void artdaq::database::confjson::debug::Conf2Json() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(0) <<  "artdaq::database::conf2json trace_enable";
+  TLOG(10) <<  "artdaq::database::conf2json trace_enable";
 }

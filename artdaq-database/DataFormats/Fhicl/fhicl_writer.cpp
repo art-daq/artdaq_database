@@ -25,7 +25,7 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
   confirm(out.empty());
   confirm(!json_object.empty());
 
-  TLOG(2) << "write_data() begin";
+  TLOG(12) << "write_data() begin";
 
   using artdaq::database::fhicl::fhicl_generator_grammar;
   using artdaq::database::fhicljson::valuetuple_t;
@@ -98,7 +98,7 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
 
   out.swap(buffer);
 
-  TLOG(2) << "write_data() end";
+  TLOG(12) << "write_data() end";
 
   return true;
 }
@@ -109,5 +109,5 @@ void artdaq::database::fhicl::debug::FhiclWriter() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(0) <<  "artdaq::database::fhicl::FhiclWrite trace_enable";
+  TLOG(10) <<  "artdaq::database::fhicl::FhiclWrite trace_enable";
 }

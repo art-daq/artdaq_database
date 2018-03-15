@@ -38,8 +38,8 @@ fcl2jsondb::operator datapair_t() try {
   auto const& key = self.first;
   auto const& value = self.second;
 
-  TLOG(2) << "fcl2jsondb() key=<" << key << ">";
-  TLOG(2) << "fcl2jsondb() value=<" << value.to_string() << ">";
+  TLOG(12) << "fcl2jsondb() key=<" << key << ">";
+  TLOG(12) << "fcl2jsondb() value=<" << value.to_string() << ">";
 
   using artdaq::database::fhicljson::return_pair;
 
@@ -109,7 +109,7 @@ fcl2jsondb::operator datapair_t() try {
 
   if (value.protection != ::fhicl::Protection::NONE) {
     object[literal::protection] = fcl::protection_as_string(value.protection);
-    TLOG(2) << "fcl2jsondb() value type=<" << fcl::tag_as_string(value.tag) << ">, protection=<"
+    TLOG(12) << "fcl2jsondb() value type=<" << fcl::tag_as_string(value.tag) << ">, protection=<"
                                           << fcl::protection_as_string(value.protection) << ">";
   }
 
@@ -227,18 +227,18 @@ json2fcldb::operator fcl::atom_t() try {
 
   auto type_name = boost::get<std::string>(metadata_object.at(literal::type));
 
-  TLOG(2) << "json2fcldb() key=<" << self_key << "> type=<" << type_name << ">";
+  TLOG(12) << "json2fcldb() key=<" << self_key << "> type=<" << type_name << ">";
 
   auto override_comment = false;
 
   if (type_name == "table" && self_data.type() == typeid(std::string)) {
-    TLOG(2) << "json2fcldb() type override to string";
+    TLOG(12) << "json2fcldb() type override to string";
     type_name = "string";
     override_comment = true;
   }
 
   if (self_key.compare(0, include.length(), include) == 0) {
-    TLOG(2) << "json2fcldb() name override to #include";
+    TLOG(12) << "json2fcldb() name override to #include";
 
     auto fcl_key = fcl::key_t("#include", " ");
     auto fcl_value = fcl::value_t();
@@ -380,5 +380,5 @@ void artdaq::database::fhicljson::debug::FCL2JSON() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(0) <<  "artdaq::database::convertjson::FCL2JSON trace_enable";
+  TLOG(10) <<  "artdaq::database::convertjson::FCL2JSON trace_enable";
 }

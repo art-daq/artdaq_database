@@ -24,7 +24,7 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
   confirm(!in.empty());
   confirm(json_object.empty());
 
-  TLOG(2) << "read_data() begin";
+  TLOG(12) << "read_data() begin";
 
   try {
     using boost::spirit::qi::phrase_parse;
@@ -71,7 +71,7 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
 
     ::fhicl::parse_document(conf, fhicl_table);
 
-    TLOG(2) << "parse_document() returned " << std::distance(fhicl_table.begin(), fhicl_table.end()) << " entries.";
+    TLOG(12) << "parse_document() returned " << std::distance(fhicl_table.begin(), fhicl_table.end()) << " entries.";
 
     {  // convert prolog section
       auto opts = extra_opts{};
@@ -121,12 +121,12 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
 
     json_object.swap(object);
 
-    TLOG(2) << "read_data() end";
+    TLOG(12) << "read_data() end";
 
     return true;
 
   } catch (::fhicl::exception const& e) {
-    TLOG(2) << "read_data() Caught fhicl::exception message=" << e.what();
+    TLOG(12) << "read_data() Caught fhicl::exception message=" << e.what();
 
     std::cerr << "Caught fhicl::exception message=" << e.what() << "\n";
     throw;
@@ -166,9 +166,9 @@ bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
       object.push_back(jsn::data_t::make(literal::linenum, comment.first));
 
       if(fcl::from_json_string(fcl::to_json_string(comment.second))!=comment.second){
-	  TLOG(3)<<"Warning non reversable convertion\nbegin" <<comment.second;
-	  TLOG(3)<<"convd" << fcl::to_json_string(comment.second);
-	  TLOG(3)<<"restd" << fcl::from_json_string(fcl::to_json_string(comment.second));
+	  TLOG(13)<<"Warning non reversable convertion\nbegin" <<comment.second;
+	  TLOG(13)<<"convd" << fcl::to_json_string(comment.second);
+	  TLOG(13)<<"restd" << fcl::from_json_string(fcl::to_json_string(comment.second));
       }
       object.push_back(jsn::data_t::make(literal::value, fcl::to_json_string(comment.second)));
     }
@@ -189,5 +189,5 @@ void artdaq::database::fhicl::debug::FhiclReader() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(0) <<  "artdaq::database::fhicl::FhiclReader trace_enable";
+  TLOG(10) <<  "artdaq::database::fhicl::FhiclReader trace_enable";
 }
