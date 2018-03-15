@@ -39,7 +39,7 @@ extern "C" {
   using namespace debug::stack;
   last_size = backtrace(last_frames, sizeof last_frames / sizeof(void*));
 
-   __cxa_throw_t* rethrow =  (__cxa_throw_t*)dlsym(RTLD_NEXT, "__cxa_throw");
+   __cxa_throw_t* rethrow __attribute__((noreturn)) =  (__cxa_throw_t*)dlsym(RTLD_NEXT, "__cxa_throw");
 
   rethrow(ex, info, dest);
 }    

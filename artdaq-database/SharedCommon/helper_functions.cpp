@@ -34,7 +34,7 @@ std::string db::to_string(std::chrono::system_clock::time_point const& tp) {
   char buff[40];
   std::strftime(buff, sizeof(buff), apiliteral::timestamp_format, std::localtime(&time));
   auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch()).count() % 1000;
-  snprintf(buff + 30, 4, "%03lld", milliseconds);
+  snprintf(buff + 30, 4, "%03ld", milliseconds);
   strncpy(buff + 20, buff + 30, 3);
 
   if (useFakeTime()) return apiliteral::timestamp_faketime;

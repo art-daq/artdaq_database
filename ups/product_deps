@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_database  v1_04_45
+parent artdaq_database  v1_04_46
 defaultqual	e14:s50
 
 # These optional lines define the installed directories where
@@ -23,11 +23,11 @@ cetlib   	v2_02_00        s46
 cetlib   	v3_00_01        s50
 cetlib          v3_02_00        s64
 TRACE           v3_13_04        -
-mongodb 	v3_4_6b
+mongodb 	v3_4_6c
 python          v2_7_13b	s46
 python          v2_7_13d	s50
 python          v2_7_14b        s64
-swig            v3_0_12b	-		optional
+swig            v3_0_12c	-		optional
 nodejs		v4_5_0		-		optional
 cetbuildtools	v7_01_00	-		only_for_build
 end_product_list
