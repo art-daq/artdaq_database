@@ -97,15 +97,14 @@ catch(...)
 
 namespace literal
 {
-constexpr auto operation = "operation";
-constexpr auto path = "path";
-constexpr auto beginstate = "begin-state";
-constexpr auto delta = "delta";
-constexpr auto endstate = "end-state";
-constexpr auto returnedvalue = "returned-value";
-constexpr auto mustsucceed = "must-succeed";
+constexpr auto operation [[gnu::unused]]= "operation";
+constexpr auto path [[gnu::unused]] = "path";
+constexpr auto beginstate [[gnu::unused]] = "begin-state";
+constexpr auto delta [[gnu::unused]] = "delta";
+constexpr auto endstate [[gnu::unused]] = "end-state";
+constexpr auto returnedvalue [[gnu::unused]] = "returned-value";
+constexpr auto mustsucceed [[gnu::unused]] = "must-succeed";
 }
-
 
 bool test_insertChild(std::string const& conf)
 {
@@ -121,7 +120,7 @@ bool test_insertChild(std::string const& conf)
     auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
 
     try {
-        auto returned = std::move(begin.insertChild(delta, path));
+        auto returned = begin.insertChild(delta, path);
 
         if (begin != end) {
             std::cout << "Error invalid end state. \n" ;
@@ -158,7 +157,7 @@ bool test_replaceChild(std::string const& conf)
     auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
 
     try {
-        auto returned = std::move(begin.replaceChild(delta, path));
+        auto returned = begin.replaceChild(delta, path);
 
         if (begin != end) {
             std::cout << "Error invalid end state. \n" ;
@@ -194,7 +193,7 @@ bool test_deleteChild(std::string const& conf)
     auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
 
     try {
-        auto returned = std::move(begin.deleteChild(path));
+        auto returned = begin.deleteChild(path);
 
         if (begin != end) {
             std::cout << "Error invalid end state. \n" ;
@@ -228,7 +227,7 @@ bool test_findChild(std::string const& conf)
     auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
 
     try {
-        auto returned = std::move(begin.findChild(path));
+        auto returned = begin.findChild(path);
 
         if (begin != end) {
             std::cout << "Error invalid end state. \n" ;
@@ -264,7 +263,7 @@ bool test_appendChild(std::string const& conf)
     auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
 
     try {
-        auto returned = std::move(begin.appendChild(delta, path));
+        auto returned = begin.appendChild(delta, path);
 
         if (begin != end) {
             std::cout << "Error invalid end state. \n" ;
@@ -303,7 +302,7 @@ bool test_removeChild(std::string const& conf)
     auto mustsucceed = opts.value_as<bool>(literal::mustsucceed);
 
     try {
-        auto returned = std::move(begin.removeChild(delta, path));
+        auto returned = begin.removeChild(delta, path);
 
         if (begin != end) {
             std::cout << "Error invalid end state. \n" ;

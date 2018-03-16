@@ -43,7 +43,7 @@ std::string const& BulkOperations::bulkOperations(std::string const& query_paylo
   confirm(!query_payload.empty());
 
   auto tmp = db::dequote(query_payload);
-  TLOG(15)<< "Options: bulkOperations args query_payload=<" << tmp << ">.";
+  TLOG(25)<< "Options: bulkOperations args query_payload=<" << tmp << ">.";
 
   _bulk_operations = tmp;
 
@@ -87,7 +87,7 @@ int BulkOperations::readProgramOptions(bpo::variables_map const& vm) {
       is.close();
     }
 
-    TLOG(14) << "BulkOperations: json = <" << json << ">";
+    TLOG(24) << "BulkOperations: json = <" << json << ">";
 
     readJsonData(json);
     return process_exit_code::SUCCESS;
@@ -139,5 +139,5 @@ void cf::debug::options::BulkOperations() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(0) <<  "artdaq::database::configuration::options::BulkOperations trace_enable";
+  TLOG(10) <<  "artdaq::database::configuration::options::BulkOperations trace_enable";
 }

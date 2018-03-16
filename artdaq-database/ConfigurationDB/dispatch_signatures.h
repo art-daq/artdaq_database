@@ -5,6 +5,7 @@
 #include <map>
 #include <memory>
 #include <utility>
+#include <string>
 
 #include "artdaq-database/ConfigurationDB/operation_dispatch.h"
 

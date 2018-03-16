@@ -26,7 +26,7 @@ bool XmlReader::read(std::string const& in, jsn::object_t& json_object) {
   confirm(!in.empty());
   confirm(json_object.empty());
 
-  TLOG(2) << "read() begin";
+  TLOG(12) << "read() begin";
 
   try {
     auto object = jsn::object_t();
@@ -59,12 +59,12 @@ bool XmlReader::read(std::string const& in, jsn::object_t& json_object) {
 
     json_object.swap(object);
 
-    TLOG(2) << "read() end";
+    TLOG(12) << "read() end";
 
     return true;
 
   } catch (std::exception const& e) {
-    TLOG(2) << "read() Caught exception message=" << e.what();
+    TLOG(12) << "read() Caught exception message=" << e.what();
 
     std::cerr << "Caught exception message=" << e.what() << "\n";
     throw;
@@ -77,5 +77,5 @@ void artdaq::database::xml::debug::XmlReader() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(0) <<  "artdaq::database::xml::XmlReader trace_enable";
+  TLOG(10) <<  "artdaq::database::xml::XmlReader trace_enable";
 }

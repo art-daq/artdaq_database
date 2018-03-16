@@ -57,10 +57,10 @@ void write_document(Options const& options, std::string& conf) {
   confirm(options.operation().compare(apiliteral::operation::writedocument) == 0 ||
           options.operation().compare(apiliteral::operation::overwritedocument) == 0);
 
-  TLOG(2) << "write_document: begin";
+  TLOG(12) << "write_document: begin";
 
   if (conf.empty()) {
-    TLOG(2) << "Error in write_document: Invalid configuration document; configuration document is empty.";
+    TLOG(12) << "Error in write_document: Invalid configuration document; configuration document is empty.";
 
     throw runtime_error("write_document") << "Invalid configuration document; configuration document is empty.";
   }
@@ -103,12 +103,12 @@ void write_document(Options const& options, std::string& conf) {
       auto fhicl = FhiclData{};
 
       if (!data.convert_to<FhiclData>(fhicl)) {
-        TLOG(2) << "write_document: Unable to convert json data to fcl; json=<" << data << ">";
+        TLOG(12) << "write_document: Unable to convert json data to fcl; json=<" << data << ">";
 
         throw runtime_error("write_document") << "Unable to reverse fhicl-to-json convertion";
       } else {
-        TLOG(2) << "write_document: Converted json data to fcl; json=<" << data << ">";
-        TLOG(2) << "write_document: Converted json data to fcl; fcl=<" << fhicl << ">";
+        TLOG(12) << "write_document: Converted json data to fcl; json=<" << data << ">";
+        TLOG(12) << "write_document: Converted json data to fcl; fcl=<" << fhicl << ">";
       }
 
       returnValue = fhicl;
@@ -124,12 +124,12 @@ void write_document(Options const& options, std::string& conf) {
       auto xml = XmlData{};
 
       if (!data.convert_to<XmlData>(xml)) {
-        TLOG(2) << "write_document: Unable to convert json data to fcl; json=<" << data << ">";
+        TLOG(12) << "write_document: Unable to convert json data to fcl; json=<" << data << ">";
 
         throw runtime_error("write_document") << "Unable to reverse xml-to-json convertion";
       } else {
-        TLOG(2) << "write_document: Converted json data to fcl; json=<" << data << ">";
-        TLOG(2) << "write_document: Converted json data to fcl; fcl=<" << xml << ">";
+        TLOG(12) << "write_document: Converted json data to fcl; json=<" << data << ">";
+        TLOG(12) << "write_document: Converted json data to fcl; fcl=<" << xml << ">";
       }
 
       returnValue = xml;
@@ -139,8 +139,8 @@ void write_document(Options const& options, std::string& conf) {
     }
   }
 
-  TLOG(2) << "write_document: json_buffer=<" << data << ">";
-  TLOG(2) << "write_document: options=<" << options << ">";
+  TLOG(12) << "write_document: json_buffer=<" << data << ">";
+  TLOG(12) << "write_document: options=<" << options << ">";
 
   // create a json document to be inserted into the database
   JSONDocumentBuilder builder{{data}};
@@ -183,7 +183,7 @@ void write_document(Options const& options, std::string& conf) {
   auto insert_payload =
       JsonData{"{\"document\":" + builder.to_string() + filter + ", \"collection\":\"" + options.collection() + "\"}"};
 
-  TLOG(2) << "write_document: insert_payload=<" << insert_payload << ">";
+  TLOG(12) << "write_document: insert_payload=<" << insert_payload << ">";
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers =
@@ -198,13 +198,13 @@ void write_document(Options const& options, std::string& conf) {
 
   if (returnValueChanged) conf.swap(returnValue);
 
-  TLOG(2) << "write_document: end";
+  TLOG(12) << "write_document: end";
 }
 
 void read_document(Options const& options, std::string& conf) {
   confirm(options.operation().compare(apiliteral::operation::readdocument) == 0);
 
-  TLOG(3)<< "read_document: begin";
+  TLOG(13)<< "read_document: begin";
 
   if (!conf.empty()) {
     throw runtime_error("read_document") << "Invalid configuration document; configuration document is not empty.";
@@ -215,7 +215,7 @@ void read_document(Options const& options, std::string& conf) {
   auto search_payload = JsonData{"{\"filter\":" + options.query_filter_to_JsonData().json_buffer +
                                  +", \"collection\":\"" + options.collection() + "\"}"};
 
-  TLOG(3)<< "read_document: search_payload=<" << search_payload << ">";
+  TLOG(13)<< "read_document: search_payload=<" << search_payload << ">";
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers =
@@ -241,7 +241,7 @@ void read_document(Options const& options, std::string& conf) {
     auto const& docAst = boost::get<jsn::object_t>(resultAst.at(jsonliteral::origin));
     format = to_data_format(boost::get<std::string>(docAst.at(jsonliteral::format)));
 
-    TLOG(3)<< "read_document: format=<" << to_string(format) << ">";
+    TLOG(13)<< "read_document: format=<" << to_string(format) << ">";
   }
 
   switch (format) {
@@ -286,7 +286,7 @@ void read_document(Options const& options, std::string& conf) {
 
       auto fhicl = FhiclData{};
       if (!json.convert_to<FhiclData>(fhicl)) {
-        TLOG(3)<< "read_document: Unable to convert json data to fcl; json=<" << json << ">";
+        TLOG(13)<< "read_document: Unable to convert json data to fcl; json=<" << json << ">";
 
         throw runtime_error("read_document") << "Unable to reverse fhicl-to-json convertion";
       }
@@ -302,7 +302,7 @@ void read_document(Options const& options, std::string& conf) {
 
       auto xml = XmlData{};
       if (!json.convert_to<XmlData>(xml)) {
-        TLOG(3)<< "read_document: Unable to convert json data to xml; json=<" << json << ">";
+        TLOG(13)<< "read_document: Unable to convert json data to xml; json=<" << json << ">";
 
         throw runtime_error("read_document") << "Unable to reverse xml-to-json convertion";
       }
@@ -316,15 +316,15 @@ void read_document(Options const& options, std::string& conf) {
 
   if (returnValueChanged) conf.swap(returnValue);
 
-  TLOG(3)<< "read_document: end";
+  TLOG(13)<< "read_document: end";
 }
 
 void find_versions(Options const& options, std::string& versions) {
   confirm(versions.empty());
   confirm(options.operation().compare(apiliteral::operation::findversions) == 0);
 
-  TLOG(4) << "find_versions: begin";
-  TLOG(4) << "find_versions args options=<" << options << ">";
+  TLOG(14) << "find_versions: begin";
+  TLOG(14) << "find_versions args options=<" << options << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -364,14 +364,14 @@ void find_versions(Options const& options, std::string& versions) {
       object_t results_ast;
 
       if (!reader.read(search_result, results_ast)) {
-        TLOG(4) << "find_entities() Failed to create an AST from search results JSON.";
+        TLOG(14) << "find_entities() Failed to create an AST from search results JSON.";
 
         throw runtime_error("find_entities") << "Failed to create an AST from search results JSON.";
       }
 
       auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
 
-      TLOG(4) << "find_entities: found " << results_list.size() << " results.";
+      TLOG(14) << "find_entities: found " << results_list.size() << " results.";
 
       std::ostringstream os;
 
@@ -384,7 +384,7 @@ void find_versions(Options const& options, std::string& versions) {
       }
 
       for (auto const& entity : entities) {
-        TLOG(4) << "find_entities() Found entity=<" << entity << ">.";
+        TLOG(14) << "find_entities() Found entity=<" << entity << ">.";
         os << entity << ",";
       }
 
@@ -400,15 +400,15 @@ void find_versions(Options const& options, std::string& versions) {
 
   if (returnValueChanged) versions.swap(returnValue);
 
-  TLOG(4) << "find_versions: end";
+  TLOG(14) << "find_versions: end";
 }
 
 void find_entities(Options const& options, std::string& entities) {
   confirm(entities.empty());
   confirm(options.operation().compare(apiliteral::operation::findentities) == 0);
 
-  TLOG(5) << "find_entities: begin";
-  TLOG(5) << "find_entities args options=<" << options << ">";
+  TLOG(15) << "find_entities: begin";
+  TLOG(15) << "find_entities args options=<" << options << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -448,14 +448,14 @@ void find_entities(Options const& options, std::string& entities) {
       object_t results_ast;
 
       if (!reader.read(search_result, results_ast)) {
-        TLOG(5) << "find_entities() Failed to create an AST from search results JSON.";
+        TLOG(15) << "find_entities() Failed to create an AST from search results JSON.";
 
         throw runtime_error("find_entities") << "Failed to create an AST from search results JSON.";
       }
 
       auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
 
-      TLOG(5) << "find_entities: found " << results_list.size() << " results.";
+      TLOG(15) << "find_entities: found " << results_list.size() << " results.";
 
       std::ostringstream os;
 
@@ -468,7 +468,7 @@ void find_entities(Options const& options, std::string& entities) {
       }
 
       for (auto const& entity : entities) {
-        TLOG(5) << "find_entities() Found entity=<" << entity << ">.";
+        TLOG(15) << "find_entities() Found entity=<" << entity << ">.";
         os << entity << ",";
       }
 
@@ -484,17 +484,17 @@ void find_entities(Options const& options, std::string& entities) {
 
   if (returnValueChanged) entities.swap(returnValue);
 
-  TLOG(5) << "find_entities: end";
-  TLOG(5) << "find_entities: end entities=" << entities;
+  TLOG(15) << "find_entities: end";
+  TLOG(15) << "find_entities: end entities=" << entities;
 }
 
 void add_entity(Options const& options, std::string& conf) {
   confirm(conf.empty());
   confirm(options.operation().compare(apiliteral::operation::addentity) == 0);
 
-  TLOG(6) << "add_entity: begin";
-  TLOG(6) << "add_entity args options=<" << options << ">";
-  TLOG(6) << "add_entity args conf=<" << conf << ">";
+  TLOG(16) << "add_entity: begin";
+  TLOG(16) << "add_entity args options=<" << options << ">";
+  TLOG(16) << "add_entity args conf=<" << conf << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -504,44 +504,44 @@ void add_entity(Options const& options, std::string& conf) {
   newOptions.operation(apiliteral::operation::readdocument);
   newOptions.format(data_format_t::db);
   newOptions.entity(apiliteral::notprovided);
-  TLOG(6) << "add_entity 0";
+  TLOG(16) << "add_entity 0";
 
   newOptions.queryFilter(apiliteral::notprovided);
-  TLOG(6) << "add_entity 0";
+  TLOG(16) << "add_entity 0";
 
   read_document(newOptions, document);
   JSONDocumentBuilder builder{{document}};
-  TLOG(6) << "add_entity 1";
+  TLOG(16) << "add_entity 1";
 
   builder.addEntity({options.entity_to_JsonData()});
 
   newOptions.operation(apiliteral::operation::writedocument);
   newOptions.format(data_format_t::db);
 
-  TLOG(6) << "add_entity 2";
+  TLOG(16) << "add_entity 2";
 
   auto updated = builder.to_string();
   write_document(newOptions, updated);
-  TLOG(6) << "add_entity 3";
+  TLOG(16) << "add_entity 3";
   newOptions.operation(apiliteral::operation::readdocument);
   newOptions.format(options.format());
-  TLOG(6) << "add_entity 4";
+  TLOG(16) << "add_entity 4";
 
   document.clear();
   read_document(newOptions, document);
 
   conf.swap(document);
 
-  TLOG(6) << "add_entity end conf=<" << conf << ">";
+  TLOG(16) << "add_entity end conf=<" << conf << ">";
 }
 
 void remove_entity(Options const& options, std::string& conf) {
   confirm(conf.empty());
   confirm(options.operation().compare(apiliteral::operation::rmentity) == 0);
 
-  TLOG(5) << "remove_entity: begin";
-  TLOG(6) << "remove_entity args options=<" << options << ">";
-  TLOG(6) << "remove_entity args conf=<" << conf << ">";
+  TLOG(15) << "remove_entity: begin";
+  TLOG(16) << "remove_entity args options=<" << options << ">";
+  TLOG(16) << "remove_entity args conf=<" << conf << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -572,16 +572,16 @@ void remove_entity(Options const& options, std::string& conf) {
 
   conf.swap(document);
 
-  TLOG(6) << "remove_entity end conf=<" << conf << ">";
+  TLOG(16) << "remove_entity end conf=<" << conf << ">";
 }
 
 void mark_document_readonly(Options const& options, std::string& conf) {
   confirm(conf.empty());
   confirm(options.operation().compare(apiliteral::operation::markreadonly) == 0);
 
-  TLOG(5) << "mark_document_readonly: begin";
-  TLOG(5) << "mark_document_readonly args options=<" << options << ">";
-  TLOG(5) << "mark_document_readonly args conf=<" << conf << ">";
+  TLOG(15) << "mark_document_readonly: begin";
+  TLOG(15) << "mark_document_readonly args options=<" << options << ">";
+  TLOG(15) << "mark_document_readonly args conf=<" << conf << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -612,16 +612,16 @@ void mark_document_readonly(Options const& options, std::string& conf) {
 
   conf.swap(document);
 
-  TLOG(5) << "mark_document_readonly end conf=<" << conf << ">";
+  TLOG(15) << "mark_document_readonly end conf=<" << conf << ">";
 }
 
 void mark_document_deleted(Options const& options, std::string& conf) {
   confirm(conf.empty());
   confirm(options.operation().compare(apiliteral::operation::markdeleted) == 0);
 
-  TLOG(9) << "mark_document_deleted: begin";
-  TLOG(9) << "mark_document_deleted args options=<" << options << ">";
-  TLOG(9) << "mark_document_deleted args conf=<" << conf << ">";
+  TLOG(19) << "mark_document_deleted: begin";
+  TLOG(19) << "mark_document_deleted args options=<" << options << ">";
+  TLOG(19) << "mark_document_deleted args conf=<" << conf << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -652,7 +652,7 @@ void mark_document_deleted(Options const& options, std::string& conf) {
 
   conf.swap(document);
 
-  TLOG(9) << "mark_document_deleted end conf=<" << conf << ">";
+  TLOG(19) << "mark_document_deleted end conf=<" << conf << ">";
 }
 
 void read_documents(ManageDocumentOperation const& options, std::list<JsonData>& document_list) {
@@ -662,7 +662,7 @@ void read_documents(ManageDocumentOperation const& options, std::list<JsonData>&
   typedef std::list<JsonData> (*provider_call_t)(ManageDocumentOperation const& /*options*/,
                                                  JsonData const& /*task_payload*/);
 
-  TLOG(3)<< "read_documents: begin";
+  TLOG(13)<< "read_documents: begin";
 
   validate_dbprovider_name(options.provider());
 
@@ -672,7 +672,7 @@ void read_documents(ManageDocumentOperation const& options, std::list<JsonData>&
 
   auto search_payload = oss.str();
 
-  TLOG(3)<< "read_documents: search_payload=<" << search_payload << ">";
+  TLOG(13)<< "read_documents: search_payload=<" << search_payload << ">";
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers =
@@ -685,15 +685,15 @@ void read_documents(ManageDocumentOperation const& options, std::list<JsonData>&
   auto documents = dispatch_persistence_provider(options.provider())(options, search_payload);
   document_list.swap(documents);
 
-  TLOG(3)<< "read_documents: found " << document_list.size() << "documents.";
-  TLOG(3)<< "read_documents: end";
+  TLOG(13)<< "read_documents: found " << document_list.size() << "documents.";
+  TLOG(13)<< "read_documents: end";
 }
 
 void write_documents(ManageDocumentOperation const& options, std::list<JsonData> const& document_list) {
   confirm(!document_list.empty());
   confirm(options.operation().compare(apiliteral::operation::writedocument) == 0);
 
-  TLOG(2) << "write_documents: begin";
+  TLOG(12) << "write_documents: begin";
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers =
@@ -703,7 +703,7 @@ void write_documents(ManageDocumentOperation const& options, std::list<JsonData>
     return providers.at(name);
   };
 
-  TLOG(2) << "write_documents: writing " << document_list.size() << " documents.";
+  TLOG(12) << "write_documents: writing " << document_list.size() << " documents.";
 
   for (auto const& document : document_list) {
     JSONDocumentBuilder builder{{document}};
@@ -717,10 +717,10 @@ void write_documents(ManageDocumentOperation const& options, std::list<JsonData>
 
     dispatch_persistence_provider(options.provider())(options, {oss.str()});
 
-    TLOG(2) << "write_documents: wrote document ouid=" << builder.getObjectOUID();
+    TLOG(12) << "write_documents: wrote document ouid=" << builder.getObjectOUID();
   }
 
-  TLOG(2) << "write_documents: end";
+  TLOG(12) << "write_documents: end";
 }
 }  // namespace detail
 }  // namespace configuration
@@ -734,5 +734,5 @@ void cftd::ManageDocuments() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(0) <<  "artdaq::database::configuration::ManageDocuments trace_enable";
+  TLOG(10) <<  "artdaq::database::configuration::ManageDocuments trace_enable";
 }

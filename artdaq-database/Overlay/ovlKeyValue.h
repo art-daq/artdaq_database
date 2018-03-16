@@ -76,14 +76,14 @@ template <typename T>
 T& ovlKeyValue::objectValue(object_t::key_type const& key) {
   using artdaq::database::sharedtypes::unwrap;
 
-  return unwrap(_value).value_as<T>(key);
+  return unwrap(_value).template value_as<T>(key);
 }
 
 template <typename T>
 T const& ovlKeyValue::objectValue(object_t::key_type const& key) const {
   using artdaq::database::sharedtypes::unwrap;
 
-  return unwrap(_value).value_as<T>(key);
+  return unwrap(_value).template value_as<T>(key);
 }
 
 template <typename OVL, typename T = object_t>
@@ -97,7 +97,7 @@ std::unique_ptr<OVL> overlay(value_t& parent, object_t::key_type const& self_key
 
   if (type(parent) != type_t::OBJECT) throw std::runtime_error("Errror: parent is not a type_t::OBJECT type");
 
-  return std::make_unique<OVL>(self_key, unwrap(parent).value<object_t, T>(self_key));
+  return std::make_unique<OVL>(self_key, unwrap(parent).template value<object_t, T>(self_key));
 }
 
 using ovlKeyValueUPtr_t = std::unique_ptr<ovlKeyValue>;

@@ -4,6 +4,7 @@ cet_make(
   ${Boost_SYSTEM_LIBRARY}    
   #${CETLIB}
   ${CETLIB_EXCEPT}
+  -ldl
   )
 
 install_headers()

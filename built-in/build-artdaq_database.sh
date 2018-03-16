@@ -93,7 +93,7 @@ function pull_products() {
 
   # we pull what we can so we don't have to build everything
   ${productsdir}/pullProducts -l ${productsdir} ${flvr} artdaq_database-build ${squal}-${basequal} ${build_type}
-
+  
   # Remove any artdaq_database that came with the bundle
   if [ -d ${productsdir}/artdaq_database ]; then
     echo "Removing ${productsdir}/artdaq_database"
@@ -172,6 +172,13 @@ function stash_artifacts() {
   rm -rf ${srcdir}
 }
 
+function patch_products() {
+#fix mongodb
+  cd ${productsdir}/mongodb/v3_4_6c
+  find ./ -name  "mongodbConfig.cmake" -type f -print | xargs -n 1 sed -i "s/3.4.6b/3.4.6c/g"
+  find ./ -name  "mongodbConfig.cmake" -type f -print | xargs -n 1 sed -i "s/v3_4_6b/v3_4_6c/g"
+}
+
 cleanup
 RC=$?
 if [ $RC -ne 0 ]; then
@@ -189,6 +196,8 @@ RC=$?
 if [ $RC -ne 0 ]; then
    echo "Error: Failed pulling build dependency products. Aborting. "; exit 1
 fi
+
+patch_products
 
 run_build
 RC=$?

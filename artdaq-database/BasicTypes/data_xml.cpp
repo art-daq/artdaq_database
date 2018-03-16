@@ -48,9 +48,9 @@ XmlData::XmlData(JsonData const& document) {
 
   confirm(!document.empty());
 
-  TLOG(1) << "XML document=" << document;
+  TLOG(11) << "XML document=" << document;
 
-  auto ex = std::regex({regex::parse_base64data});
+  auto ex = std::regex(regex::parse_base64data);
 
   auto results = std::smatch();
 
@@ -65,38 +65,38 @@ XmlData::XmlData(JsonData const& document) {
         document.json_buffer);
 
   auto base64 = std::string(results[0]);
-  TLOG(2) << "XML base64=" << base64;
+  TLOG(12) << "XML base64=" << base64;
 
   auto json = base64_decode(base64);
-  TLOG(3)<< "XML  json=" << json;
+  TLOG(13)<< "XML  json=" << json;
 
   JsonData(json).convert_to(*this);
 
-  TLOG(4) << "XML xml=" << xml_buffer;
+  TLOG(14) << "XML xml=" << xml_buffer;
 }
 
 XmlData::operator JsonData() const {
   namespace literal = artdaq::database::dataformats::literal;
 
-  TLOG(5) << "XML xml=" << xml_buffer;
+  TLOG(15) << "XML xml=" << xml_buffer;
 
   auto json = JsonData("");
 
   if (!json.convert_from(*this))
     throw std::runtime_error("XML to JSON convertion error; XML buffer: " + this->xml_buffer);
 
-  TLOG(6) << "XML  json=" << json;
+  TLOG(16) << "XML  json=" << json;
 
   auto collection = std::string("XmlData_") + type_version();
 
   auto base64 = base64_encode(xml_buffer);
-  TLOG(5) << "XML base64=" << base64;
+  TLOG(15) << "XML base64=" << base64;
 
   std::ostringstream os;
 
   os << json;
 
-  TLOG(5) << "XML document=" << os.str();
+  TLOG(15) << "XML document=" << os.str();
 
   return {os.str()};
 }

@@ -28,7 +28,7 @@ bool conf_to_json(std::string const& conf, std::string& json) {
   confirm(!conf.empty());
   confirm(json.empty());
 
-  TLOG(2) << "conf_to_json: begin";
+  TLOG(12) << "conf_to_json: begin";
 
   auto result = bool{false};
 
@@ -58,7 +58,7 @@ bool conf_to_json(std::string const& conf, std::string& json) {
 
   if (result) json.swap(json1);
 
-  TLOG(2) << "conf_to_json: end";
+  TLOG(12) << "conf_to_json: end";
 
   return result;
 }
@@ -67,18 +67,18 @@ bool json_to_conf(std::string const& json, std::string& conf) {
   confirm(!json.empty());
   confirm(conf.empty());
 
-  TLOG(3)<< "json_to_conf: begin";
+  TLOG(13)<< "json_to_conf: begin";
 
   auto result = bool{false};
 
-  TLOG(3)<< "json_to_conf: Reading JSON buffer..";
+  TLOG(13)<< "json_to_conf: Reading JSON buffer..";
 
   auto json_root = jsn::object_t{};
   auto reader = JsonReader{};
   result = reader.read(json, json_root);
 
   if (!result) {
-    TLOG(3)<< "json_to_conf: Unable to read JSON buffer";
+    TLOG(13)<< "json_to_conf: Unable to read JSON buffer";
     return result;
   }
 
@@ -96,7 +96,7 @@ bool json_to_conf(std::string const& json, std::string& conf) {
 
   if (result) conf.swap(conf1);
 
-  TLOG(3)<< "json_to_conf: end";
+  TLOG(13)<< "json_to_conf: end";
 
   return result;
 }
@@ -108,7 +108,7 @@ void enableConfJson() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(0) <<  "artdaq::database::confjson trace_enable";
+  TLOG(10) <<  "artdaq::database::confjson trace_enable";
 }
 }
 }  // namespace confjson

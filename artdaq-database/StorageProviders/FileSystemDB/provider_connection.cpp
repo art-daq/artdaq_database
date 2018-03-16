@@ -74,7 +74,7 @@ std::string& FileSystemDB::connection() {
 
   db::write_buffer_to_file(oss.str(), filename);
 
-  TLOG(5) << "StorageProvider::FileSystemDB::connection created metadata record id=" << oid
+  TLOG(15) << "StorageProvider::FileSystemDB::connection created metadata record id=" << oid
                                                                                     << ", path=" << path.c_str();
 
   return _connection;

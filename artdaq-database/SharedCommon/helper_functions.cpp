@@ -34,7 +34,15 @@ std::string db::to_string(std::chrono::system_clock::time_point const& tp) {
   char buff[40];
   std::strftime(buff, sizeof(buff), apiliteral::timestamp_format, std::localtime(&time));
   auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch()).count() % 1000;
-  snprintf(buff + 30, 4, "%03ld", milliseconds);
+  
+#ifndef __clang__
+  #define FORMAT_DURATION_MILLISECONDS "%03ld"  
+#else //__clang__
+  #define FORMAT_DURATION_MILLISECONDS "%03lld"
+#endif //__clang__
+  
+  snprintf(buff + 30, 4, FORMAT_DURATION_MILLISECONDS, milliseconds);
+  
   strncpy(buff + 20, buff + 30, 3);
 
   if (useFakeTime()) return apiliteral::timestamp_faketime;
@@ -229,10 +237,10 @@ db::object_id_t db::extract_oid(std::string const& filter) {
 
   if (results.size() != 2) {
     // we are interested in a second match
-    TLOG(12) << "value()"
+    TLOG(22) << "value()"
                    << "JSON regex_search() result count=" << results.size();
     for (auto const& result : results) {
-      TLOG(12) << "value()"
+      TLOG(22) << "value()"
                      << "JSON regex_search() result=" << result;
     }
 
@@ -253,7 +261,7 @@ db::object_id_t db::extract_oid(std::string const& filter) {
 
   match = dequote(match);
 
-  TLOG(12) << "value()"
+  TLOG(22) << "value()"
                  << "JSON regex_search() result=" << match;
 
   return match;

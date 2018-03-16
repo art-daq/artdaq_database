@@ -16,9 +16,6 @@
 
 #define TRACE_NAME "FHJS:fcl2jsndb_C"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
-
 namespace db = artdaq::database;
 namespace jsn = artdaq::database::json;
 namespace fcl = artdaq::database::fhicl;
@@ -41,8 +38,8 @@ fcl2jsondb::operator datapair_t() try {
   auto const& key = self.first;
   auto const& value = self.second;
 
-  TLOG(2) << "fcl2jsondb() key=<" << key << ">";
-  TLOG(2) << "fcl2jsondb() value=<" << value.to_string() << ">";
+  TLOG(12) << "fcl2jsondb() key=<" << key << ">";
+  TLOG(12) << "fcl2jsondb() value=<" << value.to_string() << ">";
 
   using artdaq::database::fhicljson::return_pair;
 
@@ -112,7 +109,7 @@ fcl2jsondb::operator datapair_t() try {
 
   if (value.protection != ::fhicl::Protection::NONE) {
     object[literal::protection] = fcl::protection_as_string(value.protection);
-    TLOG(2) << "fcl2jsondb() value type=<" << fcl::tag_as_string(value.tag) << ">, protection=<"
+    TLOG(12) << "fcl2jsondb() value type=<" << fcl::tag_as_string(value.tag) << ">, protection=<"
                                           << fcl::protection_as_string(value.protection) << ">";
   }
 
@@ -158,7 +155,7 @@ fcl2jsondb::operator datapair_t() try {
 
       for (auto const& tmpVal : fcl_value::sequence_t(value)) {
         fhicl_key_value_pair_t kvp = std::make_pair(std::to_string(idx++), tmpVal);
-        datapair_t pair = std::move(fcl2jsondb(std::make_tuple(kvp, self, comments, opts)));
+        datapair_t pair = std::move(fcl2jsondb(std::forward_as_tuple(kvp, self, comments, opts)));
         tmpDataArray.push_back(std::move(pair.first.value));
         tmpMetadataObject.push_back(std::move(pair.second));
       }
@@ -174,7 +171,7 @@ fcl2jsondb::operator datapair_t() try {
 
       for (auto const& kvp : fcl_value::table_t(value)) {
         if ((kvp.second.in_prolog && opts.readProlog) || (!kvp.second.in_prolog && opts.readMain)) {
-          datapair_t pair = std::move(fcl2jsondb(std::make_tuple(kvp, self, comments, opts)));
+          datapair_t pair = std::move(fcl2jsondb(std::forward_as_tuple(kvp, self, comments, opts)));
           tmpDataObject.push_back(std::move(pair.first));
           tmpMetadataObject.push_back(std::move(pair.second));
         }
@@ -230,18 +227,18 @@ json2fcldb::operator fcl::atom_t() try {
 
   auto type_name = boost::get<std::string>(metadata_object.at(literal::type));
 
-  TLOG(2) << "json2fcldb() key=<" << self_key << "> type=<" << type_name << ">";
+  TLOG(12) << "json2fcldb() key=<" << self_key << "> type=<" << type_name << ">";
 
   auto override_comment = false;
 
   if (type_name == "table" && self_data.type() == typeid(std::string)) {
-    TLOG(2) << "json2fcldb() type override to string";
+    TLOG(12) << "json2fcldb() type override to string";
     type_name = "string";
     override_comment = true;
   }
 
   if (self_key.compare(0, include.length(), include) == 0) {
-    TLOG(2) << "json2fcldb() name override to #include";
+    TLOG(12) << "json2fcldb() name override to #include";
 
     auto fcl_key = fcl::key_t("#include", " ");
     auto fcl_value = fcl::value_t();
@@ -320,7 +317,7 @@ json2fcldb::operator fcl::atom_t() try {
         for (auto const& tmpVal : values) {
           auto datakey = std::to_string(idx++);
           valuetuple_t value_tuple = std::forward_as_tuple(datakey, tmpVal, children.at(datakey));
-          sequence.push_back(json2fcldb(std::make_tuple(value_tuple, self, opts)));
+          sequence.push_back(json2fcldb(std::forward_as_tuple(value_tuple, self, opts)));
         }
       } catch (std::out_of_range const&) {
       }
@@ -336,8 +333,7 @@ json2fcldb::operator fcl::atom_t() try {
         auto const& children = boost::get<jsn::object_t>(metadata_object.at(literal::children));
         for (auto const& data : object) {
           valuetuple_t value_tuple = std::forward_as_tuple(data.key, data.value, children.at(data.key));
-
-          table.push_back(json2fcldb(std::make_tuple(value_tuple, self, opts)));
+          table.push_back(json2fcldb(std::forward_as_tuple(value_tuple, self, opts)));
         }
 
       } catch (std::out_of_range const&) {
@@ -378,13 +374,11 @@ T& unwrapper<fcl::value_t>::value_as() {
   return boost::get<T>(any.value);
 }
 
-#pragma GCC diagnostic pop
-
 void artdaq::database::fhicljson::debug::FCL2JSON() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(0) <<  "artdaq::database::convertjson::FCL2JSON trace_enable";
+  TLOG(10) <<  "artdaq::database::convertjson::FCL2JSON trace_enable";
 }

@@ -1,11 +1,7 @@
 #ifndef _ARTDAQ_DATABASE_CONFIGURATIONDBIFC_H_
 #define _ARTDAQ_DATABASE_CONFIGURATIONDBIFC_H_
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
 #include "artdaq-database/ConfigurationDB/configurationdbifc_base.h"
-#pragma GCC diagnostic pop
-
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "options_operation_manageconfigs.h"
 

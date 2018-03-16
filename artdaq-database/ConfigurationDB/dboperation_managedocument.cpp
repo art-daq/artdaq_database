@@ -213,13 +213,13 @@ result_t json::find_entities(std::string const& query_payload) noexcept {
 result_t json::add_entity(std::string const& query_payload) noexcept {
   try {
     if (query_payload.empty()) return Failure(msg_EmptyFilter);
-    TLOG(0) <<  "add_entity 1";
+    TLOG(10) <<  "add_entity 1";
 
     auto options = ManageDocumentOperation{apiliteral::operation::addentity};
-    TLOG(0) <<  "add_entity 2";
+    TLOG(10) <<  "add_entity 2";
 
     options.readJsonData({query_payload});
-    TLOG(0) <<  "add_entity 2";
+    TLOG(10) <<  "add_entity 2";
 
     auto returnValue = std::string{};
 
@@ -289,5 +289,5 @@ void dbcfg::debug::ManageDocuments() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
   dbcfg::debug::detail::ManageDocuments();
-  TLOG(0) <<  "artdaq::database::configuration::ManageDocuments trace_enable";
+  TLOG(10) <<  "artdaq::database::configuration::ManageDocuments trace_enable";
 }

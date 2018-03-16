@@ -32,16 +32,27 @@ size_t last_size;
 }
 }
 
+
 extern "C" {
-void __cxa_throw(void* ex, void* info, void (*dest)(void*)) {
+#ifndef __clang__
+  void __cxa_throw(void* ex, void* info, void (*dest)(void*)) {
   using namespace debug::stack;
   last_size = backtrace(last_frames, sizeof last_frames / sizeof(void*));
 
-  static void (*const rethrow)(void*, void*, void (*)(void*)) __attribute__((noreturn)) =
-      (void (*)(void*, void*, void (*)(void*)))dlsym(RTLD_NEXT, "__cxa_throw");
+   __cxa_throw_t* rethrow __attribute__((noreturn)) =  (__cxa_throw_t*)dlsym(RTLD_NEXT, "__cxa_throw");
 
   rethrow(ex, info, dest);
-}
+}    
+#else
+  __attribute__((noreturn)) void __cxa_throw(void * ex,std::type_info *info,void(*dest)(void *)){
+  using namespace debug::stack;
+  last_size = backtrace(last_frames, sizeof last_frames / sizeof(void*));
+  
+  __cxa_throw_t* rethrow =  (__cxa_throw_t*)dlsym(RTLD_NEXT, "__cxa_throw");
+  
+  rethrow(ex, info, dest);
+  }
+#endif  
 }
 
 namespace debug {
@@ -135,12 +146,12 @@ void signalHandler(int signum) {
   }
 
   if (name) {
-    TLOG(1) << "Caught signal " << signum << " (" << name << ")";
+    TLOG(11) << "Caught signal " << signum << " (" << name << ")";
   } else {
-    TLOG(1) << "Caught signal " << signum;
+    TLOG(11) << "Caught signal " << signum;
   }
 
-  TLOG(1) << "" << getStackTrace();
+  TLOG(11) << "" << getStackTrace();
 
   exit(signum);
 }
@@ -156,28 +167,28 @@ void terminateHandler() {
       char funcname[1024];
       int status = 0;
 
-      TLOG(1)<< "Terminate called after throwing an instance of \'"
+      TLOG(11)<< "Terminate called after throwing an instance of \'"
                     << abi::__cxa_demangle(typeid(ex).name(), funcname, &funcnamesize, &status) << "\'";
 
-      TLOG(1)<< " what(): " << ex.what();
+      TLOG(11)<< " what(): " << ex.what();
 
-      TLOG(1) << " details: " << pending;
+      TLOG(11) << " details: " << pending;
 
     } catch (...) {
-      TLOG(1) << "Terminate called after throwing an instance of unknown exception";
+      TLOG(11) << "Terminate called after throwing an instance of unknown exception";
     }
   } else {
-    TLOG(1) << "Terminate called";
+    TLOG(11) << "Terminate called";
   }
 
-  TLOG(1) << getStackTrace();
+  TLOG(11) << getStackTrace();
 
   exit(SIGTERM);
 }
 
 void uncaughtExceptionHandler() {
-  TLOG(1) << "Unexpected handler function called.";
-  TLOG(1) << getCxaThrowStack();
+  TLOG(11) << "Unexpected handler function called.";
+  TLOG(11) << getCxaThrowStack();
   terminateHandler();
 }
 
@@ -195,7 +206,7 @@ void registerAbortHandler() {
 
 void registerTerminateHandler() { std::set_terminate(terminateHandler); }
 
-void registerUncaughtExceptionHandler() { std::set_unexpected(uncaughtExceptionHandler); }
+void registerUncaughtExceptionHandler() { /*std::set_unexpected(uncaughtExceptionHandler);*/ }
 
 void trace_enable() {
   TRACE_CNTL("name", TRACE_NAME);

@@ -37,7 +37,7 @@ bool XmlWriter::write(jsn::object_t const& json_object, std::string& out) {
   confirm(out.empty());
   confirm(!json_object.empty());
 
-  TLOG(2) << "write() begin";
+  TLOG(12) << "write() begin";
 
   try {
     auto const& json_tree = boost::get<jsn::object_t>(json_object.at(literal::data));
@@ -70,11 +70,11 @@ bool XmlWriter::write(jsn::object_t const& json_object, std::string& out) {
 
     out.swap(buffer);
 
-    TLOG(2) << "write() end";
+    TLOG(12) << "write() end";
 
     return true;
   } catch (std::exception const& e) {
-    TLOG(2) << "read() Caught exception message=" << e.what();
+    TLOG(12) << "read() Caught exception message=" << e.what();
 
     std::cerr << "Caught exception message=" << e.what() << "\n";
     throw;
@@ -87,5 +87,5 @@ void artdaq::database::xml::debug::XmlWriter() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(0) <<  "artdaq::database::xml::XmlWriter trace_enable";
+  TLOG(10) <<  "artdaq::database::xml::XmlWriter trace_enable";
 }

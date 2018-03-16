@@ -30,8 +30,8 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::findConfigurations(JsonDa
   confirm(!query_payload.empty());
   auto returnCollection = std::list<JsonData>();
 
-  TLOG(5) << "StorageProvider::FileSystemDB::findConfigurations() begin";
-  TLOG(5) << "StorageProvider::FileSystemDB::findConfigurations() args data=<" << query_payload << ">";
+  TLOG(15) << "StorageProvider::FileSystemDB::findConfigurations() begin";
+  TLOG(15) << "StorageProvider::FileSystemDB::findConfigurations() args data=<" << query_payload << ">";
 
   throw runtime_error("UconDB") << "StorageProvider::UconDB::findConfigurations() is not implemented";
 
@@ -45,8 +45,8 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::configurationComposition(
 
   auto returnCollection = std::list<JsonData>();
 
-  TLOG(6) << "StorageProvider::UconDB::configurationComposition() begin";
-  TLOG(6) << "StorageProvider::UconDB::configurationComposition() args data=<" << query_payload << ">";
+  TLOG(16) << "StorageProvider::UconDB::configurationComposition() begin";
+  TLOG(16) << "StorageProvider::UconDB::configurationComposition() args data=<" << query_payload << ">";
 
   throw runtime_error("UconDB") << "StorageProvider::UconDB::configurationComposition() is not implemented";
 
@@ -60,8 +60,8 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::findVersions(JsonData con
 
   auto returnCollection = std::list<JsonData>();
 
-  TLOG(5) << "StorageProvider::UconDB::findVersions() begin";
-  TLOG(5) << "StorageProvider::UconDB::findVersions() args data=<" << filter << ">";
+  TLOG(15) << "StorageProvider::UconDB::findVersions() begin";
+  TLOG(15) << "StorageProvider::UconDB::findVersions() args data=<" << filter << ">";
 
   throw runtime_error("UconDB") << "StorageProvider::UconDB::findVersions() is not implemented";
 
@@ -74,8 +74,8 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::findEntities(JsonData con
   confirm(!filter.empty());
   auto returnCollection = std::list<JsonData>();
 
-  TLOG(9) << "StorageProvider::UconDB::findEntities() begin";
-  TLOG(9) << "StorageProvider::UconDB::findEntities() args data=<" << filter << ">";
+  TLOG(19) << "StorageProvider::UconDB::findEntities() begin";
+  TLOG(19) << "StorageProvider::UconDB::findEntities() args data=<" << filter << ">";
 
   throw runtime_error("UconDB") << "StorageProvider::UconDB::findEntities() is not implemented";
 
@@ -88,8 +88,8 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::listCollections(JsonData 
   confirm(!query_payload.empty());
 
   auto returnCollection = std::list<JsonData>();
-  TLOG(12) << "StorageProvider::UconDB::listCollections() begin";
-  TLOG(12) << "StorageProvider::UconDB::listCollections() args data=<" << query_payload << ">";
+  TLOG(22) << "StorageProvider::UconDB::listCollections() begin";
+  TLOG(22) << "StorageProvider::UconDB::listCollections() args data=<" << query_payload << ">";
 
   throw runtime_error("UconDB") << "StorageProvider::UconDB::listCollections() is not implemented";
 
@@ -102,8 +102,8 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::addConfiguration(JsonData
   confirm(!query_payload.empty());
   auto returnCollection = std::list<JsonData>();
 
-  TLOG(5) << "StorageProvider::UconDB::addConfiguration() begin";
-  TLOG(5) << "StorageProvider::UconDB::addConfiguration() args data=<" << query_payload << ">";
+  TLOG(15) << "StorageProvider::UconDB::addConfiguration() begin";
+  TLOG(15) << "StorageProvider::UconDB::addConfiguration() args data=<" << query_payload << ">";
 
   throw runtime_error("UconDB") << "StorageProvider::UconDB::addConfiguration() is not implemented";
 
@@ -116,8 +116,8 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::listDatabases(JsonData co
   confirm(!query_payload.empty());
   auto returnCollection = std::list<JsonData>();
 
-  TLOG(9) << "StorageProvider::UconDB::listDatabases() begin";
-  TLOG(9) << "StorageProvider::UconDB::listDatabases() args data=<" << query_payload << ">";
+  TLOG(19) << "StorageProvider::UconDB::listDatabases() begin";
+  TLOG(19) << "StorageProvider::UconDB::listDatabases() args data=<" << query_payload << ">";
 
   throw runtime_error("UconDB") << "StorageProvider::UconDB::listDatabases() is not implemented";
 
@@ -143,7 +143,7 @@ void enable() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(0) <<  "artdaq::database::ucon trace_enable";
+  TLOG(10) <<  "artdaq::database::ucon trace_enable";
   artdaq::database::ucon::debug::UconDBAPI();
   artdaq::database::ucon::debug::ReadWrite();
 }

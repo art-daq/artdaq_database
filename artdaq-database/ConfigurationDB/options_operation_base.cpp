@@ -46,7 +46,7 @@ std::string const& OperationBase::operation() const {
 std::string const& OperationBase::operation(std::string const& operation) {
   confirm(!operation.empty());
 
-  TLOG(10)<< "Options: Updating operation from " << _operation << " to " << operation << ".";
+  TLOG(20)<< "Options: Updating operation from " << _operation << " to " << operation << ".";
 
   _operation = operation;
 
@@ -62,7 +62,7 @@ std::string const& OperationBase::collection() const {
 std::string const& OperationBase::collection(std::string const& collection_name) {
   confirm(!collection_name.empty());
 
-  TLOG(11)<< "Options: Updating collection_name from " << _collection_name << " to " << collection_name << ".";
+  TLOG(21)<< "Options: Updating collection_name from " << _collection_name << " to " << collection_name << ".";
 
   _collection_name = collection_name;
 
@@ -84,7 +84,7 @@ std::string const& OperationBase::provider(std::string const& provider) {
                                                         << ".";
   }
 
-  TLOG(12) << "Options: Updating provider from " << _provider << " to " << provider << ".";
+  TLOG(22) << "Options: Updating provider from " << _provider << " to " << provider << ".";
 
   _provider = provider;
 
@@ -99,7 +99,7 @@ data_format_t const& OperationBase::format() const {
 data_format_t const& OperationBase::format(data_format_t const& data_format) {
   confirm(data_format != data_format_t::unknown);
 
-  TLOG(13)<< "Options: Updating data_format from " << cf::to_string(_data_format) << " to "
+  TLOG(23)<< "Options: Updating data_format from " << cf::to_string(_data_format) << " to "
                                                    << cf::to_string(data_format) << ".";
 
   _data_format = data_format;
@@ -110,7 +110,7 @@ data_format_t const& OperationBase::format(data_format_t const& data_format) {
 data_format_t const& OperationBase::format(std::string const& format) {
   confirm(!format.empty());
 
-  TLOG(14) << "Options: format args format=<" << format << ">.";
+  TLOG(24) << "Options: format args format=<" << format << ">.";
 
   _data_format = cf::to_data_format(format);
 
@@ -127,7 +127,7 @@ std::string const& OperationBase::queryFilter(std::string const& query_payload) 
   confirm(!query_payload.empty());
 
   auto tmp = db::dequote(query_payload);
-  TLOG(15)<< "Options: queryFilter args query_payload=<" << tmp << ">.";
+  TLOG(25)<< "Options: queryFilter args query_payload=<" << tmp << ">.";
 
   _query_payload = tmp;
 
@@ -147,7 +147,7 @@ std::string const& OperationBase::resultFileName(std::string const& result_file_
 
   _result_file_name = db::expand_environment_variables(result_file_name);
 
-  TLOG(14) << "Options: resultFileName args result_file_name=<" << _result_file_name << ">.";
+  TLOG(24) << "Options: resultFileName args result_file_name=<" << _result_file_name << ">.";
 
   return _result_file_name;
 }
@@ -230,7 +230,7 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
       is.close();
     }
 
-    TLOG(14) << "Options: json query= <" << json << ">";
+    TLOG(24) << "Options: json query= <" << json << ">";
 
     readJsonData(json);
     return process_exit_code::SUCCESS;
@@ -276,17 +276,17 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
 }
 
 void OperationBase::readJsonData(JsonData const& data) {
-  TLOG(14) << "OperationBase::readJsonData() data=<" << data << ">";
+  TLOG(24) << "OperationBase::readJsonData() data=<" << data << ">";
   confirm(!data.empty());
-  TLOG(14) << "OperationBase::readJsonData() not empty=<" << data << ">";
+  TLOG(24) << "OperationBase::readJsonData() not empty=<" << data << ">";
   confirm(data.json_buffer != apiliteral::notprovided);
-  TLOG(14) << "OperationBase::readJsonData() object=<" << data << ">";
+  TLOG(24) << "OperationBase::readJsonData() object=<" << data << ">";
 
   using namespace artdaq::database::json;
   auto filterAST = object_t{};
 
   if (!JsonReader{}.read(data, filterAST)) {
-    TLOG(14) << "OperationBase: JSON buffer= <" << data << ">";
+    TLOG(24) << "OperationBase: JSON buffer= <" << data << ">";
     throw db::invalid_option_exception("OperationBase") << "OperationBase: Unable to read JSON buffer.";
   }
 
@@ -363,5 +363,5 @@ void cf::debug::options::OperationBase() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(0) <<  "artdaq::database::configuration::options::OperationBase trace_enable";
+  TLOG(10) <<  "artdaq::database::configuration::options::OperationBase trace_enable";
 }

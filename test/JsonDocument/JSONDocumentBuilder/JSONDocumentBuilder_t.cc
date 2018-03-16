@@ -93,13 +93,13 @@ int main(int argc, char* argv[]) {
 }
 
 namespace literal {
-constexpr auto operation = "operation";
-constexpr auto path = "path";
-constexpr auto beginstate = "begin-state";
-constexpr auto delta = "delta";
-constexpr auto endstate = "end-state";
-constexpr auto returnedvalue = "returned-value";
-constexpr auto mustsucceed = "must-succeed";
+constexpr auto operation [[gnu::unused]] = "operation";
+constexpr auto path [[gnu::unused]] = "path";
+constexpr auto beginstate [[gnu::unused]] = "begin-state";
+constexpr auto delta [[gnu::unused]] = "delta";
+constexpr auto endstate [[gnu::unused]] = "end-state";
+constexpr auto returnedvalue [[gnu::unused]] = "returned-value";
+constexpr auto mustsucceed [[gnu::unused]] = "must-succeed";
 }
 
 bool test_buildDocument(std::string const& conf) {

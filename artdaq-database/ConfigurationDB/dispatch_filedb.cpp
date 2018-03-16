@@ -34,24 +34,24 @@ void prov::writeDocument(ManageDocumentOperation const& options, JsonData const&
     throw runtime_error("write_document") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TLOG(15)<< "writeDocument(): begin";
+  TLOG(25)<< "writeDocument(): begin";
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JsonData>::create(database);
   auto object_id = provider->writeDocument(insert_payload);
 
-  TLOG(15)<< "writeDocument(): object_id=<" << object_id << ">";
+  TLOG(25)<< "writeDocument(): object_id=<" << object_id << ">";
 
-  TLOG(15)<< "writeDocument(): end";
+  TLOG(25)<< "writeDocument(): end";
 }
 
 JsonData prov::readDocument(ManageDocumentOperation const& options, JsonData const& search_payload) {
-  TLOG(16)<< "readDocument(): begin";
+  TLOG(26)<< "readDocument(): begin";
 
   auto collection = readDocuments(options, search_payload);
 
-  TLOG(16)<< "read_document: "
+  TLOG(26)<< "read_document: "
                  << "Search returned " << collection.size() << " results.";
 
   if (collection.size() != 1) {
@@ -60,7 +60,7 @@ JsonData prov::readDocument(ManageDocumentOperation const& options, JsonData con
 
   auto data = JsonData{*collection.begin()};
 
-  TLOG(16)<< "readDocument(): end";
+  TLOG(26)<< "readDocument(): end";
 
   return data;
 }
@@ -74,7 +74,7 @@ std::list<JsonData> prov::readDocuments(ManageDocumentOperation const& options, 
     throw runtime_error("read_documents") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TLOG(16)<< "readDocuments(): begin";
+  TLOG(26)<< "readDocuments(): begin";
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
@@ -82,9 +82,9 @@ std::list<JsonData> prov::readDocuments(ManageDocumentOperation const& options, 
 
   auto collection = provider->readDocument(search_payload);
 
-  TLOG(16)<< "read_documents: Search returned " << collection.size() << " results.";
+  TLOG(26)<< "read_documents: Search returned " << collection.size() << " results.";
 
-  TLOG(16)<< "readDocuments(): end";
+  TLOG(26)<< "readDocuments(): end";
 
   return collection;
 }
@@ -99,8 +99,8 @@ JsonData prov::findConfigurations(ManageDocumentOperation const& options, JsonDa
     throw runtime_error("operation_findconfigs") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TLOG(17) << "operation_findconfigs: begin";
-  TLOG(18) << "operation_findconfigs args data=<" << search_payload << ">";
+  TLOG(27) << "operation_findconfigs: begin";
+  TLOG(28) << "operation_findconfigs args data=<" << search_payload << ">";
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
@@ -165,8 +165,8 @@ JsonData prov::configurationComposition(ManageDocumentOperation const& options, 
                                                      << ">.";
   }
 
-  TLOG(18) << "operation_confcomposition: begin";
-  TLOG(18) << "operation_confcomposition args data=<" << search_payload << ">";
+  TLOG(28) << "operation_confcomposition: begin";
+  TLOG(28) << "operation_confcomposition args data=<" << search_payload << ">";
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
@@ -206,7 +206,7 @@ JsonData prov::configurationComposition(ManageDocumentOperation const& options, 
         for (size_t i = 0; i < results.size(); ++i) {
           std::ssub_match sub_match = results[i];
           std::string piece = sub_match.str();
-                     TLOG(18) << "operation_confcomposition: submatch*** " << i << ":
+                     TLOG(28) << "operation_confcomposition: submatch*** " << i << ":
        " << piece << '\n';
         }
     */
@@ -234,7 +234,7 @@ JsonData prov::findVersions(ManageDocumentOperation const& options, JsonData con
     throw runtime_error("operation_findversions") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TLOG(19)<< "operation_findversions: begin";
+  TLOG(29)<< "operation_findversions: begin";
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
@@ -277,7 +277,7 @@ JsonData prov::findVersions(ManageDocumentOperation const& options, JsonData con
             for (size_t i = 0; i < results.size(); ++i) {
               std::ssub_match sub_match = results[i];
               std::string piece = sub_match.str();
-                         TLOG(18) << "operation_findversions: submatch*** " << i
+                         TLOG(28) << "operation_findversions: submatch*** " << i
        << ": " << piece << '\n');
             }
     */
@@ -306,7 +306,7 @@ JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData con
     throw runtime_error("operation_findentities") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TLOG(19)<< "operation_findentities: begin";
+  TLOG(29)<< "operation_findentities: begin";
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
@@ -336,7 +336,7 @@ JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData con
 
   for (auto const& config_entity : config_entities) {
     auto filter_json = JSONDocument{config_entity}.findChild("filter").value();
-    TLOG(18) << "operation_findentities: filter_json=<" << filter_json << '>';
+    TLOG(28) << "operation_findentities: filter_json=<" << filter_json << '>';
 
     auto results = std::smatch();
 
@@ -347,7 +347,7 @@ JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData con
             for (size_t i = 0; i < results.size(); ++i) {
               std::ssub_match sub_match = results[i];
               std::string piece = sub_match.str();
-                         TLOG(18) << "operation_findentities: submatch*** " << i
+                         TLOG(28) << "operation_findentities: submatch*** " << i
        << ": " << piece << '\n');
             }
     */
@@ -377,14 +377,14 @@ JsonData prov::assignConfiguration(ManageDocumentOperation const& options, JsonD
     throw runtime_error("operation_assignconfig") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TLOG(20)<< "operation_addconfig: begin";
+  TLOG(30)<< "operation_addconfig: begin";
 
   auto new_options = options;
   new_options.operation(apiliteral::operation::readdocument);
 
   auto search =
       JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collection() + "\"}"};
-  TLOG(20)<< "operation_addconfig: args search_payload=<" << search << ">";
+  TLOG(30)<< "operation_addconfig: args search_payload=<" << search << ">";
 
   auto document = filesystem::readDocument(new_options, search);
   auto json_document = JSONDocument{document};
@@ -397,9 +397,9 @@ JsonData prov::assignConfiguration(ManageDocumentOperation const& options, JsonD
   auto update =
       JsonData{"{\"filter\": "s + builder.getObjectID().to_string() + ",  \"document\":" + builder.to_string() + "\n}"};
 
-  // TLOG(20)<< "operation_addconfig: writeDocument() begin";
+  // TLOG(30)<< "operation_addconfig: writeDocument() begin";
   filesystem::writeDocument(new_options, update);
-  // TLOG(20)<< "operation_addconfig: writeDocument() done";
+  // TLOG(30)<< "operation_addconfig: writeDocument() done";
 
   new_options.operation(apiliteral::operation::confcomposition);
 
@@ -423,14 +423,14 @@ JsonData prov::removeConfiguration(ManageDocumentOperation const& options, JsonD
     throw runtime_error("operation_removeconfig") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TLOG(20)<< "operation_removeconfig: begin";
+  TLOG(30)<< "operation_removeconfig: begin";
 
   auto new_options = options;
   new_options.operation(apiliteral::operation::readdocument);
 
   auto search =
       JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collection() + "\"}"};
-  TLOG(20)<< "operation_removeconfig: args search_payload=<" << search << ">";
+  TLOG(30)<< "operation_removeconfig: args search_payload=<" << search << ">";
 
   auto document = filesystem::readDocument(new_options, search);
   auto json_document = JSONDocument{document};
@@ -443,9 +443,9 @@ JsonData prov::removeConfiguration(ManageDocumentOperation const& options, JsonD
   auto update =
       JsonData{"{\"filter\": "s + builder.getObjectID().to_string() + ",  \"document\":" + builder.to_string() + "\n}"};
 
-  // TLOG(20)<< "operation_addconfig: writeDocument() begin";
+  // TLOG(30)<< "operation_addconfig: writeDocument() begin";
   filesystem::writeDocument(new_options, update);
-  // TLOG(20)<< "operation_addconfig: writeDocument() done";
+  // TLOG(30)<< "operation_addconfig: writeDocument() done";
 
   new_options.operation(apiliteral::operation::confcomposition);
 
@@ -475,7 +475,7 @@ JsonData prov::listCollections(ManageDocumentOperation const& options, JsonData 
                                                      << ">.";
   }
 
-  TLOG(20)<< "operation_listcollections: begin";
+  TLOG(30)<< "operation_listcollections: begin";
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
@@ -502,7 +502,7 @@ JsonData prov::listCollections(ManageDocumentOperation const& options, JsonData 
 
   for (auto const& collection_name : collection_names) {
     auto name = JSONDocument{collection_name.json_buffer}.findChild("collection").value();
-    TLOG(18) << "operation_listcollections: collection=<" << name << '>';
+    TLOG(28) << "operation_listcollections: collection=<" << name << '>';
 
     oss << printComma() << "{";
     oss << "\"name\" :\"" << name << "\",";
@@ -525,7 +525,7 @@ JsonData prov::listDatabases(ManageDocumentOperation const& options, JsonData co
     throw runtime_error("operation_listdatabases") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TLOG(20)<< "operation_listdatabases: begin";
+  TLOG(30)<< "operation_listdatabases: begin";
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
@@ -552,7 +552,7 @@ JsonData prov::listDatabases(ManageDocumentOperation const& options, JsonData co
 
   for (auto const& database_name : database_names) {
     auto name = JSONDocument{database_name}.findChild("database").value();
-    TLOG(18) << "operation_listdatabases: database=<" << name << '>';
+    TLOG(28) << "operation_listdatabases: database=<" << name << '>';
 
     oss << printComma() << "{";
     oss << "\"name\" :\"" << name << "\",";
@@ -574,7 +574,7 @@ JsonData prov::readDbInfo(ManageDocumentOperation const& options, JsonData const
     throw runtime_error("operation_readdbinfo") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TLOG(20)<< "operation_readdbinfo: begin";
+  TLOG(30)<< "operation_readdbinfo: begin";
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
@@ -589,7 +589,7 @@ JsonData prov::readDbInfo(ManageDocumentOperation const& options, JsonData const
 
   auto const database_metadata = search_results.begin();
 
-  TLOG(20)<< "operation_readdbinfo: database_metadata =<" << *database_metadata << ">";
+  TLOG(30)<< "operation_readdbinfo: database_metadata =<" << *database_metadata << ">";
 
   std::ostringstream oss;
   oss << "{ \"search\":\n";
@@ -606,5 +606,5 @@ void cf::debug::FileSystemDB() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(0) <<  "artdaq::database::configuration::FileSystemDB trace_enable";
+  TLOG(10) <<  "artdaq::database::configuration::FileSystemDB trace_enable";
 }

@@ -76,9 +76,6 @@ int DatabaseConfigurationInterface::markActiveVersionReadonly(const Configuratio
   return -1;
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
-
 // find the latest configuration version by configuration type
 int DatabaseConfigurationInterface::findLatestVersion(const ConfigurationBase* configuration) const noexcept {
   auto versions = getVersions(configuration);
@@ -108,7 +105,7 @@ std::set<int> DatabaseConfigurationInterface::getVersions(const ConfigurationBas
 
 // returns a set of all configuration data types
 std::set<std::string /*name*/> DatabaseConfigurationInterface::listConfigurationsTypes() const
-    throw(std::runtime_error) try {
+     try {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
 
   auto collection_name_prefix=std::string{};
@@ -124,7 +121,7 @@ std::set<std::string /*name*/> DatabaseConfigurationInterface::listConfiguration
 
 // find all global configurations in database
 std::set<std::string /*name*/> DatabaseConfigurationInterface::findAllGlobalConfigurations() const
-    throw(std::runtime_error) try {
+     try {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
 
   return ifc.findGlobalConfigurations("*");
@@ -138,7 +135,7 @@ std::set<std::string /*name*/> DatabaseConfigurationInterface::findAllGlobalConf
 
 // return the contents of a global configuration
 config_version_map_t DatabaseConfigurationInterface::loadGlobalConfiguration(
-    std::string const& configuration) const throw(std::runtime_error) try {
+    std::string const& configuration) const  try {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
   auto result = ifc.loadGlobalConfiguration(configuration);
 
@@ -163,7 +160,7 @@ config_version_map_t DatabaseConfigurationInterface::loadGlobalConfiguration(
 // create a new global configuration from the contents map
 void DatabaseConfigurationInterface::storeGlobalConfiguration(config_version_map_t const& configurationMap,
                                                               std::string const& configuration) const
-    throw(std::runtime_error) try {
+     try {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
 
   auto to_list = [](auto const& inputMap) {
@@ -187,5 +184,3 @@ void DatabaseConfigurationInterface::storeGlobalConfiguration(config_version_map
   std::cout << "DBI Unknown exception.\n";
   throw std::runtime_error("DBI Unknown exception.");
 }
-
-#pragma GCC diagnostic pop

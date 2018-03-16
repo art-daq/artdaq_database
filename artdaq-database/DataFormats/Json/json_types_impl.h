@@ -11,19 +11,17 @@ using artdaq::database::json::object_t;
 
 template <>
 template <typename T>
-T const& dbt::unwrapper<const object_t>::value_as(std::string const& name) try {
+T& dbt::unwrapper<object_t>::value_as(std::string const& name) try {
   confirm(!name.empty());
 
-  using V = typename std::remove_const<T>::type;
-
-  return boost::get<V>(any.at(name));
-} catch (...) {
+  return boost::get<T>(any.at(name));
+} catch (std::exception& e) {
   throw;
 }
 
 template <>
 template <typename T>
-T& dbt::unwrapper<object_t>::value_as(std::string const& name) try {
+T& dbt::unwrapper<const object_t>::value_as(std::string const& name) try {
   confirm(!name.empty());
 
   return boost::get<T>(any.at(name));
@@ -42,12 +40,9 @@ T& dbt::unwrapper<value_t>::value_as(std::string const& name) try {
 
 template <>
 template <typename T>
-T const& dbt::unwrapper<const value_t>::value_as(std::string const& name) try {
+T& dbt::unwrapper<const value_t>::value_as(std::string const& name) try {
   confirm(!name.empty());
-
-  using V = typename std::remove_const<T>::type;
-
-  return boost::get<V>(boost::get<object_t>(any).at(name));
+  return boost::get<T>(boost::get<object_t>(any).at(name));
 } catch (...) {
   throw;
 }
@@ -62,11 +57,9 @@ T& dbt::unwrapper<value_t>::value_as() try {
 
 template <>
 template <typename T>
-T const& dbt::unwrapper<const value_t>::value_as() try {
-  using V = typename std::remove_const<T>::type;
-
-  return boost::get<V>(any);
-}catch (...) {
+T& dbt::unwrapper<const value_t>::value_as() try {
+  return boost::get<T>(any);
+} catch (...) {
   throw;
 }
 
