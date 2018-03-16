@@ -27,7 +27,7 @@ def __copy_default_schema():
   except KeyError:    
     schema=os.path.dirname(os.path.realpath(__file__))+'/../conf'+ fhicl_schema
 
-  if not os.path.isfile(fhicl_schema):
+  if not os.path.isfile(schema):
     print ('File not found', schema)
     sys.exit(1)
   
@@ -157,6 +157,24 @@ def getListOfAvailableRunConfigurations(searchString='*'):
   
   return list(c['name'].encode('ascii') for c in json.loads(result[1])['search'])
 
+
+def getListOfArchivedRunConfigurations(searchString='*'):  
+  try:
+    artdaq_database_uri=os.environ['ARTDAQ_DATABASE_URI']
+  except KeyError:
+    print 'Error: ARTDAQ_DATABASE_URI is not set.'
+    return False
+
+  os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri+'_archive'
+  print 'Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI']
+
+  result=getListOfAvailableRunConfigurations(searchString)
+
+  os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri
+  print 'Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI']
+
+  return result 
+
 	  
 #std::vector<std::string> getListOfAvailableRunConfigurationPrefixes(std::string searchString = "*"); 
 def getListOfAvailableRunConfigurationPrefixes(searchString='*'):
@@ -171,10 +189,8 @@ def getListOfAvailableRunConfigurationPrefixes(searchString='*'):
   
   configs=list(c['name'].encode('ascii') for c in json.loads(result[1])['search'])
   return list(set( __get_prefix(c) for c in configs))
-   
-def __getLatestConfiguration(configNamePrefix):
-  config=__latest_config_name(configNamePrefix)
-  
+
+def __getConfigurationComposition(config):
   if config is None:
     return None
 
@@ -189,15 +205,60 @@ def __getLatestConfiguration(configNamePrefix):
   
   print ('Last configuration',config)
   return list(__read_document(c['query']) for c in json.loads(result[1])['search'])
+   
+def __exportConfiguration(config):
+  entity_name=0
+  user_data=1
+  collection=2
 
+  if not __ends_on_5digitnumber(config):
+    print 'Error: Configuration does not have five digits at the end.'
+    return False
+
+  cfgs = __getConfigurationComposition(config)
+  
+  if not cfgs:
+      return False
+  
+  for cfg in cfgs:
+    if cfg[entity_name] == 'schema' and cfg[collection]=='SystemLayout':
+      with open(fhicl_schema, "w") as fcl_file:
+	fcl_file.write(cfg[user_data]) 
+	print ('Exported',(cfg[collection],cfg[entity_name],fhicl_schema))
+	break
+  
+  __copy_default_schema()
+
+  schema =__read_schema()
+  
+  include_dirs=[]
+  
+  for l in schema['artdaq_includes']:
+    include_dirs.append(l['collection'])
+    
+  for cfg in cfgs:
+    if cfg[entity_name]=='schema':
+      continue
+    
+    path = cfg[collection] if cfg[collection] in include_dirs else __get_prefix(config)
+    
+    if not os.path.exists(path):
+      os.makedirs(path)
+    
+    fcl_name = path+'/'+cfg[entity_name]+'.fcl'
+    
+    with open(fcl_name, "w") as fcl_file:
+      fcl_file.write(cfg[user_data])
+
+    print ('Exported',(cfg[collection],cfg[entity_name],fcl_name))
+
+  return True
 
 #std::map<std::string /*entityName*/, std::string /*FHiCL document*/> getLatestConfiguration(std::string const& configNamePrefix); 
 def getLatestConfiguration(configNamePrefix):
   return dict((cfg[0],cfg[1]) for cfg in __getLatestConfiguration(configNamePrefix))
 
 def importConfiguration(configNamePrefix):
-  configNamePrefix=__get_prefix(configNamePrefix)
-
   config = __latest_config_name(configNamePrefix)
 
   config = __increment_config_name(config) if config else __increment_config_name(configNamePrefix)
@@ -235,52 +296,14 @@ def importConfiguration(configNamePrefix):
   return True
 
 def exportConfiguration(configNamePrefix):
-  entity_name=0
-  user_data=1
-  collection=2
-
   if not __ends_on_5digitnumber(configNamePrefix):
     print 'Error: Configuration does not have five digits at the end.'
     return False
 
-  cfgs = __getLatestConfiguration(configNamePrefix)
-  
-  if not cfgs:
-      return False
-  
-  for cfg in cfgs:
-    if cfg[entity_name] == 'schema' and cfg[collection]=='SystemLayout':
-      with open(fhicl_schema, "w") as fcl_file:
-	fcl_file.write(cfg[user_data]) 
-	print ('Exported',(cfg[collection],cfg[entity_name],fhicl_schema))
-	break
-  
-  __copy_default_schema()
+  config=__latest_config_name(configNamePrefix)
 
-  schema =__read_schema()
-  
-  include_dirs=[]
-  
-  for l in schema['artdaq_includes']:
-    include_dirs.append(l['collection'])
-    
-  for cfg in cfgs:
-    if cfg[entity_name]=='schema':
-      continue
-    
-    path = cfg[collection] if cfg[collection] in include_dirs else __get_prefix(configNamePrefix)
-    
-    if not os.path.exists(path):
-      os.makedirs(path)
-    
-    fcl_name = path+'/'+cfg[entity_name]+'.fcl'
-    
-    with open(fcl_name, "w") as fcl_file:
-      fcl_file.write(cfg[user_data])
+  return __exportConfiguration(config)
 
-    print ('Exported',(cfg[collection],cfg[entity_name],fcl_name))
-
-  return True
 
 #bool /* status */ archiveConfiguration(std::string configuration_name,int run_number, std::map<std::string, std::string>); 
 def archiveConfiguration(configuration_name,run_number,entity_userdata_map):
@@ -340,6 +363,27 @@ def archiveRunConfiguration(config,run_number):
     print ('Archive',entry)
 
   return True  
+
+def exportArchivedRunConfiguration(config):  
+  if not __ends_on_5digitnumber(config):
+    print 'Error: Configuration does not have five digits at the end.'
+    return False
+
+  try:
+    artdaq_database_uri=os.environ['ARTDAQ_DATABASE_URI']
+  except KeyError:
+    print 'Error: ARTDAQ_DATABASE_URI is not set.'
+    return False
+
+  os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri+'_archive'
+  print 'Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI']
+
+  result=__exportConfiguration(config)
+
+  os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri
+  print 'Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI']
+
+  return result  
 
 def listDatabases(): 
   result = conftoolg.list_databases('{"operation" : "listdatabases", "dataformat":"csv", "filter":{}}')  
@@ -436,12 +480,14 @@ def help():
   print 'Example:'
   print ' conftool.py exportConfiguration demo_safemode00003'
   print ' conftool.py importConfiguration demo_safemode'
-  print ' conftool.py archiveRunConfiguration demo_safemode 23 #where 23 is the run number'
   print ' conftool.py getListOfAvailableRunConfigurationPrefixes'
   print ' conftool.py getListOfAvailableRunConfigurations'
   print ' conftool.py getListOfAvailableRunConfigurations demo_'
 #  print ' conftool.py exportDatabase #writes archives into the current directory'
 #  print ' conftool.py importDatabase #reads archives from the current directory'
+  print ' conftool.py archiveRunConfiguration demo_safemode 23 #where 23 is a run number'
+  print ' conftool.py getListOfArchivedRunConfigurations 23 #where 23 is a run number'
+  print ' conftool.py exportArchivedRunConfiguration 23/demo_safemode00003 #where 23/demo_safemode00003 is a configuration name'
   print ' conftool.py listDatabases'
   print ' conftool.py listCollections'
   print ' conftool.py readDatabaseInfo'
@@ -487,3 +533,4 @@ if __name__ == "__main__":
   else:
     __report_error(result)
     sys.exit(1)
+
