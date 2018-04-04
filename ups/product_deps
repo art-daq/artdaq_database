@@ -22,14 +22,14 @@ product		version		optional
 cetlib   	v2_02_00        s46
 cetlib   	v3_00_01        s50
 cetlib          v3_02_00        s64
-TRACE           v3_13_04        -
+TRACE           v3_13_05        -
 mongodb 	v3_4_6c
 python          v2_7_13b	s46
 python          v2_7_13d	s50
 python          v2_7_14b        s64
 swig            v3_0_12c	-		optional
 nodejs		v4_5_0		-		optional
-cetbuildtools	v7_01_00	-		only_for_build
+cetbuildtools	v7_02_01	-		only_for_build
 end_product_list
 
 # -nq- means there is no qualifier
