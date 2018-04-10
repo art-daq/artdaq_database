@@ -2,47 +2,59 @@ artdaq_processes:
 [
   {
     collection:RCEs
-    pattern:"(.*)((rce)(\d+)(_hw_cfg))(\.fcl$)"
+    pattern:"(.*)(rce\d+(_hw_cfg|))(\.fcl$)"
+  },
+  {
+    collection:COBRCEs
+    pattern:"(.*)(cob\d+_rce\d+(_hw_cfg|))(\.fcl$)"
   },
   {
     collection:SSPs
-    pattern:"(.*)((ssp)(\d+)(_hw_cfg))(\.fcl$)"
+    pattern:"(.*)(ssp\d+(_hw_cfg|))(\.fcl$)"
   },
   {
     collection:PENs
-    pattern:"(.*)((pen)(\d+)(_hw_cfg))(\.fcl$)"
+    pattern:"(.*)((pen)(\d+)(_hw_cfg|))(\.fcl$)"
+  },
+  {
+    collection:TPCs
+    pattern:"(.*)((tpc)(\d+)(_hw_cfg|))(\.fcl$)"
   },
   {
     collection:Components
-    pattern:"(.*)((component)(\d+)(_hw_cfg))(\.fcl$)"
+    pattern:"(.*)((component)(\d+)(_hw_cfg|))(\.fcl$)"
   },
   {
     collection:Timing
-    pattern:"(.*)((timing)(\d*)(_hw_cfg))(\.fcl$)"
+    pattern:"(.*)((timing)(\d+)(_hw_cfg|))(\.fcl$)"
   },  
   {
     collection:Components
-    pattern:"(.*)((component)(\d*))(\.fcl$)"
+    pattern:"(.*)(component\d+)(\.fcl$)"
+  },
+  {
+    collection:BoardReaders
+    pattern:"(.*)(BoardReader\d+)(\.fcl$)"
   },  
   {
     collection:EventBuilders
-    pattern:"(.*)((EventBuilder)(\d+))(\.fcl$)"
+    pattern:"(.*)(EventBuilder\d+)(\.fcl$)"
   },
   {
     collection:Aggregators
-    pattern: "(.*)((Aggregator)(\d+))(\.fcl$)"
+    pattern: "(.*)(Aggregator\d+)(\.fcl$)"
   },
   {
     collection:DataLoggers
-    pattern: "(.*)((DataLogger)(\d+))(\.fcl$)"
+    pattern: "(.*)(DataLogger\d+)(\.fcl$)"
   },
   {
     collection:Dispatchers
-    pattern: "(.*)((Dispatcher)(\d+))(\.fcl$)"
+    pattern: "(.*)(Dispatcher\d+)(\.fcl$)"
   },
   {
     collection:expert_options
-    pattern: "(.*)((rce_expert_run_options|ssp_expert_run_options|user_run_options)(\d*))(\.fcl$)"
+    pattern: "(.*)((rce_expert_run_options|ssp_expert_run_options|user_run_options).*)(\.fcl$)"
   }
 ]
 
@@ -50,31 +62,32 @@ artdaq_includes:
 [ 
   {
     collection:common_code
-    pattern:"(.*)common_code\/(.*[^\d])(\d*)(\.fcl$)"
+    pattern:"(.*)common_code\/(.*)(\.fcl$)"
   }
 ]
 
 run_history: 
-{
+[
+ {
+  collection:RunHistory  
+  pattern:"(.*)((BoardReader_TOY\d+|BoardReader)_(.*[^_])_(\d+))(\.fcl$)"
+  entity:"match.group(3)+'-'+match.group(4)+'-'+match.group(5)"    
+ },
+ {
   collection:RunHistory
-  
-  entity:{
-    name_rule:"match.group(3)+delim+match.group(4)+delim+match.group(5)"
-    delim:"-"
-  }
-    
-  patterns:
-  [  
-    "(.*)((BoardReader_TOY\d+|BoardReader)_(.*[^_])_(\d+))(\.fcl$)",
-    "(.*)((EventBuilder)_(.*[^_])_(\d+))(\.fcl$)",
-    "(.*)((Aggregator)_(.*[^_])_(\d+))(\.fcl$)",
-    "(.*)((DataLogger)_(.*[^_])_(\d+))(\.fcl$)",
-    "(.*)((Dispatcher)_(.*[^_])_(\d+))(\.fcl$)",
-    "(.*)((metadata)(.*[^\d])(\d*))(\.fcl$)"
-  ]
-}
+  pattern:"(.*)((EventBuilder|Dispatcher|DataLogger)_(.*[^_])_(\d+))(\.fcl$)"
+  entity:"match.group(3)+'-'+match.group(4)+'-'+match.group(5)"
+ },
+ {
+  collection:RunHistory
+  pattern:"(.*)(metadata)(\.fcl$)"
+ }
+]
 
-system_layout: {
+system_layout: 
+[
+  {
     collection:SystemLayout
-    pattern:"(.*)((schema)(\d*))(\.fcl$)"
-}
+    pattern:"(.*)(schema)(\.fcl$)"
+  }
+]

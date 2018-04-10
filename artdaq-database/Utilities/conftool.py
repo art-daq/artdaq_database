@@ -14,6 +14,9 @@ import shutil
 
 fhicl_schema='schema.fcl'
 
+any_file_pattern = '*.*'
+fcl_file_pattern = '*.fcl'
+
 artdaq_database_uri=None
 
 def __copy_default_schema():
@@ -32,9 +35,20 @@ def __copy_default_schema():
     sys.exit(1)
   
   shutil.copyfile(schema,fhicl_schema)
+  print 'Info: Copied ' + schema + ' to ' + fhicl_schema
 
 def __report_error(result):
   print >> sys.stderr, 'Error:' + result[1]
+
+def __allow_importing_incomplete_configurations():
+  try:
+    allow_incomplete=os.environ['ARTDAQ_DATABASE_ALLOW_INCOMPLETE_CONFIGURATIONS'].lower()
+    if allow_incomplete=='true':
+      return True
+  except KeyError:
+    return False
+  
+  return False
 
 def __remove_run(config):
   has_run = re.match(r'^\d+/(.*)', config)  
@@ -122,26 +136,27 @@ def __read_schema():
   layout_json= json.loads(result[1])
   return layout_json['document']['data']['main']
 
-def __configuration_composition_reader(config,layout,files):
+def __composition_reader(subsets,layout,files):
   for f in files: 
-    for l in ['artdaq_processes','artdaq_includes']:
+    for l in subsets:
       for d in layout[l]:
 	match = re.match(d['pattern'].encode('ascii'), f)
 	if match:
-	  entity_userdata_map=((d['collection'].encode('ascii'), match.group(2), f ))
+	  entity_name=match.group(2)	    
+	  if 'entity' in d:
+	    entity_name_rule=d['entity'].encode('ascii')  
+	    entity_name = eval(entity_name_rule)	      
+	  entity_userdata_map=((d['collection'].encode('ascii'), entity_name, f ))
 	  yield entity_userdata_map
 
-def __archive_composition_reader(config,layout,files):
-  delim=layout['run_history']['entity']['delim'].encode('ascii')
-  entity_name_rule=layout['run_history']['entity']['name_rule'].encode('ascii')  
-  for f in files: 
-      for p in layout['run_history']['patterns']:
-	match = re.match(p, f)
-	if match:
-	  entity_name = eval(entity_name_rule)
-	  entity_userdata_map=((layout['run_history']['collection'].encode('ascii'), entity_name, f ))
-	  yield entity_userdata_map
+def __list_excluded_files(config,layout,files,configuration_composition):
+  excluded_files=list(files)
 
+  for entry in configuration_composition:
+    excluded_files.remove(entry[2])
+
+  return excluded_files
+  
 def __create_entity_userdata_map(cfgs):
   return dict( (cfg[1],open(cfg[2], 'r').read()) for cfg in cfgs)
 
@@ -258,27 +273,29 @@ def __exportConfiguration(config):
 def getLatestConfiguration(configNamePrefix):
   return dict((cfg[0],cfg[1]) for cfg in __getLatestConfiguration(configNamePrefix))
 
-def importConfiguration(configNamePrefix):
-  config = __latest_config_name(configNamePrefix)
-
-  config = __increment_config_name(config) if config else __increment_config_name(configNamePrefix)
+def importConfiguration(configNameOrconfigPrefix):
+  configPrefix= __get_prefix(configNameOrconfigPrefix)
   
+  config = __latest_config_name(configPrefix)
+  
+  config = __increment_config_name(config) #if config else __increment_config_name(configPrefix)
+
   schema =__read_schema()   
-  fhicl_finder = __find_files('.','*.fcl')
   
+  cfg_composition =list( __composition_reader(['artdaq_processes','artdaq_includes','system_layout'], schema, __find_files('.',fcl_file_pattern)))
+
+  excluded_files=__list_excluded_files(__get_prefix(config), schema, __find_files('.',any_file_pattern),cfg_composition)
+  
+  if len(excluded_files)>0:
+      print 'Warning: The following files will be excluded from being loaded into the artdaq database ' \
+	+ ', '.join(excluded_files) + '. Update ' + fhicl_schema + ' to include them.'
+  
+  if not __allow_importing_incomplete_configurations():
+      print 'Error: Importing of incomplete configurations is not allowed; ' \
+	+ 'set ARTDAQ_DATABASE_ALLOW_INCOMPLETE_CONFIGURATIONS to TRUE to allow.'
+      return False 
+    
   print ('New configuration', config)
-
-  cfg_composition = __configuration_composition_reader(__get_prefix(config), schema,fhicl_finder)
-
-  query = json.loads('{"operation" : "store", "dataformat":"fhicl", "filter":{}}')  
-  query['filter']['configurations.name']=config
-  query['collection']=schema['system_layout']['collection']
-  query['filter']['version']=config+'-ver001'
-  query['filter']['entities.name']='schema'       
-  
-  result=__write_document(query,__read_fhicl_schema())  
-  if result[0] is not True:
-    return False
  
   for entry in cfg_composition:
     query = json.loads('{"operation" : "store", "dataformat":"fhicl", "filter":{}}')  
@@ -340,13 +357,24 @@ def archiveRunConfiguration(config,run_number):
     print 'Error: ARTDAQ_DATABASE_URI is not set.'
     return False
 
+  __copy_default_schema()
+
   schema =__read_schema()
 
-  fhicl_finder = __find_files(str(run_number),'*.fcl')
+  cfg_composition =list( __composition_reader(['run_history'], schema, __find_files('.',fcl_file_pattern)))
 
-  composition = list(__archive_composition_reader(config,schema,fhicl_finder))
-
-  entity_userdata_map=__create_entity_userdata_map(composition)
+  excluded_files=__list_excluded_files(__get_prefix(config), schema, __find_files('.',any_file_pattern),cfg_composition)
+  
+  if len(excluded_files)>0:
+      print 'Warning: The following files will be excluded from being loaded into the artdaq database ' \
+	+ ', '.join(excluded_files) + '. Update ' + fhicl_schema + ' to include them.'
+  
+  if not __allow_importing_incomplete_configurations():
+      print 'Error: Importing of incomplete configurations is not allowed; ' \
+	+ 'set ARTDAQ_DATABASE_ALLOW_INCOMPLETE_CONFIGURATIONS to TRUE to allow.'
+      return False 
+  
+  entity_userdata_map=__create_entity_userdata_map(cfg_composition)
 
   os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri+'_archive'
   print 'Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI']
@@ -359,7 +387,7 @@ def archiveRunConfiguration(config,run_number):
   if result is not True:
      return False
 
-  for entry in composition:
+  for entry in cfg_composition:
     print ('Archive',entry)
 
   return True  
