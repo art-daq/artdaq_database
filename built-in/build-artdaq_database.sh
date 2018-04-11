@@ -177,7 +177,9 @@ function patch_products() {
   cd ${productsdir}/mongodb/v3_4_6c
   find ./ -name  "mongodbConfig.cmake" -type f -print | xargs -n 1 sed -i "s/3.4.6b/3.4.6c/g"
   find ./ -name  "mongodbConfig.cmake" -type f -print | xargs -n 1 sed -i "s/v3_4_6b/v3_4_6c/g"
-}
+  find ./ -name  "mongodbConfigVersion.cmake" -type f -print | xargs -n 1 sed -i "s/3.4.6b/3.4.6c/g"
+  find ./ -name  "mongodbConfigVersion.cmake" -type f -print | xargs -n 1 sed -i "s/v3_4_6b/v3_4_6c/g"
+}	
 
 cleanup
 RC=$?
