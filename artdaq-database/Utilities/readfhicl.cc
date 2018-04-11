@@ -32,15 +32,18 @@ std::ostream& operator<<(std::ostream& out, std::tuple<fhicl::extended_value con
      out << "\n" << std::string(il, ' ') << "{\n" ;
      ::fhicl::extended_value::table_t const& tab=  value;
      for (auto& entry : tab){
-       out << std::string(il+1, ' ') << entry.first << ":" ;    
-       out << std::make_tuple<fhicl::extended_value const&, std::size_t>(entry.second, il+1,in_prolog);        
+       out << std::string(il+1, ' ') << entry.first << ":" ;
+       auto tmp=std::make_tuple<fhicl::extended_value const&, std::size_t>(entry.second, il+1,in_prolog);
+       out << tmp;        
     }
      out << std::string(il, ' ') << "}\n" ;
   }else if (value.is_a(::fhicl::SEQUENCE)){
      out << "\n" << std::string(il, ' ') << "[ " ;
      ::fhicl::extended_value::sequence_t const& seq=  value;
-     for (auto& ev : seq)
-       out << std::make_tuple<fhicl::extended_value const&, std::size_t>(ev, il+1,in_prolog) << " ";
+     for (auto& ev : seq){
+       auto tmp=std::make_tuple<fhicl::extended_value const&, std::size_t>(ev, il+1,in_prolog);
+       out << tmp << " ";
+     }
      out << std::string(il, ' ') << "]\n" ;
   } else {
     out << value.raw_value << (il > 0?"\n":"");
@@ -144,7 +147,10 @@ int main(int argc, char* argv[]) try {
     if(atom.second.to_string().empty()) {
       if (!prune_intermediate_table) std::cout << atom.first << ":" << "@nil\n";
     }
-    else std::cout << atom.first << ":" << std::make_tuple<fhicl::extended_value const&, std::size_t, bool>(atom.second,0,true) << "\n";
+    else { 
+      auto tmp=std::make_tuple<fhicl::extended_value const&, std::size_t, bool>(atom.second,0,true);
+      std::cout << atom.first << ":" << tmp << "\n";
+    }
   }
     std::cout << "END_PROLOG\n\n";
   }
@@ -154,7 +160,10 @@ int main(int argc, char* argv[]) try {
     if(atom.second.to_string().empty()) {
       if (!prune_intermediate_table) std::cout << atom.first << ":" << "@nil\n";
     }
-    else std::cout << atom.first << ":" << std::make_tuple<fhicl::extended_value const&, std::size_t, bool>(atom.second,0,false) << "\n";
+    else {
+      auto tmp=std::make_tuple<fhicl::extended_value const&, std::size_t, bool>(atom.second,0,false);
+      std::cout << atom.first << ":" << tmp << "\n";
+    }
   }
   
   std::cout << "\n";
