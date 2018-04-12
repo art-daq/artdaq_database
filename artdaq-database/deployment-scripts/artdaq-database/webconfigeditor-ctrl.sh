@@ -1,9 +1,10 @@
 #!/bin/bash
 
-#source /daq/database/cern_pddaq_v3x_db/webconfigeditor.env
-
 rc_success=0 
 rc_failure=1
+
+#source /grid/fermiapp/products/artdaq/setup
+#source /cvmfs/fermilab.opensciencegrid.org/products/artdaq/setup
 
 unset http_proxy
 unset https_proxy
