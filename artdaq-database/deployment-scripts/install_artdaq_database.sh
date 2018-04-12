@@ -5,8 +5,8 @@
 # Main program starts at the bottom of this file.
 #----------------------------------------------------------------
 ARTDAQ_UPS_QUAL="e14:prof:s50"
-ARTDAQ_DB_UPS_VER=v1_04_39
-WEBEDITOR_UPS_VER=v1_00_11
+ARTDAQ_DB_UPS_VER=v1_04_48
+WEBEDITOR_UPS_VER=v1_00_14
 
 ARTDAQ_BASE_DIR=/tmp/artdaq
 ARTDAQ_DB_NAME=cern_pddaq_v3x_db
