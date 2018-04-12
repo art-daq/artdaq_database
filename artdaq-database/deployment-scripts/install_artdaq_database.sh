@@ -4,23 +4,26 @@
 # overriden in $HOME/artdaq_database.env file if it exits. 
 # Main program starts at the bottom of this file.
 #----------------------------------------------------------------
-ARTDAQ_UPS_QUAL="e14:prof:s50"
+ARTDAQ_UPS_QUAL="e15:prof:s54"
 ARTDAQ_DB_UPS_VER=v1_04_48
 WEBEDITOR_UPS_VER=v1_00_14
 
-ARTDAQ_BASE_DIR=/tmp/artdaq
-ARTDAQ_DB_NAME=cern_pddaq_v3x_db
 
+ARTDAQ_BASE_DIR=/tmp/artdaq
+ARTDAQ_DB_NAME=artdaq_db
 #----------------------------------------------------------------
 # Optional configuration parameters, which can be 
 # overriden in $HOME/artdaq_database.env file if it exits. 
 # Main program starts at the bottom of this file.
 #----------------------------------------------------------------
+MONGOD_UPS_QUAL="e15:prof"
+MONGOD_UPS_VER=v3_4_6c
+
 
 MONGOD_PORT=27037
 WEBEDITOR_BASE_PORT=8880
 
-INACTIVE_DATABASES="cern_pddaq_v2_db cern_pddaq_v3_db"
+INACTIVE_DATABASES="cern_pddaq_v3_db artdaq_db"
 
 ARTDAQ_DB_PULLPRODUCTS="slf7 artdaq_database-${ARTDAQ_DB_UPS_VER} $(echo $ARTDAQ_UPS_QUAL | cut -d":" -f3 )-$(echo $ARTDAQ_UPS_QUAL | cut -d":" -f1 ) $(echo $ARTDAQ_UPS_QUAL | cut -d":" -f2 )"
 
@@ -213,8 +216,8 @@ cat <<EOF > ${filename}
 MONGOD_DATABASE_NAME=${ARTDAQ_DB_NAME}
 MONGOD_BASE_DIR=${DATABASE_BASE_DIR}
 MONGOD_PORT=${MONGOD_PORT}
-MONGOD_UPS_VER=v3_4_6
-MONGOD_UPS_QUAL="e14:prof"
+MONGOD_UPS_VER=${MONGOD_UPS_VER}
+MONGOD_UPS_QUAL=${MONGOD_UPS_QUAL}
 #MONGOD_NUMA_CTRL="numactl --interleave=all"
 EOF
 RC=$?
@@ -387,6 +390,9 @@ do
         printf "Info: coppied ${filename} to ${DATABASE_BASE_DIR}"
     fi
 done
+
+cp ${HOME}/DAQInterfaceIcarus/setup_database.sh ${DATABASE_BASE_DIR}/
+
 chmod a+rx ${DATABASE_BASE_DIR}/*.sh >/dev/null 2>&1
 find ${DATABASE_BASE_DIR} -name  "*.sh" -type f -print |\
   xargs -n 1 sed -i "s|/daq/artdaq|${ARTDAQ_BASE_DIR}|g; \
@@ -692,6 +698,31 @@ function update_crontab(){
   return $rc_success;
 }
 
+function apply_patches(){
+  local products_dir=${ARTDAQ_BASE_DIR}/products
+
+  mongo_table=$(find  ${products_dir}/mongodb/ -name mongodb.table)
+
+  printf "Info: pathing ${mongo_table}\n"
+
+patch -b ${mongo_table}  <<EOF
+--- ./products/mongodb/v3_4_6a/ups/mongodb.table  2018-02-01 09:27:56.000000000 -0600
++++ ./products/mongodb/v3_4_6a/ups/mongodb.table.patched  2018-03-08 13:23:16.758754330 -0600
+@@ -81,6 +81,7 @@
+ 
+     # add the bin directory to the path
+     pathPrepend(PATH, \${\${UPS_PROD_NAME_UC}_FQ_DIR}/bin )
++    pathPrepend(PATH, \${\${UPS_PROD_NAME_UC}_FQ_DIR} )
+ 
+ 
+ End:
+EOF
+
+  if [[ $? -ne $rc_success ]]; then 
+    echo -e "\e[31;7;5mError: Failed patching mongodb.table.\e[0m"; return $rc_failure
+  fi
+}
+
 function main_program(){
 printf "\nInfo: Running main_program\n"
 
@@ -995,6 +1026,11 @@ pull_products
 if [[ $? -ne $rc_success ]]; then 
   exit $?
 fi
+
+#apply_patches
+#if [[ $? -ne $rc_success ]]; then
+#   exit $?
+#fi
 
 printf "Info: Configuring artdaq_database services to run using the following credentials:\n"
 printf "\t\tuser=${run_as_user}, group=${run_as_group}\n"
