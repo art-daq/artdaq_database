@@ -3,6 +3,9 @@
 rc_success=0 
 rc_failure=1
 
+#source /grid/fermiapp/products/artdaq/setup
+#source /cvmfs/fermilab.opensciencegrid.org/products/artdaq/setup
+
 unset http_proxy
 unset https_proxy
 

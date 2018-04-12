@@ -1,12 +1,20 @@
 #!/bin/bash
 
-database_work_dir=/daq/database/work-db-v3-dir
+artdaq_swroot_dir=${HOME}/daqsw
 
+current_artdaq_database_uri="mongodb://127.0.0.1:27037/artdaq_db"
+#current_artdaq_database_uri="mongodb://127.0.0.1:27037/fnal_icarus_db"
+#current_artdaq_database_uri="mongodb://127.0.0.1:27037/cern_pddaq_db"
+
+database_work_dir=${artdaq_swroot_dir}/database/work-db-v3-dir
+
+#source /grid/fermiapp/products/artdaq/setup
 #source /cvmfs/fermilab.opensciencegrid.org/products/artdaq/setup
-source /daq/artdaq/products/setup
-setup artdaq_database v1_04_36 -q e14:prof:s50
+source ${artdaq_swroot_dir}/products/setup
 
-export ARTDAQ_DATABASE_URI="mongodb://127.0.0.1:27037/cern_pddaq_db"
+setup artdaq_database v1_04_48 -q e14:prof:s50
+
+export ARTDAQ_DATABASE_URI=${current_artdaq_database_uri}
 
 
 if [ ! -d ${database_work_dir} ]; then 
