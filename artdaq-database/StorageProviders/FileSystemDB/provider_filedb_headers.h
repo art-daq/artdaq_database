@@ -19,8 +19,8 @@ using artdaq::database::filesystem::FileSystemDB;
 using artdaq::database::filesystem::index::SearchIndex;
 
 using artdaq::database::basictypes::JsonData;
-using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocument;
+using artdaq::database::docrecord::JSONDocumentBuilder;
 
 namespace jsonliteral = artdaq::database::dataformats::literal;
 

@@ -18,8 +18,8 @@ namespace jsn = artdaq::database::json;
 namespace literal = artdaq::database::dataformats::literal;
 
 using artdaq::database::fhicl::FhiclWriter;
-using artdaq::database::fhicljson::json2fcldb;
 using artdaq::database::fhicljson::extra_opts;
+using artdaq::database::fhicljson::json2fcldb;
 
 bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out) {
   confirm(out.empty());
@@ -57,13 +57,15 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
       fhicl_table.push_back(json2fcldb(std::forward_as_tuple(value_tuple, value_tuple, opts)));
     }
 
-    if (data.size()) {
+    if (static_cast<unsigned int>(!data.empty()) != 0u) {
       buffer.append("BEGIN_PROLOG\n");
       sink = std::back_insert_iterator<std::string>(buffer);
 
       fhicl_generator_grammar<decltype(sink)> grammar;
 
-      if (!karma::generate(sink, grammar, fhicl_table)) return false;
+      if (!karma::generate(sink, grammar, fhicl_table)) {
+        return false;
+      }
       buffer.append("\nEND_PROLOG\n");
     }
   }
@@ -86,7 +88,9 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
 
     fhicl_generator_grammar<decltype(sink)> grammar;
 
-    if (!karma::generate(sink, grammar, fhicl_table)) return false;
+    if (!karma::generate(sink, grammar, fhicl_table)) {
+      return false;
+    }
   }
 
   buffer.reserve(buffer.size() + 512);
@@ -109,5 +113,5 @@ void artdaq::database::fhicl::debug::FhiclWriter() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::fhicl::FhiclWrite trace_enable";
+  TLOG(10) << "artdaq::database::fhicl::FhiclWrite trace_enable";
 }

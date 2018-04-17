@@ -2,6 +2,8 @@
 #include "artdaq-database/BasicTypes/data_json_fusion.h"
 
 #include "artdaq-database/BasicTypes/data_xml.h"
+
+#include <utility>
 #include "artdaq-database/BasicTypes/data_xml_fusion.h"
 
 #include "artdaq-database/DataFormats/Xml/xml_common.h"
@@ -18,7 +20,7 @@
 #define TRACE_NAME "BTPS:XmlData_C"
 
 namespace regex {
-constexpr auto parse_base64data = "[\\s\\S]*\"base64\"\\s*:\\s*\"(\\S*?)\"";
+constexpr auto parse_base64data = R"lit([\s\S]*"base64"\s*:\s*"(\S*?)")lit";
 }
 
 namespace artdaq {
@@ -39,13 +41,11 @@ bool JsonData::convert_from(XmlData const& xml) {
   return xml_to_json(xml.xml_buffer, json_buffer);
 }
 
-XmlData::XmlData(std::string const& buffer) : xml_buffer{buffer} {}
+XmlData::XmlData(std::string buffer) : xml_buffer{std::move(buffer)} {}
 
 XmlData::operator std::string const&() const { return xml_buffer; }
 
 XmlData::XmlData(JsonData const& document) {
-  namespace literal = artdaq::database::dataformats::literal;
-
   confirm(!document.empty());
 
   TLOG(11) << "XML document=" << document;
@@ -54,21 +54,23 @@ XmlData::XmlData(JsonData const& document) {
 
   auto results = std::smatch();
 
-  if (!std::regex_search(document.json_buffer, results, ex))
+  if (!std::regex_search(document.json_buffer, results, ex)) {
     throw std::runtime_error("JSON to XML convertion error, regex_search()==false; JSON buffer: " +
                              document.json_buffer);
+  }
 
-  if (results.size() != 1)
+  if (results.size() != 1) {
     throw std::runtime_error(
         "JSON to XML convertion error, "
         "regex_search().size()!=1; JSON buffer: " +
         document.json_buffer);
+  }
 
   auto base64 = std::string(results[0]);
   TLOG(12) << "XML base64=" << base64;
 
   auto json = base64_decode(base64);
-  TLOG(13)<< "XML  json=" << json;
+  TLOG(13) << "XML  json=" << json;
 
   JsonData(json).convert_to(*this);
 
@@ -76,14 +78,13 @@ XmlData::XmlData(JsonData const& document) {
 }
 
 XmlData::operator JsonData() const {
-  namespace literal = artdaq::database::dataformats::literal;
-
   TLOG(15) << "XML xml=" << xml_buffer;
 
   auto json = JsonData("");
 
-  if (!json.convert_from(*this))
+  if (!json.convert_from(*this)) {
     throw std::runtime_error("XML to JSON convertion error; XML buffer: " + this->xml_buffer);
+  }
 
   TLOG(16) << "XML  json=" << json;
 

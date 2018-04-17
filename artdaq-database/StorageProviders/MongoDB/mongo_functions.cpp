@@ -29,33 +29,14 @@
 #define TRACE_NAME "PRVDR:MongoDB_C"
 
 using namespace artdaq::database;
-namespace db = artdaq::database;
-
-namespace literal = db::mongo::literal;
-namespace bbs = bsoncxx::builder::stream;
-
-using bsoncxx::builder::stream::document;
-using bsoncxx::builder::stream::open_document;
-using bsoncxx::builder::stream::close_document;
-using bsoncxx::builder::stream::open_array;
-using bsoncxx::builder::stream::close_array;
-using bsoncxx::builder::stream::finalize;
-using bsoncxx::builder::concatenate_doc;
-
-using artdaq::database::mongo::DBConfig;
-using artdaq::database::mongo::MongoDB;
-using artdaq::database::basictypes::JsonData;
-using artdaq::database::docrecord::JSONDocumentBuilder;
-using artdaq::database::docrecord::JSONDocument;
-
-namespace jsonliteral = artdaq::database::dataformats::literal;
 
 bsoncxx::types::value extract_value_from_document(bsoncxx::document::value const& document, std::string const& key) {
   auto view = document.view();
   auto element = view.find(key);
 
-  if (element == view.end())
+  if (element == view.end()) {
     throw runtime_error("MongoDB") << "Search JsonData is missing the \"" << key << "\" element.";
+  }
 
   return element->get_value();
 }

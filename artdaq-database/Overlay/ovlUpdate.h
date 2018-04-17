@@ -3,8 +3,8 @@
 
 #include "artdaq-database/Overlay/common.h"
 #include "artdaq-database/Overlay/ovlKeyValue.h"
-#include "artdaq-database/Overlay/ovlTimeStamp.h"
 #include "artdaq-database/Overlay/ovlKeyValueTimeStamp.h"
+#include "artdaq-database/Overlay/ovlTimeStamp.h"
 
 namespace artdaq {
 namespace database {

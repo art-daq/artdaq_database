@@ -7,16 +7,15 @@
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/Overlay/JSONDocumentOverlay.h"
 
-#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include <boost/program_options.hpp>
+#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 
 namespace bpo = boost::program_options;
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
-using artdaq::database::overlay::ovlDatabaseRecord;
 namespace ovl = artdaq::database::overlay;
 
-typedef bool (*test_case)(std::string const&);
+using test_case = bool (*)(const std::string&);
 
 bool test_buildDocument(std::string const& conf);
 
@@ -25,7 +24,7 @@ bool test_setVersion(std::string const& conf);
 bool test_removeAlias(std::string const& conf);
 bool test_markDeleted(std::string const& conf);
 bool test_markReadonly(std::string const& conf);
-bool test_setVersion(std::string const& conf);
+
 bool test_addToGlobalConfig(std::string const& conf);
 
 bool test_addEntity(std::string const& conf);
@@ -55,11 +54,11 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
-  if (vm.count("help")) {
+  if (vm.count("help") != 0u) {
     std::cout << desc << std::endl;
     return 1;
   }
-  if (!vm.count("config")) {
+  if (vm.count("config") == 0u) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no configuration file given.\n"
               << "For usage and an options list, please do '" << argv[0] << " --help"
               << "'.\n";
@@ -89,18 +88,18 @@ int main(int argc, char* argv[]) {
 
   auto testResult = runTest(name(conf))(conf);
 
-  return !testResult;
+  return static_cast<int>(!testResult);
 }
 
 namespace literal {
-constexpr auto operation [[gnu::unused]] = "operation";
-constexpr auto path [[gnu::unused]] = "path";
-constexpr auto beginstate [[gnu::unused]] = "begin-state";
-constexpr auto delta [[gnu::unused]] = "delta";
-constexpr auto endstate [[gnu::unused]] = "end-state";
-constexpr auto returnedvalue [[gnu::unused]] = "returned-value";
-constexpr auto mustsucceed [[gnu::unused]] = "must-succeed";
-}
+constexpr auto operation[[gnu::unused]] = "operation";
+constexpr auto path[[gnu::unused]] = "path";
+constexpr auto beginstate[[gnu::unused]] = "begin-state";
+constexpr auto delta[[gnu::unused]] = "delta";
+constexpr auto endstate[[gnu::unused]] = "end-state";
+constexpr auto returnedvalue[[gnu::unused]] = "returned-value";
+constexpr auto mustsucceed[[gnu::unused]] = "must-succeed";
+}  // namespace literal
 
 bool test_buildDocument(std::string const& conf) {
   confirm(!conf.empty());
@@ -134,7 +133,9 @@ bool test_buildDocument(std::string const& conf) {
     }
 
   } catch (cet::exception const& e) {
-    if (mustsucceed) throw;
+    if (mustsucceed) {
+      throw;
+    }
   }
 
   return true;
@@ -169,7 +170,9 @@ bool test_addAlias(std::string const& conf) {
     }
 
   } catch (cet::exception const& e) {
-    if (mustsucceed) throw;
+    if (mustsucceed) {
+      throw;
+    }
   }
 
   return true;
@@ -204,7 +207,9 @@ bool test_removeAlias(std::string const& conf) {
     }
 
   } catch (cet::exception const& e) {
-    if (mustsucceed) throw;
+    if (mustsucceed) {
+      throw;
+    }
   }
 
   return true;
@@ -239,7 +244,9 @@ bool test_addToGlobalConfig(std::string const& conf) {
     }
 
   } catch (cet::exception const& e) {
-    if (mustsucceed) throw;
+    if (mustsucceed) {
+      throw;
+    }
   }
 
   return true;
@@ -274,7 +281,9 @@ bool test_setVersion(std::string const& conf) {
     }
 
   } catch (cet::exception const& e) {
-    if (mustsucceed) throw;
+    if (mustsucceed) {
+      throw;
+    }
   }
 
   return true;
@@ -308,7 +317,9 @@ bool test_markReadonly(std::string const& conf) {
     }
 
   } catch (cet::exception const& e) {
-    if (mustsucceed) throw;
+    if (mustsucceed) {
+      throw;
+    }
   }
 
   return true;
@@ -342,7 +353,9 @@ bool test_markDeleted(std::string const& conf) {
     }
 
   } catch (cet::exception const& e) {
-    if (mustsucceed) throw;
+    if (mustsucceed) {
+      throw;
+    }
   }
 
   return true;
@@ -377,7 +390,9 @@ bool test_addEntity(std::string const& conf) {
     }
 
   } catch (cet::exception const& e) {
-    if (mustsucceed) throw;
+    if (mustsucceed) {
+      throw;
+    }
   }
 
   return true;
@@ -412,7 +427,9 @@ bool test_removeEntity(std::string const& conf) {
     }
 
   } catch (cet::exception const& e) {
-    if (mustsucceed) throw;
+    if (mustsucceed) {
+      throw;
+    }
   }
 
   return true;

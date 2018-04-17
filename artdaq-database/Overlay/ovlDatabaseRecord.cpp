@@ -1,13 +1,10 @@
 #include "artdaq-database/Overlay/ovlDatabaseRecord.h"
 #include "artdaq-database/Overlay/ovlKeyValue.h"
 
-namespace jsonliteral = artdaq::database::dataformats::literal;
-namespace ovl = artdaq::database::overlay;
 using namespace artdaq::database;
 using namespace artdaq::database::overlay;
 using namespace artdaq::database::result;
 using result_t = artdaq::database::result_t;
-using artdaq::database::sharedtypes::unwrap;
 
 ovlDatabaseRecord::ovlDatabaseRecord(value_t& record)
     : ovlKeyValue(jsonliteral::database_record, record),
@@ -29,7 +26,9 @@ ovlDatabaseRecord::ovlDatabaseRecord(value_t& record)
 ovlDocument& ovlDatabaseRecord::document() { return *_document; }
 
 result_t ovlDatabaseRecord::swap(ovlDocumentUPtr_t& document) {
-  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) {
+    return Failure(msg_IsReadonly);
+  }
 
   return _document->ovlKeyValue::swap(document.get());
 }
@@ -39,7 +38,9 @@ ovlComments& ovlDatabaseRecord::comments() { return *_comments; }
 result_t ovlDatabaseRecord::swap(ovlCommentsUPtr_t& comments) {
   confirm(comments);
 
-  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) {
+    return Failure(msg_IsReadonly);
+  }
 
   return _comments->ovlKeyValue::swap(comments.get());
 }
@@ -49,7 +50,9 @@ ovlOrigin& ovlDatabaseRecord::origin() { return *_origin; }
 result_t ovlDatabaseRecord::swap(ovlOriginUPtr_t& origin) {
   confirm(origin);
 
-  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) {
+    return Failure(msg_IsReadonly);
+  }
 
   return _origin->ovlKeyValue::swap(origin.get());
 }
@@ -59,7 +62,9 @@ ovlVersion& ovlDatabaseRecord::version() { return *_version; }
 result_t ovlDatabaseRecord::swap(ovlVersionUPtr_t& version) {
   confirm(version);
 
-  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) {
+    return Failure(msg_IsReadonly);
+  }
 
   return _version->ovlKeyValue::swap(version.get());
 }
@@ -67,7 +72,9 @@ result_t ovlDatabaseRecord::swap(ovlVersionUPtr_t& version) {
 result_t ovlDatabaseRecord::swap(ovlConfigurationTypeUPtr_t& configtype) {
   confirm(configtype);
 
-  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) {
+    return Failure(msg_IsReadonly);
+  }
 
   return _configurationtype->ovlKeyValue::swap(configtype.get());
 }
@@ -75,7 +82,9 @@ result_t ovlDatabaseRecord::swap(ovlConfigurationTypeUPtr_t& configtype) {
 result_t ovlDatabaseRecord::swap(ovlCollectionUPtr_t& collection) {
   confirm(collection);
 
-  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) {
+    return Failure(msg_IsReadonly);
+  }
 
   return _collection->ovlKeyValue::swap(collection.get());
 }
@@ -91,7 +100,9 @@ ovlId& ovlDatabaseRecord::id() { return *_id; }
 result_t ovlDatabaseRecord::swap(ovlIdUPtr_t& id) {
   confirm(id);
 
-  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) {
+    return Failure(msg_IsReadonly);
+  }
 
   return _id->ovlKeyValue::swap(id.get());
 }
@@ -121,7 +132,9 @@ std::string ovlDatabaseRecord::to_string() const {
 bool ovlDatabaseRecord::isReadonlyOrDeleted() const { return _bookkeeping->isReadonly() || _bookkeeping->isDeleted(); }
 
 result_t ovlDatabaseRecord::markReadonly() {
-  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) {
+    return Failure(msg_IsReadonly);
+  }
 
   _bookkeeping->markReadonly(true);
 
@@ -138,13 +151,17 @@ result_t ovlDatabaseRecord::markDeleted() {
 result_t ovlDatabaseRecord::addConfiguration(ovlConfigurationUPtr_t& configuration) {
   confirm(configuration);
 
-  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) {
+    return Failure(msg_IsReadonly);
+  }
 
   auto update = std::string("addConfiguration");
 
   auto result = _configurations->add(configuration);
 
-  if (!result.first) return result;
+  if (!result.first) {
+    return result;
+  }
 
   return _bookkeeping->postUpdate(update, configuration);
 }
@@ -152,13 +169,17 @@ result_t ovlDatabaseRecord::addConfiguration(ovlConfigurationUPtr_t& configurati
 result_t ovlDatabaseRecord::removeConfiguration(ovlConfigurationUPtr_t& configuration) {
   confirm(configuration);
 
-  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) {
+    return Failure(msg_IsReadonly);
+  }
 
   auto update = std::string("removeConfiguration");
 
   auto result = _configurations->remove(configuration);
 
-  if (!result.first) return result;
+  if (!result.first) {
+    return result;
+  }
 
   return _bookkeeping->postUpdate(update, configuration);
 }
@@ -166,13 +187,17 @@ result_t ovlDatabaseRecord::removeConfiguration(ovlConfigurationUPtr_t& configur
 result_t ovlDatabaseRecord::addAlias(ovlAliasUPtr_t& alias) {
   confirm(alias);
 
-  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) {
+    return Failure(msg_IsReadonly);
+  }
 
   auto update = std::string("addAlias");
 
   auto result = _aliases->add(alias);
 
-  if (!result.first) return result;
+  if (!result.first) {
+    return result;
+  }
 
   return _bookkeeping->postUpdate(update, alias);
 }
@@ -180,13 +205,17 @@ result_t ovlDatabaseRecord::addAlias(ovlAliasUPtr_t& alias) {
 result_t ovlDatabaseRecord::removeAlias(ovlAliasUPtr_t& alias) {
   confirm(alias);
 
-  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) {
+    return Failure(msg_IsReadonly);
+  }
 
   auto update = std::string("removeAlias");
 
   auto result = _aliases->remove(alias);
 
-  if (!result.first) return result;
+  if (!result.first) {
+    return result;
+  }
 
   return _bookkeeping->postUpdate(update, alias);
 }
@@ -194,13 +223,19 @@ result_t ovlDatabaseRecord::removeAlias(ovlAliasUPtr_t& alias) {
 result_t ovlDatabaseRecord::setVersion(ovlVersionUPtr_t& version) {
   confirm(version);
 
-  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) {
+    return Failure(msg_IsReadonly);
+  }
 
-  if (_version->string_value().compare(version->string_value()) == 0) return Success(msg_Ignored);
+  if (_version->string_value() == version->string_value()) {
+    return Success(msg_Ignored);
+  }
 
   auto result = swap(version);
 
-  if (!result.first) return result;
+  if (!result.first) {
+    return result;
+  }
 
   auto update = std::string("setVersion");
 
@@ -210,13 +245,19 @@ result_t ovlDatabaseRecord::setVersion(ovlVersionUPtr_t& version) {
 result_t ovlDatabaseRecord::setConfigurationType(ovlConfigurationTypeUPtr_t& configurationtype) {
   confirm(configurationtype);
 
-  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) {
+    return Failure(msg_IsReadonly);
+  }
 
-  if (_configurationtype->string_value().compare(configurationtype->string_value()) == 0) return Success(msg_Ignored);
+  if (_configurationtype->string_value() == configurationtype->string_value()) {
+    return Success(msg_Ignored);
+  }
 
   auto result = swap(configurationtype);
 
-  if (!result.first) return result;
+  if (!result.first) {
+    return result;
+  }
 
   auto update = std::string("setConfigurationType");
 
@@ -226,13 +267,19 @@ result_t ovlDatabaseRecord::setConfigurationType(ovlConfigurationTypeUPtr_t& con
 result_t ovlDatabaseRecord::setCollection(ovlCollectionUPtr_t& collection) {
   confirm(collection);
 
-  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) {
+    return Failure(msg_IsReadonly);
+  }
 
-  if (_collection->string_value().compare(collection->string_value()) == 0) return Success(msg_Ignored);
+  if (_collection->string_value() == collection->string_value()) {
+    return Success(msg_Ignored);
+  }
 
   auto result = swap(collection);
 
-  if (!result.first) return result;
+  if (!result.first) {
+    return result;
+  }
 
   auto update = std::string("setCollection");
 
@@ -242,13 +289,17 @@ result_t ovlDatabaseRecord::setCollection(ovlCollectionUPtr_t& collection) {
 result_t ovlDatabaseRecord::addEntity(ovlEntityUPtr_t& entity) {
   confirm(entity);
 
-  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) {
+    return Failure(msg_IsReadonly);
+  }
 
   auto update = std::string("addEntity");
 
   auto result = _entities->add(entity);
 
-  if (!result.first) return result;
+  if (!result.first) {
+    return result;
+  }
 
   return _bookkeeping->postUpdate(update, entity);
 }
@@ -256,27 +307,35 @@ result_t ovlDatabaseRecord::addEntity(ovlEntityUPtr_t& entity) {
 result_t ovlDatabaseRecord::addRun(ovlRunUPtr_t& run) {
   confirm(run);
 
-  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) {
+    return Failure(msg_IsReadonly);
+  }
 
   auto update = std::string("addRun");
 
   auto result = _runs->add(run);
 
-  if (!result.first) return result;
+  if (!result.first) {
+    return result;
+  }
 
   return _bookkeeping->postUpdate(update, run);
 }
-  
+
 result_t ovlDatabaseRecord::removeEntity(ovlEntityUPtr_t& entity) {
   confirm(entity);
 
-  if (isReadonlyOrDeleted()) return Failure(msg_IsReadonly);
+  if (isReadonlyOrDeleted()) {
+    return Failure(msg_IsReadonly);
+  }
 
   auto update = std::string("removeEntity");
 
   auto result = _entities->remove(entity);
 
-  if (!result.first) return result;
+  if (!result.first) {
+    return result;
+  }
 
   return _bookkeeping->postUpdate(update, entity);
 }
@@ -288,61 +347,91 @@ result_t ovlDatabaseRecord::operator==(ovlDatabaseRecord const& other) const {
 
   auto result = *_document == *other._document;
 
-  if (!result.first) oss << result.second;
+  if (!result.first) {
+    oss << result.second;
+  }
 
   result = *_comments == *other._comments;
 
-  if (!result.first) oss << result.second;
+  if (!result.first) {
+    oss << result.second;
+  }
 
   result = *_origin == *other._origin;
 
-  if (!result.first) oss << result.second;
+  if (!result.first) {
+    oss << result.second;
+  }
 
   result = *_version == *other._version;
 
-  if (!result.first) oss << result.second;
+  if (!result.first) {
+    oss << result.second;
+  }
 
   result = *_collection == *other._collection;
 
-  if (!result.first) oss << result.second;
+  if (!result.first) {
+    oss << result.second;
+  }
 
   result = *_configurationtype == *other._configurationtype;
 
-  if (!result.first) oss << result.second;
+  if (!result.first) {
+    oss << result.second;
+  }
 
   result = *_configurations == *other._configurations;
 
-  if (!result.first) oss << result.second;
+  if (!result.first) {
+    oss << result.second;
+  }
 
   result = *_changelog == *other._changelog;
 
-  if (!result.first) oss << result.second;
+  if (!result.first) {
+    oss << result.second;
+  }
 
   result = *_bookkeeping == *other._bookkeeping;
 
-  if (!result.first) oss << result.second;
+  if (!result.first) {
+    oss << result.second;
+  }
 
   result = *_id == *other._id;
 
-  if (!result.first) oss << result.second;
+  if (!result.first) {
+    oss << result.second;
+  }
 
   result = *_entities == *other._entities;
 
-  if (!result.first) oss << result.second;
+  if (!result.first) {
+    oss << result.second;
+  }
 
   result = *_runs == *other._runs;
 
-  if (!result.first) oss << result.second;
+  if (!result.first) {
+    oss << result.second;
+  }
 
   result = *_aliases == *other._aliases;
 
-  if (!result.first) oss << result.second;
+  if (!result.first) {
+    oss << result.second;
+  }
 
   result = *_attachments == *other._attachments;
 
-  if (!result.first) oss << result.second;
+  if (!result.first) {
+    oss << result.second;
+  }
 
-  if (oss.tellp() == noerror_pos) return Success();
+  if (oss.tellp() == noerror_pos) {
+    return Success();
+  }
 
   // oss << "\n  Debug info:";
   // oss << "\n  Self  value: " << to_string();

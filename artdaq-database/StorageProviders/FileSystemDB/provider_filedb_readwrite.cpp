@@ -11,8 +11,8 @@ namespace database {
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonData const& arg) {
-  TLOG(13)<< "FileSystemDB::readDocument() begin";
-  TLOG(13)<< "FileSystemDB::readDocument() args=<" << arg << ">";
+  TLOG(13) << "FileSystemDB::readDocument() begin";
+  TLOG(13) << "FileSystemDB::readDocument() args=<" << arg << ">";
 
   auto returnCollection = std::list<JsonData>();
 
@@ -23,7 +23,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonDa
   try {
     filter_document = arg_document.findChildDocument(jsonliteral::filter);
   } catch (...) {
-    TLOG(13)<< "FileSystemDB::readDocument() No filter was found.";
+    TLOG(13) << "FileSystemDB::readDocument() No filter was found.";
   }
 
   auto collection_name = std::string{};
@@ -31,18 +31,20 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonDa
   try {
     collection_name = filter_document.findChild(jsonliteral::collection).value();
   } catch (...) {
-    TLOG(13)<< "FileSystemDB::readDocument() Filter must have the collection element.";
+    TLOG(13) << "FileSystemDB::readDocument() Filter must have the collection element.";
   }
 
-  if (collection_name.empty()) collection_name = arg_document.findChild(jsonliteral::collection).value();
+  if (collection_name.empty()) {
+    collection_name = arg_document.findChild(jsonliteral::collection).value();
+  }
 
   confirm(!collection_name.empty());
 
-  TLOG(13)<< "FileSystemDB::readDocument() collection_name=<" << collection_name << ">";
+  TLOG(13) << "FileSystemDB::readDocument() collection_name=<" << collection_name << ">";
 
   auto collection = _provider->connection() + collection_name;
 
-  TLOG(13)<< "FileSystemDB::readDocument() collection_path=<" << collection << ">";
+  TLOG(13) << "FileSystemDB::readDocument() collection_path=<" << collection << ">";
 
   collection = expand_environment_variables(collection);
 
@@ -54,11 +56,11 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonDa
 
   SearchIndex search_index(index_path);
 
-  TLOG(13)<< "FileSystemDB::readDocument() filter_json=<" << filter_json << ">.";
+  TLOG(13) << "FileSystemDB::readDocument() filter_json=<" << filter_json << ">.";
 
   auto oids = search_index.findDocumentIDs(filter_json);
 
-  TLOG(13)<< "FileSystemDB::readDocument() search returned " << oids.size() << " documents.";
+  TLOG(13) << "FileSystemDB::readDocument() search returned " << oids.size() << " documents.";
 
   for (auto const& oid : oids) {
     auto doc_path = boost::filesystem::path(dir_name.c_str()).append(oid).replace_extension(".json");
@@ -66,7 +68,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::readDocument(JsonDa
     auto json = std::string{};
     db::read_buffer_from_file(json, {doc_path.c_str()});
 
-    TLOG(13)<< "FileSystemDB::readDocument() found_document=<" << json << ">";
+    TLOG(13) << "FileSystemDB::readDocument() found_document=<" << json << ">";
 
     returnCollection.emplace_back(json);
   }
@@ -99,13 +101,17 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeDocument(JsonData cons
     TLOG(14) << "FileSystemDB::writeDocument() User document must have the collection element.";
   }
 
-  if (collection_name.empty()) try {
+  if (collection_name.empty()) {
+    try {
       collection_name = filter_document.findChild(jsonliteral::collection).value();
     } catch (...) {
       TLOG(14) << "FileSystemDB::writeDocument() Filter should have the collection element.";
     }
+  }
 
-  if (collection_name.empty()) collection_name = arg_document.findChild(jsonliteral::collection).value();
+  if (collection_name.empty()) {
+    collection_name = arg_document.findChild(jsonliteral::collection).value();
+  }
 
   confirm(!collection_name.empty());
 
@@ -146,9 +152,10 @@ object_id_t StorageProvider<JsonData, FileSystemDB>::writeDocument(JsonData cons
   TLOG(14) << "FileSystemDB::writeDocument() filename=<" << filename << ">.";
 
   if (isNew) {
-    if (dbfs::check_if_file_exists(filename))
+    if (dbfs::check_if_file_exists(filename)) {
       throw runtime_error("FileSystemDB") << "FileSystemDB failed inserting data, document already exist; filename= <"
                                           << filename << ">, filter= <" << filter_document << ">";
+    }
   }
 
   auto json = builder.to_string();
@@ -176,11 +183,11 @@ void ReadWrite() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::filesystem::ReadWrite trace_enable";
+  TLOG(10) << "artdaq::database::filesystem::ReadWrite trace_enable";
 
   artdaq::database::filesystem::index::debug::enable();
 }
-}
+}  // namespace debug
 }  // namespace filesystem
 
 }  // namespace database

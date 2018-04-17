@@ -21,38 +21,38 @@ namespace DBI = artdaq::database::filesystem;
 namespace prov = artdaq::database::configuration::filesystem;
 
 using artdaq::database::basictypes::JsonData;
-using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocument;
+using artdaq::database::docrecord::JSONDocumentBuilder;
 
 void prov::writeDocument(ManageDocumentOperation const& options, JsonData const& insert_payload) {
-  if (options.operation().compare(apiliteral::operation::writedocument) != 0 &&
-      options.operation().compare(apiliteral::operation::overwritedocument) != 0) {
+  if (options.operation() != apiliteral::operation::writedocument &&
+      options.operation() != apiliteral::operation::overwritedocument) {
     throw runtime_error("write_document") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+  if (options.provider() != apiliteral::provider::filesystem) {
     throw runtime_error("write_document") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TLOG(25)<< "writeDocument(): begin";
+  TLOG(25) << "writeDocument(): begin";
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JsonData>::create(database);
   auto object_id = provider->writeDocument(insert_payload);
 
-  TLOG(25)<< "writeDocument(): object_id=<" << object_id << ">";
+  TLOG(25) << "writeDocument(): object_id=<" << object_id << ">";
 
-  TLOG(25)<< "writeDocument(): end";
+  TLOG(25) << "writeDocument(): end";
 }
 
 JsonData prov::readDocument(ManageDocumentOperation const& options, JsonData const& search_payload) {
-  TLOG(26)<< "readDocument(): begin";
+  TLOG(26) << "readDocument(): begin";
 
   auto collection = readDocuments(options, search_payload);
 
-  TLOG(26)<< "read_document: "
-                 << "Search returned " << collection.size() << " results.";
+  TLOG(26) << "read_document: "
+           << "Search returned " << collection.size() << " results.";
 
   if (collection.size() != 1) {
     throw runtime_error("read_document") << "Search returned " << collection.size() << " results.";
@@ -60,21 +60,21 @@ JsonData prov::readDocument(ManageDocumentOperation const& options, JsonData con
 
   auto data = JsonData{*collection.begin()};
 
-  TLOG(26)<< "readDocument(): end";
+  TLOG(26) << "readDocument(): end";
 
   return data;
 }
 
 std::list<JsonData> prov::readDocuments(ManageDocumentOperation const& options, JsonData const& search_payload) {
-  if (options.operation().compare(apiliteral::operation::readdocument) != 0) {
+  if (options.operation() != apiliteral::operation::readdocument) {
     throw runtime_error("read_documents") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+  if (options.provider() != apiliteral::provider::filesystem) {
     throw runtime_error("read_documents") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TLOG(26)<< "readDocuments(): begin";
+  TLOG(26) << "readDocuments(): begin";
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
@@ -82,20 +82,20 @@ std::list<JsonData> prov::readDocuments(ManageDocumentOperation const& options, 
 
   auto collection = provider->readDocument(search_payload);
 
-  TLOG(26)<< "read_documents: Search returned " << collection.size() << " results.";
+  TLOG(26) << "read_documents: Search returned " << collection.size() << " results.";
 
-  TLOG(26)<< "readDocuments(): end";
+  TLOG(26) << "readDocuments(): end";
 
   return collection;
 }
 
 JsonData prov::findConfigurations(ManageDocumentOperation const& options, JsonData const& search_payload) {
-  if (options.operation().compare(apiliteral::operation::findconfigs) != 0) {
-    throw runtime_error("operation_findconfigs") << "Wrong operation option; operation=<" << options.operation()
-                                                 << ">.";
+  if (options.operation() != apiliteral::operation::findconfigs) {
+    throw runtime_error("operation_findconfigs")
+        << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+  if (options.provider() != apiliteral::provider::filesystem) {
     throw runtime_error("operation_findconfigs") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
@@ -116,7 +116,9 @@ JsonData prov::findConfigurations(ManageDocumentOperation const& options, JsonDa
 
   auto needComma = bool{false};
   auto printComma = [&needComma]() {
-    if (needComma) return ", ";
+    if (needComma) {
+      return ", ";
+    }
     needComma = true;
     return " ";
   };
@@ -124,11 +126,13 @@ JsonData prov::findConfigurations(ManageDocumentOperation const& options, JsonDa
   std::ostringstream oss;
 
   auto seenValues = std::list<std::string>{};
-  seenValues.push_back(apiliteral::notprovided);
+  seenValues.emplace_back(apiliteral::notprovided);
 
   auto isNew = [& v = seenValues](auto const& name) {
     confirm(!name.empty());
-    if (std::find(v.begin(), v.end(), name) != v.end()) return false;
+    if (std::find(v.begin(), v.end(), name) != v.end()) {
+      return false;
+    }
 
     v.emplace_back(name);
     return true;
@@ -141,10 +145,12 @@ JsonData prov::findConfigurations(ManageDocumentOperation const& options, JsonDa
 
     auto global_config_name = JSONDocument::value(doc.findChild("filter").value());
 
-    if (!isNew(global_config_name)) continue;
+    if (!isNew(global_config_name)) {
+      continue;
+    }
 
     oss << printComma() << "{";
-    oss << "\"name\" :\"" << global_config_name << "\",";
+    oss << R"("name" :")" << global_config_name << "\",";
     oss << "\"query\" :" << global_config;
     oss << "}";
   }
@@ -155,14 +161,14 @@ JsonData prov::findConfigurations(ManageDocumentOperation const& options, JsonDa
 }
 
 JsonData prov::configurationComposition(ManageDocumentOperation const& options, JsonData const& search_payload) {
-  if (options.operation().compare(apiliteral::operation::confcomposition) != 0) {
-    throw runtime_error("operation_confcomposition") << "Wrong operation option; operation=<" << options.operation()
-                                                     << ">.";
+  if (options.operation() != apiliteral::operation::confcomposition) {
+    throw runtime_error("operation_confcomposition")
+        << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
-    throw runtime_error("operation_confcomposition") << "Wrong provider option; provider=<" << options.provider()
-                                                     << ">.";
+  if (options.provider() != apiliteral::provider::filesystem) {
+    throw runtime_error("operation_confcomposition")
+        << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
   TLOG(28) << "operation_confcomposition: begin";
@@ -185,7 +191,9 @@ JsonData prov::configurationComposition(ManageDocumentOperation const& options, 
 
   auto needComma = bool{false};
   auto printComma = [&needComma]() {
-    if (needComma) return ", ";
+    if (needComma) {
+      return ", ";
+    }
     needComma = true;
     return " ";
   };
@@ -199,8 +207,9 @@ JsonData prov::configurationComposition(ManageDocumentOperation const& options, 
 
     auto results = std::smatch();
 
-    if (!std::regex_search(filter_json, results, ex))
+    if (!std::regex_search(filter_json, results, ex)) {
       throw runtime_error("operation_confcomposition") << "Unsupported filter string, no match";
+    }
 
     /*
         for (size_t i = 0; i < results.size(); ++i) {
@@ -210,11 +219,12 @@ JsonData prov::configurationComposition(ManageDocumentOperation const& options, 
        " << piece << '\n';
         }
     */
-    if (results.size() != 5)
+    if (results.size() != 5) {
       throw runtime_error("operation_confcomposition") << "Unsupported filter string, wrong result count";
+    }
 
     oss << printComma() << "{";
-    oss << "\"name\" :\"" << results[1].str() << ":" << results[3].str() << "\",";
+    oss << R"("name" :")" << results[1].str() << ":" << results[3].str() << "\",";
     oss << "\"query\" :" << query_payload;
     oss << "}";
   }
@@ -225,16 +235,16 @@ JsonData prov::configurationComposition(ManageDocumentOperation const& options, 
 }
 
 JsonData prov::findVersions(ManageDocumentOperation const& options, JsonData const& /*not used*/) {
-  if (options.operation().compare(apiliteral::operation::findversions) != 0) {
-    throw runtime_error("operation_findversions") << "Wrong operation option; operation=<" << options.operation()
-                                                  << ">.";
+  if (options.operation() != apiliteral::operation::findversions) {
+    throw runtime_error("operation_findversions")
+        << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+  if (options.provider() != apiliteral::provider::filesystem) {
     throw runtime_error("operation_findversions") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TLOG(29)<< "operation_findversions: begin";
+  TLOG(29) << "operation_findversions: begin";
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
@@ -256,7 +266,9 @@ JsonData prov::findVersions(ManageDocumentOperation const& options, JsonData con
 
   auto needComma = bool{false};
   auto printComma = [&needComma]() {
-    if (needComma) return ", ";
+    if (needComma) {
+      return ", ";
+    }
     needComma = true;
     return " ";
   };
@@ -270,8 +282,9 @@ JsonData prov::findVersions(ManageDocumentOperation const& options, JsonData con
 
     auto results = std::smatch();
 
-    if (!std::regex_search(filter_json, results, ex))
+    if (!std::regex_search(filter_json, results, ex)) {
       throw runtime_error("operation_findversions") << "Unsupported filter string, no match";
+    }
 
     /*
             for (size_t i = 0; i < results.size(); ++i) {
@@ -281,11 +294,12 @@ JsonData prov::findVersions(ManageDocumentOperation const& options, JsonData con
        << ": " << piece << '\n');
             }
     */
-    if (results.size() != 5)
+    if (results.size() != 5) {
       throw runtime_error("operation_findversions") << "Unsupported filter string, wrong result count";
+    }
 
     oss << printComma() << "{";
-    oss << "\"name\" :\"" << results[1].str() /*<< ":" << results[3].str()*/
+    oss << R"("name" :")" << results[1].str() /*<< ":" << results[3].str()*/
         << "\",";
     oss << "\"query\" :" << config_version;
     oss << "}";
@@ -297,16 +311,16 @@ JsonData prov::findVersions(ManageDocumentOperation const& options, JsonData con
 }
 
 JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData const& /*not used*/) {
-  if (options.operation().compare(apiliteral::operation::findentities) != 0) {
-    throw runtime_error("operation_findentities") << "Wrong operation option; operation=<" << options.operation()
-                                                  << ">.";
+  if (options.operation() != apiliteral::operation::findentities) {
+    throw runtime_error("operation_findentities")
+        << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+  if (options.provider() != apiliteral::provider::filesystem) {
     throw runtime_error("operation_findentities") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TLOG(29)<< "operation_findentities: begin";
+  TLOG(29) << "operation_findentities: begin";
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
@@ -321,11 +335,13 @@ JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData con
     // entities were found.";
   }
 
-  auto ex = std::regex("\\s\"(entities\\.name)\"\\s:\\s\"((\\\\\"|[^\"])*)\"");
+  auto ex = std::regex(R"lit(\s"(entities\.name)"\s:\s"((\\"|[^"])*)")lit");
 
   auto needComma = bool{false};
   auto printComma = [&needComma]() {
-    if (needComma) return ", ";
+    if (needComma) {
+      return ", ";
+    }
     needComma = true;
     return " ";
   };
@@ -340,8 +356,9 @@ JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData con
 
     auto results = std::smatch();
 
-    if (!std::regex_search(filter_json, results, ex))
+    if (!std::regex_search(filter_json, results, ex)) {
       throw runtime_error("operation_findentities") << "Unsupported filter string, no match";
+    }
 
     /*
             for (size_t i = 0; i < results.size(); ++i) {
@@ -352,11 +369,12 @@ JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData con
             }
     */
 
-    if (results.size() != 4)
+    if (results.size() != 4) {
       throw runtime_error("operation_findentities") << "Unsupported filter string, wrong result count";
+    }
 
     oss << printComma() << "{";
-    oss << "\"name\" :\"" << results[2].str() /*<< ":" << results[3].str()*/
+    oss << R"("name" :")" << results[2].str() /*<< ":" << results[3].str()*/
         << "\",";
     oss << "\"query\" :" << config_entity;
     oss << "}\n";
@@ -368,23 +386,23 @@ JsonData prov::findEntities(ManageDocumentOperation const& options, JsonData con
 }
 
 JsonData prov::assignConfiguration(ManageDocumentOperation const& options, JsonData const& search_payload) {
-  if (options.operation().compare(apiliteral::operation::assignconfig) != 0) {
-    throw runtime_error("operation_assignconfig") << "Wrong operation option; operation=<" << options.operation()
-                                                  << ">.";
+  if (options.operation() != apiliteral::operation::assignconfig) {
+    throw runtime_error("operation_assignconfig")
+        << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+  if (options.provider() != apiliteral::provider::filesystem) {
     throw runtime_error("operation_assignconfig") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TLOG(30)<< "operation_addconfig: begin";
+  TLOG(30) << "operation_addconfig: begin";
 
   auto new_options = options;
   new_options.operation(apiliteral::operation::readdocument);
 
   auto search =
-      JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collection() + "\"}"};
-  TLOG(30)<< "operation_addconfig: args search_payload=<" << search << ">";
+      JsonData{"{\"filter\":" + search_payload.json_buffer + R"(, "collection":")" + options.collection() + "\"}"};
+  TLOG(30) << "operation_addconfig: args search_payload=<" << search << ">";
 
   auto document = filesystem::readDocument(new_options, search);
   auto json_document = JSONDocument{document};
@@ -395,7 +413,7 @@ JsonData prov::assignConfiguration(ManageDocumentOperation const& options, JsonD
   new_options.operation(apiliteral::operation::writedocument);
 
   auto update =
-      JsonData{"{\"filter\": "s + builder.getObjectID().to_string() + ",  \"document\":" + builder.to_string() + "\n}"};
+      JsonData{R"({"filter": )" + builder.getObjectID().to_string() + ",  \"document\":" + builder.to_string() + "\n}"};
 
   // TLOG(30)<< "operation_addconfig: writeDocument() begin";
   filesystem::writeDocument(new_options, update);
@@ -414,23 +432,23 @@ JsonData prov::assignConfiguration(ManageDocumentOperation const& options, JsonD
 }
 
 JsonData prov::removeConfiguration(ManageDocumentOperation const& options, JsonData const& search_payload) {
-  if (options.operation().compare(apiliteral::operation::removeconfig) != 0) {
-    throw runtime_error("operation_removeconfig") << "Wrong operation option; operation=<" << options.operation()
-                                                  << ">.";
+  if (options.operation() != apiliteral::operation::removeconfig) {
+    throw runtime_error("operation_removeconfig")
+        << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+  if (options.provider() != apiliteral::provider::filesystem) {
     throw runtime_error("operation_removeconfig") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TLOG(30)<< "operation_removeconfig: begin";
+  TLOG(30) << "operation_removeconfig: begin";
 
   auto new_options = options;
   new_options.operation(apiliteral::operation::readdocument);
 
   auto search =
-      JsonData{"{\"filter\":" + search_payload.json_buffer + ", \"collection\":\"" + options.collection() + "\"}"};
-  TLOG(30)<< "operation_removeconfig: args search_payload=<" << search << ">";
+      JsonData{"{\"filter\":" + search_payload.json_buffer + R"(, "collection":")" + options.collection() + "\"}"};
+  TLOG(30) << "operation_removeconfig: args search_payload=<" << search << ">";
 
   auto document = filesystem::readDocument(new_options, search);
   auto json_document = JSONDocument{document};
@@ -441,7 +459,7 @@ JsonData prov::removeConfiguration(ManageDocumentOperation const& options, JsonD
   new_options.operation(apiliteral::operation::writedocument);
 
   auto update =
-      JsonData{"{\"filter\": "s + builder.getObjectID().to_string() + ",  \"document\":" + builder.to_string() + "\n}"};
+      JsonData{R"({"filter": )" + builder.getObjectID().to_string() + ",  \"document\":" + builder.to_string() + "\n}"};
 
   // TLOG(30)<< "operation_addconfig: writeDocument() begin";
   filesystem::writeDocument(new_options, update);
@@ -465,17 +483,17 @@ JsonData prov::findVersionAliases(cf::ManageAliasesOperation const& /*options*/,
 }
 
 JsonData prov::listCollections(ManageDocumentOperation const& options, JsonData const& search_payload) {
-  if (options.operation().compare(apiliteral::operation::listcollections) != 0) {
-    throw runtime_error("operation_listcollections") << "Wrong operation option; operation=<" << options.operation()
-                                                     << ">.";
+  if (options.operation() != apiliteral::operation::listcollections) {
+    throw runtime_error("operation_listcollections")
+        << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
-    throw runtime_error("operation_listcollections") << "Wrong provider option; provider=<" << options.provider()
-                                                     << ">.";
+  if (options.provider() != apiliteral::provider::filesystem) {
+    throw runtime_error("operation_listcollections")
+        << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TLOG(30)<< "operation_listcollections: begin";
+  TLOG(30) << "operation_listcollections: begin";
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
@@ -491,7 +509,9 @@ JsonData prov::listCollections(ManageDocumentOperation const& options, JsonData 
 
   auto needComma = bool{false};
   auto printComma = [&needComma]() {
-    if (needComma) return ", ";
+    if (needComma) {
+      return ", ";
+    }
     needComma = true;
     return " ";
   };
@@ -505,7 +525,7 @@ JsonData prov::listCollections(ManageDocumentOperation const& options, JsonData 
     TLOG(28) << "operation_listcollections: collection=<" << name << '>';
 
     oss << printComma() << "{";
-    oss << "\"name\" :\"" << name << "\",";
+    oss << R"("name" :")" << name << "\",";
     oss << "\"query\" :" << collection_name;
     oss << "}\n";
   }
@@ -516,16 +536,16 @@ JsonData prov::listCollections(ManageDocumentOperation const& options, JsonData 
 }
 
 JsonData prov::listDatabases(ManageDocumentOperation const& options, JsonData const& search_payload) {
-  if (options.operation().compare(apiliteral::operation::listdatabases) != 0) {
-    throw runtime_error("operation_listdatabases") << "Wrong operation option; operation=<" << options.operation()
-                                                   << ">.";
+  if (options.operation() != apiliteral::operation::listdatabases) {
+    throw runtime_error("operation_listdatabases")
+        << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+  if (options.provider() != apiliteral::provider::filesystem) {
     throw runtime_error("operation_listdatabases") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TLOG(30)<< "operation_listdatabases: begin";
+  TLOG(30) << "operation_listdatabases: begin";
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
@@ -541,7 +561,9 @@ JsonData prov::listDatabases(ManageDocumentOperation const& options, JsonData co
 
   auto needComma = bool{false};
   auto printComma = [&needComma]() {
-    if (needComma) return ", ";
+    if (needComma) {
+      return ", ";
+    }
     needComma = true;
     return " ";
   };
@@ -555,7 +577,7 @@ JsonData prov::listDatabases(ManageDocumentOperation const& options, JsonData co
     TLOG(28) << "operation_listdatabases: database=<" << name << '>';
 
     oss << printComma() << "{";
-    oss << "\"name\" :\"" << name << "\",";
+    oss << R"("name" :")" << name << "\",";
     oss << "\"query\" :" << database_name;
     oss << "}\n";
   }
@@ -566,15 +588,15 @@ JsonData prov::listDatabases(ManageDocumentOperation const& options, JsonData co
 }
 
 JsonData prov::readDbInfo(ManageDocumentOperation const& options, JsonData const& search_payload) {
-  if (options.operation().compare(apiliteral::operation::readdbinfo) != 0) {
+  if (options.operation() != apiliteral::operation::readdbinfo) {
     throw runtime_error("operation_readdbinfo") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
-  if (options.provider().compare(apiliteral::provider::filesystem) != 0) {
+  if (options.provider() != apiliteral::provider::filesystem) {
     throw runtime_error("operation_readdbinfo") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
-  TLOG(30)<< "operation_readdbinfo: begin";
+  TLOG(30) << "operation_readdbinfo: begin";
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
@@ -589,7 +611,7 @@ JsonData prov::readDbInfo(ManageDocumentOperation const& options, JsonData const
 
   auto const database_metadata = search_results.begin();
 
-  TLOG(30)<< "operation_readdbinfo: database_metadata =<" << *database_metadata << ">";
+  TLOG(30) << "operation_readdbinfo: database_metadata =<" << *database_metadata << ">";
 
   std::ostringstream oss;
   oss << "{ \"search\":\n";
@@ -606,5 +628,5 @@ void cf::debug::FileSystemDB() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::configuration::FileSystemDB trace_enable";
+  TLOG(10) << "artdaq::database::configuration::FileSystemDB trace_enable";
 }

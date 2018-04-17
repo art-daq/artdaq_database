@@ -6,10 +6,10 @@
 #include "artdaq-database/DataFormats/shared_literals.h"
 #include "artdaq-database/SharedCommon/sharedcommon_common.h"
 
-using artdaq::database::json::object_t;
-using artdaq::database::json::value_t;
 using artdaq::database::json::array_t;
+using artdaq::database::json::object_t;
 using artdaq::database::json::type_t;
+using artdaq::database::json::value_t;
 
 namespace artdaq {
 namespace database {

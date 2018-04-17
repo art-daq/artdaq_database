@@ -27,37 +27,33 @@ namespace db = artdaq::database;
 namespace cf = db::configuration;
 namespace cftd = cf::debug::detail;
 namespace jsonliteral = db::dataformats::literal;
-namespace apiliteral = db::configapi::literal;
 
 using cf::options::data_format_t;
 
 using Options = cf::ManageDocumentOperation;
 
 using artdaq::database::basictypes::JsonData;
-using artdaq::database::basictypes::FhiclData;
-using artdaq::database::docrecord::JSONDocument;
-using artdaq::database::docrecord::JSONDocumentBuilder;
 
 namespace artdaq {
 namespace database {
 bool json_db_to_gui(std::string const&, std::string&);
 bool json_gui_to_db(std::string const&, std::string&);
-}
-}
+}  // namespace database
+}  // namespace artdaq
 
 namespace artdaq {
 namespace database {
 namespace configuration {
 namespace detail {
 
-typedef JsonData (*provider_call_t)(Options const& /*options*/, JsonData const& /*task_payload*/);
+using provider_call_t = JsonData (*)(const Options&, const JsonData&);
 
 void assign_configuration(Options const& options, std::string& configs) {
   confirm(configs.empty());
-  confirm(options.operation().compare(apiliteral::operation::assignconfig) == 0);
+  confirm(options.operation() == apiliteral::operation::assignconfig);
 
-  TLOG(21)<< "assign_configuration: begin";
-  TLOG(21)<< "assign_configuration args options=<" << options << ">";
+  TLOG(21) << "assign_configuration: begin";
+  TLOG(21) << "assign_configuration args options=<" << options << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -92,17 +88,19 @@ void assign_configuration(Options const& options, std::string& configs) {
     }
   }
 
-  if (returnValueChanged) configs.swap(returnValue);
+  if (returnValueChanged) {
+    configs.swap(returnValue);
+  }
 
-  TLOG(21)<< "assign_configuration: end";
+  TLOG(21) << "assign_configuration: end";
 }
 
 void remove_configuration(Options const& options, std::string& configs) {
   confirm(configs.empty());
-  confirm(options.operation().compare(apiliteral::operation::removeconfig) == 0);
+  confirm(options.operation() == apiliteral::operation::removeconfig);
 
-  TLOG(21)<< "remove_configuration: begin";
-  TLOG(21)<< "remove_configuration args options=<" << options << ">";
+  TLOG(21) << "remove_configuration: begin";
+  TLOG(21) << "remove_configuration args options=<" << options << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -137,9 +135,11 @@ void remove_configuration(Options const& options, std::string& configs) {
     }
   }
 
-  if (returnValueChanged) configs.swap(returnValue);
+  if (returnValueChanged) {
+    configs.swap(returnValue);
+  }
 
-  TLOG(21)<< "remove_configuration: end";
+  TLOG(21) << "remove_configuration: end";
 }
 void create_configuration(std::string const& operations, std::string& configs) {
   confirm(!operations.empty());
@@ -147,28 +147,27 @@ void create_configuration(std::string const& operations, std::string& configs) {
 
   using namespace artdaq::database::json;
 
-  TLOG(21)<< "create_configuration: begin";
-  TLOG(21)<< "create_configuration args operations=<" << operations << ">";
+  TLOG(21) << "create_configuration: begin";
+  TLOG(21) << "create_configuration args operations=<" << operations << ">";
 
   auto reader = JsonReader{};
   object_t operations_ast;
 
   if (!reader.read(operations, operations_ast)) {
-    TLOG(21)<<
-           "create_configuration() Failed to create an AST from operations JSON.";
+    TLOG(21) << "create_configuration() Failed to create an AST from operations JSON.";
 
     throw runtime_error("create_configuration") << "Failed to create an AST from operations JSON.";
   }
 
   auto const& operations_list = boost::get<array_t>(operations_ast.at(apiliteral::operations));
 
-  TLOG(21)<< "create_configuration: found " << operations_list.size() << " operations.";
+  TLOG(21) << "create_configuration: found " << operations_list.size() << " operations.";
 
   for (auto const& operation_entry : operations_list) {
     auto buff = std::string{};
     JsonWriter{}.write(boost::get<object_t>(operation_entry), buff);
 
-    TLOG(21)<< "create_configuration() Found operation=<" << buff << ">.";
+    TLOG(21) << "create_configuration() Found operation=<" << buff << ">.";
 
     auto addconfig = Options{apiliteral::operations};
     addconfig.readJsonData(buff);
@@ -178,15 +177,15 @@ void create_configuration(std::string const& operations, std::string& configs) {
     assign_configuration(addconfig, configs);
   }
 
-  TLOG(21)<< "create_configuration: end";
+  TLOG(21) << "create_configuration: end";
 }
 
 void find_configurations(Options const& options, std::string& configs) {
   confirm(configs.empty());
-  confirm(options.operation().compare(apiliteral::operation::findconfigs) == 0);
+  confirm(options.operation() == apiliteral::operation::findconfigs);
 
-  TLOG(21)<< "find_configurations: begin";
-  TLOG(21)<< "find_configurations args options=<" << options << ">";
+  TLOG(21) << "find_configurations: begin";
+  TLOG(21) << "find_configurations args options=<" << options << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -229,14 +228,14 @@ void find_configurations(Options const& options, std::string& configs) {
       object_t results_ast;
 
       if (!reader.read(search_result, results_ast)) {
-        TLOG(21)<< "find_configurations() Failed to create an AST from search results JSON.";
+        TLOG(21) << "find_configurations() Failed to create an AST from search results JSON.";
 
         throw runtime_error("find_configurations") << "Failed to create an AST from search results JSON.";
       }
 
       auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
 
-      TLOG(21)<< "find_configurations: found " << results_list.size() << " results.";
+      TLOG(21) << "find_configurations: found " << results_list.size() << " results.";
 
       std::ostringstream os;
 
@@ -244,30 +243,33 @@ void find_configurations(Options const& options, std::string& configs) {
         auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
         auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
 
-        TLOG(21)<< "find_configurations() Found config=<" << value << ">.";
+        TLOG(21) << "find_configurations() Found config=<" << value << ">.";
 
         os << value << ",";
       }
       returnValue = os.str();
 
-      if(returnValue.back()==',')
-	returnValue.pop_back();
-      
+      if (returnValue.back() == ',') {
+        returnValue.pop_back();
+      }
+
       returnValueChanged = true;
       break;
     }
   }
 
-  if (returnValueChanged) configs.swap(returnValue);
+  if (returnValueChanged) {
+    configs.swap(returnValue);
+  }
 
-  TLOG(21)<< "find_configurations: end";
+  TLOG(21) << "find_configurations: end";
 }
 void configuration_composition(Options const& options, std::string& filters) {
   confirm(filters.empty());
-  confirm(options.operation().compare(apiliteral::operation::confcomposition) == 0);
+  confirm(options.operation() == apiliteral::operation::confcomposition);
 
   TLOG(22) << "configuration_composition: begin";
-  TLOG(21)<< "configuration_composition args options=<" << options << ">";
+  TLOG(21) << "configuration_composition args options=<" << options << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -305,9 +307,11 @@ void configuration_composition(Options const& options, std::string& filters) {
     }
   }
 
-  if (returnValueChanged) filters.swap(returnValue);
+  if (returnValueChanged) {
+    filters.swap(returnValue);
+  }
 
-  TLOG(21)<< "configuration_composition: end";
+  TLOG(21) << "configuration_composition: end";
 }
 }  // namespace detail
 }  // namespace configuration
@@ -320,5 +324,5 @@ void cftd::ManageConfigs() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::configuration::ManageConfigs trace_enable";
+  TLOG(10) << "artdaq::database::configuration::ManageConfigs trace_enable";
 }

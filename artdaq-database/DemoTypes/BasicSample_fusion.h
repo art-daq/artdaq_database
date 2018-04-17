@@ -14,8 +14,8 @@ namespace BasicSampleBKeys {
 namespace keys {
 struct f1;
 struct f2;
-}
-}
+}  // namespace keys
+}  // namespace BasicSampleBKeys
 
 BOOST_FUSION_ADAPT_ASSOC_STRUCT(cfg::BasicSampleB,
                                 (int, f1, BasicSampleBKeys::keys::f1)(double, f2, BasicSampleBKeys::keys::f2))
@@ -30,8 +30,8 @@ struct value2;
 struct value3;
 struct value4;
 struct value5;
-}
-}
+}  // namespace keys
+}  // namespace BasicSampleKeys
 
 BOOST_FUSION_ADAPT_ASSOC_STRUCT(cfg::BasicSample,
                                 (int, value1, BasicSampleKeys::keys::value1)(

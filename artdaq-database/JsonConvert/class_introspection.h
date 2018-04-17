@@ -17,7 +17,7 @@ void runVisitor(Visitor& visitor, UserData& data) {
 }
 
 }  // namespace visitor
-}  // namespace configuration
+}  // namespace jsonconvert
 }  // namespace database
 }  // namespace artdaq
 

@@ -21,6 +21,6 @@ std::string from_json_string(std::string const& str);
 
 }  // namespace fhicl
 }  // namespace database
-}  // artdaq
+}  // namespace artdaq
 
 #endif /* _ARTDAQ_DATABASE_DATAFORMATS_FHICL_HEALPERFUNCTIONS_H_ */

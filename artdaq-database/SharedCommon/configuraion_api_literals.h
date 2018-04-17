@@ -10,7 +10,7 @@ constexpr auto msg_EmptyDocument = "{\"message\":\"Json document is empty\"}";
 constexpr auto msg_SystemCallFailed =
     "{\"message\":\"Unable to call system() from this API; check if either set-user-ID or set-group-ID check if either "
     "set-user-ID or set-group-ID \"}";
-}
+}  // namespace result
 namespace configapi {
 namespace literal {
 
@@ -60,13 +60,13 @@ constexpr auto exportconfig = "exportconfig";
 constexpr auto importconfig = "importconfig";
 constexpr auto exportcollection = "exportcollection";
 constexpr auto importcollection = "importcollection";
-}
+}  // namespace operation
 
 namespace provider {
 constexpr auto mongo = "mongo";
 constexpr auto filesystem = "filesystem";
 constexpr auto ucon = "ucon";
-}
+}  // namespace provider
 
 namespace option {
 constexpr auto operation = "operation";
@@ -89,7 +89,7 @@ constexpr auto entity = "entity";
 
 constexpr auto configuration = "configuration";
 constexpr auto configuration_alias = "configurationalias";
-}
+}  // namespace option
 
 namespace filter {
 constexpr auto entities = "entities.name";
@@ -102,7 +102,7 @@ constexpr auto version = "version";
 constexpr auto version_alias = "alias";
 constexpr auto run = "run";
 constexpr auto configuration_alias = "configuration_alias";
-}
+}  // namespace filter
 
 namespace format {
 constexpr auto gui = "gui";
@@ -115,7 +115,7 @@ constexpr auto cant_call_system =
     "Unable to call system() from this API; "
     "check if either set-user-ID or set-group-ID "
     "check if either set-user-ID or set-group-ID ";
-}
+}  // namespace msg
 
 constexpr auto name = "name";
 constexpr auto notprovided = "notprovided";
@@ -140,11 +140,11 @@ constexpr auto database_format_version = 3;
 constexpr auto database_format_locale = "en_US.UTF-8";
 
 constexpr auto timestamp_format_old = "%a %b %d %H:%M:%S %Y";
-constexpr auto timestamp_format= "%FT%T.000%z";
-//constexpr auto timestamp_faketime_old = "Mon Feb  8 14:00:30 2016";
+constexpr auto timestamp_format = "%FT%T.000%z";
+// constexpr auto timestamp_faketime_old = "Mon Feb  8 14:00:30 2016";
 constexpr auto timestamp_faketime = "2017-07-18T12:48:10.123-0500";
-//2017-07-18T12:48:10-0500
-}
+// 2017-07-18T12:48:10-0500
+}  // namespace literal
 }  // namespace configapi
 }  // namespace database
 }  // namespace artdaq

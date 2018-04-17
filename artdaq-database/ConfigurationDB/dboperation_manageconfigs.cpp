@@ -16,14 +16,12 @@
 using namespace artdaq::database::configuration;
 namespace dbcfg = artdaq::database::configuration;
 
-using artdaq::database::configuration::options::data_format_t;
-
 namespace artdaq {
 namespace database {
 bool json_db_to_gui(std::string const&, std::string&);
 bool json_gui_to_db(std::string const&, std::string&);
-}
-}
+}  // namespace database
+}  // namespace artdaq
 
 namespace artdaq {
 namespace database {
@@ -124,7 +122,9 @@ using namespace artdaq::database::result;
 
 result_t json::assign_configuration(std::string const& query_payload) noexcept {
   try {
-    if (query_payload.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) {
+      return Failure(msg_EmptyFilter);
+    }
 
     auto options = ManageDocumentOperation{apiliteral::operation::assignconfig};
     options.readJsonData({query_payload});
@@ -140,7 +140,9 @@ result_t json::assign_configuration(std::string const& query_payload) noexcept {
 
 result_t json::remove_configuration(std::string const& query_payload) noexcept {
   try {
-    if (query_payload.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) {
+      return Failure(msg_EmptyFilter);
+    }
 
     auto options = ManageDocumentOperation{apiliteral::operation::removeconfig};
     options.readJsonData({query_payload});
@@ -156,7 +158,9 @@ result_t json::remove_configuration(std::string const& query_payload) noexcept {
 
 result_t json::create_configuration(std::string const& operations) noexcept {
   try {
-    if (operations.empty()) return Failure(msg_EmptyFilter);
+    if (operations.empty()) {
+      return Failure(msg_EmptyFilter);
+    }
 
     auto returnValue = std::string{};
 
@@ -176,5 +180,5 @@ void dbcfg::debug::ManageConfigs() {
   TRACE_CNTL("modeS", trace_mode::modeS);
 
   dbcfg::debug::detail::ManageConfigs();
-  TLOG(10) <<  "artdaq::database::configuration::ManageConfigs trace_enable";
+  TLOG(10) << "artdaq::database::configuration::ManageConfigs trace_enable";
 }

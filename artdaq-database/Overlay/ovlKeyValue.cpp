@@ -1,7 +1,7 @@
 #include "artdaq-database/Overlay/ovlKeyValue.h"
 
-namespace jsonliteral = artdaq::database::dataformats::literal;
-namespace ovl = artdaq::database::overlay;
+#include <utility>
+
 using namespace artdaq::database;
 using namespace artdaq::database::overlay;
 using namespace artdaq::database::result;
@@ -14,7 +14,7 @@ std::uint32_t artdaq::database::overlay::useCompareMask(std::uint32_t compareMas
   return _compareMask;
 }
 
-ovlKeyValue::ovlKeyValue(object_t::key_type const& key, value_t& value) : _key(key), _value(value) {}
+ovlKeyValue::ovlKeyValue(object_t::key_type key, value_t& value) : _key(std::move(key)), _value(value) {}
 
 std::string ovlKeyValue::to_string() const {
   auto retValue = std::string{};
@@ -24,10 +24,10 @@ std::string ovlKeyValue::to_string() const {
 
   using artdaq::database::json::JsonWriter;
 
-  if (JsonWriter().write(tmpAST, retValue))
+  if (JsonWriter().write(tmpAST, retValue)) {
     return retValue;
-  else
-    return msg_ConvertionError;
+  }
+  { return msg_ConvertionError; }
 }
 
 value_t& ovlKeyValue::value(object_t::key_type const& key) { return objectValue(key); }
@@ -63,11 +63,15 @@ ovlKeyValue& ovlKeyValue::self() { return *this; }
 std::string const& ovlKeyValue::objectStringValue() const { return unwrap(_value).value_as<std::string>(); }
 
 result_t ovlKeyValue::operator==(ovlKeyValue const& other) const {
-  if (_key != other._key) return {false, "Keys are different: self,other=" + _key + "," + other._key + "."};
+  if (_key != other._key) {
+    return {false, "Keys are different: self,other=" + _key + "," + other._key + "."};
+  }
 
   auto result = artdaq::database::json::operator==(_value, other._value);
 
-  if (result.first) return result;
+  if (result.first) {
+    return result;
+  }
 
   using artdaq::database::json::print_visitor;
 
@@ -81,7 +85,9 @@ result_t ovlKeyValue::operator==(ovlKeyValue const& other) const {
 }
 
 result_t ovlKeyValue::swap(ovlKeyValue* other) try {
-  if (other == nullptr) return Failure(msg_InvalidArgument);
+  if (other == nullptr) {
+    return Failure(msg_InvalidArgument);
+  }
 
   _key.swap(other->_key);
   _value.swap(other->_value);

@@ -24,8 +24,7 @@ struct ConfigurationBase {
 
   virtual ConfigurationView* getViewP() = 0;
   virtual int getViewVersion() const = 0;
-  virtual ~ConfigurationBase()=default;
-
+  virtual ~ConfigurationBase() = default;
 };
 
 struct TestConfiguration001 final : public ConfigurationBase {
@@ -36,8 +35,7 @@ struct TestConfiguration001 final : public ConfigurationBase {
   ConfigurationView* getViewP() { return &view; }
   int getViewVersion() const { return view.version; }
   ConfigurationView view;
-  ~TestConfiguration001()=default;
-
+  ~TestConfiguration001() = default;
 };
 
 struct TestConfiguration002 final : public ConfigurationBase {
@@ -48,8 +46,8 @@ struct TestConfiguration002 final : public ConfigurationBase {
   ConfigurationView* getViewP() { return &view; }
   int getViewVersion() const { return view.version; }
   ConfigurationView view;
-  ~TestConfiguration002()=default;
+  ~TestConfiguration002() = default;
 };
-}
+}  // namespace ots
 
 #endif  //_ots_DatabaseConfigurationInterface_h_

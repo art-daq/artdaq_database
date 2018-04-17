@@ -1,10 +1,9 @@
+#include "artdaq-database/SharedCommon/helper_functions.h"
 #include "artdaq-database/SharedCommon/common.h"
 #include "artdaq-database/SharedCommon/configuraion_api_literals.h"
-#include "artdaq-database/SharedCommon/helper_functions.h"
 #include "artdaq-database/SharedCommon/shared_exceptions.h"
 
 #include <sys/utsname.h>
-#include <time.h>
 #include <wordexp.h>
 #include <chrono>
 #include <clocale>
@@ -34,25 +33,29 @@ std::string db::to_string(std::chrono::system_clock::time_point const& tp) {
   char buff[40];
   std::strftime(buff, sizeof(buff), apiliteral::timestamp_format, std::localtime(&time));
   auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch()).count() % 1000;
-  
+
 #ifndef __clang__
-  #define FORMAT_DURATION_MILLISECONDS "%03ld"  
-#else //__clang__
-  #define FORMAT_DURATION_MILLISECONDS "%03lld"
-#endif //__clang__
-  
+#define FORMAT_DURATION_MILLISECONDS "%03ld"
+#else  //__clang__
+#define FORMAT_DURATION_MILLISECONDS "%03lld"
+#endif  //__clang__
+
   snprintf(buff + 30, 4, FORMAT_DURATION_MILLISECONDS, milliseconds);
-  
+
   strncpy(buff + 20, buff + 30, 3);
 
-  if (useFakeTime()) return apiliteral::timestamp_faketime;
+  if (useFakeTime()) {
+    return apiliteral::timestamp_faketime;
+  }
 
   return {buff};
 }
 
 std::chrono::system_clock::time_point db::to_timepoint(std::string const& strtime) {
   confirm(!strtime.empty());
-  if (strtime.empty()) throw std::invalid_argument("Failed calling to_timepoint(): Invalid strtime; strtime is empty");
+  if (strtime.empty()) {
+    throw std::invalid_argument("Failed calling to_timepoint(): Invalid strtime; strtime is empty");
+  }
 
   auto timeinfo = std::tm();
   auto milliseconds = std::chrono::milliseconds(atoi(strtime.substr(20, 3).c_str()));
@@ -62,7 +65,7 @@ std::chrono::system_clock::time_point db::to_timepoint(std::string const& strtim
   tmptime.at(21) = '0';
   tmptime.at(22) = '0';
 
-  if (strptime(tmptime.c_str(), apiliteral::timestamp_format, &timeinfo) != NULL) {
+  if (strptime(tmptime.c_str(), apiliteral::timestamp_format, &timeinfo) != nullptr) {
     timeinfo.tm_isdst = -1;
     return std::chrono::system_clock::from_time_t(std::mktime(&timeinfo)) + milliseconds;
   }
@@ -74,42 +77,41 @@ std::chrono::system_clock::time_point db::to_timepoint(std::string const& strtim
 std::string db::confirm_iso8601_timestamp(std::string const& strtime) {
   confirm(!strtime.empty());
 
-  if (strtime.empty())
+  if (strtime.empty()) {
     throw std::invalid_argument("Failed calling confirm_iso8601_timestamp(): Invalid strtime; strtime is empty");
+  }
 
   if (strtime.at(0) == '2') {
     return strtime;
-  } else {
-    auto timeinfo = std::tm();
-    if (strptime(strtime.c_str(), apiliteral::timestamp_format_old, &timeinfo) != NULL) {
-      timeinfo.tm_isdst = -1;
-      return db::to_string(std::chrono::system_clock::from_time_t(std::mktime(&timeinfo)));
-    }
-    throw std::invalid_argument(std::string("Failed calling confirm_iso8601_timestamp(): format mismatch; format=<") +
-                                apiliteral::timestamp_format_old + ">, timestamp=<" + strtime + ">");
   }
+  auto timeinfo = std::tm();
+  if (strptime(strtime.c_str(), apiliteral::timestamp_format_old, &timeinfo) != nullptr) {
+    timeinfo.tm_isdst = -1;
+    return db::to_string(std::chrono::system_clock::from_time_t(std::mktime(&timeinfo)));
+  }
+  throw std::invalid_argument(std::string("Failed calling confirm_iso8601_timestamp(): format mismatch; format=<") +
+                              apiliteral::timestamp_format_old + ">, timestamp=<" + strtime + ">");
 }
 
 std::string db::unamejson() {
   struct utsname thisuname;
   if (uname(&thisuname) == -1) {
     return "{}";
-  } else {
-    std::ostringstream oss;
-    oss << "{";
-    oss << "sysname"_quoted
-        << ":" << quoted_(thisuname.sysname) << ",";
-    oss << "nodename"_quoted
-        << ":" << quoted_(thisuname.nodename) << ",";
-    oss << "release"_quoted
-        << ":" << quoted_(thisuname.release) << ",";
-    oss << "version"_quoted
-        << ":" << quoted_(thisuname.version) << ",";
-    oss << "machine"_quoted
-        << ":" << quoted_(thisuname.machine);
-    oss << "}";
-    return oss.str();
   }
+  std::ostringstream oss;
+  oss << "{";
+  oss << "sysname"_quoted
+      << ":" << quoted_(thisuname.sysname) << ",";
+  oss << "nodename"_quoted
+      << ":" << quoted_(thisuname.nodename) << ",";
+  oss << "release"_quoted
+      << ":" << quoted_(thisuname.release) << ",";
+  oss << "version"_quoted
+      << ":" << quoted_(thisuname.version) << ",";
+  oss << "machine"_quoted
+      << ":" << quoted_(thisuname.machine);
+  oss << "}";
+  return oss.str();
 }
 
 std::string db::quoted_(std::string const& text, const char qchar) {
@@ -119,47 +121,50 @@ std::string db::quoted_(std::string const& text, const char qchar) {
 
 std::string db::bool_(bool value) { return (value ? "true" : "false"); }
 
-std::string db::operator"" _quoted(const char* text, std::size_t) { return "\"" + std::string(text) + "\""; }
+std::string db::operator"" _quoted(const char* text, std::size_t /*unused*/) { return "\"" + std::string(text) + "\""; }
 
 std::string db::debrace(std::string s) {
-  if (s[0] == '{' && s[s.length() - 1] == '}')
+  if (s[0] == '{' && s[s.length() - 1] == '}') {
     return s.substr(1, s.length() - 2);
-  else
-    return s;
+  }
+  { return s; }
 }
 
 db::quotation_type_t db::quotation_type(std::string s) {
-  if (s[0] == '\"' && s[s.length() - 1] == '\"')
+  if (s[0] == '\"' && s[s.length() - 1] == '\"') {
     return db::quotation_type_t::DOUBLE;
-  else if (s[0] == '\'' && s[s.length() - 1] == '\'')
+  }
+  if (s[0] == '\'' && s[s.length() - 1] == '\'') {
     return db::quotation_type_t::SINGLE;
-  else
-    return db::quotation_type_t::NONE;
+  }
+  return db::quotation_type_t::NONE;
 }
 
 std::string db::dequote(std::string s) {
-  if ((s[0] == '\"' && s[s.length() - 1] == '\"') || (s[0] == '\'' && s[s.length() - 1] == '\''))
+  if ((s[0] == '\"' && s[s.length() - 1] == '\"') || (s[0] == '\'' && s[s.length() - 1] == '\'')) {
     return s.substr(1, s.length() - 2);
-  else
-    return s;
+  }
+  { return s; }
 }
 
 std::string db::debracket(std::string s) {
-  if (s[0] == '[' && s[s.length() - 1] == ']')
+  if (s[0] == '[' && s[s.length() - 1] == ']') {
     return s.substr(1, s.length() - 2);
-  else
-    return s;
+  }
+  { return s; }
 }
 
 std::string db::annotate(std::string const& s) {
   auto str = db::trim(s);
 
-  if (str[0] == '#')
+  if (str[0] == '#') {
     return str;
-  
-  if( str.empty() )
+  }
+
+  if (str.empty()) {
     return apiliteral::nullstring;
-    
+  }
+
   return std::string{"#"}.append(str);
 }
 
@@ -197,7 +202,7 @@ std::string db::to_json(std::string const& key, std::string const& value) {
   return oss.str();
 }
 
-std::string db::expand_environment_variables(std::string var) {
+std::string db::expand_environment_variables(const std::string& var) {
   wordexp_t p;
   char** w;
 
@@ -207,13 +212,17 @@ std::string db::expand_environment_variables(std::string var) {
 
   std::ostringstream oss;
 
-  for (size_t i = 0; i < p.we_wordc; i++) oss << w[i] << "/";
+  for (size_t i = 0; i < p.we_wordc; i++) {
+    oss << w[i] << "/";
+  }
 
   ::wordfree(&p);
 
   auto result = oss.str();
 
-  if (result.back() == '/') result.pop_back();  // remove trailing slash
+  if (result.back() == '/') {
+    result.pop_back();  // remove trailing slash
+  }
 
   return result;
 }
@@ -222,26 +231,25 @@ bool db::equal(std::string const& left, std::string const& right) {
   confirm(!left.empty());
   confirm(!right.empty());
 
-  return left.compare(right) == 0;
+  return left == right;
 }
 
 bool db::not_equal(std::string const& left, std::string const& right) { return !equal(left, right); }
 
 db::object_id_t db::extract_oid(std::string const& filter) {
-  auto ex = std::regex("^\\{[^:]+:\\s+([\\s\\S]+)\\}$");
+  auto ex = std::regex(R"(^\{[^:]+:\s+([\s\S]+)\}$)");
 
   auto results = std::smatch();
 
-  if (!std::regex_search(filter, results, ex))
+  if (!std::regex_search(filter, results, ex)) {
     throw std::logic_error(std::string("Regex ouid search failed; JSON buffer:") + filter);
+  }
 
   if (results.size() != 2) {
     // we are interested in a second match
-    TLOG(22) << "value()"
-                   << "JSON regex_search() result count=" << results.size();
+    TLOG(22) << "value() JSON regex_search() result count=" << results.size();
     for (auto const& result : results) {
-      TLOG(22) << "value()"
-                     << "JSON regex_search() result=" << result;
+      TLOG(22) << "value() JSON regex_search() result=" << result;
     }
 
     throw runtime_error(std::string("Regex search failed, regex_search().size()!=1; JSON buffer: ") + filter);
@@ -253,25 +261,25 @@ db::object_id_t db::extract_oid(std::string const& filter) {
 
   auto dequote = [](auto s) {
 
-    if (s[0] == '"' && s[s.length() - 1] == '"')
+    if (s[0] == '"' && s[s.length() - 1] == '"') {
       return s.substr(1, s.length() - 2);
-    else
-      return s;
+    }
+    { return s; }
   };
 
   match = dequote(match);
 
   TLOG(22) << "value()"
-                 << "JSON regex_search() result=" << match;
+           << "JSON regex_search() result=" << match;
 
   return match;
 }
 
 std::string db::trim(std::string const& s) {
   auto wsfront = std::find_if_not(s.begin(), s.end(), [](int c) { return std::isspace(c); });
-  return std::string(wsfront, std::find_if_not(s.rbegin(), std::string::const_reverse_iterator(wsfront), [](int c) {
-                                return std::isspace(c);
-                              }).base());
+  return std::string(wsfront, std::find_if_not(s.rbegin(), std::string::const_reverse_iterator(wsfront),
+                                               [](int c) { return std::isspace(c); })
+                                  .base());
 }
 
 std::string db::to_lower(std::string const& c) {
@@ -305,7 +313,7 @@ std::string db::replace_all(std::string const& source, std::string const& match,
 }
 
 namespace artdaq {
-namespace database {  
+namespace database {
 template <>
 std::string quoted<quotation_type_t::NONE>(std::string const& text) {
   return text;
@@ -315,5 +323,5 @@ template <>
 std::string quoted<quotation_type_t::SINGLE>(std::string const& text) {
   return quoted_(text, '\'');
 }
-}
-}
+}  // namespace database
+}  // namespace artdaq

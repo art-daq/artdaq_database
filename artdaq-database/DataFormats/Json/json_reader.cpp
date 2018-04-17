@@ -4,8 +4,8 @@
 using namespace boost::spirit;
 using namespace artdaq::database;
 
-using artdaq::database::json::object_t;
 using artdaq::database::json::JsonReader;
+using artdaq::database::json::object_t;
 
 bool JsonReader::read(std::string const& in, object_t& ast) {
   confirm(!in.empty());
@@ -20,7 +20,9 @@ bool JsonReader::read(std::string const& in, object_t& ast) {
 
   result = qi::phrase_parse(start, in.end(), grammar, ascii::space, buffer);
 
-  if (result) ast.swap(buffer);
+  if (result) {
+    ast.swap(buffer);
+  }
 
   return result;
 }
@@ -33,9 +35,13 @@ std::pair<bool, std::string> artdaq::database::json::compare_json_objects(std::s
   auto firstAST = object_t{};
   auto secondAST = object_t{};
 
-  if (!JsonReader{}.read(first, firstAST)) return std::make_pair(false, "Unable to read first Json buffer");
+  if (!JsonReader{}.read(first, firstAST)) {
+    return std::make_pair(false, "Unable to read first Json buffer");
+  }
 
-  if (!JsonReader{}.read(second, secondAST)) return std::make_pair(false, "Unable to read second Json buffer");
+  if (!JsonReader{}.read(second, secondAST)) {
+    return std::make_pair(false, "Unable to read second Json buffer");
+  }
 
   return firstAST == secondAST;
 }

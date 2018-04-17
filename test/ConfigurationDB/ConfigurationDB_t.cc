@@ -4,21 +4,18 @@
 #include "artdaq-database/ConfigurationDB/conftoolifc.h"
 
 #include "artdaq-database/BasicTypes/basictypes.h"
+#include "artdaq-database/DataFormats/Json/json_reader.h"
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
-#include "artdaq-database/DataFormats/Json/json_reader.h"
 
 namespace db = artdaq::database;
 namespace bpo = boost::program_options;
 namespace impl = db::configuration::json;
 
-using artdaq::database::basictypes::JsonData;
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
-using artdaq::database::overlay::ovlDatabaseRecord;
 namespace ovl = artdaq::database::overlay;
 
-namespace jsonliteral = db::dataformats::literal;
 namespace apiliteral = db::configapi::literal;
 
 int main(int argc, char* argv[]) try {
@@ -27,7 +24,7 @@ int main(int argc, char* argv[]) try {
   impl::enable_trace();
 
   debug::registerUngracefullExitHandlers();
-  //artdaq::database::useFakeTime(true);
+  // artdaq::database::useFakeTime(true);
 #endif
 
   std::unique_ptr<db::configuration::OperationBase> options;
@@ -36,10 +33,10 @@ int main(int argc, char* argv[]) try {
   auto make_opt_name = [](auto& long_name, auto& short_name) {
     return std::string{long_name}.append(",").append(short_name);
   };
-  
+
   bpo::variables_map vm;
 
-  bpo::options_description opts;  
+  bpo::options_description opts;
   opts.add_options()("help,h", "Produce help message");
   opts.add_options()(make_opt_name(apiliteral::option::operation, "o").c_str(), bpo::value<std::string>(), "Operation");
 
@@ -47,30 +44,29 @@ int main(int argc, char* argv[]) try {
     bpo::store(bpo::command_line_parser(argc, argv).options(opts).allow_unregistered().run(), vm);
     bpo::notify(vm);
   } catch (bpo::error const& e) {
-    std::cerr << "Exception from command line processing in " << options-> processName() << ": " << e.what() << "\n";
+    std::cerr << "Exception from command line processing in " << options->processName() << ": " << e.what() << "\n";
     return process_exit_code::INVALID_ARGUMENT;
   }
 
-  if (vm.count("help")) {
+  if (vm.count("help") != 0u) {
     std::cerr << opts << std::endl;
     return process_exit_code::HELP;
-  }  
-  
-   if (!vm.count(apiliteral::option::operation)){
-      std::cerr << "Operation option is missing\n";
-      std::cerr << opts << std::endl;
-
-      return process_exit_code::INVALID_ARGUMENT;
-   }
-  
-  auto opname=vm[apiliteral::option::operation].as<std::string>();
-  
-  if(opname==apiliteral::operation::addversionalias ||opname==apiliteral::operation::rmversionalias){
-    options = std::make_unique<db::configuration::ManageAliasesOperation>(argv[0]);    
-  }else if (opname==apiliteral::operation::findconfigs){
-    options = std::make_unique<db::configuration::ManageConfigsOperation>(argv[0]);
   }
-  else{
+
+  if (vm.count(apiliteral::option::operation) == 0u) {
+    std::cerr << "Operation option is missing\n";
+    std::cerr << opts << std::endl;
+
+    return process_exit_code::INVALID_ARGUMENT;
+  }
+
+  auto opname = vm[apiliteral::option::operation].as<std::string>();
+
+  if (opname == apiliteral::operation::addversionalias || opname == apiliteral::operation::rmversionalias) {
+    options = std::make_unique<db::configuration::ManageAliasesOperation>(argv[0]);
+  } else if (opname == apiliteral::operation::findconfigs) {
+    options = std::make_unique<db::configuration::ManageConfigsOperation>(argv[0]);
+  } else {
     options = std::make_unique<db::configuration::ManageDocumentOperation>(argv[0]);
   }
 
@@ -113,7 +109,9 @@ int main(int argc, char* argv[]) try {
 
     auto result = returned == expected;
 
-    if (result.first) return process_exit_code::SUCCESS;
+    if (result.first) {
+      return process_exit_code::SUCCESS;
+    }
 
     std::cout << "Error returned!=expected.\n";
     std::cerr << "returned:\n" << returned << "\n";
@@ -129,11 +127,11 @@ int main(int argc, char* argv[]) try {
       return process_exit_code::SUCCESS;
     }
     std::cout << "Test failed (expected!=returned); error message: " << compare_result.second << "\n";
-  } else if (cmpdoc.compare(retdoc) == 0) {
+  } else if (cmpdoc == retdoc) {
     std::cout << "returned:\n" << retdoc << "\n";
 
     return process_exit_code::SUCCESS;
-  } else if (cmpdoc.pop_back(), cmpdoc.compare(retdoc) == 0) {
+  } else if (cmpdoc.pop_back(), cmpdoc == retdoc) {
     std::cout << "returned:\n" << retdoc << "\n";
 
     return process_exit_code::SUCCESS;
@@ -149,7 +147,8 @@ int main(int argc, char* argv[]) try {
             << std::distance(retdoc.begin(), retdoc.end()) << ")\n";
 
   std::cout << "First mismatch at position " << std::distance(cmpdoc.begin(), mismatch.first) << ", (exp,ret)=(0x"
-            << std::hex << (unsigned int)*mismatch.first << ",0x" << (unsigned int)*mismatch.second << ")\n";
+            << std::hex << static_cast<unsigned int>(*mismatch.first) << ",0x"
+            << static_cast<unsigned int>(*mismatch.second) << ")\n";
 
   auto file_out_name = std::string(db::make_temp_dir())
                            .append("/")
@@ -157,7 +156,7 @@ int main(int argc, char* argv[]) try {
                            .append("-")
                            .append(options->operation())
                            .append("-")
-                           .append(basename((char*)options->resultFileName().c_str()))
+                           .append(basename(const_cast<char*>(options->resultFileName().c_str())))
                            .append(".txt");
 
   db::write_buffer_to_file(retdoc, file_out_name);

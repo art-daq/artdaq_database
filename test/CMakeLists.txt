@@ -1,5 +1,12 @@
 cet_enable_asserts()
 
+IF (FORMAT_WITH_CLANG)
+  string(TOUPPER ${FORMAT_WITH_CLANG} FORMAT_WITH_CLANG_UC )
+  if( ${FORMAT_WITH_CLANG_UC} MATCHES "TRUE" )
+    include(clang-format)
+  endif()
+ENDIF()
+
 # Make sure tests have correct environment settings.
 include(CetTest)
 

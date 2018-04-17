@@ -11,7 +11,7 @@ using namespace artdaq::database::result;
 
 class ovlKeyValue {
  public:
-  ovlKeyValue(object_t::key_type const& /*key*/, value_t& /*value*/);
+  ovlKeyValue(object_t::key_type /*key*/, value_t& /*value*/);
 
   // defaults
   ovlKeyValue(ovlKeyValue&&) = default;

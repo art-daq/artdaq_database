@@ -9,7 +9,7 @@ namespace ucon {
 namespace debug {
 void enable();
 void ReadWrite();
-}
+}  // namespace debug
 
 namespace literal {
 constexpr auto UCONURI = "http://";
@@ -17,11 +17,11 @@ constexpr auto search_index = "index.json";
 constexpr auto db_name = "test_db";
 constexpr auto hostname = "127.0.0.1";
 constexpr auto port = 80;
-}
+}  // namespace literal
 
 struct DBConfig final {
   DBConfig();
-  DBConfig(std::string uri_);
+  DBConfig(const std::string& uri_);
 
   std::string uri;
   const std::string connectionURI() const { return uri; };
@@ -39,7 +39,7 @@ class UconDB final {
     PassKeyIdiom() {}
   };
 
-  explicit UconDB(DBConfig const& config, PassKeyIdiom const&);
+  explicit UconDB(DBConfig config, PassKeyIdiom const&);
 
   std::string& connection();
   long timeout() const;

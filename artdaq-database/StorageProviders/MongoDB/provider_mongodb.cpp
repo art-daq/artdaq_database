@@ -1,6 +1,6 @@
+#include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/StorageProviders/MongoDB/mongo_json.h"
-#include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 #include "artdaq-database/StorageProviders/common.h"
 
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
@@ -31,22 +31,12 @@
 using namespace artdaq::database;
 namespace db = artdaq::database;
 
-namespace literal = db::mongo::literal;
 namespace bbs = bsoncxx::builder::stream;
 
 using bsoncxx::builder::stream::document;
-using bsoncxx::builder::stream::open_document;
-using bsoncxx::builder::stream::close_document;
-using bsoncxx::builder::stream::open_array;
-using bsoncxx::builder::stream::close_array;
-using bsoncxx::builder::stream::finalize;
-using bsoncxx::builder::concatenate_doc;
 
-using artdaq::database::mongo::DBConfig;
-using artdaq::database::mongo::MongoDB;
 using artdaq::database::basictypes::JsonData;
-using artdaq::database::docrecord::JSONDocumentBuilder;
-using artdaq::database::docrecord::JSONDocument;
+using artdaq::database::mongo::MongoDB;
 
 namespace jsonliteral = db::dataformats::literal;
 namespace apiliteral = db::configapi::literal;
@@ -82,22 +72,23 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
   auto search_document = compat::from_json(search.json_buffer);
 
   auto extract_value = [&search_document](auto const& name) {
-      auto view = search_document.view();
-      auto element = view.find(name);
+    auto view = search_document.view();
+    auto element = view.find(name);
 
-      if (element == view.end())
-        throw runtime_error("MongoDB") << "Search JsonData is missing the \"" << name << "\" element.";
+    if (element == view.end()) {
+      throw runtime_error("MongoDB") << "Search JsonData is missing the \"" << name << "\" element.";
+    }
 
-      return element->get_value();
+    return element->get_value();
   };
 
   auto configuration_name_expected = db::dequote(compat::to_json(extract_value(apiliteral::filter::configurations)));
-  
-  if(configuration_name_expected.back()=='*')
+
+  if (configuration_name_expected.back() == '*') {
     configuration_name_expected.pop_back();
-    
-  TLOG(15) << "MongoDB::findConfigurations()  configuration_name_expected=<" << configuration_name_expected
-                                                                                   << ">";
+  }
+
+  TLOG(15) << "MongoDB::findConfigurations()  configuration_name_expected=<" << configuration_name_expected << ">";
   auto fields = std::vector<std::string>{};
   fields.emplace_back(apiliteral::filter::configurations);
 
@@ -118,14 +109,17 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
 
     auto element_name = collectionDescriptor.find(jsonliteral::name);
 
-    if (element_name == collectionDescriptor.end())
+    if (element_name == collectionDescriptor.end()) {
       throw runtime_error("MongoDB") << "MongoDB returned invalid database collection descriptor.";
+    }
 
     auto string_value = element_name->get_value();
 
     auto collection_name = dequote(compat::to_json(string_value));
 
-    if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
+    if (collection_name == "system.indexes" || collection_name == system_metadata) {
+      continue;
+    }
 
     TLOG(14) << "MongoDB::findConfigurations() querying collection_name=<" << collection_name << ">";
 
@@ -151,8 +145,9 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
       TLOG(14) << "MongoDB::findConfigurations() looping over cursor =<" << compat::to_json(view) << ">";
 
       auto tmp_configurations = view.find(jsonliteral::configurations);
-      if (tmp_configurations == collectionDescriptor.end())
+      if (tmp_configurations == collectionDescriptor.end()) {
         throw runtime_error("MongoDB") << "MongoDB returned invalid database search, \"configurations\" is missing.";
+      }
 
       bsoncxx::array::view configurations{tmp_configurations->get_array().value};
 
@@ -160,29 +155,32 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
         bsoncxx::document::view configuration{tmp_config.get_document().value};
 
         auto tmp_config_name = configuration.find(jsonliteral::name);
-        if (tmp_config_name == collectionDescriptor.end())
+        if (tmp_config_name == collectionDescriptor.end()) {
           throw runtime_error("MongoDB")
               << "MongoDB returned invalid database search, \"configurations.name\" is missing.";
+        }
 
-        auto name = db::replace_all(db::dequote(compat::to_json(tmp_config_name->get_value())),"\\/", "/");
+        auto name = db::replace_all(db::dequote(compat::to_json(tmp_config_name->get_value())), "\\/", "/");
 
         auto tmp_config_assigned = configuration.find(jsonliteral::assigned);
-        if (tmp_config_assigned == collectionDescriptor.end())
+        if (tmp_config_assigned == collectionDescriptor.end()) {
           throw runtime_error("MongoDB")
               << "MongoDB returned invalid database search, \"configurations.assigned\" is missing.";
+        }
         auto assigned = db::dequote(compat::to_json(tmp_config_assigned->get_value()));
-	
-	if(configuration_name_expected == name) {
-	  config_timestamps.clear();
-	  
-	  config_timestamps[name].insert(
-            std::chrono::duration_cast<std::chrono::seconds>(db::to_timepoint(assigned).time_since_epoch()).count());
 
-	  goto exact_match;
-	}
-	
-	if (!std::equal(configuration_name_expected.begin(),
-	  configuration_name_expected.end(), name.begin())) continue;
+        if (configuration_name_expected == name) {
+          config_timestamps.clear();
+
+          config_timestamps[name].insert(
+              std::chrono::duration_cast<std::chrono::seconds>(db::to_timepoint(assigned).time_since_epoch()).count());
+
+          goto exact_match;
+        }
+
+        if (!std::equal(configuration_name_expected.begin(), configuration_name_expected.end(), name.begin())) {
+          continue;
+        }
 
         config_timestamps[name].insert(
             std::chrono::duration_cast<std::chrono::seconds>(db::to_timepoint(assigned).time_since_epoch()).count());
@@ -191,8 +189,10 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
   }
 
 exact_match:
-  
-  for (auto const& cfg : config_timestamps) timestamp_configs.emplace(*cfg.second.rbegin(), cfg.first);
+
+  for (auto const& cfg : config_timestamps) {
+    timestamp_configs.emplace(*cfg.second.rbegin(), cfg.first);
+  }
 
   // keys are sorted the reverse chronological order
   for (auto const& cfg : timestamp_configs) {
@@ -234,19 +234,23 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
   auto collectionDescriptors = _provider->connection().list_collections(filter.view_document());
 
   for (auto const& collectionDescriptor : collectionDescriptors) {
-    TLOG(15) << "MongoDB::configurationComposition() found collection=<" << compat::to_json(collectionDescriptor) << ">";
+    TLOG(15) << "MongoDB::configurationComposition() found collection=<" << compat::to_json(collectionDescriptor)
+             << ">";
 
     // auto view = collectionDescriptor.view();
     auto element_name = collectionDescriptor.find(jsonliteral::name);
 
-    if (element_name == collectionDescriptor.end())
+    if (element_name == collectionDescriptor.end()) {
       throw runtime_error("MongoDB") << "MongoDB returned invalid database collection descriptor.";
+    }
 
     auto string_value = element_name->get_value();
 
     auto collection_name = dequote(compat::to_json(string_value));
 
-    if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
+    if (collection_name == "system.indexes" || collection_name == system_metadata) {
+      continue;
+    }
 
     TLOG(15) << "MongoDB::configurationComposition() querying collection_name=<" << collection_name << ">";
 
@@ -257,15 +261,16 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
       auto view = bson_document.view();
       auto element = view.find(name);
 
-      if (element == view.end())
+      if (element == view.end()) {
         throw runtime_error("MongoDB") << "Search JsonData is missing the \"" << name << "\" element.";
+      }
 
       return element->get_value();
     };
 
     auto configuration_name_expected = compat::to_json(extract_value(apiliteral::filter::configurations));
     TLOG(15) << "MongoDB::configurationComposition()  configuration_name_expected=<" << configuration_name_expected
-                                                                                   << ">";
+             << ">";
 
     mongocxx::pipeline stages;
     bbs::document project_stage;
@@ -293,8 +298,9 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
       auto configurations_value = view.find("configurations");
       auto entities_value = view.find("entities");
 
-      if (configurations_value == collectionDescriptor.end() || entities_value == collectionDescriptor.end())
+      if (configurations_value == collectionDescriptor.end() || entities_value == collectionDescriptor.end()) {
         throw runtime_error("MongoDB") << "MongoDB returned invalid database search.";
+      }
 
       auto configurations = configurations_value->get_array();
       auto entities = entities_value->get_array();
@@ -304,7 +310,9 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
           auto configuration_name = compat::to_json(configuration.get_value());
           auto entity_name = compat::to_json(entity.get_value());
 
-          if (configuration_name != configuration_name_expected) continue;
+          if (configuration_name != configuration_name_expected) {
+            continue;
+          }
 
           std::ostringstream oss;
           oss << "{";
@@ -350,8 +358,9 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
     auto view = bson_document.view();
     auto element = view.find(name);
 
-    if (element == view.end())
+    if (element == view.end()) {
       throw runtime_error("MongoDB") << "Search JsonData is missing the \"" << name << "\" element.";
+    }
 
     return element->get_value();
   };
@@ -431,8 +440,9 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
     auto view = bson_document.view();
     auto element = view.find(name);
 
-    if (element == view.end())
+    if (element == view.end()) {
       throw runtime_error("MongoDB") << "Search JsonData is missing the \"" << name << "\" element.";
+    }
 
     return element->get_value();
   };
@@ -448,14 +458,17 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
 
     auto element_name = collectionDescriptor.find(jsonliteral::name);
 
-    if (element_name == collectionDescriptor.end())
+    if (element_name == collectionDescriptor.end()) {
       throw runtime_error("MongoDB") << "MongoDB returned invalid database collection descriptor.";
+    }
 
     auto string_value = element_name->get_value();
 
     auto collection_name = dequote(compat::to_json(string_value));
 
-    if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
+    if (collection_name == "system.indexes" || collection_name == system_metadata) {
+      continue;
+    }
 
     TLOG(19) << "MongoDB::findEntities() querying collection_name=<" << collection_name << ">";
 
@@ -480,7 +493,9 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
 
     auto isNew = [& v = seenValues](auto const& name) {
       confirm(!name.empty());
-      if (std::find(v.begin(), v.end(), name) != v.end()) return false;
+      if (std::find(v.begin(), v.end(), name) != v.end()) {
+        return false;
+      }
 
       v.emplace_back(name);
       return true;
@@ -494,7 +509,9 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
       for (auto const& entity : entities.value) {
         auto entity_name = compat::to_json(entity.get_value());
 
-        if (!isNew(entity_name)) continue;
+        if (!isNew(entity_name)) {
+          continue;
+        }
 
         std::ostringstream oss;
         oss << "{";
@@ -550,14 +567,17 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listCollections(JsonData
 
     auto element_name = collectionDescriptor.find(jsonliteral::name);
 
-    if (element_name == collectionDescriptor.end())
+    if (element_name == collectionDescriptor.end()) {
       throw runtime_error("MongoDB") << "MongoDB returned invalid database collection descriptor.";
+    }
 
     auto string_value = element_name->get_value();
 
     auto collection_name = dequote(compat::to_json(string_value));
 
-    if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
+    if (collection_name == "system.indexes" || collection_name == system_metadata) {
+      continue;
+    }
 
     TLOG(19) << "MongoDB::listCollections() found collection_name=<" << collection_name << ">";
 
@@ -593,14 +613,17 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listDatabases(JsonData c
 
     auto element_name = databaseDescriptor.find(jsonliteral::name);
 
-    if (element_name == databaseDescriptor.end())
+    if (element_name == databaseDescriptor.end()) {
       throw runtime_error("MongoDB") << "MongoDB returned invalid database descriptor.";
+    }
 
     auto string_value = element_name->get_value();
 
     auto database_name = dequote(compat::to_json(string_value));
 
-    if (database_name == "local" || database_name == "admin") continue;
+    if (database_name == "local" || database_name == "admin") {
+      continue;
+    }
 
     TLOG(19) << "MongoDB::listDatabases() found database_name=<" << database_name << ">";
 
@@ -641,9 +664,9 @@ void enable() {
   TRACE_CNTL("modeS", trace_mode::modeS);
 
   artdaq::database::mongo::debug::ReadWrite();
-  TLOG(10) <<  "artdaq::database::mongo trace_enable";
+  TLOG(10) << "artdaq::database::mongo trace_enable";
 }
-}
+}  // namespace debug
 }  // namespace mongo
 
 }  // namespace database

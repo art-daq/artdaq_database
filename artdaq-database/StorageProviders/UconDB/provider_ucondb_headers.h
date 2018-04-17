@@ -20,11 +20,11 @@ namespace dbucl = dbuc::literal;
 namespace jsonliteral = db::dataformats::literal;
 
 using artdaq::database::basictypes::JsonData;
-using artdaq::database::ucon::UconDB;
 using artdaq::database::ucon::DBConfig;
+using artdaq::database::ucon::UconDB;
 using artdaq::database::ucon::UconDBSPtr_t;
 
-using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocument;
+using artdaq::database::docrecord::JSONDocumentBuilder;
 
 #endif /* _ARTDAQ_DATABASE_PROVIDER_UCOND_HEADERS_H_ */

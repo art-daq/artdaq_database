@@ -17,8 +17,8 @@ namespace filesystem {
 namespace index {
 
 using artdaq::database::basictypes::JsonData;
-using artdaq::database::object_id_t;
 using artdaq::database::json::object_t;
+using artdaq::database::object_id_t;
 
 class SearchIndex final {
  public:
@@ -79,7 +79,7 @@ class SearchIndex final {
                                                                                          std::string const&,
                                                                                          std::string const&) const;
   std::vector<std::string> _filtered_attribute_list(std::string const& attribute,
-                                                    std::string const& attribute_with) const;
+                                                    std::string const& attribute_begins_with) const;
 
  private:
   bool _open(boost::filesystem::path const&);

@@ -22,12 +22,9 @@ namespace db = artdaq::database;
 namespace cf = db::configuration;
 namespace dbbt = db::basictypes;
 
-using dbbt::JsonData;
-using cf::OperationBase;
 using cf::ManageAliasesOperation;
-
-using cf::options::data_format_t;
-namespace apiliteral = artdaq::database::configapi::literal;
+using cf::OperationBase;
+using dbbt::JsonData;
 
 ManageAliasesOperation::ManageAliasesOperation(std::string const& process_name) : OperationBase{process_name} {}
 
@@ -44,7 +41,7 @@ std::string const& ManageAliasesOperation::version(std::string const& version) {
     throw runtime_error("Options") << "Invalid version; version is empty.";
   }
 
-  TLOG(20)<< "Options: Updating version from " << _version << " to " << version << ".";
+  TLOG(20) << "Options: Updating version from " << _version << " to " << version << ".";
 
   _version = version;
 
@@ -64,7 +61,7 @@ std::string const& ManageAliasesOperation::entity(std::string const& entity) {
     throw runtime_error("Options") << "Invalid configurable entity; entity is empty.";
   }
 
-  TLOG(21)<< "Options: Updating entity from " << _entity << " to " << entity << ".";
+  TLOG(21) << "Options: Updating entity from " << _entity << " to " << entity << ".";
 
   _entity = entity;
 
@@ -84,7 +81,7 @@ std::string const& ManageAliasesOperation::run(std::string const& run) {
     throw runtime_error("Options") << "Invalid run; run is empty.";
   }
 
-  TLOG(20)<< "Options: Updating run from " << _run << " to " << run << ".";
+  TLOG(20) << "Options: Updating run from " << _run << " to " << run << ".";
 
   _run = run;
 
@@ -124,7 +121,7 @@ std::string const& ManageAliasesOperation::versionAlias(std::string const& alias
     throw runtime_error("Options") << "Invalid version alias; version alias is empty.";
   }
 
-  TLOG(20)<< "Options: Updating version alias from " << _version_alias << " to " << alias << ".";
+  TLOG(20) << "Options: Updating version alias from " << _version_alias << " to " << alias << ".";
 
   _version_alias = alias;
 
@@ -144,8 +141,8 @@ std::string const& ManageAliasesOperation::configurationAlias(std::string const&
     throw runtime_error("Options") << "Invalid global configuration alias; global configuration alias is empty.";
   }
 
-  TLOG(20)<< "Options: Updating global configuration alias from " << _configuration_alias << " to "
-                                                                  << global_configuration_alias << ".";
+  TLOG(20) << "Options: Updating global configuration alias from " << _configuration_alias << " to "
+           << global_configuration_alias << ".";
 
   _configuration_alias = global_configuration_alias;
 
@@ -168,7 +165,9 @@ void ManageAliasesOperation::readJsonData(JsonData const& data) {
   try {
     auto const& filterAST = boost::get<jsn::object_t>(dataAST.at(apiliteral::option::searchfilter));
 
-    if (filterAST.empty()) queryFilter(apiliteral::notprovided);
+    if (filterAST.empty()) {
+      queryFilter(apiliteral::notprovided);
+    }
 
     try {
       entity(boost::get<std::string>(filterAST.at(apiliteral::filter::entities)));
@@ -232,29 +231,31 @@ void ManageAliasesOperation::readJsonData(JsonData const& data) {
 int ManageAliasesOperation::readProgramOptions(bpo::variables_map const& vm) {
   auto result = OperationBase::readProgramOptions(vm);
 
-  if (result != process_exit_code::SUCCESS) return result;
+  if (result != process_exit_code::SUCCESS) {
+    return result;
+  }
 
-  if (vm.count(apiliteral::option::entity)) {
+  if (vm.count(apiliteral::option::entity) != 0u) {
     entity(vm[apiliteral::option::entity].as<std::string>());
   }
 
-  if (vm.count(apiliteral::option::configuration)) {
+  if (vm.count(apiliteral::option::configuration) != 0u) {
     configuration(vm[apiliteral::option::configuration].as<std::string>());
   }
 
-  if (vm.count(apiliteral::option::version)) {
+  if (vm.count(apiliteral::option::version) != 0u) {
     version(vm[apiliteral::option::version].as<std::string>());
   }
 
-  if (vm.count(apiliteral::option::run)) {
+  if (vm.count(apiliteral::option::run) != 0u) {
     run(vm[apiliteral::option::run].as<std::string>());
   }
 
-  if (vm.count(apiliteral::option::version_alias)) {
+  if (vm.count(apiliteral::option::version_alias) != 0u) {
     versionAlias(vm[apiliteral::option::version_alias].as<std::string>());
   }
 
-  if (vm.count(apiliteral::option::configuration_alias)) {
+  if (vm.count(apiliteral::option::configuration_alias) != 0u) {
     configurationAlias(vm[apiliteral::option::configuration_alias].as<std::string>());
   }
 
@@ -295,13 +296,22 @@ JsonData ManageAliasesOperation::writeJsonData() const {
     throw db::invalid_option_exception("ManageAliasesOperation") << "Unable to read query_filter_to_JsonData().";
   }
 
-  if (configuration() != apiliteral::notprovided) docAST[apiliteral::option::configuration] = configuration();
-  if (versionAlias() != apiliteral::notprovided) docAST[apiliteral::option::version_alias] = versionAlias();
-  if (configurationAlias() != apiliteral::notprovided)
+  if (configuration() != apiliteral::notprovided) {
+    docAST[apiliteral::option::configuration] = configuration();
+  }
+  if (versionAlias() != apiliteral::notprovided) {
+    docAST[apiliteral::option::version_alias] = versionAlias();
+  }
+  if (configurationAlias() != apiliteral::notprovided) {
     docAST[apiliteral::option::configuration_alias] = configurationAlias();
-  if (version() != apiliteral::notprovided) docAST[apiliteral::option::version] = version();
+  }
+  if (version() != apiliteral::notprovided) {
+    docAST[apiliteral::option::version] = version();
+  }
 
-  if (run() != apiliteral::notprovided) docAST[apiliteral::option::run] = run();
+  if (run() != apiliteral::notprovided) {
+    docAST[apiliteral::option::run] = run();
+  }
 
   auto json_buffer = std::string{};
 
@@ -323,18 +333,25 @@ JsonData ManageAliasesOperation::query_filter_to_JsonData() const {
     throw db::invalid_option_exception("ManageAliasesOperation") << "Unable to query_filter_to_JsonData().";
   }
 
-  if (entity() != apiliteral::notprovided) docAST[apiliteral::filter::entities] = entity();
+  if (entity() != apiliteral::notprovided) {
+    docAST[apiliteral::filter::entities] = entity();
+  }
 
-  if (version() != apiliteral::notprovided) docAST[apiliteral::filter::version] = version();
+  if (version() != apiliteral::notprovided) {
+    docAST[apiliteral::filter::version] = version();
+  }
 
-  if (configuration() != apiliteral::notprovided && operation() != apiliteral::operation::assignconfig)
+  if (configuration() != apiliteral::notprovided && operation() != apiliteral::operation::assignconfig) {
     docAST[apiliteral::filter::configurations] = configuration();
+  }
 
-  if (versionAlias() != apiliteral::notprovided && operation() != apiliteral::operation::addversionalias)
+  if (versionAlias() != apiliteral::notprovided && operation() != apiliteral::operation::addversionalias) {
     docAST[apiliteral::filter::version_aliases] = versionAlias();
+  }
 
-  if (run() != apiliteral::notprovided && operation() != apiliteral::operation::addrun)
+  if (run() != apiliteral::notprovided && operation() != apiliteral::operation::addrun) {
     docAST[apiliteral::filter::runs] = run();
+  }
 
   if (docAST.empty()) {
     return {apiliteral::empty_json};
@@ -386,5 +403,5 @@ void cf::debug::options::ManageAliases() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::configuration::options::ManageAliases trace_enable";
+  TLOG(10) << "artdaq::database::configuration::options::ManageAliases trace_enable";
 }

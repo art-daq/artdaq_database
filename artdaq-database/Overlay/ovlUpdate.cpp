@@ -1,13 +1,10 @@
 
 #include "artdaq-database/Overlay/ovlUpdate.h"
 
-namespace jsonliteral = artdaq::database::dataformats::literal;
-namespace ovl = artdaq::database::overlay;
 using namespace artdaq::database;
 using namespace artdaq::database::overlay;
 using namespace artdaq::database::result;
 using result_t = artdaq::database::result_t;
-using artdaq::database::sharedtypes::unwrap;
 
 ovlUpdate::ovlUpdate(object_t::key_type const& key, value_t& update)
     : ovlKeyValue(key, update), _timestamp(map_timestamp(update)), _what(map_what(update)) {}
@@ -62,27 +59,33 @@ result_t ovlUpdate::operator==(ovlUpdate const& other) const {
 
   auto result = _timestamp == other._timestamp;
 
-  if (!result.first)
+  if (!result.first) {
     oss << "\n  Timestamps are different: self,other=" << quoted_(_timestamp.timestamp()) << ","
         << quoted_(other._timestamp.timestamp());
+  }
 
-  if (name() != other.name())
+  if (name() != other.name()) {
     oss << "\n  Events are different: self,other=" << quoted_(name()) << "," << quoted_(other.name());
+  }
 
   if ((useCompareMask() & DOCUMENT_COMPARE_MUTE_TIMESTAMPS) == DOCUMENT_COMPARE_MUTE_TIMESTAMPS) {
     auto const& name = _what.value_as<std::string>(jsonliteral::name);
     auto const& otherName = other._what.value_as<std::string>(jsonliteral::name);
 
-    if (name != otherName)
+    if (name != otherName) {
       oss << "\n  Event names are different: self,other=" << quoted_(name) << "," << quoted_(otherName);
+    }
   } else {
     result = _what == other._what;
 
-    if (!result.first)
+    if (!result.first) {
       oss << "\n  Event data are different: self,other=" << what().to_string() << "," << other.what().to_string();
+    }
   }
 
-  if (oss.tellp() == noerror_pos) return Success();
+  if (oss.tellp() == noerror_pos) {
+    return Success();
+  }
 
   return Failure(oss);
 }

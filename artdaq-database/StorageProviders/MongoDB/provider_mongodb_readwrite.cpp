@@ -13,8 +13,8 @@ namespace database {
 template <>
 template <>
 std::list<JsonData> StorageProvider<JsonData, MongoDB>::readDocument(JsonData const& arg) {
-  TLOG(13)<< "MongoDB::readDocument() begin";
-  TLOG(13)<< "MongoDB::readDocument() args=<" << arg << ">";
+  TLOG(13) << "MongoDB::readDocument() begin";
+  TLOG(13) << "MongoDB::readDocument() args=<" << arg << ">";
 
   auto returnCollection = std::list<JsonData>();
 
@@ -27,31 +27,33 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::readDocument(JsonData co
   try {
     collection_name = filter_document.findChild(jsonliteral::collection).value();
   } catch (...) {
-    TLOG(13)<< "MongoDB::readDocument() Filter must have the collection element.";
+    TLOG(13) << "MongoDB::readDocument() Filter must have the collection element.";
   }
 
-  if (collection_name.empty()) collection_name = arg_document.findChild(jsonliteral::collection).value();
+  if (collection_name.empty()) {
+    collection_name = arg_document.findChild(jsonliteral::collection).value();
+  }
 
   confirm(!collection_name.empty());
 
-  TLOG(13)<< "MongoDB::readDocument() collection_name=<" << collection_name << ">";
+  TLOG(13) << "MongoDB::readDocument() collection_name=<" << collection_name << ">";
 
   auto collection = _provider->connection().collection(collection_name);
 
   auto filter_json = filter_document.to_string();
 
-  TLOG(13)<< "MongoDB::readDocument() query_payload=<" << filter_json << ">";
+  TLOG(13) << "MongoDB::readDocument() query_payload=<" << filter_json << ">";
 
   auto filter_bsondoc = compat::from_json(filter_json);
 
   auto size = collection.count(filter_bsondoc.view());
 
-  TLOG(13)<< "MongoDB::readDocument() Found " << size << " document(s).";
+  TLOG(13) << "MongoDB::readDocument() Found " << size << " document(s).";
 
   auto cursor = collection.find(filter_bsondoc.view());
 
   for (auto& doc : cursor) {
-    TLOG(13)<< "MongoDB::readDocument() found_document=<" << compat::to_json_unescaped(doc) << ">";
+    TLOG(13) << "MongoDB::readDocument() found_document=<" << compat::to_json_unescaped(doc) << ">";
 
     returnCollection.emplace_back(compat::to_json_unescaped(doc));
   }
@@ -80,20 +82,22 @@ object_id_t StorageProvider<JsonData, MongoDB>::writeDocument(JsonData const& ar
   try {
     collection_name = user_document.findChild(jsonliteral::collection).value();
   } catch (...) {
-    TLOG(14) <<
-           "MongoDB::writeDocument() User document must have the collection "
-           "element.";
+    TLOG(14) << "MongoDB::writeDocument() User document must have the collection "
+                "element.";
   }
 
-  if (collection_name.empty()) try {
+  if (collection_name.empty()) {
+    try {
       collection_name = filter_document.findChild(jsonliteral::collection).value();
     } catch (...) {
-      TLOG(14) <<
-             "MongoDB::writeDocument() Filter should have the collection "
-             "element.";
+      TLOG(14) << "MongoDB::writeDocument() Filter should have the collection "
+                  "element.";
     }
+  }
 
-  if (collection_name.empty()) collection_name = arg_document.findChild(jsonliteral::collection).value();
+  if (collection_name.empty()) {
+    collection_name = arg_document.findChild(jsonliteral::collection).value();
+  }
 
   confirm(!collection_name.empty());
 
@@ -132,7 +136,9 @@ object_id_t StorageProvider<JsonData, MongoDB>::writeDocument(JsonData const& ar
 
   auto found = collection.count(filter_bsondoc.view());
 
-  if (!isNew && found == 0) isNew = true;
+  if (!isNew && found == 0) {
+    isNew = true;
+  }
 
   if (isNew) {
     auto user_bsondoc = compat::from_json(builder.to_string());
@@ -146,9 +152,10 @@ object_id_t StorageProvider<JsonData, MongoDB>::writeDocument(JsonData const& ar
 
   TLOG(14) << "MongoDB::writeDocument() Found " << found << " document(s).";
 
-  if (found > 1)
+  if (found > 1) {
     throw runtime_error("MongoDB") << "MongoDB failed inserting data, search filter is too wide; filter= <"
                                    << filter_json << ">, returned count=" << found << ".";
+  }
   {
     auto user_doc = builder.extract();
     user_doc.deleteChild(jsonliteral::id);
@@ -161,7 +168,7 @@ object_id_t StorageProvider<JsonData, MongoDB>::writeDocument(JsonData const& ar
   }
 
   TLOG(14) << "MongoDB::writeDocument() Deleting documents matching filter=<" << compat::to_json(filter_bsondoc.view())
-                                                                            << ">";
+           << ">";
 
   auto result = collection.delete_one(filter_bsondoc.view());
 
@@ -178,9 +185,9 @@ void ReadWrite() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::mongo::ReadWrite trace_enable";
+  TLOG(10) << "artdaq::database::mongo::ReadWrite trace_enable";
 }
-}
+}  // namespace debug
 }  // namespace mongo
 
 }  // namespace database

@@ -21,17 +21,17 @@ namespace database {
 namespace jsonconvert {
 namespace visitor {
 
-using boost::optional;
-using boost::fusion::result_of::value_at;
+using boost::fusion::at;
 using boost::fusion::extension::struct_member_name;
 using boost::fusion::result_of::size;
+using boost::fusion::result_of::value_at;
 using boost::fusion::traits::is_sequence;
-using boost::fusion::at;
+using boost::optional;
 
 using boost::mpl::eval_if;
-using boost::mpl::next;
 using boost::mpl::identity;
 using boost::mpl::int_;
+using boost::mpl::next;
 
 template <typename Flavour, typename UserData>
 struct VisitorApplication;
@@ -76,7 +76,7 @@ struct members_impl<Visitor, S, typename size<S>::type> {
 template <typename Visitor, typename S>
 struct Struct : members_impl<Visitor, S, int_<0>> {};
 
-}  // iteration
+}  // namespace iteration
 
 template <typename Visitor, typename UserData>
 struct array_application {
@@ -131,10 +131,10 @@ struct select_application {
                                        identity<value_application<Visitor, UserData>>>>::type type;
 };
 
-}  // detail
+}  // namespace detail
 
 }  // namespace visitor
-}  // core
+}  // namespace jsonconvert
 }  // namespace database
 }  // namespace artdaq
 

@@ -1,5 +1,5 @@
-#include "artdaq-database/ConfigurationDB/configurationdb.h"
 #include "conftool.h"
+#include "artdaq-database/ConfigurationDB/configurationdb.h"
 
 namespace impl = artdaq::database::configuration::json;
 

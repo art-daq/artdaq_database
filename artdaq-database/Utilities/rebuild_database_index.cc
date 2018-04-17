@@ -8,19 +8,15 @@
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb_index.h"
 
-
 namespace bpo = boost::program_options;
 using namespace artdaq::database;
 
 using namespace artdaq::database::configuration;
-namespace cf = artdaq::database::configuration;
 
 namespace DBI = artdaq::database::filesystem;
 
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::docrecord::JSONDocumentBuilder;
-using artdaq::database::docrecord::JSONDocumentMigrator;
-using artdaq::database::docrecord::JSONDocument;
 
 int main(int argc, char* argv[]) try {
   std::ostringstream descstr;
@@ -40,12 +36,12 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::INVALID_ARGUMENT;
   }
 
-  if (vm.count("help")) {
+  if (vm.count("help") != 0u) {
     std::cout << desc << std::endl;
     return process_exit_code::HELP;
   }
 
-  if (!vm.count("uri")) {
+  if (vm.count("uri") == 0u) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no databse URI given.\n"
               << "For usage and an options list, please do '" << argv[0] << " --help"
               << "'.\n";
@@ -59,7 +55,9 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::INVALID_ARGUMENT | 1;
   }
 
-  if (database_uri.back() == '/') database_uri.pop_back();  // remove trailing slash
+  if (database_uri.back() == '/') {
+    database_uri.pop_back();  // remove trailing slash
+  }
 
   auto database_path = database_uri.substr(strlen(DBI::literal::FILEURI));
   database_path = db::expand_environment_variables(database_path);
@@ -69,27 +67,32 @@ int main(int argc, char* argv[]) try {
   auto provider = DBI::DBProvider<JsonData>::create(database);
 
   DBI::index::shouldAutoRebuildSearchIndex(true);
-  
+
   std::ostringstream oss;
 
   std::cout << "Database:" << database_path << "\n";
 
   auto collection_names = DBI::find_subdirs(database_path);
   for (auto const& collection_name : collection_names) {
-    if (collection_name == system_metadata) continue;
+    if (collection_name == system_metadata) {
+      continue;
+    }
 
     std::cout << "\n\n Collection:" << collection_name << "\n";
 
     boost::filesystem::directory_iterator end_iter;
 
-    auto collection_path = database_path + "/" + collection_name;
+    auto collection_path = database_path;
+    collection_path.append("/").append(collection_name);
 
-    if (!boost::filesystem::remove_all( collection_path+ "/index.json")){
-       std::cout << "   Missing index: " << collection_path+ "/index.json";
+    if (boost::filesystem::remove_all(collection_path + "/index.json") == 0u) {
+      std::cout << "   Missing index: " << collection_path + "/index.json";
     }
-    
+
     for (boost::filesystem::directory_iterator dir_iter(collection_path); dir_iter != end_iter; ++dir_iter) {
-      if (boost::filesystem::is_directory(dir_iter->status()) || dir_iter->path().filename() == "index.json") continue;
+      if (boost::filesystem::is_directory(dir_iter->status()) || dir_iter->path().filename() == "index.json") {
+        continue;
+      }
       auto oid = dir_iter->path().filename().replace_extension().string();
 
       std::cout << "   Document: " << oid;
@@ -103,7 +106,6 @@ int main(int argc, char* argv[]) try {
           continue;
         }
 
-        
         JSONDocumentBuilder builder{{source}};
 
         oss.str("");

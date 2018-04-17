@@ -1,5 +1,12 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+IF (FORMAT_WITH_CLANG)
+  string(TOUPPER ${FORMAT_WITH_CLANG} FORMAT_WITH_CLANG_UC )
+  if( ${FORMAT_WITH_CLANG_UC} MATCHES "TRUE" )
+    include(clang-format)
+  endif()
+ENDIF()
+
 message(STATUS "FHICLCPP='${FHICLCPP}'")
 
 install(DIRECTORY deployment-scripts DESTINATION ${product}/${version})
@@ -20,7 +27,7 @@ add_subdirectory(ConfigurationDB)
 #add_subdirectory(JsonConvert)
 
 add_subdirectory(Utilities)
-add_subdirectory(SWIGBindings)
+#add_subdirectory(SWIGBindings)
 
 
 

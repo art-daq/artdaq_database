@@ -17,8 +17,8 @@ namespace jsonliteral = db::dataformats::literal;
 namespace cf = db::configuration;
 namespace impl = cf::opts;
 
-using artdaq::database::basictypes::JsonData;
 using artdaq::database::basictypes::FhiclData;
+using artdaq::database::basictypes::JsonData;
 using cf::options::data_format_t;
 
 constexpr auto apiname = "ConfigurationInterface";
@@ -105,7 +105,7 @@ struct ConfigurationInterface final {
     auto apiCallResult = impl::read_document(opts, buffer);
 
     if (!apiCallResult.first) throw artdaq::database::runtime_exception(apifunctname) << apiCallResult.second;
-    
+
     if (std::is_same<TYPE, JsonData>::value) {
       opts.format(data_format_t::json);
     } else if (std::is_same<TYPE, FhiclData>::value) {
@@ -114,35 +114,35 @@ struct ConfigurationInterface final {
       throw artdaq::database::invalid_option_exception(apifunctname)
           << "Unsupported storage format " << demangle(typeid(TYPE).name()) << ",  use either JsonData or FhiclData.";
     }
-    
+
     auto data = TYPE{{"{}"}};
 
     auto writeResult = serializer.template writeDocument<TYPE>(data);
-    
+
     if (!writeResult.first) throw artdaq::database::runtime_exception(apifunctname) << writeResult.second;
-    
+
     auto wraped_data = JsonData{std::string("{\"data\":").append(data).append("}")};
-    
-    std::ostringstream oss;    
+
+    std::ostringstream oss;
     oss << db::docrecord::JSONDocumentBuilder().createFromData(wraped_data);
 
-    auto newRecord=jsn::object_t{};
-    
-    if(!db::json::JsonReader{}.read(oss.str(), newRecord))
-       throw artdaq::database::runtime_exception(apifunctname) << "Not a JSON object" << oss.str();
+    auto newRecord = jsn::object_t{};
 
-    auto dbRecord=jsn::object_t{};
-       
-    if(!db::json::JsonReader{}.read(buffer, dbRecord))
-       throw artdaq::database::runtime_exception(apifunctname) << "Not a JSON object" << buffer;
-       
+    if (!db::json::JsonReader{}.read(oss.str(), newRecord))
+      throw artdaq::database::runtime_exception(apifunctname) << "Not a JSON object" << oss.str();
+
+    auto dbRecord = jsn::object_t{};
+
+    if (!db::json::JsonReader{}.read(buffer, dbRecord))
+      throw artdaq::database::runtime_exception(apifunctname) << "Not a JSON object" << buffer;
+
     dbRecord[jsonliteral::document].swap(newRecord[jsonliteral::document]);
-    
+
     buffer.clear();
-    
-    if(!db::json::JsonWriter{}.write(dbRecord,buffer))
-       throw artdaq::database::runtime_exception(apifunctname) << "Not a JSON object" << buffer;
-           
+
+    if (!db::json::JsonWriter{}.write(dbRecord, buffer))
+      throw artdaq::database::runtime_exception(apifunctname) << "Not a JSON object" << buffer;
+
     opts.operation(apiliteral::operation::overwritedocument);
     opts.format(data_format_t::db);
 
@@ -154,7 +154,7 @@ struct ConfigurationInterface final {
   } catch (std::exception const& e) {
     return {false, {e.what()}};
   }
-  
+
   //==============================================================================
   // marks configuration version as read-only in database
   template <typename CONF, typename TYPE>
@@ -184,9 +184,7 @@ struct ConfigurationInterface final {
   } catch (std::exception const& e) {
     return {false, {e.what()}};
   }
-  
-  
-  
+
   //==============================================================================
   // loads configuration version from database
   template <typename CONF, typename TYPE>
@@ -401,8 +399,8 @@ struct ConfigurationInterface final {
           auto const& searches2 = boost::get<jsn::array_t>(result2AST.at(jsonliteral::search));
 
           if (searches2.size() != 1)
-            throw artdaq::database::runtime_exception(apifunctname) << "Invalid JSON:" << apiCall2Result.second
-                                                                    << "Too many results found, expected one.";
+            throw artdaq::database::runtime_exception(apifunctname)
+                << "Invalid JSON:" << apiCall2Result.second << "Too many results found, expected one.";
 
           auto const& version_query = boost::get<jsn::object_t>(*searches2.begin()).at(jsonliteral::query);
 

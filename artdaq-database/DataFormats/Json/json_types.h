@@ -1,10 +1,10 @@
 #ifndef _ARTDAQ_DATABASE_JSONTYPES_H_
 #define _ARTDAQ_DATABASE_JSONTYPES_H_
 
-#include "artdaq-database/DataFormats/common.h"
-#include "artdaq-database/DataFormats/shared_types.h"
 #include <boost/fusion/adapted/struct/adapt_struct.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
+#include "artdaq-database/DataFormats/common.h"
+#include "artdaq-database/DataFormats/shared_types.h"
 
 namespace artdaq {
 namespace database {

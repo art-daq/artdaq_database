@@ -1,5 +1,5 @@
-#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/JsonDocument/JSONDocumentMigrator.h"
+#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/JsonDocument/common.h"
 
 #ifdef TRACE_NAME
@@ -8,30 +8,22 @@
 
 #define TRACE_NAME "JSNU:DocuMgrt_C"
 
+using artdaq::database::json::array_t;
 using artdaq::database::json::object_t;
 using artdaq::database::json::value_t;
-using artdaq::database::json::array_t;
-using artdaq::database::json::type_t;
-using artdaq::database::ThrowOnFailure;
 using artdaq::database::result_t;
 
-using artdaq::database::overlay::ovlDatabaseRecord;
 using artdaq::database::overlay::ovlDatabaseRecordUPtr_t;
 
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
-
-using namespace artdaq::database::docrecord;
+using artdaq::database::docrecord::JSONDocumentMigrator;
 
 namespace db = artdaq::database;
-namespace utl = db::docrecord;
-namespace ovl = db::overlay;
 
 namespace dbdr = artdaq::database::docrecord;
 
 namespace jsonliteral = artdaq::database::dataformats::literal;
-
-using namespace artdaq::database::sharedtypes;
 
 JSONDocumentMigrator::JSONDocumentMigrator(JSONDocument const& document) : _document(document) {}
 
@@ -65,5 +57,5 @@ void dbdr::debug::JSONDocumentMigrator() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::JSONDocumentMigrator trace_enable";
+  TLOG(10) << "artdaq::database::JSONDocumentMigrator trace_enable";
 }

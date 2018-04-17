@@ -14,7 +14,7 @@ namespace database {
 namespace basictypes {
 
 struct JsonData final {
-  JsonData(std::string const&);
+  JsonData(std::string);
 
   template <typename TYPE>
   bool convert_to(TYPE&) const;

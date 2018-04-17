@@ -2,12 +2,12 @@
 #define _ARTDAQ_DATABASE_DATAFORMATS_COMMON_HEALPERFUNCTIONS_H_
 
 #include <cassert>
+#include <chrono>
 #include <iostream>
 #include <iterator>
 #include <memory>
 #include <sstream>
 #include <string>
-#include <chrono>
 
 #include "artdaq-database/SharedCommon/shared_datatypes.h"
 
@@ -54,11 +54,7 @@ namespace artdaq {
 namespace database {
 using std::chrono::system_clock;
 
-enum class quotation_type_t {
-  NONE=0,
-  SINGLE=1,
-  DOUBLE
-};
+enum class quotation_type_t { NONE = 0, SINGLE = 1, DOUBLE };
 
 std::string timestamp();
 std::string to_string(system_clock::time_point const& tp);
@@ -68,7 +64,7 @@ std::string confirm_iso8601_timestamp(std::string const& strtime);
 bool useFakeTime(bool);
 std::string bool_(bool /*bool*/);
 
-std::string quoted_(std::string const& /*text*/, const char /*qchar*/ ='\"');
+std::string quoted_(std::string const& /*text*/, const char /*qchar*/ = '\"');
 std::string operator"" _quoted(const char* /*text*/, std::size_t);
 
 std::string debrace(std::string /*s*/);
@@ -78,16 +74,17 @@ std::string annotate(std::string const& /*s*/);
 
 quotation_type_t quotation_type(std::string /*text*/);
 
-template <quotation_type_t Q> 
-std::string quoted(std::string const& text){return quoted_(text);}
-
+template <quotation_type_t Q>
+std::string quoted(std::string const& text) {
+  return quoted_(text);
+}
 
 void set_default_locale();
 
 bool equal(std::string const&, std::string const&);
 bool not_equal(std::string const&, std::string const&);
 
-std::string expand_environment_variables(std::string /*var*/);
+std::string expand_environment_variables(const std::string& /*var*/);
 object_id_t extract_oid(std::string const&);
 
 std::string generate_oid();
@@ -95,8 +92,8 @@ std::string to_id(std::string const& /*oid*/);
 std::string to_json(std::string const& /*key*/, std::string const& /*value*/);
 
 std::string trim(std::string const& s);
-std::string to_lower(std::string const& s);
-std::string to_upper(std::string const& s);
+std::string to_lower(std::string const& c);
+std::string to_upper(std::string const& c);
 
 std::string unamejson();
 
@@ -119,9 +116,9 @@ template <typename T>
 constexpr std::uint8_t static_cast_as_uint8_t(T const& t) {
   return static_cast<std::uint8_t>(t);
 }
-std::string replace_all(std::string const& , std::string const& , std::string const& );
+std::string replace_all(std::string const&, std::string const&, std::string const&);
 
 }  // namespace database
-}  // artdaq
+}  // namespace artdaq
 
 #endif /* _ARTDAQ_DATABASE_DATAFORMATS_FHICL_HEALPERFUNCTIONS_H_ */

@@ -31,7 +31,7 @@ namespace debug {
 void JSONDocumentMigrator();
 }
 
-}  // namespace jsonrecord
+}  // namespace docrecord
 }  // namespace database
 }  // namespace artdaq
 #endif /* _ARTDAQ_DATABASE_DOCRECORD_JSONDOCUMENTMIGRATOR_H_ */

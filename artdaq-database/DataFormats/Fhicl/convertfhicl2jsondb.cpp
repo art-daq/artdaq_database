@@ -4,8 +4,8 @@
 #include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
 #include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
 #include "artdaq-database/DataFormats/Json/json_types_impl.h"
-#include "artdaq-database/SharedCommon/printStackTrace.h"
 #include "artdaq-database/SharedCommon/configuraion_api_literals.h"
+#include "artdaq-database/SharedCommon/printStackTrace.h"
 
 #include <boost/variant/get.hpp>
 #include <cmath>
@@ -17,7 +17,6 @@
 #define TRACE_NAME "FHJS:fcl2jsndb_C"
 
 namespace db = artdaq::database;
-namespace jsn = artdaq::database::json;
 namespace fcl = artdaq::database::fhicl;
 
 using comments_t = artdaq::database::fhicljson::comments_t;
@@ -25,7 +24,6 @@ using comments_t = artdaq::database::fhicljson::comments_t;
 using artdaq::database::fhicljson::fcl2jsondb;
 using artdaq::database::fhicljson::json2fcldb;
 
-namespace literal = artdaq::database::dataformats::literal;
 namespace apiliteral = artdaq::database::configapi::literal;
 
 std::string include("fhicl_pound_include");
@@ -58,19 +56,25 @@ fcl2jsondb::operator datapair_t() try {
   object[literal::type] = fcl::tag_as_string(value.tag);
 
   auto parse_linenum = [](std::string const& str) -> linenum_t {
-    if (str.empty()) return -1;
+    if (str.empty()) {
+      return -1;
+    }
 
-    auto tmp = str.substr(str.find_last_of(":") + 1);
+    auto tmp = str.substr(str.find_last_of(':') + 1);
     return boost::lexical_cast<linenum_t>(tmp);
   };
 
   auto annotation_at = [this](linenum_t linenum) -> std::string {
     confirm(linenum > -1);
 
-    if (comments.empty() || linenum < 1) return apiliteral::nullstring;
+    if (comments.empty() || linenum < 1) {
+      return apiliteral::nullstring;
+    }
 
     auto search = comments.find(linenum);
-    if (comments.end() == search) return apiliteral::nullstring;
+    if (comments.end() == search) {
+      return apiliteral::nullstring;
+    }
 
     return search->second;
   };
@@ -80,7 +84,9 @@ fcl2jsondb::operator datapair_t() try {
 
     auto comment = annotation_at(linenum);
 
-    if (!comment.empty() && comment.at(0) != '/' && comment.find("#include ") == std::string::npos) return comment;
+    if (!comment.empty() && comment.at(0) != '/' && comment.find("#include ") == std::string::npos) {
+      return comment;
+    }
 
     return apiliteral::nullstring;
   };
@@ -90,10 +96,11 @@ fcl2jsondb::operator datapair_t() try {
 
     auto result = func(linenum);
 
-    if (!result.empty()) 
+    if (!result.empty()) {
       object[field] = fcl::to_json_string(result);
-    else
-      object[field] =std::string{apiliteral::nullstring};
+    } else {
+      object[field] = std::string{apiliteral::nullstring};
+    }
   };
 
   auto linenum = parse_linenum(value.src_info);
@@ -104,13 +111,15 @@ fcl2jsondb::operator datapair_t() try {
   } else {
     add_comment_annotation(comment_at, literal::comment, linenum - 1);
 
-    if (value.tag != ::fhicl::TABLE) add_comment_annotation(annotation_at, literal::annotation, linenum);
+    if (value.tag != ::fhicl::TABLE) {
+      add_comment_annotation(annotation_at, literal::annotation, linenum);
+    }
   }
 
   if (value.protection != ::fhicl::Protection::NONE) {
     object[literal::protection] = fcl::protection_as_string(value.protection);
     TLOG(12) << "fcl2jsondb() value type=<" << fcl::tag_as_string(value.tag) << ">, protection=<"
-                                          << fcl::protection_as_string(value.protection) << ">";
+             << fcl::protection_as_string(value.protection) << ">";
   }
 
   switch (value.tag) {
@@ -155,9 +164,9 @@ fcl2jsondb::operator datapair_t() try {
 
       for (auto const& tmpVal : fcl_value::sequence_t(value)) {
         fhicl_key_value_pair_t kvp = std::make_pair(std::to_string(idx++), tmpVal);
-        datapair_t pair = std::move(fcl2jsondb(std::forward_as_tuple(kvp, self, comments, opts)));
-        tmpDataArray.push_back(std::move(pair.first.value));
-        tmpMetadataObject.push_back(std::move(pair.second));
+        datapair_t pair = fcl2jsondb(std::forward_as_tuple(kvp, self, comments, opts));
+        tmpDataArray.push_back(pair.first.value);
+        tmpMetadataObject.push_back(pair.second);
       }
 
       break;
@@ -171,9 +180,9 @@ fcl2jsondb::operator datapair_t() try {
 
       for (auto const& kvp : fcl_value::table_t(value)) {
         if ((kvp.second.in_prolog && opts.readProlog) || (!kvp.second.in_prolog && opts.readMain)) {
-          datapair_t pair = std::move(fcl2jsondb(std::forward_as_tuple(kvp, self, comments, opts)));
-          tmpDataObject.push_back(std::move(pair.first));
-          tmpMetadataObject.push_back(std::move(pair.second));
+          datapair_t pair = fcl2jsondb(std::forward_as_tuple(kvp, self, comments, opts));
+          tmpDataObject.push_back(pair.first);
+          tmpMetadataObject.push_back(pair.second);
         }
       }
 
@@ -200,11 +209,14 @@ json2fcldb::operator fcl::value_t() try {
 
   if (self_value.type() == typeid(bool)) {
     return fcl::value_t(unwrap(self_value).value_as<const bool>());
-  } else if (self_value.type() == typeid(integer)) {
+  }
+  if (self_value.type() == typeid(integer)) {
     return fcl::value_t(unwrap(self_value).value_as<const integer>());
-  } else if (self_value.type() == typeid(decimal)) {
+  }
+  if (self_value.type() == typeid(decimal)) {
     return fcl::value_t(unwrap(self_value).value_as<const decimal>());
-  } else if (self_value.type() == typeid(std::string)) {
+  }
+  if (self_value.type() == typeid(std::string)) {
     auto value = fcl::from_json_string(unwrap(self_value).value_as<const std::string>());
     return fcl::value_t(need_quotes(value) ? db::quoted_(value) : value);
   } else if (self_value.type() == typeid(jsn::object_t)) {
@@ -244,8 +256,8 @@ json2fcldb::operator fcl::atom_t() try {
     auto fcl_value = fcl::value_t();
 
     fcl_value.value = db::quoted_(boost::get<std::string>(self_data));
-    fcl_value.annotation=apiliteral::nullstring;
-    
+    fcl_value.annotation = apiliteral::nullstring;
+
     return {fcl_key, fcl_value};
   }
 
@@ -263,16 +275,17 @@ json2fcldb::operator fcl::atom_t() try {
     case ::fhicl::STRING: {
       auto value = fcl::from_json_string(boost::get<std::string>(self_data));
 
-      if (type_name == literal::string)
+      if (type_name == literal::string) {
         fcl_value.value = need_quotes(value) ? db::quoted_(value) : value;
-      else if (type_name == literal::string_unquoted)
+      } else if (type_name == literal::string_unquoted) {
         fcl_value.value = value;
-      else if (type_name == literal::string_singlequoted)
+      } else if (type_name == literal::string_singlequoted) {
         fcl_value.value = db::quoted_(value, '\'');
-      else if (type_name == literal::string_doublequoted)
+      } else if (type_name == literal::string_doublequoted) {
         fcl_value.value = db::quoted_(value, '\"');
-      else
+      } else {
         fcl_value.value = need_quotes(value) ? db::quoted_(value) : value;
+      }
 
       break;
     }
@@ -353,11 +366,12 @@ json2fcldb::operator fcl::atom_t() try {
     }
   }
 
-  auto fcl_key =
-      fcl::key_t(name, (comment.find("#include ") == std::string::npos ? comment : std::string{apiliteral::nullstring}));
+  auto fcl_key = fcl::key_t(
+      name, (comment.find("#include ") == std::string::npos ? comment : std::string{apiliteral::nullstring}));
 
-  if (type != ::fhicl::TABLE && !override_comment)  // table does not have annotation
+  if (type != ::fhicl::TABLE && !override_comment) {  // table does not have annotation
     fcl_value.annotation = fcl::from_json_string(boost::get<std::string>(metadata_object.at(literal::annotation)));
+  }
 
   return {fcl_key, fcl_value};
 
@@ -365,7 +379,6 @@ json2fcldb::operator fcl::atom_t() try {
   throw;
 }
 
-using artdaq::database::sharedtypes::unwrap;
 using artdaq::database::sharedtypes::unwrapper;
 
 template <>
@@ -380,5 +393,5 @@ void artdaq::database::fhicljson::debug::FCL2JSON() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::convertjson::FCL2JSON trace_enable";
+  TLOG(10) << "artdaq::database::convertjson::FCL2JSON trace_enable";
 }

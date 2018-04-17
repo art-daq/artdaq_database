@@ -30,6 +30,7 @@ set(CMAKE_MODULE_PATH
     $ENV{ARTDAQ_UTILITIES_DIR}/Modules
     $ENV{CETBUILDTOOLS_DIR}/Modules
     ${CMAKE_MODULE_PATH}
+    ${TOP_CMAKE_SOURCE_DIR}/Modules
     ${TOP_CMAKE_SOURCE_DIR}/built-in)
 
 include(CetCMakeEnv)
@@ -45,6 +46,7 @@ IF (SANITIZE_ADDRESS)
     cet_add_compiler_flags(-fsanitize=address)
   endif()
 ENDIF()
+
 
 cet_report_compiler_flags()
 

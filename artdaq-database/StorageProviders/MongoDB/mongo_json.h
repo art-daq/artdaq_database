@@ -11,10 +11,10 @@ namespace mongo {
 namespace compat {
 inline std::string to_json(bsoncxx::document::view view) { return bsoncxx::to_json(view); }
 inline bsoncxx::document::value from_json(std::string json) { return bsoncxx::from_json(json); }
-std::string to_json(bsoncxx::types::value value);
-std::string to_json_unescaped(bsoncxx::types::value value);
+std::string to_json(const bsoncxx::types::value& value);
+std::string to_json_unescaped(const bsoncxx::types::value& value);
 std::string to_json_unescaped(bsoncxx::document::view view);
-}
+}  // namespace compat
 }  // namespace mongo
 }  // namespace database
 }  // namespace artdaq

@@ -31,19 +31,19 @@ namespace db = artdaq::database;
 namespace literal = db::mongo::literal;
 namespace bbs = bsoncxx::builder::stream;
 
-using bsoncxx::builder::stream::document;
-using bsoncxx::builder::stream::open_document;
-using bsoncxx::builder::stream::close_document;
-using bsoncxx::builder::stream::open_array;
-using bsoncxx::builder::stream::close_array;
-using bsoncxx::builder::stream::finalize;
 using bsoncxx::builder::concatenate_doc;
+using bsoncxx::builder::stream::close_array;
+using bsoncxx::builder::stream::close_document;
+using bsoncxx::builder::stream::document;
+using bsoncxx::builder::stream::finalize;
+using bsoncxx::builder::stream::open_array;
+using bsoncxx::builder::stream::open_document;
 
+using artdaq::database::basictypes::JsonData;
+using artdaq::database::docrecord::JSONDocument;
+using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::mongo::DBConfig;
 using artdaq::database::mongo::MongoDB;
-using artdaq::database::basictypes::JsonData;
-using artdaq::database::docrecord::JSONDocumentBuilder;
-using artdaq::database::docrecord::JSONDocument;
 
 namespace jsonliteral = artdaq::database::dataformats::literal;
 

@@ -28,8 +28,8 @@ namespace db = artdaq::database;
 namespace cf = db::configuration;
 namespace impl = cf::opts;
 
-using artdaq::database::basictypes::JsonData;
 using artdaq::database::basictypes::FhiclData;
+using artdaq::database::basictypes::JsonData;
 using cf::options::data_format_t;
 
 auto make_error_msg = [](const char* msg) { return std::string("{error:\"").append(msg).append("\"}"); };
@@ -41,7 +41,7 @@ class MakeSerializable final {
 
  public:
   template <class TYPE>
-  bool writeDocument(TYPE& data) const  try {
+  bool writeDocument(TYPE& data) const try {
     return writeDocumentImpl(data);
   } catch (std::exception const& e) {
     throw artdaq::database::exception("MakeSerializable::writeDocument")
@@ -53,7 +53,7 @@ class MakeSerializable final {
   }
 
   template <class TYPE>
-  bool readDocument(TYPE const& data)  try {
+  bool readDocument(TYPE const& data) try {
     return readDocumentImpl(data);
   } catch (std::exception const& e) {
     throw artdaq::database::exception("MakeSerializable::readDocument")
@@ -64,14 +64,12 @@ class MakeSerializable final {
         << "Unable to read " << demangle(typeid(CONF).name()) << " from " << demangle(typeid(TYPE).name()) << ".";
   }
 
-  std::string configurationName() const  try {
-    return configurationNameImpl();
-  } catch (std::exception const& e) {
+  std::string configurationName() const try { return configurationNameImpl(); } catch (std::exception const& e) {
     throw artdaq::database::exception("MakeSerializable::configurationName")
         << "Unable to get configuration name" << demangle(typeid(CONF).name()) << "; Exception msg:" << e.what() << ".";
   } catch (...) {
-    throw artdaq::database::exception("MakeSerializable::configurationName") << "Unable to to get configuration name"
-                                                                             << demangle(typeid(CONF).name()) << ".";
+    throw artdaq::database::exception("MakeSerializable::configurationName")
+        << "Unable to to get configuration name" << demangle(typeid(CONF).name()) << ".";
   }
 
   MakeSerializable(CONF conf) : _conf(conf){};

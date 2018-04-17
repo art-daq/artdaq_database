@@ -13,7 +13,6 @@
 
 #define TRACE_NAME "XML:XmlReader_C"
 
-namespace xml = artdaq::database::xml;
 namespace jsn = artdaq::database::json;
 
 namespace pt = boost::property_tree;
@@ -55,7 +54,9 @@ bool XmlReader::read(std::string const& in, jsn::object_t& json_object) {
 
     convert(xml_tree, json_tree);
 
-    if (json_tree.empty()) return false;
+    if (json_tree.empty()) {
+      return false;
+    }
 
     json_object.swap(object);
 
@@ -77,5 +78,5 @@ void artdaq::database::xml::debug::XmlReader() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::xml::XmlReader trace_enable";
+  TLOG(10) << "artdaq::database::xml::XmlReader trace_enable";
 }

@@ -1,10 +1,10 @@
 #ifndef _ARTDAQ_DATABASE_FHICLTYPES_H_
 #define _ARTDAQ_DATABASE_FHICLTYPES_H_
 
-#include "artdaq-database/DataFormats/common.h"
-#include "artdaq-database/DataFormats/shared_types.h"
 #include <boost/fusion/adapted/struct/adapt_struct.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
+#include "artdaq-database/DataFormats/common.h"
+#include "artdaq-database/DataFormats/shared_types.h"
 
 namespace artdaq {
 namespace database {
@@ -17,9 +17,9 @@ struct sequence_t;
 
 using variant_value_t = sharedtypes::variant_value_of<table_t, sequence_t>;
 
-using sharedtypes::optional_comment_t;
-using sharedtypes::optional_annotation_t;
 using sharedtypes::basic_key_t;
+using sharedtypes::optional_annotation_t;
+using sharedtypes::optional_comment_t;
 
 using key_t = sharedtypes::key_of<basic_key_t, optional_comment_t>;
 using value_t = sharedtypes::value_of<variant_value_t, optional_annotation_t>;

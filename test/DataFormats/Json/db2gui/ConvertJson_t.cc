@@ -6,12 +6,12 @@
 namespace bpo = boost::program_options;
 using namespace artdaq::database;
 
-typedef bool (*test_case)(std::string const& /*input*/, std::string const& /*compare*/);
+using test_case = bool (*)(const std::string&, const std::string&);
 
-bool test_convert2gui(std::string const&, std::string const&);
-bool test_convert2db(std::string const&, std::string const&);
-bool test_roundconvertgui(std::string const&, std::string const&);
-bool test_roundconvertdb(std::string const&, std::string const&);
+bool test_convert2gui(std::string const& /*input*/, std::string const& /*compare*/);
+bool test_convert2db(std::string const& /*input*/, std::string const& /*compare*/);
+bool test_roundconvertgui(std::string const& /*input*/, std::string const& /*compare*/);
+bool test_roundconvertdb(std::string const& /*input*/, std::string const& /*compare*/);
 
 int main(int argc, char* argv[]) try {
   artdaq::database::json::debug::JSON2GUIJSON();
@@ -20,9 +20,10 @@ int main(int argc, char* argv[]) try {
   artdaq::database::useFakeTime(true);
 
   std::ostringstream descstr;
-  descstr << argv[0] << " <-s <source-file>> <-c <compare-with-file>> <-t <test-name>> (available test names: "
-                        "Convert_DBJson2GUIJson,Convert_GUIJson2DBJson,RoundConvert_DBJson2GUIJson,RoundConvert_"
-                        "GUIJson2DBJson)";
+  descstr << argv[0]
+          << " <-s <source-file>> <-c <compare-with-file>> <-t <test-name>> (available test names: "
+             "Convert_DBJson2GUIJson,Convert_GUIJson2DBJson,RoundConvert_DBJson2GUIJson,RoundConvert_"
+             "GUIJson2DBJson)";
 
   bpo::options_description desc = descstr.str();
 
@@ -40,26 +41,26 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::INVALID_ARGUMENT;
   }
 
-  if (vm.count("help")) {
+  if (vm.count("help") != 0u) {
     std::cout << desc << std::endl;
     return process_exit_code::HELP;
   }
 
-  if (!vm.count("source")) {
+  if (vm.count("source") == 0u) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no source file given.\n"
               << "For usage and an options list, please do '" << argv[0] << " --help"
               << "'.\n";
     return process_exit_code::INVALID_ARGUMENT | 1;
   }
 
-  if (!vm.count("compare")) {
+  if (vm.count("compare") == 0u) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no compare file given.\n"
               << "For usage and an options list, please do '" << argv[0] << " --help"
               << "'.\n";
     return process_exit_code::INVALID_ARGUMENT | 2;
   }
 
-  if (!vm.count("testname")) {
+  if (vm.count("testname") == 0u) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no test name given.\n"
               << "For usage and an options list, please do '" << argv[0] << " --help"
               << "'.\n";
@@ -91,7 +92,7 @@ int main(int argc, char* argv[]) try {
 
   auto testResult = runTest(test_name)(input, compare);
 
-  return !testResult;
+  return static_cast<int>(!testResult);
 } catch (...) {
   std::cerr << "Process exited with error: " << ::debug::current_exception_diagnostic_information();
   return process_exit_code::UNCAUGHT_EXCEPTION;
@@ -103,12 +104,14 @@ bool test_convert2gui(std::string const& input, std::string const& compare) {
 
   auto output = std::string();
 
-  if (!artdaq::database::json_db_to_gui(input, output)) return false;
+  if (!artdaq::database::json_db_to_gui(input, output)) {
+    return false;
+  }
 
   auto compare_result = artdaq::database::json::compare_json_objects(output, compare);
-  if (compare_result.first)
+  if (compare_result.first) {
     return true;
-  else {
+  } else {
     std::cout << "Convertion failed; error: " << compare_result.second << "\n";
     std::cerr << "output:\n" << output << "\n";
     std::cerr << "expected:\n" << compare << "\n";
@@ -123,12 +126,14 @@ bool test_convert2db(std::string const& input, std::string const& compare) {
 
   auto output = std::string();
 
-  if (!artdaq::database::json_gui_to_db(input, output)) return false;
+  if (!artdaq::database::json_gui_to_db(input, output)) {
+    return false;
+  }
 
   auto compare_result = artdaq::database::json::compare_json_objects(output, compare);
-  if (compare_result.first)
+  if (compare_result.first) {
     return true;
-  else {
+  } else {
     std::cout << "Convertion failed; error: " << compare_result.second << "\n";
     std::cerr << "output:\n" << output << "\n";
     std::cerr << "expected:\n" << compare << "\n";
@@ -145,11 +150,15 @@ bool test_roundconvertgui(std::string const& input, std::string const& compare) 
   auto output = std::string();
 
   try {
-    if (!artdaq::database::json_db_to_gui(input, tmp)) return false;
+    if (!artdaq::database::json_db_to_gui(input, tmp)) {
+      return false;
+    }
 
     std::cout << "json_db_to_gui succeeded.\n";
 
-    if (!artdaq::database::json_gui_to_db(tmp, output)) return false;
+    if (!artdaq::database::json_gui_to_db(tmp, output)) {
+      return false;
+    }
 
     std::cout << "json_gui_to_db succeeded.\n";
 
@@ -162,9 +171,9 @@ bool test_roundconvertgui(std::string const& input, std::string const& compare) 
   }
 
   auto compare_result = artdaq::database::json::compare_json_objects(output, compare);
-  if (compare_result.first)
+  if (compare_result.first) {
     return true;
-  else {
+  } else {
     std::cout << "Convertion failed; error: " << compare_result.second << "\n";
     std::cerr << "output:\n" << output << "\n";
     std::cerr << "expected:\n" << compare << "\n";
@@ -182,11 +191,15 @@ bool test_roundconvertdb(std::string const& input, std::string const& compare) {
   auto output = std::string();
 
   try {
-    if (!artdaq::database::json_gui_to_db(input, tmp)) return false;
+    if (!artdaq::database::json_gui_to_db(input, tmp)) {
+      return false;
+    }
 
     std::cout << "json_gui_to_db succeeded.\n";
 
-    if (!artdaq::database::json_db_to_gui(tmp, output)) return false;
+    if (!artdaq::database::json_db_to_gui(tmp, output)) {
+      return false;
+    }
     std::cout << "json_db_to_gui succeeded.\n";
 
   } catch (...) {
@@ -198,9 +211,9 @@ bool test_roundconvertdb(std::string const& input, std::string const& compare) {
   }
 
   auto compare_result = artdaq::database::json::compare_json_objects(output, compare);
-  if (compare_result.first)
+  if (compare_result.first) {
     return true;
-  else {
+  } else {
     std::cout << "Convertion failed; error: " << compare_result.second << "\n";
     std::cerr << "output:\n" << output << "\n";
     std::cerr << "expected:\n" << compare << "\n";

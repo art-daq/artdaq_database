@@ -67,18 +67,18 @@ bool json_to_conf(std::string const& json, std::string& conf) {
   confirm(!json.empty());
   confirm(conf.empty());
 
-  TLOG(13)<< "json_to_conf: begin";
+  TLOG(13) << "json_to_conf: begin";
 
   auto result = bool{false};
 
-  TLOG(13)<< "json_to_conf: Reading JSON buffer..";
+  TLOG(13) << "json_to_conf: Reading JSON buffer..";
 
   auto json_root = jsn::object_t{};
   auto reader = JsonReader{};
   result = reader.read(json, json_root);
 
   if (!result) {
-    TLOG(13)<< "json_to_conf: Unable to read JSON buffer";
+    TLOG(13) << "json_to_conf: Unable to read JSON buffer";
     return result;
   }
 
@@ -96,7 +96,7 @@ bool json_to_conf(std::string const& json, std::string& conf) {
 
   if (result) conf.swap(conf1);
 
-  TLOG(13)<< "json_to_conf: end";
+  TLOG(13) << "json_to_conf: end";
 
   return result;
 }
@@ -108,9 +108,9 @@ void enableConfJson() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::confjson trace_enable";
+  TLOG(10) << "artdaq::database::confjson trace_enable";
 }
-}
+}  // namespace debug
 }  // namespace confjson
 }  // namespace database
 }  // namespace artdaq

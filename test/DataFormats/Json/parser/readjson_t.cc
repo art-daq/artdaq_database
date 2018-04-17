@@ -24,12 +24,12 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::INVALID_ARGUMENT;
   }
 
-  if (vm.count("help")) {
+  if (vm.count("help") != 0u) {
     std::cout << desc << std::endl;
     return process_exit_code::HELP;
   }
 
-  if (!vm.count("config")) {
+  if (vm.count("config") == 0u) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no configuration file given.\n"
               << "For usage and an options list, please do '" << argv[0] << " --help"
               << "'.\n";
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) try {
   jsn::object_t doc_ast1;
 
   if (!reader.read(json, doc_ast1)) {
-      std::cout << "Failed reading JSON buffer: << " << json_buffer.str() << ">>\n";
+    std::cout << "Failed reading JSON buffer: << " << json_buffer.str() << ">>\n";
 
     return process_exit_code::FAILURE;
   }
@@ -65,28 +65,28 @@ int main(int argc, char* argv[]) try {
   if (!writer.write(doc_ast1, jsonout)) {
     return process_exit_code::FAILURE;
   }
-    std::cout << "Initial:" << json << "\n";
-    std::cout << "Converted:" << jsonout << "\n";
-  
+  std::cout << "Initial:" << json << "\n";
+  std::cout << "Converted:" << jsonout << "\n";
+
   jsn::object_t doc_ast2;
 
   if (!reader.read(jsonout, doc_ast2)) {
-      std::cout << "Failed reading JSON buffer: << " << jsonout << ">>\n";
+    std::cout << "Failed reading JSON buffer: << " << jsonout << ">>\n";
 
     return process_exit_code::FAILURE;
   }
-  
-  auto compare_result= doc_ast1==doc_ast2;
 
-  if(compare_result.first){
-      std::cout << "Returned:" << jsonout << "\n";
-      return process_exit_code::SUCCESS;
-  }else{
+  auto compare_result = doc_ast1 == doc_ast2;
+
+  if (compare_result.first) {
+    std::cout << "Returned:" << jsonout << "\n";
+    return process_exit_code::SUCCESS;
+  } else {
     std::cout << "Test failed (expected!=returned); error message: " << compare_result.second << "\n";
 
     std::cout << "Expected:" << json << "\n";
     std::cout << "Returned:" << jsonout << "\n";
-    
+
     return process_exit_code::FAILURE;
   }
 } catch (...) {

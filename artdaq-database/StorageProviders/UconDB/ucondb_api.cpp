@@ -15,11 +15,11 @@
 using namespace artdaq::database;
 
 static size_t data_write(void* buf, size_t size, size_t nmemb, void* userp) {
-  if (userp) {
+  if (userp != nullptr) {
     std::ostream& os = *static_cast<std::ostream*>(userp);
     std::streamsize len = size * nmemb;
     if (os.write(static_cast<char*>(buf), len)) {
-      TLOG(20)<< "UconDBAPI::data_write() len=" << len;
+      TLOG(20) << "UconDBAPI::data_write() len=" << len;
       return len;
     }
   }
@@ -28,18 +28,18 @@ static size_t data_write(void* buf, size_t size, size_t nmemb, void* userp) {
 }
 
 static size_t data_read(void* buf, size_t size, size_t nmemb, void* userp) {
-  if (userp) {
+  if (userp != nullptr) {
     std::istream& is = *static_cast<std::istream*>(userp);
     std::streamsize need = size * nmemb;
     std::streamsize len = is.readsome(static_cast<char*>(buf), need);
-    TLOG(21)<< "UconDBAPI::data_read() len=" << len;
+    TLOG(21) << "UconDBAPI::data_read() len=" << len;
     return len;
   }
 
   return 0;
 }
 
-std::list<std::string> dbuc::folders(UconDBSPtr_t provider) {
+std::list<std::string> dbuc::folders(const UconDBSPtr_t& provider) {
   auto retValue = std::list<std::string>{};
 
   TLOG(12) << "UconDBAPI::folders() begin";
@@ -52,7 +52,7 @@ std::list<std::string> dbuc::folders(UconDBSPtr_t provider) {
 
   CURLcode code(CURLE_FAILED_INIT);
   CURL* curl = curl_easy_init();
-  if (curl) {
+  if (curl != nullptr) {
     if (CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &data_write)) &&
         // CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_HTTPAUTH, (long)CURLAUTH_DIGEST)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L)) &&
@@ -76,7 +76,9 @@ std::list<std::string> dbuc::folders(UconDBSPtr_t provider) {
   std::string s;
   while (std::getline(ss, s, ',')) {
     s = db::dequote(trim(s));
-    if (!s.empty()) retValue.push_back(s);
+    if (!s.empty()) {
+      retValue.push_back(s);
+    }
   }
 
   if (CURLE_OK != code) {
@@ -88,26 +90,26 @@ std::list<std::string> dbuc::folders(UconDBSPtr_t provider) {
   return retValue;
 }
 
-std::list<std::string> dbuc::tags(UconDBSPtr_t provider, std::string const& folder) {
+std::list<std::string> dbuc::tags(const UconDBSPtr_t& provider, std::string const& folder) {
   auto retValue = std::list<std::string>{};
 
   confirm(!folder.empty());
 
-  TLOG(13)<< "UconDBAPI::tags() begin";
-  TLOG(13)<< "UconDBAPI::tags() folder=<" << folder << ">";
+  TLOG(13) << "UconDBAPI::tags() begin";
+  TLOG(13) << "UconDBAPI::tags() folder=<" << folder << ">";
 
   auto url = provider->connection();
   url.append("/app/tags");
   url.append("?folder=");
   url.append(folder);
 
-  TLOG(13)<< "UconDBAPI::tags() url=" << url;
+  TLOG(13) << "UconDBAPI::tags() url=" << url;
 
   std::stringstream ss;
 
   CURLcode code(CURLE_FAILED_INIT);
   CURL* curl = curl_easy_init();
-  if (curl) {
+  if (curl != nullptr) {
     if (CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &data_write)) &&
         // CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_HTTPAUTH, (long)CURLAUTH_DIGEST)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L)) &&
@@ -131,19 +133,21 @@ std::list<std::string> dbuc::tags(UconDBSPtr_t provider, std::string const& fold
   std::string s;
   while (std::getline(ss, s, ',')) {
     s = db::dequote(trim(s));
-    if (!s.empty()) retValue.push_back(s);
+    if (!s.empty()) {
+      retValue.push_back(s);
+    }
   }
 
   if (CURLE_OK != code) {
-    TLOG(13)<< "UconDBAPI::tags() CURLcode=" << curl_easy_strerror(code);
+    TLOG(13) << "UconDBAPI::tags() CURLcode=" << curl_easy_strerror(code);
   }
 
-  TLOG(13)<< "UconDBAPI::tags() received=<" << db::to_csv(retValue) << ">";
+  TLOG(13) << "UconDBAPI::tags() received=<" << db::to_csv(retValue) << ">";
 
   return retValue;
 }
 
-std::list<std::string> dbuc::objects(UconDBSPtr_t provider, std::string const& folder) {
+std::list<std::string> dbuc::objects(const UconDBSPtr_t& provider, std::string const& folder) {
   auto retValue = std::list<std::string>{};
 
   confirm(!folder.empty());
@@ -162,7 +166,7 @@ std::list<std::string> dbuc::objects(UconDBSPtr_t provider, std::string const& f
 
   CURLcode code(CURLE_FAILED_INIT);
   CURL* curl = curl_easy_init();
-  if (curl) {
+  if (curl != nullptr) {
     if (CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &data_write)) &&
         // CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_HTTPAUTH, (long)CURLAUTH_DIGEST)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L)) &&
@@ -201,7 +205,7 @@ std::list<std::string> dbuc::objects(UconDBSPtr_t provider, std::string const& f
   return retValue;
 }
 
-result_t dbuc::get_object(UconDBSPtr_t provider, std::string const& folder, std::string const& object) {
+result_t dbuc::get_object(const UconDBSPtr_t& provider, std::string const& folder, std::string const& object) {
   auto retValue = std::string{};
 
   confirm(!folder.empty());
@@ -223,7 +227,7 @@ result_t dbuc::get_object(UconDBSPtr_t provider, std::string const& folder, std:
 
   CURLcode code(CURLE_FAILED_INIT);
   CURL* curl = curl_easy_init();
-  if (curl) {
+  if (curl != nullptr) {
     if (CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &data_write)) &&
         // CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_HTTPAUTH, (long)CURLAUTH_DIGEST)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L)) &&
@@ -252,7 +256,7 @@ result_t dbuc::get_object(UconDBSPtr_t provider, std::string const& folder, std:
   return Success(retValue);
 }
 
-result_t dbuc::put_object(UconDBSPtr_t provider, std::string const& folder, std::string const& buffer,
+result_t dbuc::put_object(const UconDBSPtr_t& provider, std::string const& folder, std::string const& buffer,
                           std::string const& object, long const tv, std::list<std::string> const& tags,
                           std::string const& key) {
   confirm(!folder.empty());
@@ -277,7 +281,9 @@ result_t dbuc::put_object(UconDBSPtr_t provider, std::string const& folder, std:
 
   if (!tags.empty()) {
     urlss << "&tag=";
-    for (auto const& tag : tags) urlss << tag << ",";
+    for (auto const& tag : tags) {
+      urlss << tag << ",";
+    }
     urlss.seekp(-1, urlss.cur);
   }
 
@@ -303,7 +309,7 @@ result_t dbuc::put_object(UconDBSPtr_t provider, std::string const& folder, std:
 
   CURLcode code(CURLE_FAILED_INIT);
   CURL* curl = curl_easy_init();
-  if (curl) {
+  if (curl != nullptr) {
     if (CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &data_write)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_READFUNCTION, &data_read)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_HTTPAUTH, (long)CURLAUTH_DIGEST)) &&
@@ -331,12 +337,14 @@ result_t dbuc::put_object(UconDBSPtr_t provider, std::string const& folder, std:
 
   auto msg = oss.str();
 
-  if (msg == "Authorization required") return Failure(msg);
+  if (msg == "Authorization required") {
+    return Failure(msg);
+  }
 
   return Success();
 }
 
-result_t dbuc::create_folder(UconDBSPtr_t provider, std::string const& folder) {
+result_t dbuc::create_folder(const UconDBSPtr_t& provider, std::string const& folder) {
   confirm(!folder.empty());
 
   TLOG(15) << "UconDBAPI::create_folder() begin";
@@ -363,7 +371,7 @@ result_t dbuc::create_folder(UconDBSPtr_t provider, std::string const& folder) {
 
   CURLcode code(CURLE_FAILED_INIT);
   CURL* curl = curl_easy_init();
-  if (curl) {
+  if (curl != nullptr) {
     if (CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &data_write)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_HTTPAUTH, (long)CURLAUTH_DIGEST)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L)) &&
@@ -381,17 +389,17 @@ result_t dbuc::create_folder(UconDBSPtr_t provider, std::string const& folder) {
 
   if (CURLE_OK != code) {
     auto msg = std::string(curl_easy_strerror(code));
-    TLOG(17)<< "UconDBAPI::create_folder() CURLcode=" << msg;
+    TLOG(17) << "UconDBAPI::create_folder() CURLcode=" << msg;
     return Failure(msg);
   }
 
   fl = folders(provider);
   found = (std::find(fl.begin(), fl.end(), to_lower(folder)) != fl.end());
 
-  if (found)
+  if (found) {
     return Success(db::result::msg_Added);
-  else
-    return Failure(db::result::msg_Failure);
+  }
+  { return Failure(db::result::msg_Failure); }
 }
 
 void dbuc::debug::UconDBAPI() {

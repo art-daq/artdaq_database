@@ -2,9 +2,9 @@
 
 #include <boost/test/auto_unit_test.hpp>
 
-#include <time.h> /* time */
 #include <cassert>
 #include <cstdlib>
+#include <ctime> /* time */
 #include <iostream>
 #include <memory>
 #include <string>
@@ -60,20 +60,18 @@ struct TestData {
     std::cout << "setup fixture\n";
   }
 
-  ~TestData() {
-    std::cout << "setup fixture\n";
-  }
+  ~TestData() { std::cout << "setup fixture\n"; }
 
   void updateConfigCount(int count) { _oldConfigCount = count; }
 
   int version() { return _version; }
   int oldConfigCount() { return _oldConfigCount; }
 
-  const int _version = (srand(time(NULL)), rand() % 99999 + 100000);
+  const int _version = (srand(time(nullptr)), rand() % 99999 + 100000);
 
   int _oldConfigCount = 0;
-  
-  int rand_version() {return (srand(time(NULL)), rand() % 88888 + 111111);}
+
+  int rand_version() { return (srand(time(nullptr)), rand() % 88888 + 111111); }
 };
 
 using namespace ots;
@@ -82,20 +80,16 @@ TestData fixture;
 
 BOOST_AUTO_TEST_SUITE(databaseconfiguration_test)
 
-BOOST_AUTO_TEST_CASE(configure_tests) {
-  std::cout << "TestData::version=" << fixture.version() << "\n";
-  return;
-}
+BOOST_AUTO_TEST_CASE(configure_tests) { std::cout << "TestData::version=" << fixture.version() << "\n"; }
 
 BOOST_AUTO_TEST_CASE(write_document) {
-  std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();  
+  std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();
   auto ifc = DatabaseConfigurationInterface();
 
   cfg1->getView().version = fixture.version();
   auto result = ifc.saveActiveVersion(cfg1.get());
 
   BOOST_CHECK_EQUAL(result, 0);
-  return;
 }
 
 BOOST_AUTO_TEST_CASE(read_document) {
@@ -105,8 +99,6 @@ BOOST_AUTO_TEST_CASE(read_document) {
   auto result = ifc.fill(cfg1.get(), fixture.version());
 
   BOOST_CHECK_EQUAL(result, 0);
-
-  return;
 }
 
 BOOST_AUTO_TEST_CASE(store_configuration) {
@@ -135,8 +127,6 @@ BOOST_AUTO_TEST_CASE(store_configuration) {
   fixture.updateConfigCount(list.size());
 
   ifc.storeGlobalConfiguration(map, configName);
-
-  return;
 }
 
 BOOST_AUTO_TEST_CASE(load_configuration) {
@@ -153,8 +143,6 @@ BOOST_AUTO_TEST_CASE(load_configuration) {
 
   BOOST_CHECK_EQUAL(map.at(cfg1->getConfigurationName()), fixture.version() + 1);
   BOOST_CHECK_EQUAL(map.at(cfg2->getConfigurationName()), fixture.version() + 2);
-
-  return;
 }
 
 BOOST_AUTO_TEST_CASE(find_all_configurations) {
@@ -169,8 +157,6 @@ BOOST_AUTO_TEST_CASE(find_all_configurations) {
   auto found = (std::find(list.begin(), list.end(), configName) != list.end());
 
   BOOST_CHECK_EQUAL(found, true);
-
-  return;
 }
 
 BOOST_AUTO_TEST_CASE(list_configuration_types) {
@@ -190,81 +176,75 @@ BOOST_AUTO_TEST_CASE(list_configuration_types) {
   auto found2 = (std::find(list.begin(), list.end(), cfg2->getConfigurationName()) != list.end());
 
   BOOST_CHECK_EQUAL(found2, true);
-
-  return;
 }
 
 BOOST_AUTO_TEST_CASE(find_configuration_version) {
   auto ifc = DatabaseConfigurationInterface();
 
-   std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();
+  std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();
 
-   auto list = ifc.getVersions(cfg1.get());
+  auto list = ifc.getVersions(cfg1.get());
 
-   auto found1 = (std::find(list.begin(), list.end(), fixture.version()) != list.end());
+  auto found1 = (std::find(list.begin(), list.end(), fixture.version()) != list.end());
 
-   BOOST_CHECK_EQUAL(found1, true);
-   
-   auto found2 = (std::find(list.begin(), list.end(), fixture.version() + 1) != list.end());
+  BOOST_CHECK_EQUAL(found1, true);
 
-   BOOST_CHECK_EQUAL(found2, true);
+  auto found2 = (std::find(list.begin(), list.end(), fixture.version() + 1) != list.end());
 
-   return;
+  BOOST_CHECK_EQUAL(found2, true);
 }
 
 BOOST_AUTO_TEST_CASE(find_latest_configuration_version) {
   auto ifc = DatabaseConfigurationInterface();
 
-   std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();
+  std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();
 
-   auto version = ifc.findLatestVersion(cfg1.get());
+  auto version = ifc.findLatestVersion(cfg1.get());
 
-   auto list = ifc.getVersions(cfg1.get());
+  auto list = ifc.getVersions(cfg1.get());
 
-   std::cout << "Found versions\n";
-   
-   for(auto version:list) { std::cout << std::to_string(version) << ", "; }
-      
-   std::cout << "\nGot latest version" <<  std::to_string(version) << "\n";
+  std::cout << "Found versions\n";
 
-   return;
+  for (auto version : list) {
+    std::cout << std::to_string(version) << ", ";
+  }
+
+  std::cout << "\nGot latest version" << std::to_string(version) << "\n";
 }
 
 BOOST_AUTO_TEST_CASE(overwrite_document) {
   auto ifc = DatabaseConfigurationInterface();
 
-  auto oldJson=std::string{"{\n\"oldJson\" : 321\n}"};
-  auto version=fixture.rand_version();
-  std::shared_ptr<ConfigurationBase> w1 = std::make_shared<TestConfiguration001>();  
+  auto oldJson = std::string{"{\n\"oldJson\" : 321\n}"};
+  auto version = fixture.rand_version();
+  std::shared_ptr<ConfigurationBase> w1 = std::make_shared<TestConfiguration001>();
   w1->getView().fillFromJSON(oldJson);
   w1->getView().version = version;
   auto result = ifc.saveActiveVersion(w1.get());
   BOOST_CHECK_EQUAL(result, 0);
-  
+
   std::shared_ptr<ConfigurationBase> r1 = std::make_shared<TestConfiguration001>();
   result = ifc.fill(r1.get(), version);
   BOOST_CHECK_EQUAL(result, 0);
-  BOOST_CHECK_EQUAL(r1->getView()._json,oldJson);  
+  BOOST_CHECK_EQUAL(r1->getView()._json, oldJson);
 
   std::shared_ptr<ConfigurationBase> w2 = std::make_shared<TestConfiguration001>();
   w2->getView().version = version;
-  result = ifc.saveActiveVersion(w2.get(),true);
+  result = ifc.saveActiveVersion(w2.get(), true);
   BOOST_CHECK_EQUAL(result, 0);
 
   r1 = std::make_shared<TestConfiguration001>();
   result = ifc.fill(r1.get(), version);
   BOOST_CHECK_EQUAL(result, 0);
-  BOOST_CHECK_EQUAL(r1->getView()._json,w2->getView()._json);  
-  
+  BOOST_CHECK_EQUAL(r1->getView()._json, w2->getView()._json);
+
   std::shared_ptr<ConfigurationBase> r2 = std::make_shared<TestConfiguration001>();
   result = ifc.fill(r2.get(), version);
   BOOST_CHECK_EQUAL(result, 0);
-  BOOST_CHECK_EQUAL(r2->getView()._json,w2->getView()._json);  
+  BOOST_CHECK_EQUAL(r2->getView()._json, w2->getView()._json);
 
   std::shared_ptr<ConfigurationBase> cfg = std::make_shared<TestConfiguration001>();
-  BOOST_CHECK_EQUAL(r2->getView()._json,cfg->getView()._json);  
- 
-  return;
+  BOOST_CHECK_EQUAL(r2->getView()._json, cfg->getView()._json);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

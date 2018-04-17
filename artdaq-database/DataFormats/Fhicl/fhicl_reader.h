@@ -39,15 +39,15 @@ struct get_line_f {
 template <typename Iter>
 struct fhicl_comments_parser_grammar : qi::grammar<Iter, comments_t(), qi::blank_type> {
   fhicl_comments_parser_grammar() : fhicl_comments_parser_grammar::base_type(comments_rule) {
-    using boost::spirit::qi::_val;
     using boost::spirit::qi::_1;
-    using boost::spirit::qi::lit;
-    using boost::spirit::qi::eol;
+    using boost::spirit::qi::_val;
     using boost::spirit::qi::eoi;
+    using boost::spirit::qi::eol;
+    using boost::spirit::qi::lit;
     using boost::spirit::qi::raw;
 
-    using boost::phoenix::construct;
     using boost::phoenix::begin;
+    using boost::phoenix::construct;
     using boost::phoenix::end;
 
     whitespace_rule = *(ascii::char_ - (lit("#") | lit("//")));
@@ -61,9 +61,8 @@ struct fhicl_comments_parser_grammar : qi::grammar<Iter, comments_t(), qi::blank
 
     string_rule = +(ascii::char_ - (eol | eoi));
 
-    comment_rule =
-        raw[string_rule]
-           [_val = construct<linenum_comment_t>(get_line_(begin(_1)), construct<std::string>(begin(_1), end(_1)))];
+    comment_rule = raw[string_rule][_val = construct<linenum_comment_t>(get_line_(begin(_1)),
+                                                                        construct<std::string>(begin(_1), end(_1)))];
 
     comments_rule = (padded_quoted_string_rule >> whitespace_rule >> comment_rule) % eol;
   }
@@ -79,11 +78,11 @@ struct fhicl_comments_parser_grammar : qi::grammar<Iter, comments_t(), qi::blank
 template <typename Iter>
 struct fhicl_includes_parser_grammar : qi::grammar<Iter, includes_t(), qi::blank_type> {
   fhicl_includes_parser_grammar() : fhicl_includes_parser_grammar::base_type(includes_rule) {
-    using boost::spirit::qi::lit;
-    using boost::spirit::qi::eol;
     using boost::spirit::qi::eoi;
-    using boost::spirit::qi::space;
+    using boost::spirit::qi::eol;
+    using boost::spirit::qi::lit;
     using boost::spirit::qi::omit;
+    using boost::spirit::qi::space;
 
     include_rule = omit[*space] >> lit("#include") >> omit[*space];
 

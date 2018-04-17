@@ -76,7 +76,7 @@ class json_node_t final {
     } else if (_any.which() == 1) {
       auto& value = boost::get<json_any_cref_t>(_any);
       TLOG(12) << "json_node_t() value_as() const any.which()=" << _any.which()
-                                                              << " const value.which()=" << value.which();
+               << " const value.which()=" << value.which();
 
       return boost::get<T const&>(value);
     }
@@ -97,15 +97,16 @@ class json_node_t final {
   }
 
   template <typename T, typename O>
-  T& makeChild(O const& o) try{
+  T& makeChild(O const& o) try {
     using namespace artdaq::database::sharedtypes;
 
     confirm(type() == type_t::OBJECT || type() == type_t::ARRAY);
 
-    auto const node_name = unwrap(o). template value_as<const std::string>(literal::name);
-    auto const node_type = unwrap(o). template value_as<const std::string>(literal::type);
+    auto const node_name = unwrap(o).template value_as<const std::string>(literal::name);
+    auto const node_type = unwrap(o).template value_as<const std::string>(literal::type);
 
-    TLOG(26)<< "json_node_t() makeChild() node_name=<" << node_name << ">, node_type=<" << node_type << ">, this->type()=<" << jsn::to_string(type()) << ">";
+    TLOG(26) << "json_node_t() makeChild() node_name=<" << node_name << ">, node_type=<" << node_type
+             << ">, this->type()=<" << jsn::to_string(type()) << ">";
 
     if (type() == type_t::OBJECT) {
       object_t& object = value_as<object_t>();
@@ -120,9 +121,8 @@ class json_node_t final {
     }
 
     throw runtime_error("json_node_t") << "Value was not created";
-  }catch(...)
-  {
-    TLOG(26)<< "json_node_t() makeChild() failed";
+  } catch (...) {
+    TLOG(26) << "json_node_t() makeChild() failed";
     throw;
   }
 
@@ -131,17 +131,15 @@ class json_node_t final {
     using namespace artdaq::database::sharedtypes;
 
     confirm(type() == type_t::OBJECT || type() == type_t::ARRAY);
-    TLOG(26)<< "json_node_t() makeChildOfChildren() node_name=<children>";
+    TLOG(26) << "json_node_t() makeChildOfChildren() node_name=<children>";
 
     object_t& object = value_as<object_t>();
-    
-    if(object.count(literal::children)==0)
-      object[literal::children] = object_t();
+
+    if (object.count(literal::children) == 0) object[literal::children] = object_t();
 
     return json_node_t{unwrap(object.at(literal::children)).value_as<object_t>()}.makeChild<T, O>(o);
-  }catch(...)
-  {
-    TLOG(26)<< "json_node_t() makeChildOfChildren() failed";
+  } catch (...) {
+    TLOG(26) << "json_node_t() makeChildOfChildren() failed";
     throw;
   }
 
@@ -275,7 +273,7 @@ jcunwrapper<A> jcunwrap(A& any) {
 namespace debug {
 void JSON2GUIJSON();
 }
-}  // namespace fhicljson
+}  // namespace json
 bool json_db_to_gui(std::string const&, std::string&);
 bool json_gui_to_db(std::string const&, std::string&);
 }  // namespace database

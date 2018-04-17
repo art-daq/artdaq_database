@@ -41,19 +41,19 @@ std::string cf::to_string(data_format_t const& f) {
 data_format_t cf::to_data_format(std::string const& f) {
   confirm(!f.empty());
 
-  if (f.compare("fhicl") == 0) {
+  if (f == "fhicl") {
     return data_format_t::fhicl;
-  } else if (f.compare("json") == 0) {
+  } else if (f == "json") {
     return data_format_t::json;
-  } else if (f.compare("gui") == 0) {
+  } else if (f == "gui") {
     return data_format_t::gui;
-  } else if (f.compare("db") == 0) {
+  } else if (f == "db") {
     return data_format_t::db;
-  } else if (f.compare("xml") == 0) {
+  } else if (f == "xml") {
     return data_format_t::xml;
-  } else if (f.compare("origin") == 0) {
+  } else if (f == "origin") {
     return data_format_t::origin;
-  } else if (f.compare("csv") == 0) {
+  } else if (f == "csv") {
     return data_format_t::csv;
   }
 

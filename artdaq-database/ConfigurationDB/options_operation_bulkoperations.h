@@ -29,7 +29,7 @@ class BulkOperations final {
   using iterator = std::list<std::tuple<std::string, OperationBaseUPtr>>::iterator;
   using const_iterator = std::list<std::tuple<std::string, OperationBaseUPtr>>::const_iterator;
 
-  BulkOperations(std::string const&);
+  BulkOperations(std::string);
 
   std::string const& bulkOperations() const;
   std::string const& bulkOperations(std::string const&);
@@ -64,10 +64,10 @@ namespace debug {
 namespace options {
 void BulkOperations();
 }
-}
+}  // namespace debug
 }  // namespace configuration
 }  // namespace database
 }  // namespace artdaq
 
 #endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_BULKOPERATIONS_H_ \
-          */
+        */

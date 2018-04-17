@@ -19,24 +19,21 @@ namespace bpo = boost::program_options;
 
 using Options = cf::ManageDocumentOperation;
 
-using artdaq::database::docrecord::JSONDocument;
-using artdaq::database::basictypes::JsonData;
-
 int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
   // artdaq::database::docrecord::debug::JSONDocument();
-  //artdaq::database::docrecord::debug::JSONDocumentBuilder();
+  // artdaq::database::docrecord::debug::JSONDocumentBuilder();
 
   artdaq::database::configuration::debug::ManageConfigs();
   artdaq::database::configuration::debug::ManageAliases();
   artdaq::database::configuration::debug::ManageDocuments();
-  
+
   artdaq::database::configuration::debug::options::OperationBase();
   artdaq::database::configuration::debug::options::ManageDocuments();
   artdaq::database::configuration::debug::options::ManageConfigs();
   artdaq::database::configuration::debug::options::ManageAliases();
-  
+
   artdaq::database::configuration::debug::detail::ManageConfigs();
   artdaq::database::configuration::debug::detail::ManageAliases();
   artdaq::database::configuration::debug::detail::ManageDocuments();
@@ -46,7 +43,6 @@ int main(int argc, char* argv[]) try {
 
   debug::registerUngracefullExitHandlers();
   artdaq::database::useFakeTime(true);
-
 
   auto options = Options{argv[0]};
   auto desc = options.makeProgramOptions();
@@ -61,7 +57,7 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::INVALID_ARGUMENT;
   }
 
-  if (vm.count("help")) {
+  if (vm.count("help") != 0u) {
     std::cerr << desc << std::endl;
     return process_exit_code::HELP;
   }
@@ -72,7 +68,7 @@ int main(int argc, char* argv[]) try {
     return exit_code;
   }
 
-  if (!vm.count(apiliteral::option::result)) {
+  if (vm.count(apiliteral::option::result) == 0u) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no result file name given.\n"
               << "For usage and an options list, please do '" << argv[0] << " --help"
               << "'.\n";
@@ -84,7 +80,7 @@ int main(int argc, char* argv[]) try {
 
   auto file_src_name = file_res_name;
 
-  if (vm.count(apiliteral::option::source)) {
+  if (vm.count(apiliteral::option::source) != 0u) {
     file_src_name = vm[apiliteral::option::source].as<std::string>();
   }
 
@@ -97,25 +93,25 @@ int main(int argc, char* argv[]) try {
 
   cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP, std::string const&, std::string&>(
       apiliteral::operation::readdocument, read_document, options_string, test_document);
-  
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      apiliteral::operation::findconfigs, find_configurations, options_string);
+
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findconfigs,
+                                                                                  find_configurations, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
       apiliteral::operation::confcomposition, configuration_composition, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::assignconfig,
+                                                                                  assign_configuration, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findversions,
+                                                                                  find_versions, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findentities,
+                                                                                  find_entities, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      apiliteral::operation::assignconfig, assign_configuration, options_string);
+      apiliteral::operation::addversionalias, add_version_alias, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::rmversionalias,
+                                                                                  remove_version_alias, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      apiliteral::operation::findversions, find_versions, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
-      apiliteral::operation::findentities, find_entities, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::addversionalias, add_version_alias,
-                                                                                  options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::rmversionalias, remove_version_alias,
-                                                                                  options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findversionalias, find_version_aliases,
-                                                                                  options_string);
+      apiliteral::operation::findversionalias, find_version_aliases, options_string);
   try {
-      db::read_buffer_from_file(test_document,file_src_name);
+    db::read_buffer_from_file(test_document, file_src_name);
     cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
         apiliteral::operation::writedocument, write_document, options_string, test_document);
   } catch (...) {
@@ -130,16 +126,17 @@ int main(int argc, char* argv[]) try {
     std::cout << ::debug::current_exception_diagnostic_information();
     return process_exit_code::FAILURE;
   }
-  
-  if(result.second.empty()){
-    std::cout << "Test failed; error message: result is empty." << "\n";
+
+  if (result.second.empty()) {
+    std::cout << "Test failed; error message: result is empty."
+              << "\n";
     return process_exit_code::FAILURE;
   }
-  
+
   auto returned = std::string{result.second};
 
-        auto expected=std::string{};
-      db::read_buffer_from_file(expected,file_res_name);
+  auto expected = std::string{};
+  db::read_buffer_from_file(expected, file_res_name);
 
   using cfo::data_format_t;
 
@@ -152,11 +149,11 @@ int main(int argc, char* argv[]) try {
       return process_exit_code::SUCCESS;
     }
     std::cout << "Test failed (expected!=returned); error message: " << compare_result.second << "\n";
-  } else if (expected.compare(returned) == 0) {
+  } else if (expected == returned) {
     std::cout << "returned:\n" << returned << "\n";
 
     return process_exit_code::SUCCESS;
-  } else if (expected.pop_back(), expected.compare(returned) == 0) {
+  } else if (expected.pop_back(), expected == returned) {
     std::cout << "returned:\n" << returned << "\n";
 
     return process_exit_code::SUCCESS;
@@ -172,18 +169,20 @@ int main(int argc, char* argv[]) try {
             << std::distance(returned.begin(), returned.end()) << ")\n";
 
   std::cout << "First mismatch at position " << std::distance(expected.begin(), mismatch.first) << ", (exp,ret)=(0x"
-            << std::hex << (unsigned int)*mismatch.first << ",0x" << (unsigned int)*mismatch.second << ")\n";
+            << std::hex << static_cast<unsigned int>(*mismatch.first) << ",0x"
+            << static_cast<unsigned int>(*mismatch.second) << ")\n";
 
-  auto file_out_name = std::string(db::filesystem::mkdir(tmpdir)).append("/")
+  auto file_out_name = std::string(db::filesystem::mkdir(tmpdir))
+                           .append("/")
                            .append(argv[0])
                            .append("-")
                            .append(options.operation())
                            .append("-")
-                           .append(basename((char*)file_src_name.c_str()))
+                           .append(basename(const_cast<char*>(file_src_name.c_str())))
                            .append(".txt");
 
-  db::write_buffer_to_file(returned,file_out_name);
-			   
+  db::write_buffer_to_file(returned, file_out_name);
+
   std::cout << "Wrote file:" << file_out_name << "\n";
 
   return process_exit_code::FAILURE;

@@ -66,7 +66,7 @@ namespace debug {
 namespace options {
 void ManageDocuments();
 }
-}
+}  // namespace debug
 }  // namespace configuration
 }  // namespace database
 }  // namespace artdaq

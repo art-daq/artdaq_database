@@ -1,5 +1,6 @@
-#include <iostream>
 #include "artdaq-database/BasicTypes/data_json.h"
+#include <iostream>
+#include <utility>
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -11,7 +12,7 @@ namespace artdaq {
 namespace database {
 namespace basictypes {
 
-JsonData::JsonData(std::string const& buffer) : json_buffer{buffer} {}
+JsonData::JsonData(std::string buffer) : json_buffer{std::move(buffer)} {}
 
 JsonData::operator std::string const&() const { return json_buffer; }
 

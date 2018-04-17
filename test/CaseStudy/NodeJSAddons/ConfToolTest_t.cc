@@ -1,3 +1,4 @@
+#include <boost/program_options.hpp>
 #include <fstream>
 #include <iostream>
 #include <streambuf>
@@ -5,7 +6,6 @@
 #include "artdaq-database/BuildInfo/printStackTrace.h"
 #include "artdaq-database/BuildInfo/process_exit_codes.h"
 #include "artdaq-database/ConfigurationDB/configurationdb.h"
-#include <boost/program_options.hpp>
 #include "cetlib/coded_exception.h"
 
 #include "artdaq-database/FhiclJson/fhicljsondb.h"

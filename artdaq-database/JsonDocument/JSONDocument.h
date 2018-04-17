@@ -10,9 +10,9 @@ struct JsonData;
 }
 namespace docrecord {
 
+using artdaq::database::basictypes::JsonData;
 using artdaq::database::json::object_t;
 using artdaq::database::json::value_t;
-using artdaq::database::basictypes::JsonData;
 
 class JSONDocumentBuilder;
 class JSONDocumentMigrator;
@@ -24,7 +24,7 @@ class JSONDocument final {
  public:
   JSONDocument(JsonData const&);
   JSONDocument(std::string const&);
-  JSONDocument(value_t const&);
+  JSONDocument(value_t);
   JSONDocument();
 
   // returns inserted child
@@ -99,7 +99,7 @@ T JSONDocument::value_as(path_t const& path) const {
 namespace debug {
 void JSONDocument();
 void JSONDocumentUtils();
-}
+}  // namespace debug
 std::ostream& operator<<(std::ostream&, JSONDocument const&);
 
 std::vector<path_t> split_path(path_t const&);

@@ -1,13 +1,10 @@
 #include "artdaq-database/Overlay/ovlChangeLog.h"
 #include "artdaq-database/Overlay/ovlKeyValue.h"
 
-namespace jsonliteral = artdaq::database::dataformats::literal;
-namespace ovl = artdaq::database::overlay;
 using namespace artdaq::database;
 using namespace artdaq::database::overlay;
 using namespace artdaq::database::result;
 using result_t = artdaq::database::result_t;
-using artdaq::database::sharedtypes::unwrap;
 
 ovlChangeLog::ovlChangeLog(object_t::key_type const& key, value_t& changelog) : ovlStringKeyValue(key, changelog) {}
 

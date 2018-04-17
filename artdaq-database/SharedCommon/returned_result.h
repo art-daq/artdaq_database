@@ -17,7 +17,7 @@ constexpr auto msg_Removed = "{\"message\":\"Removed\"}";
 constexpr auto msg_Success = "{\"message\":\"Success\"}";
 constexpr auto msg_Failure = "{\"message\":\"Failure\"}";
 constexpr auto msg_AlreadyExist = "{\"message\":\"AlreadyExist\"}";
-}
+}  // namespace result
 
 using result_t = std::pair<bool, std::string>;
 
@@ -27,6 +27,6 @@ result_t Failure(std::string const& = result::msg_Failure);
 result_t Success(std::string const& = result::msg_Success);
 void ThrowOnFailure(result_t const&);
 }  // namespace database
-}  // artdaq
+}  // namespace artdaq
 
 #endif /* _ARTDAQ_DATABASE_DATAFORMATS_COMMON_RESULT_H_ */

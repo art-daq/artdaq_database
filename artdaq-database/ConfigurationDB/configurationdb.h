@@ -13,8 +13,8 @@ namespace configuration {
 namespace json {
 void enable_trace();
 }
-}
-}
-}
+}  // namespace configuration
+}  // namespace database
+}  // namespace artdaq
 
 #endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_H_ */

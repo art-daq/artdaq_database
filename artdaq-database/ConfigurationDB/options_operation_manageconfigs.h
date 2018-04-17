@@ -55,11 +55,11 @@ namespace debug {
 namespace options {
 void ManageConfigs();
 }
-}
+}  // namespace debug
 
 }  // namespace configuration
 }  // namespace database
 }  // namespace artdaq
 
 #endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_MANAGECONFIGS_H_ \
-          */
+        */

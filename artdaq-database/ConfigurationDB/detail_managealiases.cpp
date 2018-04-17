@@ -25,7 +25,6 @@ namespace db = artdaq::database;
 namespace cf = db::configuration;
 namespace cftd = cf::debug::detail;
 namespace jsonliteral = db::dataformats::literal;
-namespace apiliteral = db::configapi::literal;
 
 using cf::ManageAliasesOperation;
 using cf::options::data_format_t;
@@ -33,16 +32,14 @@ using cf::options::data_format_t;
 using Options = cf::ManageAliasesOperation;
 
 using artdaq::database::basictypes::JsonData;
-using artdaq::database::basictypes::FhiclData;
-using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 
 namespace artdaq {
 namespace database {
 bool json_db_to_gui(std::string const&, std::string&);
 bool json_gui_to_db(std::string const&, std::string&);
-}
-}
+}  // namespace database
+}  // namespace artdaq
 
 namespace artdaq {
 namespace database {
@@ -51,14 +48,14 @@ namespace detail {
 void write_document(cf::ManageDocumentOperation const&, std::string&);
 void read_document(cf::ManageDocumentOperation const&, std::string&);
 
-typedef JsonData (*provider_call_t)(Options const& /*options*/, JsonData const& /*task_payload*/);
+using provider_call_t = JsonData (*)(const Options&, const JsonData&);
 
 void find_version_aliases(Options const& options, std::string& configs) {
   confirm(configs.empty());
-  confirm(options.operation().compare(apiliteral::operation::findversionalias) == 0);
+  confirm(options.operation() == apiliteral::operation::findversionalias);
 
-  TLOG(21)<< "find_version_aliases: begin";
-  TLOG(21)<< "find_version_aliases args options=<" << options << ">";
+  TLOG(21) << "find_version_aliases: begin";
+  TLOG(21) << "find_version_aliases args options=<" << options << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -101,14 +98,14 @@ void find_version_aliases(Options const& options, std::string& configs) {
       object_t results_ast;
 
       if (!reader.read(search_result, results_ast)) {
-        TLOG(21)<< "find_version_aliases() Failed to create an AST from search results JSON.";
+        TLOG(21) << "find_version_aliases() Failed to create an AST from search results JSON.";
 
         throw runtime_error("find_version_aliases") << "Failed to create an AST from search results JSON.";
       }
 
       auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
 
-      TLOG(21)<< "find_version_aliases: found " << results_list.size() << " results.";
+      TLOG(21) << "find_version_aliases: found " << results_list.size() << " results.";
 
       std::ostringstream os;
 
@@ -116,28 +113,31 @@ void find_version_aliases(Options const& options, std::string& configs) {
         auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
         auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
 
-        TLOG(21)<< "find_version_aliases() Found alias=<" << value << ">.";
+        TLOG(21) << "find_version_aliases() Found alias=<" << value << ">.";
 
         os << value << ",";
       }
       returnValue = os.str();
-      
-      if(returnValue.back()==',')
-	returnValue.pop_back();
-      
+
+      if (returnValue.back() == ',') {
+        returnValue.pop_back();
+      }
+
       returnValueChanged = true;
       break;
     }
   }
 
-  if (returnValueChanged) configs.swap(returnValue);
+  if (returnValueChanged) {
+    configs.swap(returnValue);
+  }
 
-  TLOG(21)<< "find_version_aliases: end";
+  TLOG(21) << "find_version_aliases: end";
 }
 
 void add_version_alias(Options const& options, std::string& conf) {
   confirm(conf.empty());
-  confirm(options.operation().compare(apiliteral::operation::addversionalias) == 0);
+  confirm(options.operation() == apiliteral::operation::addversionalias);
 
   TLOG(16) << "add_version_alias: begin";
   TLOG(16) << "add_version_alias args options=<" << options << ">";
@@ -176,7 +176,7 @@ void add_version_alias(Options const& options, std::string& conf) {
 
 void remove_version_alias(Options const& options, std::string& conf) {
   confirm(conf.empty());
-  confirm(options.operation().compare(apiliteral::operation::rmversionalias) == 0);
+  confirm(options.operation() == apiliteral::operation::rmversionalias);
 
   TLOG(15) << "remove_version_alias: begin";
   TLOG(15) << "remove_version_alias args options=<" << options << ">";
@@ -225,5 +225,5 @@ void cftd::ManageAliases() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::configuration::ManageAliases trace_enable";
+  TLOG(10) << "artdaq::database::configuration::ManageAliases trace_enable";
 }
