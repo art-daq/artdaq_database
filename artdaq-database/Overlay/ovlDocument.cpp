@@ -1,13 +1,10 @@
 #include "artdaq-database/Overlay/ovlDocument.h"
 #include "artdaq-database/Overlay/ovlKeyValue.h"
 
-namespace jsonliteral = artdaq::database::dataformats::literal;
-namespace ovl = artdaq::database::overlay;
 using namespace artdaq::database;
 using namespace artdaq::database::overlay;
 using namespace artdaq::database::result;
 using result_t = artdaq::database::result_t;
-using artdaq::database::sharedtypes::unwrap;
 
 ovlDocument::ovlDocument(object_t::key_type const& key, value_t& document)
     : ovlKeyValue(key, document),
@@ -67,13 +64,19 @@ result_t ovlDocument::operator==(ovlDocument const& other) const {
 
   auto result = *_data == *other._data;
 
-  if (!result.first) oss << "\n  Data are different:\n  " << result.second;
+  if (!result.first) {
+    oss << "\n  Data are different:\n  " << result.second;
+  }
 
   result = *_metadata == *other._metadata;
 
-  if (!result.first) oss << "\n  Metadata are different:\n  " << result.second;
+  if (!result.first) {
+    oss << "\n  Metadata are different:\n  " << result.second;
+  }
 
-  if (oss.tellp() == noerror_pos) return Success();
+  if (oss.tellp() == noerror_pos) {
+    return Success();
+  }
 
   //  oss << "\n  Debug info:";
   //  oss << "\n  Self  value: " << to_string();

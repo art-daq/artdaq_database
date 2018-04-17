@@ -9,10 +9,10 @@ namespace artdaq {
 namespace database {
 namespace docrecord {
 
-using artdaq::database::json::object_t;
-using artdaq::database::json::value_t;
 using artdaq::database::json::array_t;
+using artdaq::database::json::object_t;
 using artdaq::database::json::type_t;
+using artdaq::database::json::value_t;
 
 using artdaq::database::overlay::ovlDatabaseRecord;
 using artdaq::database::overlay::ovlDatabaseRecordUPtr_t;
@@ -20,7 +20,7 @@ using artdaq::database::overlay::ovlDatabaseRecordUPtr_t;
 class JSONDocumentBuilder final {
  public:
   JSONDocumentBuilder();
-  JSONDocumentBuilder(JSONDocument const&);
+  JSONDocumentBuilder(JSONDocument);
 
   JSONDocumentBuilder& createFromData(JSONDocument const&);
   JSONDocumentBuilder& addAlias(JSONDocument const&);
@@ -103,7 +103,7 @@ std::unique_ptr<OVL> JSONDocumentBuilder::overlay(JSONDocument& document, object
 }
 
 template <typename T>
-JSONDocument toJSONDocument(T const& t);
+JSONDocument toJSONDocument(T const&);
 
 namespace debug {
 void JSONDocumentBuilder();
@@ -111,7 +111,7 @@ void JSONDocumentBuilder();
 
 std::ostream& operator<<(std::ostream&, JSONDocumentBuilder const&);
 
-}  // namespace jsonrecord
+}  // namespace docrecord
 }  // namespace database
 }  // namespace artdaq
 #endif /* _ARTDAQ_DATABASE_DOCRECORD_JSONDOCUMENTBUILDER_H_ */

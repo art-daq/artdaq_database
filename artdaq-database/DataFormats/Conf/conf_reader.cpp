@@ -48,5 +48,5 @@ void artdaq::database::conf::debug::ConfReader() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::conf::ConfReader trace_enable";
+  TLOG(10) << "artdaq::database::conf::ConfReader trace_enable";
 }

@@ -23,7 +23,6 @@ namespace dbcfg = artdaq::database::configuration;
 
 namespace db = artdaq::database;
 namespace jsonliteral = db::dataformats::literal;
-namespace apiliteral = db::configapi::literal;
 
 using artdaq::database::configuration::options::data_format_t;
 using artdaq::database::docrecord::JSONDocumentBuilder;
@@ -56,7 +55,7 @@ result_t write_document_file(ManageDocumentOperation const& options, std::string
 }  // namespace database
 }  // namespace artdaq
 
-auto make_error_msg = [](auto msg) { return std::string("{\"error\":\"").append(msg).append("\"}"); };
+auto make_error_msg = [](auto msg) { return std::string(R"({"error":")").append(msg).append("\"}"); };
 
 using namespace artdaq::database::result;
 using artdaq::database::result_t;
@@ -71,23 +70,29 @@ result_t opts::export_database(ManageDocumentOperation const& options) noexcept 
 
 result_t json::export_database(std::string const& query_payload) noexcept {
   try {
-    if (query_payload.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) {
+      return Failure(msg_EmptyFilter);
+    }
 
-    if (!system(NULL)) return Failure(msg_SystemCallFailed);
+    if (system(nullptr) == 0) {
+      return Failure(msg_SystemCallFailed);
+    }
 
     auto options = ManageDocumentOperation{apiliteral::operation::exportdatabase};
     options.readJsonData({query_payload});
 
-    TLOG(20)<< "export_database: operation=<" << options << ">";
+    TLOG(20) << "export_database: operation=<" << options << ">";
 
-    confirm(options.operation().compare(apiliteral::operation::exportdatabase) == 0);
+    confirm(options.operation() == apiliteral::operation::exportdatabase);
 
     options.format(options::data_format_t::csv);
     options.operation(apiliteral::operation::listcollections);
 
     auto result = opts::list_collections(options);
 
-    if (!result.first) return Failure(result.second);
+    if (!result.first) {
+      return Failure(result.second);
+    }
 
     auto tmp = result.second;
     std::replace(tmp.begin(), tmp.end(), ',', ' ');
@@ -113,18 +118,22 @@ result_t json::export_database(std::string const& query_payload) noexcept {
       oss << dirname << "/" << collection << apiliteral::dbexport_extension;
       options.sourceFileName(oss.str());
 
-      TLOG(20)<< "export_database: exporting collection=" << collection << " to file=" << options.sourceFileName();
+      TLOG(20) << "export_database: exporting collection=" << collection << " to file=" << options.sourceFileName();
 
       auto result = opts::export_collection(options);
 
-      if (!result.first) err << result.second << ", ";
+      if (!result.first) {
+        err << result.second << ", ";
+      }
 
       res << quoted_(options.sourceFileName()) << ",";
     }
     res.seekp(-1, res.cur);
     res << "]}";
 
-    if (err.tellp() != noerror_pos) return Failure(err);
+    if (err.tellp() != noerror_pos) {
+      return Failure(err);
+    }
 
     return Success(res);
   } catch (...) {
@@ -142,16 +151,20 @@ result_t opts::import_database(ManageDocumentOperation const& options) noexcept 
 
 result_t json::import_database(std::string const& query_payload) noexcept {
   try {
-    if (query_payload.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) {
+      return Failure(msg_EmptyFilter);
+    }
 
-    if (!system(NULL)) return Failure(msg_SystemCallFailed);
+    if (system(nullptr) == 0) {
+      return Failure(msg_SystemCallFailed);
+    }
 
     auto options = ManageDocumentOperation{apiliteral::operation::importdatabase};
     options.readJsonData({query_payload});
 
-    TLOG(20)<< "import_database: operation=<" << options << ">";
+    TLOG(20) << "import_database: operation=<" << options << ">";
 
-    confirm(options.operation().compare(apiliteral::operation::importdatabase) == 0);
+    confirm(options.operation() == apiliteral::operation::importdatabase);
 
     options.operation(apiliteral::operation::importcollection);
     options.format(options::data_format_t::db);
@@ -167,7 +180,9 @@ result_t json::import_database(std::string const& query_payload) noexcept {
     for (auto const& file_name : list_files(dirname)) {
       auto collection = std::string{};
 
-      if (!db::extract_collectionname_from_filename(file_name, collection)) continue;
+      if (!db::extract_collectionname_from_filename(file_name, collection)) {
+        continue;
+      }
 
       oss.str("");
       oss.clear();
@@ -175,18 +190,22 @@ result_t json::import_database(std::string const& query_payload) noexcept {
       oss << dirname << "/" << collection << apiliteral::dbexport_extension;
       options.sourceFileName(oss.str());
 
-      TLOG(20)<< "import_database: importing collection=" << collection << " to file=" << options.sourceFileName();
+      TLOG(20) << "import_database: importing collection=" << collection << " to file=" << options.sourceFileName();
 
       auto result = opts::import_collection(options);
 
-      if (!result.first) err << result.second << ", ";
+      if (!result.first) {
+        err << result.second << ", ";
+      }
 
       res << quoted_(options.sourceFileName()) << ",";
     }
     res.seekp(-1, res.cur);
     res << "]}";
 
-    if (err.tellp() != noerror_pos) return Failure(err);
+    if (err.tellp() != noerror_pos) {
+      return Failure(err);
+    }
 
     return Success(res);
   } catch (...) {
@@ -246,17 +265,23 @@ result_t opts::import_configuration(ManageDocumentOperation const& options) noex
 
 result_t json::write_configuration(std::string const& query_payload, std::string const& tarbzip2_base64) noexcept {
   try {
-    if (query_payload.empty()) return Failure(msg_EmptyFilter);
-    if (tarbzip2_base64.empty()) return Failure(msg_EmptyDocument);
+    if (query_payload.empty()) {
+      return Failure(msg_EmptyFilter);
+    }
+    if (tarbzip2_base64.empty()) {
+      return Failure(msg_EmptyDocument);
+    }
 
-    if (!system(NULL)) return Failure(msg_SystemCallFailed);
+    if (system(nullptr) == 0) {
+      return Failure(msg_SystemCallFailed);
+    }
 
     auto options = ManageDocumentOperation{apiliteral::operation::writeconfiguration};
     options.readJsonData({query_payload});
 
-    TLOG(20)<< "write_configuration: operation=<" << options << ">";
+    TLOG(20) << "write_configuration: operation=<" << options << ">";
 
-    confirm(options.operation().compare(apiliteral::operation::writeconfiguration) == 0);
+    confirm(options.operation() == apiliteral::operation::writeconfiguration);
 
     options.operation(apiliteral::operation::writedocument);
 
@@ -264,33 +289,39 @@ result_t json::write_configuration(std::string const& query_payload, std::string
 
     auto file_name = tmp_dir_name + "/userdata" + apiliteral::dbexport_extension;
 
-    if(!db::write_buffer_to_file(tarbzip2_base64,file_name))
-         return Failure(make_error_msg("Unable to write userdata"));
-    
-    db::tarbzip2base64_to_dir(file_name,tmp_dir_name);
-        
+    if (!db::write_buffer_to_file(tarbzip2_base64, file_name)) {
+      return Failure(make_error_msg("Unable to write userdata"));
+    }
+
+    db::tarbzip2base64_to_dir(file_name, tmp_dir_name);
+
     std::ostringstream oss;
 
     for (auto const& file_name : list_files(tmp_dir_name)) {
       options.collection(collection_name_from_relative_path(file_name));
-      if (file_name.rfind(".fcl") != std::string::npos || file_name.rfind(".fhicl") != std::string::npos)
+      if (file_name.rfind(".fcl") != std::string::npos || file_name.rfind(".fhicl") != std::string::npos) {
         options.format(options::data_format_t::fhicl);
-      else if (file_name.rfind(".jsn") != std::string::npos || file_name.rfind(".json") != std::string::npos)
+      } else if (file_name.rfind(".jsn") != std::string::npos || file_name.rfind(".json") != std::string::npos) {
         options.format(options::data_format_t::json);
-      else if (file_name.rfind(".xml") != std::string::npos)
+      } else if (file_name.rfind(".xml") != std::string::npos) {
         options.format(options::data_format_t::xml);
-      else
+      } else {
         continue;
+      }
 
       auto result = detail::write_document_file(options, file_name);
-      if (!result.first) oss << "Failed to import " << file_name << ", details:" << result.second;
+      if (!result.first) {
+        oss << "Failed to import " << file_name << ", details:" << result.second;
+      }
     }
 
     db::delete_temp_dir(tmp_dir_name);
 
     auto error_message = std::string{oss.str()};
 
-    if (!error_message.empty()) return Failure(make_error_msg(error_message));
+    if (!error_message.empty()) {
+      return Failure(make_error_msg(error_message));
+    }
 
     return Success();
   } catch (...) {
@@ -300,17 +331,22 @@ result_t json::write_configuration(std::string const& query_payload, std::string
 
 result_t json::read_configuration(std::string const& query_payload, std::string& tarbzip2_base64) noexcept {
   try {
-    if (query_payload.empty()) return Failure(msg_EmptyFilter);
-    if (!system(NULL)) return Failure(msg_SystemCallFailed);
-    if (!tarbzip2_base64.empty())
+    if (query_payload.empty()) {
+      return Failure(msg_EmptyFilter);
+    }
+    if (system(nullptr) == 0) {
+      return Failure(msg_SystemCallFailed);
+    }
+    if (!tarbzip2_base64.empty()) {
       return Failure(make_error_msg("Invalid tarbzip2_base64 stream; buffer is not empty."));
+    }
 
     auto options = ManageDocumentOperation{apiliteral::operation::readconfiguration};
     options.readJsonData({query_payload});
 
-    TLOG(20)<< "read_configuration: operation=<" << options << ">";
+    TLOG(20) << "read_configuration: operation=<" << options << ">";
 
-    confirm(options.operation().compare(apiliteral::operation::readconfiguration) == 0);
+    confirm(options.operation() == apiliteral::operation::readconfiguration);
 
     options.operation(apiliteral::operation::confcomposition);
 
@@ -318,14 +354,15 @@ result_t json::read_configuration(std::string const& query_payload, std::string&
 
     detail::configuration_composition(options, configuration_list);
 
-    TLOG(20)<< "read_configuration: configuration_list=<" << configuration_list << ">";
+    TLOG(20) << "read_configuration: configuration_list=<" << configuration_list << ">";
 
     namespace jsn = artdaq::database::json;
 
     auto resultAST = jsn::object_t{};
 
-    if (!jsn::JsonReader{}.read(configuration_list, resultAST))
+    if (!jsn::JsonReader{}.read(configuration_list, resultAST)) {
       throw runtime_error("read_configuration") << "read_configuration: Unable to read configuration_list";
+    }
 
     auto tmp_dir_name = db::make_temp_dir();
 
@@ -337,41 +374,47 @@ result_t json::read_configuration(std::string const& query_payload, std::string&
       auto configuration = std::string{};
 
       if (!jsn::JsonWriter{}.write(
-              boost::get<jsn::object_t>(boost::get<jsn::object_t>(confElement).at(jsonliteral::query)), configuration))
+              boost::get<jsn::object_t>(boost::get<jsn::object_t>(confElement).at(jsonliteral::query)),
+              configuration)) {
         throw runtime_error("read_configuration") << "read_configuration: Unable to write configuration";
+      }
 
       auto tmpOpts = ManageDocumentOperation{apiliteral::operation::readconfiguration};
       tmpOpts.readJsonData({configuration});
 
       tmpOpts.format(options::data_format_t::origin);
 
-      TLOG(20)<< "read_configuration: looping over configurations operation=<" << tmpOpts.to_string() << ">";
+      TLOG(20) << "read_configuration: looping over configurations operation=<" << tmpOpts.to_string() << ">";
 
       auto file_name = tmp_dir_name + "/" + relative_path_from_collection_name(tmpOpts.collection());
 
       auto result = detail::read_document_file(tmpOpts, file_name);
 
-      if (!result.first) oss << "Failed to import " << file_name << ", details:" << result.second;
+      if (!result.first) {
+        oss << "Failed to import " << file_name << ", details:" << result.second;
+      }
     }
 
     auto error_message = std::string{oss.str()};
 
-    if (!error_message.empty()) return Failure(make_error_msg(error_message));
+    if (!error_message.empty()) {
+      return Failure(make_error_msg(error_message));
+    }
 
     auto buffer = std::string{};
 
     oss.str("");
     oss.clear();
 
-    
     auto file_name = tmp_dir_name + "/userdata" + apiliteral::dbexport_extension;
-    
+
     db::dir_to_tarbzip2base64(tmp_dir_name, file_name);
-    
-    if(!db::read_buffer_from_file(buffer,file_name))
-         return Failure(make_error_msg("Unable to read userdata"));
-    
-    oss << "{\"collection.tar.bzip2.base64\":\"" << buffer << "\"}";
+
+    if (!db::read_buffer_from_file(buffer, file_name)) {
+      return Failure(make_error_msg("Unable to read userdata"));
+    }
+
+    oss << R"({"collection.tar.bzip2.base64":")" << buffer << "\"}";
 
     db::delete_temp_dir(tmp_dir_name);
 
@@ -379,7 +422,7 @@ result_t json::read_configuration(std::string const& query_payload, std::string&
 
     tarbzip2_base64 = oss.str();
 
-    TLOG(20)<< "read_configuration: end";
+    TLOG(20) << "read_configuration: end";
 
     return Success(tarbzip2_base64);
   } catch (...) {
@@ -397,30 +440,35 @@ result_t opts::export_collection(ManageDocumentOperation const& options) noexcep
 
 result_t json::export_collection(std::string const& query_payload) noexcept {
   try {
-    if (query_payload.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) {
+      return Failure(msg_EmptyFilter);
+    }
 
-    if (!system(NULL)) return Failure(msg_SystemCallFailed);
+    if (system(nullptr) == 0) {
+      return Failure(msg_SystemCallFailed);
+    }
 
     auto options = ManageDocumentOperation{apiliteral::operation::exportcollection};
     options.readJsonData({query_payload});
 
-    TLOG(20)<< "export_collection: operation=<" << options << ">";
+    TLOG(20) << "export_collection: operation=<" << options << ">";
 
-    confirm(options.operation().compare(apiliteral::operation::exportcollection) == 0);
+    confirm(options.operation() == apiliteral::operation::exportcollection);
 
     options.operation(apiliteral::operation::readdocument);
     options.format(options::data_format_t::db);
 
-    typedef std::list<JsonData> (*provider_call_t)(ManageDocumentOperation const& /*options*/,
-                                                   JsonData const& /*task_payload*/);
+    using provider_call_t = std::list<JsonData> (*)(const ManageDocumentOperation&, const JsonData&);
 
     auto document_list = std::list<JsonData>{};
 
     detail::read_documents(options, document_list);
 
-    if(document_list.empty()) return Failure(make_error_msg(options.collection() +" is empty.") );
-    
-    TLOG(20)<< "export_collection: found " << document_list.size() << "documents.";
+    if (document_list.empty()) {
+      return Failure(make_error_msg(options.collection() + " is empty."));
+    }
+
+    TLOG(20) << "export_collection: found " << document_list.size() << "documents.";
 
     auto tmp_dir_name = db::make_temp_dir();
 
@@ -431,8 +479,8 @@ result_t json::export_collection(std::string const& query_payload) noexcept {
       oss << file_name << "/" << JSONDocumentBuilder{{document}}.getObjectOUID() << ".json";
 
       if (!db::write_buffer_to_file(document.json_buffer, oss.str())) {
-        throw runtime_error("export_collection") << "export_collection: Unable to write a json file; file="
-                                                 << oss.str();
+        throw runtime_error("export_collection")
+            << "export_collection: Unable to write a json file; file=" << oss.str();
       }
     }
 
@@ -442,7 +490,7 @@ result_t json::export_collection(std::string const& query_payload) noexcept {
 
     db::delete_temp_dir(tmp_dir_name);
 
-    TLOG(13)<< "export_collection: end";
+    TLOG(13) << "export_collection: end";
 
     return Success(oss.str());
   } catch (...) {
@@ -460,16 +508,20 @@ result_t opts::import_collection(ManageDocumentOperation const& options) noexcep
 
 result_t json::import_collection(std::string const& query_payload) noexcept {
   try {
-    if (query_payload.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) {
+      return Failure(msg_EmptyFilter);
+    }
 
-    if (!system(NULL)) return Failure(msg_SystemCallFailed);
+    if (system(nullptr) == 0) {
+      return Failure(msg_SystemCallFailed);
+    }
 
     auto options = ManageDocumentOperation{apiliteral::operation::importcollection};
     options.readJsonData({query_payload});
 
-    TLOG(20)<< "import_collection: operation=<" << options << ">";
+    TLOG(20) << "import_collection: operation=<" << options << ">";
 
-    confirm(options.operation().compare(apiliteral::operation::importcollection) == 0);
+    confirm(options.operation() == apiliteral::operation::importcollection);
 
     options.operation(apiliteral::operation::writedocument);
     options.format(options::data_format_t::db);
@@ -483,12 +535,12 @@ result_t json::import_collection(std::string const& query_payload) noexcept {
     auto document_list = std::list<JsonData>{};
 
     for (auto const& file_name : list_files(tmp_dir_name)) {
-     
-      auto buffer=std::string();
+      auto buffer = std::string();
 
-      if (!db::read_buffer_from_file(buffer, file_name))
+      if (!db::read_buffer_from_file(buffer, file_name)) {
         oss << "Failed to import " << file_name << "\n";
-      
+      }
+
       document_list.emplace_back(JSONDocumentBuilder(buffer).to_string());
     }
 
@@ -496,10 +548,14 @@ result_t json::import_collection(std::string const& query_payload) noexcept {
 
     auto error_message = std::string{oss.str()};
 
-    if (!error_message.empty()) return Failure(make_error_msg(error_message));
+    if (!error_message.empty()) {
+      return Failure(make_error_msg(error_message));
+    }
 
-    if(document_list.empty()) return Failure(make_error_msg(options.collection() +" is empty." ) );
-    
+    if (document_list.empty()) {
+      return Failure(make_error_msg(options.collection() + " is empty."));
+    }
+
     detail::write_documents(options, document_list);
 
     oss.str("");
@@ -507,7 +563,7 @@ result_t json::import_collection(std::string const& query_payload) noexcept {
     oss << "{" << quoted_(apiliteral::option::source) << ":[";
     oss << quoted_(options.sourceFileName()) << "]}";
 
-    TLOG(13)<< "import_collection: end";
+    TLOG(13) << "import_collection: end";
 
     return Success(oss.str());
   } catch (...) {
@@ -524,5 +580,5 @@ void dbcfg::debug::ExportImport() {
 
   dbcfg::debug::detail::ExportImport();
 
-  TLOG(10) <<  "artdaq::database::configuration::ExportImport trace_enable";
+  TLOG(10) << "artdaq::database::configuration::ExportImport trace_enable";
 }

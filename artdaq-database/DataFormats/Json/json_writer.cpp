@@ -4,8 +4,8 @@
 using namespace boost::spirit;
 using namespace artdaq::database;
 
-using artdaq::database::json::object_t;
 using artdaq::database::json::JsonWriter;
+using artdaq::database::json::object_t;
 
 bool JsonWriter::write(object_t const& ast, std::string& out) {
   confirm(out.empty());
@@ -20,9 +20,11 @@ bool JsonWriter::write(object_t const& ast, std::string& out) {
 
   result = karma::generate(sink, grammar, ast);
 
-  result = true;
+  // result = true;
 
-  if (result) out.swap(buffer);
+  if (result) {
+    out.swap(buffer);
+  }
 
   return result;
 }

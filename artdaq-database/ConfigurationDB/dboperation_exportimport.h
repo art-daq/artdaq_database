@@ -19,7 +19,7 @@ result_t import_database(ManageDocumentOperation const& /*options*/) noexcept;
 
 result_t export_collection(ManageDocumentOperation const& /*options*/) noexcept;
 result_t import_collection(ManageDocumentOperation const& /*options*/) noexcept;
-}
+}  // namespace opts
 
 namespace json {
 result_t write_configuration(std::string const& /*task_payload*/, std::string const& /*conf*/) noexcept;
@@ -33,14 +33,14 @@ result_t import_database(std::string const& /*task_payload*/) noexcept;
 
 result_t export_collection(std::string const& /*task_payload*/) noexcept;
 result_t import_collection(std::string const& /*task_payload*/) noexcept;
-}
+}  // namespace json
 
 namespace debug {
 void ExportImport();
 namespace detail {
 void ExportImport();
 }
-}
+}  // namespace debug
 
 }  // namespace configuration
 void set_default_locale();

@@ -21,7 +21,7 @@ result_t find_versions(ManageDocumentOperation const& /*options*/) noexcept;
 result_t find_entities(ManageDocumentOperation const& /*options*/) noexcept;
 result_t add_entity(ManageDocumentOperation const& /*options*/) noexcept;
 result_t remove_entity(ManageDocumentOperation const& /*options*/) noexcept;
-}
+}  // namespace opts
 
 namespace json {
 result_t write_document(std::string const& /*task_payload*/, std::string const& /*conf*/) noexcept;
@@ -32,14 +32,14 @@ result_t find_versions(std::string const& /*task_payload*/) noexcept;
 result_t find_entities(std::string const& /*task_payload*/) noexcept;
 result_t add_entity(std::string const& /*task_payload*/) noexcept;
 result_t remove_entity(std::string const& /*task_payload*/) noexcept;
-}
+}  // namespace json
 
 namespace debug {
 void ManageDocuments();
 namespace detail {
 void ManageDocuments();
 }
-}
+}  // namespace debug
 
 }  // namespace configuration
 }  // namespace database

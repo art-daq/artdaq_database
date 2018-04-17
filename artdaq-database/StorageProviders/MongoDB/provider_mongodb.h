@@ -12,18 +12,18 @@ namespace mongo {
 namespace debug {
 void enable();
 void ReadWrite();
-}
+}  // namespace debug
 
 namespace literal {
 constexpr auto MONGOURI = "mongodb://";
 constexpr auto hostname = "127.0.0.1";
 constexpr auto port = 27017;
 constexpr auto db_name = "test_configuration_db";
-}
+}  // namespace literal
 
 struct DBConfig final {
   DBConfig();
-  DBConfig(std::string uri_);
+  DBConfig(const std::string& uri_);
 
   std::string uri;
   const std::string connectionURI() const { return uri; };
@@ -41,7 +41,7 @@ class MongoDB final {
     PassKeyIdiom() = default;
   };
 
-  explicit MongoDB(DBConfig const& config, PassKeyIdiom const&);
+  explicit MongoDB(DBConfig config, PassKeyIdiom const&);
 
   mongocxx::database& connection();
   mongocxx::cursor list_databases();

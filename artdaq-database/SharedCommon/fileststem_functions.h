@@ -27,6 +27,6 @@ std::string const& dir_to_tarbzip2base64(std::string const& /*tmp_dir_name*/, st
 std::string const& tarbzip2base64_to_dir(std::string const& /*bzip2base64*/, std::string const& /*tmp_dir_name*/);
 
 }  // namespace database
-}  // artdaq
+}  // namespace artdaq
 
 #endif /* _ARTDAQ_DATABASE_FILESYSTEM_FUNCTIONS_H_ */

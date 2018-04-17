@@ -20,17 +20,17 @@ file_paths_t list_files_in_directory(boost::filesystem::path const& path, std::s
 namespace debug {
 void enable();
 void ReadWrite();
-}
+}  // namespace debug
 
 namespace literal {
 constexpr auto FILEURI = "filesystemdb://";
 constexpr auto search_index = "index.json";
 constexpr auto db_name = "test_configuration_db";
-}
+}  // namespace literal
 
 struct DBConfig final {
   DBConfig();
-  DBConfig(std::string uri_);
+  DBConfig(const std::string& uri_);
 
   std::string uri;
   const std::string connectionURI() const { return uri; };
@@ -48,7 +48,7 @@ class FileSystemDB final {
     PassKeyIdiom() {}
   };
 
-  explicit FileSystemDB(DBConfig const& config, PassKeyIdiom const&);
+  explicit FileSystemDB(DBConfig config, PassKeyIdiom const&);
 
   std::string& connection();
 

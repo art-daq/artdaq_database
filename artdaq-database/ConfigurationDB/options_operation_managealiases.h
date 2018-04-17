@@ -70,11 +70,11 @@ namespace debug {
 namespace options {
 void ManageAliases();
 }
-}
+}  // namespace debug
 
 }  // namespace configuration
 }  // namespace database
 }  // namespace artdaq
 
 #endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_MANAGEALIASES_H_ \
-          */
+        */

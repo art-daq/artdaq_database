@@ -1,6 +1,8 @@
 #include "artdaq-database/ConfigurationDB/common.h"
 
 #include "artdaq-database/ConfigurationDB/options_operation_base.h"
+
+#include <utility>
 #include "artdaq-database/ConfigurationDB/shared_helper_functions.h"
 
 #include "artdaq-database/DataFormats/shared_literals.h"
@@ -20,23 +22,15 @@ namespace db = artdaq::database;
 namespace cf = db::configuration;
 namespace dbbt = db::basictypes;
 
-using dbbt::JsonData;
 using cf::OperationBase;
 using cf::options::data_format_t;
+using dbbt::JsonData;
 
-namespace apiliteral = artdaq::database::configapi::literal;
+OperationBase::OperationBase(std::string process_name)
+    : _process_name{std::move(process_name)}, _provider{_getProviderFromURI()} {}
 
-namespace artdaq {
-namespace database {
-std::string expand_environment_variables(std::string var);
-}
-}
+OperationBase::~OperationBase() = default;
 
-OperationBase::OperationBase(std::string const& process_name)
-    : _process_name{process_name}, _provider{_getProviderFromURI()} {}
-
-OperationBase::~OperationBase(){}
-    
 std::string const& OperationBase::operation() const {
   confirm(!_operation.empty());
 
@@ -46,7 +40,7 @@ std::string const& OperationBase::operation() const {
 std::string const& OperationBase::operation(std::string const& operation) {
   confirm(!operation.empty());
 
-  TLOG(20)<< "Options: Updating operation from " << _operation << " to " << operation << ".";
+  TLOG(20) << "Options: Updating operation from " << _operation << " to " << operation << ".";
 
   _operation = operation;
 
@@ -62,7 +56,7 @@ std::string const& OperationBase::collection() const {
 std::string const& OperationBase::collection(std::string const& collection_name) {
   confirm(!collection_name.empty());
 
-  TLOG(21)<< "Options: Updating collection_name from " << _collection_name << " to " << collection_name << ".";
+  TLOG(21) << "Options: Updating collection_name from " << _collection_name << " to " << collection_name << ".";
 
   _collection_name = collection_name;
 
@@ -80,8 +74,8 @@ std::string const& OperationBase::provider(std::string const& provider) {
 
   if (db::not_equal(provider, apiliteral::provider::filesystem) &&
       db::not_equal(provider, apiliteral::provider::mongo) && db::not_equal(provider, apiliteral::provider::ucon)) {
-    throw db::invalid_option_exception("OperationBase") << "Invalid database provider; database provider=" << provider
-                                                        << ".";
+    throw db::invalid_option_exception("OperationBase")
+        << "Invalid database provider; database provider=" << provider << ".";
   }
 
   TLOG(22) << "Options: Updating provider from " << _provider << " to " << provider << ".";
@@ -99,8 +93,8 @@ data_format_t const& OperationBase::format() const {
 data_format_t const& OperationBase::format(data_format_t const& data_format) {
   confirm(data_format != data_format_t::unknown);
 
-  TLOG(23)<< "Options: Updating data_format from " << cf::to_string(_data_format) << " to "
-                                                   << cf::to_string(data_format) << ".";
+  TLOG(23) << "Options: Updating data_format from " << cf::to_string(_data_format) << " to "
+           << cf::to_string(data_format) << ".";
 
   _data_format = data_format;
 
@@ -127,7 +121,7 @@ std::string const& OperationBase::queryFilter(std::string const& query_payload) 
   confirm(!query_payload.empty());
 
   auto tmp = db::dequote(query_payload);
-  TLOG(25)<< "Options: queryFilter args query_payload=<" << tmp << ">.";
+  TLOG(25) << "Options: queryFilter args query_payload=<" << tmp << ">.";
 
   _query_payload = tmp;
 
@@ -201,28 +195,30 @@ bpo::options_description OperationBase::makeProgramOptions() const {
 }
 
 std::string OperationBase::_getProviderFromURI() {
-  auto tmpURI =
-      getenv("ARTDAQ_DATABASE_URI") ? db::expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
+  auto tmpURI = getenv("ARTDAQ_DATABASE_URI") != nullptr ? db::expand_environment_variables("${ARTDAQ_DATABASE_URI}")
+                                                         : std::string("");
 
   auto tmpDB = std::string(apiliteral::provider::mongo);
-  if (std::equal(std::begin(tmpDB), std::end(tmpDB), tmpURI.begin())) return apiliteral::provider::mongo;
+  if (std::equal(std::begin(tmpDB), std::end(tmpDB), tmpURI.begin())) {
+    return apiliteral::provider::mongo;
+  }
 
   return apiliteral::provider::filesystem;
 }
 
 int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
-  if (vm.count("help")) {
+  if (vm.count("help") != 0u) {
     std::cout << makeProgramOptions() << "\n";
     return process_exit_code::HELP;
   }
 
-  if (vm.count(apiliteral::option::result)) {
+  if (vm.count(apiliteral::option::result) != 0u) {
     resultFileName(vm[apiliteral::option::result].as<std::string>());
   } else {
     resultFileName("${HOME}/${0}.result.out");
   }
 
-  if (vm.count(apiliteral::option::searchquery)) {
+  if (vm.count(apiliteral::option::searchquery) != 0u) {
     auto json = vm[apiliteral::option::searchquery].as<std::string>();
     std::ifstream is(json.c_str());
     if (is.good()) {
@@ -251,7 +247,7 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
     }
   */
 
-  if (!vm.count(apiliteral::option::operation)) {
+  if (vm.count(apiliteral::option::operation) == 0u) {
     std::cerr << "Exception from command line processing in " << _process_name << ": no database operation given.\n"
               << "For usage and an options list, please do '" << _process_name << " --help"
               << "'.\n";
@@ -260,15 +256,15 @@ int OperationBase::readProgramOptions(bpo::variables_map const& vm) {
     operation(vm[apiliteral::option::operation].as<std::string>());
   }
 
-  if (vm.count(apiliteral::option::format)) {
+  if (vm.count(apiliteral::option::format) != 0u) {
     format(vm[apiliteral::option::format].as<std::string>());
   }
 
-  if (vm.count(apiliteral::option::collection)) {
+  if (vm.count(apiliteral::option::collection) != 0u) {
     collection(vm[apiliteral::option::collection].as<std::string>());
   }
 
-  if (vm.count(apiliteral::option::searchfilter)) {
+  if (vm.count(apiliteral::option::searchfilter) != 0u) {
     queryFilter(vm[apiliteral::option::searchfilter].as<std::string>());
   }
 
@@ -314,7 +310,9 @@ void OperationBase::readJsonData(JsonData const& data) {
   try {
     auto const& filter_object = boost::get<jsn::object_t>(filterAST.at(apiliteral::option::searchfilter));
     auto filter_string = std::string{};
-    if (!filter_object.empty() && JsonWriter{}.write(filter_object, filter_string)) queryFilter(filter_string);
+    if (!filter_object.empty() && JsonWriter{}.write(filter_object, filter_string)) {
+      queryFilter(filter_string);
+    }
   } catch (...) {
   }
 }
@@ -363,5 +361,5 @@ void cf::debug::options::OperationBase() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::configuration::options::OperationBase trace_enable";
+  TLOG(10) << "artdaq::database::configuration::options::OperationBase trace_enable";
 }

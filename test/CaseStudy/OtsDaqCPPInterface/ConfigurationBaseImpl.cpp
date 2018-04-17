@@ -9,7 +9,6 @@
 #include "artdaq-database/ConfigurationDB/configurationdbifc.h"
 
 #include "artdaq-database/BasicTypes/basictypes.h"
-using artdaq::database::basictypes::FhiclData;
 using artdaq::database::basictypes::JsonData;
 
 namespace artdaq {

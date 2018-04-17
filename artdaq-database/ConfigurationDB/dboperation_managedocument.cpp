@@ -16,17 +16,12 @@
 using namespace artdaq::database::configuration;
 namespace dbcfg = artdaq::database::configuration;
 
-using artdaq::database::configuration::options::data_format_t;
-
-namespace jsonliteral = artdaq::database::dataformats::literal;
-namespace apiliteral = artdaq::database::configapi::literal;
-
 namespace artdaq {
 namespace database {
 bool json_db_to_gui(std::string const&, std::string&);
 bool json_gui_to_db(std::string const&, std::string&);
-}
-}
+}  // namespace database
+}  // namespace artdaq
 
 namespace artdaq {
 namespace database {
@@ -140,8 +135,12 @@ result_t opts::mark_document_deleted(ManageDocumentOperation const& options) noe
 
 result_t json::write_document(std::string const& query_payload, std::string const& conf) noexcept {
   try {
-    if (query_payload.empty()) return Failure(msg_EmptyFilter);
-    if (conf.empty()) return Failure(msg_EmptyDocument);
+    if (query_payload.empty()) {
+      return Failure(msg_EmptyFilter);
+    }
+    if (conf.empty()) {
+      return Failure(msg_EmptyDocument);
+    }
 
     auto options = ManageDocumentOperation{apiliteral::operation::writedocument};
     options.readJsonData({query_payload});
@@ -158,7 +157,9 @@ result_t json::write_document(std::string const& query_payload, std::string cons
 
 result_t json::read_document(std::string const& query_payload, std::string& conf) noexcept {
   try {
-    if (query_payload.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) {
+      return Failure(msg_EmptyFilter);
+    }
 
     auto options = ManageDocumentOperation{apiliteral::operation::readdocument};
     options.readJsonData({query_payload});
@@ -178,7 +179,9 @@ result_t json::read_document(std::string const& query_payload, std::string& conf
 
 result_t json::find_versions(std::string const& query_payload) noexcept {
   try {
-    if (query_payload.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) {
+      return Failure(msg_EmptyFilter);
+    }
 
     auto options = ManageDocumentOperation{apiliteral::operation::findversions};
     options.readJsonData({query_payload});
@@ -195,7 +198,9 @@ result_t json::find_versions(std::string const& query_payload) noexcept {
 
 result_t json::find_entities(std::string const& query_payload) noexcept {
   try {
-    if (query_payload.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) {
+      return Failure(msg_EmptyFilter);
+    }
 
     auto options = ManageDocumentOperation{apiliteral::operation::findentities};
     options.readJsonData({query_payload});
@@ -212,14 +217,16 @@ result_t json::find_entities(std::string const& query_payload) noexcept {
 
 result_t json::add_entity(std::string const& query_payload) noexcept {
   try {
-    if (query_payload.empty()) return Failure(msg_EmptyFilter);
-    TLOG(10) <<  "add_entity 1";
+    if (query_payload.empty()) {
+      return Failure(msg_EmptyFilter);
+    }
+    TLOG(10) << "add_entity 1";
 
     auto options = ManageDocumentOperation{apiliteral::operation::addentity};
-    TLOG(10) <<  "add_entity 2";
+    TLOG(10) << "add_entity 2";
 
     options.readJsonData({query_payload});
-    TLOG(10) <<  "add_entity 2";
+    TLOG(10) << "add_entity 2";
 
     auto returnValue = std::string{};
 
@@ -233,7 +240,9 @@ result_t json::add_entity(std::string const& query_payload) noexcept {
 
 result_t json::remove_entity(std::string const& query_payload) noexcept {
   try {
-    if (query_payload.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) {
+      return Failure(msg_EmptyFilter);
+    }
 
     auto options = ManageDocumentOperation{apiliteral::operation::rmentity};
     options.readJsonData({query_payload});
@@ -250,7 +259,9 @@ result_t json::remove_entity(std::string const& query_payload) noexcept {
 
 result_t json::mark_document_readonly(std::string const& query_payload) noexcept {
   try {
-    if (query_payload.empty()) return Failure(msg_EmptyFilter);
+    if (query_payload.empty()) {
+      return Failure(msg_EmptyFilter);
+    }
 
     auto options = ManageDocumentOperation{apiliteral::operation::markreadonly};
     options.readJsonData({query_payload});
@@ -289,5 +300,5 @@ void dbcfg::debug::ManageDocuments() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
   dbcfg::debug::detail::ManageDocuments();
-  TLOG(10) <<  "artdaq::database::configuration::ManageDocuments trace_enable";
+  TLOG(10) << "artdaq::database::configuration::ManageDocuments trace_enable";
 }

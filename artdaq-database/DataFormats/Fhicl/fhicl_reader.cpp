@@ -3,8 +3,8 @@
 #include "artdaq-database/DataFormats/Fhicl/convertfhicl2jsondb.h"
 #include "artdaq-database/DataFormats/Fhicl/fhicl_reader.h"
 #include "artdaq-database/DataFormats/Fhicl/fhicl_types.h"
-#include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
 #include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
+#include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
 #include "artdaq-database/DataFormats/Json/json_types.h"
 
 #ifdef TRACE_NAME
@@ -27,21 +27,23 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
   TLOG(12) << "read_data() begin";
 
   try {
-    using boost::spirit::qi::phrase_parse;
     using boost::spirit::qi::blank;
+    using boost::spirit::qi::phrase_parse;
 
     using artdaq::database::fhicl::fhicl_comments_parser_grammar;
     using artdaq::database::fhicl::pos_iterator_t;
-    using artdaq::database::fhicljson::fcl2jsondb;
-    using artdaq::database::fhicljson::extra_opts;
     using artdaq::database::fhicljson::datapair_t;
+    using artdaq::database::fhicljson::extra_opts;
+    using artdaq::database::fhicljson::fcl2jsondb;
 
     auto comments = comments_t();
     fhicl_comments_parser_grammar<pos_iterator_t> grammar;
     auto start = pos_iterator_t(in.begin());
     auto end = pos_iterator_t(in.end());
 
-    if (!phrase_parse(start, end, grammar, blank, comments)) comments[0] = "No comments";
+    if (!phrase_parse(start, end, grammar, blank, comments)) {
+      comments[0] = "No comments";
+    }
 
     auto object = jsn::object_t();
 
@@ -89,9 +91,9 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
 
       for (auto const& fhicl_element : fhicl_table) {
         if (fhicl_element.second.in_prolog && opts.readProlog) {
-          datapair_t pair = std::move(fcl2jsondb(std::forward_as_tuple(fhicl_element, fhicl_element, comments, opts)));
-          data.push_back(std::move(pair.first));
-          metadata.push_back(std::move(pair.second));
+          datapair_t pair = fcl2jsondb(std::forward_as_tuple(fhicl_element, fhicl_element, comments, opts));
+          data.push_back(pair.first);
+          metadata.push_back(pair.second);
         }
       }
     }
@@ -112,9 +114,9 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
 
       for (auto const& fhicl_element : fhicl_table) {
         if (!fhicl_element.second.in_prolog && opts.readMain) {
-          datapair_t pair = std::move(fcl2jsondb(std::forward_as_tuple(fhicl_element, fhicl_element, comments, opts)));
-          data.push_back(std::move(pair.first));
-          metadata.push_back(std::move(pair.second));
+          datapair_t pair = fcl2jsondb(std::forward_as_tuple(fhicl_element, fhicl_element, comments, opts));
+          data.push_back(pair.first);
+          metadata.push_back(pair.second);
         }
       }
     }
@@ -138,8 +140,8 @@ bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
   confirm(json_array.empty());
 
   try {
-    using boost::spirit::qi::phrase_parse;
     using boost::spirit::qi::blank;
+    using boost::spirit::qi::phrase_parse;
 
     using artdaq::database::fhicl::fhicl_comments_parser_grammar;
     using artdaq::database::fhicl::pos_iterator_t;
@@ -165,10 +167,10 @@ bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
       auto& object = boost::get<jsn::object_t>(array.back());
       object.push_back(jsn::data_t::make(literal::linenum, comment.first));
 
-      if(fcl::from_json_string(fcl::to_json_string(comment.second))!=comment.second){
-	  TLOG(13)<<"Warning non reversable convertion\nbegin" <<comment.second;
-	  TLOG(13)<<"convd" << fcl::to_json_string(comment.second);
-	  TLOG(13)<<"restd" << fcl::from_json_string(fcl::to_json_string(comment.second));
+      if (fcl::from_json_string(fcl::to_json_string(comment.second)) != comment.second) {
+        TLOG(13) << "Warning non reversable convertion\nbegin" << comment.second;
+        TLOG(13) << "convd" << fcl::to_json_string(comment.second);
+        TLOG(13) << "restd" << fcl::from_json_string(fcl::to_json_string(comment.second));
       }
       object.push_back(jsn::data_t::make(literal::value, fcl::to_json_string(comment.second)));
     }
@@ -189,5 +191,5 @@ void artdaq::database::fhicl::debug::FhiclReader() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::fhicl::FhiclReader trace_enable";
+  TLOG(10) << "artdaq::database::fhicl::FhiclReader trace_enable";
 }

@@ -83,7 +83,7 @@ struct JsonDeserializer {
   int array_elemnt_index = -1;
 };
 
-}  // namespace json
+}  // namespace jsonconvert
 }  // namespace database
 }  // namespace artdaq
 #endif /* _ARTDAQ_DATABASE_JSON_READER_H_ */

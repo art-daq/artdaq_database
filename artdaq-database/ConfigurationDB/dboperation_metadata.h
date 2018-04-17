@@ -16,20 +16,20 @@ using artdaq::database::configuration::ManageDocumentOperation;
 result_t list_databases(ManageDocumentOperation const& /*options*/, std::string& /*conf*/) noexcept;
 result_t list_collections(ManageDocumentOperation const& /*options*/) noexcept;
 result_t read_dbinfo(ManageDocumentOperation const& /*options*/, std::string& /*conf*/) noexcept;
-}
+}  // namespace opts
 
 namespace json {
 result_t list_databases(std::string const& /*task_payload*/) noexcept;
 result_t list_collections(std::string const& /*task_payload*/) noexcept;
 result_t read_dbinfo(std::string const& /*task_payload*/) noexcept;
-}
+}  // namespace json
 
 namespace debug {
 void Metadata();
 namespace detail {
 void Metadata();
 }
-}
+}  // namespace debug
 
 }  // namespace configuration
 }  // namespace database

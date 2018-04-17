@@ -5,7 +5,7 @@ typedef std::pair<bool, std::string> result_t;
 
 void set_default_locale();
 
-result_t read_document(std::string const& query_payload);                                     // manage doc
+result_t read_document(std::string const& query_payload);  // manage doc
 
 result_t write_document(std::string const& query_payload, std::string const& json_document);  // managedoc
 result_t mark_document_readonly(std::string const& query_payload);                            // manage doc
@@ -30,8 +30,8 @@ result_t create_configuration(std::string const& query_payload);       // manage
 result_t assign_configuration(std::string const& query_payload);       // manage configs
 result_t remove_configuration(std::string const& query_payload);       // manage configs
 
-result_t read_configuration(std::string const& query_payload);                                    // exportimport
-result_t write_configuration(std::string const& query_payload, std::string const& tarbz2base64);  // exportimport
+result_t read_configuration(std::string const& query_payload);                                     // exportimport
+result_t write_configuration(std::string const& query_payload, std::string const& json_document);  // exportimport
 
 result_t export_configuration(std::string const& query_payload);  // exportimport
 result_t import_configuration(std::string const& query_payload);  // exportimport
@@ -44,7 +44,6 @@ result_t list_databases(std::string const& query_payload);    // metadata
 result_t read_dbinfo(std::string const& query_payload);       // metadata
 result_t list_collections(std::string const& query_payload);  // metadata
 
-result_t fhicl_to_json(std::string const& fcl, std::string const& filename); // utility function
-result_t json_to_fhicl(std::string const& jsn, std::string& filename); // utility function
+result_t fhicl_to_json(std::string const& fcl, std::string const& filename);  // utility function
+result_t json_to_fhicl(std::string const& jsn, std::string& filename);        // utility function
 void enable_trace();
-

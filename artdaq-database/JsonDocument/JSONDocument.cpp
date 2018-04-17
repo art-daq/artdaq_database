@@ -1,5 +1,5 @@
-#include "artdaq-database/DataFormats/Json/json_types_impl.h"
 #include "artdaq-database/JsonDocument/JSONDocument.h"
+#include "artdaq-database/DataFormats/Json/json_types_impl.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -7,24 +7,25 @@
 
 #define TRACE_NAME "JSNU:Document_C"
 
-using artdaq::database::json::object_t;
-using artdaq::database::json::value_t;
 using artdaq::database::json::array_t;
+using artdaq::database::json::object_t;
 using artdaq::database::json::type_t;
+using artdaq::database::json::value_t;
 
-using artdaq::database::json::JsonReader;
 using artdaq::database::json::JsonWriter;
 
 using namespace artdaq::database;
-using namespace artdaq::database::docrecord;
+using artdaq::database::docrecord::JSONDocument;
+using artdaq::database::docrecord::split_path;
 
 namespace dbdr = artdaq::database::docrecord;
 
 std::string print_visitor(value_t const&);
 
 void validate(path_t const& path, std::string const& caller) {
-  if (path.empty())
+  if (path.empty()) {
     throw invalid_argument("JSONDocument") << "Failed calling " << caller << "(): Invalid path; path is empty";
+  }
 }
 
 std::vector<path_t> split_path_validate(path_t const& path, std::string const& caller) {
@@ -36,8 +37,9 @@ std::vector<path_t> split_path_validate(path_t const& path, std::string const& c
 
   auto path_tokens = split_path(path);
 
-  if (path_tokens.empty())
+  if (path_tokens.empty()) {
     throw invalid_argument("JSONDocument") << "Failed calling " << caller << "(): Invalid path; path=" << path;
+  }
 
   std::reverse(path_tokens.begin(), path_tokens.end());
 
@@ -78,7 +80,9 @@ value_t const& JSONDocument::findChildValue(path_t const& path) const try {
 
     auto const& matchedValue = childDocument.at(path_token);
 
-    if (currentDepth == 0) return matchedValue;
+    if (currentDepth == 0) {
+      return matchedValue;
+    }
 
     return recurse(matchedValue, currentDepth - 1);
   };
@@ -175,8 +179,8 @@ JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t con
     tmpJson.clear();
 
     if (childDocument.count(path_token) == 0) {
-      throw notfound_exception("JSONDocument") << "Failed calling replaceChild(): Replace failed for " << path_token
-                                               << ", search path =<" << path << ">.";
+      throw notfound_exception("JSONDocument")
+          << "Failed calling replaceChild(): Replace failed for " << path_token << ", search path =<" << path << ">.";
     }
 
     auto& matchedValue = childDocument.at(path_token);
@@ -236,7 +240,7 @@ JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t cons
 
     tmpJson.clear();
     TLOG(12) << "insertChild() recurse() args childValue=<" << (JsonWriter().write(childDocument, tmpJson), tmpJson)
-                                                          << ">";
+             << ">";
 
     auto numberOfChildren = childDocument.count(path_token);
 
@@ -245,8 +249,8 @@ JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t cons
                                                << ", search path =<" << path << ">; Child exists, call replace instead";
 
     } else if (currentDepth != 0 && numberOfChildren == 0) {
-      throw notfound_exception("JSONDocument") << "Failed calling insertChild(): Insert failed for" << path_token
-                                               << ", search path =<" << path << ">.";
+      throw notfound_exception("JSONDocument")
+          << "Failed calling insertChild(): Insert failed for" << path_token << ", search path =<" << path << ">.";
     } else if (currentDepth == 0 && numberOfChildren == 0) {
       auto const& returnValue = childDocument[path_token] = newValue;
       return returnValue;
@@ -271,8 +275,8 @@ JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t cons
 
 // returns old child
 JSONDocument JSONDocument::deleteChild(path_t const& path) try {
-  TLOG(13)<< "deleteChild() begin json_buffer=<" << cached_json_buffer() << ">";
-  TLOG(13)<< "deleteChild() args  path=<" << path << ">";
+  TLOG(13) << "deleteChild() begin json_buffer=<" << cached_json_buffer() << ">";
+  TLOG(13) << "deleteChild() args  path=<" << path << ">";
 
   auto path_tokens = split_path_validate(path, "deleteChild");
 
@@ -280,7 +284,7 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) try {
 
   std::function<value_t(value_t&, std::size_t)> recurse = [&](value_t& childValue,
                                                               std::size_t currentDepth) -> value_t {
-    TLOG(13)<< "deleteChild() recurse() args currentDepth=" << currentDepth;
+    TLOG(13) << "deleteChild() recurse() args currentDepth=" << currentDepth;
 
     auto const& path_token = path_tokens.at(currentDepth);
 
@@ -294,12 +298,12 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) try {
     auto& childDocument = boost::get<object_t>(childValue);
 
     tmpJson.clear();
-    TLOG(13)<< "deleteChild() recurse() args childValue=<" << (JsonWriter().write(childDocument, tmpJson), tmpJson)
-                                                          << ">";
+    TLOG(13) << "deleteChild() recurse() args childValue=<" << (JsonWriter().write(childDocument, tmpJson), tmpJson)
+             << ">";
 
     if (childDocument.count(path_token) == 0) {
-      throw notfound_exception("JSONDocument") << "Failed calling deleteChild(): Delete failed for " << path_token
-                                               << ", search path =<" << path << ">.";
+      throw notfound_exception("JSONDocument")
+          << "Failed calling deleteChild(): Delete failed for " << path_token << ", search path =<" << path << ">.";
     }
 
     auto& matchedValue = childDocument.at(path_token);
@@ -314,14 +318,14 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) try {
   auto deleted_value = recurse(_value, path_tokens.size() - 1);
   update_json_buffer();
 
-  TLOG(13)<< "deleteChild() deleted child value=" << print_visitor(deleted_value);
-  TLOG(13)<< "deleteChild() resultDocument=<" << cached_json_buffer() << ">";
-  TLOG(13)<< "deleteChild() Delete succeeded.";
+  TLOG(13) << "deleteChild() deleted child value=" << print_visitor(deleted_value);
+  TLOG(13) << "deleteChild() resultDocument=<" << cached_json_buffer() << ">";
+  TLOG(13) << "deleteChild() Delete succeeded.";
   //    if (path == "_id") std::replace(return_json.begin(), return_json.end(), '$', '_');
 
   return JSONDocument(deleted_value);
 } catch (std::exception& ex) {
-  TLOG(13)<< "deleteChild() Delete failed; Error:" << ex.what();
+  TLOG(13) << "deleteChild() Delete failed; Error:" << ex.what();
   throw;
 }
 
@@ -340,8 +344,8 @@ JSONDocument JSONDocument::appendChild(JSONDocument const& newChild, path_t cons
 
   update_json_buffer();
 
-  TLOG(13)<< "appendChild() resultDocument=<" << cached_json_buffer() << ">";
-  TLOG(13)<< "appendChild() Append succeeded.";
+  TLOG(13) << "appendChild() resultDocument=<" << cached_json_buffer() << ">";
+  TLOG(13) << "appendChild() Append succeeded.";
 
   return {newValue};
 } catch (std::exception& ex) {
@@ -399,5 +403,5 @@ void dbdr::debug::JSONDocument() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::JSONDocument trace_enable";
+  TLOG(10) << "artdaq::database::JSONDocument trace_enable";
 }

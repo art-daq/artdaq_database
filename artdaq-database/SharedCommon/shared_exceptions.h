@@ -18,13 +18,13 @@ class exception : public cet::exception {
   explicit exception(Category const& category) : cet::exception{category} {}
 
   exception(Category const& category, std::string const& message) : cet::exception{category, message} {}
-/*
-  template <typename W>
-  exception& operator<<(W const& w) {
-    this->append(w);
-    return *this;
-  }
-*/  
+  /*
+    template <typename W>
+    exception& operator<<(W const& w) {
+      this->append(w);
+      return *this;
+    }
+  */
 };
 
 class invalid_argument : public exception {

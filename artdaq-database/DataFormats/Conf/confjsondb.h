@@ -18,7 +18,7 @@ namespace conf {
 namespace debug {
 void ConfReader();
 void ConfWriter();
-}
+}  // namespace debug
 }  // namespace conf
 
 }  // namespace database

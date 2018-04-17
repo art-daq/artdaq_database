@@ -5,8 +5,8 @@
 #include "artdaq-database/DataFormats/common.h"
 #include "artdaq-database/DataFormats/shared_literals.h"
 
-#include "artdaq-database/DataFormats/Fhicl/fhicl_types.h"
 #include "artdaq-database/DataFormats/Fhicl/fhicl_reader.h"
+#include "artdaq-database/DataFormats/Fhicl/fhicl_types.h"
 #include "artdaq-database/DataFormats/Json/json_types.h"
 
 namespace artdaq {
@@ -19,8 +19,8 @@ namespace jsn = artdaq::database::json;
 namespace literal = artdaq::database::dataformats::literal;
 
 using artdaq::database::fhicl::comment_t;
-using artdaq::database::fhicl::linenum_t;
 using artdaq::database::fhicl::comments_t;
+using artdaq::database::fhicl::linenum_t;
 
 using datapair_t = std::pair<jsn::data_t, jsn::data_t>;
 using valuetuple_t = std::tuple<jsn::key_t const&, jsn::value_t const&, jsn::value_t const&>;

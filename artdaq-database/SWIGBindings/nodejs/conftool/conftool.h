@@ -12,7 +12,7 @@ result_t create_new_global_configuration_ui(std::string const& query_payload);
 result_t find_configuration_versions_ui(std::string const& query_payload);
 result_t find_configuration_entities_ui(std::string const& query_payload);
 result_t load_globalconfiguration_ui(std::string const& query_payload);
-result_t store_globalconfiguration_ui(std::string const& query_payload, std::string const& tarbz2base64);
+result_t store_globalconfiguration_ui(std::string const& query_payload, std::string const& json_document);
 result_t list_databases(std::string const& query_payload);
 result_t read_dbinfo(std::string const& query_payload);
 result_t list_collections(std::string const& query_payload);

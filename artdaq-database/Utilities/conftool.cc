@@ -4,7 +4,6 @@
 #include "artdaq-database/ConfigurationDB/conftoolifc.h"
 
 namespace db = artdaq::database;
-namespace bpo = boost::program_options;
 namespace impl = db::configuration::json;
 
 using Options = db::configuration::ManageDocumentOperation;
@@ -32,14 +31,14 @@ int main(int argc, char* argv[]) try {
 
   auto returned = std::string{result.second};
 
-  if (options->operation().compare(apiliteral::operation::readdocument) == 0 ||
-      options->operation().compare(apiliteral::operation::readconfiguration) == 0) {
+  if (options->operation() == apiliteral::operation::readdocument ||
+      options->operation() == apiliteral::operation::readconfiguration) {
     db::write_buffer_to_file(returned, options->resultFileName());
     std::cout << "Wrote file:" << options->resultFileName() << "\n";
 
     return process_exit_code::SUCCESS;
-  } else if (options->operation().compare(apiliteral::operation::writedocument) == 0 ||
-             options->operation().compare(apiliteral::operation::writeconfiguration) == 0) {
+  } else if (options->operation() == apiliteral::operation::writedocument ||
+             options->operation() == apiliteral::operation::writeconfiguration) {
     /* db::write_buffer_to_file(returned,options->resultFileName());
      std::cout << "Wrote responce to file:" << file_res_name << "\n";
      */

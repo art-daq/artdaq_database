@@ -9,7 +9,7 @@
 
 namespace artdaq {
 namespace database {
-  
+
 using decimal = double;
 using integer = int64_t;
 namespace sharedtypes {

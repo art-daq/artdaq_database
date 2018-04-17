@@ -20,6 +20,7 @@
 #include <mongocxx/instance.hpp>
 #include <mongocxx/options/find.hpp>
 #include <mongocxx/pipeline.hpp>
+#include <utility>
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -28,22 +29,9 @@
 #define TRACE_NAME "PRVDR:MongoDB_C"
 
 using namespace artdaq::database;
-namespace db = artdaq::database;
-
-namespace literal = db::mongo::literal;
-namespace bbs = bsoncxx::builder::stream;
-
-using bsoncxx::builder::stream::document;
-using bsoncxx::builder::stream::open_document;
-using bsoncxx::builder::stream::close_document;
-using bsoncxx::builder::stream::open_array;
-using bsoncxx::builder::stream::close_array;
-using bsoncxx::builder::stream::finalize;
-using bsoncxx::builder::concatenate_doc;
 
 using artdaq::database::mongo::DBConfig;
 using artdaq::database::mongo::MongoDB;
-using artdaq::database::basictypes::JsonData;
 
 mongocxx::instance& getInstance() {
   static mongocxx::instance _instance{};
@@ -53,18 +41,19 @@ mongocxx::instance& getInstance() {
 DBConfig::DBConfig()
     : uri{std::string{literal::MONGOURI} + literal::hostname + ":" + std::to_string(literal::port) + "/" +
           literal::db_name} {
-  auto tmpURI =
-      getenv("ARTDAQ_DATABASE_URI") ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
+  auto tmpURI = getenv("ARTDAQ_DATABASE_URI") != nullptr ? expand_environment_variables("${ARTDAQ_DATABASE_URI}")
+                                                         : std::string("");
 
   auto prefixURI = std::string{literal::MONGOURI};
-  if (tmpURI.length() > prefixURI.length() && std::equal(prefixURI.begin(), prefixURI.end(), tmpURI.begin()))
+  if (tmpURI.length() > prefixURI.length() && std::equal(prefixURI.begin(), prefixURI.end(), tmpURI.begin())) {
     uri = tmpURI;
+  }
 }
 
-DBConfig::DBConfig(std::string uri_) : uri{uri_} { confirm(!uri_.empty()); }
+DBConfig::DBConfig(const std::string& uri_) : uri{uri_} { confirm(!uri_.empty()); }
 
-MongoDB::MongoDB(DBConfig const& config, PassKeyIdiom const&)
-    : _config{config},
+MongoDB::MongoDB(DBConfig config, PassKeyIdiom const& /*unused*/)
+    : _config{std::move(config)},
       _instance{getInstance()},
       _client{mongocxx::uri{_config.connectionURI()}},
       _connection{_client[_client.uri().database()]} {}
@@ -80,7 +69,9 @@ mongocxx::database& MongoDB::connection() {
   auto collection = _connection.collection(system_metadata);
   auto filter = bsoncxx::builder::core(false);
 
-  if (collection.count(filter.view_document()) > 0) return _connection;
+  if (collection.count(filter.view_document()) > 0) {
+    return _connection;
+  }
 
   auto bson_document = compat::from_json(
       "{" + make_database_metadata("artdaq", expand_environment_variables(_config.connectionURI())) + "}");

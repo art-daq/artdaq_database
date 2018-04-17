@@ -12,21 +12,14 @@
 
 namespace db = artdaq::database;
 namespace bpo = boost::program_options;
-namespace impl = db::configuration::json;
 
-using artdaq::database::basictypes::JsonData;
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocumentMigrator;
-using artdaq::database::overlay::ovlDatabaseRecord;
-namespace ovl = artdaq::database::overlay;
 
-namespace jsonliteral = db::dataformats::literal;
-namespace apiliteral = db::configapi::literal;
+using test_case = bool (*)(const std::string&, const std::string&);
 
-typedef bool (*test_case)(std::string const& /*input*/, std::string const& /*compare*/);
-
-bool test_migratev1v2(std::string const&, std::string const&);
+bool test_migratev1v2(std::string const& /*source*/, std::string const& /*compare*/);
 
 int main(int argc, char* argv[]) try {
 #if 0
@@ -38,7 +31,7 @@ int main(int argc, char* argv[]) try {
   artdaq::database::useFakeTime(true);
 
   artdaq::database::docrecord::debug::JSONDocumentMigrator();
-  
+
   // Get the input parameters via the boost::program_options library,
   // designed to make it relatively simple to define arguments and
   // issue errors if argument list is supplied incorrectly
@@ -61,19 +54,19 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::INVALID_ARGUMENT;
   }
 
-  if (vm.count("help")) {
+  if (vm.count("help") != 0u) {
     std::cout << desc << std::endl;
     return process_exit_code::HELP;
   }
 
-  if (!vm.count("source")) {
+  if (vm.count("source") == 0u) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no source file given.\n"
               << "For usage and an options list, please do '" << argv[0] << " --help"
               << "'.\n";
     return process_exit_code::INVALID_ARGUMENT | 1;
   }
 
-  if (!vm.count("compare")) {
+  if (vm.count("compare") == 0u) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no compare file given.\n"
               << "For usage and an options list, please do '" << argv[0] << " --help"
               << "'.\n";
@@ -108,8 +101,8 @@ int main(int argc, char* argv[]) try {
 
   auto testResult = runTest(test_name)(source_buffer, compare_buffer);
 
-  return !testResult;
-}catch (...) {
+  return static_cast<int>(!testResult);
+} catch (...) {
   std::cout << "Process exited with error: " << ::debug::current_exception_diagnostic_information();
   return process_exit_code::UNCAUGHT_EXCEPTION;
 }
@@ -118,7 +111,7 @@ bool test_migratev1v2(std::string const& source, std::string const& compare) {
   confirm(!source.empty());
   confirm(!compare.empty());
 
-  JSONDocument rdoc =JSONDocumentMigrator{{source}};
+  JSONDocument rdoc = JSONDocumentMigrator{{source}};
   JSONDocument cdoc{compare};
 
   JSONDocumentBuilder returned{rdoc};
@@ -128,7 +121,9 @@ bool test_migratev1v2(std::string const& source, std::string const& compare) {
 
   auto result = returned == expected;
 
-  if (result.first) return true;
+  if (result.first) {
+    return true;
+  }
 
   std::cout << "Error returned!=expected.\n";
   std::cerr << "returned:\n" << returned << "\n";

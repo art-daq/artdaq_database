@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "artdaq-database/ConfigurationDB/common.h"
 
 #include "artdaq-database/ConfigurationDB/options_operations.h"
@@ -21,15 +23,11 @@ namespace db = artdaq::database;
 namespace cf = db::configuration;
 namespace dbbt = db::basictypes;
 
-namespace apiliteral = artdaq::database::configapi::literal;
-
-using dbbt::JsonData;
 using cf::BulkOperations;
 using cf::options::data_format_t;
+using dbbt::JsonData;
 
-namespace apiliteral = artdaq::database::configapi::literal;
-
-BulkOperations::BulkOperations(std::string const& process_name) : _process_name{process_name} {}
+BulkOperations::BulkOperations(std::string process_name) : _process_name{std::move(process_name)} {}
 
 std::string const& BulkOperations::bulkOperations() const {
   confirm(!_bulk_operations.empty());
@@ -43,7 +41,7 @@ std::string const& BulkOperations::bulkOperations(std::string const& query_paylo
   confirm(!query_payload.empty());
 
   auto tmp = db::dequote(query_payload);
-  TLOG(25)<< "Options: bulkOperations args query_payload=<" << tmp << ">.";
+  TLOG(25) << "Options: bulkOperations args query_payload=<" << tmp << ">.";
 
   _bulk_operations = tmp;
 
@@ -74,12 +72,12 @@ bpo::options_description BulkOperations::makeProgramOptions() const {
 }
 
 int BulkOperations::readProgramOptions(bpo::variables_map const& vm) {
-  if (vm.count("help")) {
+  if (vm.count("help") != 0u) {
     std::cout << makeProgramOptions() << "\n";
     return process_exit_code::HELP;
   }
 
-  if (vm.count(apiliteral::option::bulkoperations)) {
+  if (vm.count(apiliteral::option::bulkoperations) != 0u) {
     auto json = vm[apiliteral::option::bulkoperations].as<std::string>();
     std::ifstream is(json.c_str());
     if (is.good()) {
@@ -139,5 +137,5 @@ void cf::debug::options::BulkOperations() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::configuration::options::BulkOperations trace_enable";
+  TLOG(10) << "artdaq::database::configuration::options::BulkOperations trace_enable";
 }

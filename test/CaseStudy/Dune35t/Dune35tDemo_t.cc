@@ -19,8 +19,8 @@ namespace bpo = boost::program_options;
 
 using Options = cf::ManageDocumentOperation;
 
-using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::basictypes::JsonData;
+using artdaq::database::docrecord::JSONDocument;
 
 int main(int argc, char* argv[]) try {
   artdaq::database::configuration::debug::ExportImport();
@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) try {
   artdaq::database::configuration::debug::ManageConfigs();
   artdaq::database::configuration::debug::ManageDocuments();
   artdaq::database::configuration::debug::Metadata();
-  
+
   artdaq::database::configuration::debug::detail::ExportImport();
   artdaq::database::configuration::debug::detail::ManageAliases();
   artdaq::database::configuration::debug::detail::ManageConfigs();
@@ -40,11 +40,11 @@ int main(int argc, char* argv[]) try {
   artdaq::database::configuration::debug::options::ManageDocuments();
   artdaq::database::configuration::debug::options::ManageConfigs();
   artdaq::database::configuration::debug::options::ManageAliases();
-  
+
   artdaq::database::configuration::debug::MongoDB();
   artdaq::database::configuration::debug::FileSystemDB();
   artdaq::database::configuration::debug::UconDB();
-  
+
   artdaq::database::filesystem::debug::enable();
   artdaq::database::mongo::debug::enable();
 
@@ -117,12 +117,12 @@ int main(int argc, char* argv[]) try {
                                                                                   find_versions, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findentities,
                                                                                   find_entities, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::addversionalias,
-                                                                                  add_version_alias, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
+      apiliteral::operation::addversionalias, add_version_alias, options_string);
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::rmversionalias,
                                                                                   remove_version_alias, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findversionalias,
-                                                                                  find_version_aliases, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(
+      apiliteral::operation::findversionalias, find_version_aliases, options_string);
 
   cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::listdatabases,
                                                                                   list_databases, options_string);
@@ -134,9 +134,9 @@ int main(int argc, char* argv[]) try {
                                                                                   read_dbinfo, options_string);
 
   try {
-      db::read_buffer_from_file(test_document,file_src_name);
+    db::read_buffer_from_file(test_document, file_src_name);
 
-      cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
+    cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
         apiliteral::operation::writedocument, write_document, options_string, test_document);
 
     cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
@@ -154,17 +154,17 @@ int main(int argc, char* argv[]) try {
     std::cout << ::debug::current_exception_diagnostic_information();
     return process_exit_code::FAILURE;
   }
-  
-  if(result.second.empty()){
-    std::cout << "Test failed; error message: result is empty." << "\n";
+
+  if (result.second.empty()) {
+    std::cout << "Test failed; error message: result is empty."
+              << "\n";
     return process_exit_code::FAILURE;
   }
-  
+
   auto returned = std::string{result.second};
 
-        auto expected=std::string{};
-      db::read_buffer_from_file(expected,file_res_name);
-  
+  auto expected = std::string{};
+  db::read_buffer_from_file(expected, file_res_name);
 
   using cfo::data_format_t;
 
@@ -199,7 +199,8 @@ int main(int argc, char* argv[]) try {
   std::cout << "First mismatch at position " << std::distance(expected.begin(), mismatch.first) << ", (exp,ret)=(0x"
             << std::hex << (unsigned int)*mismatch.first << ",0x" << (unsigned int)*mismatch.second << ")\n";
 
-  auto file_out_name = std::string(db::filesystem::mkdir(tmpdir)).append("/")
+  auto file_out_name = std::string(db::filesystem::mkdir(tmpdir))
+                           .append("/")
                            .append(argv[0])
                            .append("-")
                            .append(options.operation())
@@ -207,8 +208,7 @@ int main(int argc, char* argv[]) try {
                            .append(basename((char*)file_src_name.c_str()))
                            .append(".txt");
 
-
-  db::write_buffer_to_file(returned,file_out_name);
+  db::write_buffer_to_file(returned, file_out_name);
 
   std::cout << "Wrote file:" << file_out_name << "\n";
 

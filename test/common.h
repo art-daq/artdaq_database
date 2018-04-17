@@ -1,10 +1,10 @@
 #ifndef _ARTDAQ_DATABASE_TEST_COMMON_H_
 #define _ARTDAQ_DATABASE_TEST_COMMON_H_
 
-#include "artdaq-database/SharedCommon/sharedcommon_common.h"
 #include "artdaq-database/DataFormats/shared_literals.h"
 #include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 #include "artdaq-database/SharedCommon/helper_functions.h"
+#include "artdaq-database/SharedCommon/sharedcommon_common.h"
 
 #include <boost/program_options.hpp>
 

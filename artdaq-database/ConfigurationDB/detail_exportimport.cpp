@@ -24,30 +24,21 @@
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
-namespace cfj = db::configuration::json;
 
 namespace cftd = cf::debug::detail;
-namespace jsonliteral = db::dataformats::literal;
-namespace apiliteral = db::configapi::literal;
 
 using cf::ManageDocumentOperation;
-using cf::options::data_format_t;
 
 using Options = cf::ManageDocumentOperation;
 
 using artdaq::database::configuration::result_t;
 
-using artdaq::database::basictypes::JsonData;
-using artdaq::database::basictypes::FhiclData;
-using artdaq::database::docrecord::JSONDocument;
-using artdaq::database::docrecord::JSONDocumentBuilder;
-
 namespace artdaq {
 namespace database {
 bool json_db_to_gui(std::string const&, std::string&);
 bool json_gui_to_db(std::string const&, std::string&);
-}
-}
+}  // namespace database
+}  // namespace artdaq
 
 namespace artdaq {
 namespace database {
@@ -58,8 +49,8 @@ result_t write_document_file(ManageDocumentOperation const& options, std::string
 void write_document(ManageDocumentOperation const&, std::string&);
 void read_document(ManageDocumentOperation const&, std::string&);
 
-void export_configuration(ManageDocumentOperation const&, std::string&);
-void import_configuration(ManageDocumentOperation const&, std::string&);
+void export_configuration(ManageDocumentOperation const& /*unused*/, std::string& /*unused*/);
+void import_configuration(ManageDocumentOperation const& /*unused*/, std::string& /*unused*/);
 
 }  // namespace detail
 }  // namespace configuration
@@ -71,13 +62,15 @@ namespace cfd = db::configuration::detail;
 result_t cfd::read_document_file(ManageDocumentOperation const& options, std::string const& file_out_name) try {
   confirm(!file_out_name.empty());
 
-  TLOG(21)<< "read_configuration: file_name=<" << file_out_name << ">";
+  TLOG(21) << "read_configuration: file_name=<" << file_out_name << ">";
 
   auto test_document = std::string{};
 
   detail::read_document(options, test_document);
 
-  if (!write_buffer_to_file(test_document, file_out_name)) return Failure();
+  if (!write_buffer_to_file(test_document, file_out_name)) {
+    return Failure();
+  }
 
   return Success();
 } catch (...) {
@@ -91,7 +84,9 @@ result_t cfd::write_document_file(ManageDocumentOperation const& options, std::s
 
   auto test_document = std::string{};
 
-  if (!read_buffer_from_file(test_document, file_src_name)) return Failure();
+  if (!read_buffer_from_file(test_document, file_src_name)) {
+    return Failure();
+  }
 
   detail::write_document(options, test_document);
 
@@ -117,11 +112,11 @@ result_t cfd::write_document_file(ManageDocumentOperation const& options, std::s
   return Failure(::debug::current_exception_diagnostic_information());
 }
 
-void cfd::export_configuration(ManageDocumentOperation const&, std::string&) {
+void cfd::export_configuration(ManageDocumentOperation const& /*unused*/, std::string& /*unused*/) {
   throw runtime_error("export_configuration") << "export_configuration: is not implemented";
 }
 
-void cfd::import_configuration(ManageDocumentOperation const&, std::string&) {
+void cfd::import_configuration(ManageDocumentOperation const& /*unused*/, std::string& /*unused*/) {
   throw runtime_error("import_configuration") << "import_configuration: is not implemented";
 }
 
@@ -132,5 +127,5 @@ void cftd::ExportImport() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::configuration::ExportImport trace_enable";
+  TLOG(10) << "artdaq::database::configuration::ExportImport trace_enable";
 }

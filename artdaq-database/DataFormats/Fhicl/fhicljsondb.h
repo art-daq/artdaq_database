@@ -11,14 +11,14 @@ bool json_to_fhicl(std::string const&, std::string&, std::string&);
 namespace debug {
 void FhiclJson();
 void FCL2JSONDB();
-}
+}  // namespace debug
 }  // namespace fhicljson
 
 namespace fhicl {
 namespace debug {
 void FhiclReader();
 void FhiclWriter();
-}
+}  // namespace debug
 }  // namespace fhicl
 
 }  // namespace database

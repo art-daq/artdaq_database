@@ -66,10 +66,10 @@ std::string ovlFixedList<T, mask>::to_string() const {
 }
 
 template <typename T, std::uint32_t mask>
-void ovlFixedList<T, mask>::wipe() {  
-  auto& entries = ovlKeyValue::array_value();  
-  auto empty=array_t{};  
-  entries.swap(empty);  
+void ovlFixedList<T, mask>::wipe() {
+  auto& entries = ovlKeyValue::array_value();
+  auto empty = array_t{};
+  entries.swap(empty);
   // reattach AST
   _list = make_list(entries);
 }

@@ -15,7 +15,7 @@ namespace apiliteral = db::configapi::literal;
 
 namespace artdaq {
 namespace database {
-std::string expand_environment_variables(std::string var);
+std::string expand_environment_variables(const std::string& var);
 
 template <typename OPTS>
 result_t conftool_impl(std::unique_ptr<OPTS>& options, int argc, char* argv[]) {
@@ -140,6 +140,6 @@ result_t conftool_impl(std::unique_ptr<OPTS>& options, int argc, char* argv[]) {
 
   return cf::getOperations().at(options->operation())->invoke();
 }
-}
-}
+}  // namespace database
+}  // namespace artdaq
 #endif /* _ARTDAQ_DATABASE_CONFTOOLIFC_H_ */

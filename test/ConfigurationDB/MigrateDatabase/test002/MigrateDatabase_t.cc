@@ -12,14 +12,12 @@ namespace bpo = boost::program_options;
 using namespace artdaq::database;
 
 using namespace artdaq::database::configuration;
-namespace cf = artdaq::database::configuration;
 
 namespace DBI = artdaq::database::filesystem;
 
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocumentMigrator;
-using artdaq::database::docrecord::JSONDocument;
 
 int main(int argc, char* argv[]) try {
   std::ostringstream descstr;
@@ -39,12 +37,12 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::INVALID_ARGUMENT;
   }
 
-  if (vm.count("help")) {
+  if (vm.count("help") != 0u) {
     std::cout << desc << std::endl;
     return process_exit_code::HELP;
   }
 
-  if (!vm.count("uri")) {
+  if (vm.count("uri") == 0u) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no databse URI given.\n"
               << "For usage and an options list, please do '" << argv[0] << " --help"
               << "'.\n";
@@ -58,7 +56,9 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::INVALID_ARGUMENT | 1;
   }
 
-  if (database_uri.back() == '/') database_uri.pop_back();  // remove trailing slash
+  if (database_uri.back() == '/') {
+    database_uri.pop_back();  // remove trailing slash
+  }
 
   auto database_path = database_uri.substr(strlen(DBI::literal::FILEURI));
   database_path = db::expand_environment_variables(database_path);
@@ -73,16 +73,21 @@ int main(int argc, char* argv[]) try {
 
   auto collection_names = DBI::find_subdirs(database_path);
   for (auto const& collection_name : collection_names) {
-    if (collection_name == system_metadata) continue;
+    if (collection_name == system_metadata) {
+      continue;
+    }
 
     std::cout << "\n\n Collection:" << collection_name << "\n";
 
     boost::filesystem::directory_iterator end_iter;
 
-    auto collection_path = database_path + "/" + collection_name;
+    auto collection_path = database_path;
+    collection_path.append("/").append(collection_name);
 
     for (boost::filesystem::directory_iterator dir_iter(collection_path); dir_iter != end_iter; ++dir_iter) {
-      if (boost::filesystem::is_directory(dir_iter->status()) || dir_iter->path().filename() == "index.json") continue;
+      if (boost::filesystem::is_directory(dir_iter->status()) || dir_iter->path().filename() == "index.json") {
+        continue;
+      }
       auto oid = dir_iter->path().filename().replace_extension().string();
 
       std::cout << "   Document: " << oid;
@@ -95,9 +100,9 @@ int main(int argc, char* argv[]) try {
           std::cout << " -> failed\n";
           continue;
         }
-        
-	JSONDocumentBuilder builder{JSONDocumentMigrator{{source}}};
-	builder.setCollection({"{\"collection\":\""s+collection_name+"\"}"});
+
+        JSONDocumentBuilder builder{JSONDocumentMigrator{{source}}};
+        builder.setCollection({R"({"collection":")" + collection_name + "\"}"});
 
         oss.str("");
         oss.clear();

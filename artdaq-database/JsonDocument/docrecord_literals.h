@@ -54,7 +54,7 @@ constexpr auto addToGlobalConfig = "addToGlobalConfig";
 constexpr auto setVersion = "setVersion";
 constexpr auto markDeleted = "markDeleted";
 constexpr auto markReadonly = "markReadonly";
-}
+}  // namespace actions
 
 constexpr auto template__empty_document =
     "{\n"

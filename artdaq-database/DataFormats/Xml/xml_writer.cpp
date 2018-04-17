@@ -13,7 +13,6 @@
 
 #define TRACE_NAME "XML:XmlWriter_C"
 
-namespace xml = artdaq::database::xml;
 namespace jsn = artdaq::database::json;
 namespace pt = boost::property_tree;
 
@@ -66,7 +65,9 @@ bool XmlWriter::write(jsn::object_t const& json_object, std::string& out) {
 
     auto buffer = sout.str();
 
-    if (buffer.empty()) return false;
+    if (buffer.empty()) {
+      return false;
+    }
 
     out.swap(buffer);
 
@@ -87,5 +88,5 @@ void artdaq::database::xml::debug::XmlWriter() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::xml::XmlWriter trace_enable";
+  TLOG(10) << "artdaq::database::xml::XmlWriter trace_enable";
 }

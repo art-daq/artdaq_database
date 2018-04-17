@@ -55,17 +55,17 @@ std::string from_json_string(std::string const& str) {
     /*if(str[pos] == '\''){
       oss << "\\\'";
       continue;
-    }  
+    }
     */
-    
+
     if (str[pos] != '\\') {
-        oss << str[pos];
-        continue;
+      oss << str[pos];
+      continue;
     }
 
     switch (str[++pos]) {
       case '\\':
-	oss << '\\';
+        oss << '\\';
         break;
       case '"':
         oss << '"';
@@ -83,7 +83,7 @@ std::string from_json_string(std::string const& str) {
         oss << '\r';
         break;
       case 't':
-        oss << '\t';        
+        oss << '\t';
         break;
     }
   }
@@ -115,23 +115,29 @@ std::string tag_as_string(::fhicl::value_tag tag) {
 
 ::fhicl::value_tag string_as_tag(std::string name) {
   auto str = std::move(name);
-  if (str == literal::nil)
+  if (str == literal::nil) {
     return ::fhicl::NIL;
-  else if (str == literal::string || str == literal::string_unquoted || str == literal::string_singlequoted ||
-           str == literal::string_doublequoted)
+  }
+  if (str == literal::string || str == literal::string_unquoted || str == literal::string_singlequoted ||
+      str == literal::string_doublequoted) {
     return ::fhicl::STRING;
-  else if (str == literal::boolean)
+  }
+  if (str == literal::boolean) {
     return ::fhicl::BOOL;
-  else if (str == literal::number)
+  }
+  if (str == literal::number) {
     return ::fhicl::NUMBER;
-  else if (str == literal::complex)
+  }
+  if (str == literal::complex) {
     return ::fhicl::COMPLEX;
-  else if (str == literal::sequence)
+  }
+  if (str == literal::sequence) {
     return ::fhicl::SEQUENCE;
-  else if (str == literal::table)
+  } else if (str == literal::table) {
     return ::fhicl::TABLE;
-  else if (str == literal::tableid)
+  } else if (str == literal::tableid) {
     return ::fhicl::TABLEID;
+  }
 
   throw ::fhicl::exception(::fhicl::parse_error, literal::data)
       << ("FHiCL atom type \"" + str + "\" is not implemented.");
@@ -161,12 +167,15 @@ std::string protection_as_string(::fhicl::Protection protection) {
 
 ::fhicl::Protection string_as_protection(std::string name) {
   auto str = std::move(name);
-  if (str == "" || str == "@none")
+  if (str.empty() || str == "@none") {
     return ::fhicl::Protection::NONE;
-  else if (str == "@protect_ignore")
+  }
+  if (str == "@protect_ignore") {
     return ::fhicl::Protection::PROTECT_IGNORE;
-  else if (str == "@protect_error")
+  }
+  if (str == "@protect_error") {
     return ::fhicl::Protection::PROTECT_ERROR;
+  }
   /*
     else if (str == "@initial")
       return ::fhicl::Protection::INITIAL;
@@ -184,4 +193,4 @@ std::string protection_as_string(::fhicl::Protection protection) {
 
 }  // namespace fhicl
 }  // namespace database
-}  // artdaq
+}  // namespace artdaq

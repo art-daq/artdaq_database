@@ -9,8 +9,8 @@
 namespace artdaq {
 namespace database {
 
-using artdaq::database::jsonconvert::JsonSerializer;
 using artdaq::database::jsonconvert::JsonDeserializer;
+using artdaq::database::jsonconvert::JsonSerializer;
 
 struct JSON {
   using writer = JsonSerializer;

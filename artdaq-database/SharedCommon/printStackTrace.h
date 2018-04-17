@@ -3,18 +3,16 @@
 
 #include <string>
 
-
 extern "C" {
-  
-#ifndef __clang__
-  typedef void (__cxa_throw_t)(void*, void*, void (*)(void*));
-  void __cxa_throw(void*, void*, void (*)(void*));
-#else  //__clang__
-  typedef __attribute__((noreturn)) void (__cxa_throw_t)(void *,std::type_info *,void(*)(void *));
-  __attribute__((noreturn)) void __cxa_throw(void *,std::type_info *,void(*)(void *));
-#endif //__clang__
-}
 
+#ifndef __clang__
+typedef void(__cxa_throw_t)(void*, void*, void (*)(void*));
+void __cxa_throw(void*, void*, void (*)(void*));
+#else   //__clang__
+typedef __attribute__((noreturn)) void(__cxa_throw_t)(void*, std::type_info*, void (*)(void*));
+__attribute__((noreturn)) void __cxa_throw(void*, std::type_info*, void (*)(void*));
+#endif  //__clang__
+}
 
 namespace debug {
 void registerAbortHandler();
@@ -30,6 +28,6 @@ std::string demangle(std::string const&);
 std::string demangleStackTrace(void* const*, int);
 std::string getCxaThrowStack();
 std::string getStackTrace();
-}
+}  // namespace debug
 
 #endif /* #ifndef PRINTSTACKTRACE_H */

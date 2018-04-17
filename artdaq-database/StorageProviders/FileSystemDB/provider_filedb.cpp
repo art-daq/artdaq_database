@@ -23,15 +23,12 @@ namespace db = artdaq::database;
 namespace dbfs = artdaq::database::filesystem;
 namespace dbfsl = dbfs::literal;
 
-using artdaq::database::filesystem::DBConfig;
 using artdaq::database::filesystem::FileSystemDB;
 using artdaq::database::filesystem::index::SearchIndex;
 
 using artdaq::database::basictypes::JsonData;
-using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocument;
 
-namespace jsonliteral = db::dataformats::literal;
 namespace apiliteral = db::configapi::literal;
 
 namespace artdaq {
@@ -62,10 +59,9 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigurations(
   auto collection_names = dbfs::find_subdirs(dir_name);
 
   for (auto const& collection_name : collection_names) {
-    TLOG(15) <<
-           "FileSystemDB::findConfigurations() querying "
-           "collection_name=<"
-               << collection_name << ">";
+    TLOG(15) << "FileSystemDB::findConfigurations() querying "
+                "collection_name=<"
+             << collection_name << ">";
 
     auto index_path = boost::filesystem::path(dir_name.c_str()).append(collection_name).append(dbfsl::search_index);
 
@@ -74,7 +70,7 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigurations(
     auto configentityname_pairs = search_index.findAllGlobalConfigurations(query_payload);
 
     TLOG(15) << "FileSystemDB::findConfigurations() search returned " << configentityname_pairs.size()
-                                                                    << " configurations.";
+             << " configurations.";
     for (auto const& configentityname_pair : configentityname_pairs) {
       auto const& name = configentityname_pair.first;
       std::ostringstream oss;
@@ -87,7 +83,9 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigurations(
     }
   }
 
-  for (auto const& cfg : config_timestamps) timestamp_configs.emplace(*cfg.second.rbegin(), cfg.first);
+  for (auto const& cfg : config_timestamps) {
+    timestamp_configs.emplace(*cfg.second.rbegin(), cfg.first);
+  }
 
   // keys are sorted the reverse chronological order
   for (auto const& cfg : timestamp_configs) {
@@ -95,10 +93,12 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigurations(
     oss << "{";
     // oss << db::quoted_(apiliteral::option::collection) <<":" << db::quoted_(collection_name) << ",";
 
-    oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem)<< ",";
-    oss << db::quoted_(apiliteral::option::format) << ":" <<  db::quoted_(apiliteral::format::gui) << ",";
-    oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::confcomposition)<< ",";
-    oss << db::quoted_(apiliteral::option::searchfilter) << ":" << "{";
+    oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem) << ",";
+    oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
+    oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::confcomposition)
+        << ",";
+    oss << db::quoted_(apiliteral::option::searchfilter) << ":"
+        << "{";
     oss << db::quoted_(apiliteral::filter::configurations) << ": " << db::quoted_(cfg.second);
     oss << "}";
     oss << "}";
@@ -126,10 +126,9 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::configurationCompos
   auto collection_names = dbfs::find_subdirs(dir_name);
 
   for (auto const& collection_name : collection_names) {
-    TLOG(16) <<
-           "FileSystemDB::configurationComposition() "
-           "querying collection_name=<"
-               << collection_name << ">";
+    TLOG(16) << "FileSystemDB::configurationComposition() "
+                "querying collection_name=<"
+             << collection_name << ">";
 
     auto index_path = boost::filesystem::path(dir_name.c_str()).append(collection_name).append(dbfsl::search_index);
 
@@ -137,29 +136,29 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::configurationCompos
 
     auto configentityname_pairs = search_index.findAllGlobalConfigurations(query_payload);
 
-    TLOG(16) <<
-           "FileSystemDB::configurationComposition() search "
-           "returned "
-               << configentityname_pairs.size() << " configurations.";
+    TLOG(16) << "FileSystemDB::configurationComposition() search "
+                "returned "
+             << configentityname_pairs.size() << " configurations.";
 
     for (auto const& configentityname_pair : configentityname_pairs) {
       std::ostringstream oss;
 
       oss << "{";
-      oss << db::quoted_(apiliteral::option::collection) <<":" << db::quoted_(collection_name) << ",";
-      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem)<<",";
-      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui)<<",";
-      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument)<<",";
-      oss << db::quoted_(apiliteral::option::searchfilter) << ":" << "{";
+      oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
+      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem) << ",";
+      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
+      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument)
+          << ",";
+      oss << db::quoted_(apiliteral::option::searchfilter) << ":"
+          << "{";
       oss << db::quoted_(apiliteral::filter::configurations) << ":" << db::quoted_(configentityname_pair.first);
-      oss <<"," << db::quoted_(apiliteral::filter::entities)<< ":" << db::quoted_(configentityname_pair.second);
+      oss << "," << db::quoted_(apiliteral::filter::entities) << ":" << db::quoted_(configentityname_pair.second);
       oss << "}";
       oss << "}";
 
-      TLOG(16) <<
-             "FileSystemDB::configurationComposition() "
-             "found document=<"
-                 << oss.str() << ">";
+      TLOG(16) << "FileSystemDB::configurationComposition() "
+                  "found document=<"
+               << oss.str() << ">";
 
       returnCollection.emplace_back(oss.str());
     }
@@ -197,28 +196,29 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findVersions(JsonDa
 
   if (!jsn::JsonReader{}.read(query_payload, search_ast)) {
     TLOG(15) << "FileSystemDB::index::findVersionsByEntityName()"
-                  << " Failed to create an AST from search.";
+             << " Failed to create an AST from search.";
     return returnCollection;
   }
 
   if (search_ast.count(apiliteral::filter::configurations) == 0) {
     auto versionentityname_pairs = search_index.findVersionsByEntityName(query_payload);
 
-    TLOG(15) <<
-           "FileSystemDB::findVersionsByEntityName() search returned "
-               << versionentityname_pairs.size() << " configurations.";
+    TLOG(15) << "FileSystemDB::findVersionsByEntityName() search returned " << versionentityname_pairs.size()
+             << " configurations.";
 
     for (auto const& versionentityname_pair : versionentityname_pairs) {
       std::ostringstream oss;
 
       oss << "{";
-      oss << db::quoted_(apiliteral::option::collection) <<":" << db::quoted_(collection_name) << ",";
-      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem)<<",";
-      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui)<<",";
-      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument)<<",";
-      oss << db::quoted_(apiliteral::option::searchfilter) << ":" << "{";
+      oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
+      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem) << ",";
+      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
+      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument)
+          << ",";
+      oss << db::quoted_(apiliteral::option::searchfilter) << ":"
+          << "{";
       oss << db::quoted_(apiliteral::filter::version) << ":" << db::quoted_(versionentityname_pair.second);
-      oss <<"," << db::quoted_(apiliteral::filter::entities) << ":" << db::quoted_(versionentityname_pair.first);
+      oss << "," << db::quoted_(apiliteral::filter::entities) << ":" << db::quoted_(versionentityname_pair.first);
       oss << "}";
       oss << "}";
 
@@ -233,29 +233,30 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findVersions(JsonDa
       entityName = boost::get<std::string>(search_ast.at(apiliteral::filter::entities));
 
       TLOG(15) << "FileSystemDB::findVersionsByGlobalConfigName"
-                    << " Found entity filter=<" << entityName << ">.";
+               << " Found entity filter=<" << entityName << ">.";
 
     } catch (...) {
     }
 
     auto versionentityname_pairs = search_index.findVersionsByGlobalConfigName(query_payload);
 
-    TLOG(15) <<
-           "FileSystemDB::findVersionsByGlobalConfigName() "
-           "search returned "
-               << versionentityname_pairs.size() << " configurations.";
+    TLOG(15) << "FileSystemDB::findVersionsByGlobalConfigName() "
+                "search returned "
+             << versionentityname_pairs.size() << " configurations.";
 
     for (auto const& versionentityname_pair : versionentityname_pairs) {
       std::ostringstream oss;
 
       oss << "{";
-      oss << db::quoted_(apiliteral::option::collection) <<":" << db::quoted_(collection_name) << ",";
-      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem)<<",";
-      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui)<<",";
-      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument)<<",";
-      oss << db::quoted_(apiliteral::option::searchfilter) << ":" << "{";
+      oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
+      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem) << ",";
+      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
+      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument)
+          << ",";
+      oss << db::quoted_(apiliteral::option::searchfilter) << ":"
+          << "{";
       oss << db::quoted_(apiliteral::filter::version) << ":" << db::quoted_(versionentityname_pair.second);
-      oss <<"," << db::quoted_(apiliteral::filter::entities) << ":" << db::quoted_(entityName);
+      oss << "," << db::quoted_(apiliteral::filter::entities) << ":" << db::quoted_(entityName);
       oss << "}";
       oss << "}";
 
@@ -286,10 +287,9 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findEntities(JsonDa
   auto collection_names = dbfs::find_subdirs(dir_name);
 
   for (auto const& collection_name : collection_names) {
-    TLOG(19) <<
-           "FileSystemDB::findEntities() querying "
-           "collection_name=<"
-               << collection_name << ">";
+    TLOG(19) << "FileSystemDB::findEntities() querying "
+                "collection_name=<"
+             << collection_name << ">";
 
     auto index_path = boost::filesystem::path(dir_name.c_str()).append(collection_name).append(dbfsl::search_index);
 
@@ -311,11 +311,13 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findEntities(JsonDa
       std::ostringstream oss;
 
       oss << "{";
-      oss << db::quoted_(apiliteral::option::collection) <<":" << db::quoted_(collection_name) << ",";
-      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem)<<",";
-      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui)<<",";
-      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::findversions)<<",";
-      oss << db::quoted_(apiliteral::option::searchfilter) << ":" << "{";
+      oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
+      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem) << ",";
+      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
+      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::findversions)
+          << ",";
+      oss << db::quoted_(apiliteral::option::searchfilter) << ":"
+          << "{";
       oss << db::quoted_(apiliteral::filter::entities) << ":" << db::quoted_(configentity_name);
       oss << "}";
       oss << "}";
@@ -344,21 +346,22 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listCollections(Jso
   auto collection_names = dbfs::find_subdirs(dir_name);
 
   for (auto const& collection_name : collection_names) {
-    if (collection_name == "system.indexes" || collection_name == system_metadata) continue;
+    if (collection_name == "system.indexes" || collection_name == system_metadata) {
+      continue;
+    }
 
-    TLOG(22) <<
-           "FileSystemDB::listCollections() found "
-           "collection_name=<"
-               << collection_name << ">";
+    TLOG(22) << "FileSystemDB::listCollections() found "
+                "collection_name=<"
+             << collection_name << ">";
 
     std::ostringstream oss;
 
     oss << "{";
-    oss << db::quoted_(apiliteral::option::collection) <<":" << db::quoted_(collection_name) << ",";
-    oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem)<<",";
-    oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui)<<",";
-    oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::findversions)<<",";
-    oss << db::quoted_(apiliteral::option::searchfilter)<< ":" << apiliteral::empty_json ;
+    oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
+    oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem) << ",";
+    oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
+    oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::findversions) << ",";
+    oss << db::quoted_(apiliteral::option::searchfilter) << ":" << apiliteral::empty_json;
     oss << "}";
 
     TLOG(22) << "FileSystemDB::listCollections() found document=<" << oss.str() << ">";
@@ -392,23 +395,27 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listDatabases(JsonD
   auto database = _provider->connection();
 
   auto found = database.find_last_not_of("\\/");
-  if (found != std::string::npos) database.erase(found + 1);
+  if (found != std::string::npos) {
+    database.erase(found + 1);
+  }
 
   auto database_names = dbfs::find_siblingdirs(database);
 
   for (auto const& database_name : database_names) {
     TLOG(19) << "FileSystemDB::listDatabases() found databases=<" << database_name << ">";
 
-    if (database_name == "system") continue;
+    if (database_name == "system") {
+      continue;
+    }
 
     TLOG(19) << "FileSystemDB::listDatabases() found database_name=<" << database_name << ">";
 
     std::ostringstream oss;
     oss << "{";
     oss << db::quoted_(apiliteral::database) << ":" << db::quoted_(database_name) << ",";
-    oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem)<<",";
-    oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui)<<",";
-    oss << db::quoted_(apiliteral::option::searchfilter)<< ":" << apiliteral::empty_json;
+    oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem) << ",";
+    oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
+    oss << db::quoted_(apiliteral::option::searchfilter) << ":" << apiliteral::empty_json;
     oss << "}";
 
     TLOG(19) << "FileSystemDB::listDatabases() found document=<" << oss.str() << ">";
@@ -429,24 +436,26 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::databaseMetadata(
   auto collection = _provider->connection() + system_metadata;
   collection = expand_environment_variables(collection);
 
-  if (collection.find(dbfsl::FILEURI) == 0) collection = collection.substr(strlen(dbfsl::FILEURI));
+  if (collection.find(dbfsl::FILEURI) == 0) {
+    collection = collection.substr(strlen(dbfsl::FILEURI));
+  }
 
-  TLOG(13)<< "FileSystemDB::databaseMetadata() collection_path=<" << collection << ">.";
+  TLOG(13) << "FileSystemDB::databaseMetadata() collection_path=<" << collection << ">.";
 
   auto oids = dbfs::find_documents(collection);
 
-  TLOG(13)<< "FileSystemDB::databaseMetadata() search returned " << oids.size() << " documents.";
+  TLOG(13) << "FileSystemDB::databaseMetadata() search returned " << oids.size() << " documents.";
 
   for (auto const& oid : oids) {
     auto doc_path = boost::filesystem::path(collection).append(oid).replace_extension(".json");
 
-    TLOG(13)<< "FileSystemDB::databaseMetadata() reading document <" << doc_path.c_str() << ">.";
+    TLOG(13) << "FileSystemDB::databaseMetadata() reading document <" << doc_path.c_str() << ">.";
 
     auto json = std::string{};
 
     db::read_buffer_from_file(json, {doc_path.c_str()});
 
-    TLOG(13)<< "FileSystemDB::databaseMetadata() document <" << json << ">.";
+    TLOG(13) << "FileSystemDB::databaseMetadata() document <" << json << ">.";
 
     returnCollection.emplace_back(json);
   }
@@ -462,11 +471,11 @@ void enable() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::filesystem trace_enable";
+  TLOG(10) << "artdaq::database::filesystem trace_enable";
   artdaq::database::filesystem::debug::ReadWrite();
   artdaq::database::filesystem::index::debug::enable();
 }
-}
+}  // namespace debug
 }  // namespace filesystem
 
 }  // namespace database

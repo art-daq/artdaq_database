@@ -1,4 +1,6 @@
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
+
+#include <utility>
 #include "artdaq-database/JsonDocument/common.h"
 
 #ifdef TRACE_NAME
@@ -7,14 +9,12 @@
 
 #define TRACE_NAME "JSNU:DocuBldr_C"
 
-using artdaq::database::json::object_t;
-using artdaq::database::json::value_t;
-using artdaq::database::json::array_t;
-using artdaq::database::json::type_t;
 using artdaq::database::ThrowOnFailure;
+using artdaq::database::json::value_t;
 using artdaq::database::result_t;
 
-using namespace artdaq::database::docrecord;
+using artdaq::database::docrecord::JSONDocument;
+using artdaq::database::docrecord::JSONDocumentBuilder;
 
 namespace db = artdaq::database;
 namespace utl = db::docrecord;
@@ -29,17 +29,19 @@ JSONDocumentBuilder::JSONDocumentBuilder()
       _overlay(std::make_unique<ovlDatabaseRecord>(_document._value)),
       _initOK(init()) {}
 
-JSONDocumentBuilder::JSONDocumentBuilder(JSONDocument const& document)
-    : _document(document), _overlay(std::make_unique<ovlDatabaseRecord>(_document._value)), _initOK(init()) {}
+JSONDocumentBuilder::JSONDocumentBuilder(JSONDocument document)
+    : _document(std::move(document)),
+      _overlay(std::make_unique<ovlDatabaseRecord>(_document._value)),
+      _initOK(init()) {}
 
 bool JSONDocumentBuilder::init() {
   auto buff[[gnu::unused]] = _document.writeJson();
-  TLOG(13)<< "JSONDocumentBuilder::init() new document=<" << buff << ">";
+  TLOG(13) << "JSONDocumentBuilder::init() new document=<" << buff << ">";
   return true;
 }
 
 JSONDocumentBuilder& JSONDocumentBuilder::addAlias(JSONDocument const& alias) try {
-  TLOG(13)<< "addAlias() args  alias=<" << alias << ">";
+  TLOG(13) << "addAlias() args  alias=<" << alias << ">";
 
   JSONDocument copy(alias);
   auto ovl = overlay<ovl::ovlAlias>(copy, jsonliteral::alias);
@@ -50,7 +52,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::addAlias(JSONDocument const& alias) tr
 
   return self();
 } catch (std::exception const& ex) {
-  TLOG(13)<< "addAlias() Exception:" << ex.what();
+  TLOG(13) << "addAlias() Exception:" << ex.what();
   ThrowOnFailure(CallUndo());
 
   return self();
@@ -113,7 +115,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeConfiguration(JSONDocument const
 JSONDocumentBuilder& JSONDocumentBuilder::removeAllConfigurations() try {
   TLOG(15) << "removeAllConfigurations()";
 
-  _overlay->configurations().wipe();  
+  _overlay->configurations().wipe();
   _document.writeJson();
 
   return self();
@@ -122,7 +124,6 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeAllConfigurations() try {
   ThrowOnFailure(CallUndo());
   return self();
 }
-
 
 JSONDocumentBuilder& JSONDocumentBuilder::setObjectID(JSONDocument const& objectId) try {
   TLOG(15) << "setObjectID() args  objectId=<" << objectId << ">";
@@ -243,10 +244,9 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeEntity(JSONDocument const& entit
   return self();
 }
 
-
 JSONDocumentBuilder& JSONDocumentBuilder::removeAllEntities() try {
   TLOG(15) << "removeAllEntities()";
-    
+
   _overlay->entities().wipe();
   _document.writeJson();
 
@@ -256,7 +256,6 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeAllEntities() try {
   ThrowOnFailure(CallUndo());
   return self();
 }
-
 
 JSONDocumentBuilder& JSONDocumentBuilder::markReadonly() try {
   TLOG(16) << "markReadonly()";
@@ -329,5 +328,5 @@ void dbdr::debug::JSONDocumentBuilder() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::JSONDocumentBuilder trace_enable";
+  TLOG(10) << "artdaq::database::JSONDocumentBuilder trace_enable";
 }

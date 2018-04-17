@@ -1,7 +1,7 @@
+#include "artdaq-database/StorageProviders/UconDB/provider_ucondb.h"
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/SharedCommon/common.h"
-#include "artdaq-database/StorageProviders/UconDB/provider_ucondb.h"
 #include "artdaq-database/StorageProviders/UconDB/ucondb_api.h"
 
 #ifdef TRACE_NAME
@@ -10,19 +10,11 @@
 
 #define TRACE_NAME "PRVDR:UconDB_C"
 
-namespace db = artdaq::database;
-namespace dbfsl = db::ucon::literal;
-namespace jsonliteral = artdaq::database::dataformats::literal;
-
 namespace artdaq {
 namespace database {
 
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::ucon::UconDB;
-using artdaq::database::ucon::DBConfig;
-
-using artdaq::database::docrecord::JSONDocumentBuilder;
-using artdaq::database::docrecord::JSONDocument;
 
 template <>
 template <>
@@ -143,11 +135,11 @@ void enable() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::ucon trace_enable";
+  TLOG(10) << "artdaq::database::ucon trace_enable";
   artdaq::database::ucon::debug::UconDBAPI();
   artdaq::database::ucon::debug::ReadWrite();
 }
-}
+}  // namespace debug
 }  // namespace ucon
 }  // namespace database
 }  // namespace artdaq

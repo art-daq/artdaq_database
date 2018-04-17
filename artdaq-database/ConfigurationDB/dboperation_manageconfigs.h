@@ -18,7 +18,7 @@ result_t assign_configuration(ManageDocumentOperation const& /*options*/) noexce
 result_t remove_configuration(ManageDocumentOperation const& /*options*/) noexcept;
 result_t create_configuration(ManageDocumentOperation const& /*options*/) noexcept;
 result_t configuration_composition(ManageDocumentOperation const& /*options*/) noexcept;
-}
+}  // namespace opts
 
 namespace json {
 result_t find_configurations(std::string const& /*task_payload*/) noexcept;
@@ -26,14 +26,14 @@ result_t assign_configuration(std::string const& /*task_payload*/) noexcept;
 result_t remove_configuration(std::string const& /*task_payload*/) noexcept;
 result_t create_configuration(std::string const& /*task_payload*/) noexcept;
 result_t configuration_composition(std::string const& /*task_payload*/) noexcept;
-}
+}  // namespace json
 
 namespace debug {
 void ManageConfigs();
 namespace detail {
 void ManageConfigs();
 }
-}
+}  // namespace debug
 
 }  // namespace configuration
 }  // namespace database

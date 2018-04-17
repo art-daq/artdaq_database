@@ -10,10 +10,10 @@
 namespace bpo = boost::program_options;
 using namespace artdaq::database;
 
-typedef bool (*test_case)(std::string const& /*input*/, std::string const& /*compare*/);
+using test_case = bool (*)(const std::string&, const std::string&);
 
-bool test_convertxml2json(std::string const&, std::string const&);
-bool test_convertjson2xml(std::string const&, std::string const&);
+bool test_convertxml2json(std::string const& /*input*/, std::string const& /*compare*/);
+bool test_convertjson2xml(std::string const& /*input*/, std::string const& /*compare*/);
 
 int main(int argc, char* argv[]) {
   artdaq::database::xml::debug::XmlReader();
@@ -44,26 +44,26 @@ int main(int argc, char* argv[]) {
     return process_exit_code::INVALID_ARGUMENT;
   }
 
-  if (vm.count("help")) {
+  if (vm.count("help") != 0u) {
     std::cout << desc << std::endl;
     return process_exit_code::HELP;
   }
 
-  if (!vm.count("source")) {
+  if (vm.count("source") == 0u) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no source file given.\n"
               << "For usage and an options list, please do '" << argv[0] << " --help"
               << "'.\n";
     return process_exit_code::INVALID_ARGUMENT | 1;
   }
 
-  if (!vm.count("compare")) {
+  if (vm.count("compare") == 0u) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no compare file given.\n"
               << "For usage and an options list, please do '" << argv[0] << " --help"
               << "'.\n";
     return process_exit_code::INVALID_ARGUMENT | 2;
   }
 
-  if (!vm.count("testname")) {
+  if (vm.count("testname") == 0u) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no test name given.\n"
               << "For usage and an options list, please do '" << argv[0] << " --help"
               << "'.\n";
@@ -93,7 +93,7 @@ int main(int argc, char* argv[]) {
 
   auto testResult = runTest(test_name)(input, compare);
 
-  return !testResult;
+  return static_cast<int>(!testResult);
 }
 
 bool test_convertxml2json(std::string const& input, std::string const& compare) {
@@ -102,12 +102,14 @@ bool test_convertxml2json(std::string const& input, std::string const& compare) 
 
   auto output = std::string();
 
-  if (!artdaq::database::xmljson::xml_to_json(input, output)) return false;
+  if (!artdaq::database::xmljson::xml_to_json(input, output)) {
+    return false;
+  }
 
   auto compare_result = artdaq::database::json::compare_json_objects(output, compare);
-  if (compare_result.first)
+  if (compare_result.first) {
     return true;
-  else {
+  } else {
     std::cout << "Convertion failed; error: " << compare_result.second << "\n";
     std::cerr << "output:\n" << output << "\n";
     std::cerr << "expected:\n" << compare << "\n";
@@ -122,11 +124,13 @@ bool test_convertjson2xml(std::string const& input, std::string const& compare) 
 
   auto output = std::string();
 
-  if (!artdaq::database::xmljson::json_to_xml(input, output)) return false;
+  if (!artdaq::database::xmljson::json_to_xml(input, output)) {
+    return false;
+  }
 
-  if (output == compare)
+  if (output == compare) {
     return true;
-  else {
+  } else {
     std::cout << "Convertion failed. \n";
     std::cerr << "output:\n" << output << "\n";
     std::cerr << "expected:\n" << compare << "\n";

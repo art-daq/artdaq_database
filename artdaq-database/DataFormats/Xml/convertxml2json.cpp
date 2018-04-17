@@ -9,7 +9,7 @@
 
 #define TRACE_NAME "XML:xml2json_C"
 
-// TODO xml to json conversion code
+// TODO(mu2etrg): xml to json conversion code
 
 void artdaq::database::xmljson::debug::Xml2Json() {
   TRACE_CNTL("name", TRACE_NAME);
@@ -17,5 +17,5 @@ void artdaq::database::xmljson::debug::Xml2Json() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) <<  "artdaq::database::xml2json trace_enable";
+  TLOG(10) << "artdaq::database::xml2json trace_enable";
 }

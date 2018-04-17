@@ -41,7 +41,7 @@ JsonData listCollections(cf::ManageDocumentOperation const& /*options*/, JsonDat
 JsonData listDatabases(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
 JsonData readDbInfo(cf::ManageDocumentOperation const& /*options*/, JsonData const& /*query_payload*/);
 
-}  // namespace mongo
+}  // namespace ucon
 namespace debug {
 void UconDB();
 }

@@ -4,8 +4,8 @@
 #include <cstring>
 #include <map>
 #include <memory>
-#include <utility>
 #include <string>
+#include <utility>
 
 #include "artdaq-database/ConfigurationDB/operation_dispatch.h"
 
@@ -14,8 +14,8 @@ namespace database {
 namespace configuration {
 
 using artdaq::configuration::dispatch::Functor;
-using artdaq::configuration::dispatch::RA1Functor;
 using artdaq::configuration::dispatch::RA1A2Functor;
+using artdaq::configuration::dispatch::RA1Functor;
 using artdaq::configuration::dispatch::RA1R2Functor;
 
 using result_t = std::pair<bool, std::string>;

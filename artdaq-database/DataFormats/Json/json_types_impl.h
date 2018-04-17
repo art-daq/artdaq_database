@@ -6,8 +6,8 @@
 namespace dbt = artdaq::database::sharedtypes;
 
 using artdaq::database::json::array_t;
-using artdaq::database::json::value_t;
 using artdaq::database::json::object_t;
+using artdaq::database::json::value_t;
 
 template <>
 template <typename T>

@@ -18,7 +18,7 @@ namespace xml {
 namespace debug {
 void XmlReader();
 void XmlWriter();
-}
+}  // namespace debug
 }  // namespace xml
 
 }  // namespace database

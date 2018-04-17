@@ -6,7 +6,6 @@
 #include "artdaq-database/ConfigurationDB/configurationdbifc.h"
 
 #include "artdaq-database/BasicTypes/basictypes.h"
-using artdaq::database::basictypes::FhiclData;
 using artdaq::database::basictypes::JsonData;
 
 using ots::DatabaseConfigurationInterface;
@@ -25,12 +24,16 @@ int DatabaseConfigurationInterface::fill(ConfigurationBase* configuration, int v
 
   auto versionstring = std::to_string(version);
 
-  if (-1 == version) versionstring = std::to_string(findLatestVersion(configuration));
+  if (-1 == version) {
+    versionstring = std::to_string(findLatestVersion(configuration));
+  }
 
   auto result =
       ifc.template loadVersion<decltype(configuration), JsonData>(configuration, versionstring, default_entity);
 
-  if (result.first) return 0;
+  if (result.first) {
+    return 0;
+  }
 
   std::cout << "DBI Error:" << result.second << "\n";
 
@@ -40,16 +43,20 @@ int DatabaseConfigurationInterface::fill(ConfigurationBase* configuration, int v
 }
 
 // write configuration to database
-int DatabaseConfigurationInterface::saveActiveVersion(const ConfigurationBase* configuration, bool overwrite) const noexcept {
+int DatabaseConfigurationInterface::saveActiveVersion(const ConfigurationBase* configuration, bool overwrite) const
+    noexcept {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
 
   auto versionstring = std::to_string(configuration->getViewVersion());
 
-  auto result = overwrite ? 
-      ifc.template overwriteVersion<decltype(configuration), JsonData>(configuration, versionstring, default_entity) :
-      ifc.template storeVersion<decltype(configuration), JsonData>(configuration, versionstring, default_entity);
+  auto result = overwrite ? ifc.template overwriteVersion<decltype(configuration), JsonData>(
+                                configuration, versionstring, default_entity)
+                          : ifc.template storeVersion<decltype(configuration), JsonData>(configuration, versionstring,
+                                                                                         default_entity);
 
-  if (result.first) return 0;
+  if (result.first) {
+    return 0;
+  }
 
   std::cout << "DBI Error:" << result.second << "\n";
 
@@ -58,8 +65,8 @@ int DatabaseConfigurationInterface::saveActiveVersion(const ConfigurationBase* c
   return -1;
 }
 
-//mark configuration as read-only in database
-int DatabaseConfigurationInterface::markActiveVersionReadonly(const ConfigurationBase* configuration) const noexcept{
+// mark configuration as read-only in database
+int DatabaseConfigurationInterface::markActiveVersionReadonly(const ConfigurationBase* configuration) const noexcept {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
 
   auto versionstring = std::to_string(configuration->getViewVersion());
@@ -67,7 +74,9 @@ int DatabaseConfigurationInterface::markActiveVersionReadonly(const Configuratio
   auto result =
       ifc.template markVersionReadonly<decltype(configuration), JsonData>(configuration, versionstring, default_entity);
 
-  if (result.first) return 0;
+  if (result.first) {
+    return 0;
+  }
 
   std::cout << "DBI Error:" << result.second << "\n";
 
@@ -80,7 +89,9 @@ int DatabaseConfigurationInterface::markActiveVersionReadonly(const Configuratio
 int DatabaseConfigurationInterface::findLatestVersion(const ConfigurationBase* configuration) const noexcept {
   auto versions = getVersions(configuration);
 
-  if (!versions.size()) return -1;
+  if (versions.empty()) {
+    return -1;
+  }
 
   return *(versions.rbegin());
 }
@@ -93,7 +104,7 @@ std::set<int> DatabaseConfigurationInterface::getVersions(const ConfigurationBas
   auto to_set = [](auto const& inputList) {
     auto resultSet = std::set<int>{};
     std::for_each(inputList.begin(), inputList.end(),
-                  [&resultSet](std::string const& version) { resultSet.insert(std::stol(version, 0, 10)); });
+                  [&resultSet](std::string const& version) { resultSet.insert(std::stol(version, nullptr, 10)); });
     return resultSet;
   };
 
@@ -104,12 +115,11 @@ std::set<int> DatabaseConfigurationInterface::getVersions(const ConfigurationBas
 }
 
 // returns a set of all configuration data types
-std::set<std::string /*name*/> DatabaseConfigurationInterface::listConfigurationsTypes() const
-     try {
+std::set<std::string /*name*/> DatabaseConfigurationInterface::listConfigurationsTypes() const try {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
 
-  auto collection_name_prefix=std::string{};
-  
+  auto collection_name_prefix = std::string{};
+
   return ifc.listCollections(collection_name_prefix);
 } catch (std::exception const& e) {
   std::cout << "DBI Exception:" << e.what() << "\n";
@@ -120,8 +130,7 @@ std::set<std::string /*name*/> DatabaseConfigurationInterface::listConfiguration
 }
 
 // find all global configurations in database
-std::set<std::string /*name*/> DatabaseConfigurationInterface::findAllGlobalConfigurations() const
-     try {
+std::set<std::string /*name*/> DatabaseConfigurationInterface::findAllGlobalConfigurations() const try {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
 
   return ifc.findGlobalConfigurations("*");
@@ -134,8 +143,8 @@ std::set<std::string /*name*/> DatabaseConfigurationInterface::findAllGlobalConf
 }
 
 // return the contents of a global configuration
-config_version_map_t DatabaseConfigurationInterface::loadGlobalConfiguration(
-    std::string const& configuration) const  try {
+config_version_map_t DatabaseConfigurationInterface::loadGlobalConfiguration(std::string const& configuration) const
+    try {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
   auto result = ifc.loadGlobalConfiguration(configuration);
 
@@ -159,8 +168,7 @@ config_version_map_t DatabaseConfigurationInterface::loadGlobalConfiguration(
 
 // create a new global configuration from the contents map
 void DatabaseConfigurationInterface::storeGlobalConfiguration(config_version_map_t const& configurationMap,
-                                                              std::string const& configuration) const
-     try {
+                                                              std::string const& configuration) const try {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
 
   auto to_list = [](auto const& inputMap) {
@@ -174,7 +182,9 @@ void DatabaseConfigurationInterface::storeGlobalConfiguration(config_version_map
 
   auto result = ifc.storeGlobalConfiguration(to_list(configurationMap), configuration);
 
-  if (result.first) return;
+  if (result.first) {
+    return;
+  }
 
   throw std::runtime_error(result.second);
 } catch (std::exception const& e) {
