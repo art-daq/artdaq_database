@@ -4,9 +4,9 @@
 # overriden in $HOME/artdaq_database.env file if it exits. 
 # Main program starts at the bottom of this file.
 #----------------------------------------------------------------
-ARTDAQ_UPS_QUAL="e15:prof:s54"
-ARTDAQ_DB_UPS_VER=v1_04_48
-WEBEDITOR_UPS_VER=v1_00_14
+ARTDAQ_UPS_QUAL="e15:prof:s64"
+ARTDAQ_DB_UPS_VER=v1_04_49
+WEBEDITOR_UPS_VER=v1_01_00
 
 
 ARTDAQ_BASE_DIR=/tmp/artdaq

@@ -27,7 +27,7 @@ add_subdirectory(ConfigurationDB)
 #add_subdirectory(JsonConvert)
 
 add_subdirectory(Utilities)
-#add_subdirectory(SWIGBindings)
+add_subdirectory(SWIGBindings)
 
 
 

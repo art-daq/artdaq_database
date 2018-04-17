@@ -278,7 +278,7 @@ def importConfiguration(configNameOrconfigPrefix):
   
   config = __latest_config_name(configPrefix)
   
-  config = __increment_config_name(config) #if config else __increment_config_name(configPrefix)
+  config = __increment_config_name(config) if config else __increment_config_name(configPrefix)
 
   schema =__read_schema()   
   
@@ -290,10 +290,10 @@ def importConfiguration(configNameOrconfigPrefix):
       print 'Warning: The following files will be excluded from being loaded into the artdaq database ' \
 	+ ', '.join(excluded_files) + '. Update ' + fhicl_schema + ' to include them.'
   
-  if not __allow_importing_incomplete_configurations():
-      print 'Error: Importing of incomplete configurations is not allowed; ' \
-	+ 'set ARTDAQ_DATABASE_ALLOW_INCOMPLETE_CONFIGURATIONS to TRUE to allow.'
-      return False 
+      if not __allow_importing_incomplete_configurations():
+        print 'Error: Importing of incomplete configurations is not allowed; ' \
+	  + 'set ARTDAQ_DATABASE_ALLOW_INCOMPLETE_CONFIGURATIONS to TRUE to allow.'
+        return False 
     
   print ('New configuration', config)
  
@@ -369,10 +369,10 @@ def archiveRunConfiguration(config,run_number):
       print 'Warning: The following files will be excluded from being loaded into the artdaq database ' \
 	+ ', '.join(excluded_files) + '. Update ' + fhicl_schema + ' to include them.'
   
-  if not __allow_importing_incomplete_configurations():
-      print 'Error: Importing of incomplete configurations is not allowed; ' \
-	+ 'set ARTDAQ_DATABASE_ALLOW_INCOMPLETE_CONFIGURATIONS to TRUE to allow.'
-      return False 
+      if not __allow_importing_incomplete_configurations():
+	  print 'Error: Importing of incomplete configurations is not allowed; ' \
+	    + 'set ARTDAQ_DATABASE_ALLOW_INCOMPLETE_CONFIGURATIONS to TRUE to allow.'
+	  return False 
   
   entity_userdata_map=__create_entity_userdata_map(cfg_composition)
 
