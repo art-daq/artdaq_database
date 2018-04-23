@@ -1,7 +1,8 @@
 #ifndef _ARTDAQ_DATABASE_DOCRECORD_EXCEPTIONS_H_
 #define _ARTDAQ_DATABASE_DOCRECORD_EXCEPTIONS_H_
 
-#include "cetlib/coded_exception.h"
+#include "cetlib_except/coded_exception.h"
+
 namespace artdaq {
 namespace database {
 namespace docrecord {

@@ -40,7 +40,7 @@ std::string db::to_string(std::chrono::system_clock::time_point const& tp) {
 #define FORMAT_DURATION_MILLISECONDS "%03lld"
 #endif  //__clang__
 
-  snprintf(buff + 30, 4, FORMAT_DURATION_MILLISECONDS, milliseconds);
+  snprintf(buff + 30, 5, FORMAT_DURATION_MILLISECONDS, milliseconds);
 
   strncpy(buff + 20, buff + 30, 3);
 
