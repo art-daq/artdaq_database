@@ -136,7 +136,75 @@ def __read_schema():
   layout_json= json.loads(result[1])
   return layout_json['document']['data']['main']
 
+def __validate_schema(schema):  
+  def to_string(dict):
+    result='{ '
+    for key in dict:
+      result+=key + ':'+ dict[key] + ' '
+    result+='}'
+    return result
+        
+  errors_count=0
+  for l in ['artdaq_processes','artdaq_includes','system_layout','run_history']:
+    if l not in schema:
+      print 'Error: Invalid schema.fcl; A top level ' + l + ' sequence is missing.'
+      errors_count+=1
+      continue
+    if isinstance(schema[l], list) is not True:
+      print 'Error: Invalid schema.fcl; A top level ' + l + ' is not a sequence type.'
+      errors_count+=1
+      continue
+    idx=-1
+    for d in schema[l]:
+      idx+=1
+      if isinstance(d, dict) is not True:
+	print 'Error: Invalid schema.fcl; A top level ' + l + ' is not a sequence of tables type.'
+	errors_count+=1
+	break      
+      error_message='Error: Schema rule ' + l +':['+to_string(d)+ '] '
+      if 'collection' not in d or 'pattern' not in d:
+        print error_message + 'is missing either \"collection\" or \"pattern\" key-value pairs.'
+        errors_count+=1
+        continue      
+      r=d['pattern'].encode('ascii')
+      try:
+        if re.compile(r).groups < 3:
+          print error_message + ' has an invalid regular expression in the \"pattern\" key-value pair.'\
+           + '\n Regular expressions must have at least three capturing groups, example : (.*)(metadata)(\.fcl$) or (.*)(ssp\d+(_hw_cfg|))(\.fcl$).'\
+           + '\n The second capturing group is used as a default value for the \"entity\" key-value pair, e.g. entity:\"match.group(2)\"' 
+          errors_count+=1
+          continue
+      except re.error:
+	print error_message + ' has an invalid regular expression in the \"pattern\" key-value pair.'
+        errors_count+=1
+        continue
+      if 'entity' in d:
+        entity=d['entity'].encode('ascii')        
+        match = re.match(r'(.*)((gr1)(gr2)(gr3)(gr4)(gr5)(gr6)(gr7)(gr8)(gr9))(\.fcl$)', './demo/gr1gr2gr3gr4gr5gr6gr7gr8gr9.fcl')
+        entity_name_rule=d['entity'].encode('ascii')
+        try:
+	  entity_name = eval(entity_name_rule)	      
+        except Exception as e:
+	  print error_message + ' has an invalid eval expression in the \"entity\" key-value pair. Exception message:' + e.__doc__ \
+	    + '\nDetails: Suppose the entity key-value pair if defined as \'entity: \"match.group(3)+\'-\'+match.group(4)+\'-\'+match.group(7)\"\''\
+	    + '\n and the pattern key-value pair if defined as \'pattern: \"(.*)((gr1)(gr2)(gr3)(gr4)(gr5)(gr6)(gr7)(gr8)(gr9))(\.fcl$)\"\''\
+	    + '\n then the evaluated entity/process name for a file \"./demo/gr1gr2gr3gr4gr5gr6gr7gr8gr9.fcl\" is \"gr1-gr2-rg5\".'\
+	    + '\n And the exported configuration file will be \"gr1-gr2-rg5.fcl\".'  
+          errors_count+=1
+          continue
+	
+  if errors_count > 0:
+    schema=os.path.dirname(os.path.realpath(__file__))+'/../conf/'+ fhicl_schema
+    if not os.path.isfile(schema):
+      print 'Info: Replace ./schema.fcl with ' +schema+'; review schema.fcl and re-run the import command.'  
+    else:
+      shutil.copyfile(schema,fhicl_schema)
+      print 'Info: Replaced schema.fcl with the default one; review schema.fcl and re-run the import command.'
+    exit(1)
+
+
 def __composition_reader(subsets,layout,files):
+  __validate_schema(layout)  
   for f in files: 
     for l in subsets:
       for d in layout[l]:
@@ -360,7 +428,7 @@ def archiveRunConfiguration(config,run_number):
   __copy_default_schema()
 
   schema =__read_schema()
-
+  
   cfg_composition =list( __composition_reader(['run_history'], schema, __find_files('.',fcl_file_pattern)))
 
   excluded_files=__list_excluded_files(__get_prefix(config), schema, __find_files('.',any_file_pattern),cfg_composition)

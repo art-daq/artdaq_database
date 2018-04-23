@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_database  v1_04_50
+parent artdaq_database  v1_04_51
 defaultqual	e14:s50
 
 # These optional lines define the installed directories where
@@ -19,13 +19,11 @@ perllib  product_dir
 
 #
 product		version		optional
-cetlib   	v2_02_00        s46
 cetlib   	v3_00_01        s50
 cetlib          v3_02_00        s64
 cetlib          v3_03_00        s67
 TRACE           v3_13_06        -
 mongodb 	v3_4_6c
-python          v2_7_13b	s46
 python          v2_7_13d	s50
 python          v2_7_14b        s64
 python          v2_7_14b        s67
@@ -49,8 +47,6 @@ e15:s67:debug   e15:debug	-nq-	e15:debug 	-nq-	e15:debug	-nq-	-std=c++14
 e15:s67:prof    e15:prof	-nq-	e15:prof	-nq-	e15:prof	-nq-	-std=c++14
 e14:s50:debug   e14:debug	-nq-	e14:debug 	-nq-	e14:debug	-nq-	-std=c++14
 e14:s50:prof    e14:prof	-nq-	e14:prof	-nq-	e14:prof	-nq-	-std=c++14
-e10:s46:debug   e10:debug	-nq-	e10:debug 	-nq-	e10:debug	-nq-	-std=c++14
-e10:s46:prof    e10:prof	-nq-	e10:prof	-nq-	e10:prof	-nq-	-std=c++14
 end_qualifier_list
 
 
