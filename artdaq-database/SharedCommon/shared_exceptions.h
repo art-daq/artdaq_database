@@ -2,7 +2,7 @@
 #define _ARTDAQ_DATABASE_EXCEPTIONS_H_
 
 #include <exception>
-#include "cetlib/coded_exception.h"
+#include "cetlib_except/coded_exception.h"
 
 namespace debug {
 std::string current_exception_diagnostic_information();

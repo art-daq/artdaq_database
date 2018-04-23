@@ -1,3 +1,18 @@
+diff --git a/fhiclcpp/exception.h b/fhiclcpp/exception.h
+index bf2658a..69f4ff4 100644
+--- a/fhiclcpp/exception.h
++++ b/fhiclcpp/exception.h
+@@ -7,7 +7,9 @@
+ //
+ // ======================================================================
+ 
+-#include "cetlib/coded_exception.h"
++//#include "cetlib/coded_exception.h"
++#include "cetlib_except/coded_exception.h"
++
+ 
+ #include <string>
+ 
 diff --git a/fhiclcpp/extended_value.h b/fhiclcpp/extended_value.h
 index 484038d..bee0847 100644
 --- a/fhiclcpp/extended_value.h
