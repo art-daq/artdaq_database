@@ -221,7 +221,8 @@ def __list_excluded_files(config,layout,files,configuration_composition):
   excluded_files=list(files)
 
   for entry in configuration_composition:
-    excluded_files.remove(entry[2])
+    if entry[2] in excluded_files:
+      excluded_files.remove(entry[2])
 
   return excluded_files
   
@@ -348,6 +349,8 @@ def importConfiguration(configNameOrconfigPrefix):
   
   config = __increment_config_name(config) if config else __increment_config_name(configPrefix)
 
+  __copy_default_schema()
+  
   schema =__read_schema()   
   
   cfg_composition =list( __composition_reader(['artdaq_processes','artdaq_includes','system_layout'], schema, __find_files('.',fcl_file_pattern)))
@@ -429,7 +432,7 @@ def archiveRunConfiguration(config,run_number):
 
   schema =__read_schema()
   
-  cfg_composition =list( __composition_reader(['run_history'], schema, __find_files('.',fcl_file_pattern)))
+  cfg_composition =list( __composition_reader(['run_history','system_layout'], schema, __find_files('.',fcl_file_pattern)))
 
   excluded_files=__list_excluded_files(__get_prefix(config), schema, __find_files('.',any_file_pattern),cfg_composition)
   
