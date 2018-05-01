@@ -3,133 +3,133 @@ artdaq_processes: [{
 
 collection: COB1RCEs 
 
-pattern: "(.*)(cob1_rce\d+(_hw_cfg|))(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)(cob1_rce\d+(_hw_cfg|))(\.fcl$)" 
 
 }, {
 
 collection: COB2RCEs 
 
-pattern: "(.*)(cob2_rce\d+(_hw_cfg|))(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)(cob2_rce\d+(_hw_cfg|))(\.fcl$)" 
 
 }, {
 
 collection: COB3RCEs 
 
-pattern: "(.*)(cob3_rce\d+(_hw_cfg|))(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)(cob3_rce\d+(_hw_cfg|))(\.fcl$)" 
 
 }, {
 
 collection: COB4RCEs 
 
-pattern: "(.*)(cob4_rce\d+(_hw_cfg|))(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)(cob4_rce\d+(_hw_cfg|))(\.fcl$)" 
 
 }, {
 
 collection: COB5RCEs 
 
-pattern: "(.*)(cob5_rce\d+(_hw_cfg|))(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)(cob5_rce\d+(_hw_cfg|))(\.fcl$)" 
 
 }, {
 
 collection: COB6RCEs 
 
-pattern: "(.*)(cob6_rce\d+(_hw_cfg|))(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)(cob6_rce\d+(_hw_cfg|))(\.fcl$)" 
 
 }, {
 
 collection: RCEs 
 
-pattern: "(.*)(rce\d+(_hw_cfg|))(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)(rce\d+(_hw_cfg|))(\.fcl$)" 
 
 }, {
 
 collection: WIBs 
 
-pattern: "(.*)(wib\d+(_hw_cfg|))(\.fcl$)"
+pattern: "^(?!.*common_code)(.*/)(wib\d+(_hw_cfg|))(\.fcl$)" 
 
 }, {
 
 collection: WIBTests 
 
-pattern: "(.*)(wibtest\d+(_hw_cfg|))(\.fcl$)"
+pattern: "^(?!.*common_code)(.*/)(wibtest\d+(_hw_cfg|))(\.fcl$)" 
 
 }, {
 
 collection: SSPs 
 
-pattern: "(.*)(ssp\d+(_hw_cfg|))(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)(ssp\d+(_hw_cfg|))(\.fcl$)" 
 
 }, {
 
 collection: PENs 
 
-pattern: "(.*)(pen\d+(_hw_cfg|))(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)(pen\d+(_hw_cfg|))(\.fcl$)" 
 
 }, {
 
 collection: Felixes 
 
-pattern: "(.*)([Ff]elix\d+(_hw_cfg|))(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)([Ff]elix\d+(_hw_cfg|))(\.fcl$)" 
 
 }, {
 
 collection: Timing 
 
-pattern: "(.*)(timing[_|]\d*(_hw_cfg|))(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)(timing[_|]\d+(_hw_cfg|))(\.fcl$)" 
 
 }, {
 
 collection: PMTs 
 
-pattern: "(.*)(pmt\d+(_hw_cfg|))(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)(pmt\d+(_hw_cfg|))(\.fcl$)" 
 
 }, {
 
 collection: TPCs 
 
-pattern: "(.*)(tpc\d+(_hw_cfg|))(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)(tpc\d+(_hw_cfg|))(\.fcl$)" 
 
-},{
+}, {
 
 collection: Components 
 
-pattern: "(.*)(component\d*(_hw_cfg|))(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)(component\d*(_hw_cfg|))(\.fcl$)" 
 
 }, {
 
 collection: BoardReaders 
 
-pattern: "(.*)(BoardReader\d+)(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)(BoardReader\d+)(\.fcl$)" 
 
 }, {
 
 collection: EventBuilders 
 
-pattern: "(.*)(EventBuilder\d+)(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)(EventBuilder\d+)(\.fcl$)" 
 
 }, {
 
 collection: Aggregators 
 
-pattern: "(.*)(Aggregator\d+)(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)(Aggregator\d+)(\.fcl$)" 
 
 }, {
 
 collection: DataLoggers 
 
-pattern: "(.*)(DataLogger\d+)(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)(DataLogger\d+)(\.fcl$)" 
 
 }, {
 
 collection: Dispatchers 
 
-pattern: "(.*)(Dispatcher\d+)(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)(Dispatcher\d+)(\.fcl$)" 
 
 }, {
 
 collection: expert_options 
 
-pattern: "(.*)((rce_expert_run_options|ssp_expert_run_options|user_run_options).*)(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*/)((rce_expert_run_options|ssp_expert_run_options|user_run_options).*)(\.fcl$)" 
 
 }] 
 
@@ -137,7 +137,7 @@ artdaq_includes: [{
 
 collection: common_code 
 
-pattern: "(.*)common_code\/(.*)(\.fcl$)" 
+pattern: "(.*/)common_code\/(.*)(\.fcl$)" 
 
 }] 
 
@@ -145,7 +145,7 @@ run_history: [{
 
 collection: RunHistory 
 
-pattern: "(.*)((BoardReader_TOY\d+|BoardReader)_(.*[^_])_(\d+))(\.fcl$)" 
+pattern: "(.*/)((BoardReader_TOY\d+|BoardReader)_(.*[^_])_(\d+))(\.fcl$)" 
 
 entity: "match.group(3)+'_'+match.group(4)+'_'+match.group(5)" 
 
@@ -153,7 +153,7 @@ entity: "match.group(3)+'_'+match.group(4)+'_'+match.group(5)"
 
 collection: RunHistory 
 
-pattern: "(.*)((EventBuilder|Aggregator|DataLogger|Dispatcher)_(.*[^_])_(\d+))(\.fcl$)" 
+pattern: "(.*/)((EventBuilder|Aggregator|DataLogger|Dispatcher)_(.*[^_])_(\d+))(\.fcl$)" 
 
 entity: "match.group(3)+'_'+match.group(4)+'_'+match.group(5)" 
 
@@ -161,7 +161,7 @@ entity: "match.group(3)+'_'+match.group(4)+'_'+match.group(5)"
 
 collection: RunHistory 
 
-pattern: "(.*)(metadata)(\.fcl$)" 
+pattern: "(.*/)(metadata)(\.fcl$)" 
 
 }] 
 
@@ -169,6 +169,6 @@ system_layout: [{
 
 collection: SystemLayout 
 
-pattern: "(.*)(schema)(\.fcl$)" 
+pattern: "^(?!.*common_code)(.*)(schema)(\.fcl$)" 
 
 }] 
