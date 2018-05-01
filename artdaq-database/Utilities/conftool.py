@@ -11,6 +11,7 @@ import re
 import fnmatch
 import os
 import shutil
+import time
 
 fhicl_schema='schema.fcl'
 
@@ -192,17 +193,15 @@ def __validate_schema(schema):
 	    + '\n And the exported configuration file will be \"gr1-gr2-rg5.fcl\".'  
           errors_count+=1
           continue
-	
   if errors_count > 0:
-    timestamp = time.strftime('%b-%d-%Y_%H%M', time.localtime())
+    timestamp = time.strftime('%Y-%m-%d_%H%M%S', time.localtime())
     saved_fcl_name= './'+fhicl_schema + '.' + timestamp
-    shutil.copyfile(fhicl_schema,saved_fcl_name)
-    shutil.copyfile(schema,fhicl_schema)
-    print 'Info: Old schema.fcl was renamed to ' + saved_fcl_name + '.'
+    shutil.move(fhicl_schema,saved_fcl_name)
+    print 'Info: Old schema.fcl was renamed to ' + saved_fcl_name
     __copy_default_schema()      
     print 'Info: Replaced schema.fcl with the default one; review schema.fcl and re-run the import command.'
     exit(1)
-
+	
 
 def __composition_reader(subsets,layout,files):
   __validate_schema(layout)  
