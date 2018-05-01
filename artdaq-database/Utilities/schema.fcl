@@ -1,15 +1,57 @@
 
 artdaq_processes: [{
 
+collection: COB1RCEs 
+
+pattern: "(.*)(cob1_rce\d+(_hw_cfg|))(\.fcl$)" 
+
+}, {
+
+collection: COB2RCEs 
+
+pattern: "(.*)(cob2_rce\d+(_hw_cfg|))(\.fcl$)" 
+
+}, {
+
+collection: COB3RCEs 
+
+pattern: "(.*)(cob3_rce\d+(_hw_cfg|))(\.fcl$)" 
+
+}, {
+
+collection: COB4RCEs 
+
+pattern: "(.*)(cob4_rce\d+(_hw_cfg|))(\.fcl$)" 
+
+}, {
+
+collection: COB5RCEs 
+
+pattern: "(.*)(cob5_rce\d+(_hw_cfg|))(\.fcl$)" 
+
+}, {
+
+collection: COB6RCEs 
+
+pattern: "(.*)(cob6_rce\d+(_hw_cfg|))(\.fcl$)" 
+
+}, {
+
 collection: RCEs 
 
 pattern: "(.*)(rce\d+(_hw_cfg|))(\.fcl$)" 
 
 }, {
 
-collection: COBRCEs 
+collection: WIBs 
 
-pattern: "(.*)(cob\d+_rce\d+(_hw_cfg|))(\.fcl$)" 
+pattern: "(.*)(wib\d+(_hw_cfg|))(\.fcl$)"
+
+}, {
+
+collection: WIBTests 
+
+pattern: "(.*)(wibtest\d+(_hw_cfg|))(\.fcl$)"
 
 }, {
 
@@ -21,25 +63,37 @@ pattern: "(.*)(ssp\d+(_hw_cfg|))(\.fcl$)"
 
 collection: PENs 
 
-pattern: "(.*)((pen)(\d+)(_hw_cfg|))(\.fcl$)" 
+pattern: "(.*)(pen\d+(_hw_cfg|))(\.fcl$)" 
 
 }, {
 
-collection: TPCs 
+collection: Felixes 
 
-pattern: "(.*)((tpc)(\d+)(_hw_cfg|))(\.fcl$)" 
-
-}, {
-
-collection: Components 
-
-pattern: "(.*)((component)(\d*)(_hw_cfg|))(\.fcl$)" 
+pattern: "(.*)([Ff]elix\d+(_hw_cfg|))(\.fcl$)" 
 
 }, {
 
 collection: Timing 
 
-pattern: "(.*)((timing)(\d*)(_hw_cfg|))(\.fcl$)" 
+pattern: "(.*)(timing[_|]\d*(_hw_cfg|))(\.fcl$)" 
+
+}, {
+
+collection: PMTs 
+
+pattern: "(.*)(pmt\d+(_hw_cfg|))(\.fcl$)" 
+
+}, {
+
+collection: TPCs 
+
+pattern: "(.*)(tpc\d+(_hw_cfg|))(\.fcl$)" 
+
+},{
+
+collection: Components 
+
+pattern: "(.*)(component\d*(_hw_cfg|))(\.fcl$)" 
 
 }, {
 
@@ -93,15 +147,15 @@ collection: RunHistory
 
 pattern: "(.*)((BoardReader_TOY\d+|BoardReader)_(.*[^_])_(\d+))(\.fcl$)" 
 
-entity: "match.group(3)+'-'+match.group(4)+'-'+match.group(5)" 
+entity: "match.group(3)+'_'+match.group(4)+'_'+match.group(5)" 
 
 }, {
 
 collection: RunHistory 
 
-pattern: "(.*)((EventBuilder|Dispatcher|DataLogger)_(.*[^_])_(\d+))(\.fcl$)" 
+pattern: "(.*)((EventBuilder|Aggregator|DataLogger|Dispatcher)_(.*[^_])_(\d+))(\.fcl$)" 
 
-entity: "match.group(3)+'-'+match.group(4)+'-'+match.group(5)" 
+entity: "match.group(3)+'_'+match.group(4)+'_'+match.group(5)" 
 
 }, {
 
