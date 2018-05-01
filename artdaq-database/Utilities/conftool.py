@@ -194,12 +194,13 @@ def __validate_schema(schema):
           continue
 	
   if errors_count > 0:
-    schema=os.path.dirname(os.path.realpath(__file__))+'/../conf/'+ fhicl_schema
-    if not os.path.isfile(schema):
-      print 'Info: Replace ./schema.fcl with ' +schema+'; review schema.fcl and re-run the import command.'  
-    else:
-      shutil.copyfile(schema,fhicl_schema)
-      print 'Info: Replaced schema.fcl with the default one; review schema.fcl and re-run the import command.'
+    timestamp = time.strftime('%b-%d-%Y_%H%M', time.localtime())
+    saved_fcl_name= './'+fhicl_schema + '.' + timestamp
+    shutil.copyfile(fhicl_schema,saved_fcl_name)
+    shutil.copyfile(schema,fhicl_schema)
+    print 'Info: Old schema.fcl was renamed to ' + saved_fcl_name + '.'
+    __copy_default_schema()      
+    print 'Info: Replaced schema.fcl with the default one; review schema.fcl and re-run the import command.'
     exit(1)
 
 
