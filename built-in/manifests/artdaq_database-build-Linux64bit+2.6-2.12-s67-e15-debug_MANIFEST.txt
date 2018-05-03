@@ -12,6 +12,6 @@ mongodb              v3_4_6c         mongodb-3.4.6c-slf6-x86_64-e15-debug.tar.bz
 sqlite               v3_20_01_00     sqlite-3.20.01.00-slf6-x86_64.tar.bz2                       -f Linux64bit+2.6-2.12                       
 swig                 v3_0_12c        swig-3.0.12c-slf6-x86_64-e15-debug.tar.bz2                     -f Linux64bit+2.6-2.12    -q e15:debug       
 tbb                  v2018_2         tbb-2018.2-slf6-x86_64-e15-debug.tar.bz2                     -f Linux64bit+2.6-2.12    -q e15:debug       
-TRACE                v3_13_06        TRACE-3.13.06-slf6-x86_64.tar.bz2                           -f Linux64bit+2.6-2.12                       
+TRACE                v3_13_07        TRACE-3.13.07-slf6-x86_64.tar.bz2                           -f Linux64bit+2.6-2.12                       
 ups                  v6_0_7          ups-6.0.7-Linux64bit+2.6-2.12.tar.bz2                      -f Linux64bit+2.6-2.12                 
 nodejs               v4_5_0          nodejs-4.5.0-noarch.tar.bz2                                 -f Linux64bit+2.6-2.12                       
