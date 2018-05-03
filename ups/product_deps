@@ -22,7 +22,7 @@ product		version		optional
 cetlib   	v3_00_01        s50
 cetlib          v3_02_00        s64
 cetlib          v3_03_00        s67
-TRACE           v3_13_06        -
+TRACE           v3_13_07        -
 mongodb 	v3_4_6c
 python          v2_7_13d	s50
 python          v2_7_14b        s64
