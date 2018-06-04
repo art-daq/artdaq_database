@@ -62,7 +62,7 @@ bool dbfj::fhicl_to_json(std::string const& fcl, std::string const& filename, st
 
   TLOG(12) << "read_comments begin";
   result = reader.read_comments(fcl, boost::get<jsn::array_t>(json_root[literal::comments]));
-  TLOG(12) << "read_comments end result=" << std::to_string(static_cast<int>(result));
+  TLOG(12) << "read_comments end result=" << static_cast<int>(result);
 
   if (!result) {
     return result;
@@ -70,7 +70,7 @@ bool dbfj::fhicl_to_json(std::string const& fcl, std::string const& filename, st
 
   TLOG(12) << "read_data begin";
   result = reader.read_data(fcl, boost::get<jsn::object_t>(json_root[literal::document]));
-  TLOG(12) << "read_data end result=" << std::to_string(static_cast<int>(result));
+  TLOG(12) << "read_data end result=" << static_cast<int>(result);
 
   if (!result) {
     return result;
