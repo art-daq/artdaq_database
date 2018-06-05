@@ -5,7 +5,7 @@
 # Main program starts at the bottom of this file.
 #----------------------------------------------------------------
 ARTDAQ_UPS_QUAL="e15:prof:s64"
-ARTDAQ_DB_UPS_VER=v1_04_50
+ARTDAQ_DB_UPS_VER=v1_04_56
 WEBEDITOR_UPS_VER=v1_01_00
 
 
