@@ -23,31 +23,13 @@ MONGOD_UPS_VER=v3_4_6c
 MONGOD_PORT=27037
 WEBEDITOR_BASE_PORT=8880
 
-INACTIVE_DATABASES="cern_pddaq_v3_db artdaq_db"
+INACTIVE_DATABASES="cern_pddaq_v3x_db cern_pddaq_v3_db artdaq_db"
 
-ARTDAQ_DB_PULLPRODUCTS="slf7 artdaq_database-${ARTDAQ_DB_UPS_VER} $(echo $ARTDAQ_UPS_QUAL | cut -d":" -f3 )-$(echo $ARTDAQ_UPS_QUAL | cut -d":" -f1 ) $(echo $ARTDAQ_UPS_QUAL | cut -d":" -f2 )"
-
+INSTALL_TESTDATA_URI="https://cdcvs.fnal.gov/redmine/projects/artdaq-utilities/repository/database/revisions/develop/raw/test/testdata/np04_teststand_tests.taz"
 #----------------------------------------------------------------
 # Implementaion
 # Main program starts at the bottom of this file.
 #----------------------------------------------------------------
-
-TMP_PAR_LIST=(${ARTDAQ_DB_PULLPRODUCTS})
-
-if [[ "${TMP_PAR_LIST[0]}" == "slf7" ]]; then
-  this_ups_flavor="Linux64bit+3.10-2.17"
-else
-  this_ups_flavor="Linux64bit+2.6-2.12"
-fi
- 
-ARTDAQ_DB_MANIFEST="artdaq_database-$(echo $ARTDAQ_DB_UPS_VER|sed 's/_/./g'|sed -e 's/^v//')-${this_ups_flavor}-${TMP_PAR_LIST[2]}-${TMP_PAR_LIST[3]}_MANIFEST.txt"
-
-ARTDAQ_DB_MANIFEST_RAW="artdaq_database-build-${this_ups_flavor}-${TMP_PAR_LIST[2]}-${TMP_PAR_LIST[3]}_MANIFEST.txt"
-
-#ARTDAQ_DB_MANIFEST="artdaq_database-build-Linux64bit+3.10-2.17-s50-e14-prof_MANIFEST.txt"
-ARTDAQ_DB_MANIFESTURL="https://cdcvs.fnal.gov/redmine/projects/artdaq-utilities/repository/database/revisions/${ARTDAQ_DB_UPS_VER}/raw/built-in/manifests/${ARTDAQ_DB_MANIFEST_RAW}"
-
-
 
 WEBEDITOR_UPS_QUAL=${ARTDAQ_UPS_QUAL}
 ARTDAQ_DB_UPS_QUAL=${ARTDAQ_UPS_QUAL}
@@ -62,11 +44,32 @@ user_prompts=true
 timestamp=$(date -d "today" +"%Y%m%d%H%M%S")
 dblist=(${INACTIVE_DATABASES} ${ARTDAQ_DB_NAME})
 
+ARTDAQ_DB_PULLPRODUCTS="notset"
+ARTDAQ_DB_MANIFESTURL="notset"
+
 run_as_user=$(id -u -n )
 run_as_group=$(id -g -n ${run_as_user})
 
 source ${PRODUCTS_BASE_DIR}/setup
 unsetup_all  >/dev/null 2>&1 
+
+function configure_pull_products() {
+ARTDAQ_DB_PULLPRODUCTS="slf7 artdaq_database-${ARTDAQ_DB_UPS_VER} $(echo $ARTDAQ_UPS_QUAL | cut -d":" -f3 )-$(echo $ARTDAQ_UPS_QUAL | cut -d":" -f1 ) $(echo $ARTDAQ_UPS_QUAL | cut -d":" -f2 )"
+
+TMP_PAR_LIST=(${ARTDAQ_DB_PULLPRODUCTS})
+
+if [[ "${TMP_PAR_LIST[0]}" == "slf7" ]]; then
+  this_ups_flavor="Linux64bit+3.10-2.17"
+else
+  this_ups_flavor="Linux64bit+2.6-2.12"
+fi
+ 
+ARTDAQ_DB_MANIFEST="artdaq_database-$(echo $ARTDAQ_DB_UPS_VER|sed 's/_/./g'|sed -e 's/^v//')-${this_ups_flavor}-${TMP_PAR_LIST[2]}-${TMP_PAR_LIST[3]}_MANIFEST.txt"
+ARTDAQ_DB_MANIFEST_RAW="artdaq_database-build-${this_ups_flavor}-${TMP_PAR_LIST[2]}-${TMP_PAR_LIST[3]}_MANIFEST.txt"
+ARTDAQ_DB_MANIFESTURL="https://cdcvs.fnal.gov/redmine/projects/artdaq-utilities/repository/database/revisions/${ARTDAQ_DB_UPS_VER}/raw/built-in/manifests/${ARTDAQ_DB_MANIFEST_RAW}"
+return $rc_success
+
+}
 
 function have_artdaq_database() {
 #----------------------------------------------------------------
@@ -502,14 +505,22 @@ if [ -z "conftool_bin" ] &&  [ ! -x ${conftool_bin} ]; then
         printf "Info: conftool found: '${conftool_bin}'\n"
 fi
 
+if [ -z ${INSTALL_TESTDATA_URI+x} ]; then
+        printf "Info: Using ${ARTDAQ_DATABASE_DIR}/testdata/\n";return $rc_failure;  else
+	printf "Info: Downloading ${INSTALL_TESTDATA_URI} into ${ARTDAQ_DATABASE_DIR}/testdata/\n"
+        wget ${INSTALL_DATA_URI} 
+	cp $(basename ${INSTALL_TESTDATA_URI}) ${ARTDAQ_DATABASE_DIR}/testdata/
+fi
+
 tmpdir="/tmp/artdaqdb_test_data-${timestamp}"
+
 for testfile in $(find ${ARTDAQ_DATABASE_DIR}/testdata -name  "np04_teststand*taz" -type f -print);do 
   tmpname=$(basename ${testfile})
   tmpname=${tmpname%.taz}
   mkdir -p ${tmpdir}/${tmpname}
   
   printf "\nInfo: Unpacking ${tmpname} to ${tmpdir}/${tmpname}\n"
-  cp ${ARTDAQ_DATABASE_FQ_DIR}/conf/schema.fcl ${tmpdir}/${tmpname}/  
+  cp ${ARTDAQ_DATABASE_FQ_DIR}/conf/schema.fcl ${tmpdir}/${tmpname}/
   tar xfz ${testfile} -C ${tmpdir}/${tmpname} --no-acls --no-selinux --no-selinux
   sync
   
@@ -1021,6 +1032,11 @@ read -p "Press CTRL-C to abort or any other key to resume this script." answer
 
 DATABASE_BASE_DIR=$(dirname ${ARTDAQ_BASE_DIR})/database
 PRODUCTS_BASE_DIR=${ARTDAQ_BASE_DIR}/products
+
+configure_pull_products
+if [[ $? -ne $rc_success ]]; then 
+  exit $?
+fi
 
 pull_products
 if [[ $? -ne $rc_success ]]; then 
