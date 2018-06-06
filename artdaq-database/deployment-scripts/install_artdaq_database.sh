@@ -508,7 +508,7 @@ fi
 if [ -z ${INSTALL_TESTDATA_URI+x} ]; then
         printf "Info: Using ${ARTDAQ_DATABASE_DIR}/testdata/\n";return $rc_failure;  else
 	printf "Info: Downloading ${INSTALL_TESTDATA_URI} into ${ARTDAQ_DATABASE_DIR}/testdata/\n"
-        wget ${INSTALL_DATA_URI} 
+        wget ${INSTALL_TESTDATA_URI} 
 	cp $(basename ${INSTALL_TESTDATA_URI}) ${ARTDAQ_DATABASE_DIR}/testdata/
 fi
 
