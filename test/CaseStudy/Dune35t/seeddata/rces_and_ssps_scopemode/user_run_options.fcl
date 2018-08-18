@@ -1,8 +1,0 @@
-daq.fragment_receiver.HardwareConfig.ALL_readout_window                : 2000
-daq.fragment_receiver.DAQConfig.MillisliceLength                       : 320000
-daq.fragment_receiver.DAQConfig.MillisliceOverlap                      : 0
-daq.fragment_receiver.rce_daq_mode                                     : Scope
-daq.fragment_receiver.rce_xml_config_file                              : 'config/defaults.scopemode.xml'
-daq.fragment_receiver.HardwareConfig.ALL_readout_pretrigger            : 50
-daq.fragment_receiver.number_of_microslices_per_millislice             : 10
-daq.fragment_receiver.HardwareConfig.ALL_channel_control               : 0x00006001

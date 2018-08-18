@@ -1,3 +1,0 @@
-#include "rce_standard.fcl"
-
-daq: @local::rce07_standard
