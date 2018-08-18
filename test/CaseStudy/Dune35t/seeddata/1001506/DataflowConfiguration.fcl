@@ -1,0 +1,52 @@
+
+DAQ_setup_script: "/nfs/sw/work_dirs/dune-artdaq_artdaq_v3_02_00_testing/setupDUNEARTDAQ"
+
+PMT_host: "localhost"
+
+PMT_port: 6400
+
+partition_number: 1
+
+tcp_base_port: 9100
+
+request_port: 3001
+
+request_address: "227.128.12.26"
+
+table_update_address: "227.129.2.128"
+
+routing_base_port: 11010
+
+zmq_fragment_connection_out: 17438
+
+manage_processes: "false"
+
+
+
+RoutingMaster_labels: ["RoutingMaster_1"]
+
+EventBuilder_labels: ["EventBuilder3", "EventBuilder4", "EventBuilder7", "EventBuilder8", "EventBuilder11", "EventBuilder12", "EventBuilder15", "EventBuilder16"]
+
+EventBuilder_ports: [6237, 6238, 6241, 6242, 6245, 6246, 6249, 6250]
+
+EventBuilder_hosts: ["np04-srv-001", "np04-srv-001", "np04-srv-002", "np04-srv-002", "np04-srv-003", "np04-srv-003", "np04-srv-004", "np04-srv-004"]
+
+RoutingMaster_ports: [7296]
+
+RoutingMaster_hosts: ["np04-srv-001"]
+BoardReader_hosts: ["np04-srv-011","np04-srv-011","np04-srv-011","np04-srv-011","np04-srv-013","np04-srv-013","np04-srv-013","np04-srv-013","np04-srv-014","np04-srv-014","np04-srv-014","np04-srv-014","np04-srv-015","np04-srv-015","np04-srv-015","np04-srv-015","np04-srv-016","np04-srv-016","np04-srv-016","np04-srv-016","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-012","np04-srv-011","np04-srv-011","np04-srv-013","np04-srv-013","np04-srv-013","np04-srv-013","np04-srv-013","np04-srv-013","np04-srv-013","np04-srv-013","np04-srv-013","np04-srv-013","np04-srv-014","np04-srv-014","np04-srv-014","np04-srv-014","np04-srv-014","np04-srv-014","np04-srv-014","np04-srv-014","np04-srv-014","np04-srv-014","np04-srv-015","np04-srv-015","np04-srv-015","np04-srv-015","np04-srv-015","np04-srv-015","np04-srv-015","np04-srv-015","np04-srv-015","np04-srv-015","np04-srv-016","np04-srv-016","np04-srv-016","np04-srv-016","np04-srv-016","np04-srv-016","np04-srv-016","np04-srv-016","np04-srv-016","np04-srv-016","np04-srv-016","np04-srv-016","np04-srv-016","np04-srv-016","np04-srv-016","np04-srv-016","np04-srv-016","np04-srv-016"]
+BoardReader_ports: ["7000","7001","7002","7003","7004","7005","7006","7007","7008","7009","7010","7011","7012","7013","7014","7015","7016","7017","7018","7019","8001","10005","10006","10007","10008","10009","10010","10011","10012","10013","10014","10015","10016","10017","10018","10019","10020","10021","10022","10023","10024","10025","10026","10027","10028","10029","11008","11009","11010","11011","11012","11013","11014","11015","11016","11017","11018","11019","11020","11021","11022","11023","11024","11025","11026","11027","11028","11029","11030","11031","11032","11033","11034","11035","11036","11037","11038","11039","11040","11041","11042","11043","11044","11045","11046","11047","11048","11049","11056","11057","11058","11059","11060","11061","11062","11063"]
+BoardReader_labels: ["ssp101","ssp102","ssp103","ssp104","ssp201","ssp202","ssp203","ssp204","ssp301","ssp302","ssp303","ssp304","ssp401","ssp402","ssp403","ssp404","ssp501","ssp502","ssp503","ssp504","timing_1","wib101","wib102","wib103","wib104","wib105","wib201","wib202","wib203","wib204","wib205","wib301","wib302","wib303","wib304","wib305","wib401","wib402","wib403","wib404","wib405","wib501","wib502","wib503","wib504","wib505","cob2_rce01","cob2_rce02","cob2_rce03","cob2_rce04","cob2_rce05","cob2_rce06","cob2_rce07","cob2_rce08","cob3_rce01","cob3_rce02","cob3_rce03","cob3_rce04","cob3_rce05","cob3_rce06","cob3_rce07","cob3_rce08","cob4_rce01","cob4_rce02","cob4_rce03","cob4_rce04","cob4_rce05","cob4_rce06","cob4_rce07","cob4_rce08","cob5_rce01","cob5_rce02","cob5_rce03","cob5_rce04","cob5_rce05","cob5_rce06","cob5_rce07","cob5_rce08","cob6_rce01","cob6_rce02","cob6_rce03","cob6_rce04","cob6_rce05","cob6_rce06","cob6_rce07","cob6_rce08","cob7_rce01","cob7_rce02","cob8_rce01","cob8_rce02","cob8_rce03","cob8_rce04","cob8_rce05","cob8_rce06","cob8_rce07","cob8_rce08"]
+config_name: "np04_WibsReal_Ssps00045"
+
+components: ["cob2_rce01", "cob2_rce02", "cob2_rce03", "cob2_rce04", "cob2_rce05", "cob2_rce06", "cob2_rce07", "cob2_rce08", "cob3_rce01", "cob3_rce02", "cob3_rce03", "cob3_rce04", "cob3_rce05", "cob3_rce06", "cob3_rce07", "cob3_rce08", "cob4_rce01", "cob4_rce02", "cob4_rce03", "cob4_rce04", "cob4_rce05", "cob4_rce06", "cob4_rce07", "cob4_rce08", "cob5_rce01", "cob5_rce02", "cob5_rce03", "cob5_rce04", "cob5_rce05", "cob5_rce06", "cob5_rce07", "cob5_rce08", "cob6_rce01", "cob6_rce02", "cob6_rce03", "cob6_rce04", "cob6_rce05", "cob6_rce06", "cob6_rce07", "cob6_rce08", "cob7_rce01", "cob7_rce02", "cob8_rce01", "cob8_rce02", "cob8_rce03", "cob8_rce04", "cob8_rce05", "cob8_rce06", "cob8_rce07", "cob8_rce08", "ssp101", "ssp102", "ssp103", "ssp104", "ssp201", "ssp202", "ssp203", "ssp204", "ssp301", "ssp302", "ssp303", "ssp304", "ssp401", "ssp402", "ssp403", "ssp404", "ssp501", "ssp502", "ssp503", "ssp504", "timing_1", "wib101", "wib102", "wib103", "wib104", "wib105", "wib201", "wib202", "wib203", "wib204", "wib205", "wib301", "wib302", "wib303", "wib304", "wib305", "wib401", "wib402", "wib403", "wib404", "wib405", "wib501", "wib502", "wib503", "wib504", "wib505"]
+
+DAQInterface_directory: "/nfs/sw/artdaq/DAQInterface2"
+
+DAQInterface_commit: 1.0
+
+artdaq_commit: "125690712685f59fd8df6ce41eae8c0d58503ce1"
+
+dune_artdaq_commit: "209311233a2ed277c1ba05e4775c927428591ecb"
+
+dune_raw_data_commit: "4a6140a3e04795098f547eb2fa80a82a55f0a124"
