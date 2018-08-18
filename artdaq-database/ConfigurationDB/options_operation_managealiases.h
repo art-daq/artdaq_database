@@ -75,6 +75,13 @@ void ManageAliases();
 }  // namespace configuration
 }  // namespace database
 }  // namespace artdaq
-
+namespace {
+template<>
+inline TraceStreamer& TraceStreamer::operator<<(const artdaq::database::configuration::ManageAliasesOperation& r)
+{
+  std::ostringstream s; s << r.to_string(); msg_append(s.str().c_str());
+  return *this;
+}
+}
 #endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_MANAGEALIASES_H_ \
         */

@@ -36,4 +36,13 @@ std::ostream& operator<<(std::ostream&, artdaq::database::basictypes::XmlData co
 }  // namespace database
 }  // namespace artdaq
 
+namespace {
+template<>
+inline TraceStreamer& TraceStreamer::operator<<(const artdaq::database::basictypes::XmlData& r)
+{
+  std::ostringstream s; s << r; msg_append(s.str().c_str());
+  return *this;
+}
+}
+
 #endif /* _ARTDAQ_DATABASE_BASICTYPES_FHICL_H_ */

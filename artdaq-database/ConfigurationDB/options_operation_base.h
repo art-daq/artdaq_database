@@ -14,13 +14,18 @@ namespace database {
 namespace basictypes {
 struct JsonData;
 }
+namespace docrecord {
+class JSONDocument;  
+}
 
 namespace configuration {
 
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::configuration::options::data_format_t;
+using artdaq::database::docrecord::JSONDocument;
 
 namespace apiliteral = artdaq::database::configapi::literal;
+namespace jsonliteral = artdaq::database::dataformats::literal;
 
 class OperationBase {
  public:
@@ -54,6 +59,8 @@ class OperationBase {
   std::string to_string() const;
   operator std::string() const;
 
+  operator JSONDocument() const;
+  
   virtual bpo::options_description makeProgramOptions() const;
 
   virtual int readProgramOptions(bpo::variables_map const&);

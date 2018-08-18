@@ -6,7 +6,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "JSNU:DocuMgrt_C"
+#define TRACE_NAME "JSONDocumentMigrator.cpp"
 
 using artdaq::database::json::array_t;
 using artdaq::database::json::object_t;

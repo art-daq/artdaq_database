@@ -14,7 +14,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "FHJS:fcl2jsndb_C"
+#define TRACE_NAME "convertfhicl2jsondb.cpp"
 
 namespace db = artdaq::database;
 namespace fcl = artdaq::database::fhicl;

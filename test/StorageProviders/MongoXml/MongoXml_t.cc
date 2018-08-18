@@ -137,16 +137,16 @@ bool test_insert(std::string const& source_xml, std::string const& compare_xml, 
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
-  auto provider = DBI::DBProvider<JsonData>::create(database);
+  auto provider = DBI::DBProvider<JSONDocument>::create(database);
 
   auto collection = std::string("testXML_V001");
 
-  auto json = JsonData{"{\"document\":" + insert.to_string() + R"(, "collection":")" + collection + "\"}"};
+  auto json = JSONDocument{"{\"document\":" + insert.to_string() + ", \"collection\":\"" + collection + "\"}"};
 
   auto object_id = provider->writeDocument(json);
 
   auto search =
-      JsonData{"{\"filter\":" + (filter.empty() ? object_id : filter) + R"(, "collection":")" + collection + "\"}"};
+      JSONDocument{"{\"filter\":" + (filter.empty() ? object_id : filter) + ", \"collection\":\"" + collection + "\"}"};
 
   std::cout << "Search criteria " << search << "\n";
 
@@ -203,16 +203,16 @@ bool test_search1(std::string const& source_xml, std::string const& compare_xml,
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
-  auto provider = DBI::DBProvider<JsonData>::create(database);
+  auto provider = DBI::DBProvider<JSONDocument>::create(database);
 
   auto collection = std::string("testXML_V001");
 
-  auto json = JsonData{"{\"document\":" + insert.to_string() + R"(, "collection":")" + collection + "\"}"};
+  auto json = JSONDocument{"{\"document\":" + insert.to_string() + ", \"collection\":\"" + collection + "\"}"};
 
   auto object_id = provider->writeDocument(json);
 
   auto search =
-      JsonData{"{\"filter\":" + (filter.empty() ? object_id : filter) + R"(, "collection":")" + collection + "\"}"};
+      JSONDocument{"{\"filter\":" + (filter.empty() ? object_id : filter) + ", \"collection\":\"" + collection + "\"}"};
 
   std::cout << "Search criteria " << search << "\n";
 
@@ -259,11 +259,11 @@ bool test_search2(std::string const& source_xml, std::string const& compare_xml,
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
-  auto provider = DBI::DBProvider<JsonData>::create(database);
+  auto provider = DBI::DBProvider<JSONDocument>::create(database);
 
   auto collection = std::string("testXML_V001");
 
-  auto json = JsonData{"{\"document\":" + source.json_buffer + R"(, "collection":")" + collection + "\"}"};
+  auto json = JSONDocument{"{\"document\":" + source.json_buffer + ", \"collection\":\"" + collection + "\"}"};
 
   auto repeatCount = std::size_t{10};
 
@@ -289,7 +289,7 @@ bool test_search2(std::string const& source_xml, std::string const& compare_xml,
   auto filter = oss.str();
 
   auto search =
-      JsonData{"{\"filter\":" + (filter.empty() ? options : filter) + R"(, "collection":")" + collection + "\"}"};
+      JSONDocument{"{\"filter\":" + (filter.empty() ? options : filter) + ", \"collection\":\"" + collection + "\"}"};
 
   std::cout << "Search criteria " << search << "\n";
 
@@ -330,15 +330,15 @@ bool test_update(std::string const& source_xml, std::string const& compare_xml, 
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
-  auto provider = DBI::DBProvider<JsonData>::create(database);
+  auto provider = DBI::DBProvider<JSONDocument>::create(database);
 
   auto collection = std::string("testXML_V001");
 
-  auto json = JsonData{"{\"document\":" + insert.to_string() + R"(, "collection":")" + collection + "\"}"};
+  auto json = JSONDocument{"{\"document\":" + insert.to_string() + ", \"collection\":\"" + collection + "\"}"};
 
   auto object_id = provider->writeDocument(json);
 
-  auto search = JsonData{"{\"filter\":" + object_id + R"(, "collection":")" + collection + "\"}"};
+  auto search = JSONDocument{"{\"filter\":" + object_id + ", \"collection\":\"" + collection + "\"}"};
 
   std::cout << "Search criteria " << search << "\n";
 
@@ -357,12 +357,12 @@ bool test_update(std::string const& source_xml, std::string const& compare_xml, 
   auto payload = changes.findChild("document");
   found.replaceChild(payload, "document");
 
-  json = JsonData{"{\"document\":" + found.to_string() + ", \"filter\":" + object_id + R"(,"collection":")" +
+  json = JSONDocument{"{\"document\":" + found.to_string() + ", \"filter\":" + object_id + ",\"collection\":\"" +
                   collection + "\"}"};
 
   object_id = provider->writeDocument(json);
 
-  search = JsonData{"{\"filter\":" + object_id + R"(, "collection":")" + collection + "\"}"};
+  search = JSONDocument{"{\"filter\":" + object_id + ", \"collection\":\"" + collection + "\"}"};
   results = provider->readDocument(search);
 
   if (results.size() != 1) {

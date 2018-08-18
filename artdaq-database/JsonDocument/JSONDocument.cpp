@@ -5,14 +5,12 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "JSNU:Document_C"
+#define TRACE_NAME "JSONDocument.cpp"
 
 using artdaq::database::json::array_t;
 using artdaq::database::json::object_t;
 using artdaq::database::json::type_t;
 using artdaq::database::json::value_t;
-
-using artdaq::database::json::JsonWriter;
 
 using namespace artdaq::database;
 using artdaq::database::docrecord::JSONDocument;
@@ -49,7 +47,6 @@ std::vector<path_t> split_path_validate(path_t const& path, std::string const& c
 }
 
 value_t const& JSONDocument::findChildValue(path_t const& path) const try {
-  TLOG(15) << "findChildValue() begin json_buffer=<" << cached_json_buffer() << ">";
   TLOG(15) << "findChildValue() args  path=<" << path << ">";
 
   auto path_tokens = split_path_validate(path, "findChildValue");
@@ -99,7 +96,6 @@ value_t const& JSONDocument::findChildValue(path_t const& path) const try {
 
 // returns found child
 JSONDocument JSONDocument::findChild(path_t const& path) const try {
-  TLOG(16) << "findChild() begin json_buffer=<" << cached_json_buffer() << ">";
   TLOG(16) << "findChild() args  path=<" << path << ">";
 
   validate(path, "findChild");
@@ -113,9 +109,6 @@ JSONDocument JSONDocument::findChild(path_t const& path) const try {
   auto& document = boost::get<object_t>(returnValue._value);
   document[path] = found_value;
 
-  returnValue.update_json_buffer();
-
-  TLOG(16) << "findChild() resultDocument=<" << returnValue.cached_json_buffer() << ">";
   TLOG(16) << "findChild() Find succeeded.";
 
   return returnValue;
@@ -126,7 +119,6 @@ JSONDocument JSONDocument::findChild(path_t const& path) const try {
 
 // returns found child value as a document
 JSONDocument JSONDocument::findChildDocument(path_t const& path) const try {
-  TLOG(16) << "findChildDocument() begin json_buffer=<" << cached_json_buffer() << ">";
   TLOG(16) << "findChildDocument() args  path=<" << path << ">";
 
   validate(path, "findChildDocument");
@@ -140,7 +132,6 @@ JSONDocument JSONDocument::findChildDocument(path_t const& path) const try {
 
   auto returnValue = JSONDocument(found_value);
 
-  TLOG(16) << "findChildDocument() resultDocument=<" << returnValue.cached_json_buffer() << ">";
   TLOG(16) << "findChildDocument() Find succeeded.";
 
   return returnValue;
@@ -151,8 +142,6 @@ JSONDocument JSONDocument::findChildDocument(path_t const& path) const try {
 
 // returns old child
 JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t const& path) try {
-  TLOG(14) << "replaceChild() begin json_buffer=<" << cached_json_buffer() << ">";
-  TLOG(14) << "replaceChild() args  newChild=<" << newChild.cached_json_buffer() << ">";
   TLOG(14) << "replaceChild() args  path=<" << path << ">";
 
   auto path_tokens = split_path_validate(path, "replaceChild");
@@ -194,10 +183,9 @@ JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t con
   };
 
   auto replaced_value = recurse(_value, path_tokens.size() - 1);
-  update_json_buffer();
+  
+  _isDirty=true;
 
-  TLOG(14) << "replaceChild() old child value=" << print_visitor(replaced_value);
-  TLOG(14) << "replaceChild() resultDocument=<" << cached_json_buffer() << ">";
   TLOG(14) << "replaceChild() Replace succeeded.";
 
   auto obj = object_t{};
@@ -212,8 +200,6 @@ JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t con
 
 // returns inserted child
 JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t const& path) try {
-  TLOG(12) << "insertChild() begin json_buffer=<" << cached_json_buffer() << ">";
-  TLOG(12) << "insertChild() args  newChild=<" << newChild.cached_json_buffer() << ">";
   TLOG(12) << "insertChild() args  path=<" << path << ">";
 
   auto path_tokens = split_path_validate(path, "insertChild");
@@ -239,8 +225,6 @@ JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t cons
     auto& childDocument = boost::get<object_t>(childValue);
 
     tmpJson.clear();
-    TLOG(12) << "insertChild() recurse() args childValue=<" << (JsonWriter().write(childDocument, tmpJson), tmpJson)
-             << ">";
 
     auto numberOfChildren = childDocument.count(path_token);
 
@@ -262,9 +246,9 @@ JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t cons
   };
 
   auto inserted_value = recurse(_value, path_tokens.size() - 1);
-  update_json_buffer();
+  
+  _isDirty=true;
 
-  TLOG(12) << "insertChild() resultDocument=<" << cached_json_buffer() << ">";
   TLOG(12) << "insertChild() Insert succeeded.";
 
   return JSONDocument(inserted_value);
@@ -298,8 +282,6 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) try {
     auto& childDocument = boost::get<object_t>(childValue);
 
     tmpJson.clear();
-    TLOG(13) << "deleteChild() recurse() args childValue=<" << (JsonWriter().write(childDocument, tmpJson), tmpJson)
-             << ">";
 
     if (childDocument.count(path_token) == 0) {
       throw notfound_exception("JSONDocument")
@@ -316,12 +298,10 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) try {
   };
 
   auto deleted_value = recurse(_value, path_tokens.size() - 1);
-  update_json_buffer();
+  
+  _isDirty=true;
 
-  TLOG(13) << "deleteChild() deleted child value=" << print_visitor(deleted_value);
-  TLOG(13) << "deleteChild() resultDocument=<" << cached_json_buffer() << ">";
   TLOG(13) << "deleteChild() Delete succeeded.";
-  //    if (path == "_id") std::replace(return_json.begin(), return_json.end(), '$', '_');
 
   return JSONDocument(deleted_value);
 } catch (std::exception& ex) {
@@ -331,7 +311,6 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) try {
 
 // returns added child
 JSONDocument JSONDocument::appendChild(JSONDocument const& newChild, path_t const& path) try {
-  TLOG(15) << "appendChild() begin json_buffer=<" << cached_json_buffer() << ">";
   TLOG(15) << "appendChild() args  path=<" << path << ">";
 
   auto const& newValue = newChild.getPayloadValueForKey("null");
@@ -342,9 +321,8 @@ JSONDocument JSONDocument::appendChild(JSONDocument const& newChild, path_t cons
 
   valueArray.push_back(newValue);
 
-  update_json_buffer();
+  _isDirty=true;
 
-  TLOG(13) << "appendChild() resultDocument=<" << cached_json_buffer() << ">";
   TLOG(13) << "appendChild() Append succeeded.";
 
   return {newValue};
@@ -356,7 +334,6 @@ JSONDocument JSONDocument::appendChild(JSONDocument const& newChild, path_t cons
 bool matches(value_t const&, value_t const&);
 // returns removed child
 JSONDocument JSONDocument::removeChild(JSONDocument const& delChild, path_t const& path) try {
-  TLOG(15) << "removeChild() begin json_buffer=<" << cached_json_buffer() << ">";
   TLOG(15) << "removeChild() args  path=<" << path << ">";
 
   validate(path, "removeChild");
@@ -383,11 +360,8 @@ JSONDocument JSONDocument::removeChild(JSONDocument const& delChild, path_t cons
     }
   }
 
-  update_json_buffer();
-  returnValue.update_json_buffer();
-
-  TLOG(15) << "removeChild() resultDocument=<" << cached_json_buffer() << ">";
-  TLOG(15) << "removeChild() removedChildren=<" << returnValue.cached_json_buffer() << ">";
+  _isDirty=true;
+  
   TLOG(15) << "removeChild() Remove succeeded.";
 
   return returnValue;

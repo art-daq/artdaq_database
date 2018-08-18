@@ -11,7 +11,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "CONF:OpSrch_C"
+#define TRACE_NAME "dboperation_manageconfigs.cpp"
 
 using namespace artdaq::database::configuration;
 namespace dbcfg = artdaq::database::configuration;

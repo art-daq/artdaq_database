@@ -13,7 +13,8 @@ bool JsonWriter::write(object_t const& ast, std::string& out) {
 
   auto result = bool(false);
   auto buffer = std::string();
-
+  buffer.reserve(10000);
+  
   auto sink = std::back_insert_iterator<std::string>(buffer);
 
   json_generator_grammar<decltype(sink)> grammar;

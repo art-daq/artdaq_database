@@ -10,7 +10,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "JSNU:DocUtils_C"
+#define TRACE_NAME "JSONDocument_utils.cpp"
 
 using artdaq::database::json::array_t;
 using artdaq::database::json::object_t;
@@ -153,7 +153,7 @@ std::string JSONDocument::writeJson() const {
   auto const& tmpObject = boost::get<object_t>(_value);
 
   if (tmpObject.empty()) {
-    return "{}";
+    return jsonliteral::empty_json;
   }
 
   auto json = std::string{};
@@ -162,24 +162,24 @@ std::string JSONDocument::writeJson() const {
     throw invalid_argument("JSONDocument") << "Failed writing JSON: JSONDocument::_value has invalid AST";
   }
 
-  // TLOG(11) << "writeJson() json=<" << json << " > ");
-
   return json;
 }
 
-std::string JSONDocument::to_string() const { return writeJson(); }
+std::string JSONDocument::to_string() const { if (_isDirty) {_cached_json_buffer = writeJson(); _isDirty=false;} return _cached_json_buffer; }
 
-JSONDocument::JSONDocument(JsonData const& data) : _value{readJson(data)}, _cached_json_buffer(data) {}
+JSONDocument::operator std::string() const {if (_isDirty) {_cached_json_buffer = writeJson(); _isDirty=false;} return _cached_json_buffer;}
 
-JSONDocument::JSONDocument(std::string const& json) : _value{readJson(json)}, _cached_json_buffer(json) {}
+bool JSONDocument::empty() const { return _value.empty(); }
 
-JSONDocument::JSONDocument(value_t value) : _value{std::move(value)}, _cached_json_buffer(writeJson()) {}
+JSONDocument::JSONDocument(JsonData const& data) : _value{readJson(data)}, _cached_json_buffer(jsonliteral::empty_json), _isDirty(true) {}
 
-JSONDocument::JSONDocument() : _value{object_t{}}, _cached_json_buffer(writeJson()) {}
+JSONDocument::JSONDocument(std::string const& json) : _value{readJson(json)}, _cached_json_buffer(jsonliteral::empty_json),_isDirty(true) {}
+
+JSONDocument::JSONDocument(value_t value) : _value{std::move(value)}, _cached_json_buffer(jsonliteral::empty_json), _isDirty(true){}
+
+JSONDocument::JSONDocument() : _value{object_t{}}, _cached_json_buffer(jsonliteral::empty_json), _isDirty(true){}
 
 std::string const& JSONDocument::cached_json_buffer() const { return _cached_json_buffer; }
-
-void JSONDocument::update_json_buffer() { _cached_json_buffer = writeJson(); }
 
 value_t const& JSONDocument::getPayloadValueForKey(object_t::key_type const& key) const {
   confirm(!key.empty());
@@ -261,9 +261,8 @@ JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& doc
     auto ovl = std::make_unique<ovlDatabaseRecord>(_document._value);
     std::swap(_overlay, ovl);
   }
-  _document.writeJson();
 
-  TLOG(12) << "createFrom() imported document=<" << _document.cached_json_buffer() << ">";
+  TLOG(12) << "createFrom() imported document";
 
   return self();
 }
@@ -433,3 +432,5 @@ JSONDocument toJSONDocument<string_pair_t>(string_pair_t const& pair) {
 }  // namespace docrecord
 }  // namespace database
 }  // namespace artdaq
+
+

@@ -3,7 +3,7 @@
 #ifdef TRACE_NAME
 #undef TRACE_NAME
 #endif
-#define TRACE_NAME "MongoDB:RDWRT_C"
+#define TRACE_NAME "provider_mongodb_readwrite.cpp"
 
 #include <mongocxx/options/update.hpp>
 
@@ -12,15 +12,12 @@ namespace database {
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, MongoDB>::readDocument(JsonData const& arg) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::readDocument(JSONDocument const& arg) {
   TLOG(13) << "MongoDB::readDocument() begin";
-  TLOG(13) << "MongoDB::readDocument() args=<" << arg << ">";
 
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
-  auto arg_document = JSONDocument{arg};
-
-  auto filter_document = arg_document.findChildDocument(jsonliteral::filter);
+  auto filter_document = arg.findChildDocument(jsonliteral::filter);
 
   auto collection_name = std::string{};
 
@@ -31,7 +28,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::readDocument(JsonData co
   }
 
   if (collection_name.empty()) {
-    collection_name = arg_document.findChild(jsonliteral::collection).value();
+    collection_name = arg.findChild(jsonliteral::collection).value();
   }
 
   confirm(!collection_name.empty());
@@ -61,18 +58,15 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::readDocument(JsonData co
 }
 
 template <>
-object_id_t StorageProvider<JsonData, MongoDB>::writeDocument(JsonData const& arg) {
+object_id_t StorageProvider<JSONDocument, MongoDB>::writeDocument(JSONDocument const& arg) {
   TLOG(14) << "MongoDB::writeDocument() begin";
-  TLOG(14) << "MongoDB::writeDocument() args=<" << arg << ">";
 
-  auto arg_document = JSONDocument{arg};
-
-  auto user_document = arg_document.findChildDocument(jsonliteral::document);
+  auto user_document = arg.findChildDocument(jsonliteral::document);
 
   auto filter_document = JSONDocument{};
 
   try {
-    filter_document = arg_document.findChildDocument(jsonliteral::filter);
+    filter_document = arg.findChildDocument(jsonliteral::filter);
   } catch (...) {
     TLOG(14) << "MongoDB::writeDocument() No filter was found.";
   }
@@ -96,7 +90,7 @@ object_id_t StorageProvider<JsonData, MongoDB>::writeDocument(JsonData const& ar
   }
 
   if (collection_name.empty()) {
-    collection_name = arg_document.findChild(jsonliteral::collection).value();
+    collection_name = arg.findChild(jsonliteral::collection).value();
   }
 
   confirm(!collection_name.empty());

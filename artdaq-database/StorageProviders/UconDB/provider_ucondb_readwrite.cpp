@@ -7,7 +7,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "UconDB:RDWRT_C"
+#define TRACE_NAME "provider_ucondb_readwrite.cpp"
 
 namespace artdaq {
 namespace database {
@@ -20,18 +20,16 @@ using artdaq::database::sharedtypes::unwrap;
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, UconDB>::readDocument(JsonData const& arg) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::readDocument(JSONDocument const& arg) {
   TLOG(13) << "UconDB::readDocument() begin";
   TLOG(13) << "UconDB::readDocument() args=<" << arg << ">";
 
-  auto returnCollection = std::list<JsonData>();
-
-  auto arg_document = JSONDocument{arg};
+  auto returnCollection = std::vector<JSONDocument>();
 
   auto filter_document = JSONDocument{};
 
   try {
-    filter_document = arg_document.findChildDocument(jsonliteral::filter);
+    filter_document = arg.findChildDocument(jsonliteral::filter);
   } catch (...) {
     TLOG(13) << "UconDB::readDocument() No filter was found.";
   }
@@ -45,7 +43,7 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::readDocument(JsonData con
   }
 
   if (collection_name.empty()) {
-    collection_name = arg_document.findChild(jsonliteral::collection).value();
+    collection_name = arg.findChild(jsonliteral::collection).value();
   }
 
   confirm(!collection_name.empty());
@@ -105,18 +103,16 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::readDocument(JsonData con
 }
 
 template <>
-object_id_t StorageProvider<JsonData, UconDB>::writeDocument(JsonData const& arg) {
+object_id_t StorageProvider<JSONDocument, UconDB>::writeDocument(JSONDocument const& arg) {
   TLOG(14) << "UconDB::writeDocument() begin";
   TLOG(14) << "UconDB::writeDocument() args=<" << arg << ">";
 
-  auto arg_document = JSONDocument{arg};
-
-  auto user_document = arg_document.findChildDocument(jsonliteral::document);
+  auto user_document = arg.findChildDocument(jsonliteral::document);
 
   auto filter_document = JSONDocument{};
 
   try {
-    filter_document = arg_document.findChildDocument(jsonliteral::filter);
+    filter_document = arg.findChildDocument(jsonliteral::filter);
   } catch (...) {
     TLOG(14) << "UconDB::writeDocument() No filter was found.";
   }
@@ -138,7 +134,7 @@ object_id_t StorageProvider<JsonData, UconDB>::writeDocument(JsonData const& arg
   }
 
   if (collection_name.empty()) {
-    collection_name = arg_document.findChild(jsonliteral::collection).value();
+    collection_name = arg.findChild(jsonliteral::collection).value();
   }
 
   confirm(!collection_name.empty());

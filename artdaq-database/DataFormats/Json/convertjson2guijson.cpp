@@ -13,7 +13,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "FHJS:json2gui_C"
+#define TRACE_NAME "convertjson2guijson.cpp"
 
 using namespace artdaq::database::sharedtypes;
 using namespace artdaq::database::json;

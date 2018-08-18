@@ -26,7 +26,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "PRVDR:MongoDB_C"
+#define TRACE_NAME "mongo_functions.cpp"
 
 using namespace artdaq::database;
 
@@ -35,7 +35,7 @@ bsoncxx::types::value extract_value_from_document(bsoncxx::document::value const
   auto element = view.find(key);
 
   if (element == view.end()) {
-    throw runtime_error("MongoDB") << "Search JsonData is missing the \"" << key << "\" element.";
+    throw runtime_error("MongoDB") << "Search JSONDocument is missing the \"" << key << "\" element.";
   }
 
   return element->get_value();

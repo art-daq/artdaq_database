@@ -7,7 +7,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "BTPS:JsonData_H"
+#define TRACE_NAME "data_json.h"
 
 namespace artdaq {
 namespace database {
@@ -39,4 +39,12 @@ std::istream& operator>>(std::istream&, artdaq::database::basictypes::JsonData&)
 }  // namespace database
 }  // namespace artdaq
 
+namespace {
+template<>
+inline TraceStreamer& TraceStreamer::operator<<(const artdaq::database::basictypes::JsonData& r)
+{
+  std::ostringstream s; s << r; msg_append(s.str().c_str());
+  return *this;
+}
+}
 #endif /* _ARTDAQ_DATABASE_BASICTYPES_JSON_H_ */

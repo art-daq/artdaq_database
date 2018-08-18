@@ -16,7 +16,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "CONF:OpldStr_C"
+#define TRACE_NAME "dboperation_exportimport.cpp"
 
 using namespace artdaq::database::configuration;
 namespace dbcfg = artdaq::database::configuration;
@@ -26,6 +26,7 @@ namespace jsonliteral = db::dataformats::literal;
 
 using artdaq::database::configuration::options::data_format_t;
 using artdaq::database::docrecord::JSONDocumentBuilder;
+using artdaq::database::docrecord::JSONDocument;
 
 namespace artdaq {
 namespace database {
@@ -42,8 +43,8 @@ void export_collection(ManageDocumentOperation const&, std::string&);
 
 void configuration_composition(ManageDocumentOperation const&, std::string&);
 
-void write_documents(ManageDocumentOperation const&, std::list<JsonData> const&);
-void read_documents(ManageDocumentOperation const&, std::list<JsonData>&);
+void write_documents(ManageDocumentOperation const&, std::vector<JSONDocument> const&);
+void read_documents(ManageDocumentOperation const&, std::vector<JSONDocument>&);
 
 using artdaq::database::configuration::result_t;
 
@@ -458,9 +459,9 @@ result_t json::export_collection(std::string const& query_payload) noexcept {
     options.operation(apiliteral::operation::readdocument);
     options.format(options::data_format_t::db);
 
-    using provider_call_t = std::list<JsonData> (*)(const ManageDocumentOperation&, const JsonData&);
+    using provider_call_t = std::vector<JsonData> (*)(const ManageDocumentOperation&, const JsonData&);
 
-    auto document_list = std::list<JsonData>{};
+    auto document_list = std::vector<JSONDocument>{};
 
     detail::read_documents(options, document_list);
 
@@ -476,9 +477,9 @@ result_t json::export_collection(std::string const& query_payload) noexcept {
 
     for (auto const& document : document_list) {
       std::ostringstream oss;
-      oss << file_name << "/" << JSONDocumentBuilder{{document}}.getObjectOUID() << ".json";
+      oss << file_name << "/" << JSONDocumentBuilder{document}.getObjectOUID() << ".json";
 
-      if (!db::write_buffer_to_file(document.json_buffer, oss.str())) {
+      if (!db::write_buffer_to_file(document.to_string(), oss.str())) {
         throw runtime_error("export_collection")
             << "export_collection: Unable to write a json file; file=" << oss.str();
       }
@@ -532,7 +533,7 @@ result_t json::import_collection(std::string const& query_payload) noexcept {
 
     std::ostringstream oss;
 
-    auto document_list = std::list<JsonData>{};
+    auto document_list = std::vector<JSONDocument>{};
 
     for (auto const& file_name : list_files(tmp_dir_name)) {
       auto buffer = std::string();
@@ -541,7 +542,7 @@ result_t json::import_collection(std::string const& query_payload) noexcept {
         oss << "Failed to import " << file_name << "\n";
       }
 
-      document_list.emplace_back(JSONDocumentBuilder(buffer).to_string());
+      document_list.emplace_back(JSONDocumentBuilder(buffer).extract());
     }
 
     db::delete_temp_dir(tmp_dir_name);

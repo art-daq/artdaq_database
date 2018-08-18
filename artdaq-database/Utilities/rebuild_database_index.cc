@@ -17,6 +17,8 @@ namespace DBI = artdaq::database::filesystem;
 
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::docrecord::JSONDocumentBuilder;
+using artdaq::database::docrecord::JSONDocument;
+
 
 int main(int argc, char* argv[]) try {
   std::ostringstream descstr;
@@ -64,7 +66,7 @@ int main(int argc, char* argv[]) try {
 
   auto config = DBI::DBConfig{database_uri + "_new"};
   auto database = DBI::DB::create(config);
-  auto provider = DBI::DBProvider<JsonData>::create(database);
+  auto provider = DBI::DBProvider<JSONDocument>::create(database);
 
   DBI::index::shouldAutoRebuildSearchIndex(true);
 

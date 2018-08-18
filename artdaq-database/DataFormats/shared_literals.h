@@ -93,6 +93,7 @@ constexpr auto string_singlequoted = "string_singlequoted";
 constexpr auto string_doublequoted = "string_doublequoted";
 constexpr auto string_unquoted = "string_unquoted";
 
+constexpr auto empty_json="{}";
 namespace regex {
 constexpr auto parse_decimal = "-?\\d*\\.?\\d+e[+-]?\\d+";
 constexpr auto parse_include = "(#include)";

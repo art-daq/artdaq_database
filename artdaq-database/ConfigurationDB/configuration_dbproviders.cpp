@@ -2,6 +2,14 @@
 #include "artdaq-database/ConfigurationDB/configuration_common.h"
 #include "artdaq-database/SharedCommon/shared_exceptions.h"
 
+
+#ifdef TRACE_NAME
+#undef TRACE_NAME
+#endif
+
+#define TRACE_NAME "configuration_dbproviders.cpp"
+
+
 namespace db = artdaq::database;
 namespace cf = db::configuration;
 namespace prov = artdaq::database::configapi::literal::provider;

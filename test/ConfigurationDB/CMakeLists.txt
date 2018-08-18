@@ -18,8 +18,9 @@ add_subdirectory(ManageConfigs)
 add_subdirectory(BulkOperations)
 add_subdirectory(ManageDocuments)
 add_subdirectory(ManageAliases)
-add_subdirectory(ExportImport)
 
+
+add_subdirectory(ExportImport)
 add_subdirectory(MigrateDatabase)
 
 #add_subdirectory(Utils)

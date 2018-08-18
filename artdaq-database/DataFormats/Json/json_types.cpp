@@ -2,6 +2,7 @@
 
 #include "artdaq-database/DataFormats/Json/json_types.h"
 
+
 using artdaq::database::sharedtypes::unwrapper;
 namespace artdaq {
 namespace database {

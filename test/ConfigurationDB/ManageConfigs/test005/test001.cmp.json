@@ -1,30 +1,30 @@
 {
-   "search":[
-      {
-         "name":"@TEST_COLLECTION_NAME_QUAL@-@TEST_CONFIGURATION_NAME@-B:@TEST_COLLECTION_NAME_QUAL@-@CONFIG_NUMBER@-B",
-         "query":{
-            "collection":"@TEST_COLLECTION_NAME@_@TEST_COLLECTION_NAME_QUAL@_02",
-            "dbprovider":"@TEST_DBPROVIDER@",
-            "dataformat":"gui",
-            "operation":"load",
-            "filter":{
-               "configurations.name":"@TEST_COLLECTION_NAME_QUAL@-@TEST_CONFIGURATION_NAME@-B",
-               "entities.name":"@TEST_COLLECTION_NAME_QUAL@-@CONFIG_NUMBER@-B"
-            }
-         }
-      },   
-      {
-         "name":"@TEST_COLLECTION_NAME_QUAL@-@TEST_CONFIGURATION_NAME@-B:@TEST_COLLECTION_NAME_QUAL@-@CONFIG_NUMBER@-A",
-         "query":{
-            "collection":"@TEST_COLLECTION_NAME@_@TEST_COLLECTION_NAME_QUAL@_01",
-            "dbprovider":"@TEST_DBPROVIDER@",
-            "dataformat":"gui",
-            "operation":"load",
-            "filter":{
-               "configurations.name":"@TEST_COLLECTION_NAME_QUAL@-@TEST_CONFIGURATION_NAME@-B",
-               "entities.name":"@TEST_COLLECTION_NAME_QUAL@-@CONFIG_NUMBER@-A"
-            }
-         }
-      }
-   ]
+"search" : [
+{
+"name" : "@TEST_COLLECTION_NAME_QUAL@-@TEST_CONFIGURATION_NAME@-B:@TEST_COLLECTION_NAME_QUAL@-@CONFIG_NUMBER@-A",
+"query" : {
+"collection" : "@TEST_COLLECTION_NAME@_@TEST_COLLECTION_NAME_QUAL@_01",
+"dbprovider" : "@TEST_DBPROVIDER@",
+"dataformat" : "gui",
+"operation" : "load",
+"filter" : {
+"configurations.name" : "@TEST_COLLECTION_NAME_QUAL@-@TEST_CONFIGURATION_NAME@-B",
+"entities.name" : "@TEST_COLLECTION_NAME_QUAL@-@CONFIG_NUMBER@-A"
+}
+}
+},
+{
+"name" : "@TEST_COLLECTION_NAME_QUAL@-@TEST_CONFIGURATION_NAME@-B:@TEST_COLLECTION_NAME_QUAL@-@CONFIG_NUMBER@-B",
+"query" : {
+"collection" : "@TEST_COLLECTION_NAME@_@TEST_COLLECTION_NAME_QUAL@_02",
+"dbprovider" : "@TEST_DBPROVIDER@",
+"dataformat" : "gui",
+"operation" : "load",
+"filter" : {
+"configurations.name" : "@TEST_COLLECTION_NAME_QUAL@-@TEST_CONFIGURATION_NAME@-B",
+"entities.name" : "@TEST_COLLECTION_NAME_QUAL@-@CONFIG_NUMBER@-B"
+}
+}
+}
+]
 }

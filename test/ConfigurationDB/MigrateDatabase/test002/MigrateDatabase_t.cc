@@ -16,6 +16,7 @@ using namespace artdaq::database::configuration;
 namespace DBI = artdaq::database::filesystem;
 
 using artdaq::database::basictypes::JsonData;
+using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocumentMigrator;
 
@@ -65,7 +66,7 @@ int main(int argc, char* argv[]) try {
 
   auto config = DBI::DBConfig{database_uri + "_migrated"};
   auto database = DBI::DB::create(config);
-  auto provider = DBI::DBProvider<JsonData>::create(database);
+  auto provider = DBI::DBProvider<JSONDocument>::create(database);
 
   std::ostringstream oss;
 
@@ -102,7 +103,7 @@ int main(int argc, char* argv[]) try {
         }
 
         JSONDocumentBuilder builder{JSONDocumentMigrator{{source}}};
-        builder.setCollection({R"({"collection":")" + collection_name + "\"}"});
+        builder.setCollection({"({\"collection\":\")" + collection_name + "\"}"});
 
         oss.str("");
         oss.clear();
@@ -110,7 +111,8 @@ int main(int argc, char* argv[]) try {
         oss << quoted_(jsonliteral::filter) << ":" << to_id(oid) << ",";
         oss << quoted_(jsonliteral::collection) << ":" << quoted_(collection_name) << "}";
 
-        provider->writeDocument(oss.str());
+	auto doc = JSONDocument{oss.str()};
+        provider->writeDocument(doc);
         std::cout << " -> succeeded\n";
 
       } catch (...) {

@@ -1,5 +1,5 @@
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
-#include "artdaq-database/BasicTypes/basictypes.h"
+#include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/StorageProviders/MongoDB/mongo_json.h"
 #include "artdaq-database/StorageProviders/common.h"
 
@@ -26,7 +26,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "PRVDR:MongoDB_C"
+#define TRACE_NAME "provider_mongodb.cpp"
 
 using namespace artdaq::database;
 namespace db = artdaq::database;
@@ -35,7 +35,7 @@ namespace bbs = bsoncxx::builder::stream;
 
 using bsoncxx::builder::stream::document;
 
-using artdaq::database::basictypes::JsonData;
+using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::mongo::MongoDB;
 
 namespace jsonliteral = db::dataformats::literal;
@@ -47,14 +47,14 @@ namespace artdaq {
 namespace database {
 
 namespace mongo {
-JsonData rewrite_query_with_regex(JsonData const&, std::vector<std::string> const&);
+JSONDocument rewrite_query_with_regex(JSONDocument const&, std::vector<std::string> const&);
 }  // namespace mongo
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonData const& search) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::findConfigurations(JSONDocument const& search) {
   confirm(!search.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   using timestamp_t = unsigned long long;
   using ordered_timestamps_t = std::set<timestamp_t>;
@@ -69,14 +69,14 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
   TLOG(14) << "MongoDB::findConfigurations() begin";
   TLOG(14) << "MongoDB::findConfigurations() args data=<" << search << ">";
 
-  auto search_document = compat::from_json(search.json_buffer);
+  auto search_document = compat::from_json(search.to_string());
 
   auto extract_value = [&search_document](auto const& name) {
     auto view = search_document.view();
     auto element = view.find(name);
 
     if (element == view.end()) {
-      throw runtime_error("MongoDB") << "Search JsonData is missing the \"" << name << "\" element.";
+      throw runtime_error("MongoDB") << "Search JSONDocument is missing the \"" << name << "\" element.";
     }
 
     return element->get_value();
@@ -128,7 +128,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findConfigurations(JsonD
     mongocxx::pipeline stages;
 
     auto match_stage = bsoncxx::builder::core(false);
-    auto bson_document = compat::from_json(regex_search.json_buffer);
+    auto bson_document = compat::from_json(regex_search);
     match_stage.concatenate(bson_document.view());
 
     bbs::document project_stage;
@@ -218,9 +218,9 @@ exact_match:
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition(JsonData const& search) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::configurationComposition(JSONDocument const& search) {
   confirm(!search.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   TLOG(15) << "MongoDB::configurationComposition() begin";
   TLOG(15) << "MongoDB::configurationComposition() args data=<" << search << ">";
@@ -255,14 +255,14 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
     TLOG(15) << "MongoDB::configurationComposition() querying collection_name=<" << collection_name << ">";
 
     auto collection = _provider->connection().collection(collection_name);
-    auto bson_document = compat::from_json(search.json_buffer);
+    auto bson_document = compat::from_json(search.to_string());
 
     auto extract_value = [&bson_document](auto const& name) {
       auto view = bson_document.view();
       auto element = view.find(name);
 
       if (element == view.end()) {
-        throw runtime_error("MongoDB") << "Search JsonData is missing the \"" << name << "\" element.";
+        throw runtime_error("MongoDB") << "Search JSONDocument is missing the \"" << name << "\" element.";
       }
 
       return element->get_value();
@@ -345,21 +345,21 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::configurationComposition
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData const& query_payload) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::findVersions(JSONDocument const& query_payload) {
   confirm(!query_payload.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   TLOG(15) << "MongoDB::findVersions() begin";
   TLOG(15) << "MongoDB::findVersions() args data=<" << query_payload << ">";
 
-  auto bson_document = compat::from_json(query_payload.json_buffer);
+  auto bson_document = compat::from_json(query_payload);
 
   auto extract_value = [&bson_document](auto const& name) {
     auto view = bson_document.view();
     auto element = view.find(name);
 
     if (element == view.end()) {
-      throw runtime_error("MongoDB") << "Search JsonData is missing the \"" << name << "\" element.";
+      throw runtime_error("MongoDB") << "Search JSONDocument is missing the \"" << name << "\" element.";
     }
 
     return element->get_value();
@@ -369,7 +369,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
 
   auto collection = _provider->connection().collection(collection_name);
 
-  auto search = JsonData{compat::to_json(extract_value(apiliteral::option::searchfilter))};
+  auto search = JSONDocument{compat::to_json(extract_value(apiliteral::option::searchfilter))};
 
   auto fields = std::vector<std::string>{};
   fields.emplace_back(apiliteral::filter::entities);
@@ -379,7 +379,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
   mongocxx::pipeline stages;
   bbs::document project_stage;
   auto match_stage = bsoncxx::builder::core(false);
-  auto bson_search = compat::from_json(regex_search.json_buffer);
+  auto bson_search = compat::from_json(regex_search);
   match_stage.concatenate(bson_search.view());
 
   project_stage << "_id" << 0 << "version"
@@ -427,21 +427,21 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findVersions(JsonData co
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData const& search) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::findEntities(JSONDocument const& search) {
   confirm(!search.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   TLOG(19) << "MongoDB::findEntities() begin";
   TLOG(19) << "MongoDB::findEntities() args data=<" << search << ">";
 
-  auto bson_document = compat::from_json(search.json_buffer);
+  auto bson_document = compat::from_json(search);
 
   auto extract_value = [&bson_document](auto const& name) {
     auto view = bson_document.view();
     auto element = view.find(name);
 
     if (element == view.end()) {
-      throw runtime_error("MongoDB") << "Search JsonData is missing the \"" << name << "\" element.";
+      throw runtime_error("MongoDB") << "Search JSONDocument is missing the \"" << name << "\" element.";
     }
 
     return element->get_value();
@@ -473,7 +473,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
     TLOG(19) << "MongoDB::findEntities() querying collection_name=<" << collection_name << ">";
 
     auto collection = _provider->connection().collection(collection_name);
-    auto bson_document = compat::from_json(search.json_buffer);
+    auto bson_document = compat::from_json(search);
 
     mongocxx::pipeline stages;
     bbs::document project_stage;
@@ -537,9 +537,9 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::findEntities(JsonData co
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, MongoDB>::addConfiguration(JsonData const& query_payload) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::addConfiguration(JSONDocument const& query_payload) {
   confirm(!query_payload.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   TLOG(15) << "MongoDB::addConfiguration() begin";
   TLOG(15) << "MongoDB::addConfiguration() args data=<" << query_payload << ">";
@@ -549,9 +549,9 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::addConfiguration(JsonDat
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, MongoDB>::listCollections(JsonData const& query_payload) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::listCollections(JSONDocument const& query_payload) {
   confirm(!query_payload.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   TLOG(19) << "MongoDB::listCollections() begin";
   TLOG(19) << "MongoDB::listCollections() args data=<" << query_payload << ">";
@@ -599,9 +599,9 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listCollections(JsonData
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, MongoDB>::listDatabases(JsonData const& query_payload) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::listDatabases(JSONDocument const& query_payload) {
   confirm(!query_payload.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   TLOG(19) << "MongoDB::listDatabases() begin";
   TLOG(19) << "MongoDB::listDatabases() args data=<" << query_payload << ">";
@@ -644,7 +644,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::listDatabases(JsonData c
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, MongoDB>::databaseMetadata(JsonData const& query_payload[[gnu::unused]]) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::databaseMetadata(JSONDocument const& query_payload[[gnu::unused]]) {
   confirm(!query_payload.empty());
 
   std::ostringstream oss;
@@ -652,7 +652,7 @@ std::list<JsonData> StorageProvider<JsonData, MongoDB>::databaseMetadata(JsonDat
   oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(system_metadata) << ",";
   oss << db::quoted_(apiliteral::option::searchfilter) << ":" << apiliteral::empty_json;
   oss << "}";
-  return readDocument(JsonData{oss.str()});
+  return readDocument(JSONDocument{oss.str()});
 }
 
 namespace mongo {

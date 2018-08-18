@@ -9,7 +9,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "PRVDR:FileDB_C"
+#define TRACE_NAME "filesystem_functions.cpp"
 
 using namespace artdaq::database;
 

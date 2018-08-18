@@ -16,6 +16,8 @@ cet_make_exec(readjson
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_DataFormats_Fhicl
+  artdaq-database_JsonDocument
+
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 

@@ -9,14 +9,14 @@
 
 namespace artdaq {
 namespace database {
-namespace basictypes {
-struct JsonData;
+namespace docrecord {
+struct JSONDocument;
 }
 
 namespace filesystem {
 namespace index {
 
-using artdaq::database::basictypes::JsonData;
+using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::json::object_t;
 using artdaq::database::object_id_t;
 
@@ -25,17 +25,17 @@ class SearchIndex final {
   SearchIndex(boost::filesystem::path const&);
   ~SearchIndex();
 
-  std::vector<object_id_t> findDocumentIDs(JsonData const&);
-  std::vector<std::pair<std::string, std::string>> findAllGlobalConfigurations(JsonData const&);
-  std::vector<std::pair<std::string, std::string>> findVersionsByGlobalConfigName(JsonData const&);
-  std::vector<std::pair<std::string, std::string>> findVersionsByEntityName(JsonData const&);
+  std::vector<object_id_t> findDocumentIDs(JSONDocument const&);
+  std::vector<std::pair<std::string, std::string>> findAllGlobalConfigurations(JSONDocument const&);
+  std::vector<std::pair<std::string, std::string>> findVersionsByGlobalConfigName(JSONDocument const&);
+  std::vector<std::pair<std::string, std::string>> findVersionsByEntityName(JSONDocument const&);
 
-  std::vector<std::string> findEntities(JsonData const&);
+  std::vector<std::string> findEntities(JSONDocument const&);
 
-  bool addDocument(JsonData const&, object_id_t const&);
-  bool removeDocument(JsonData const&, object_id_t const&);
+  bool addDocument(JSONDocument const&, object_id_t const&);
+  bool removeDocument(JSONDocument const&, object_id_t const&);
 
-  std::vector<std::string> getConfigurationAssignedTimestamps(JsonData const&);
+  std::vector<std::string> getConfigurationAssignedTimestamps(JSONDocument const&);
   // deleted
   SearchIndex() = delete;
   SearchIndex& operator=(SearchIndex const&) = delete;

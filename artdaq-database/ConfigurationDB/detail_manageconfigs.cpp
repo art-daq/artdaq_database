@@ -21,7 +21,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "CONF:CrtCfD_C"
+#define TRACE_NAME "detail_manageconfigs.cpp"
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
@@ -32,7 +32,7 @@ using cf::options::data_format_t;
 
 using Options = cf::ManageDocumentOperation;
 
-using artdaq::database::basictypes::JsonData;
+using artdaq::database::docrecord::JSONDocument;
 
 namespace artdaq {
 namespace database {
@@ -46,7 +46,8 @@ namespace database {
 namespace configuration {
 namespace detail {
 
-using provider_call_t = JsonData (*)(const Options&, const JsonData&);
+using provider_call_returnslist_t = std::vector<JSONDocument> (*)(const Options&, const JSONDocument&);
+using provider_call_t = JSONDocument (*)(const Options&, const JSONDocument&);
 
 void assign_configuration(Options const& options, std::string& configs) {
   confirm(configs.empty());
@@ -191,14 +192,14 @@ void find_configurations(Options const& options, std::string& configs) {
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers =
-        std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::findConfigurations},
+        std::map<std::string, provider_call_returnslist_t>{{apiliteral::provider::mongo, cf::mongo::findConfigurations},
                                                {apiliteral::provider::filesystem, cf::filesystem::findConfigurations},
                                                {apiliteral::provider::ucon, cf::ucon::findConfigurations}};
 
     return providers.at(name);
   };
 
-  auto search_result = dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
+  auto search_results = dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -210,44 +211,31 @@ void find_configurations(Options const& options, std::string& configs) {
     case data_format_t::unknown:
     case data_format_t::fhicl:
     case data_format_t::xml: {
-      if (!db::json_db_to_gui(search_result, returnValue)) {
         throw runtime_error("find_configurations") << "Unsupported data format.";
-      }
       break;
     }
 
-    case data_format_t::gui: {
-      returnValue = search_result;
+       case data_format_t::gui: {
+      std::ostringstream oss;      
+      oss << "{ \"search\": [\n";
+      for (auto const& search_result : search_results){
+	oss << search_result << ",";
+      }
+
+      oss.seekp(-1, oss.cur);
+      oss << "] }";      
+      returnValue = oss.str();
       returnValueChanged = true;
       break;
     }
 
     case data_format_t::csv: {
-      using namespace artdaq::database::json;
-      auto reader = JsonReader{};
-      object_t results_ast;
-
-      if (!reader.read(search_result, results_ast)) {
-        TLOG(21) << "find_configurations() Failed to create an AST from search results JSON.";
-
-        throw runtime_error("find_configurations") << "Failed to create an AST from search results JSON.";
+      std::ostringstream oss;      
+      for (auto const& search_result : search_results){
+	oss << search_result.value_as<std::string>(apiliteral::name) << ",";
       }
-
-      auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
-
-      TLOG(21) << "find_configurations: found " << results_list.size() << " results.";
-
-      std::ostringstream os;
-
-      for (auto const& result_entry : results_list) {
-        auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
-        auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
-
-        TLOG(21) << "find_configurations() Found config=<" << value << ">.";
-
-        os << value << ",";
-      }
-      returnValue = os.str();
+      
+      returnValue = oss.str();
 
       if (returnValue.back() == ',') {
         returnValue.pop_back();

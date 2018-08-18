@@ -20,7 +20,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "CONF:LdStrD_C"
+#define TRACE_NAME "detail_managedocument.cpp"
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
@@ -49,8 +49,10 @@ namespace artdaq {
 namespace database {
 namespace configuration {
 namespace detail {
-using provider_store_t = void (*)(const Options&, const JsonData&);
-using provider_call_t = JsonData (*)(const Options&, const JsonData&);
+using provider_write_t = void (*)(const Options&, const JSONDocument&);
+using provider_read_t = JSONDocument (*)(const Options&, const JSONDocument&);
+
+using provider_call_t = std::vector<JSONDocument> (*)(const Options&, const JSONDocument&);
 
 void write_document(Options const& options, std::string& conf) {
   confirm(options.operation() == apiliteral::operation::writedocument ||
@@ -66,7 +68,7 @@ void write_document(Options const& options, std::string& conf) {
 
   validate_dbprovider_name(options.provider());
 
-  auto data = JsonData{conf};
+  auto data = JsonData{"{}"};
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
 
@@ -82,6 +84,7 @@ void write_document(Options const& options, std::string& conf) {
       break;
     }
     case data_format_t::db: {
+      data = JsonData{conf};
       break;
     }
     case data_format_t::gui: {
@@ -182,13 +185,13 @@ void write_document(Options const& options, std::string& conf) {
   }
 
   auto insert_payload =
-      JsonData{"{\"document\":" + builder.to_string() + filter + R"(, "collection":")" + options.collection() + "\"}"};
+      JsonData{"{\"document\":" + builder.to_string() + filter + ", \"collection\":\"" + options.collection() + "\"}"};
 
   TLOG(12) << "write_document: insert_payload=<" << insert_payload << ">";
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers =
-        std::map<std::string, provider_store_t>{{apiliteral::provider::mongo, cf::mongo::writeDocument},
+        std::map<std::string, provider_write_t>{{apiliteral::provider::mongo, cf::mongo::writeDocument},
                                                 {apiliteral::provider::filesystem, cf::filesystem::writeDocument},
                                                 {apiliteral::provider::ucon, cf::ucon::writeDocument}};
 
@@ -216,13 +219,13 @@ void read_document(Options const& options, std::string& conf) {
   validate_dbprovider_name(options.provider());
 
   auto search_payload = JsonData{"{\"filter\":" + options.query_filter_to_JsonData().json_buffer +
-                                 +R"(, "collection":")" + options.collection() + "\"}"};
+                                 +", \"collection\":\"" + options.collection() + "\"}"};
 
   TLOG(13) << "read_document: search_payload=<" << search_payload << ">";
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers =
-        std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::readDocument},
+        std::map<std::string, provider_read_t>{{apiliteral::provider::mongo, cf::mongo::readDocument},
                                                {apiliteral::provider::filesystem, cf::filesystem::readDocument},
                                                {apiliteral::provider::ucon, cf::ucon::readDocument}};
 
@@ -347,7 +350,7 @@ void find_versions(Options const& options, std::string& versions) {
     return providers.at(name);
   };
 
-  auto search_result = dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
+  auto search_results = dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -361,44 +364,27 @@ void find_versions(Options const& options, std::string& versions) {
       throw runtime_error("find_versions") << "Unsupported data format.";
       break;
     }
+   case data_format_t::gui: {
+      std::ostringstream oss;      
+      oss << "{ \"search\": [\n";
+      for (auto const& search_result : search_results){
+	oss << search_result << ",";
+      }
 
-    case data_format_t::gui: {
-      returnValue = search_result;
+      oss.seekp(-1, oss.cur);
+      oss << "] }";      
+      returnValue = oss.str();
       returnValueChanged = true;
       break;
     }
 
     case data_format_t::csv: {
-      using namespace artdaq::database::json;
-      auto reader = JsonReader{};
-      object_t results_ast;
-
-      if (!reader.read(search_result, results_ast)) {
-        TLOG(14) << "find_entities() Failed to create an AST from search results JSON.";
-
-        throw runtime_error("find_entities") << "Failed to create an AST from search results JSON.";
+      std::ostringstream oss;      
+      for (auto const& search_result : search_results){
+	oss << search_result.value_as<std::string>(apiliteral::name) << ",";
       }
-
-      auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
-
-      TLOG(14) << "find_entities: found " << results_list.size() << " results.";
-
-      std::ostringstream os;
-
-      auto entities = std::set<std::string>{};
-
-      for (auto const& result_entry : results_list) {
-        auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
-        auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
-        entities.emplace(value);
-      }
-
-      for (auto const& entity : entities) {
-        TLOG(14) << "find_entities() Found entity=<" << entity << ">.";
-        os << entity << ",";
-      }
-
-      returnValue = os.str();
+      
+      returnValue = oss.str();
 
       if (returnValue.back() == ',') {
         returnValue.pop_back();
@@ -434,7 +420,7 @@ void find_entities(Options const& options, std::string& entities) {
     return providers.at(name);
   };
 
-  auto search_result = dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
+  auto search_results = dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -449,43 +435,27 @@ void find_entities(Options const& options, std::string& entities) {
       break;
     }
 
-    case data_format_t::gui: {
-      returnValue = search_result;
+   case data_format_t::gui: {
+      std::ostringstream oss;      
+      oss << "{ \"search\": [\n";
+      for (auto const& search_result : search_results){
+	oss << search_result << ",";
+      }
+
+      oss.seekp(-1, oss.cur);
+      oss << "] }";      
+      returnValue = oss.str();
       returnValueChanged = true;
       break;
     }
 
     case data_format_t::csv: {
-      using namespace artdaq::database::json;
-      auto reader = JsonReader{};
-      object_t results_ast;
-
-      if (!reader.read(search_result, results_ast)) {
-        TLOG(15) << "find_entities() Failed to create an AST from search results JSON.";
-
-        throw runtime_error("find_entities") << "Failed to create an AST from search results JSON.";
+      std::ostringstream oss;      
+      for (auto const& search_result : search_results){
+	oss << search_result.value_as<std::string>(apiliteral::name) << ",";
       }
-
-      auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
-
-      TLOG(15) << "find_entities: found " << results_list.size() << " results.";
-
-      std::ostringstream os;
-
-      auto entities = std::set<std::string>{};
-
-      for (auto const& result_entry : results_list) {
-        auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
-        auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
-        entities.emplace(value);
-      }
-
-      for (auto const& entity : entities) {
-        TLOG(15) << "find_entities() Found entity=<" << entity << ">.";
-        os << entity << ",";
-      }
-
-      returnValue = os.str();
+      
+      returnValue = oss.str();
 
       if (returnValue.back() == ',') {
         returnValue.pop_back();
@@ -520,28 +490,21 @@ void add_entity(Options const& options, std::string& conf) {
   newOptions.operation(apiliteral::operation::readdocument);
   newOptions.format(data_format_t::db);
   newOptions.entity(apiliteral::notprovided);
-  TLOG(16) << "add_entity 0";
 
   newOptions.queryFilter(apiliteral::notprovided);
-  TLOG(16) << "add_entity 0";
 
   read_document(newOptions, document);
   JSONDocumentBuilder builder{{document}};
-  TLOG(16) << "add_entity 1";
 
   builder.addEntity({options.entity_to_JsonData()});
 
   newOptions.operation(apiliteral::operation::writedocument);
   newOptions.format(data_format_t::db);
 
-  TLOG(16) << "add_entity 2";
-
   auto updated = builder.to_string();
   write_document(newOptions, updated);
-  TLOG(16) << "add_entity 3";
   newOptions.operation(apiliteral::operation::readdocument);
   newOptions.format(options.format());
-  TLOG(16) << "add_entity 4";
 
   document.clear();
   read_document(newOptions, document);
@@ -671,11 +634,11 @@ void mark_document_deleted(Options const& options, std::string& conf) {
   TLOG(19) << "mark_document_deleted end conf=<" << conf << ">";
 }
 
-void read_documents(ManageDocumentOperation const& options, std::list<JsonData>& document_list) {
+void read_documents(ManageDocumentOperation const& options, std::vector<JSONDocument>& document_list) {
   confirm(document_list.empty());
   confirm(options.operation() == apiliteral::operation::readdocument);
 
-  using provider_call_t = std::list<JsonData> (*)(const ManageDocumentOperation&, const JsonData&);
+  using provider_call_t = std::vector<JSONDocument> (*)(const ManageDocumentOperation&, const JSONDocument&);
 
   TLOG(13) << "read_documents: begin";
 
@@ -704,7 +667,7 @@ void read_documents(ManageDocumentOperation const& options, std::list<JsonData>&
   TLOG(13) << "read_documents: end";
 }
 
-void write_documents(ManageDocumentOperation const& options, std::list<JsonData> const& document_list) {
+void write_documents(ManageDocumentOperation const& options, std::vector<JSONDocument> const& document_list) {
   confirm(!document_list.empty());
   confirm(options.operation() == apiliteral::operation::writedocument);
 
@@ -712,7 +675,7 @@ void write_documents(ManageDocumentOperation const& options, std::list<JsonData>
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers =
-        std::map<std::string, provider_store_t>{{apiliteral::provider::mongo, cf::mongo::writeDocument},
+        std::map<std::string, provider_write_t>{{apiliteral::provider::mongo, cf::mongo::writeDocument},
                                                 {apiliteral::provider::filesystem, cf::filesystem::writeDocument},
                                                 {apiliteral::provider::ucon, cf::ucon::writeDocument}};
     return providers.at(name);
@@ -721,14 +684,14 @@ void write_documents(ManageDocumentOperation const& options, std::list<JsonData>
   TLOG(12) << "write_documents: writing " << document_list.size() << " documents.";
 
   for (auto const& document : document_list) {
-    JSONDocumentBuilder builder{{document}};
+    JSONDocumentBuilder builder{document};
 
     if (builder.isReadonlyOrDeleted()) {
       builder.newObjectID();
     }
 
     std::ostringstream oss;
-    oss << "{" << quoted_(jsonliteral::document) << ":" << document.json_buffer << ",";
+    oss << "{" << quoted_(jsonliteral::document) << ":" << document << ",";
     oss << quoted_(jsonliteral::filter) << ":" << builder.getObjectID().to_string() << ",";
     oss << quoted_(jsonliteral::collection) << ":" << quoted_(options.collection()) << "}";
 

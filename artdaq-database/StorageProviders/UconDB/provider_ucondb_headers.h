@@ -19,7 +19,7 @@ namespace dbuc = db::ucon;
 namespace dbucl = dbuc::literal;
 namespace jsonliteral = db::dataformats::literal;
 
-using artdaq::database::basictypes::JsonData;
+using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::ucon::DBConfig;
 using artdaq::database::ucon::UconDB;
 using artdaq::database::ucon::UconDBSPtr_t;

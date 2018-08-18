@@ -19,7 +19,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "CONF:FndCfD_C"
+#define TRACE_NAME "detail_managealiases.cpp"
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
@@ -31,7 +31,7 @@ using cf::options::data_format_t;
 
 using Options = cf::ManageAliasesOperation;
 
-using artdaq::database::basictypes::JsonData;
+using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 
 namespace artdaq {
@@ -48,7 +48,7 @@ namespace detail {
 void write_document(cf::ManageDocumentOperation const&, std::string&);
 void read_document(cf::ManageDocumentOperation const&, std::string&);
 
-using provider_call_t = JsonData (*)(const Options&, const JsonData&);
+using provider_call_t = std::vector<JSONDocument> (*)(const Options&, const JSONDocument&);
 
 void find_version_aliases(Options const& options, std::string& configs) {
   confirm(configs.empty());
@@ -68,7 +68,7 @@ void find_version_aliases(Options const& options, std::string& configs) {
     return providers.at(name);
   };
 
-  auto search_result = dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
+  auto search_results = dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -80,44 +80,31 @@ void find_version_aliases(Options const& options, std::string& configs) {
     case data_format_t::unknown:
     case data_format_t::fhicl:
     case data_format_t::xml: {
-      if (!db::json_db_to_gui(search_result, returnValue)) {
-        throw runtime_error("find_version_aliases") << "Unsupported data format.";
-      }
+      throw runtime_error("find_version_aliases") << "Unsupported data format.";
       break;
     }
 
-    case data_format_t::gui: {
-      returnValue = search_result;
+   case data_format_t::gui: {
+      std::ostringstream oss;      
+      oss << "{ \"search\": [\n";
+      for (auto const& search_result : search_results){
+	oss << search_result << ",";
+      }
+
+      oss.seekp(-1, oss.cur);
+      oss << "] }";      
+      returnValue = oss.str();
       returnValueChanged = true;
       break;
     }
 
     case data_format_t::csv: {
-      using namespace artdaq::database::json;
-      auto reader = JsonReader{};
-      object_t results_ast;
-
-      if (!reader.read(search_result, results_ast)) {
-        TLOG(21) << "find_version_aliases() Failed to create an AST from search results JSON.";
-
-        throw runtime_error("find_version_aliases") << "Failed to create an AST from search results JSON.";
+      std::ostringstream oss;      
+      for (auto const& search_result : search_results){
+	oss << search_result.value_as<std::string>(apiliteral::name) << ",";
       }
-
-      auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
-
-      TLOG(21) << "find_version_aliases: found " << results_list.size() << " results.";
-
-      std::ostringstream os;
-
-      for (auto const& result_entry : results_list) {
-        auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
-        auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
-
-        TLOG(21) << "find_version_aliases() Found alias=<" << value << ">.";
-
-        os << value << ",";
-      }
-      returnValue = os.str();
+      
+      returnValue = oss.str();
 
       if (returnValue.back() == ',') {
         returnValue.pop_back();
@@ -125,7 +112,7 @@ void find_version_aliases(Options const& options, std::string& configs) {
 
       returnValueChanged = true;
       break;
-    }
+    }    
   }
 
   if (returnValueChanged) {

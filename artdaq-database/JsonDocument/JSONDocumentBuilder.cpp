@@ -7,7 +7,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "JSNU:DocuBldr_C"
+#define TRACE_NAME "JSONDocumentBuilder.cpp"
 
 using artdaq::database::ThrowOnFailure;
 using artdaq::database::json::value_t;
@@ -35,8 +35,7 @@ JSONDocumentBuilder::JSONDocumentBuilder(JSONDocument document)
       _initOK(init()) {}
 
 bool JSONDocumentBuilder::init() {
-  auto buff[[gnu::unused]] = _document.writeJson();
-  TLOG(13) << "JSONDocumentBuilder::init() new document=<" << buff << ">";
+  TLOG(13) << "JSONDocumentBuilder::init() new document=<" << _document.cached_json_buffer() << ">";
   return true;
 }
 
@@ -48,7 +47,6 @@ JSONDocumentBuilder& JSONDocumentBuilder::addAlias(JSONDocument const& alias) tr
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->addAlias(ovl));
-  _document.writeJson();
 
   return self();
 } catch (std::exception const& ex) {
@@ -66,7 +64,6 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeAlias(JSONDocument const& alias)
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->removeAlias(ovl));
-  _document.writeJson();
 
   return self();
 } catch (std::exception const& ex) {
@@ -80,11 +77,11 @@ JSONDocumentBuilder& JSONDocumentBuilder::addConfiguration(JSONDocument const& c
   TLOG(15) << "addConfiguration() args config=<" << config << ">";
 
   JSONDocument copy(config);
+
   auto ovl = overlay<ovl::ovlConfiguration>(copy, jsonliteral::configuration);
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->addConfiguration(ovl));
-  _document.writeJson();
 
   return self();
 } catch (std::exception const& ex) {
@@ -102,7 +99,6 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeConfiguration(JSONDocument const
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->removeConfiguration(ovl));
-  _document.writeJson();
 
   return self();
 } catch (std::exception const& ex) {
@@ -116,7 +112,6 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeAllConfigurations() try {
   TLOG(15) << "removeAllConfigurations()";
 
   _overlay->configurations().wipe();
-  _document.writeJson();
 
   return self();
 } catch (std::exception const& ex) {
@@ -133,8 +128,6 @@ JSONDocumentBuilder& JSONDocumentBuilder::setObjectID(JSONDocument const& object
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->swap(id));
-
-  _document.writeJson();
 
   return self();
 } catch (std::exception const& ex) {
@@ -159,7 +152,6 @@ JSONDocumentBuilder& JSONDocumentBuilder::setVersion(JSONDocument const& version
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->setVersion(ovl));
-  _document.writeJson();
 
   return self();
 } catch (std::exception const& ex) {
@@ -178,7 +170,6 @@ JSONDocumentBuilder& JSONDocumentBuilder::setCollection(JSONDocument const& coll
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->setCollection(ovl));
-  _document.writeJson();
 
   return self();
 } catch (std::exception const& ex) {
@@ -195,8 +186,6 @@ JSONDocumentBuilder& JSONDocumentBuilder::addEntity(JSONDocument const& entity) 
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->addEntity(ovl));
-
-  _document.writeJson();
 
   return self();
 } catch (std::exception const& ex) {
@@ -215,8 +204,6 @@ JSONDocumentBuilder& JSONDocumentBuilder::addRun(JSONDocument const& run) try {
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->addRun(ovl));
 
-  _document.writeJson();
-
   return self();
 } catch (std::exception const& ex) {
   TLOG(19) << "addRun() Exception:" << ex.what();
@@ -234,8 +221,6 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeEntity(JSONDocument const& entit
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->removeEntity(ovl));
 
-  _document.writeJson();
-
   return self();
 } catch (std::exception const& ex) {
   TLOG(19) << "removeEntity() Exception:" << ex.what();
@@ -248,7 +233,6 @@ JSONDocumentBuilder& JSONDocumentBuilder::removeAllEntities() try {
   TLOG(15) << "removeAllEntities()";
 
   _overlay->entities().wipe();
-  _document.writeJson();
 
   return self();
 } catch (std::exception const& ex) {
@@ -263,8 +247,6 @@ JSONDocumentBuilder& JSONDocumentBuilder::markReadonly() try {
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->markReadonly());
 
-  _document.writeJson();
-
   return self();
 } catch (std::exception const& ex) {
   TLOG(16) << "markReadonly() Exception:" << ex.what();
@@ -278,8 +260,6 @@ JSONDocumentBuilder& JSONDocumentBuilder::markDeleted() try {
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->markDeleted());
-
-  _document.writeJson();
 
   return self();
 } catch (std::exception const& ex) {

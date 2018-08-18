@@ -8,19 +8,19 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "PRVDR:UconDB_C"
+#define TRACE_NAME "provider_ucondb.cpp"
 
 namespace artdaq {
 namespace database {
 
-using artdaq::database::basictypes::JsonData;
+using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::ucon::UconDB;
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, UconDB>::findConfigurations(JsonData const& query_payload) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::findConfigurations(JSONDocument const& query_payload) {
   confirm(!query_payload.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   TLOG(15) << "StorageProvider::FileSystemDB::findConfigurations() begin";
   TLOG(15) << "StorageProvider::FileSystemDB::findConfigurations() args data=<" << query_payload << ">";
@@ -32,10 +32,10 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::findConfigurations(JsonDa
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, UconDB>::configurationComposition(JsonData const& query_payload) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::configurationComposition(JSONDocument const& query_payload) {
   confirm(!query_payload.empty());
 
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   TLOG(16) << "StorageProvider::UconDB::configurationComposition() begin";
   TLOG(16) << "StorageProvider::UconDB::configurationComposition() args data=<" << query_payload << ">";
@@ -47,10 +47,10 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::configurationComposition(
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, UconDB>::findVersions(JsonData const& filter) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::findVersions(JSONDocument const& filter) {
   confirm(!filter.empty());
 
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   TLOG(15) << "StorageProvider::UconDB::findVersions() begin";
   TLOG(15) << "StorageProvider::UconDB::findVersions() args data=<" << filter << ">";
@@ -62,9 +62,9 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::findVersions(JsonData con
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, UconDB>::findEntities(JsonData const& filter) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::findEntities(JSONDocument const& filter) {
   confirm(!filter.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   TLOG(19) << "StorageProvider::UconDB::findEntities() begin";
   TLOG(19) << "StorageProvider::UconDB::findEntities() args data=<" << filter << ">";
@@ -76,10 +76,10 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::findEntities(JsonData con
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, UconDB>::listCollections(JsonData const& query_payload) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::listCollections(JSONDocument const& query_payload) {
   confirm(!query_payload.empty());
 
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
   TLOG(22) << "StorageProvider::UconDB::listCollections() begin";
   TLOG(22) << "StorageProvider::UconDB::listCollections() args data=<" << query_payload << ">";
 
@@ -90,9 +90,9 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::listCollections(JsonData 
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, UconDB>::addConfiguration(JsonData const& query_payload) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::addConfiguration(JSONDocument const& query_payload) {
   confirm(!query_payload.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   TLOG(15) << "StorageProvider::UconDB::addConfiguration() begin";
   TLOG(15) << "StorageProvider::UconDB::addConfiguration() args data=<" << query_payload << ">";
@@ -104,9 +104,9 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::addConfiguration(JsonData
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, UconDB>::listDatabases(JsonData const& query_payload) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::listDatabases(JSONDocument const& query_payload) {
   confirm(!query_payload.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   TLOG(19) << "StorageProvider::UconDB::listDatabases() begin";
   TLOG(19) << "StorageProvider::UconDB::listDatabases() args data=<" << query_payload << ">";
@@ -118,9 +118,9 @@ std::list<JsonData> StorageProvider<JsonData, UconDB>::listDatabases(JsonData co
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, UconDB>::databaseMetadata(JsonData const& query_payload[[gnu::unused]]) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::databaseMetadata(JSONDocument const& query_payload[[gnu::unused]]) {
   confirm(!query_payload.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   throw runtime_error("UconDB") << "StorageProvider::UconDB::databaseMetadata() is not implemented";
 
