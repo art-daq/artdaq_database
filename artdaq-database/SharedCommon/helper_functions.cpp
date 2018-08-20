@@ -11,6 +11,12 @@
 #include <fstream>
 #include <regex>
 
+#ifdef TRACE_NAME
+#undef TRACE_NAME
+#endif
+
+#define TRACE_NAME "helper_functions.cpp"
+
 namespace db = artdaq::database;
 using namespace artdaq::database;
 
@@ -169,12 +175,16 @@ std::string db::annotate(std::string const& s) {
 }
 
 std::string db::generate_oid() {
+  TLOG(11) << "generate_oid() begin";
+
   std::ifstream is("/proc/sys/kernel/random/uuid");
 
   std::string oid((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
 
   oid.erase(std::remove(oid.begin(), oid.end(), '-'), oid.end());
   oid.resize(24);
+  
+  TLOG(12) << "generate_oid() end";
 
   return oid;
 }
@@ -247,9 +257,9 @@ db::object_id_t db::extract_oid(std::string const& filter) {
 
   if (results.size() != 2) {
     // we are interested in a second match
-    TLOG(22) << "value() JSON regex_search() result count=" << results.size();
+    TLOG(13) << "value() JSON regex_search() result count=" << results.size();
     for (auto const& result : results) {
-      TLOG(22) << "value() JSON regex_search() result=" << result;
+      TLOG(14) << "value() JSON regex_search() result=" << result;
     }
 
     throw runtime_error(std::string("Regex search failed, regex_search().size()!=1; JSON buffer: ") + filter);
@@ -269,8 +279,7 @@ db::object_id_t db::extract_oid(std::string const& filter) {
 
   match = dequote(match);
 
-  TLOG(22) << "value()"
-           << "JSON regex_search() result=" << match;
+  TLOG(15) << "value() JSON regex_search() result=" << match;
 
   return match;
 }

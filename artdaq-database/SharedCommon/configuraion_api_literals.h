@@ -69,6 +69,8 @@ constexpr auto ucon = "ucon";
 }  // namespace provider
 
 namespace option {
+constexpr auto path = "path";
+  
 constexpr auto operation = "operation";
 constexpr auto format = "dataformat";
 constexpr auto provider = "dbprovider";
@@ -79,6 +81,8 @@ constexpr auto source = "source";
 constexpr auto version = "version";
 constexpr auto version_alias = "alias";
 constexpr auto run = "run";
+constexpr auto threads = "threads";
+constexpr auto debug = "debug";
 
 constexpr auto searchfilter = "filter";
 constexpr auto searchquery = "searchquery";

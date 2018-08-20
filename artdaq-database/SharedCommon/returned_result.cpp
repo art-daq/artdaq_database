@@ -1,6 +1,12 @@
 #include "artdaq-database/SharedCommon/returned_result.h"
 #include "artdaq-database/SharedCommon/shared_exceptions.h"
 
+#ifdef TRACE_NAME
+#undef TRACE_NAME
+#endif
+
+#define TRACE_NAME "returned_result.cpp"
+
 namespace db = artdaq::database;
 
 using artdaq::database::result_t;

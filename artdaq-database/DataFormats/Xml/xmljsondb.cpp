@@ -10,7 +10,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "XML:xmljsondb_C"
+#define TRACE_NAME "xmljsondb.cpp"
 
 using artdaq::database::json::JsonReader;
 using artdaq::database::json::JsonWriter;

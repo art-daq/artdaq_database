@@ -97,7 +97,7 @@ FhiclData::operator JsonData() const {
 
   auto base64 = base64_encode(fhicl_buffer);
   TLOG(17) << "FHICL base64=" << base64;
-
+  
   std::ostringstream os;
 
   os << json;

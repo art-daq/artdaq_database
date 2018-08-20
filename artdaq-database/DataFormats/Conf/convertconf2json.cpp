@@ -7,7 +7,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "CNF:conf2json_C"
+#define TRACE_NAME "convertconf2json.cpp"
 
 // TODO conf to json conversion code
 

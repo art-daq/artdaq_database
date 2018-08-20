@@ -47,6 +47,11 @@ bool json_gui_to_db(std::string const&, std::string&);
 
 namespace artdaq {
 namespace database {
+namespace fhicljson {
+  bool fhicl_to_ast(std::string const& fcl, std::string const& filename, jsn::object_t& json);
+  bool fhicl_to_json(std::string const& fcl, std::string const& filename, std::string& json);
+
+}  // namespace fhicljson  
 namespace configuration {
 namespace detail {
 using provider_write_t = void (*)(const Options&, const JSONDocument&);
@@ -57,18 +62,18 @@ using provider_call_t = std::vector<JSONDocument> (*)(const Options&, const JSON
 void write_document(Options const& options, std::string& conf) {
   confirm(options.operation() == apiliteral::operation::writedocument ||
           options.operation() == apiliteral::operation::overwritedocument);
-
-  TLOG(12) << "write_document: begin";
+  
+  TLOG(20) << "write_document: begin";
 
   if (conf.empty()) {
-    TLOG(12) << "Error in write_document: Invalid configuration document; configuration document is empty.";
+    TLOG(21) << "Error in write_document: Invalid configuration document; configuration document is empty.";
 
     throw runtime_error("write_document") << "Invalid configuration document; configuration document is empty.";
   }
 
   validate_dbprovider_name(options.provider());
 
-  auto data = JsonData{"{}"};
+  auto data =  JsonData{conf};
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
 
@@ -100,49 +105,50 @@ void write_document(Options const& options, std::string& conf) {
     }
     case data_format_t::fhicl: {
       // convert from fhicl to json and back to fhicl
-      data = FhiclData{conf};
+      data =  FhiclData{conf};
 
+#if 0      
       auto fhicl = FhiclData{};
 
       if (!data.convert_to<FhiclData>(fhicl)) {
-        TLOG(12) << "write_document: Unable to convert json data to fcl; json=<" << data << ">";
+        TLOG(22) << "write_document: Unable to convert json data to fcl; json=<" << data << ">";
 
         throw runtime_error("write_document") << "Unable to reverse fhicl-to-json convertion";
       } else {
-        TLOG(12) << "write_document: Converted json data to fcl; json=<" << data << ">";
-        TLOG(12) << "write_document: Converted json data to fcl; fcl=<" << fhicl << ">";
+        TLOG(23) << "write_document: Converted json data to fcl; json=<" << data << ">";
+        TLOG(24) << "write_document: Converted json data to fcl; fcl=<" << fhicl << ">";
       }
 
       returnValue = fhicl;
       returnValueChanged = true;
-
+#endif
       break;
     }
     case data_format_t::xml: {
       // convert from xml to json and back to xml
 
       data = XmlData{conf};
-
+#if 0
       auto xml = XmlData{};
 
       if (!data.convert_to<XmlData>(xml)) {
-        TLOG(12) << "write_document: Unable to convert json data to fcl; json=<" << data << ">";
+        TLOG(25) << "write_document: Unable to convert json data to fcl; json=<" << data << ">";
 
         throw runtime_error("write_document") << "Unable to reverse xml-to-json convertion";
       } else {
-        TLOG(12) << "write_document: Converted json data to fcl; json=<" << data << ">";
-        TLOG(12) << "write_document: Converted json data to fcl; fcl=<" << xml << ">";
+        TLOG(26) << "write_document: Converted json data to fcl; json=<" << data << ">";
+        TLOG(27) << "write_document: Converted json data to fcl; fcl=<" << xml << ">";
       }
 
       returnValue = xml;
       returnValueChanged = true;
-
+#endif
       break;
     }
   }
 
-  TLOG(12) << "write_document: json_buffer=<" << data << ">";
-  TLOG(12) << "write_document: options=<" << options << ">";
+  //TLOG(28) << "write_document: json_buffer=<" << data << ">";
+  TLOG(29) << "write_document: options=<" << options << ">";
 
   // create a json document to be inserted into the database
   JSONDocumentBuilder builder{{data}};
@@ -187,8 +193,8 @@ void write_document(Options const& options, std::string& conf) {
   auto insert_payload =
       JsonData{"{\"document\":" + builder.to_string() + filter + ", \"collection\":\"" + options.collection() + "\"}"};
 
-  TLOG(12) << "write_document: insert_payload=<" << insert_payload << ">";
-
+  TLOG(30) << "write_document: insert_payload=<" << insert_payload << ">";
+  
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers =
         std::map<std::string, provider_write_t>{{apiliteral::provider::mongo, cf::mongo::writeDocument},
@@ -204,13 +210,13 @@ void write_document(Options const& options, std::string& conf) {
     conf.swap(returnValue);
   }
 
-  TLOG(12) << "write_document: end";
+  TLOG(31) << "write_document: end";
 }
 
 void read_document(Options const& options, std::string& conf) {
   confirm(options.operation() == apiliteral::operation::readdocument);
 
-  TLOG(13) << "read_document: begin";
+  TLOG(32) << "read_document: begin";
 
   if (!conf.empty()) {
     throw runtime_error("read_document") << "Invalid configuration document; configuration document is not empty.";
@@ -221,7 +227,7 @@ void read_document(Options const& options, std::string& conf) {
   auto search_payload = JsonData{"{\"filter\":" + options.query_filter_to_JsonData().json_buffer +
                                  +", \"collection\":\"" + options.collection() + "\"}"};
 
-  TLOG(13) << "read_document: search_payload=<" << search_payload << ">";
+  TLOG(33) << "read_document: search_payload=<" << search_payload << ">";
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers =
@@ -249,7 +255,7 @@ void read_document(Options const& options, std::string& conf) {
     auto const& docAst = boost::get<jsn::object_t>(resultAst.at(jsonliteral::origin));
     format = to_data_format(boost::get<std::string>(docAst.at(jsonliteral::format)));
 
-    TLOG(13) << "read_document: format=<" << to_string(format) << ">";
+    TLOG(34) << "read_document: format=<" << to_string(format) << ">";
   }
 
   switch (format) {
@@ -297,7 +303,7 @@ void read_document(Options const& options, std::string& conf) {
 
       auto fhicl = FhiclData{};
       if (!json.convert_to<FhiclData>(fhicl)) {
-        TLOG(13) << "read_document: Unable to convert json data to fcl; json=<" << json << ">";
+        TLOG(35) << "read_document: Unable to convert json data to fcl; json=<" << json << ">";
 
         throw runtime_error("read_document") << "Unable to reverse fhicl-to-json convertion";
       }
@@ -313,7 +319,7 @@ void read_document(Options const& options, std::string& conf) {
 
       auto xml = XmlData{};
       if (!json.convert_to<XmlData>(xml)) {
-        TLOG(13) << "read_document: Unable to convert json data to xml; json=<" << json << ">";
+        TLOG(36) << "read_document: Unable to convert json data to xml; json=<" << json << ">";
 
         throw runtime_error("read_document") << "Unable to reverse xml-to-json convertion";
       }
@@ -329,15 +335,15 @@ void read_document(Options const& options, std::string& conf) {
     conf.swap(returnValue);
   }
 
-  TLOG(13) << "read_document: end";
+  TLOG(18) << "read_document: end";
 }
 
 void find_versions(Options const& options, std::string& versions) {
   confirm(versions.empty());
   confirm(options.operation() == apiliteral::operation::findversions);
 
-  TLOG(14) << "find_versions: begin";
-  TLOG(14) << "find_versions args options=<" << options << ">";
+  TLOG(38) << "find_versions: begin";
+  TLOG(39) << "find_versions args options=<" << options << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -399,15 +405,15 @@ void find_versions(Options const& options, std::string& versions) {
     versions.swap(returnValue);
   }
 
-  TLOG(14) << "find_versions: end";
+  TLOG(40) << "find_versions: end";
 }
 
 void find_entities(Options const& options, std::string& entities) {
   confirm(entities.empty());
   confirm(options.operation() == apiliteral::operation::findentities);
 
-  TLOG(15) << "find_entities: begin";
-  TLOG(15) << "find_entities args options=<" << options << ">";
+  TLOG(41) << "find_entities: begin";
+  TLOG(42) << "find_entities args options=<" << options << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -470,17 +476,17 @@ void find_entities(Options const& options, std::string& entities) {
     entities.swap(returnValue);
   }
 
-  TLOG(15) << "find_entities: end";
-  TLOG(15) << "find_entities: end entities=" << entities;
+  TLOG(43) << "find_entities: end";
+  TLOG(44) << "find_entities: end entities=" << entities;
 }
 
 void add_entity(Options const& options, std::string& conf) {
   confirm(conf.empty());
   confirm(options.operation() == apiliteral::operation::addentity);
 
-  TLOG(16) << "add_entity: begin";
-  TLOG(16) << "add_entity args options=<" << options << ">";
-  TLOG(16) << "add_entity args conf=<" << conf << ">";
+  TLOG(45) << "add_entity: begin";
+  TLOG(46) << "add_entity args options=<" << options << ">";
+  TLOG(47) << "add_entity args conf=<" << conf << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -511,16 +517,16 @@ void add_entity(Options const& options, std::string& conf) {
 
   conf.swap(document);
 
-  TLOG(16) << "add_entity end conf=<" << conf << ">";
+  TLOG(48) << "add_entity end conf=<" << conf << ">";
 }
 
 void remove_entity(Options const& options, std::string& conf) {
   confirm(conf.empty());
   confirm(options.operation() == apiliteral::operation::rmentity);
 
-  TLOG(15) << "remove_entity: begin";
-  TLOG(16) << "remove_entity args options=<" << options << ">";
-  TLOG(16) << "remove_entity args conf=<" << conf << ">";
+  TLOG(49) << "remove_entity: begin";
+  TLOG(50) << "remove_entity args options=<" << options << ">";
+  TLOG(51) << "remove_entity args conf=<" << conf << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -551,16 +557,16 @@ void remove_entity(Options const& options, std::string& conf) {
 
   conf.swap(document);
 
-  TLOG(16) << "remove_entity end conf=<" << conf << ">";
+  TLOG(52) << "remove_entity end conf=<" << conf << ">";
 }
 
 void mark_document_readonly(Options const& options, std::string& conf) {
   confirm(conf.empty());
   confirm(options.operation() == apiliteral::operation::markreadonly);
 
-  TLOG(15) << "mark_document_readonly: begin";
-  TLOG(15) << "mark_document_readonly args options=<" << options << ">";
-  TLOG(15) << "mark_document_readonly args conf=<" << conf << ">";
+  TLOG(53) << "mark_document_readonly: begin";
+  TLOG(54) << "mark_document_readonly args options=<" << options << ">";
+  TLOG(55) << "mark_document_readonly args conf=<" << conf << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -591,16 +597,16 @@ void mark_document_readonly(Options const& options, std::string& conf) {
 
   conf.swap(document);
 
-  TLOG(15) << "mark_document_readonly end conf=<" << conf << ">";
+  TLOG(56) << "mark_document_readonly end conf=<" << conf << ">";
 }
 
 void mark_document_deleted(Options const& options, std::string& conf) {
   confirm(conf.empty());
   confirm(options.operation() == apiliteral::operation::markdeleted);
 
-  TLOG(19) << "mark_document_deleted: begin";
-  TLOG(19) << "mark_document_deleted args options=<" << options << ">";
-  TLOG(19) << "mark_document_deleted args conf=<" << conf << ">";
+  TLOG(57) << "mark_document_deleted: begin";
+  TLOG(58) << "mark_document_deleted args options=<" << options << ">";
+  TLOG(59) << "mark_document_deleted args conf=<" << conf << ">";
 
   validate_dbprovider_name(options.provider());
 
@@ -631,7 +637,7 @@ void mark_document_deleted(Options const& options, std::string& conf) {
 
   conf.swap(document);
 
-  TLOG(19) << "mark_document_deleted end conf=<" << conf << ">";
+  TLOG(60) << "mark_document_deleted end conf=<" << conf << ">";
 }
 
 void read_documents(ManageDocumentOperation const& options, std::vector<JSONDocument>& document_list) {
@@ -640,7 +646,7 @@ void read_documents(ManageDocumentOperation const& options, std::vector<JSONDocu
 
   using provider_call_t = std::vector<JSONDocument> (*)(const ManageDocumentOperation&, const JSONDocument&);
 
-  TLOG(13) << "read_documents: begin";
+  TLOG(61) << "read_documents: begin";
 
   validate_dbprovider_name(options.provider());
 
@@ -650,7 +656,7 @@ void read_documents(ManageDocumentOperation const& options, std::vector<JSONDocu
 
   auto search_payload = oss.str();
 
-  TLOG(13) << "read_documents: search_payload=<" << search_payload << ">";
+  TLOG(62) << "read_documents: search_payload=<" << search_payload << ">";
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers =
@@ -663,15 +669,15 @@ void read_documents(ManageDocumentOperation const& options, std::vector<JSONDocu
   auto documents = dispatch_persistence_provider(options.provider())(options, search_payload);
   document_list.swap(documents);
 
-  TLOG(13) << "read_documents: found " << document_list.size() << "documents.";
-  TLOG(13) << "read_documents: end";
+  TLOG(11) << "read_documents: found " << document_list.size() << "documents.";
+  TLOG(12) << "read_documents: end";
 }
 
 void write_documents(ManageDocumentOperation const& options, std::vector<JSONDocument> const& document_list) {
   confirm(!document_list.empty());
   confirm(options.operation() == apiliteral::operation::writedocument);
 
-  TLOG(12) << "write_documents: begin";
+  TLOG(13) << "write_documents: begin";
 
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers =
@@ -681,7 +687,7 @@ void write_documents(ManageDocumentOperation const& options, std::vector<JSONDoc
     return providers.at(name);
   };
 
-  TLOG(12) << "write_documents: writing " << document_list.size() << " documents.";
+  TLOG(14) << "write_documents: writing " << document_list.size() << " documents.";
 
   for (auto const& document : document_list) {
     JSONDocumentBuilder builder{document};
@@ -697,10 +703,10 @@ void write_documents(ManageDocumentOperation const& options, std::vector<JSONDoc
 
     dispatch_persistence_provider(options.provider())(options, {oss.str()});
 
-    TLOG(12) << "write_documents: wrote document ouid=" << builder.getObjectOUID();
+    TLOG(15) << "write_documents: wrote document ouid=" << builder.getObjectOUID();
   }
 
-  TLOG(12) << "write_documents: end";
+  TLOG(16) << "write_documents: end";
 }
 }  // namespace detail
 }  // namespace configuration
@@ -714,5 +720,5 @@ void cftd::ManageDocuments() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) << "artdaq::database::configuration::ManageDocuments trace_enable";
+  TLOG(17) << "artdaq::database::configuration::ManageDocuments trace_enable";
 }

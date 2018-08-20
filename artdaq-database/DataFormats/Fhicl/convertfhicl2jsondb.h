@@ -89,6 +89,8 @@ struct json2fcldb final {
   extra_opts const& opts;
 };
 
+bool fhicl_to_ast(std::string const& fcl, std::string const& filename, jsn::object_t& json);
+
 namespace debug {
 void FCL2JSON();
 }

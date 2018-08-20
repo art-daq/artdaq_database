@@ -1,6 +1,12 @@
 #include "artdaq-database/DataFormats/Json/json_reader.h"
 #include "artdaq-database/DataFormats/common.h"
 
+#ifdef TRACE_NAME
+#undef TRACE_NAME
+#endif
+
+#define TRACE_NAME "json_reader.cpp"
+
 using namespace boost::spirit;
 using namespace artdaq::database;
 
@@ -10,6 +16,9 @@ using artdaq::database::json::object_t;
 bool JsonReader::read(std::string const& in, object_t& ast) {
   confirm(!in.empty());
   confirm(ast.empty());
+
+  TLOG(21) << "read() begin";
+  TLOG(22) << "read() in=<" << in << ">";
 
   auto result = bool(false);
   object_t buffer;
@@ -24,6 +33,8 @@ bool JsonReader::read(std::string const& in, object_t& ast) {
     ast.swap(buffer);
   }
 
+  TLOG(23) << "write() end ";
+  
   return result;
 }
 

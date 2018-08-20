@@ -11,7 +11,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "XML:XmlWriter_C"
+#define TRACE_NAME "xml_writer.cpp"
 
 namespace jsn = artdaq::database::json;
 namespace pt = boost::property_tree;

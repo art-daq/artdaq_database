@@ -7,7 +7,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "CNF:ConfWriter_C"
+#define TRACE_NAME "conf_writer.cpp"
 
 namespace fcl = artdaq::database::conf;
 namespace jsn = artdaq::database::json;
@@ -20,24 +20,24 @@ bool ConfWriter::write(jsn::object_t const& json_object, std::string& out) {
   confirm(out.empty());
   confirm(!json_object.empty());
 
-  TLOG(12) << "write() begin";
+  TLOG(11) << "write() begin";
 
   auto const& data_node = boost::get<jsn::object_t>(json_object.at(literal::data));
 
   auto result = bool(false);
   auto buffer = std::string();
 
-  TLOG(12) << "write() create conf begin";
+  TLOG(13) << "write() create conf begin";
 
   for (auto const& data[[gnu::unused]] : data_node) {
     // TODO loop over json AST and convert it to XML
   }
 
-  TLOG(12) << "write() create conf end";
+  TLOG(14) << "write() create conf end";
 
   if (result) out.swap(buffer);
 
-  TLOG(12) << "write() end";
+  TLOG(15) << "write() end";
 
   return result;
 }
@@ -48,5 +48,5 @@ void artdaq::database::conf::debug::ConfWriter() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) << "artdaq::database::conf::ConfWriter trace_enable";
+  TLOG(16) << "artdaq::database::conf::ConfWriter trace_enable";
 }

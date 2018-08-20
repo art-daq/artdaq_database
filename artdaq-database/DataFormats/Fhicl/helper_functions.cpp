@@ -2,6 +2,12 @@
 #include "artdaq-database/DataFormats/common.h"
 #include "artdaq-database/DataFormats/shared_literals.h"
 
+#ifdef TRACE_NAME
+#undef TRACE_NAME
+#endif
+
+#define TRACE_NAME "helper_functions.cpp"
+
 namespace artdaq {
 namespace database {
 namespace fhicl {

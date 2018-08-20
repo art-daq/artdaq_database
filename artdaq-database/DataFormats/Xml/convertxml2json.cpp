@@ -7,7 +7,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "XML:xml2json_C"
+#define TRACE_NAME "convertxml2json.cpp"
 
 // TODO(mu2etrg): xml to json conversion code
 
