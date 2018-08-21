@@ -72,6 +72,8 @@ endif()
 
 # buil-in libraries
 include(BuiltinFHICLCPP)
+include(BuiltinPARAMICO)
+add_subdirectory(built-in)
 
 # Build Node Addons
 #include(NodeJSAddon)

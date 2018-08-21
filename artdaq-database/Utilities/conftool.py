@@ -12,6 +12,7 @@ import fnmatch
 import os
 import shutil
 import time
+import paramiko
 
 fhicl_schema='schema.fcl'
 
@@ -463,6 +464,53 @@ def archiveRunConfiguration(config,run_number):
 
   return True  
 
+def archiveRunConfigurationWithBulkloader(config,run_number):  
+  try:
+    artdaq_database_uri=os.environ['ARTDAQ_DATABASE_URI']
+  except KeyError:
+    print 'Error: ARTDAQ_DATABASE_URI is not set.'
+    return False
+
+  try:
+    artdaq_database_remote_host=os.environ['ARTDAQ_DATABASE_REMOTEHOST']
+  except KeyError:
+    print 'Error: ARTDAQ_DATABASE_REMOTEHOST is not set.'
+    return False
+
+  ssh = SSHClient()
+  ssh.load_system_host_keys()
+  ssh.connect(artdaq_database_remote_host,look_for_keys=false)
+  
+  stdin, stdout, stderr = ssh.exec_command('echo im on $(hostname -s)')
+
+  __copy_default_schema()
+
+  schema =__read_schema()
+  
+  cfg_composition =list( __composition_reader(['run_history','system_layout'], schema, __find_files('.',fcl_file_pattern)))
+
+  excluded_files=__list_excluded_files(__get_prefix(config), schema, __find_files('.',any_file_pattern),cfg_composition)
+  
+  if len(excluded_files)>0:
+      print 'Warning: The following files will be excluded from being loaded into the artdaq database ' \
+	+ ', '.join(excluded_files) + '. Update ' + fhicl_schema + ' to include them.'
+  
+      if not __allow_importing_incomplete_configurations():
+	  print 'Error: Importing of incomplete configurations is not allowed; ' \
+	    + 'set ARTDAQ_DATABASE_ALLOW_INCOMPLETE_CONFIGURATIONS to TRUE to allow.'
+	  return False 
+
+  stdin, stdout, stderr = ssh.exec_command('echo im on $(hostname -s)')
+  
+  ssh.close()
+  if result is not True:
+     return False
+
+  for entry in cfg_composition:
+    print ('Archive',entry)
+
+  return True 
+
 def exportArchivedRunConfiguration(config):  
   if not __ends_on_5digitnumber(config):
     print 'Error: Configuration does not have five digits at the end.'
@@ -586,6 +634,7 @@ def help():
 #  print ' conftool.py importDatabase #reads archives from the current directory'
   print ' conftool.py archiveRunConfiguration demo_safemode 23 #where 23 is a run number'
   print ' conftool.py getListOfArchivedRunConfigurations 23 #where 23 is a run number'
+  print ' conftool.py archiveRunConfigurationWithBulkloader 23 #where 23 is a run number'
   print ' conftool.py exportArchivedRunConfiguration 23/demo_safemode00003 #where 23/demo_safemode00003 is a configuration name'
   print ' conftool.py listDatabases'
   print ' conftool.py listCollections'
