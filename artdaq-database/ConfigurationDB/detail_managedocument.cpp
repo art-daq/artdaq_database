@@ -16,6 +16,10 @@
 
 #include "artdaq-database/ConfigurationDB/options_operations.h"
 
+
+#include <boost/variant.hpp>
+
+
 #ifdef TRACE_NAME
 #undef TRACE_NAME
 #endif
@@ -37,6 +41,8 @@ using artdaq::database::basictypes::JsonData;
 using artdaq::database::basictypes::XmlData;
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
+
+using JsonAnyHandle_t = boost::variant<JsonData,JSONDocument>;
 
 namespace artdaq {
 namespace database {
@@ -73,7 +79,7 @@ void write_document(Options const& options, std::string& conf) {
 
   validate_dbprovider_name(options.provider());
 
-  auto data =  JsonData{conf};
+  auto data = JsonAnyHandle_t{ JsonData{conf} };
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
 
@@ -104,10 +110,19 @@ void write_document(Options const& options, std::string& conf) {
       break;
     }
     case data_format_t::fhicl: {
+      {
+	auto value= jsn::value_t {jsn::object_t{}};      
+	auto& ast = db::sharedtypes::unwrap(value).value_as<jsn::object_t>();      
+	if(!db::fhicljson::fhicl_to_ast(conf,options.entity(),ast)){
+	  throw  runtime_error("write_document") << "FHICL to JSON convertion failed";
+	}
+      
+	data =  JSONDocument{value};
+      }
+#if 0      
       // convert from fhicl to json and back to fhicl
       data =  FhiclData{conf};
 
-#if 0      
       auto fhicl = FhiclData{};
 
       if (!data.convert_to<FhiclData>(fhicl)) {
@@ -125,13 +140,13 @@ void write_document(Options const& options, std::string& conf) {
       break;
     }
     case data_format_t::xml: {
-      // convert from xml to json and back to xml
+      // convert from xml to json and back to xml      
+      JsonData tmp=XmlData{conf};
+      data = tmp;
 
-      data = XmlData{conf};
-#if 0
       auto xml = XmlData{};
 
-      if (!data.convert_to<XmlData>(xml)) {
+      if (!boost::get<JsonData>(data).convert_to<XmlData>(xml)) {
         TLOG(25) << "write_document: Unable to convert json data to fcl; json=<" << data << ">";
 
         throw runtime_error("write_document") << "Unable to reverse xml-to-json convertion";
@@ -142,59 +157,68 @@ void write_document(Options const& options, std::string& conf) {
 
       returnValue = xml;
       returnValueChanged = true;
-#endif
+
       break;
     }
   }
 
   //TLOG(28) << "write_document: json_buffer=<" << data << ">";
-  TLOG(29) << "write_document: options=<" << options << ">";
-
+  TLOG(28) << "write_document: options=<" << options << ">";
+  
+  auto builder=std::unique_ptr<JSONDocumentBuilder>(nullptr);
+  
   // create a json document to be inserted into the database
-  JSONDocumentBuilder builder{{data}};
+  if(data.type() == typeid(JsonData)){
+    builder.reset(new JSONDocumentBuilder{{boost::get<JsonData>(data)}});
+  }else if(data.type() == typeid(JSONDocument)){
+    builder.reset(new JSONDocumentBuilder{boost::get<JSONDocument>(data)});
+  }
 
   auto filter = std::string{", \"filter\":"};
   filter.append(options.query_filter_to_JsonData());
 
-  if (options.format() != data_format_t::db && options.format() != data_format_t::gui) {
-    builder.createFromData(data);
+  if(options.format() != data_format_t::fhicl){
+    TLOG(29) << "write_document: building fhicl document";
+  } else if (options.format() != data_format_t::db && options.format() != data_format_t::gui) {
+    //FIXME::GAL builder->createFromData(data);//GAL
   } else if (options.format() == data_format_t::gui) {
-    builder.newObjectID();
-    builder.removeAllConfigurations();
-    builder.removeAllEntities();
+    builder->newObjectID();
+    builder->removeAllConfigurations();
+    builder->removeAllEntities();
 
-    filter = std::string{", \"filter\":"} + builder.getObjectID().to_string();
+    filter = std::string{", \"filter\":"} + builder->getObjectID().to_string();
   } else {
-    if (builder.isReadonlyOrDeleted() && options.operation() == apiliteral::operation::writedocument) {
-      builder.newObjectID();
+    if (builder->isReadonlyOrDeleted() && options.operation() == apiliteral::operation::writedocument) {
+      builder->newObjectID();
     }
 
-    filter = std::string{", \"filter\":"} + builder.getObjectID().to_string();
+    filter = std::string{", \"filter\":"} + builder->getObjectID().to_string();
   }
 
-  if (!builder.isReadonlyOrDeleted()) {
+  if (!builder->isReadonlyOrDeleted()) {
     //      if(options.configuration()!=jsonliteral::notprovided)
-    builder.addConfiguration({options.configuration_to_JsonData()});
+    builder->addConfiguration({options.configuration_to_JsonData()});
 
     //      if(options.version()!=jsonliteral::notprovided)
-    builder.setVersion({options.version_to_JsonData()});
+    builder->setVersion({options.version_to_JsonData()});
 
     //      if(options.collection()!=jsonliteral::notprovided)
-    builder.setCollection({options.collection_to_JsonData()});
+    builder->setCollection({options.collection_to_JsonData()});
 
     //      if(options.entity()!=jsonliteral::notprovided)
-    builder.addEntity({options.entity_to_JsonData()});
+    builder->addEntity({options.entity_to_JsonData()});
 
     if (options.run() != jsonliteral::notprovided) {
-      builder.addRun({options.run_to_JsonData()});
+      builder->addRun({options.run_to_JsonData()});
     }
   }
 
-  auto insert_payload =
-      JsonData{"{\"document\":" + builder.to_string() + filter + ", \"collection\":\"" + options.collection() + "\"}"};
-
-  TLOG(30) << "write_document: insert_payload=<" << insert_payload << ">";
+  auto insert_payload=JSONDocument{{"{\"document\":{}" + filter + ", \"collection\":\"" + options.collection() + "\"}"}};
   
+  TLOG(30) << "write_document: insert_payload=<" << insert_payload << ">";
+ 
+  insert_payload.replaceChild(builder->extract(),"document");   
+        
   auto dispatch_persistence_provider = [](std::string const& name) {
     auto providers =
         std::map<std::string, provider_write_t>{{apiliteral::provider::mongo, cf::mongo::writeDocument},

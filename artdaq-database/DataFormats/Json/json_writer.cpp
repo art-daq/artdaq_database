@@ -16,7 +16,6 @@ using artdaq::database::json::object_t;
 bool JsonWriter::write(object_t const& ast, std::string& out) {
   confirm(out.empty());
   confirm(!ast.empty());
-  
   TLOG(21) << "write() begin ";
 
   auto result = bool(false);
@@ -35,6 +34,11 @@ bool JsonWriter::write(object_t const& ast, std::string& out) {
     out.swap(buffer);
   }
   TLOG(22) << "write() out=<" << out << ">";
-  TLOG(23) << "write() end ";
+
+  if(out.size()>512){   
+      TLOG(23) << "heavy write() " << debug::getStackTrace();
+  }
+  
+  TLOG(24) << "write() end ";
   return result;
 }

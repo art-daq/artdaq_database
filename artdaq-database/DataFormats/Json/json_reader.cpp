@@ -17,7 +17,12 @@ bool JsonReader::read(std::string const& in, object_t& ast) {
   confirm(!in.empty());
   confirm(ast.empty());
 
-  TLOG(21) << "read() begin";
+  TLOG(20) << "read() begin";
+  
+   if(in.size()>512){   
+      TLOG(21) << "heavy read() " << debug::getStackTrace();
+   }
+
   TLOG(22) << "read() in=<" << in << ">";
 
   auto result = bool(false);

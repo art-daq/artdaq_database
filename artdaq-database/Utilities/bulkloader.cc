@@ -158,7 +158,7 @@ int main(int argc, char* argv[]) try {
 
    std::stringstream oss;
  
-   oss << "Loaded " << file_count << " with " <<  workers.size();
+   oss << "Loaded " << file_count << " files with " <<  workers.size();
    oss << " threads in " << std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count() << " msecs.\n";
    oss << "Avarage file load time is " ;
    oss << std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count()*std::min(((size_t)std::thread::hardware_concurrency()),workers.size())/file_count;
