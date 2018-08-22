@@ -102,9 +102,9 @@ int main(int argc, char* argv[]) try {
   auto configuration = vm[apiliteral::option::configuration].as<std::string>();
   auto run = std::to_string(vm[apiliteral::option::run].as<std::size_t>());
 
-  options1.configuration(configuration);
+  options1.configuration(run + '/'+ configuration);
   options1.run(run);
-  options1.version(configuration);
+  options1.version(run + '/'+ configuration);
 
   auto file_names =  db::list_files(dir_path);
   std::mutex file_names_mutex;

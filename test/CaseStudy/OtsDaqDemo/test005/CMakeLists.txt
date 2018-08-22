@@ -6,4 +6,4 @@ cet_test(conftool_filesystem_${TEST_NAME}_${TEST_NUMBER}_12_t HANDBUILT  TEST_EX
   DATAFILES 
       ${CMAKE_CURRENT_SOURCE_DIR}/test005.flt.filesystem.json 
       ${CMAKE_CURRENT_SOURCE_DIR}/test005.gui.filesystem.json 
-  TEST_ARGS -o store -c test005.flt.filesystem.json -j test005.gui.filesystem.json )
+  TEST_ARGS -o store -searchquery=test005.flt.filesystem.json -x test005.gui.filesystem.json )

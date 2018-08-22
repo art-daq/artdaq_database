@@ -25,9 +25,9 @@ namespace dbdr = artdaq::database::docrecord;
 
 namespace jsonliteral = artdaq::database::dataformats::literal;
 
-JSONDocumentMigrator::JSONDocumentMigrator(JSONDocument const& document) : _document(document) {}
+JSONDocumentMigrator::JSONDocumentMigrator(JSONDocument& document) : _document(document) {}
 
-JSONDocumentMigrator::operator JSONDocument() const {
+JSONDocumentMigrator::operator JSONDocument(){
   JSONDocumentBuilder builder{};
 
   builder.createFromData(_document);

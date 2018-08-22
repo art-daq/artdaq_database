@@ -243,17 +243,24 @@ bool JSONDocument::saveToFile(std::string const& fileName) try {
   throw runtime_error("JSONDocument") << "Failed calling saveToFile(): Caught exception:" << ex.what();
 }
 
-JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& document) {
+JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument doc) {  
   _overlay.reset(nullptr);
-
-  _createFromTemplate(JSONDocument(std::string(template__empty_document)));
+  
+  auto const document=std::move(doc);
+  
+  TLOG(24) << "createFrom() begin args";
+  
+#ifdef TESTBUILD        
+  TLOG(24) << "createFrom() document=<" << document << ">";
+#endif 
+  
+  _createFromTemplate({std::string{template__empty_document}});
 
   {  // create a new document template using overlay classes
     auto ovl = std::make_unique<ovlDatabaseRecord>(_document._value);
     std::swap(_overlay, ovl);
   }
 
-  TLOG(24) << "createFrom() args  document=<" << document << ">";
 
   _importUserData(document);
 
@@ -262,12 +269,18 @@ JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& doc
     std::swap(_overlay, ovl);
   }
 
-  TLOG(25) << "createFrom() imported document";
+  TLOG(24) << "createFrom() end";
 
   return self();
 }
 
 void JSONDocumentBuilder::_importUserData(JSONDocument const& document) {
+  TLOG(25) << "_importUserData() begin";
+
+#ifdef TESTBUILD        
+  TLOG(25) << "_importUserData() document=<" << document << ">";
+#endif
+  
   // replace metadata if any
   try {
     auto path = ""s + jsonliteral::document + jsonliteral::dot + jsonliteral::metadata;
@@ -350,6 +363,9 @@ void JSONDocumentBuilder::_importUserData(JSONDocument const& document) {
   } catch (notfound_exception const&) {
     TLOG(38) << "_importUserData() No document.data";
   }
+  
+  TLOG(25) << "_importUserData() end";
+  
 }
 
 std::string JSONDocument::value(JSONDocument const& document) {

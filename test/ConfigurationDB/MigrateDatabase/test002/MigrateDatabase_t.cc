@@ -102,7 +102,8 @@ int main(int argc, char* argv[]) try {
           continue;
         }
 
-        JSONDocumentBuilder builder{JSONDocumentMigrator{{source}}};
+        auto jsondoc= JSONDocument{source};
+        JSONDocumentBuilder builder{JSONDocumentMigrator{jsondoc}};
         builder.setCollection({"({\"collection\":\")" + collection_name + "\"}"});
 
         oss.str("");

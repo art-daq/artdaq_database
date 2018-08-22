@@ -10,8 +10,8 @@ namespace docrecord {
 
 class JSONDocumentMigrator final {
  public:
-  JSONDocumentMigrator(JSONDocument const&);
-  operator JSONDocument() const;
+  JSONDocumentMigrator(JSONDocument&);
+  operator JSONDocument();
 
   // defaults
   ~JSONDocumentMigrator() = default;
@@ -24,7 +24,7 @@ class JSONDocumentMigrator final {
   JSONDocumentMigrator(JSONDocumentMigrator&&) = delete;
 
  private:
-  JSONDocument const& _document;
+  JSONDocument& _document;
 };
 
 namespace debug {

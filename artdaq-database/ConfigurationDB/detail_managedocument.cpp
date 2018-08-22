@@ -119,18 +119,18 @@ void write_document(Options const& options, std::string& conf) {
       
 	data =  JSONDocument{value};
       }
-#if 0      
+#ifdef TESTBUILD      
       // convert from fhicl to json and back to fhicl
-      data =  FhiclData{conf};
+      JsonData json =  FhiclData{conf};
 
       auto fhicl = FhiclData{};
 
-      if (!data.convert_to<FhiclData>(fhicl)) {
-        TLOG(22) << "write_document: Unable to convert json data to fcl; json=<" << data << ">";
+      if (!json.convert_to<FhiclData>(fhicl)) {
+        TLOG(22) << "write_document: Unable to convert json data to fcl; json=<" << json << ">";
 
         throw runtime_error("write_document") << "Unable to reverse fhicl-to-json convertion";
       } else {
-        TLOG(23) << "write_document: Converted json data to fcl; json=<" << data << ">";
+        TLOG(23) << "write_document: Converted json data to fcl; json=<" << json << ">";
         TLOG(24) << "write_document: Converted json data to fcl; fcl=<" << fhicl << ">";
       }
 
@@ -169,25 +169,29 @@ void write_document(Options const& options, std::string& conf) {
   
   // create a json document to be inserted into the database
   if(data.type() == typeid(JsonData)){
-    builder.reset(new JSONDocumentBuilder{{boost::get<JsonData>(data)}});
-  }else if(data.type() == typeid(JSONDocument)){
-    builder.reset(new JSONDocumentBuilder{boost::get<JSONDocument>(data)});
+    data = JSONDocument{boost::get<JsonData>(data)};
   }
 
   auto filter = std::string{", \"filter\":"};
   filter.append(options.query_filter_to_JsonData());
 
-  if(options.format() != data_format_t::fhicl){
+  if(options.format() == data_format_t::fhicl){
     TLOG(29) << "write_document: building fhicl document";
+    builder.reset(new JSONDocumentBuilder{boost::get<JSONDocument>(data)});
   } else if (options.format() != data_format_t::db && options.format() != data_format_t::gui) {
-    //FIXME::GAL builder->createFromData(data);//GAL
+    builder.reset(new JSONDocumentBuilder{});    
+    builder->createFromData(boost::get<JSONDocument>(data));
   } else if (options.format() == data_format_t::gui) {
+    builder.reset(new JSONDocumentBuilder{boost::get<JSONDocument>(data)});
+    
     builder->newObjectID();
     builder->removeAllConfigurations();
     builder->removeAllEntities();
 
     filter = std::string{", \"filter\":"} + builder->getObjectID().to_string();
   } else {
+    builder.reset(new JSONDocumentBuilder{boost::get<JSONDocument>(data)});
+    
     if (builder->isReadonlyOrDeleted() && options.operation() == apiliteral::operation::writedocument) {
       builder->newObjectID();
     }

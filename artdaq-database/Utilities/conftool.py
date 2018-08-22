@@ -401,7 +401,7 @@ def archiveConfiguration(configuration_name,run_number,entity_userdata_map):
   
   version=str(run_number)+"/"+configuration_name
   
-  if version in listVersions('RunHistory'):
+  if version in listVersions('SystemLayout'):
     print 'Error: Run ' +str(run_number) + ' already archived.'
     return False
   
@@ -477,39 +477,97 @@ def archiveRunConfigurationWithBulkloader(config,run_number):
     print 'Error: ARTDAQ_DATABASE_REMOTEHOST is not set.'
     return False
 
-  ssh = SSHClient()
-  ssh.load_system_host_keys()
-  ssh.connect(artdaq_database_remote_host,look_for_keys=false)
-  
-  stdin, stdout, stderr = ssh.exec_command('echo im on $(hostname -s)')
+  version=str(run_number)+"/"+config
 
+  os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri+'_archive'
+
+  try:
+    found_versions=listVersions('SystemLayout')
+  except Exception,e:
+    print 'Error: Unable to query versions.'
+    os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri
+    return False
+  
+  print found_versions
+  os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri
+    
+  if version in found_versions:
+    print 'Error: Run ' +str(run_number) + ' already archived.'
+    return False
+  
   __copy_default_schema()
 
-  schema =__read_schema()
+  ssh=None
+  stdoutbuff=None
+  stderrbuff=None
   
-  cfg_composition =list( __composition_reader(['run_history','system_layout'], schema, __find_files('.',fcl_file_pattern)))
+  try:
+    try:
+      ssh = paramiko.SSHClient()
+      ssh.load_system_host_keys()
+      ssh.set_missing_host_key_policy(paramiko.client.AutoAddPolicy)
+      ssh.connect(artdaq_database_remote_host)
+    except Exception,e:
+      print 'Error: Unable to ssh into '+ artdaq_database_remote_host + '. Exception message: '+ str(e)
+      return False
+    
+    __copy_default_schema()
 
-  excluded_files=__list_excluded_files(__get_prefix(config), schema, __find_files('.',any_file_pattern),cfg_composition)
-  
-  if len(excluded_files)>0:
-      print 'Warning: The following files will be excluded from being loaded into the artdaq database ' \
-	+ ', '.join(excluded_files) + '. Update ' + fhicl_schema + ' to include them.'
-  
-      if not __allow_importing_incomplete_configurations():
-	  print 'Error: Importing of incomplete configurations is not allowed; ' \
-	    + 'set ARTDAQ_DATABASE_ALLOW_INCOMPLETE_CONFIGURATIONS to TRUE to allow.'
-	  return False 
+    schema =__read_schema()
+    
+    cfg_composition =list( __composition_reader(['run_history','system_layout'], schema, __find_files('.',fcl_file_pattern)))
 
-  stdin, stdout, stderr = ssh.exec_command('echo im on $(hostname -s)')
-  
-  ssh.close()
-  if result is not True:
-     return False
+    excluded_files=__list_excluded_files(__get_prefix(config), schema, __find_files('.',any_file_pattern),cfg_composition)
+    
+    if len(excluded_files)>0:
+	print 'Warning: The following files will be excluded from being loaded into the artdaq database ' \
+	  + ', '.join(excluded_files) + '. Update ' + fhicl_schema + ' to include them.'
+    
+	if not __allow_importing_incomplete_configurations():
+	    print 'Error: Importing of incomplete configurations is not allowed; ' \
+	      + 'set ARTDAQ_DATABASE_ALLOW_INCOMPLETE_CONFIGURATIONS to TRUE to allow.'
+	    return False 
 
+    envvars = dict(os.environ)
+    keys = ['PATH', 'LD_LIBRARY_PATH', 'PYTHONPATH','ARTDAQ_DATABASE_DATADIR','ARTDAQ_DATABASE_CONFDIR']    
+    command=' '.join('export {}="{}";'.format(k, v) for k, v in dict((k, envvars[k]) for k in keys if k in envvars).items())
+    command+='export ARTDAQ_DATABASE_URI="{}_archive";'.format(envvars['ARTDAQ_DATABASE_URI'])
+    command+='echo BULKLOADER is running on $(hostname -s) and ARTDAQ_DATABASE_URI=$ARTDAQ_DATABASE_URI;'
+    command+='cd {};'.format(envvars['PWD'])
+    command+='bulkloader -r {} -c {} -p {} -t $(( $(nproc)/2 ))\n'.format(run_number,config,'./')
+    command+='[[ $? -eq 0 ]] && echo True || echo False'
+    
+    stdin, stdout, stderr = ssh.exec_command(command)    
+    while not stdout.channel.exit_status_ready() and not stdout.channel.recv_ready():
+      time.sleep(1)
+
+    stdoutbuff=stdout.readlines()
+    stderrbuff=stderr.readlines()
+  except Exception,e:
+    print 'Error: Failed running bulkloader over ssh on '+ artdaq_database_remote_host + '. Exception message: '+ str(e)
+    return False            
+  finally:
+    if ssh is not None:
+      ssh.close()
+
+  result=stdoutbuff[-1][:-1]=='True'
+    
+  if result is not True:   
+    for l in stdoutbuff[:-1]:
+      print l[:-1]
+    for l in stderrbuff:
+      print l[:-1]
+    return False
+
+  for l in stdoutbuff[:-1]:
+    print(l[:-1])
+    
   for entry in cfg_composition:
     print ('Archive',entry)
-
+    
   return True 
+
+
 
 def exportArchivedRunConfiguration(config):  
   if not __ends_on_5digitnumber(config):
@@ -634,7 +692,7 @@ def help():
 #  print ' conftool.py importDatabase #reads archives from the current directory'
   print ' conftool.py archiveRunConfiguration demo_safemode 23 #where 23 is a run number'
   print ' conftool.py getListOfArchivedRunConfigurations 23 #where 23 is a run number'
-  print ' conftool.py archiveRunConfigurationWithBulkloader 23 #where 23 is a run number'
+  print ' conftool.py archiveRunConfigurationWithBulkloader demo_safemode 23 #where 23 is a run number'
   print ' conftool.py exportArchivedRunConfiguration 23/demo_safemode00003 #where 23/demo_safemode00003 is a configuration name'
   print ' conftool.py listDatabases'
   print ' conftool.py listCollections'
