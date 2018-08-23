@@ -10,6 +10,7 @@
 #include <chrono>
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 #include <boost/filesystem.hpp>
 #include <boost/exception/diagnostic_information.hpp> 
@@ -108,26 +109,28 @@ int main(int argc, char* argv[]) try {
 
   auto file_names =  db::list_files(dir_path);
   std::mutex file_names_mutex;
-  auto file_count= file_names.size();
-
+  
+  std::atomic<int> loaded_file_count{0};
   std::vector<std::thread> workers;
   
   auto const stropts=options1.writeJsonData();
   
   for (std::size_t i = 0; i < nproc; i++) {
         workers.push_back(std::thread(
-	  [&file_names, &file_names_mutex, stropts]() 
+	  [&file_names, &file_names_mutex,&loaded_file_count, stropts]() 
 	  {
 	    auto file_name=std::string{};
             auto entity=std::string{jsonliteral::notprovided};
 	    auto options=Options{"Worker"};
+	    int filecount=0;
 	    options.readJsonData(stropts);
 	    while(true){
 	      {
 		std::lock_guard<std::mutex> lock(file_names_mutex);	    
-		if(file_names.empty())
+		if(file_names.empty()){
+		  loaded_file_count.fetch_add(filecount);
 		  return;
-		
+		}
 		file_name=file_names.back();
 		file_names.pop_back();
 	      }
@@ -145,6 +148,7 @@ int main(int argc, char* argv[]) try {
 		  options.entity(jsonliteral::schema);
 		}
 		write_document(options,file_name);
+		filecount++;
 	      }
 	    }
         }));
@@ -158,10 +162,10 @@ int main(int argc, char* argv[]) try {
 
    std::stringstream oss;
  
-   oss << "Loaded " << file_count << " files with " <<  workers.size();
+   oss << "Loaded " << loaded_file_count << " files with " <<  workers.size();
    oss << " threads in " << std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count() << " msecs.\n";
    oss << "Avarage file load time is " ;
-   oss << std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count()*std::min(((size_t)std::thread::hardware_concurrency()),workers.size())/file_count;
+   oss << std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count()*std::min(((size_t)std::thread::hardware_concurrency()),workers.size())/loaded_file_count;
    oss << " msecs.\n";
    
    std::cout << oss.str(); 

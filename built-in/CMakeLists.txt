@@ -66,5 +66,5 @@ else()
   ) 
 ENDIF()
 
-install(DIRECTORY paramiko/build/lib DESTINATION ${flavorqual_dir})
+#install(DIRECTORY paramiko/build/lib DESTINATION ${flavorqual_dir})
 

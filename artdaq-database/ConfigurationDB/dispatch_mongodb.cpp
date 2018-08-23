@@ -8,6 +8,7 @@
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
+#include "artdaq-database/SharedCommon/helper_functions.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -17,6 +18,7 @@
 
 using namespace artdaq::database::configuration;
 namespace cf = artdaq::database::configuration;
+namespace db = artdaq::database;
 
 namespace DBI = artdaq::database::mongo;
 namespace prov = artdaq::database::configuration::mongo;
@@ -217,7 +219,7 @@ JSONDocument prov::configurationComposition(ManageDocumentOperation const& optio
 
   oss << "] }";
 
-  return {oss.str()};
+  return {db::replace_all(oss.str(),"\\\\/", "/" )};
 }
 
 std::vector<JSONDocument> prov::findVersions(ManageDocumentOperation const& options, JSONDocument const& /*unused*/) {
@@ -275,8 +277,8 @@ std::vector<JSONDocument> prov::findVersions(ManageDocumentOperation const& opti
     oss <<  quoted_(jsonliteral::name) << ":" <<  quoted_(results[1].str()) << ",";
     oss <<  quoted_(jsonliteral::query)<< ":" << search_result;
     oss << "}\n";
-    
-    returnValue.emplace_back(oss.str());
+            
+    returnValue.emplace_back(db::replace_all(oss.str(),"\\\\/", "/" ));
   }
 
   TLOG(30) << "operation_findversions: end";
