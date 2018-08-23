@@ -6,7 +6,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "JSNU:DocuMgrt_C"
+#define TRACE_NAME "JSONDocumentMigrator.cpp"
 
 using artdaq::database::json::array_t;
 using artdaq::database::json::object_t;
@@ -25,9 +25,9 @@ namespace dbdr = artdaq::database::docrecord;
 
 namespace jsonliteral = artdaq::database::dataformats::literal;
 
-JSONDocumentMigrator::JSONDocumentMigrator(JSONDocument const& document) : _document(document) {}
+JSONDocumentMigrator::JSONDocumentMigrator(JSONDocument& document) : _document(document) {}
 
-JSONDocumentMigrator::operator JSONDocument() const {
+JSONDocumentMigrator::operator JSONDocument(){
   JSONDocumentBuilder builder{};
 
   builder.createFromData(_document);
@@ -57,5 +57,5 @@ void dbdr::debug::JSONDocumentMigrator() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) << "artdaq::database::JSONDocumentMigrator trace_enable";
+  TLOG(20) << "artdaq::database::JSONDocumentMigrator trace_enable";
 }

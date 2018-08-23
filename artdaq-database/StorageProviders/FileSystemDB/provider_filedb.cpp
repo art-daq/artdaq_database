@@ -17,7 +17,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "PRVDR:FileDB_C"
+#define TRACE_NAME "provider_filedb.cpp"
 
 namespace db = artdaq::database;
 namespace dbfs = artdaq::database::filesystem;
@@ -26,7 +26,6 @@ namespace dbfsl = dbfs::literal;
 using artdaq::database::filesystem::FileSystemDB;
 using artdaq::database::filesystem::index::SearchIndex;
 
-using artdaq::database::basictypes::JsonData;
 using artdaq::database::docrecord::JSONDocument;
 
 namespace apiliteral = db::configapi::literal;
@@ -35,9 +34,9 @@ namespace artdaq {
 namespace database {
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigurations(JsonData const& query_payload) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::findConfigurations(JSONDocument const& query_payload) {
   confirm(!query_payload.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   using timestamp_t = unsigned long long;
   using ordered_timestamps_t = std::set<timestamp_t>;
@@ -112,9 +111,9 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findConfigurations(
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::configurationComposition(JsonData const& query_payload) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::configurationComposition(JSONDocument const& query_payload) {
   confirm(!query_payload.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   TLOG(16) << "FileSystemDB::configurationComposition() begin";
   TLOG(16) << "FileSystemDB::configurationComposition() args data=<" << query_payload << ">";
@@ -169,9 +168,9 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::configurationCompos
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findVersions(JsonData const& filter) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::findVersions(JSONDocument const& filter) {
   confirm(!filter.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   TLOG(15) << "FileSystemDB::findVersions() begin";
   TLOG(15) << "FileSystemDB::findVersions() args data=<" << filter << ">";
@@ -270,9 +269,9 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findVersions(JsonDa
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findEntities(JsonData const& filter) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::findEntities(JSONDocument const& filter) {
   confirm(!filter.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   TLOG(19) << "FileSystemDB::findEntities() begin";
   TLOG(19) << "FileSystemDB::findEntities() args data=<" << filter << ">";
@@ -333,9 +332,9 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::findEntities(JsonDa
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listCollections(JsonData const& query_payload) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::listCollections(JSONDocument const& query_payload) {
   confirm(!query_payload.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
   TLOG(22) << "FileSystemDB::listCollections() begin";
   TLOG(22) << "FileSystemDB::listCollections() args data=<" << query_payload << ">";
 
@@ -373,9 +372,9 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listCollections(Jso
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::addConfiguration(JsonData const& query_payload) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::addConfiguration(JSONDocument const& query_payload) {
   confirm(!query_payload.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   TLOG(15) << "FileSystemDB::addConfiguration() begin";
   TLOG(15) << "FileSystemDB::addConfiguration() args data=<" << query_payload << ">";
@@ -385,9 +384,9 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::addConfiguration(Js
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listDatabases(JsonData const& query_payload) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::listDatabases(JSONDocument const& query_payload) {
   confirm(!query_payload.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   TLOG(19) << "FileSystemDB::listDatabases() begin";
   TLOG(19) << "FileSystemDB::listDatabases() args data=<" << query_payload << ">";
@@ -428,10 +427,10 @@ std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::listDatabases(JsonD
 
 template <>
 template <>
-std::list<JsonData> StorageProvider<JsonData, FileSystemDB>::databaseMetadata(
-    JsonData const& query_payload[[gnu::unused]]) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::databaseMetadata(
+    JSONDocument const& query_payload[[gnu::unused]]) {
   confirm(!query_payload.empty());
-  auto returnCollection = std::list<JsonData>();
+  auto returnCollection = std::vector<JSONDocument>();
 
   auto collection = _provider->connection() + system_metadata;
   collection = expand_environment_variables(collection);

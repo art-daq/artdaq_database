@@ -10,7 +10,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "UCAPI:UconDB_C"
+#define TRACE_NAME "ucondb_api.cpp"
 
 using namespace artdaq::database;
 

@@ -14,6 +14,7 @@
 #include <vector>
 #include "trace.h"
 */
+#include "trace.h"
 
 #include <boost/core/demangle.hpp>
 

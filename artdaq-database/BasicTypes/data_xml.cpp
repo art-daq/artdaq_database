@@ -17,7 +17,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "BTPS:XmlData_C"
+#define TRACE_NAME "data_xml.cpp"
 
 namespace regex {
 constexpr auto parse_base64data = R"lit([\s\S]*"base64"\s*:\s*"(\S*?)")lit";

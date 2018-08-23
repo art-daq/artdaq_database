@@ -72,6 +72,8 @@ endif()
 
 # buil-in libraries
 include(BuiltinFHICLCPP)
+#include(BuiltinPARAMICO)
+add_subdirectory(built-in)
 
 # Build Node Addons
 #include(NodeJSAddon)
@@ -88,6 +90,7 @@ IF(RUN_TESTS)
   string(TOUPPER ${RUN_TESTS} RUN_TESTS_UC )
   if( ${RUN_TESTS_UC} MATCHES "TRUE" )
     MESSAGE (STATUS "Enable tests")
+    add_definitions(-DTESTBUILD)
     add_subdirectory(test)
   endif()
 ENDIF()

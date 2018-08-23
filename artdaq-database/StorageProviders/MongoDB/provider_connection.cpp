@@ -26,7 +26,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "PRVDR:MongoDB_C"
+#define TRACE_NAME "provider_connection.cpp"
 
 using namespace artdaq::database;
 

@@ -10,8 +10,6 @@ add_subdirectory(FileSystemXml)
 
 cet_test_env("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_UCOND}")
 add_subdirectory(UcondJson)
-
-
 #add_subdirectory(UcondFhicl)
 #add_subdirectory(UcondXml)
 

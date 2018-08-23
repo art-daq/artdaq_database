@@ -6,8 +6,8 @@
 #include "artdaq-database/StorageProviders/common.h"
 
 #include "artdaq-database/SharedCommon/sharedcommon_common.h"
+#include "artdaq-database/DataFormats/shared_literals.h"
 
-#include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 
 namespace db = artdaq::database;
@@ -18,7 +18,6 @@ using artdaq::database::filesystem::DBConfig;
 using artdaq::database::filesystem::FileSystemDB;
 using artdaq::database::filesystem::index::SearchIndex;
 
-using artdaq::database::basictypes::JsonData;
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 

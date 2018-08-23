@@ -11,7 +11,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "FCL:FclWriter_C"
+#define TRACE_NAME "fhicl_writer.cpp"
 
 namespace fcl = artdaq::database::fhicl;
 namespace jsn = artdaq::database::json;
@@ -25,7 +25,7 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
   confirm(out.empty());
   confirm(!json_object.empty());
 
-  TLOG(12) << "write_data() begin";
+  TLOG(11) << "write_data() begin";
 
   using artdaq::database::fhicl::fhicl_generator_grammar;
   using artdaq::database::fhicljson::valuetuple_t;
@@ -113,5 +113,5 @@ void artdaq::database::fhicl::debug::FhiclWriter() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) << "artdaq::database::fhicl::FhiclWrite trace_enable";
+  TLOG(12) << "artdaq::database::fhicl::FhiclWrite trace_enable";
 }

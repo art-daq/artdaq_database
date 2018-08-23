@@ -20,7 +20,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "CONF:FndCfD_C"
+#define TRACE_NAME "detail_exportimport.cpp"
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;

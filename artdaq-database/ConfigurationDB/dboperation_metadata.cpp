@@ -10,7 +10,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "CONF:OpMDA_C"
+#define TRACE_NAME "dboperation_metadata.cpp"
 
 using namespace artdaq::database::configuration;
 namespace dbcfg = artdaq::database::configuration;

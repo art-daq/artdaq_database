@@ -7,7 +7,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "BTPS:FhiclData_H"
+#define TRACE_NAME "data_fhicl.h"
 
 namespace artdaq {
 namespace database {
@@ -37,4 +37,12 @@ std::ostream& operator<<(std::ostream&, artdaq::database::basictypes::FhiclData 
 }  // namespace database
 }  // namespace artdaq
 
+namespace {
+template<>
+inline TraceStreamer& TraceStreamer::operator<<(const artdaq::database::basictypes::FhiclData& r)
+{
+  std::ostringstream s; s << r; msg_append(s.str().c_str());
+  return *this;
+}
+}
 #endif /* _ARTDAQ_DATABASE_BASICTYPES_FHICL_H_ */

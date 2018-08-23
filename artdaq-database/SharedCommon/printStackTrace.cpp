@@ -23,7 +23,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "StackTrace_C"
+#define TRACE_NAME "printStackTrace.cpp"
 
 namespace debug {
 namespace stack {

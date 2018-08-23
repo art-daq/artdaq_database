@@ -10,7 +10,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "JSNU:DocUtils_C"
+#define TRACE_NAME "JSONDocument_utils.cpp"
 
 using artdaq::database::json::array_t;
 using artdaq::database::json::object_t;
@@ -65,7 +65,7 @@ bool matches(value_t const& left, value_t const& right) {
       auto const& templateVal = templateKVP.value;
 
       if (!matches(templateVal, candidateVal)) {
-        TLOG(11) << "matches() objects are different at key=<" << templateKVP.key << ">";
+        TLOG(20) << "matches() objects are different at key=<" << templateKVP.key << ">";
 
         return false;
       }
@@ -153,7 +153,7 @@ std::string JSONDocument::writeJson() const {
   auto const& tmpObject = boost::get<object_t>(_value);
 
   if (tmpObject.empty()) {
-    return "{}";
+    return jsonliteral::empty_json;
   }
 
   auto json = std::string{};
@@ -162,29 +162,29 @@ std::string JSONDocument::writeJson() const {
     throw invalid_argument("JSONDocument") << "Failed writing JSON: JSONDocument::_value has invalid AST";
   }
 
-  // TLOG(11) << "writeJson() json=<" << json << " > ");
-
   return json;
 }
 
-std::string JSONDocument::to_string() const { return writeJson(); }
+std::string JSONDocument::to_string() const { if (_isDirty) {_cached_json_buffer = writeJson(); _isDirty=false;} return _cached_json_buffer; }
 
-JSONDocument::JSONDocument(JsonData const& data) : _value{readJson(data)}, _cached_json_buffer(data) {}
+JSONDocument::operator std::string() const {if (_isDirty) {_cached_json_buffer = writeJson(); _isDirty=false;} return _cached_json_buffer;}
 
-JSONDocument::JSONDocument(std::string const& json) : _value{readJson(json)}, _cached_json_buffer(json) {}
+bool JSONDocument::empty() const { return _value.empty(); }
 
-JSONDocument::JSONDocument(value_t value) : _value{std::move(value)}, _cached_json_buffer(writeJson()) {}
+JSONDocument::JSONDocument(JsonData const& data) : _value{readJson(data)}, _cached_json_buffer(jsonliteral::empty_json), _isDirty(true) {}
 
-JSONDocument::JSONDocument() : _value{object_t{}}, _cached_json_buffer(writeJson()) {}
+JSONDocument::JSONDocument(std::string const& json) : _value{readJson(json)}, _cached_json_buffer(jsonliteral::empty_json),_isDirty(true) {}
+
+JSONDocument::JSONDocument(value_t value) : _value{std::move(value)}, _cached_json_buffer(jsonliteral::empty_json), _isDirty(true){}
+
+JSONDocument::JSONDocument() : _value{object_t{}}, _cached_json_buffer(jsonliteral::empty_json), _isDirty(true){}
 
 std::string const& JSONDocument::cached_json_buffer() const { return _cached_json_buffer; }
-
-void JSONDocument::update_json_buffer() { _cached_json_buffer = writeJson(); }
 
 value_t const& JSONDocument::getPayloadValueForKey(object_t::key_type const& key) const {
   confirm(!key.empty());
 
-  TLOG(25) << "getPayloadValueForKey() document=<" << cached_json_buffer() << ">";
+  TLOG(21) << "getPayloadValueForKey() document=<" << cached_json_buffer() << ">";
 
   if (boost::get<object_t>(_value).count("payload") == 1) {
     auto const& value = boost::get<object_t>(_value).at("payload");
@@ -203,13 +203,13 @@ value_t const& JSONDocument::getPayloadValueForKey(object_t::key_type const& key
 bool JSONDocument::equals(JSONDocument const& other) const {
   auto result = jsn::operator==(_value, other._value);
 
-  TLOG(20) << "matches() JSON buffers are " << (result.first ? "equal." : "not equal.");
+  TLOG(22) << "matches() JSON buffers are " << (result.first ? "equal." : "not equal.");
 
   if (result.first) {
     return true;
   }
 
-  TLOG(20) << "matches() Error message=<" << result.second << ">";
+  TLOG(23) << "matches() Error message=<" << result.second << ">";
 
   return false;
 }
@@ -243,17 +243,24 @@ bool JSONDocument::saveToFile(std::string const& fileName) try {
   throw runtime_error("JSONDocument") << "Failed calling saveToFile(): Caught exception:" << ex.what();
 }
 
-JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& document) {
+JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument doc) {  
   _overlay.reset(nullptr);
-
-  _createFromTemplate(JSONDocument(std::string(template__empty_document)));
+  
+  auto const document=std::move(doc);
+  
+  TLOG(24) << "createFrom() begin args";
+  
+#ifdef TESTBUILD        
+  TLOG(24) << "createFrom() document=<" << document << ">";
+#endif 
+  
+  _createFromTemplate({std::string{template__empty_document}});
 
   {  // create a new document template using overlay classes
     auto ovl = std::make_unique<ovlDatabaseRecord>(_document._value);
     std::swap(_overlay, ovl);
   }
 
-  TLOG(12) << "createFrom() args  document=<" << document << ">";
 
   _importUserData(document);
 
@@ -261,73 +268,78 @@ JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument const& doc
     auto ovl = std::make_unique<ovlDatabaseRecord>(_document._value);
     std::swap(_overlay, ovl);
   }
-  _document.writeJson();
 
-  TLOG(12) << "createFrom() imported document=<" << _document.cached_json_buffer() << ">";
+  TLOG(24) << "createFrom() end";
 
   return self();
 }
 
 void JSONDocumentBuilder::_importUserData(JSONDocument const& document) {
+  TLOG(25) << "_importUserData() begin";
+
+#ifdef TESTBUILD        
+  TLOG(25) << "_importUserData() document=<" << document << ">";
+#endif
+  
   // replace metadata if any
   try {
     auto path = ""s + jsonliteral::document + jsonliteral::dot + jsonliteral::metadata;
     auto metadata = document.findChild(path);
 
-    TLOG(12) << "_importUserData() Found document.metadata=<" << metadata << ">";
+    TLOG(26) << "_importUserData() Found document.metadata=<" << metadata << ">";
 
     _document.replaceChild(metadata, path);
 
   } catch (notfound_exception const&) {
-    TLOG(12) << "_importUserData() No document.metadata";
+    TLOG(27) << "_importUserData() No document.metadata";
   }
 
   // replace data if any
   try {
     auto data = document.findChild(jsonliteral::changelog);
 
-    TLOG(12) << "_importUserData() Found converted.changelog=<" << data << ">";
+    TLOG(28) << "_importUserData() Found converted.changelog=<" << data << ">";
 
     _document.replaceChild(data, jsonliteral::changelog);
 
   } catch (notfound_exception const&) {
-    TLOG(12) << "_importUserData() No converted.changelog";
+    TLOG(29) << "_importUserData() No converted.changelog";
   }
 
   // replace data origin if any
   try {
     auto data = document.findChild(jsonliteral::origin);
 
-    TLOG(12) << "_importUserData() Found origin=<" << data << ">";
+    TLOG(30) << "_importUserData() Found origin=<" << data << ">";
 
     _document.replaceChild(data, jsonliteral::origin);
 
   } catch (notfound_exception const&) {
-    TLOG(12) << "_importUserData() No origin";
+    TLOG(31) << "_importUserData() No origin";
   }
 
   // replace data origin if any
   try {
     auto collection = document.findChild(jsonliteral::collection);
 
-    TLOG(12) << "_importUserData() Found origin=<" << collection << ">";
+    TLOG(32) << "_importUserData() Found origin=<" << collection << ">";
 
     _document.replaceChild(collection, jsonliteral::collection);
 
   } catch (notfound_exception const&) {
-    TLOG(12) << "_importUserData() No collection";
+    TLOG(33) << "_importUserData() No collection";
   }
 
   // replace data attachments if any
   try {
     auto attachments = document.findChild(jsonliteral::attachments);
 
-    TLOG(12) << "_importUserData() Found origin=<" << attachments << ">";
+    TLOG(34) << "_importUserData() Found origin=<" << attachments << ">";
 
     _document.replaceChild(attachments, jsonliteral::attachments);
 
   } catch (notfound_exception const&) {
-    TLOG(12) << "_importUserData() No attachments";
+    TLOG(35) << "_importUserData() No attachments";
   }
 
   // replace data if any
@@ -335,13 +347,13 @@ void JSONDocumentBuilder::_importUserData(JSONDocument const& document) {
     auto path = ""s + jsonliteral::document + jsonliteral::dot + jsonliteral::data;
     auto data = document.findChild(path);
 
-    TLOG(12) << "_importUserData() Found document.data=<" << data << ">";
+    TLOG(36) << "_importUserData() Found document.data=<" << data << ">";
 
     _document.replaceChild(data, path);
 
     return;
   } catch (notfound_exception const&) {
-    TLOG(12) << "_importUserData() No document.data";
+    TLOG(37) << "_importUserData() No document.data";
   }
 
   // document contains data only
@@ -349,12 +361,15 @@ void JSONDocumentBuilder::_importUserData(JSONDocument const& document) {
     auto path = ""s + jsonliteral::document + jsonliteral::dot + jsonliteral::data;
     _document.replaceChild(document, path);
   } catch (notfound_exception const&) {
-    TLOG(12) << "_importUserData() No document.data";
+    TLOG(38) << "_importUserData() No document.data";
   }
+  
+  TLOG(25) << "_importUserData() end";
+  
 }
 
 std::string JSONDocument::value(JSONDocument const& document) {
-  TLOG(24) << "value() document=<" << document.cached_json_buffer() << ">";
+  TLOG(39) << "value() document=<" << document.cached_json_buffer() << ">";
 
   auto docValue = document.getPayloadValueForKey("null");
 
@@ -365,8 +380,8 @@ std::string JSONDocument::value(JSONDocument const& document) {
 }
 
 std::string JSONDocument::value_at(JSONDocument const& document, std::size_t index) try {
-  TLOG(24) << "value_at() begin json=<" << document.cached_json_buffer() << ">";
-  TLOG(24) << "value_at() begin index=<" << index << ">";
+  TLOG(40) << "value_at() begin json=<" << document.cached_json_buffer() << ">";
+  TLOG(41) << "value_at() begin index=<" << index << ">";
 
   auto docValue = document.getPayloadValueForKey("0");
 
@@ -399,7 +414,7 @@ value_t& JSONDocument::findChildValue(path_t const& path) try {
 
   return const_cast<value_t&>(myslef.findChildValue(path));
 } catch (std::exception& ex) {
-  TLOG(15) << "findChildValue() Search failed; Error:" << ex.what();
+  TLOG(42) << "findChildValue() Search failed; Error:" << ex.what();
   throw;
 }
 
@@ -415,7 +430,7 @@ void dbdr::debug::JSONDocumentUtils() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) << "artdaq::database::JSONDocument trace_enable";
+  TLOG(43) << "artdaq::database::JSONDocument trace_enable";
 }
 
 namespace artdaq {
@@ -433,3 +448,5 @@ JSONDocument toJSONDocument<string_pair_t>(string_pair_t const& pair) {
 }  // namespace docrecord
 }  // namespace database
 }  // namespace artdaq
+
+

@@ -22,7 +22,7 @@ class JSONDocumentBuilder final {
   JSONDocumentBuilder();
   JSONDocumentBuilder(JSONDocument);
 
-  JSONDocumentBuilder& createFromData(JSONDocument const&);
+  JSONDocumentBuilder& createFromData(JSONDocument);
   JSONDocumentBuilder& addAlias(JSONDocument const&);
   JSONDocumentBuilder& addConfiguration(JSONDocument const&);
   JSONDocumentBuilder& addEntity(JSONDocument const&);
@@ -51,7 +51,7 @@ class JSONDocumentBuilder final {
 
   std::list<std::string> extractTags() const;
 
-  JSONDocument& extract() { return _document; }
+  JSONDocument extract() { return std::move(_document); }
 
   result_t comapreUsingOverlays(JSONDocumentBuilder const&) const;
 

@@ -1,1 +1,0 @@
-Run up to 8 SSPs and 4 RCEs, and the PTB with ganglia, online monitoring, and root file output enabled. COnfiguration setup to do sync tests.

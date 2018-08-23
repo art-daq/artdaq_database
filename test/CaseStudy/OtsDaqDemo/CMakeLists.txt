@@ -20,9 +20,11 @@ string(RANDOM LENGTH 5 ALPHABET 0123456789 VERSION_NUMBER)
 message(STATUS "VERSION_NUMBER=${VERSION_NUMBER}")
 SET (TEST_VERSION_NAME    versionA${VERSION_NUMBER} )
 
-#add_subdirectory(test001)
-#add_subdirectory(test002)
+set (ARTDAQ_DATABASE_URI_OTS_FILESYSTEM ${ARTDAQ_DATABASE_URI_FILESYSTEM}ots)
+set (ARTDAQ_DATABASE_URI_OTS_MONGO ${ARTDAQ_DATABASE_URI_MONGO}ots)
+
 add_subdirectory(test003)
 #add_subdirectory(test004)
 #add_subdirectory(test005)
+
 install_source()

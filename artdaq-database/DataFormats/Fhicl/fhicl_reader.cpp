@@ -11,7 +11,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "FCL:FclReader_C"
+#define TRACE_NAME "fhicl_reader.cpp"
 
 namespace jsn = artdaq::database::json;
 namespace fcl = artdaq::database::fhicl;
@@ -24,7 +24,7 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
   confirm(!in.empty());
   confirm(json_object.empty());
 
-  TLOG(12) << "read_data() begin";
+  TLOG(20) << "read_data() begin";
 
   try {
     using boost::spirit::qi::blank;
@@ -41,9 +41,12 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
     auto start = pos_iterator_t(in.begin());
     auto end = pos_iterator_t(in.end());
 
+    TLOG(21) << "read_data() parse comments begin";
+
     if (!phrase_parse(start, end, grammar, blank, comments)) {
       comments[0] = "No comments";
     }
+    TLOG(22) << "read_data() parse comments end";
 
     auto object = jsn::object_t();
 
@@ -62,18 +65,25 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
 
     auto regex = std::regex{"(#include\\s)([^'\"]*)"};
 
+    TLOG(23) << "read_data() regex includes begin";
+    
     std::for_each(std::sregex_iterator(conf.begin(), conf.end(), regex), std::sregex_iterator(),
                   [&conf, &idx](auto& m) {
                     conf.replace(m.position(), m.length(), "fhicl_pound_include_" + std::to_string(idx++) + ":");
                   });
+    TLOG(24) << "read_data() regex includes end";
 
     ::fhicl::intermediate_table fhicl_table;
 
     ::shims::isSnippetMode(true);
 
+    TLOG(25) << "read_data() parse_document begin";
+    
     ::fhicl::parse_document(conf, fhicl_table);
 
-    TLOG(12) << "parse_document() returned " << std::distance(fhicl_table.begin(), fhicl_table.end()) << " entries.";
+    TLOG(26) << "read_data() parse_document end";
+
+    TLOG(27) << "parse_document() returned " << std::distance(fhicl_table.begin(), fhicl_table.end()) << " entries.";
 
     {  // convert prolog section
       auto opts = extra_opts{};
@@ -88,6 +98,8 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
       //      "}.append(literal::prolog);
 
       auto& metadata = make_SubNode(prolog, literal::children);
+      
+      TLOG(28) << "read_data() convert prolog begin";
 
       for (auto const& fhicl_element : fhicl_table) {
         if (fhicl_element.second.in_prolog && opts.readProlog) {
@@ -96,6 +108,8 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
           metadata.push_back(pair.second);
         }
       }
+      TLOG(29) << "read_data() convert prolog end";
+      
     }
 
     {  // convert main section
@@ -111,6 +125,8 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
       //      "}.append(literal::main);
 
       auto& metadata = make_SubNode(main, literal::children);
+      
+      TLOG(30) << "read_data() convert main begin";
 
       for (auto const& fhicl_element : fhicl_table) {
         if (!fhicl_element.second.in_prolog && opts.readMain) {
@@ -119,16 +135,18 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
           metadata.push_back(pair.second);
         }
       }
+      TLOG(31) << "read_data() convert main end";
+      
     }
 
     json_object.swap(object);
 
-    TLOG(12) << "read_data() end";
+    TLOG(32) << "read_data() end";
 
     return true;
 
   } catch (::fhicl::exception const& e) {
-    TLOG(12) << "read_data() Caught fhicl::exception message=" << e.what();
+    TLOG(33) << "read_data() Caught fhicl::exception message=" << e.what();
 
     std::cerr << "Caught fhicl::exception message=" << e.what() << "\n";
     throw;
@@ -138,6 +156,8 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
 bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array) {
   confirm(!in.empty());
   confirm(json_array.empty());
+
+  TLOG(41) << "read_comments() begin";
 
   try {
     using boost::spirit::qi::blank;
@@ -152,8 +172,10 @@ bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
     auto end = pos_iterator_t(in.end());
 
     auto comments = comments_t();
-
+    
+    TLOG(42) << "read_comments() phrase_parse begin";
     auto result = phrase_parse(start, end, grammar, blank, comments);
+    TLOG(43) << "read_comments() phrase_parse end";
 
     if (!result) {
       comments[0] = "No comments";
@@ -161,6 +183,8 @@ bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
     }
 
     auto array = jsn::array_t();
+    
+    TLOG(44) << "read_comments() integrate comments begin";
 
     for (auto const& comment : comments) {
       array.push_back(jsn::object_t());
@@ -168,14 +192,17 @@ bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
       object.push_back(jsn::data_t::make(literal::linenum, comment.first));
 
       if (fcl::from_json_string(fcl::to_json_string(comment.second)) != comment.second) {
-        TLOG(13) << "Warning non reversable convertion\nbegin" << comment.second;
-        TLOG(13) << "convd" << fcl::to_json_string(comment.second);
-        TLOG(13) << "restd" << fcl::from_json_string(fcl::to_json_string(comment.second));
+        TLOG(45) << "Warning non reversable convertion\nbegin" << comment.second;
+        TLOG(46) << "convd" << fcl::to_json_string(comment.second);
+        TLOG(47) << "restd" << fcl::from_json_string(fcl::to_json_string(comment.second));
       }
       object.push_back(jsn::data_t::make(literal::value, fcl::to_json_string(comment.second)));
     }
+    TLOG(48) << "read_comments() integrate comments end";
 
     json_array.swap(array);
+
+    TLOG(49) << "read_comments() begin";
 
     return result;
 
@@ -191,5 +218,5 @@ void artdaq::database::fhicl::debug::FhiclReader() {
   TRACE_CNTL("modeM", trace_mode::modeM);
   TRACE_CNTL("modeS", trace_mode::modeS);
 
-  TLOG(10) << "artdaq::database::fhicl::FhiclReader trace_enable";
+  TLOG(50) << "artdaq::database::fhicl::FhiclReader trace_enable";
 }

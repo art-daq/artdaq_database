@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_database  v1_04_56
+parent artdaq_database  v1_04_57
 defaultqual	e14:s50
 
 # These optional lines define the installed directories where
@@ -19,13 +19,11 @@ perllib  product_dir
 
 #
 product		version		optional
-cetlib   	v3_00_01        s50
 cetlib          v3_02_00        s64
 cetlib          v3_02_00        s65
 cetlib          v3_03_00        s67
 TRACE           v3_13_09        -
 mongodb 	v3_4_6c
-python          v2_7_13d	s50
 python          v2_7_14b        s64
 python          v2_7_14b        s65
 python          v2_7_14b        s67
@@ -51,8 +49,6 @@ e15:s65:debug   e15:debug	-nq-	e15:debug 	-nq-	e15:debug	-nq-	-std=c++14
 e15:s65:prof    e15:prof	-nq-	e15:prof	-nq-	e15:prof	-nq-	-std=c++14
 e15:s67:debug   e15:debug	-nq-	e15:debug 	-nq-	e15:debug	-nq-	-std=c++14
 e15:s67:prof    e15:prof	-nq-	e15:prof	-nq-	e15:prof	-nq-	-std=c++14
-e14:s50:debug   e14:debug	-nq-	e14:debug 	-nq-	e14:debug	-nq-	-std=c++14
-e14:s50:prof    e14:prof	-nq-	e14:prof	-nq-	e14:prof	-nq-	-std=c++14
 end_qualifier_list
 
 
@@ -63,7 +59,7 @@ envSet(ARTDAQ_DATABASE_CONFDIR, "${${UPS_PROD_NAME_UC}_FQ_DIR}/conf")
 
 envSet( ARTDAQ_DATABASE_URI,"filesystemdb://${ARTDAQ_DATABASE_DATADIR}/filesystemdb/test_db")
 
-envPrepend(PYTHONPATH, "${${UPS_PROD_NAME_UC}_FQ_DIR}/python")
+envPrepend(PYTHONPATH, "${${UPS_PROD_NAME_UC}_FQ_DIR}/python:${${UPS_PROD_NAME_UC}_FQ_DIR}/lib/python2.7/site-packages")
 
 table_fragment_end
 

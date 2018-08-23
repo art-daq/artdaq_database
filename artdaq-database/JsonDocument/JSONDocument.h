@@ -44,7 +44,12 @@ class JSONDocument final {
   JSONDocument removeChild(JSONDocument const&, path_t const&);
 
   std::string to_string() const;
-  std::string value() { return JSONDocument::value(self()); };
+  bool empty() const;
+
+  operator std::string() const; 
+  
+  std::string value() { return JSONDocument::value(self()); }
+  
 
   bool equals(JSONDocument const&) const;
 
@@ -73,8 +78,6 @@ class JSONDocument final {
   // JSONDocument ( JSONDocument && ) = delete;
 
  private:
-  void update_json_buffer();
-
   value_t readJson(std::string const&);
   std::string writeJson() const;
 
@@ -88,7 +91,8 @@ class JSONDocument final {
 
  private:
   value_t _value;
-  std::string _cached_json_buffer;
+  mutable std::string _cached_json_buffer;
+  mutable bool _isDirty;
 };
 
 template <typename T>
@@ -107,4 +111,15 @@ std::vector<path_t> split_path(path_t const&);
 }  // namespace docrecord
 }  // namespace database
 }  // namespace artdaq
+
+namespace {
+template<>
+inline TraceStreamer& TraceStreamer::operator<<(const artdaq::database::docrecord::JSONDocument& r)
+{
+  std::ostringstream s; s << r; msg_append(s.str().c_str());
+  return *this;
+}
+}
+
+
 #endif /* _ARTDAQ_DATABASE_JSONUTILS_JSONDOCUMENT_H_ */

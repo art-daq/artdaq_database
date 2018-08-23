@@ -11,7 +11,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "XML:XmlReader_C"
+#define TRACE_NAME "xml_reader.cpp"
 
 namespace jsn = artdaq::database::json;
 

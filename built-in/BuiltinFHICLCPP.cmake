@@ -35,4 +35,3 @@ endif()
 
 include_directories(built-in/includes)
 
-add_subdirectory(built-in)

@@ -16,7 +16,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "PRVDR:FileDBIX_C"
+#define TRACE_NAME "provider_filedb_index.cpp"
 
 using namespace artdaq::database;
 
@@ -47,7 +47,7 @@ SearchIndex::~SearchIndex() {
   }
 }
 
-std::vector<object_id_t> SearchIndex::findDocumentIDs(JsonData const& search) {
+std::vector<object_id_t> SearchIndex::findDocumentIDs(JSONDocument const& search) {
   auto ouids = std::vector<object_id_t>{};
 
   confirm(!search.empty());
@@ -174,7 +174,7 @@ std::vector<object_id_t> SearchIndex::findDocumentIDs(JsonData const& search) {
   return ouids;
 }
 
-std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByGlobalConfigName(JsonData const& search) {
+std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByGlobalConfigName(JSONDocument const& search) {
   confirm(!search.empty());
   auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
   TLOG(15) << "StorageProvider::FileSystemDB::index::findVersionsByGlobalConfigName() begin";
@@ -205,7 +205,7 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByGlob
                                                configNameFilter);
 }
 
-std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByEntityName(JsonData const& search) {
+std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByEntityName(JSONDocument const& search) {
   confirm(!search.empty());
   auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
   TLOG(15) << "StorageProvider::FileSystemDB::index::findVersionsByEntityName() begin";
@@ -236,7 +236,7 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findVersionsByEnti
                                                entityNameFilter);
 }
 
-std::vector<std::string> SearchIndex::findEntities(JsonData const& search) {
+std::vector<std::string> SearchIndex::findEntities(JSONDocument const& search) {
   confirm(!search.empty());
   auto returnCollection = std::vector<std::string>{};
   TLOG(15) << "StorageProvider::FileSystemDB::index::findEntities() begin";
@@ -265,7 +265,7 @@ std::vector<std::string> SearchIndex::findEntities(JsonData const& search) {
   return _filtered_attribute_list(apiliteral::filter::entities, entityNameFilter);
 }
 
-std::vector<std::pair<std::string, std::string>> SearchIndex::findAllGlobalConfigurations(JsonData const& search) {
+std::vector<std::pair<std::string, std::string>> SearchIndex::findAllGlobalConfigurations(JSONDocument const& search) {
   confirm(!search.empty());
   auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
   TLOG(15) << "StorageProvider::FileSystemDB::index::findAllGlobalConfigurations() begin";
@@ -294,7 +294,7 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findAllGlobalConfi
                                                configFilter);
 }
 
-std::vector<std::string> SearchIndex::getConfigurationAssignedTimestamps(JsonData const& search) {
+std::vector<std::string> SearchIndex::getConfigurationAssignedTimestamps(JSONDocument const& search) {
   confirm(!search.empty());
   auto returnCollection = std::vector<std::string>{};
   TLOG(15) << "StorageProvider::FileSystemDB::index::getConfigurationAssignedTimestamps() begin";
@@ -340,7 +340,7 @@ std::vector<std::string> SearchIndex::getConfigurationAssignedTimestamps(JsonDat
   return returnCollection;
 }
 
-bool SearchIndex::addDocument(JsonData const& document, object_id_t const& ouid) {
+bool SearchIndex::addDocument(JSONDocument const& document, object_id_t const& ouid) {
   confirm(!document.empty());
   confirm(!ouid.empty());
 
@@ -424,7 +424,7 @@ bool SearchIndex::addDocument(JsonData const& document, object_id_t const& ouid)
   return false;
 }
 
-bool SearchIndex::removeDocument(JsonData const& document, object_id_t const& ouid) {
+bool SearchIndex::removeDocument(JSONDocument const& document, object_id_t const& ouid) {
   confirm(!document.empty());
   confirm(!ouid.empty());
 

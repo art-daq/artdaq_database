@@ -1,0 +1,4370 @@
+# Produced from 'fhicl-dump' using:
+#   Input  : /tmp/np04daq/tmp.DchkLrrW2g
+#   Policy : cet::filepath_maker
+#   Path   : "FHICL_FILE_PATH"
+
+daq: {
+   fragment_receiver: {
+      DAQConfig: {
+         FragmentTimestampOffset: 1006
+         HardwareClockRate: 150
+         PostTrigLength: 337500
+         PreTrigLength: 112500
+         TriggerMask: 8192
+         TriggerWriteDelay: 1000
+         UseExternalTimestamp: 1
+      }
+      HardwareConfig: {
+         ALL_baseline_start: 0
+         ALL_cfd_parameters: 6144
+         ALL_channel_control: 1025
+         ALL_d_window: 20
+         ALL_disc_width: 10
+         ALL_i1_window: 500
+         ALL_i2_window: 500
+         ALL_m1_window: 10
+         ALL_m2_window: 10
+         ALL_p_window: 32
+         ALL_readout_pretrigger: 50
+         ALL_readout_window: 2000
+         ARR_led_threshold: [
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15
+         ]
+         ARR_pdts_cmd_control: [
+            4.27819008e9,
+            0,
+            4095
+         ]
+         baseline_delay: 5
+         dsp_clock_control: 1073
+         eventDataInterfaceSelect: 1
+         external_gate_width: 32768
+         gpio_output_width: 4096
+         module_id: 52
+         qi_config: 2.68374784e8
+         qi_dac_config: 0
+         qi_delay: 0
+         qi_pulse_width: 32768
+         trigger_input_delay: 32
+      }
+      PTB: {
+         muon_triggers: {
+            trigger_0: {
+               group1: {
+                  BSU: 0
+                  TSU: 0
+               }
+               group2: {
+                  BSU: 0
+                  TSU: 0
+               }
+               prescale: 70
+            }
+            trigger_1: {
+               prescale: 2
+            }
+            trigger_2: {
+               prescale: 2
+            }
+            trigger_3: {
+               prescale: 2
+            }
+         }
+      }
+      board_id: 52
+      board_ip: "10.73.137.76"
+      data_timeout_usecs: 1.2e8
+      destinations: {
+         d100: {
+            destination_rank: 100
+            host_map: [
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9100
+                  rank: 0
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9206
+                  rank: 1
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9312
+                  rank: 2
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9418
+                  rank: 3
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9524
+                  rank: 4
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9630
+                  rank: 5
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9736
+                  rank: 6
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9842
+                  rank: 7
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 9948
+                  rank: 8
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10054
+                  rank: 9
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10160
+                  rank: 10
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10266
+                  rank: 11
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10372
+                  rank: 12
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10478
+                  rank: 13
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10584
+                  rank: 14
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10690
+                  rank: 15
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 10796
+                  rank: 16
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 10902
+                  rank: 17
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 11008
+                  rank: 18
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 11114
+                  rank: 19
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11220
+                  rank: 20
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11326
+                  rank: 21
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11432
+                  rank: 22
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11538
+                  rank: 23
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11644
+                  rank: 24
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11750
+                  rank: 25
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11856
+                  rank: 26
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11962
+                  rank: 27
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12068
+                  rank: 28
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12174
+                  rank: 29
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12280
+                  rank: 30
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12386
+                  rank: 31
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12492
+                  rank: 32
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12598
+                  rank: 33
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12704
+                  rank: 34
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12810
+                  rank: 35
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12916
+                  rank: 36
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13022
+                  rank: 37
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13128
+                  rank: 38
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13234
+                  rank: 39
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13340
+                  rank: 40
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13446
+                  rank: 41
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13552
+                  rank: 42
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13658
+                  rank: 43
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13764
+                  rank: 44
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13870
+                  rank: 45
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 13976
+                  rank: 46
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 14082
+                  rank: 47
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14188
+                  rank: 48
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14294
+                  rank: 49
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14400
+                  rank: 50
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14506
+                  rank: 51
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14612
+                  rank: 52
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14718
+                  rank: 53
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14824
+                  rank: 54
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14930
+                  rank: 55
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 15036
+                  rank: 56
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 15142
+                  rank: 57
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15248
+                  rank: 58
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15354
+                  rank: 59
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15460
+                  rank: 60
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15566
+                  rank: 61
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15672
+                  rank: 62
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15778
+                  rank: 63
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15884
+                  rank: 64
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15990
+                  rank: 65
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 16096
+                  rank: 66
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 16202
+                  rank: 67
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16308
+                  rank: 68
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16414
+                  rank: 69
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16520
+                  rank: 70
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16626
+                  rank: 71
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16732
+                  rank: 72
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16838
+                  rank: 73
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16944
+                  rank: 74
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17050
+                  rank: 75
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17156
+                  rank: 76
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17262
+                  rank: 77
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17368
+                  rank: 78
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17474
+                  rank: 79
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17580
+                  rank: 80
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17686
+                  rank: 81
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17792
+                  rank: 82
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17898
+                  rank: 83
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18004
+                  rank: 84
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18110
+                  rank: 85
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18216
+                  rank: 86
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18322
+                  rank: 87
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18428
+                  rank: 88
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18534
+                  rank: 89
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18640
+                  rank: 90
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18746
+                  rank: 91
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18852
+                  rank: 92
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18958
+                  rank: 93
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 19064
+                  rank: 94
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 19170
+                  rank: 95
+               },
+               {
+                  host: "np04-srv-001"
+                  portOffset: 19276
+                  rank: 96
+               },
+               {
+                  host: "np04-srv-001"
+                  portOffset: 19382
+                  rank: 97
+               },
+               {
+                  host: "np04-srv-002"
+                  portOffset: 19488
+                  rank: 98
+               },
+               {
+                  host: "np04-srv-002"
+                  portOffset: 19594
+                  rank: 99
+               },
+               {
+                  host: "np04-srv-003"
+                  portOffset: 19700
+                  rank: 100
+               },
+               {
+                  host: "np04-srv-003"
+                  portOffset: 19806
+                  rank: 101
+               },
+               {
+                  host: "np04-srv-004"
+                  portOffset: 19912
+                  rank: 102
+               },
+               {
+                  host: "np04-srv-004"
+                  portOffset: 20018
+                  rank: 103
+               }
+            ]
+            max_fragment_size_words: 5e7
+            transferPluginType: "Autodetect"
+         }
+         d101: {
+            destination_rank: 101
+            host_map: [
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9100
+                  rank: 0
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9206
+                  rank: 1
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9312
+                  rank: 2
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9418
+                  rank: 3
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9524
+                  rank: 4
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9630
+                  rank: 5
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9736
+                  rank: 6
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9842
+                  rank: 7
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 9948
+                  rank: 8
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10054
+                  rank: 9
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10160
+                  rank: 10
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10266
+                  rank: 11
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10372
+                  rank: 12
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10478
+                  rank: 13
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10584
+                  rank: 14
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10690
+                  rank: 15
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 10796
+                  rank: 16
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 10902
+                  rank: 17
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 11008
+                  rank: 18
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 11114
+                  rank: 19
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11220
+                  rank: 20
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11326
+                  rank: 21
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11432
+                  rank: 22
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11538
+                  rank: 23
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11644
+                  rank: 24
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11750
+                  rank: 25
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11856
+                  rank: 26
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11962
+                  rank: 27
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12068
+                  rank: 28
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12174
+                  rank: 29
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12280
+                  rank: 30
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12386
+                  rank: 31
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12492
+                  rank: 32
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12598
+                  rank: 33
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12704
+                  rank: 34
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12810
+                  rank: 35
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12916
+                  rank: 36
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13022
+                  rank: 37
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13128
+                  rank: 38
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13234
+                  rank: 39
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13340
+                  rank: 40
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13446
+                  rank: 41
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13552
+                  rank: 42
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13658
+                  rank: 43
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13764
+                  rank: 44
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13870
+                  rank: 45
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 13976
+                  rank: 46
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 14082
+                  rank: 47
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14188
+                  rank: 48
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14294
+                  rank: 49
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14400
+                  rank: 50
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14506
+                  rank: 51
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14612
+                  rank: 52
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14718
+                  rank: 53
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14824
+                  rank: 54
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14930
+                  rank: 55
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 15036
+                  rank: 56
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 15142
+                  rank: 57
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15248
+                  rank: 58
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15354
+                  rank: 59
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15460
+                  rank: 60
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15566
+                  rank: 61
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15672
+                  rank: 62
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15778
+                  rank: 63
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15884
+                  rank: 64
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15990
+                  rank: 65
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 16096
+                  rank: 66
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 16202
+                  rank: 67
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16308
+                  rank: 68
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16414
+                  rank: 69
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16520
+                  rank: 70
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16626
+                  rank: 71
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16732
+                  rank: 72
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16838
+                  rank: 73
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16944
+                  rank: 74
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17050
+                  rank: 75
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17156
+                  rank: 76
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17262
+                  rank: 77
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17368
+                  rank: 78
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17474
+                  rank: 79
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17580
+                  rank: 80
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17686
+                  rank: 81
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17792
+                  rank: 82
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17898
+                  rank: 83
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18004
+                  rank: 84
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18110
+                  rank: 85
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18216
+                  rank: 86
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18322
+                  rank: 87
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18428
+                  rank: 88
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18534
+                  rank: 89
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18640
+                  rank: 90
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18746
+                  rank: 91
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18852
+                  rank: 92
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18958
+                  rank: 93
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 19064
+                  rank: 94
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 19170
+                  rank: 95
+               },
+               {
+                  host: "np04-srv-001"
+                  portOffset: 19276
+                  rank: 96
+               },
+               {
+                  host: "np04-srv-001"
+                  portOffset: 19382
+                  rank: 97
+               },
+               {
+                  host: "np04-srv-002"
+                  portOffset: 19488
+                  rank: 98
+               },
+               {
+                  host: "np04-srv-002"
+                  portOffset: 19594
+                  rank: 99
+               },
+               {
+                  host: "np04-srv-003"
+                  portOffset: 19700
+                  rank: 100
+               },
+               {
+                  host: "np04-srv-003"
+                  portOffset: 19806
+                  rank: 101
+               },
+               {
+                  host: "np04-srv-004"
+                  portOffset: 19912
+                  rank: 102
+               },
+               {
+                  host: "np04-srv-004"
+                  portOffset: 20018
+                  rank: 103
+               }
+            ]
+            max_fragment_size_words: 5e7
+            transferPluginType: "Autodetect"
+         }
+         d102: {
+            destination_rank: 102
+            host_map: [
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9100
+                  rank: 0
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9206
+                  rank: 1
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9312
+                  rank: 2
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9418
+                  rank: 3
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9524
+                  rank: 4
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9630
+                  rank: 5
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9736
+                  rank: 6
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9842
+                  rank: 7
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 9948
+                  rank: 8
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10054
+                  rank: 9
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10160
+                  rank: 10
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10266
+                  rank: 11
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10372
+                  rank: 12
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10478
+                  rank: 13
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10584
+                  rank: 14
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10690
+                  rank: 15
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 10796
+                  rank: 16
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 10902
+                  rank: 17
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 11008
+                  rank: 18
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 11114
+                  rank: 19
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11220
+                  rank: 20
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11326
+                  rank: 21
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11432
+                  rank: 22
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11538
+                  rank: 23
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11644
+                  rank: 24
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11750
+                  rank: 25
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11856
+                  rank: 26
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11962
+                  rank: 27
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12068
+                  rank: 28
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12174
+                  rank: 29
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12280
+                  rank: 30
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12386
+                  rank: 31
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12492
+                  rank: 32
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12598
+                  rank: 33
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12704
+                  rank: 34
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12810
+                  rank: 35
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12916
+                  rank: 36
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13022
+                  rank: 37
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13128
+                  rank: 38
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13234
+                  rank: 39
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13340
+                  rank: 40
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13446
+                  rank: 41
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13552
+                  rank: 42
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13658
+                  rank: 43
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13764
+                  rank: 44
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13870
+                  rank: 45
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 13976
+                  rank: 46
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 14082
+                  rank: 47
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14188
+                  rank: 48
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14294
+                  rank: 49
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14400
+                  rank: 50
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14506
+                  rank: 51
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14612
+                  rank: 52
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14718
+                  rank: 53
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14824
+                  rank: 54
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14930
+                  rank: 55
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 15036
+                  rank: 56
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 15142
+                  rank: 57
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15248
+                  rank: 58
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15354
+                  rank: 59
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15460
+                  rank: 60
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15566
+                  rank: 61
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15672
+                  rank: 62
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15778
+                  rank: 63
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15884
+                  rank: 64
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15990
+                  rank: 65
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 16096
+                  rank: 66
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 16202
+                  rank: 67
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16308
+                  rank: 68
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16414
+                  rank: 69
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16520
+                  rank: 70
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16626
+                  rank: 71
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16732
+                  rank: 72
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16838
+                  rank: 73
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16944
+                  rank: 74
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17050
+                  rank: 75
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17156
+                  rank: 76
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17262
+                  rank: 77
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17368
+                  rank: 78
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17474
+                  rank: 79
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17580
+                  rank: 80
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17686
+                  rank: 81
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17792
+                  rank: 82
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17898
+                  rank: 83
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18004
+                  rank: 84
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18110
+                  rank: 85
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18216
+                  rank: 86
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18322
+                  rank: 87
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18428
+                  rank: 88
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18534
+                  rank: 89
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18640
+                  rank: 90
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18746
+                  rank: 91
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18852
+                  rank: 92
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18958
+                  rank: 93
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 19064
+                  rank: 94
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 19170
+                  rank: 95
+               },
+               {
+                  host: "np04-srv-001"
+                  portOffset: 19276
+                  rank: 96
+               },
+               {
+                  host: "np04-srv-001"
+                  portOffset: 19382
+                  rank: 97
+               },
+               {
+                  host: "np04-srv-002"
+                  portOffset: 19488
+                  rank: 98
+               },
+               {
+                  host: "np04-srv-002"
+                  portOffset: 19594
+                  rank: 99
+               },
+               {
+                  host: "np04-srv-003"
+                  portOffset: 19700
+                  rank: 100
+               },
+               {
+                  host: "np04-srv-003"
+                  portOffset: 19806
+                  rank: 101
+               },
+               {
+                  host: "np04-srv-004"
+                  portOffset: 19912
+                  rank: 102
+               },
+               {
+                  host: "np04-srv-004"
+                  portOffset: 20018
+                  rank: 103
+               }
+            ]
+            max_fragment_size_words: 5e7
+            transferPluginType: "Autodetect"
+         }
+         d103: {
+            destination_rank: 103
+            host_map: [
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9100
+                  rank: 0
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9206
+                  rank: 1
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9312
+                  rank: 2
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9418
+                  rank: 3
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9524
+                  rank: 4
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9630
+                  rank: 5
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9736
+                  rank: 6
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9842
+                  rank: 7
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 9948
+                  rank: 8
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10054
+                  rank: 9
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10160
+                  rank: 10
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10266
+                  rank: 11
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10372
+                  rank: 12
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10478
+                  rank: 13
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10584
+                  rank: 14
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10690
+                  rank: 15
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 10796
+                  rank: 16
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 10902
+                  rank: 17
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 11008
+                  rank: 18
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 11114
+                  rank: 19
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11220
+                  rank: 20
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11326
+                  rank: 21
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11432
+                  rank: 22
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11538
+                  rank: 23
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11644
+                  rank: 24
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11750
+                  rank: 25
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11856
+                  rank: 26
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11962
+                  rank: 27
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12068
+                  rank: 28
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12174
+                  rank: 29
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12280
+                  rank: 30
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12386
+                  rank: 31
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12492
+                  rank: 32
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12598
+                  rank: 33
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12704
+                  rank: 34
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12810
+                  rank: 35
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12916
+                  rank: 36
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13022
+                  rank: 37
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13128
+                  rank: 38
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13234
+                  rank: 39
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13340
+                  rank: 40
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13446
+                  rank: 41
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13552
+                  rank: 42
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13658
+                  rank: 43
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13764
+                  rank: 44
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13870
+                  rank: 45
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 13976
+                  rank: 46
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 14082
+                  rank: 47
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14188
+                  rank: 48
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14294
+                  rank: 49
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14400
+                  rank: 50
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14506
+                  rank: 51
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14612
+                  rank: 52
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14718
+                  rank: 53
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14824
+                  rank: 54
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14930
+                  rank: 55
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 15036
+                  rank: 56
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 15142
+                  rank: 57
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15248
+                  rank: 58
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15354
+                  rank: 59
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15460
+                  rank: 60
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15566
+                  rank: 61
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15672
+                  rank: 62
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15778
+                  rank: 63
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15884
+                  rank: 64
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15990
+                  rank: 65
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 16096
+                  rank: 66
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 16202
+                  rank: 67
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16308
+                  rank: 68
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16414
+                  rank: 69
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16520
+                  rank: 70
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16626
+                  rank: 71
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16732
+                  rank: 72
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16838
+                  rank: 73
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16944
+                  rank: 74
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17050
+                  rank: 75
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17156
+                  rank: 76
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17262
+                  rank: 77
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17368
+                  rank: 78
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17474
+                  rank: 79
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17580
+                  rank: 80
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17686
+                  rank: 81
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17792
+                  rank: 82
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17898
+                  rank: 83
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18004
+                  rank: 84
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18110
+                  rank: 85
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18216
+                  rank: 86
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18322
+                  rank: 87
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18428
+                  rank: 88
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18534
+                  rank: 89
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18640
+                  rank: 90
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18746
+                  rank: 91
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18852
+                  rank: 92
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18958
+                  rank: 93
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 19064
+                  rank: 94
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 19170
+                  rank: 95
+               },
+               {
+                  host: "np04-srv-001"
+                  portOffset: 19276
+                  rank: 96
+               },
+               {
+                  host: "np04-srv-001"
+                  portOffset: 19382
+                  rank: 97
+               },
+               {
+                  host: "np04-srv-002"
+                  portOffset: 19488
+                  rank: 98
+               },
+               {
+                  host: "np04-srv-002"
+                  portOffset: 19594
+                  rank: 99
+               },
+               {
+                  host: "np04-srv-003"
+                  portOffset: 19700
+                  rank: 100
+               },
+               {
+                  host: "np04-srv-003"
+                  portOffset: 19806
+                  rank: 101
+               },
+               {
+                  host: "np04-srv-004"
+                  portOffset: 19912
+                  rank: 102
+               },
+               {
+                  host: "np04-srv-004"
+                  portOffset: 20018
+                  rank: 103
+               }
+            ]
+            max_fragment_size_words: 5e7
+            transferPluginType: "Autodetect"
+         }
+         d96: {
+            destination_rank: 96
+            host_map: [
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9100
+                  rank: 0
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9206
+                  rank: 1
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9312
+                  rank: 2
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9418
+                  rank: 3
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9524
+                  rank: 4
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9630
+                  rank: 5
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9736
+                  rank: 6
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9842
+                  rank: 7
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 9948
+                  rank: 8
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10054
+                  rank: 9
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10160
+                  rank: 10
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10266
+                  rank: 11
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10372
+                  rank: 12
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10478
+                  rank: 13
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10584
+                  rank: 14
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10690
+                  rank: 15
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 10796
+                  rank: 16
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 10902
+                  rank: 17
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 11008
+                  rank: 18
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 11114
+                  rank: 19
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11220
+                  rank: 20
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11326
+                  rank: 21
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11432
+                  rank: 22
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11538
+                  rank: 23
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11644
+                  rank: 24
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11750
+                  rank: 25
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11856
+                  rank: 26
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11962
+                  rank: 27
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12068
+                  rank: 28
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12174
+                  rank: 29
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12280
+                  rank: 30
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12386
+                  rank: 31
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12492
+                  rank: 32
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12598
+                  rank: 33
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12704
+                  rank: 34
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12810
+                  rank: 35
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12916
+                  rank: 36
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13022
+                  rank: 37
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13128
+                  rank: 38
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13234
+                  rank: 39
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13340
+                  rank: 40
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13446
+                  rank: 41
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13552
+                  rank: 42
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13658
+                  rank: 43
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13764
+                  rank: 44
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13870
+                  rank: 45
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 13976
+                  rank: 46
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 14082
+                  rank: 47
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14188
+                  rank: 48
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14294
+                  rank: 49
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14400
+                  rank: 50
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14506
+                  rank: 51
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14612
+                  rank: 52
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14718
+                  rank: 53
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14824
+                  rank: 54
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14930
+                  rank: 55
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 15036
+                  rank: 56
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 15142
+                  rank: 57
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15248
+                  rank: 58
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15354
+                  rank: 59
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15460
+                  rank: 60
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15566
+                  rank: 61
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15672
+                  rank: 62
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15778
+                  rank: 63
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15884
+                  rank: 64
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15990
+                  rank: 65
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 16096
+                  rank: 66
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 16202
+                  rank: 67
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16308
+                  rank: 68
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16414
+                  rank: 69
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16520
+                  rank: 70
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16626
+                  rank: 71
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16732
+                  rank: 72
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16838
+                  rank: 73
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16944
+                  rank: 74
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17050
+                  rank: 75
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17156
+                  rank: 76
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17262
+                  rank: 77
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17368
+                  rank: 78
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17474
+                  rank: 79
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17580
+                  rank: 80
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17686
+                  rank: 81
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17792
+                  rank: 82
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17898
+                  rank: 83
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18004
+                  rank: 84
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18110
+                  rank: 85
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18216
+                  rank: 86
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18322
+                  rank: 87
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18428
+                  rank: 88
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18534
+                  rank: 89
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18640
+                  rank: 90
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18746
+                  rank: 91
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18852
+                  rank: 92
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18958
+                  rank: 93
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 19064
+                  rank: 94
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 19170
+                  rank: 95
+               },
+               {
+                  host: "np04-srv-001"
+                  portOffset: 19276
+                  rank: 96
+               },
+               {
+                  host: "np04-srv-001"
+                  portOffset: 19382
+                  rank: 97
+               },
+               {
+                  host: "np04-srv-002"
+                  portOffset: 19488
+                  rank: 98
+               },
+               {
+                  host: "np04-srv-002"
+                  portOffset: 19594
+                  rank: 99
+               },
+               {
+                  host: "np04-srv-003"
+                  portOffset: 19700
+                  rank: 100
+               },
+               {
+                  host: "np04-srv-003"
+                  portOffset: 19806
+                  rank: 101
+               },
+               {
+                  host: "np04-srv-004"
+                  portOffset: 19912
+                  rank: 102
+               },
+               {
+                  host: "np04-srv-004"
+                  portOffset: 20018
+                  rank: 103
+               }
+            ]
+            max_fragment_size_words: 5e7
+            transferPluginType: "Autodetect"
+         }
+         d97: {
+            destination_rank: 97
+            host_map: [
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9100
+                  rank: 0
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9206
+                  rank: 1
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9312
+                  rank: 2
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9418
+                  rank: 3
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9524
+                  rank: 4
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9630
+                  rank: 5
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9736
+                  rank: 6
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9842
+                  rank: 7
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 9948
+                  rank: 8
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10054
+                  rank: 9
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10160
+                  rank: 10
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10266
+                  rank: 11
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10372
+                  rank: 12
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10478
+                  rank: 13
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10584
+                  rank: 14
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10690
+                  rank: 15
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 10796
+                  rank: 16
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 10902
+                  rank: 17
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 11008
+                  rank: 18
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 11114
+                  rank: 19
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11220
+                  rank: 20
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11326
+                  rank: 21
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11432
+                  rank: 22
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11538
+                  rank: 23
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11644
+                  rank: 24
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11750
+                  rank: 25
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11856
+                  rank: 26
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11962
+                  rank: 27
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12068
+                  rank: 28
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12174
+                  rank: 29
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12280
+                  rank: 30
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12386
+                  rank: 31
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12492
+                  rank: 32
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12598
+                  rank: 33
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12704
+                  rank: 34
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12810
+                  rank: 35
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12916
+                  rank: 36
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13022
+                  rank: 37
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13128
+                  rank: 38
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13234
+                  rank: 39
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13340
+                  rank: 40
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13446
+                  rank: 41
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13552
+                  rank: 42
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13658
+                  rank: 43
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13764
+                  rank: 44
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13870
+                  rank: 45
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 13976
+                  rank: 46
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 14082
+                  rank: 47
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14188
+                  rank: 48
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14294
+                  rank: 49
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14400
+                  rank: 50
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14506
+                  rank: 51
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14612
+                  rank: 52
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14718
+                  rank: 53
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14824
+                  rank: 54
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14930
+                  rank: 55
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 15036
+                  rank: 56
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 15142
+                  rank: 57
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15248
+                  rank: 58
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15354
+                  rank: 59
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15460
+                  rank: 60
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15566
+                  rank: 61
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15672
+                  rank: 62
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15778
+                  rank: 63
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15884
+                  rank: 64
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15990
+                  rank: 65
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 16096
+                  rank: 66
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 16202
+                  rank: 67
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16308
+                  rank: 68
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16414
+                  rank: 69
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16520
+                  rank: 70
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16626
+                  rank: 71
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16732
+                  rank: 72
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16838
+                  rank: 73
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16944
+                  rank: 74
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17050
+                  rank: 75
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17156
+                  rank: 76
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17262
+                  rank: 77
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17368
+                  rank: 78
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17474
+                  rank: 79
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17580
+                  rank: 80
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17686
+                  rank: 81
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17792
+                  rank: 82
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17898
+                  rank: 83
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18004
+                  rank: 84
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18110
+                  rank: 85
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18216
+                  rank: 86
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18322
+                  rank: 87
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18428
+                  rank: 88
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18534
+                  rank: 89
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18640
+                  rank: 90
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18746
+                  rank: 91
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18852
+                  rank: 92
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18958
+                  rank: 93
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 19064
+                  rank: 94
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 19170
+                  rank: 95
+               },
+               {
+                  host: "np04-srv-001"
+                  portOffset: 19276
+                  rank: 96
+               },
+               {
+                  host: "np04-srv-001"
+                  portOffset: 19382
+                  rank: 97
+               },
+               {
+                  host: "np04-srv-002"
+                  portOffset: 19488
+                  rank: 98
+               },
+               {
+                  host: "np04-srv-002"
+                  portOffset: 19594
+                  rank: 99
+               },
+               {
+                  host: "np04-srv-003"
+                  portOffset: 19700
+                  rank: 100
+               },
+               {
+                  host: "np04-srv-003"
+                  portOffset: 19806
+                  rank: 101
+               },
+               {
+                  host: "np04-srv-004"
+                  portOffset: 19912
+                  rank: 102
+               },
+               {
+                  host: "np04-srv-004"
+                  portOffset: 20018
+                  rank: 103
+               }
+            ]
+            max_fragment_size_words: 5e7
+            transferPluginType: "Autodetect"
+         }
+         d98: {
+            destination_rank: 98
+            host_map: [
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9100
+                  rank: 0
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9206
+                  rank: 1
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9312
+                  rank: 2
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9418
+                  rank: 3
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9524
+                  rank: 4
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9630
+                  rank: 5
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9736
+                  rank: 6
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9842
+                  rank: 7
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 9948
+                  rank: 8
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10054
+                  rank: 9
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10160
+                  rank: 10
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10266
+                  rank: 11
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10372
+                  rank: 12
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10478
+                  rank: 13
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10584
+                  rank: 14
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10690
+                  rank: 15
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 10796
+                  rank: 16
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 10902
+                  rank: 17
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 11008
+                  rank: 18
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 11114
+                  rank: 19
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11220
+                  rank: 20
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11326
+                  rank: 21
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11432
+                  rank: 22
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11538
+                  rank: 23
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11644
+                  rank: 24
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11750
+                  rank: 25
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11856
+                  rank: 26
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11962
+                  rank: 27
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12068
+                  rank: 28
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12174
+                  rank: 29
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12280
+                  rank: 30
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12386
+                  rank: 31
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12492
+                  rank: 32
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12598
+                  rank: 33
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12704
+                  rank: 34
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12810
+                  rank: 35
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12916
+                  rank: 36
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13022
+                  rank: 37
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13128
+                  rank: 38
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13234
+                  rank: 39
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13340
+                  rank: 40
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13446
+                  rank: 41
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13552
+                  rank: 42
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13658
+                  rank: 43
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13764
+                  rank: 44
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13870
+                  rank: 45
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 13976
+                  rank: 46
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 14082
+                  rank: 47
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14188
+                  rank: 48
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14294
+                  rank: 49
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14400
+                  rank: 50
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14506
+                  rank: 51
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14612
+                  rank: 52
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14718
+                  rank: 53
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14824
+                  rank: 54
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14930
+                  rank: 55
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 15036
+                  rank: 56
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 15142
+                  rank: 57
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15248
+                  rank: 58
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15354
+                  rank: 59
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15460
+                  rank: 60
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15566
+                  rank: 61
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15672
+                  rank: 62
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15778
+                  rank: 63
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15884
+                  rank: 64
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15990
+                  rank: 65
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 16096
+                  rank: 66
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 16202
+                  rank: 67
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16308
+                  rank: 68
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16414
+                  rank: 69
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16520
+                  rank: 70
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16626
+                  rank: 71
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16732
+                  rank: 72
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16838
+                  rank: 73
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16944
+                  rank: 74
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17050
+                  rank: 75
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17156
+                  rank: 76
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17262
+                  rank: 77
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17368
+                  rank: 78
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17474
+                  rank: 79
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17580
+                  rank: 80
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17686
+                  rank: 81
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17792
+                  rank: 82
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17898
+                  rank: 83
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18004
+                  rank: 84
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18110
+                  rank: 85
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18216
+                  rank: 86
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18322
+                  rank: 87
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18428
+                  rank: 88
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18534
+                  rank: 89
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18640
+                  rank: 90
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18746
+                  rank: 91
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18852
+                  rank: 92
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18958
+                  rank: 93
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 19064
+                  rank: 94
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 19170
+                  rank: 95
+               },
+               {
+                  host: "np04-srv-001"
+                  portOffset: 19276
+                  rank: 96
+               },
+               {
+                  host: "np04-srv-001"
+                  portOffset: 19382
+                  rank: 97
+               },
+               {
+                  host: "np04-srv-002"
+                  portOffset: 19488
+                  rank: 98
+               },
+               {
+                  host: "np04-srv-002"
+                  portOffset: 19594
+                  rank: 99
+               },
+               {
+                  host: "np04-srv-003"
+                  portOffset: 19700
+                  rank: 100
+               },
+               {
+                  host: "np04-srv-003"
+                  portOffset: 19806
+                  rank: 101
+               },
+               {
+                  host: "np04-srv-004"
+                  portOffset: 19912
+                  rank: 102
+               },
+               {
+                  host: "np04-srv-004"
+                  portOffset: 20018
+                  rank: 103
+               }
+            ]
+            max_fragment_size_words: 5e7
+            transferPluginType: "Autodetect"
+         }
+         d99: {
+            destination_rank: 99
+            host_map: [
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9100
+                  rank: 0
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9206
+                  rank: 1
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9312
+                  rank: 2
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9418
+                  rank: 3
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9524
+                  rank: 4
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9630
+                  rank: 5
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9736
+                  rank: 6
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9842
+                  rank: 7
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 9948
+                  rank: 8
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10054
+                  rank: 9
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10160
+                  rank: 10
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10266
+                  rank: 11
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10372
+                  rank: 12
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10478
+                  rank: 13
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10584
+                  rank: 14
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10690
+                  rank: 15
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 10796
+                  rank: 16
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 10902
+                  rank: 17
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 11008
+                  rank: 18
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 11114
+                  rank: 19
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11220
+                  rank: 20
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11326
+                  rank: 21
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11432
+                  rank: 22
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11538
+                  rank: 23
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11644
+                  rank: 24
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11750
+                  rank: 25
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11856
+                  rank: 26
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11962
+                  rank: 27
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12068
+                  rank: 28
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12174
+                  rank: 29
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12280
+                  rank: 30
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12386
+                  rank: 31
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12492
+                  rank: 32
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12598
+                  rank: 33
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12704
+                  rank: 34
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12810
+                  rank: 35
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12916
+                  rank: 36
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13022
+                  rank: 37
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13128
+                  rank: 38
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13234
+                  rank: 39
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13340
+                  rank: 40
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13446
+                  rank: 41
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13552
+                  rank: 42
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13658
+                  rank: 43
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13764
+                  rank: 44
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13870
+                  rank: 45
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 13976
+                  rank: 46
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 14082
+                  rank: 47
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14188
+                  rank: 48
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14294
+                  rank: 49
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14400
+                  rank: 50
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14506
+                  rank: 51
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14612
+                  rank: 52
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14718
+                  rank: 53
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14824
+                  rank: 54
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14930
+                  rank: 55
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 15036
+                  rank: 56
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 15142
+                  rank: 57
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15248
+                  rank: 58
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15354
+                  rank: 59
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15460
+                  rank: 60
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15566
+                  rank: 61
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15672
+                  rank: 62
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15778
+                  rank: 63
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15884
+                  rank: 64
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15990
+                  rank: 65
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 16096
+                  rank: 66
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 16202
+                  rank: 67
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16308
+                  rank: 68
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16414
+                  rank: 69
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16520
+                  rank: 70
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16626
+                  rank: 71
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16732
+                  rank: 72
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16838
+                  rank: 73
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16944
+                  rank: 74
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17050
+                  rank: 75
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17156
+                  rank: 76
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17262
+                  rank: 77
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17368
+                  rank: 78
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17474
+                  rank: 79
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17580
+                  rank: 80
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17686
+                  rank: 81
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17792
+                  rank: 82
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17898
+                  rank: 83
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18004
+                  rank: 84
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18110
+                  rank: 85
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18216
+                  rank: 86
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18322
+                  rank: 87
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18428
+                  rank: 88
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18534
+                  rank: 89
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18640
+                  rank: 90
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18746
+                  rank: 91
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18852
+                  rank: 92
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18958
+                  rank: 93
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 19064
+                  rank: 94
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 19170
+                  rank: 95
+               },
+               {
+                  host: "np04-srv-001"
+                  portOffset: 19276
+                  rank: 96
+               },
+               {
+                  host: "np04-srv-001"
+                  portOffset: 19382
+                  rank: 97
+               },
+               {
+                  host: "np04-srv-002"
+                  portOffset: 19488
+                  rank: 98
+               },
+               {
+                  host: "np04-srv-002"
+                  portOffset: 19594
+                  rank: 99
+               },
+               {
+                  host: "np04-srv-003"
+                  portOffset: 19700
+                  rank: 100
+               },
+               {
+                  host: "np04-srv-003"
+                  portOffset: 19806
+                  rank: 101
+               },
+               {
+                  host: "np04-srv-004"
+                  portOffset: 19912
+                  rank: 102
+               },
+               {
+                  host: "np04-srv-004"
+                  portOffset: 20018
+                  rank: 103
+               }
+            ]
+            max_fragment_size_words: 5e7
+            transferPluginType: "Autodetect"
+         }
+      }
+      dtm_client_enable: true
+      dtm_client_host_addr: "192.168.204.254"
+      dtm_client_host_port: 8090
+      dtm_client_timeout_usecs: 500000
+      event_builder_count: -1
+      first_event_builder_rank: -1
+      fragment_id: 52
+      fragment_type: "SSP"
+      generator: "SSP"
+      interface_type: 1
+      missing_request_window_timeout_us: 5e8
+      monitor_window: 1
+      mpi_buffer_count: 16
+      mpi_sync_interval: 24000
+      number_of_microslices_per_millislice: 1
+      partition_number: 1
+      raw_buffer_precommit: 100
+      raw_buffer_size: 1.6e7
+      rce_daq_mode: "External"
+      rce_feb_emulation_mode: false
+      receiver_debug_level: 0
+      receiver_tick_period_usecs: 10000
+      reporting_interval_fragments: 1
+      reporting_interval_seconds: 1
+      request_address: "227.128.12.26"
+      request_mode: "window"
+      request_port: 3001
+      request_window_offset: 0
+      request_window_width: 0
+      request_windows_are_unique: true
+      routing_table_config: {
+         routing_master_hostname: "np04-srv-001"
+         routing_retry_count: 5
+         routing_timeout_ms: 1000
+         table_acknowledge_port: 11030
+         table_update_address: "227.129.2.128"
+         table_update_port: 11020
+         use_routing_master: true
+      }
+      separate_data_thread: true
+      separate_monitoring_thread: false
+      stale_request_timeout: 2e8
+      use_fragments_as_raw_buffer: true
+      verbosity: 3
+   }
+   max_fragment_size_words: 262144
+   metrics: {
+      brFile: {
+         fileName: "/nfs/sw/artdaq/logs/boardreader/ssp_%UID%_metrics.log"
+         level: 5
+         metricPluginType: "file"
+         uniquify: true
+      }
+      dim: {
+         DIMServerName: "SSPBoardReader"
+         DNSNode: "np04-srv-010.cern.ch"
+         DNSPort: 2505
+         IDName: "ssp502"
+         Verbose: false
+         level: 5
+         metricPluginType: "dim"
+         reporting_interval: 5
+      }
+   }
+}

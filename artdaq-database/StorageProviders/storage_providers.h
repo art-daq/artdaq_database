@@ -1,7 +1,7 @@
 #ifndef _ARTDAQ_DATABASE_PROVIDERS_H_
 #define _ARTDAQ_DATABASE_PROVIDERS_H_
 
-#include <list>
+#include <vector>
 #include <memory>
 #include <string>
 
@@ -34,32 +34,32 @@ class StorageProvider final {
   StorageProvider(std::shared_ptr<IMPL> const& provider, PassKeyIdiom const&) : _provider(provider) {}
 
   template <typename FILTER>
-  std::list<TYPE> readDocument(FILTER const&);
+  std::vector<TYPE> readDocument(FILTER const&);
   object_id_t writeDocument(TYPE const&);
 
   template <typename FILTER>
-  std::list<FILTER> findConfigurations(FILTER const&);
+  std::vector<FILTER> findConfigurations(FILTER const&);
 
   template <typename FILTER>
-  std::list<FILTER> addConfiguration(FILTER const&);
+  std::vector<FILTER> addConfiguration(FILTER const&);
 
   template <typename FILTER>
-  std::list<FILTER> findVersions(FILTER const&);
+  std::vector<FILTER> findVersions(FILTER const&);
 
   template <typename FILTER>
-  std::list<FILTER> findEntities(FILTER const&);
+  std::vector<FILTER> findEntities(FILTER const&);
 
   template <typename FILTER>
-  std::list<FILTER> configurationComposition(FILTER const&);
+  std::vector<FILTER> configurationComposition(FILTER const&);
 
   template <typename FILTER>
-  std::list<FILTER> listCollections(FILTER const&);
+  std::vector<FILTER> listCollections(FILTER const&);
 
   template <typename FILTER>
-  std::list<FILTER> listDatabases(FILTER const&);
+  std::vector<FILTER> listDatabases(FILTER const&);
 
   template <typename FILTER>
-  std::list<FILTER> databaseMetadata(FILTER const&);
+  std::vector<FILTER> databaseMetadata(FILTER const&);
 
  private:
   std::shared_ptr<IMPL> _provider;

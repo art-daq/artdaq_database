@@ -1,3 +1,0 @@
-#include "penn_standard.fcl"
-
-daq: @local::penn_standard

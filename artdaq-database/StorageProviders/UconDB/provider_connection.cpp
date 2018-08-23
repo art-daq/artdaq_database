@@ -9,7 +9,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "PRVDR:UconDB_C"
+#define TRACE_NAME "provider_connection.cpp"
 
 namespace db = artdaq::database;
 namespace dbucl = db::ucon::literal;

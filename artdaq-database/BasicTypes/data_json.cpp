@@ -6,7 +6,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "BTPS:JsonData_C"
+#define TRACE_NAME "data_json.cpp"
 
 namespace artdaq {
 namespace database {

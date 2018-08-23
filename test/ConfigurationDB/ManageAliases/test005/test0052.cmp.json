@@ -1,7 +1,4 @@
 {
-"_id" : {
-"$oid" : "59a71e445ea0469d214d6313"
-},
 "document" : {
 "data" : {
 "prolog" : {
@@ -386,11 +383,98 @@
 ]
 },
 "comments" : [
-
+{
+"linenum" : 10,
+"value" : "#SimpleMemoryCheck: { }"
+},
+{
+"linenum" : 44,
+"value" : "#normalOutput: {"
+},
+{
+"linenum" : 45,
+"value" : "#  module_type: RootOutput"
+},
+{
+"linenum" : 46,
+"value" : "#  fileName: \"/tmp/artdaqdemo_r%06r_sr%02s_%to.root\""
+},
+{
+"linenum" : 47,
+"value" : "#  compressionLevel: 0"
+},
+{
+"linenum" : 48,
+"value" : "#}"
+},
+{
+"linenum" : 50,
+"value" : "#normalOutputMod2: {"
+},
+{
+"linenum" : 51,
+"value" : "#  module_type: RootOutput"
+},
+{
+"linenum" : 52,
+"value" : "#  fileName: \"/tmp/artdaqdemo_r%06r_sr%02s_%to_mod2.root\""
+},
+{
+"linenum" : 53,
+"value" : "#  SelectEvents: { SelectEvents: [ pmod2 ] }"
+},
+{
+"linenum" : 54,
+"value" : "#  compressionLevel: 0"
+},
+{
+"linenum" : 55,
+"value" : "#}"
+},
+{
+"linenum" : 57,
+"value" : "#normalOutputMod3: {"
+},
+{
+"linenum" : 58,
+"value" : "#  module_type: RootOutput"
+},
+{
+"linenum" : 59,
+"value" : "#  fileName: \"/tmp/artdaqdemo_r%06r_sr%02s_%to_mod3.root\""
+},
+{
+"linenum" : 60,
+"value" : "#  SelectEvents: { SelectEvents: [ pmod3 ] }"
+},
+{
+"linenum" : 61,
+"value" : "#  compressionLevel: 0"
+},
+{
+"linenum" : 62,
+"value" : "#}"
+},
+{
+"linenum" : 76,
+"value" : "# Decompression functionality can also be added..."
+},
+{
+"linenum" : 104,
+"value" : "#a1: [ app, wf ]"
+},
+{
+"linenum" : 106,
+"value" : "#my_output_modules: [ normalOutput ]"
+},
+{
+"linenum" : 107,
+"value" : "#my_output_modules: [ normalOutputMod2, normalOutputMod3 ]"
+}
 ],
 "origin" : {
 "format" : "fhicl",
-"name" : "notprovided",
+"name" : "@TEST_ENTITY_NAME@",
 "source" : "fhicl_to_json",
 "timestamp" : "2017-07-18T12:48:10.123-0500",
 "created" : "2017-07-18T12:48:10.123-0500",
@@ -401,12 +485,12 @@
 "version" : "version001",
 "entities" : [
 {
-"name" : "Aggregator_topol03252016-222027",
+"name" : "@TEST_ENTITY_NAME@",
 "assigned" : "2017-07-18T12:48:10.123-0500"
 },
 {
 "name" : "notprovided",
-"assigned" : "2017-08-30T15:21:20.812-0500"
+"assigned" : "2018-08-21T23:09:44.843-0500"
 }
 ],
 "configurations" : [
@@ -448,62 +532,65 @@
 "event" : "addEntity",
 "timestamp" : "2017-07-18T12:48:10.123-0500",
 "value" : {
-"name" : "Aggregator_topol03252016-222027",
+"name" : "@TEST_ENTITY_NAME@",
 "assigned" : "2017-07-18T12:48:10.123-0500"
 }
 },
 {
 "event" : "addAlias",
-"timestamp" : "2017-08-30T15:21:20.610-0500",
+"timestamp" : "2018-08-21T23:09:44.840-0500",
 "value" : {
-"name" : "testAliasA027",
-"assigned" : "2017-08-30T15:21:20.609-0500",
-"removed" : "2017-08-30T15:21:20.610-0500"
+"name" : "@TEST_ALIAS_NAME@",
+"assigned" : "2018-08-21T23:09:44.840-0500",
+"removed" : "2018-08-21T23:09:44.840-0500"
 }
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "2017-08-30T15:21:20.729-0500",
+"timestamp" : "2018-08-21T23:09:44.842-0500",
 "value" : {
 "name" : "notprovided",
-"assigned" : "2017-08-30T15:21:20.729-0500"
+"assigned" : "2018-08-21T23:09:44.842-0500"
 }
 },
 {
 "event" : "addEntity",
-"timestamp" : "2017-08-30T15:21:20.812-0500",
+"timestamp" : "2018-08-21T23:09:44.843-0500",
 "value" : {
 "name" : "notprovided",
-"assigned" : "2017-08-30T15:21:20.812-0500"
+"assigned" : "2018-08-21T23:09:44.843-0500"
 }
 },
 {
 "event" : "removeAlias",
-"timestamp" : "2017-08-30T15:21:24.073-0500",
+"timestamp" : "2018-08-21T23:09:45.072-0500",
 "value" : {
-"name" : "testAliasA027",
-"assigned" : "2017-08-30T15:21:24.073-0500",
-"removed" : "2017-08-30T15:21:24.073-0500"
+"name" : "@TEST_ALIAS_NAME@",
+"assigned" : "2018-08-21T23:09:45.072-0500",
+"removed" : "2018-08-21T23:09:45.072-0500"
 }
 },
 {
 "event" : "addConfiguration",
-"timestamp" : "2017-08-30T15:21:24.173-0500",
+"timestamp" : "2018-08-21T23:09:45.074-0500",
 "value" : {
 "name" : "notprovided",
-"assigned" : "2017-08-30T15:21:24.173-0500"
+"assigned" : "2018-08-21T23:09:45.074-0500"
 }
 },
 {
 "event" : "addEntity",
-"timestamp" : "2017-08-30T15:21:24.248-0500",
+"timestamp" : "2018-08-21T23:09:45.074-0500",
 "value" : {
 "name" : "notprovided",
-"assigned" : "2017-08-30T15:21:24.248-0500"
+"assigned" : "2018-08-21T23:09:45.074-0500"
 }
 }
 ],
 "created" : "2017-07-18T12:48:10.123-0500"
+},
+"_id" : {
+"$oid" : "a6079b8d3f57465aa52068f2"
 },
 "collection" : "artdaq_Aggregator",
 "aliases" : {
@@ -512,9 +599,9 @@
 ],
 "history" : [
 {
-"name" : "testAliasA027",
-"assigned" : "2017-08-30T15:21:24.073-0500",
-"removed" : "2017-08-30T15:21:24.073-0500"
+"name" : "@TEST_ALIAS_NAME@",
+"assigned" : "2018-08-21T23:09:45.072-0500",
+"removed" : "2018-08-21T23:09:45.072-0500"
 }
 ]
 },

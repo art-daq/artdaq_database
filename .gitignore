@@ -6,6 +6,7 @@ proxychains.conf
 #*#
 built-in/fhicl-cpp
 built-in/mongo-cxx
+built-in/paramiko
 .editorconfig
 bin/*
 obj/*

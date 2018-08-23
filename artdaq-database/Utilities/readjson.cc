@@ -1,5 +1,8 @@
 #include "artdaq-database/DataFormats/Json/json_common.h"
 #include "test/common.h"
+#include "artdaq-database/JsonDocument/JSONDocument.h"
+
+using artdaq::database::docrecord::JSONDocument;
 
 namespace bpo = boost::program_options;
 using namespace artdaq::database;
@@ -46,13 +49,22 @@ int main(int argc, char* argv[]) try {
 
   namespace jsn = artdaq::database::json;
 
-  auto reader = jsn::JsonReader{};
+  for(int i=0; i<100; i++){
+  auto doc = JSONDocument(json);
+  auto docstring =std::string{"{\"aa\": 1}"};
+  auto newdoc = JSONDocument(docstring);
 
-  jsn::object_t doc_ast;
+  auto path = std::string{"document.data.main.daq.fragment_receiver"};
 
-  if (!reader.read(json, doc_ast)) {
-    confirm(false);
+  std::cout << doc.replaceChild(newdoc,path);
   }
+//   auto reader = jsn::JsonReader{};
+// 
+//   jsn::object_t doc_ast;
+// 
+//   if (!reader.read(json, doc_ast)) {
+//     confirm(false);
+//   }
 
   return process_exit_code::SUCCESS;
 } catch (...) {

@@ -1,0 +1,1081 @@
+# Produced from 'fhicl-dump' using:
+#   Input  : /tmp/np04daq/tmp.iXG1GEIe8x
+#   Policy : cet::filepath_maker
+#   Path   : "FHICL_FILE_PATH"
+
+art: {
+   outputs: {
+      normalOutput: {
+         compressionLevel: 0
+         fastCloning: false
+         fileName: "/data2/np04_raw_run%06r_%04#_dl5.root"
+         fileProperties: {
+            maxEvents: 1000
+            maxRuns: 1
+            maxSize: 8e6
+         }
+         module_type: "RootOutput"
+      }
+   }
+   physics: {
+      analyzers: {}
+      filters: {}
+      my_output_modules: [
+         "normalOutput"
+      ]
+      producers: {}
+}
+   process_name: "DAQ"
+   services: {
+      NetMonTransportServiceInterface: {
+         destinations: {}
+         nonblocking_sends: true
+         routing_table_config: {
+            use_routing_master: false
+         }
+         service_provider: "NetMonTransportService"
+      }
+      scheduler: {
+         errorOnFailureToPut: false
+      }
+   }
+   source: {
+      module_type: "DuneInput"
+      resume_after_timeout: true
+      waiting_time: 2.5e6
+   }
+}
+daq: {
+   event_builder: {
+      buffer_count: 20
+      event_queue_wait_time: 30
+      expected_fragments_per_event: 71
+      max_event_size_bytes: 4e8
+      request_address: "227.128.12.26"
+      request_port: 3001
+      routing_token_config: {
+         routing_master_hostname: "np04-srv-001"
+         routing_token_port: 11010
+         use_routing_master: true
+      }
+      send_init_fragments: true
+      send_requests: true
+      sources: {
+         s0: {
+            host_map: [
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9100
+                  rank: 0
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9206
+                  rank: 1
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9312
+                  rank: 2
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 9418
+                  rank: 3
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9524
+                  rank: 4
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9630
+                  rank: 5
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9736
+                  rank: 6
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 9842
+                  rank: 7
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 9948
+                  rank: 8
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10054
+                  rank: 9
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10160
+                  rank: 10
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 10266
+                  rank: 11
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10372
+                  rank: 12
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10478
+                  rank: 13
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10584
+                  rank: 14
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 10690
+                  rank: 15
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 10796
+                  rank: 16
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 10902
+                  rank: 17
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 11008
+                  rank: 18
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 11114
+                  rank: 19
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11220
+                  rank: 20
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11326
+                  rank: 21
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11432
+                  rank: 22
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11538
+                  rank: 23
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11644
+                  rank: 24
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11750
+                  rank: 25
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11856
+                  rank: 26
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 11962
+                  rank: 27
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12068
+                  rank: 28
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12174
+                  rank: 29
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12280
+                  rank: 30
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12386
+                  rank: 31
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12492
+                  rank: 32
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12598
+                  rank: 33
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12704
+                  rank: 34
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12810
+                  rank: 35
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 12916
+                  rank: 36
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13022
+                  rank: 37
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13128
+                  rank: 38
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13234
+                  rank: 39
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13340
+                  rank: 40
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13446
+                  rank: 41
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13552
+                  rank: 42
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13658
+                  rank: 43
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13764
+                  rank: 44
+               },
+               {
+                  host: "np04-srv-012"
+                  portOffset: 13870
+                  rank: 45
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 13976
+                  rank: 46
+               },
+               {
+                  host: "np04-srv-011"
+                  portOffset: 14082
+                  rank: 47
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14188
+                  rank: 48
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14294
+                  rank: 49
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14400
+                  rank: 50
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14506
+                  rank: 51
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14612
+                  rank: 52
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14718
+                  rank: 53
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14824
+                  rank: 54
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 14930
+                  rank: 55
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 15036
+                  rank: 56
+               },
+               {
+                  host: "np04-srv-013"
+                  portOffset: 15142
+                  rank: 57
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15248
+                  rank: 58
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15354
+                  rank: 59
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15460
+                  rank: 60
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15566
+                  rank: 61
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15672
+                  rank: 62
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15778
+                  rank: 63
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15884
+                  rank: 64
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 15990
+                  rank: 65
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 16096
+                  rank: 66
+               },
+               {
+                  host: "np04-srv-014"
+                  portOffset: 16202
+                  rank: 67
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16308
+                  rank: 68
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16414
+                  rank: 69
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16520
+                  rank: 70
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16626
+                  rank: 71
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16732
+                  rank: 72
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16838
+                  rank: 73
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 16944
+                  rank: 74
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17050
+                  rank: 75
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17156
+                  rank: 76
+               },
+               {
+                  host: "np04-srv-015"
+                  portOffset: 17262
+                  rank: 77
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17368
+                  rank: 78
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17474
+                  rank: 79
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17580
+                  rank: 80
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17686
+                  rank: 81
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17792
+                  rank: 82
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 17898
+                  rank: 83
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18004
+                  rank: 84
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18110
+                  rank: 85
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18216
+                  rank: 86
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18322
+                  rank: 87
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18428
+                  rank: 88
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18534
+                  rank: 89
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18640
+                  rank: 90
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18746
+                  rank: 91
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18852
+                  rank: 92
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 18958
+                  rank: 93
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 19064
+                  rank: 94
+               },
+               {
+                  host: "np04-srv-016"
+                  portOffset: 19170
+                  rank: 95
+               },
+               {
+                  host: "np04-srv-001"
+                  portOffset: 19276
+                  rank: 96
+               },
+               {
+                  host: "np04-srv-001"
+                  portOffset: 19382
+                  rank: 97
+               },
+               {
+                  host: "np04-srv-002"
+                  portOffset: 19488
+                  rank: 98
+               },
+               {
+                  host: "np04-srv-002"
+                  portOffset: 19594
+                  rank: 99
+               },
+               {
+                  host: "np04-srv-003"
+                  portOffset: 19700
+                  rank: 100
+               },
+               {
+                  host: "np04-srv-003"
+                  portOffset: 19806
+                  rank: 101
+               },
+               {
+                  host: "np04-srv-004"
+                  portOffset: 19912
+                  rank: 102
+               },
+               {
+                  host: "np04-srv-004"
+                  portOffset: 20018
+                  rank: 103
+               }
+            ]
+            max_fragment_size_words: 5e7
+            source_rank: 0
+            transferPluginType: "Autodetect"
+         }
+         s1: {
+            max_fragment_size_words: 5e7
+            source_rank: 1
+            transferPluginType: "Autodetect"
+         }
+         s10: {
+            max_fragment_size_words: 5e7
+            source_rank: 10
+            transferPluginType: "Autodetect"
+         }
+         s11: {
+            max_fragment_size_words: 5e7
+            source_rank: 11
+            transferPluginType: "Autodetect"
+         }
+         s12: {
+            max_fragment_size_words: 5e7
+            source_rank: 12
+            transferPluginType: "Autodetect"
+         }
+         s13: {
+            max_fragment_size_words: 5e7
+            source_rank: 13
+            transferPluginType: "Autodetect"
+         }
+         s14: {
+            max_fragment_size_words: 5e7
+            source_rank: 14
+            transferPluginType: "Autodetect"
+         }
+         s15: {
+            max_fragment_size_words: 5e7
+            source_rank: 15
+            transferPluginType: "Autodetect"
+         }
+         s16: {
+            max_fragment_size_words: 5e7
+            source_rank: 16
+            transferPluginType: "Autodetect"
+         }
+         s17: {
+            max_fragment_size_words: 5e7
+            source_rank: 17
+            transferPluginType: "Autodetect"
+         }
+         s18: {
+            max_fragment_size_words: 5e7
+            source_rank: 18
+            transferPluginType: "Autodetect"
+         }
+         s19: {
+            max_fragment_size_words: 5e7
+            source_rank: 19
+            transferPluginType: "Autodetect"
+         }
+         s2: {
+            max_fragment_size_words: 5e7
+            source_rank: 2
+            transferPluginType: "Autodetect"
+         }
+         s20: {
+            max_fragment_size_words: 5e7
+            source_rank: 20
+            transferPluginType: "Autodetect"
+         }
+         s21: {
+            max_fragment_size_words: 5e7
+            source_rank: 21
+            transferPluginType: "Autodetect"
+         }
+         s22: {
+            max_fragment_size_words: 5e7
+            source_rank: 22
+            transferPluginType: "Autodetect"
+         }
+         s23: {
+            max_fragment_size_words: 5e7
+            source_rank: 23
+            transferPluginType: "Autodetect"
+         }
+         s24: {
+            max_fragment_size_words: 5e7
+            source_rank: 24
+            transferPluginType: "Autodetect"
+         }
+         s25: {
+            max_fragment_size_words: 5e7
+            source_rank: 25
+            transferPluginType: "Autodetect"
+         }
+         s26: {
+            max_fragment_size_words: 5e7
+            source_rank: 26
+            transferPluginType: "Autodetect"
+         }
+         s27: {
+            max_fragment_size_words: 5e7
+            source_rank: 27
+            transferPluginType: "Autodetect"
+         }
+         s28: {
+            max_fragment_size_words: 5e7
+            source_rank: 28
+            transferPluginType: "Autodetect"
+         }
+         s29: {
+            max_fragment_size_words: 5e7
+            source_rank: 29
+            transferPluginType: "Autodetect"
+         }
+         s3: {
+            max_fragment_size_words: 5e7
+            source_rank: 3
+            transferPluginType: "Autodetect"
+         }
+         s30: {
+            max_fragment_size_words: 5e7
+            source_rank: 30
+            transferPluginType: "Autodetect"
+         }
+         s31: {
+            max_fragment_size_words: 5e7
+            source_rank: 31
+            transferPluginType: "Autodetect"
+         }
+         s32: {
+            max_fragment_size_words: 5e7
+            source_rank: 32
+            transferPluginType: "Autodetect"
+         }
+         s33: {
+            max_fragment_size_words: 5e7
+            source_rank: 33
+            transferPluginType: "Autodetect"
+         }
+         s34: {
+            max_fragment_size_words: 5e7
+            source_rank: 34
+            transferPluginType: "Autodetect"
+         }
+         s35: {
+            max_fragment_size_words: 5e7
+            source_rank: 35
+            transferPluginType: "Autodetect"
+         }
+         s36: {
+            max_fragment_size_words: 5e7
+            source_rank: 36
+            transferPluginType: "Autodetect"
+         }
+         s37: {
+            max_fragment_size_words: 5e7
+            source_rank: 37
+            transferPluginType: "Autodetect"
+         }
+         s38: {
+            max_fragment_size_words: 5e7
+            source_rank: 38
+            transferPluginType: "Autodetect"
+         }
+         s39: {
+            max_fragment_size_words: 5e7
+            source_rank: 39
+            transferPluginType: "Autodetect"
+         }
+         s4: {
+            max_fragment_size_words: 5e7
+            source_rank: 4
+            transferPluginType: "Autodetect"
+         }
+         s40: {
+            max_fragment_size_words: 5e7
+            source_rank: 40
+            transferPluginType: "Autodetect"
+         }
+         s41: {
+            max_fragment_size_words: 5e7
+            source_rank: 41
+            transferPluginType: "Autodetect"
+         }
+         s42: {
+            max_fragment_size_words: 5e7
+            source_rank: 42
+            transferPluginType: "Autodetect"
+         }
+         s43: {
+            max_fragment_size_words: 5e7
+            source_rank: 43
+            transferPluginType: "Autodetect"
+         }
+         s44: {
+            max_fragment_size_words: 5e7
+            source_rank: 44
+            transferPluginType: "Autodetect"
+         }
+         s45: {
+            max_fragment_size_words: 5e7
+            source_rank: 45
+            transferPluginType: "Autodetect"
+         }
+         s46: {
+            max_fragment_size_words: 5e7
+            source_rank: 46
+            transferPluginType: "Autodetect"
+         }
+         s47: {
+            max_fragment_size_words: 5e7
+            source_rank: 47
+            transferPluginType: "Autodetect"
+         }
+         s48: {
+            max_fragment_size_words: 5e7
+            source_rank: 48
+            transferPluginType: "Autodetect"
+         }
+         s49: {
+            max_fragment_size_words: 5e7
+            source_rank: 49
+            transferPluginType: "Autodetect"
+         }
+         s5: {
+            max_fragment_size_words: 5e7
+            source_rank: 5
+            transferPluginType: "Autodetect"
+         }
+         s50: {
+            max_fragment_size_words: 5e7
+            source_rank: 50
+            transferPluginType: "Autodetect"
+         }
+         s51: {
+            max_fragment_size_words: 5e7
+            source_rank: 51
+            transferPluginType: "Autodetect"
+         }
+         s52: {
+            max_fragment_size_words: 5e7
+            source_rank: 52
+            transferPluginType: "Autodetect"
+         }
+         s53: {
+            max_fragment_size_words: 5e7
+            source_rank: 53
+            transferPluginType: "Autodetect"
+         }
+         s54: {
+            max_fragment_size_words: 5e7
+            source_rank: 54
+            transferPluginType: "Autodetect"
+         }
+         s55: {
+            max_fragment_size_words: 5e7
+            source_rank: 55
+            transferPluginType: "Autodetect"
+         }
+         s56: {
+            max_fragment_size_words: 5e7
+            source_rank: 56
+            transferPluginType: "Autodetect"
+         }
+         s57: {
+            max_fragment_size_words: 5e7
+            source_rank: 57
+            transferPluginType: "Autodetect"
+         }
+         s58: {
+            max_fragment_size_words: 5e7
+            source_rank: 58
+            transferPluginType: "Autodetect"
+         }
+         s59: {
+            max_fragment_size_words: 5e7
+            source_rank: 59
+            transferPluginType: "Autodetect"
+         }
+         s6: {
+            max_fragment_size_words: 5e7
+            source_rank: 6
+            transferPluginType: "Autodetect"
+         }
+         s60: {
+            max_fragment_size_words: 5e7
+            source_rank: 60
+            transferPluginType: "Autodetect"
+         }
+         s61: {
+            max_fragment_size_words: 5e7
+            source_rank: 61
+            transferPluginType: "Autodetect"
+         }
+         s62: {
+            max_fragment_size_words: 5e7
+            source_rank: 62
+            transferPluginType: "Autodetect"
+         }
+         s63: {
+            max_fragment_size_words: 5e7
+            source_rank: 63
+            transferPluginType: "Autodetect"
+         }
+         s64: {
+            max_fragment_size_words: 5e7
+            source_rank: 64
+            transferPluginType: "Autodetect"
+         }
+         s65: {
+            max_fragment_size_words: 5e7
+            source_rank: 65
+            transferPluginType: "Autodetect"
+         }
+         s66: {
+            max_fragment_size_words: 5e7
+            source_rank: 66
+            transferPluginType: "Autodetect"
+         }
+         s67: {
+            max_fragment_size_words: 5e7
+            source_rank: 67
+            transferPluginType: "Autodetect"
+         }
+         s68: {
+            max_fragment_size_words: 5e7
+            source_rank: 68
+            transferPluginType: "Autodetect"
+         }
+         s69: {
+            max_fragment_size_words: 5e7
+            source_rank: 69
+            transferPluginType: "Autodetect"
+         }
+         s7: {
+            max_fragment_size_words: 5e7
+            source_rank: 7
+            transferPluginType: "Autodetect"
+         }
+         s70: {
+            max_fragment_size_words: 5e7
+            source_rank: 70
+            transferPluginType: "Autodetect"
+         }
+         s71: {
+            max_fragment_size_words: 5e7
+            source_rank: 71
+            transferPluginType: "Autodetect"
+         }
+         s72: {
+            max_fragment_size_words: 5e7
+            source_rank: 72
+            transferPluginType: "Autodetect"
+         }
+         s73: {
+            max_fragment_size_words: 5e7
+            source_rank: 73
+            transferPluginType: "Autodetect"
+         }
+         s74: {
+            max_fragment_size_words: 5e7
+            source_rank: 74
+            transferPluginType: "Autodetect"
+         }
+         s75: {
+            max_fragment_size_words: 5e7
+            source_rank: 75
+            transferPluginType: "Autodetect"
+         }
+         s76: {
+            max_fragment_size_words: 5e7
+            source_rank: 76
+            transferPluginType: "Autodetect"
+         }
+         s77: {
+            max_fragment_size_words: 5e7
+            source_rank: 77
+            transferPluginType: "Autodetect"
+         }
+         s78: {
+            max_fragment_size_words: 5e7
+            source_rank: 78
+            transferPluginType: "Autodetect"
+         }
+         s79: {
+            max_fragment_size_words: 5e7
+            source_rank: 79
+            transferPluginType: "Autodetect"
+         }
+         s8: {
+            max_fragment_size_words: 5e7
+            source_rank: 8
+            transferPluginType: "Autodetect"
+         }
+         s80: {
+            max_fragment_size_words: 5e7
+            source_rank: 80
+            transferPluginType: "Autodetect"
+         }
+         s81: {
+            max_fragment_size_words: 5e7
+            source_rank: 81
+            transferPluginType: "Autodetect"
+         }
+         s82: {
+            max_fragment_size_words: 5e7
+            source_rank: 82
+            transferPluginType: "Autodetect"
+         }
+         s83: {
+            max_fragment_size_words: 5e7
+            source_rank: 83
+            transferPluginType: "Autodetect"
+         }
+         s84: {
+            max_fragment_size_words: 5e7
+            source_rank: 84
+            transferPluginType: "Autodetect"
+         }
+         s85: {
+            max_fragment_size_words: 5e7
+            source_rank: 85
+            transferPluginType: "Autodetect"
+         }
+         s86: {
+            max_fragment_size_words: 5e7
+            source_rank: 86
+            transferPluginType: "Autodetect"
+         }
+         s87: {
+            max_fragment_size_words: 5e7
+            source_rank: 87
+            transferPluginType: "Autodetect"
+         }
+         s88: {
+            max_fragment_size_words: 5e7
+            source_rank: 88
+            transferPluginType: "Autodetect"
+         }
+         s89: {
+            max_fragment_size_words: 5e7
+            source_rank: 89
+            transferPluginType: "Autodetect"
+         }
+         s9: {
+            max_fragment_size_words: 5e7
+            source_rank: 9
+            transferPluginType: "Autodetect"
+         }
+         s90: {
+            max_fragment_size_words: 5e7
+            source_rank: 90
+            transferPluginType: "Autodetect"
+         }
+         s91: {
+            max_fragment_size_words: 5e7
+            source_rank: 91
+            transferPluginType: "Autodetect"
+         }
+         s92: {
+            max_fragment_size_words: 5e7
+            source_rank: 92
+            transferPluginType: "Autodetect"
+         }
+         s93: {
+            max_fragment_size_words: 5e7
+            source_rank: 93
+            transferPluginType: "Autodetect"
+         }
+         s94: {
+            max_fragment_size_words: 5e7
+            source_rank: 94
+            transferPluginType: "Autodetect"
+         }
+         s95: {
+            max_fragment_size_words: 5e7
+            source_rank: 95
+            transferPluginType: "Autodetect"
+         }
+      }
+      use_art: true
+      verbose: true
+   }
+   metrics: {
+      dim: {
+         DIMServerName: "EventBuilder11"
+         DNSNode: "np04-srv-010.cern.ch"
+         DNSPort: 2505
+         Verbose: false
+         level: 5
+         metricPluginType: "dim"
+         reporting_interval: 5
+      }
+   }
+}

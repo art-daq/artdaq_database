@@ -1,5 +1,0 @@
-#include "ssp_standard.fcl"
-
-daq: @local::ssp01_standard
-
-daq.fragment_receiver.DAQConfig.MillisliceLength: 640000

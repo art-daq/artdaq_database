@@ -9,6 +9,12 @@
 #include "artdaq-database/SharedCommon/helper_functions.h"
 #include "artdaq-database/SharedCommon/shared_exceptions.h"
 
+#ifdef TRACE_NAME
+#undef TRACE_NAME
+#endif
+
+#define TRACE_NAME "fileststem_functions.cpp"
+
 using namespace artdaq::database;
 
 namespace db = artdaq::database;

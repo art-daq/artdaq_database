@@ -16,6 +16,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <iostream>
+#include <chrono>
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
@@ -119,7 +120,12 @@ int main(int argc, char* argv[]) try {
 
   for (auto const& file_name : list_files(path_to_config_dir)) {
     options.collection(to_collection_name(file_name));
-    if (file_name.rfind(".fcl") != std::string::npos) write_document_file(options, file_name);
+    if (file_name.rfind(".fcl") != std::string::npos) {
+      auto start = std::chrono::steady_clock::now();
+      write_document_file(options, file_name);
+      auto duration = std::chrono::duration_cast<std::chrono::milliseconds> (std::chrono::steady_clock::now() - start);
+      std::cout << "Loaded" <<file_name << ":" << duration.count() << "msecs.\n";
+    }
   }
 } catch (...) {
   std::cout << "Process exited with error: " << ::debug::current_exception_diagnostic_information();
@@ -139,9 +145,10 @@ int write_document_file(Options const& options, std::string const& file_src_name
 
   using namespace artdaq::database::configuration::json;
 
+  
   cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string&>(
       apiliteral::operation::writedocument, write_document, options_string, test_document);
-
+  
   auto result = cf::getOperations().at(options.operation())->invoke();
 
   if (result.first) return process_exit_code::SUCCESS;

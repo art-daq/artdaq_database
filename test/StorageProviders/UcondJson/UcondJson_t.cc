@@ -128,22 +128,22 @@ bool test_insert(std::string const& source, std::string const& compare, std::str
   // validate compare
   auto cmpdoc = JSONDocument(compare);
 
-  using artdaq::database::basictypes::JsonData;
+  using artdaq::database::docrecord::JSONDocument;
 
   namespace DBI = artdaq::database::ucon;
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
-  auto provider = DBI::DBProvider<JsonData>::create(database);
+  auto provider = DBI::DBProvider<JSONDocument>::create(database);
 
   auto collection = std::string("testJSON_V001");
 
-  auto json = JsonData{"{\"document\":" + insert.to_string() + R"(, "collection":")" + collection + "\"}"};
+  auto json = JSONDocument{"{\"document\":" + insert.to_string() + ", \"collection\":\"" + collection + "\"}"};
 
   auto object_id = provider->writeDocument(json);
 
   auto search =
-      JsonData{"{\"filter\":" + (filter.empty() ? object_id : filter) + R"(, "collection":")" + collection + "\"}"};
+      JSONDocument{"{\"filter\":" + (filter.empty() ? object_id : filter) + ", \"collection\":\"" + collection + "\"}"};
 
   std::cout << "Search criteria " << search << "\n";
 
@@ -189,22 +189,22 @@ bool test_search1(std::string const& source, std::string const& compare, std::st
   // validate compare
   auto cmpdoc = JSONDocument(compare);
 
-  using artdaq::database::basictypes::JsonData;
+  using artdaq::database::docrecord::JSONDocument;
 
   namespace DBI = artdaq::database::ucon;
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
-  auto provider = DBI::DBProvider<JsonData>::create(database);
+  auto provider = DBI::DBProvider<JSONDocument>::create(database);
 
   auto collection = std::string("testJSON_V001");
 
-  auto json = JsonData{"{\"document\":" + insert.to_string() + R"(, "collection":")" + collection + "\"}"};
+  auto json = JSONDocument{"{\"document\":" + insert.to_string() + ", \"collection\":\"" + collection + "\"}"};
 
   auto object_id = provider->writeDocument(json);
 
   auto search =
-      JsonData{"{\"filter\":" + (filter.empty() ? object_id : filter) + R"(, "collection":")" + collection + "\"}"};
+      JSONDocument{"{\"filter\":" + (filter.empty() ? object_id : filter) + ", \"collection\":\"" + collection + "\"}"};
 
   std::cout << "Search criteria " << search << "\n";
 
@@ -244,17 +244,17 @@ bool test_search2(std::string const& source, std::string const& compare, std::st
   confirm(!source.empty());
   confirm(!compare.empty());
 
-  using artdaq::database::basictypes::JsonData;
+  using artdaq::database::docrecord::JSONDocument;
 
   namespace DBI = artdaq::database::ucon;
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
-  auto provider = DBI::DBProvider<JsonData>::create(database);
+  auto provider = DBI::DBProvider<JSONDocument>::create(database);
 
   auto collection = std::string("testJSON_V001");
 
-  auto json = JsonData{"{\"document\":" + source + R"(, "collection":")" + collection + "\"}"};
+  auto json = JSONDocument{"{\"document\":" + source + ", \"collection\":\"" + collection + "\"}"};
 
   auto repeatCount = std::size_t{10};
 
@@ -280,7 +280,7 @@ bool test_search2(std::string const& source, std::string const& compare, std::st
   auto filter = oss.str();
 
   auto search =
-      JsonData{"{\"filter\":" + (filter.empty() ? options : filter) + R"(, "collection":")" + collection + "\"}"};
+      JSONDocument{"{\"filter\":" + (filter.empty() ? options : filter) + ", \"collection\":\"" + collection + "\"}"};
 
   std::cout << "Search criteria " << search << "\n";
 
@@ -310,21 +310,21 @@ bool test_update(std::string const& source, std::string const& compare, std::str
 
   auto updates = JSONDocument(update);
 
-  using artdaq::database::basictypes::JsonData;
+  using artdaq::database::docrecord::JSONDocument;
 
   namespace DBI = artdaq::database::ucon;
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
-  auto provider = DBI::DBProvider<JsonData>::create(database);
+  auto provider = DBI::DBProvider<JSONDocument>::create(database);
 
   auto collection = std::string("testJSON_V001");
 
-  auto json = JsonData{"{\"document\":" + insert.to_string() + R"(, "collection":")" + collection + "\"}"};
+  auto json = JSONDocument{"{\"document\":" + insert.to_string() + ", \"collection\":\"" + collection + "\"}"};
 
   auto object_id = provider->writeDocument(json);
 
-  auto search = JsonData{"{\"filter\":" + object_id + R"(, "collection":")" + collection + "\"}"};
+  auto search = JSONDocument{"{\"filter\":" + object_id + ", \"collection\":\"" + collection + "\"}"};
 
   std::cout << "Search criteria " << search << "\n";
 
@@ -346,12 +346,12 @@ bool test_update(std::string const& source, std::string const& compare, std::str
   std::cout << "Update result=<" << found.to_string() << ">\n";
   std::cout << "Displaced value=<" << displaced.to_string() << ">\n";
 
-  json = JsonData{"{\"document\":" + found.to_string() + ", \"filter\":" + object_id + R"(,"collection":")" +
+  json = JSONDocument{"{\"document\":" + found.to_string() + ", \"filter\":" + object_id + ",\"collection\":\"" +
                   collection + "\"}"};
 
   object_id = provider->writeDocument(json);
 
-  search = JsonData{"{\"filter\":" + object_id + R"(, "collection":")" + collection + "\"}"};
+  search = JSONDocument{"{\"filter\":" + object_id + ", \"collection\":\"" + collection + "\"}"};
 
   results = provider->readDocument(search);
 

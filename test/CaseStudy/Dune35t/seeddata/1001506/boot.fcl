@@ -1,0 +1,19 @@
+DAQ_setup_script: "/nfs/sw/work_dirs/dune-artdaq_artdaq_v3_02_00_testing/setupDUNEARTDAQ"
+PMT_host: "localhost"
+PMT_port: 6400
+debug_level: 2
+partition_number: 1
+tcp_base_port: 9100
+request_port: 3001
+request_address: "227.128.12.26"
+table_update_address: "227.129.2.128"
+routing_base_port: 11010
+zmq_fragment_connection_out: 17438
+manage_processes: "false"
+
+RoutingMaster_labels: ["RoutingMaster_1"]
+EventBuilder_labels: ["EventBuilder3", "EventBuilder4", "EventBuilder7", "EventBuilder8", "EventBuilder11", "EventBuilder12", "EventBuilder15", "EventBuilder16"]
+EventBuilder_ports: [6237, 6238, 6241, 6242, 6245, 6246, 6249, 6250]
+EventBuilder_hosts: ["np04-srv-001", "np04-srv-001", "np04-srv-002", "np04-srv-002", "np04-srv-003", "np04-srv-003", "np04-srv-004", "np04-srv-004"]
+RoutingMaster_ports: [7296]
+RoutingMaster_hosts: ["np04-srv-001"]

@@ -7,7 +7,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "CNF:ConfReader_C"
+#define TRACE_NAME "conf_reader.cpp"
 
 namespace fcl = artdaq::database::conf;
 namespace jsn = artdaq::database::json;

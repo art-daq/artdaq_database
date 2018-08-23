@@ -20,7 +20,7 @@
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "CONF:FndCfD_C"
+#define TRACE_NAME "detail_metadata.cpp"
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
@@ -31,7 +31,7 @@ using cf::options::data_format_t;
 
 using Options = cf::ManageDocumentOperation;
 
-using artdaq::database::basictypes::JsonData;
+using artdaq::database::docrecord::JSONDocument;
 
 namespace artdaq {
 namespace database {
@@ -45,9 +45,9 @@ namespace database {
 namespace configuration {
 namespace detail {
 
-using provider_listdatabases_t = JsonData (*)(const Options&, const JsonData&);
-using provider_listcollections_t = JsonData (*)(const Options&, const JsonData&);
-using provider_readdbinfo_t = JsonData (*)(const Options&, const JsonData&);
+using provider_listdatabases_t = std::vector<JSONDocument> (*)(const Options&, const JSONDocument&);
+using provider_listcollections_t = std::vector<JSONDocument> (*)(const Options&, const JSONDocument&);
+using provider_readdbinfo_t = JSONDocument (*)(const Options&, const JSONDocument&);
 
 void list_databases(Options const& options, std::string& configs) {
   confirm(configs.empty());
@@ -70,7 +70,7 @@ void list_databases(Options const& options, std::string& configs) {
     return providers.at(name);
   };
 
-  auto search_result = dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
+  auto search_results = dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -81,45 +81,31 @@ void list_databases(Options const& options, std::string& configs) {
     case data_format_t::json:
     case data_format_t::unknown:
     case data_format_t::fhicl:
-    case data_format_t::xml: {
-      if (!db::json_db_to_gui(search_result, returnValue)) {
-        throw runtime_error("list_databases") << "Unsupported data format.";
-      }
-      break;
+    case data_format_t::xml:{
+      throw runtime_error("list_databases") << "Unsupported data format.";      
     }
 
     case data_format_t::gui: {
-      returnValue = search_result;
+      std::ostringstream oss;      
+      oss << "{ \"search\": [\n";
+      for (auto const& search_result : search_results){
+	oss << search_result << ",";
+      }
+
+      oss.seekp(-1, oss.cur);
+      oss << "] }";      
+      returnValue = oss.str();
       returnValueChanged = true;
       break;
     }
 
     case data_format_t::csv: {
-      using namespace artdaq::database::json;
-      auto reader = JsonReader{};
-      object_t results_ast;
-
-      if (!reader.read(search_result, results_ast)) {
-        TLOG(21) << "list_databases() Failed to create an AST from search results JSON.";
-
-        throw runtime_error("list_databases") << "Failed to create an AST from search results JSON.";
+      std::ostringstream oss;      
+      for (auto const& search_result : search_results){
+	oss << search_result.value_as<std::string>(apiliteral::name) << ",";
       }
-
-      auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
-
-      TLOG(21) << "list_databases: found " << results_list.size() << " results.";
-
-      std::ostringstream os;
-
-      for (auto const& result_entry : results_list) {
-        auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
-        auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
-
-        TLOG(21) << "list_databases() Found database=<" << value << ">.";
-
-        os << value << ",";
-      }
-      returnValue = os.str();
+      
+      returnValue = oss.str();
 
       if (returnValue.back() == ',') {
         returnValue.pop_back();
@@ -204,7 +190,7 @@ void list_collections(Options const& options, std::string& collections) {
     return providers.at(name);
   };
 
-  auto search_result = dispatch_persistence_provider(options.provider())(options, options.collection_to_JsonData());
+  auto search_results = dispatch_persistence_provider(options.provider())(options, options.collection_to_JsonData());
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -220,37 +206,27 @@ void list_collections(Options const& options, std::string& collections) {
       break;
     }
 
-    case data_format_t::gui: {
-      returnValue = search_result;
+   case data_format_t::gui: {
+      std::ostringstream oss;      
+      oss << "{ \"search\": [\n";
+      for (auto const& search_result : search_results){
+	oss << search_result << ",";
+      }
+
+      oss.seekp(-1, oss.cur);
+      oss << "] }";      
+      returnValue = oss.str();
       returnValueChanged = true;
       break;
     }
+
     case data_format_t::csv: {
-      using namespace artdaq::database::json;
-      auto reader = JsonReader{};
-      object_t results_ast;
-
-      if (!reader.read(search_result, results_ast)) {
-        TLOG(21) << "list_collections() Failed to create an AST from search results JSON.";
-
-        throw runtime_error("list_collections") << "Failed to create an AST from search results JSON.";
+      std::ostringstream oss;      
+      for (auto const& search_result : search_results){
+	oss << search_result.value_as<std::string>(apiliteral::name) << ",";
       }
-
-      auto const& results_list = boost::get<array_t>(results_ast.at(jsonliteral::search));
-
-      TLOG(21) << "list_collections: found " << results_list.size() << " results.";
-
-      std::ostringstream os;
-
-      for (auto const& result_entry : results_list) {
-        auto const& buff = boost::get<object_t>(result_entry).at(apiliteral::name);
-        auto value = boost::apply_visitor(jsn::tostring_visitor(), buff);
-
-        TLOG(21) << "list_collections() Found collection=<" << value << ">.";
-
-        os << value << ",";
-      }
-      returnValue = os.str();
+      
+      returnValue = oss.str();
 
       if (returnValue.back() == ',') {
         returnValue.pop_back();

@@ -2,6 +2,12 @@
 
 #include "artdaq-database/DataFormats/Json/json_types.h"
 
+#ifdef TRACE_NAME
+#undef TRACE_NAME
+#endif
+
+#define TRACE_NAME "json_types.cpp"
+
 using artdaq::database::sharedtypes::unwrapper;
 namespace artdaq {
 namespace database {

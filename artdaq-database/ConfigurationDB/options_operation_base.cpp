@@ -11,12 +11,13 @@
 
 #include "artdaq-database/DataFormats/Json/json_reader.h"
 #include "artdaq-database/DataFormats/Json/json_writer.h"
+#include "artdaq-database/JsonDocument/JSONDocument.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
 #endif
 
-#define TRACE_NAME "CONF:OpBase_C"
+#define TRACE_NAME "options_operation_base.cpp"
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
@@ -343,6 +344,8 @@ JsonData OperationBase::writeJsonData() const {
 }
 
 JsonData OperationBase::to_JsonData() const { return {writeJsonData()}; }
+
+OperationBase::operator JSONDocument() const { return {to_JsonData()}; }
 
 std::string OperationBase::to_string() const { return to_JsonData(); }
 

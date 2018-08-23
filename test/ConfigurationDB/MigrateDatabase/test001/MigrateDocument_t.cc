@@ -111,7 +111,8 @@ bool test_migratev1v2(std::string const& source, std::string const& compare) {
   confirm(!source.empty());
   confirm(!compare.empty());
 
-  JSONDocument rdoc = JSONDocumentMigrator{{source}};
+  auto jsondoc=JSONDocument{source};
+  JSONDocument rdoc = JSONDocumentMigrator{jsondoc};
   JSONDocument cdoc{compare};
 
   JSONDocumentBuilder returned{rdoc};
