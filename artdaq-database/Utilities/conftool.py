@@ -13,6 +13,7 @@ import os
 import shutil
 import time
 import subprocess
+import socket
 
 fhicl_schema='schema.fcl'
 
@@ -522,24 +523,42 @@ def __archiveRunConfigurationWithBulkloader(config,run_number):
 	  return False 
 
   envvars = dict(os.environ)
-  keys = ['PATH', 'LD_LIBRARY_PATH', 'PYTHONPATH','ARTDAQ_DATABASE_DATADIR','ARTDAQ_DATABASE_CONFDIR']    
-  command=' '.join('export {}="{}";'.format(k, v) for k, v in dict((k, envvars[k]) for k in keys if k in envvars).items())
-  command+='export ARTDAQ_DATABASE_URI="{}_archive";'.format(envvars['ARTDAQ_DATABASE_URI'])
-  command+='echo BULKLOADER is running on $(hostname -s) and ARTDAQ_DATABASE_URI=$ARTDAQ_DATABASE_URI;'
-  command+='cd {};'.format(envvars['PWD'])
-  command+='bulkloader -r {} -c {} -p {} -t $(( $(nproc)/2 ))\n'.format(run_number,config,'./')
-  command+='[[ $? -eq 0 ]] && echo True || echo False'
+    
+  keys = ['PATH', 'LD_LIBRARY_PATH', 'PYTHONPATH','ARTDAQ_DATABASE_DATADIR','ARTDAQ_DATABASE_CONFDIR']
+  
+  setenvvars_command=' '.join('export {}="{}";'.format(k, v) for k, v in dict((k, envvars[k]) for k in keys if k in envvars).items())
+  setenvvars_command+='export ARTDAQ_DATABASE_URI="{}_archive";'.format(envvars['ARTDAQ_DATABASE_URI'])
+  setenvvars_command+='echo BULKLOADER is running on $(hostname -s) and ARTDAQ_DATABASE_URI=$ARTDAQ_DATABASE_URI'
+
+  data_files_dir= os.getcwd() if artdaq_database_remote_host is None else '$bulkloader_data_dir'
+  cddir_command='cd {}'.format(data_files_dir)
+  
+  bulkloader_command='bulkloader -r {} -c {} -p {} -t $(( $(nproc)/2 ))\nrc=$?'.format(run_number,config,data_files_dir)
+  retcode_command='[[ $rc -eq 0 ]] && echo True || echo False'
+
+  sshopts='-o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" -o "BatchMode=yes" -o "LogLevel=QUIET"'  
+
+  scp_command='export bulkloader_data_dir=/tmp/bulkloader/$(uuidgen);'
+  scp_command+='mkdir -p $bulkloader_data_dir; cd $bulkloader_data_dir;'
+  scp_command+='scp {} -r {}:{} $bulkloader_data_dir'.format(sshopts,socket.gethostname(),os.getcwd())
+  
+  cleanup_commad='rm -rf /tmp/bulkloader/'
+
+  command=''
+  
+  if artdaq_database_remote_host is None:      
+    command=';'.join([setenvvars_command,cddir_command,bulkloader_command,retcode_command])
+  else:
+    command='ssh {} {} \'{}\''.format(artdaq_database_remote_host,sshopts
+            ,';'.join([setenvvars_command,scp_command,cddir_command,bulkloader_command,cleanup_commad,retcode_command]))
+
 
   task=None
   stdoutbuff=None
   stderrbuff=None
 
   try:
-    if artdaq_database_remote_host is not None:
-      sshopts='-o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -o "BatchMode yes"'
-      command='ssh {} {} \'{}\''.format(artdaq_database_remote_host,sshopts, command)
-      
-    task = subprocess.Popen([command], stdout=subprocess.PIPE, shell=True)
+    task = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
     stdoutbuff,stderrbuff = task.communicate()
     result=task.wait()
   except Exception,e:
