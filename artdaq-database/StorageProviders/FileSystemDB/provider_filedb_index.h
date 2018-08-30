@@ -10,7 +10,7 @@
 namespace artdaq {
 namespace database {
 namespace docrecord {
-struct JSONDocument;
+class JSONDocument;
 }
 
 namespace filesystem {

@@ -47,8 +47,7 @@ int main(int argc, char* argv[]) try {
   auto json = std::string{};
   db::read_buffer_from_file(json, file_name);
 
-  namespace jsn = artdaq::database::json;
-
+  
   for (int i = 0; i < 100; i++) {
     auto doc = JSONDocument(json);
     auto docstring = std::string{"{\"aa\": 1}"};

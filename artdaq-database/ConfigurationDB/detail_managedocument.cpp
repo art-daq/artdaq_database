@@ -27,7 +27,6 @@
 namespace db = artdaq::database;
 namespace cf = db::configuration;
 namespace cftd = cf::debug::detail;
-namespace jsonliteral = db::dataformats::literal;
 
 using cf::ManageDocumentOperation;
 using cf::options::data_format_t;
@@ -173,12 +172,12 @@ void write_document(Options const& options, std::string& conf) {
 
   if (options.format() == data_format_t::fhicl) {
     TLOG(29) << "write_document: building fhicl document";
-    builder.reset(new JSONDocumentBuilder{boost::get<JSONDocument>(data)});
+    builder = std::make_unique<JSONDocumentBuilder>(boost::get<JSONDocument>(data));
   } else if (options.format() != data_format_t::db && options.format() != data_format_t::gui) {
-    builder.reset(new JSONDocumentBuilder{});
+    builder = std::make_unique<JSONDocumentBuilder>();
     builder->createFromData(boost::get<JSONDocument>(data));
   } else if (options.format() == data_format_t::gui) {
-    builder.reset(new JSONDocumentBuilder{boost::get<JSONDocument>(data)});
+    builder = std::make_unique<JSONDocumentBuilder>(boost::get<JSONDocument>(data));
 
     builder->newObjectID();
     builder->removeAllConfigurations();
@@ -186,7 +185,7 @@ void write_document(Options const& options, std::string& conf) {
 
     filter = std::string{", \"filter\":"} + builder->getObjectID().to_string();
   } else {
-    builder.reset(new JSONDocumentBuilder{boost::get<JSONDocument>(data)});
+    builder = std::make_unique<JSONDocumentBuilder>(boost::get<JSONDocument>(data));
 
     if (builder->isReadonlyOrDeleted() && options.operation() == apiliteral::operation::writedocument) {
       builder->newObjectID();

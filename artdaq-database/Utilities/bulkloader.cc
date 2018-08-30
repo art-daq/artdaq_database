@@ -23,13 +23,8 @@ namespace bpo = boost::program_options;
 
 using Options = cf::ManageDocumentOperation;
 
-namespace option {
-constexpr auto path = "path";
-constexpr auto appname = "bulkloader";
-}  // namespace option
-
-int write_document(Options const&, std::string const&);
-int configuration_composition(Options const&, std::string&);
+int write_document(Options const& /*options*/, std::string const& /*file_name*/);
+int configuration_composition(Options const& /*options*/, std::string& /*confcomp*/);
 
 int main(int argc, char* argv[]) try {
   auto start = std::chrono::high_resolution_clock::now();
@@ -114,7 +109,7 @@ int main(int argc, char* argv[]) try {
   auto const stropts = options1.writeJsonData();
 
   for (std::size_t i = 0; i < nproc; i++) {
-    workers.push_back(std::thread([&file_names, &file_names_mutex, &loaded_file_count, stropts]() {
+    workers.emplace_back([&file_names, &file_names_mutex, &loaded_file_count, stropts]() {
       auto file_name = std::string{};
       auto entity = std::string{jsonliteral::notprovided};
       auto options = Options{"Worker"};
@@ -146,7 +141,7 @@ int main(int argc, char* argv[]) try {
           filecount++;
         }
       }
-    }));
+    });
   }
 
   for (auto& worker : workers) {
@@ -161,7 +156,7 @@ int main(int argc, char* argv[]) try {
   oss << " threads in " << std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count() << " msecs.\n";
   oss << "Avarage file load time is ";
   oss << std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count() *
-             std::min(((size_t)std::thread::hardware_concurrency()), workers.size()) / loaded_file_count;
+             std::min((static_cast<size_t>(std::thread::hardware_concurrency())), workers.size()) / loaded_file_count;
   oss << " msecs.\n";
 
   std::cout << oss.str();
@@ -173,7 +168,7 @@ int main(int argc, char* argv[]) try {
     options1.format(data_format_t::gui);
     auto confcomp = std::string{};
     auto result = configuration_composition(options1, confcomp);
-    if (!result) {
+    if (result == 0) {
       return process_exit_code::FAILURE;
     }
   }

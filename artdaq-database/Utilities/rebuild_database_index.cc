@@ -15,7 +15,6 @@ using namespace artdaq::database::configuration;
 
 namespace DBI = artdaq::database::filesystem;
 
-using artdaq::database::basictypes::JsonData;
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 

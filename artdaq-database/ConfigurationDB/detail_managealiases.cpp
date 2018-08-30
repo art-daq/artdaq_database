@@ -24,7 +24,6 @@
 namespace db = artdaq::database;
 namespace cf = db::configuration;
 namespace cftd = cf::debug::detail;
-namespace jsonliteral = db::dataformats::literal;
 
 using cf::ManageAliasesOperation;
 using cf::options::data_format_t;

@@ -16,7 +16,6 @@
 #include "artdaq-database/SharedCommon/process_exit_codes.h"
 
 namespace bpo = boost::program_options;
-namespace impl = artdaq::database::configuration::json;
 namespace fjlib = artdaq::database::fhicljson;
 
 using result_t = std::pair<bool, std::string>;

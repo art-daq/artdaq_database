@@ -22,7 +22,6 @@ using namespace artdaq::database::configuration;
 namespace dbcfg = artdaq::database::configuration;
 
 namespace db = artdaq::database;
-namespace jsonliteral = db::dataformats::literal;
 
 using artdaq::database::configuration::options::data_format_t;
 using artdaq::database::docrecord::JSONDocument;
