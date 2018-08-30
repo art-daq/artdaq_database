@@ -101,7 +101,7 @@ int main(int argc, char* argv[]) try {
           std::cout << " -> failed\n";
           continue;
         }
-        auto doc=JSONDocument{source};
+        auto doc = JSONDocument{source};
         JSONDocumentBuilder builder{JSONDocumentMigrator{doc}};
         builder.setCollection({"{db::quoted_(apiliteral::option::collection):\""s + collection_name + "\"}"});
 

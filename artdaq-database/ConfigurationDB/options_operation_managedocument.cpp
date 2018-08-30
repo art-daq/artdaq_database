@@ -137,8 +137,7 @@ void ManageDocumentOperation::readJsonData(JsonData const& data) {
   auto dataAST = object_t{};
 
   if (!JsonReader{}.read(data.json_buffer, dataAST)) {
-    throw db::invalid_option_exception("ManageDocumentOperation")
-        << "ManageDocumentOperation: Unable to read JSON buffer.";
+    throw db::invalid_option_exception("ManageDocumentOperation") << "ManageDocumentOperation: Unable to read JSON buffer.";
   }
 
   try {
@@ -231,20 +230,15 @@ int ManageDocumentOperation::readProgramOptions(bpo::variables_map const& vm) {
 bpo::options_description ManageDocumentOperation::makeProgramOptions() const {
   auto opts = OperationBase::makeProgramOptions();
 
-  auto make_opt_name = [](auto& long_name, auto& short_name) {
-    return std::string{long_name}.append(",").append(short_name);
-  };
+  auto make_opt_name = [](auto& long_name, auto& short_name) { return std::string{long_name}.append(",").append(short_name); };
 
   opts.add_options()(make_opt_name(apiliteral::option::version, "v").c_str(), bpo::value<std::string>(), "Version");
   opts.add_options()(make_opt_name(apiliteral::option::run, "r").c_str(), bpo::value<std::string>(), "Run");
 
-  opts.add_options()(make_opt_name(apiliteral::option::entity, "e").c_str(), bpo::value<std::string>(),
-                     "Configurable-entity name");
-  opts.add_options()(make_opt_name(apiliteral::option::configuration, "g").c_str(), bpo::value<std::string>(),
-                     "Configuration name");
+  opts.add_options()(make_opt_name(apiliteral::option::entity, "e").c_str(), bpo::value<std::string>(), "Configurable-entity name");
+  opts.add_options()(make_opt_name(apiliteral::option::configuration, "g").c_str(), bpo::value<std::string>(), "Configuration name");
 
-  opts.add_options()(make_opt_name(apiliteral::option::source, "s").c_str(), bpo::value<std::string>(),
-                     "Configuration source file name");
+  opts.add_options()(make_opt_name(apiliteral::option::source, "s").c_str(), bpo::value<std::string>(), "Configuration source file name");
 
   return opts;
 }

@@ -31,8 +31,7 @@ struct ConfigurationInterface final {
   //==============================================================================
   // stores configuration version to database
   template <typename CONF, typename TYPE>
-  cf::result_t storeVersion(CONF configuration, std::string const& version, std::string const& entity) const
-      noexcept try {
+  cf::result_t storeVersion(CONF configuration, std::string const& version, std::string const& entity) const noexcept try {
     confirm(!version.empty());
 
     constexpr auto apifunctname = "ConfigurationInterface::storeVersion";
@@ -81,8 +80,7 @@ struct ConfigurationInterface final {
   //==============================================================================
   // overwrite configuration version to database
   template <typename CONF, typename TYPE>
-  cf::result_t overwriteVersion(CONF configuration, std::string const& version, std::string const& entity) const
-      noexcept try {
+  cf::result_t overwriteVersion(CONF configuration, std::string const& version, std::string const& entity) const noexcept try {
     confirm(!version.empty());
 
     constexpr auto apifunctname = "ConfigurationInterface::updateVersion";
@@ -133,15 +131,13 @@ struct ConfigurationInterface final {
 
     auto dbRecord = jsn::object_t{};
 
-    if (!db::json::JsonReader{}.read(buffer, dbRecord))
-      throw artdaq::database::runtime_exception(apifunctname) << "Not a JSON object" << buffer;
+    if (!db::json::JsonReader{}.read(buffer, dbRecord)) throw artdaq::database::runtime_exception(apifunctname) << "Not a JSON object" << buffer;
 
     dbRecord[jsonliteral::document].swap(newRecord[jsonliteral::document]);
 
     buffer.clear();
 
-    if (!db::json::JsonWriter{}.write(dbRecord, buffer))
-      throw artdaq::database::runtime_exception(apifunctname) << "Not a JSON object" << buffer;
+    if (!db::json::JsonWriter{}.write(dbRecord, buffer)) throw artdaq::database::runtime_exception(apifunctname) << "Not a JSON object" << buffer;
 
     opts.operation(apiliteral::operation::overwritedocument);
     opts.format(data_format_t::db);
@@ -158,8 +154,7 @@ struct ConfigurationInterface final {
   //==============================================================================
   // marks configuration version as read-only in database
   template <typename CONF, typename TYPE>
-  cf::result_t markVersionReadonly(CONF configuration, std::string const& version, std::string const& entity) const
-      noexcept try {
+  cf::result_t markVersionReadonly(CONF configuration, std::string const& version, std::string const& entity) const noexcept try {
     confirm(!version.empty());
 
     constexpr auto apifunctname = "ConfigurationInterface::markVersionReadonly";
@@ -188,8 +183,7 @@ struct ConfigurationInterface final {
   //==============================================================================
   // loads configuration version from database
   template <typename CONF, typename TYPE>
-  cf::result_t loadVersion(CONF configuration, std::string const& version, std::string const& entity) const
-      noexcept try {
+  cf::result_t loadVersion(CONF configuration, std::string const& version, std::string const& entity) const noexcept try {
     confirm(!version.empty());
 
     constexpr auto apifunctname = "ConfigurationInterface::loadVersion";
@@ -266,8 +260,7 @@ struct ConfigurationInterface final {
         for (auto const search : searches) {
           auto const& query = boost::get<jsn::object_t>(search).at(jsonliteral::query);
           auto const& filter = boost::get<jsn::object_t>(query).at(jsonliteral::filter);
-          auto const& version =
-              boost::get<std::string>(boost::get<jsn::object_t>(filter).at(apiliteral::filter::version));
+          auto const& version = boost::get<std::string>(boost::get<jsn::object_t>(filter).at(apiliteral::filter::version));
           returnList.emplace_back(version);
         }
       } catch (std::exception const& e) {
@@ -321,8 +314,7 @@ struct ConfigurationInterface final {
         for (auto const search : searches) {
           auto const& query = boost::get<jsn::object_t>(search).at(jsonliteral::query);
           auto const& filter = boost::get<jsn::object_t>(query).at(jsonliteral::filter);
-          auto const& configuration =
-              boost::get<std::string>(boost::get<jsn::object_t>(filter).at(apiliteral::filter::configurations));
+          auto const& configuration = boost::get<std::string>(boost::get<jsn::object_t>(filter).at(apiliteral::filter::configurations));
           returnSet.insert(configuration);
         }
       } catch (std::exception const& e) {
@@ -350,8 +342,7 @@ struct ConfigurationInterface final {
     auto returnList = VersionInfoList_t{};  // RVO
 
     auto to_VersionInfo = [](auto const& query) {
-      auto const& configuration =
-          boost::get<std::string>(boost::get<jsn::object_t>(query).at(apiliteral::option::collection));
+      auto const& configuration = boost::get<std::string>(boost::get<jsn::object_t>(query).at(apiliteral::option::collection));
       auto const& filter = boost::get<jsn::object_t>(query).at(jsonliteral::filter);
       auto const& version = boost::get<std::string>(boost::get<jsn::object_t>(filter).at(apiliteral::filter::version));
       auto const& entity = boost::get<std::string>(boost::get<jsn::object_t>(filter).at(apiliteral::filter::entities));
@@ -425,18 +416,15 @@ struct ConfigurationInterface final {
 
   //==============================================================================
   //
-  cf::result_t storeGlobalConfiguration(VersionInfoList_t const& versionInfoList,
-                                        std::string const& configuration) const try {
+  cf::result_t storeGlobalConfiguration(VersionInfoList_t const& versionInfoList, std::string const& configuration) const try {
     confirm(!configuration.empty());
     confirm(!versionInfoList.empty());
 
     constexpr auto apifunctname = "ConfigurationInterface::storeGlobalConfiguration";
 
-    if (versionInfoList.empty())
-      throw artdaq::database::invalid_option_exception(apifunctname) << "Version info list is empty";
+    if (versionInfoList.empty()) throw artdaq::database::invalid_option_exception(apifunctname) << "Version info list is empty";
 
-    if (configuration.empty())
-      throw artdaq::database::invalid_option_exception(apifunctname) << "Global configuration name is empty";
+    if (configuration.empty()) throw artdaq::database::invalid_option_exception(apifunctname) << "Global configuration name is empty";
 
     auto payloadAST = jsn::object_t{};
     payloadAST[apiliteral::operations] = jsn::array_t{};

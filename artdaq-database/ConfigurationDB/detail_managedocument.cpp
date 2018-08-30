@@ -16,9 +16,7 @@
 
 #include "artdaq-database/ConfigurationDB/options_operations.h"
 
-
 #include <boost/variant.hpp>
-
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -42,7 +40,7 @@ using artdaq::database::basictypes::XmlData;
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 
-using JsonAnyHandle_t = boost::variant<JsonData,JSONDocument>;
+using JsonAnyHandle_t = boost::variant<JsonData, JSONDocument>;
 
 namespace artdaq {
 namespace database {
@@ -54,10 +52,10 @@ bool json_gui_to_db(std::string const&, std::string&);
 namespace artdaq {
 namespace database {
 namespace fhicljson {
-  bool fhicl_to_ast(std::string const& fcl, std::string const& filename, jsn::object_t& json);
-  bool fhicl_to_json(std::string const& fcl, std::string const& filename, std::string& json);
+bool fhicl_to_ast(std::string const& fcl, std::string const& filename, jsn::object_t& json);
+bool fhicl_to_json(std::string const& fcl, std::string const& filename, std::string& json);
 
-}  // namespace fhicljson  
+}  // namespace fhicljson
 namespace configuration {
 namespace detail {
 using provider_write_t = void (*)(const Options&, const JSONDocument&);
@@ -66,9 +64,8 @@ using provider_read_t = JSONDocument (*)(const Options&, const JSONDocument&);
 using provider_call_t = std::vector<JSONDocument> (*)(const Options&, const JSONDocument&);
 
 void write_document(Options const& options, std::string& conf) {
-  confirm(options.operation() == apiliteral::operation::writedocument ||
-          options.operation() == apiliteral::operation::overwritedocument);
-  
+  confirm(options.operation() == apiliteral::operation::writedocument || options.operation() == apiliteral::operation::overwritedocument);
+
   TLOG(20) << "write_document: begin";
 
   if (conf.empty()) {
@@ -79,15 +76,14 @@ void write_document(Options const& options, std::string& conf) {
 
   validate_dbprovider_name(options.provider());
 
-  auto data = JsonAnyHandle_t{ JsonData{conf} };
+  auto data = JsonAnyHandle_t{JsonData{conf}};
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
 
   switch (options.format()) {
     default:
     case data_format_t::unknown: {
-      throw runtime_error("write_document")
-          << "Invalid data format; data format=" << cf::to_string(options.format()) << ".";
+      throw runtime_error("write_document") << "Invalid data format; data format=" << cf::to_string(options.format()) << ".";
       break;
     }
     case data_format_t::json: {
@@ -111,17 +107,17 @@ void write_document(Options const& options, std::string& conf) {
     }
     case data_format_t::fhicl: {
       {
-	auto value= jsn::value_t {jsn::object_t{}};      
-	auto& ast = db::sharedtypes::unwrap(value).value_as<jsn::object_t>();      
-	if(!db::fhicljson::fhicl_to_ast(conf,options.entity(),ast)){
-	  throw  runtime_error("write_document") << "FHICL to JSON convertion failed";
-	}
-      
-	data =  JSONDocument{value};
+        auto value = jsn::value_t{jsn::object_t{}};
+        auto& ast = db::sharedtypes::unwrap(value).value_as<jsn::object_t>();
+        if (!db::fhicljson::fhicl_to_ast(conf, options.entity(), ast)) {
+          throw runtime_error("write_document") << "FHICL to JSON convertion failed";
+        }
+
+        data = JSONDocument{value};
       }
-#ifdef TESTBUILD      
+#ifdef TESTBUILD
       // convert from fhicl to json and back to fhicl
-      JsonData json =  FhiclData{conf};
+      JsonData json = FhiclData{conf};
 
       auto fhicl = FhiclData{};
 
@@ -140,8 +136,8 @@ void write_document(Options const& options, std::string& conf) {
       break;
     }
     case data_format_t::xml: {
-      // convert from xml to json and back to xml      
-      JsonData tmp=XmlData{conf};
+      // convert from xml to json and back to xml
+      JsonData tmp = XmlData{conf};
       data = tmp;
 
       auto xml = XmlData{};
@@ -162,28 +158,28 @@ void write_document(Options const& options, std::string& conf) {
     }
   }
 
-  //TLOG(28) << "write_document: json_buffer=<" << data << ">";
+  // TLOG(28) << "write_document: json_buffer=<" << data << ">";
   TLOG(28) << "write_document: options=<" << options << ">";
-  
-  auto builder=std::unique_ptr<JSONDocumentBuilder>(nullptr);
-  
+
+  auto builder = std::unique_ptr<JSONDocumentBuilder>(nullptr);
+
   // create a json document to be inserted into the database
-  if(data.type() == typeid(JsonData)){
+  if (data.type() == typeid(JsonData)) {
     data = JSONDocument{boost::get<JsonData>(data)};
   }
 
   auto filter = std::string{", \"filter\":"};
   filter.append(options.query_filter_to_JsonData());
 
-  if(options.format() == data_format_t::fhicl){
+  if (options.format() == data_format_t::fhicl) {
     TLOG(29) << "write_document: building fhicl document";
     builder.reset(new JSONDocumentBuilder{boost::get<JSONDocument>(data)});
   } else if (options.format() != data_format_t::db && options.format() != data_format_t::gui) {
-    builder.reset(new JSONDocumentBuilder{});    
+    builder.reset(new JSONDocumentBuilder{});
     builder->createFromData(boost::get<JSONDocument>(data));
   } else if (options.format() == data_format_t::gui) {
     builder.reset(new JSONDocumentBuilder{boost::get<JSONDocument>(data)});
-    
+
     builder->newObjectID();
     builder->removeAllConfigurations();
     builder->removeAllEntities();
@@ -191,7 +187,7 @@ void write_document(Options const& options, std::string& conf) {
     filter = std::string{", \"filter\":"} + builder->getObjectID().to_string();
   } else {
     builder.reset(new JSONDocumentBuilder{boost::get<JSONDocument>(data)});
-    
+
     if (builder->isReadonlyOrDeleted() && options.operation() == apiliteral::operation::writedocument) {
       builder->newObjectID();
     }
@@ -217,17 +213,16 @@ void write_document(Options const& options, std::string& conf) {
     }
   }
 
-  auto insert_payload=JSONDocument{{"{\"document\":{}" + filter + ", \"collection\":\"" + options.collection() + "\"}"}};
-  
+  auto insert_payload = JSONDocument{{"{\"document\":{}" + filter + ", \"collection\":\"" + options.collection() + "\"}"}};
+
   TLOG(30) << "write_document: insert_payload=<" << insert_payload << ">";
- 
-  insert_payload.replaceChild(builder->extract(),"document");   
-        
+
+  insert_payload.replaceChild(builder->extract(), "document");
+
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers =
-        std::map<std::string, provider_write_t>{{apiliteral::provider::mongo, cf::mongo::writeDocument},
-                                                {apiliteral::provider::filesystem, cf::filesystem::writeDocument},
-                                                {apiliteral::provider::ucon, cf::ucon::writeDocument}};
+    auto providers = std::map<std::string, provider_write_t>{{apiliteral::provider::mongo, cf::mongo::writeDocument},
+                                                             {apiliteral::provider::filesystem, cf::filesystem::writeDocument},
+                                                             {apiliteral::provider::ucon, cf::ucon::writeDocument}};
 
     return providers.at(name);
   };
@@ -252,16 +247,15 @@ void read_document(Options const& options, std::string& conf) {
 
   validate_dbprovider_name(options.provider());
 
-  auto search_payload = JsonData{"{\"filter\":" + options.query_filter_to_JsonData().json_buffer +
-                                 +", \"collection\":\"" + options.collection() + "\"}"};
+  auto search_payload =
+      JsonData{"{\"filter\":" + options.query_filter_to_JsonData().json_buffer + +", \"collection\":\"" + options.collection() + "\"}"};
 
   TLOG(33) << "read_document: search_payload=<" << search_payload << ">";
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers =
-        std::map<std::string, provider_read_t>{{apiliteral::provider::mongo, cf::mongo::readDocument},
-                                               {apiliteral::provider::filesystem, cf::filesystem::readDocument},
-                                               {apiliteral::provider::ucon, cf::ucon::readDocument}};
+    auto providers = std::map<std::string, provider_read_t>{{apiliteral::provider::mongo, cf::mongo::readDocument},
+                                                            {apiliteral::provider::filesystem, cf::filesystem::readDocument},
+                                                            {apiliteral::provider::ucon, cf::ucon::readDocument}};
 
     return providers.at(name);
   };
@@ -321,8 +315,7 @@ void read_document(Options const& options, std::string& conf) {
       break;
     }
     case data_format_t::unknown:
-      throw runtime_error("read_document")
-          << "Invalid data format; data format=" << cf::to_string(options.format()) << ".";
+      throw runtime_error("read_document") << "Invalid data format; data format=" << cf::to_string(options.format()) << ".";
       break;
 
     case data_format_t::fhicl: {
@@ -376,10 +369,9 @@ void find_versions(Options const& options, std::string& versions) {
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers =
-        std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::findVersions},
-                                               {apiliteral::provider::filesystem, cf::filesystem::findVersions},
-                                               {apiliteral::provider::ucon, cf::ucon::findVersions}};
+    auto providers = std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::findVersions},
+                                                            {apiliteral::provider::filesystem, cf::filesystem::findVersions},
+                                                            {apiliteral::provider::ucon, cf::ucon::findVersions}};
 
     return providers.at(name);
   };
@@ -398,26 +390,26 @@ void find_versions(Options const& options, std::string& versions) {
       throw runtime_error("find_versions") << "Unsupported data format.";
       break;
     }
-   case data_format_t::gui: {
-      std::ostringstream oss;      
+    case data_format_t::gui: {
+      std::ostringstream oss;
       oss << "{ \"search\": [\n";
-      for (auto const& search_result : search_results){
-	oss << search_result << ",";
+      for (auto const& search_result : search_results) {
+        oss << search_result << ",";
       }
 
       oss.seekp(-1, oss.cur);
-      oss << "] }";      
+      oss << "] }";
       returnValue = oss.str();
       returnValueChanged = true;
       break;
     }
 
     case data_format_t::csv: {
-      std::ostringstream oss;      
-      for (auto const& search_result : search_results){
-	oss << search_result.value_as<std::string>(apiliteral::name) << ",";
+      std::ostringstream oss;
+      for (auto const& search_result : search_results) {
+        oss << search_result.value_as<std::string>(apiliteral::name) << ",";
       }
-      
+
       returnValue = oss.str();
 
       if (returnValue.back() == ',') {
@@ -446,10 +438,9 @@ void find_entities(Options const& options, std::string& entities) {
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers =
-        std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::findEntities},
-                                               {apiliteral::provider::filesystem, cf::filesystem::findEntities},
-                                               {apiliteral::provider::ucon, cf::ucon::findEntities}};
+    auto providers = std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::findEntities},
+                                                            {apiliteral::provider::filesystem, cf::filesystem::findEntities},
+                                                            {apiliteral::provider::ucon, cf::ucon::findEntities}};
 
     return providers.at(name);
   };
@@ -469,26 +460,26 @@ void find_entities(Options const& options, std::string& entities) {
       break;
     }
 
-   case data_format_t::gui: {
-      std::ostringstream oss;      
+    case data_format_t::gui: {
+      std::ostringstream oss;
       oss << "{ \"search\": [\n";
-      for (auto const& search_result : search_results){
-	oss << search_result << ",";
+      for (auto const& search_result : search_results) {
+        oss << search_result << ",";
       }
 
       oss.seekp(-1, oss.cur);
-      oss << "] }";      
+      oss << "] }";
       returnValue = oss.str();
       returnValueChanged = true;
       break;
     }
 
     case data_format_t::csv: {
-      std::ostringstream oss;      
-      for (auto const& search_result : search_results){
-	oss << search_result.value_as<std::string>(apiliteral::name) << ",";
+      std::ostringstream oss;
+      for (auto const& search_result : search_results) {
+        oss << search_result.value_as<std::string>(apiliteral::name) << ",";
       }
-      
+
       returnValue = oss.str();
 
       if (returnValue.back() == ',') {
@@ -687,10 +678,9 @@ void read_documents(ManageDocumentOperation const& options, std::vector<JSONDocu
   TLOG(62) << "read_documents: search_payload=<" << search_payload << ">";
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers =
-        std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::readDocuments},
-                                               {apiliteral::provider::filesystem, cf::filesystem::readDocuments},
-                                               {apiliteral::provider::ucon, cf::ucon::readDocuments}};
+    auto providers = std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::readDocuments},
+                                                            {apiliteral::provider::filesystem, cf::filesystem::readDocuments},
+                                                            {apiliteral::provider::ucon, cf::ucon::readDocuments}};
     return providers.at(name);
   };
 
@@ -708,10 +698,9 @@ void write_documents(ManageDocumentOperation const& options, std::vector<JSONDoc
   TLOG(13) << "write_documents: begin";
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers =
-        std::map<std::string, provider_write_t>{{apiliteral::provider::mongo, cf::mongo::writeDocument},
-                                                {apiliteral::provider::filesystem, cf::filesystem::writeDocument},
-                                                {apiliteral::provider::ucon, cf::ucon::writeDocument}};
+    auto providers = std::map<std::string, provider_write_t>{{apiliteral::provider::mongo, cf::mongo::writeDocument},
+                                                             {apiliteral::provider::filesystem, cf::filesystem::writeDocument},
+                                                             {apiliteral::provider::ucon, cf::ucon::writeDocument}};
     return providers.at(name);
   };
 

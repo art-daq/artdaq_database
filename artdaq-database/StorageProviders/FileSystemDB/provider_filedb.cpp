@@ -68,16 +68,14 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::findConfi
 
     auto configentityname_pairs = search_index.findAllGlobalConfigurations(query_payload);
 
-    TLOG(15) << "FileSystemDB::findConfigurations() search returned " << configentityname_pairs.size()
-             << " configurations.";
+    TLOG(15) << "FileSystemDB::findConfigurations() search returned " << configentityname_pairs.size() << " configurations.";
     for (auto const& configentityname_pair : configentityname_pairs) {
       auto const& name = configentityname_pair.first;
       std::ostringstream oss;
       oss << "{" << db::quoted_(apiliteral::filter::configurations) << ":" << db::quoted_(name) << "}";
       auto timestamps = search_index.getConfigurationAssignedTimestamps(oss.str());
       for (auto const& assigned : timestamps) {
-        config_timestamps[name].insert(
-            std::chrono::duration_cast<std::chrono::seconds>(db::to_timepoint(assigned).time_since_epoch()).count());
+        config_timestamps[name].insert(std::chrono::duration_cast<std::chrono::seconds>(db::to_timepoint(assigned).time_since_epoch()).count());
       }
     }
   }
@@ -94,8 +92,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::findConfi
 
     oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem) << ",";
     oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
-    oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::confcomposition)
-        << ",";
+    oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::confcomposition) << ",";
     oss << db::quoted_(apiliteral::option::searchfilter) << ":"
         << "{";
     oss << db::quoted_(apiliteral::filter::configurations) << ": " << db::quoted_(cfg.second);
@@ -146,8 +143,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::configura
       oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
       oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem) << ",";
       oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
-      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument)
-          << ",";
+      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument) << ",";
       oss << db::quoted_(apiliteral::option::searchfilter) << ":"
           << "{";
       oss << db::quoted_(apiliteral::filter::configurations) << ":" << db::quoted_(configentityname_pair.first);
@@ -202,8 +198,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::findVersi
   if (search_ast.count(apiliteral::filter::configurations) == 0) {
     auto versionentityname_pairs = search_index.findVersionsByEntityName(query_payload);
 
-    TLOG(15) << "FileSystemDB::findVersionsByEntityName() search returned " << versionentityname_pairs.size()
-             << " configurations.";
+    TLOG(15) << "FileSystemDB::findVersionsByEntityName() search returned " << versionentityname_pairs.size() << " configurations.";
 
     for (auto const& versionentityname_pair : versionentityname_pairs) {
       std::ostringstream oss;
@@ -212,8 +207,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::findVersi
       oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
       oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem) << ",";
       oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
-      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument)
-          << ",";
+      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument) << ",";
       oss << db::quoted_(apiliteral::option::searchfilter) << ":"
           << "{";
       oss << db::quoted_(apiliteral::filter::version) << ":" << db::quoted_(versionentityname_pair.second);
@@ -250,8 +244,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::findVersi
       oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
       oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem) << ",";
       oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
-      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument)
-          << ",";
+      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument) << ",";
       oss << db::quoted_(apiliteral::option::searchfilter) << ":"
           << "{";
       oss << db::quoted_(apiliteral::filter::version) << ":" << db::quoted_(versionentityname_pair.second);
@@ -313,8 +306,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::findEntit
       oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
       oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem) << ",";
       oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
-      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::findversions)
-          << ",";
+      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::findversions) << ",";
       oss << db::quoted_(apiliteral::option::searchfilter) << ":"
           << "{";
       oss << db::quoted_(apiliteral::filter::entities) << ":" << db::quoted_(configentity_name);
@@ -427,8 +419,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::listDatab
 
 template <>
 template <>
-std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::databaseMetadata(
-    JSONDocument const& query_payload[[gnu::unused]]) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::databaseMetadata(JSONDocument const& query_payload[[gnu::unused]]) {
   confirm(!query_payload.empty());
   auto returnCollection = std::vector<JSONDocument>();
 

@@ -124,8 +124,7 @@ std::string tag_as_string(::fhicl::value_tag tag) {
   if (str == literal::nil) {
     return ::fhicl::NIL;
   }
-  if (str == literal::string || str == literal::string_unquoted || str == literal::string_singlequoted ||
-      str == literal::string_doublequoted) {
+  if (str == literal::string || str == literal::string_unquoted || str == literal::string_singlequoted || str == literal::string_doublequoted) {
     return ::fhicl::STRING;
   }
   if (str == literal::boolean) {
@@ -145,8 +144,7 @@ std::string tag_as_string(::fhicl::value_tag tag) {
     return ::fhicl::TABLEID;
   }
 
-  throw ::fhicl::exception(::fhicl::parse_error, literal::data)
-      << ("FHiCL atom type \"" + str + "\" is not implemented.");
+  throw ::fhicl::exception(::fhicl::parse_error, literal::data) << ("FHiCL atom type \"" + str + "\" is not implemented.");
 }
 
 std::string protection_as_string(::fhicl::Protection protection) {
@@ -193,8 +191,7 @@ std::string protection_as_string(::fhicl::Protection protection) {
       return ::fhicl::Protection::ADD_OR_REPLACE_COMPAT;
   */
 
-  throw ::fhicl::exception(::fhicl::parse_error, literal::data)
-      << ("FHiCL protection option \"" + str + "\" is not implemented.");
+  throw ::fhicl::exception(::fhicl::parse_error, literal::data) << ("FHiCL protection option \"" + str + "\" is not implemented.");
 }
 
 }  // namespace fhicl

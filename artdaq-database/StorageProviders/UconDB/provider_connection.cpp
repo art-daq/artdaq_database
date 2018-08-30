@@ -17,10 +17,8 @@ namespace dbucl = db::ucon::literal;
 using artdaq::database::ucon::DBConfig;
 using artdaq::database::ucon::UconDB;
 
-DBConfig::DBConfig()
-    : uri{std::string{dbucl::UCONURI} + dbucl::hostname + ":" + std::to_string(dbucl::port) + "/" + dbucl::db_name} {
-  auto tmpURI = getenv("ARTDAQ_DATABASE_URI") != nullptr ? expand_environment_variables("${ARTDAQ_DATABASE_URI}")
-                                                         : std::string("");
+DBConfig::DBConfig() : uri{std::string{dbucl::UCONURI} + dbucl::hostname + ":" + std::to_string(dbucl::port) + "/" + dbucl::db_name} {
+  auto tmpURI = getenv("ARTDAQ_DATABASE_URI") != nullptr ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
 
   auto prefixURI = std::string{dbucl::UCONURI};
 
@@ -37,9 +35,6 @@ long UconDB::timeout() const { return 5; }
 std::string const& UconDB::authentication() const { return _userpass; }
 
 UconDB::UconDB(DBConfig config, PassKeyIdiom const& /*unused*/)
-    : _config{std::move(config)},
-      _client{_config.connectionURI()},
-      _connection{_config.connectionURI()},
-      _userpass{"user:pass"} {
+    : _config{std::move(config)}, _client{_config.connectionURI()}, _connection{_config.connectionURI()}, _userpass{"user:pass"} {
   _userpass = getenv("ARTDAQ_DATABASE_AUTH") != nullptr ? getenv("ARTDAQ_DATABASE_AUTH") : std::string("user:pass");
 }

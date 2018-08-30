@@ -27,8 +27,7 @@ using cf::OperationBase;
 using cf::options::data_format_t;
 using dbbt::JsonData;
 
-OperationBase::OperationBase(std::string process_name)
-    : _process_name{std::move(process_name)}, _provider{_getProviderFromURI()} {}
+OperationBase::OperationBase(std::string process_name) : _process_name{std::move(process_name)}, _provider{_getProviderFromURI()} {}
 
 OperationBase::~OperationBase() = default;
 
@@ -73,10 +72,9 @@ std::string const& OperationBase::provider() const {
 std::string const& OperationBase::provider(std::string const& provider) {
   confirm(!provider.empty());
 
-  if (db::not_equal(provider, apiliteral::provider::filesystem) &&
-      db::not_equal(provider, apiliteral::provider::mongo) && db::not_equal(provider, apiliteral::provider::ucon)) {
-    throw db::invalid_option_exception("OperationBase")
-        << "Invalid database provider; database provider=" << provider << ".";
+  if (db::not_equal(provider, apiliteral::provider::filesystem) && db::not_equal(provider, apiliteral::provider::mongo) &&
+      db::not_equal(provider, apiliteral::provider::ucon)) {
+    throw db::invalid_option_exception("OperationBase") << "Invalid database provider; database provider=" << provider << ".";
   }
 
   TLOG(22) << "Options: Updating provider from " << _provider << " to " << provider << ".";
@@ -94,8 +92,7 @@ data_format_t const& OperationBase::format() const {
 data_format_t const& OperationBase::format(data_format_t const& data_format) {
   confirm(data_format != data_format_t::unknown);
 
-  TLOG(23) << "Options: Updating data_format from " << cf::to_string(_data_format) << " to "
-           << cf::to_string(data_format) << ".";
+  TLOG(23) << "Options: Updating data_format from " << cf::to_string(_data_format) << " to " << cf::to_string(data_format) << ".";
 
   _data_format = data_format;
 
@@ -170,34 +167,28 @@ bpo::options_description OperationBase::makeProgramOptions() const {
 
   bpo::options_description opts = descstr.str();
 
-  auto make_opt_name = [](auto& long_name, auto& short_name) {
-    return std::string{long_name}.append(",").append(short_name);
-  };
+  auto make_opt_name = [](auto& long_name, auto& short_name) { return std::string{long_name}.append(",").append(short_name); };
 
   opts.add_options()("help,h", "Produce help message");
 
   opts.add_options()(make_opt_name(apiliteral::option::operation, "o").c_str(), bpo::value<std::string>(), "Operation");
   opts.add_options()(make_opt_name(apiliteral::option::format, "f").c_str(), bpo::value<std::string>(),
                      "In/Out data format [fhicl, xml, gui, db, or csv]");
-  opts.add_options()(make_opt_name(apiliteral::option::collection, "c").c_str(), bpo::value<std::string>(),
-                     "Collection");
+  opts.add_options()(make_opt_name(apiliteral::option::collection, "c").c_str(), bpo::value<std::string>(), "Collection");
 
-  opts.add_options()(make_opt_name(apiliteral::option::provider, "p").c_str(), bpo::value<std::string>(),
-                     "Database provider name; depricated");
+  opts.add_options()(make_opt_name(apiliteral::option::provider, "p").c_str(), bpo::value<std::string>(), "Database provider name; depricated");
 
   opts.add_options()(apiliteral::option::searchfilter, bpo::value<std::string>(), "Search filter");
 
   opts.add_options()(apiliteral::option::searchquery, bpo::value<std::string>(), "Search query");
 
-  opts.add_options()(make_opt_name(apiliteral::option::result, "x").c_str(), bpo::value<std::string>(),
-                     "Expected result file name");
+  opts.add_options()(make_opt_name(apiliteral::option::result, "x").c_str(), bpo::value<std::string>(), "Expected result file name");
 
   return opts;
 }
 
 std::string OperationBase::_getProviderFromURI() {
-  auto tmpURI = getenv("ARTDAQ_DATABASE_URI") != nullptr ? db::expand_environment_variables("${ARTDAQ_DATABASE_URI}")
-                                                         : std::string("");
+  auto tmpURI = getenv("ARTDAQ_DATABASE_URI") != nullptr ? db::expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
 
   auto tmpDB = std::string(apiliteral::provider::mongo);
   if (std::equal(std::begin(tmpDB), std::end(tmpDB), tmpURI.begin())) {

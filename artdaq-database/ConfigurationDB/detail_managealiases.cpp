@@ -60,10 +60,9 @@ void find_version_aliases(Options const& options, std::string& configs) {
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers =
-        std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::findVersionAliases},
-                                               {apiliteral::provider::filesystem, cf::filesystem::findVersionAliases},
-                                               {apiliteral::provider::ucon, cf::ucon::findVersionAliases}};
+    auto providers = std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::findVersionAliases},
+                                                            {apiliteral::provider::filesystem, cf::filesystem::findVersionAliases},
+                                                            {apiliteral::provider::ucon, cf::ucon::findVersionAliases}};
 
     return providers.at(name);
   };
@@ -84,26 +83,26 @@ void find_version_aliases(Options const& options, std::string& configs) {
       break;
     }
 
-   case data_format_t::gui: {
-      std::ostringstream oss;      
+    case data_format_t::gui: {
+      std::ostringstream oss;
       oss << "{ \"search\": [\n";
-      for (auto const& search_result : search_results){
-	oss << search_result << ",";
+      for (auto const& search_result : search_results) {
+        oss << search_result << ",";
       }
 
       oss.seekp(-1, oss.cur);
-      oss << "] }";      
+      oss << "] }";
       returnValue = oss.str();
       returnValueChanged = true;
       break;
     }
 
     case data_format_t::csv: {
-      std::ostringstream oss;      
-      for (auto const& search_result : search_results){
-	oss << search_result.value_as<std::string>(apiliteral::name) << ",";
+      std::ostringstream oss;
+      for (auto const& search_result : search_results) {
+        oss << search_result.value_as<std::string>(apiliteral::name) << ",";
       }
-      
+
       returnValue = oss.str();
 
       if (returnValue.back() == ',') {
@@ -112,7 +111,7 @@ void find_version_aliases(Options const& options, std::string& configs) {
 
       returnValueChanged = true;
       break;
-    }    
+    }
   }
 
   if (returnValueChanged) {

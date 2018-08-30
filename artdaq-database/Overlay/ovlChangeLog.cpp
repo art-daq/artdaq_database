@@ -25,7 +25,5 @@ std::string& ovlChangeLog::append(std::string const& changelog) {
 }
 
 result_t ovlChangeLog::operator==(ovlChangeLog const& other) const {
-  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_CHANGELOG) == DOCUMENT_COMPARE_MUTE_CHANGELOG)
-             ? Success()
-             : self() == other.self();
+  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_CHANGELOG) == DOCUMENT_COMPARE_MUTE_CHANGELOG) ? Success() : self() == other.self();
 }

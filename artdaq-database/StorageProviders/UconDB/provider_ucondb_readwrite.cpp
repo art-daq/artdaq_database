@@ -12,8 +12,8 @@
 namespace artdaq {
 namespace database {
 
-using artdaq::database::json::JsonReader;
 using artdaq::database::json::array_t;
+using artdaq::database::json::JsonReader;
 using artdaq::database::json::object_t;
 using artdaq::database::json::value_t;
 using artdaq::database::sharedtypes::unwrap;
@@ -144,8 +144,7 @@ object_id_t StorageProvider<JSONDocument, UconDB>::writeDocument(JSONDocument co
   auto result = create_folder(_provider, collection_name);
 
   if (!result.first) {
-    throw runtime_error("UconDB") << "UconDB failed creating a new folder; folder name=" << collection_name
-                                  << ", error=" << result.second;
+    throw runtime_error("UconDB") << "UconDB failed creating a new folder; folder name=" << collection_name << ", error=" << result.second;
   }
 
   auto oid = object_id_t{ouid_invalid};

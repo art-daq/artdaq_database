@@ -1,8 +1,8 @@
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
 #include "artdaq-database/DataFormats/Json/json_types_impl.h"
-#include "artdaq-database/SharedCommon/sharedcommon_common.h"
 #include "artdaq-database/JsonDocument/JSONDocument.h"
+#include "artdaq-database/SharedCommon/sharedcommon_common.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME

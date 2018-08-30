@@ -8,10 +8,10 @@
 
 #define TRACE_NAME "JSONDocumentMigrator.cpp"
 
+using artdaq::database::result_t;
 using artdaq::database::json::array_t;
 using artdaq::database::json::object_t;
 using artdaq::database::json::value_t;
-using artdaq::database::result_t;
 
 using artdaq::database::overlay::ovlDatabaseRecordUPtr_t;
 
@@ -27,7 +27,7 @@ namespace jsonliteral = artdaq::database::dataformats::literal;
 
 JSONDocumentMigrator::JSONDocumentMigrator(JSONDocument& document) : _document(document) {}
 
-JSONDocumentMigrator::operator JSONDocument(){
+JSONDocumentMigrator::operator JSONDocument() {
   JSONDocumentBuilder builder{};
 
   builder.createFromData(_document);

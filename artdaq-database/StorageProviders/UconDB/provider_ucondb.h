@@ -29,9 +29,7 @@ struct DBConfig final {
 
 class UconDB final {
  public:
-  static std::shared_ptr<UconDB> create(DBConfig const& config) {
-    return std::make_shared<UconDB, DBConfig const&, PassKeyIdiom const&>(config, {});
-  }
+  static std::shared_ptr<UconDB> create(DBConfig const& config) { return std::make_shared<UconDB, DBConfig const&, PassKeyIdiom const&>(config, {}); }
 
   class PassKeyIdiom {
    private:

@@ -155,8 +155,7 @@ result_t ovlKeyValueTimeStamp<mask, A, R>::operator==(ovlKeyValueTimeStamp const
 
   auto noerror_pos = oss.tellp();
 
-  if (name() != other.name())
-    oss << "\n  " << key() << "names are different: self,other=" << quoted_(name()) << "," << quoted_(other.name());
+  if (name() != other.name()) oss << "\n  " << key() << "names are different: self,other=" << quoted_(name()) << "," << quoted_(other.name());
 
   if (A) {
     auto result = *_assigned == *(other._assigned);

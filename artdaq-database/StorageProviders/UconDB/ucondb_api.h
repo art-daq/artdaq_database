@@ -20,9 +20,8 @@ std::list<std::string> tags(const UconDBSPtr_t& provider, std::string const& fol
 std::list<std::string> objects(const UconDBSPtr_t& provider, std::string const& folder);
 result_t get_object(const UconDBSPtr_t& provider, std::string const& folder, std::string const& object);
 result_t create_folder(const UconDBSPtr_t& provider, std::string const& folder);
-result_t put_object(const UconDBSPtr_t& provider, std::string const& folder, std::string const& buffer,
-                    std::string const& object, long const tv, std::list<std::string> const& tags,
-                    std::string const& key);
+result_t put_object(const UconDBSPtr_t& provider, std::string const& folder, std::string const& buffer, std::string const& object, long const tv,
+                    std::list<std::string> const& tags, std::string const& key);
 
 }  // namespace ucon
 }  // namespace database

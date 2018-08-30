@@ -30,10 +30,8 @@ using artdaq::database::filesystem::FileSystemDB;
 
 namespace jsonliteral = artdaq::database::dataformats::literal;
 
-DBConfig::DBConfig()
-    : uri{std::string{literal::FILEURI} + "${ARTDAQ_DATABASE_DATADIR}/filesystemdb" + "/" + literal::db_name} {
-  auto tmpURI = getenv("ARTDAQ_DATABASE_URI") != nullptr ? expand_environment_variables("${ARTDAQ_DATABASE_URI}")
-                                                         : std::string("");
+DBConfig::DBConfig() : uri{std::string{literal::FILEURI} + "${ARTDAQ_DATABASE_DATADIR}/filesystemdb" + "/" + literal::db_name} {
+  auto tmpURI = getenv("ARTDAQ_DATABASE_URI") != nullptr ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
 
   if (tmpURI.back() == '/') {
     tmpURI.pop_back();  // remove trailing slash
@@ -78,8 +76,7 @@ std::string& FileSystemDB::connection() {
 
   db::write_buffer_to_file(oss.str(), filename);
 
-  TLOG(15) << "StorageProvider::FileSystemDB::connection created metadata record id=" << oid
-           << ", path=" << path.c_str();
+  TLOG(15) << "StorageProvider::FileSystemDB::connection created metadata record id=" << oid << ", path=" << path.c_str();
 
   return _connection;
 }

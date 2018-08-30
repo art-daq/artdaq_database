@@ -9,9 +9,9 @@
 
 #define TRACE_NAME "JSONDocumentBuilder.cpp"
 
+using artdaq::database::result_t;
 using artdaq::database::ThrowOnFailure;
 using artdaq::database::json::value_t;
-using artdaq::database::result_t;
 
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
@@ -25,14 +25,10 @@ namespace dbdr = artdaq::database::docrecord;
 namespace jsonliteral = artdaq::database::dataformats::literal;
 
 JSONDocumentBuilder::JSONDocumentBuilder()
-    : _document(std::string(template__empty_document)),
-      _overlay(std::make_unique<ovlDatabaseRecord>(_document._value)),
-      _initOK(init()) {}
+    : _document(std::string(template__empty_document)), _overlay(std::make_unique<ovlDatabaseRecord>(_document._value)), _initOK(init()) {}
 
 JSONDocumentBuilder::JSONDocumentBuilder(JSONDocument document)
-    : _document(std::move(document)),
-      _overlay(std::make_unique<ovlDatabaseRecord>(_document._value)),
-      _initOK(init()) {}
+    : _document(std::move(document)), _overlay(std::make_unique<ovlDatabaseRecord>(_document._value)), _initOK(init()) {}
 
 bool JSONDocumentBuilder::init() {
   TLOG(20) << "JSONDocumentBuilder::init() new document=<" << _document.cached_json_buffer() << ">";
@@ -165,8 +161,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::setCollection(JSONDocument const& coll
   TLOG(35) << "collection() args  collection=<" << collection << ">";
 
   auto copy = collection.findChild(jsonliteral::collection);
-  auto ovl =
-      std::make_unique<ovl::ovlCollection>(jsonliteral::collection, copy.findChildValue(jsonliteral::collection));
+  auto ovl = std::make_unique<ovl::ovlCollection>(jsonliteral::collection, copy.findChildValue(jsonliteral::collection));
 
   ThrowOnFailure(SaveUndo());
   ThrowOnFailure(_overlay->setCollection(ovl));
@@ -291,9 +286,7 @@ std::list<std::string> JSONDocumentBuilder::extractTags() const {
   return retValue;
 }
 
-result_t JSONDocumentBuilder::comapreUsingOverlays(JSONDocumentBuilder const& other) const {
-  return *_overlay == *other._overlay;
-}
+result_t JSONDocumentBuilder::comapreUsingOverlays(JSONDocumentBuilder const& other) const { return *_overlay == *other._overlay; }
 
 std::string JSONDocumentBuilder::to_string() const { return _document.to_string(); }
 

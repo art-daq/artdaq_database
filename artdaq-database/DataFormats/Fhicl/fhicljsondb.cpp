@@ -29,12 +29,12 @@ using artdaq::database::fhicl::FhiclWriter;
 namespace artdaq {
 namespace database {
 namespace fhicljson {
-  bool fhicl_to_ast(std::string const& fcl, std::string const& filename, jsn::object_t& json);
+bool fhicl_to_ast(std::string const& fcl, std::string const& filename, jsn::object_t& json);
 }  // namespace fhicljson
 }  // namespace database
 }  // namespace artdaq
-  
-bool dbfj::fhicl_to_ast(std::string const& fcl, std::string const& filename, jsn::object_t& json){
+
+bool dbfj::fhicl_to_ast(std::string const& fcl, std::string const& filename, jsn::object_t& json) {
   confirm(!fcl.empty());
   confirm(!filename.empty());
 
@@ -46,9 +46,7 @@ bool dbfj::fhicl_to_ast(std::string const& fcl, std::string const& filename, jsn
 
   auto json_root = jsn::object_t();
 
-  auto get_object = [&json_root](std::string const& name) -> auto& {
-    return boost::get<jsn::object_t>(json_root[name]);
-  };
+  auto get_object = [&json_root](std::string const& name) -> auto& { return boost::get<jsn::object_t>(json_root[name]); };
 
   json_root[literal::document] = jsn::object_t();
   json_root[literal::comments] = jsn::array_t();
@@ -92,7 +90,7 @@ bool dbfj::fhicl_to_ast(std::string const& fcl, std::string const& filename, jsn
   return result;
 }
 
-bool dbfj::fhicl_to_json(std::string const& fcl, std::string const& filename, std::string& json){
+bool dbfj::fhicl_to_json(std::string const& fcl, std::string const& filename, std::string& json) {
   confirm(!fcl.empty());
   confirm(json.empty());
   confirm(!filename.empty());
@@ -101,11 +99,11 @@ bool dbfj::fhicl_to_json(std::string const& fcl, std::string const& filename, st
   auto json_root = jsn::object_t();
 
   bool result = dbfj::fhicl_to_ast(fcl, filename, json_root);
-  
+
   if (!result) {
     return result;
   }
-  
+
   auto json1 = std::string();
 
   auto writer = JsonWriter();
@@ -121,7 +119,6 @@ bool dbfj::fhicl_to_json(std::string const& fcl, std::string const& filename, st
   TLOG(44) << "fhicl_to_json: end";
 
   return result;
-  
 }
 
 bool dbfj::json_to_fhicl(std::string const& json, std::string& fcl, std::string& filename) {

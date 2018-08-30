@@ -1,6 +1,6 @@
 #include "artdaq-database/DataFormats/Json/json_common.h"
-#include "test/common.h"
 #include "artdaq-database/JsonDocument/JSONDocument.h"
+#include "test/common.h"
 
 using artdaq::database::docrecord::JSONDocument;
 
@@ -49,22 +49,22 @@ int main(int argc, char* argv[]) try {
 
   namespace jsn = artdaq::database::json;
 
-  for(int i=0; i<100; i++){
-  auto doc = JSONDocument(json);
-  auto docstring =std::string{"{\"aa\": 1}"};
-  auto newdoc = JSONDocument(docstring);
+  for (int i = 0; i < 100; i++) {
+    auto doc = JSONDocument(json);
+    auto docstring = std::string{"{\"aa\": 1}"};
+    auto newdoc = JSONDocument(docstring);
 
-  auto path = std::string{"document.data.main.daq.fragment_receiver"};
+    auto path = std::string{"document.data.main.daq.fragment_receiver"};
 
-  std::cout << doc.replaceChild(newdoc,path);
+    std::cout << doc.replaceChild(newdoc, path);
   }
-//   auto reader = jsn::JsonReader{};
-// 
-//   jsn::object_t doc_ast;
-// 
-//   if (!reader.read(json, doc_ast)) {
-//     confirm(false);
-//   }
+  //   auto reader = jsn::JsonReader{};
+  //
+  //   jsn::object_t doc_ast;
+  //
+  //   if (!reader.read(json, doc_ast)) {
+  //     confirm(false);
+  //   }
 
   return process_exit_code::SUCCESS;
 } catch (...) {

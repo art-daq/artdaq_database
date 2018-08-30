@@ -30,8 +30,7 @@ class ovlStringKeyValue : public ovlKeyValue {
 };
 
 template <std::uint32_t mask>
-ovlStringKeyValue<mask>::ovlStringKeyValue(object_t::key_type const& key, value_t& value)
-    : ovlKeyValue(key, value), _initOK(init(value)) {}
+ovlStringKeyValue<mask>::ovlStringKeyValue(object_t::key_type const& key, value_t& value) : ovlKeyValue(key, value), _initOK(init(value)) {}
 
 template <std::uint32_t mask>
 bool ovlStringKeyValue<mask>::init(value_t& parent) try {

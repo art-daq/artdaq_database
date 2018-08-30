@@ -1,9 +1,9 @@
 #ifndef _ARTDAQ_DATABASE_PROVIDERS_H_
 #define _ARTDAQ_DATABASE_PROVIDERS_H_
 
-#include <vector>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 #include "artdaq-database/SharedCommon/shared_datatypes.h"

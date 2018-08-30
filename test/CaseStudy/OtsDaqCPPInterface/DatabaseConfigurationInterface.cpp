@@ -28,8 +28,7 @@ int DatabaseConfigurationInterface::fill(ConfigurationBase* configuration, int v
     versionstring = std::to_string(findLatestVersion(configuration));
   }
 
-  auto result =
-      ifc.template loadVersion<decltype(configuration), JsonData>(configuration, versionstring, default_entity);
+  auto result = ifc.template loadVersion<decltype(configuration), JsonData>(configuration, versionstring, default_entity);
 
   if (result.first) {
     return 0;
@@ -43,16 +42,13 @@ int DatabaseConfigurationInterface::fill(ConfigurationBase* configuration, int v
 }
 
 // write configuration to database
-int DatabaseConfigurationInterface::saveActiveVersion(const ConfigurationBase* configuration, bool overwrite) const
-    noexcept {
+int DatabaseConfigurationInterface::saveActiveVersion(const ConfigurationBase* configuration, bool overwrite) const noexcept {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
 
   auto versionstring = std::to_string(configuration->getViewVersion());
 
-  auto result = overwrite ? ifc.template overwriteVersion<decltype(configuration), JsonData>(
-                                configuration, versionstring, default_entity)
-                          : ifc.template storeVersion<decltype(configuration), JsonData>(configuration, versionstring,
-                                                                                         default_entity);
+  auto result = overwrite ? ifc.template overwriteVersion<decltype(configuration), JsonData>(configuration, versionstring, default_entity)
+                          : ifc.template storeVersion<decltype(configuration), JsonData>(configuration, versionstring, default_entity);
 
   if (result.first) {
     return 0;
@@ -71,8 +67,7 @@ int DatabaseConfigurationInterface::markActiveVersionReadonly(const Configuratio
 
   auto versionstring = std::to_string(configuration->getViewVersion());
 
-  auto result =
-      ifc.template markVersionReadonly<decltype(configuration), JsonData>(configuration, versionstring, default_entity);
+  auto result = ifc.template markVersionReadonly<decltype(configuration), JsonData>(configuration, versionstring, default_entity);
 
   if (result.first) {
     return 0;
@@ -143,8 +138,7 @@ std::set<std::string /*name*/> DatabaseConfigurationInterface::findAllGlobalConf
 }
 
 // return the contents of a global configuration
-config_version_map_t DatabaseConfigurationInterface::loadGlobalConfiguration(std::string const& configuration) const
-    try {
+config_version_map_t DatabaseConfigurationInterface::loadGlobalConfiguration(std::string const& configuration) const try {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
   auto result = ifc.loadGlobalConfiguration(configuration);
 
@@ -167,8 +161,8 @@ config_version_map_t DatabaseConfigurationInterface::loadGlobalConfiguration(std
 }
 
 // create a new global configuration from the contents map
-void DatabaseConfigurationInterface::storeGlobalConfiguration(config_version_map_t const& configurationMap,
-                                                              std::string const& configuration) const try {
+void DatabaseConfigurationInterface::storeGlobalConfiguration(config_version_map_t const& configurationMap, std::string const& configuration) const
+    try {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
 
   auto to_list = [](auto const& inputMap) {

@@ -136,9 +136,8 @@ bool test_convert2fcl(std::string const& input, std::string const& compare) {
     std::cerr << "File sizes (exp,ret)=(" << std::distance(compare.begin(), compare.end()) << ","
               << std::distance(output.begin(), output.end()) << ")\n";
 
-    std::cerr << "First mismatch at position " << std::distance(compare.begin(), mismatch.first) << ", (exp,ret)=(0x"
-              << std::hex << static_cast<unsigned int>(*mismatch.first) << ",0x"
-              << static_cast<unsigned int>(*mismatch.second) << ")\n";
+    std::cerr << "First mismatch at position " << std::distance(compare.begin(), mismatch.first) << ", (exp,ret)=(0x" << std::hex
+              << static_cast<unsigned int>(*mismatch.first) << ",0x" << static_cast<unsigned int>(*mismatch.second) << ")\n";
   }
 
   return false;
@@ -219,9 +218,8 @@ bool test_roundconvertfcl(std::string const& input, std::string const& compare) 
     std::cerr << "File sizes (exp,ret)=(" << std::distance(compare.begin(), compare.end()) << ","
               << std::distance(output.begin(), output.end()) << ")\n";
 
-    std::cerr << "First mismatch at position " << std::distance(compare.begin(), mismatch.first) << ", (exp,ret)=(0x"
-              << std::hex << static_cast<unsigned int>(*mismatch.first) << ",0x"
-              << static_cast<unsigned int>(*mismatch.second) << ")\n";
+    std::cerr << "First mismatch at position " << std::distance(compare.begin(), mismatch.first) << ", (exp,ret)=(0x" << std::hex
+              << static_cast<unsigned int>(*mismatch.first) << ",0x" << static_cast<unsigned int>(*mismatch.second) << ")\n";
   }
 
   return false;

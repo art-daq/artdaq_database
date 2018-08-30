@@ -60,8 +60,7 @@ result_t ovlUpdate::operator==(ovlUpdate const& other) const {
   auto result = _timestamp == other._timestamp;
 
   if (!result.first) {
-    oss << "\n  Timestamps are different: self,other=" << quoted_(_timestamp.timestamp()) << ","
-        << quoted_(other._timestamp.timestamp());
+    oss << "\n  Timestamps are different: self,other=" << quoted_(_timestamp.timestamp()) << "," << quoted_(other._timestamp.timestamp());
   }
 
   if (name() != other.name()) {

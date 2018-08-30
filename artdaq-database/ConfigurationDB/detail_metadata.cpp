@@ -60,10 +60,9 @@ void list_databases(Options const& options, std::string& configs) {
   TLOG(21) << "list_databases: valid";
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_listdatabases_t>{
-        {apiliteral::provider::mongo, cf::mongo::listDatabases},
-        {apiliteral::provider::filesystem, cf::filesystem::listDatabases},
-        {apiliteral::provider::ucon, cf::ucon::listDatabases}};
+    auto providers = std::map<std::string, provider_listdatabases_t>{{apiliteral::provider::mongo, cf::mongo::listDatabases},
+                                                                     {apiliteral::provider::filesystem, cf::filesystem::listDatabases},
+                                                                     {apiliteral::provider::ucon, cf::ucon::listDatabases}};
 
     TLOG(21) << "list_databases: end";
 
@@ -81,30 +80,30 @@ void list_databases(Options const& options, std::string& configs) {
     case data_format_t::json:
     case data_format_t::unknown:
     case data_format_t::fhicl:
-    case data_format_t::xml:{
-      throw runtime_error("list_databases") << "Unsupported data format.";      
+    case data_format_t::xml: {
+      throw runtime_error("list_databases") << "Unsupported data format.";
     }
 
     case data_format_t::gui: {
-      std::ostringstream oss;      
+      std::ostringstream oss;
       oss << "{ \"search\": [\n";
-      for (auto const& search_result : search_results){
-	oss << search_result << ",";
+      for (auto const& search_result : search_results) {
+        oss << search_result << ",";
       }
 
       oss.seekp(-1, oss.cur);
-      oss << "] }";      
+      oss << "] }";
       returnValue = oss.str();
       returnValueChanged = true;
       break;
     }
 
     case data_format_t::csv: {
-      std::ostringstream oss;      
-      for (auto const& search_result : search_results){
-	oss << search_result.value_as<std::string>(apiliteral::name) << ",";
+      std::ostringstream oss;
+      for (auto const& search_result : search_results) {
+        oss << search_result.value_as<std::string>(apiliteral::name) << ",";
       }
-      
+
       returnValue = oss.str();
 
       if (returnValue.back() == ',') {
@@ -132,10 +131,9 @@ void read_dbinfo(Options const& options, std::string& filters) {
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers =
-        std::map<std::string, provider_readdbinfo_t>{{apiliteral::provider::mongo, cf::mongo::readDbInfo},
-                                                     {apiliteral::provider::filesystem, cf::filesystem::readDbInfo},
-                                                     {apiliteral::provider::ucon, cf::ucon::readDbInfo}};
+    auto providers = std::map<std::string, provider_readdbinfo_t>{{apiliteral::provider::mongo, cf::mongo::readDbInfo},
+                                                                  {apiliteral::provider::filesystem, cf::filesystem::readDbInfo},
+                                                                  {apiliteral::provider::ucon, cf::ucon::readDbInfo}};
 
     return providers.at(name);
   };
@@ -182,10 +180,9 @@ void list_collections(Options const& options, std::string& collections) {
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_listcollections_t>{
-        {apiliteral::provider::mongo, cf::mongo::listCollections},
-        {apiliteral::provider::filesystem, cf::filesystem::listCollections},
-        {apiliteral::provider::ucon, cf::ucon::listCollections}};
+    auto providers = std::map<std::string, provider_listcollections_t>{{apiliteral::provider::mongo, cf::mongo::listCollections},
+                                                                       {apiliteral::provider::filesystem, cf::filesystem::listCollections},
+                                                                       {apiliteral::provider::ucon, cf::ucon::listCollections}};
 
     return providers.at(name);
   };
@@ -206,26 +203,26 @@ void list_collections(Options const& options, std::string& collections) {
       break;
     }
 
-   case data_format_t::gui: {
-      std::ostringstream oss;      
+    case data_format_t::gui: {
+      std::ostringstream oss;
       oss << "{ \"search\": [\n";
-      for (auto const& search_result : search_results){
-	oss << search_result << ",";
+      for (auto const& search_result : search_results) {
+        oss << search_result << ",";
       }
 
       oss.seekp(-1, oss.cur);
-      oss << "] }";      
+      oss << "] }";
       returnValue = oss.str();
       returnValueChanged = true;
       break;
     }
 
     case data_format_t::csv: {
-      std::ostringstream oss;      
-      for (auto const& search_result : search_results){
-	oss << search_result.value_as<std::string>(apiliteral::name) << ",";
+      std::ostringstream oss;
+      for (auto const& search_result : search_results) {
+        oss << search_result.value_as<std::string>(apiliteral::name) << ",";
       }
-      
+
       returnValue = oss.str();
 
       if (returnValue.back() == ',') {

@@ -28,7 +28,5 @@ std::string ovlTimeStamp::to_string() const {
 }
 
 result_t ovlTimeStamp::operator==(ovlTimeStamp const& other) const {
-  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_TIMESTAMPS) == DOCUMENT_COMPARE_MUTE_TIMESTAMPS)
-             ? Success()
-             : self() == other.self();
+  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_TIMESTAMPS) == DOCUMENT_COMPARE_MUTE_TIMESTAMPS) ? Success() : self() == other.self();
 }

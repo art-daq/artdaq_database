@@ -57,16 +57,13 @@ bpo::options_description BulkOperations::makeProgramOptions() const {
 
   bpo::options_description opts = descstr.str();
 
-  auto make_opt_name = [](auto& long_name, auto& short_name) {
-    return std::string{long_name}.append(",").append(short_name);
-  };
+  auto make_opt_name = [](auto& long_name, auto& short_name) { return std::string{long_name}.append(",").append(short_name); };
 
   opts.add_options()("help,h", "Produce help message");
 
   opts.add_options()(apiliteral::option::bulkoperations, bpo::value<std::string>(), "BulkOperations json");
 
-  opts.add_options()(make_opt_name(apiliteral::option::result, "x").c_str(), bpo::value<std::string>(),
-                     "Expected result file name");
+  opts.add_options()(make_opt_name(apiliteral::option::result, "x").c_str(), bpo::value<std::string>(), "Expected result file name");
 
   return opts;
 }

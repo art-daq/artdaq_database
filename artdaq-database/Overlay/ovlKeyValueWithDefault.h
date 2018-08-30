@@ -31,8 +31,7 @@ class ovlKeyValueWithDefault : public ovlKeyValue {
 };
 
 template <std::uint32_t mask>
-ovlKeyValueWithDefault<mask>::ovlKeyValueWithDefault(object_t::key_type const& key, value_t& value)
-    : ovlKeyValue(key, value), _initOK(init(value)) {}
+ovlKeyValueWithDefault<mask>::ovlKeyValueWithDefault(object_t::key_type const& key, value_t& value) : ovlKeyValue(key, value), _initOK(init(value)) {}
 
 template <std::uint32_t mask>
 bool ovlKeyValueWithDefault<mask>::init(value_t& parent) try {

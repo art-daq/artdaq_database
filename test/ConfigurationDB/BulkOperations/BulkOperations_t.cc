@@ -140,9 +140,8 @@ int main(int argc, char* argv[]) try {
   std::cout << "File sizes (exp,ret)=(" << std::distance(expected.begin(), expected.end()) << ","
             << std::distance(returned.begin(), returned.end()) << ")\n";
 
-  std::cout << "First mismatch at position " << std::distance(expected.begin(), mismatch.first) << ", (exp,ret)=(0x"
-            << std::hex << static_cast<unsigned int>(*mismatch.first) << ",0x"
-            << static_cast<unsigned int>(*mismatch.second) << ")\n";
+  std::cout << "First mismatch at position " << std::distance(expected.begin(), mismatch.first) << ", (exp,ret)=(0x" << std::hex
+            << static_cast<unsigned int>(*mismatch.first) << ",0x" << static_cast<unsigned int>(*mismatch.second) << ")\n";
 
   auto file_out_name = std::string(db::filesystem::mkdir(tmpdir))
                            .append("/")

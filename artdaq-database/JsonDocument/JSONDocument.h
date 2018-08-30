@@ -46,10 +46,9 @@ class JSONDocument final {
   std::string to_string() const;
   bool empty() const;
 
-  operator std::string() const; 
-  
+  operator std::string() const;
+
   std::string value() { return JSONDocument::value(self()); }
-  
 
   bool equals(JSONDocument const&) const;
 
@@ -113,13 +112,13 @@ std::vector<path_t> split_path(path_t const&);
 }  // namespace artdaq
 
 namespace {
-template<>
-inline TraceStreamer& TraceStreamer::operator<<(const artdaq::database::docrecord::JSONDocument& r)
-{
-  std::ostringstream s; s << r; msg_append(s.str().c_str());
+template <>
+inline TraceStreamer& TraceStreamer::operator<<(const artdaq::database::docrecord::JSONDocument& r) {
+  std::ostringstream s;
+  s << r;
+  msg_append(s.str().c_str());
   return *this;
 }
-}
-
+}  // namespace
 
 #endif /* _ARTDAQ_DATABASE_JSONUTILS_JSONDOCUMENT_H_ */

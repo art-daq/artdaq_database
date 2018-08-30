@@ -66,11 +66,9 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
     auto regex = std::regex{"(#include\\s)([^'\"]*)"};
 
     TLOG(23) << "read_data() regex includes begin";
-    
+
     std::for_each(std::sregex_iterator(conf.begin(), conf.end(), regex), std::sregex_iterator(),
-                  [&conf, &idx](auto& m) {
-                    conf.replace(m.position(), m.length(), "fhicl_pound_include_" + std::to_string(idx++) + ":");
-                  });
+                  [&conf, &idx](auto& m) { conf.replace(m.position(), m.length(), "fhicl_pound_include_" + std::to_string(idx++) + ":"); });
     TLOG(24) << "read_data() regex includes end";
 
     ::fhicl::intermediate_table fhicl_table;
@@ -78,7 +76,7 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
     ::shims::isSnippetMode(true);
 
     TLOG(25) << "read_data() parse_document begin";
-    
+
     ::fhicl::parse_document(conf, fhicl_table);
 
     TLOG(26) << "read_data() parse_document end";
@@ -98,7 +96,7 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
       //      "}.append(literal::prolog);
 
       auto& metadata = make_SubNode(prolog, literal::children);
-      
+
       TLOG(28) << "read_data() convert prolog begin";
 
       for (auto const& fhicl_element : fhicl_table) {
@@ -109,7 +107,6 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
         }
       }
       TLOG(29) << "read_data() convert prolog end";
-      
     }
 
     {  // convert main section
@@ -125,7 +122,7 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
       //      "}.append(literal::main);
 
       auto& metadata = make_SubNode(main, literal::children);
-      
+
       TLOG(30) << "read_data() convert main begin";
 
       for (auto const& fhicl_element : fhicl_table) {
@@ -136,7 +133,6 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
         }
       }
       TLOG(31) << "read_data() convert main end";
-      
     }
 
     json_object.swap(object);
@@ -172,7 +168,7 @@ bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
     auto end = pos_iterator_t(in.end());
 
     auto comments = comments_t();
-    
+
     TLOG(42) << "read_comments() phrase_parse begin";
     auto result = phrase_parse(start, end, grammar, blank, comments);
     TLOG(43) << "read_comments() phrase_parse end";
@@ -183,7 +179,7 @@ bool FhiclReader::read_comments(std::string const& in, jsn::array_t& json_array)
     }
 
     auto array = jsn::array_t();
-    
+
     TLOG(44) << "read_comments() integrate comments begin";
 
     for (auto const& comment : comments) {

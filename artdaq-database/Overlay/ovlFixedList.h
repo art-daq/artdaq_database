@@ -142,13 +142,13 @@ result_t ovlFixedList<T, mask>::operator==(ovlFixedList const& other) const {
   if (_list.size() != other._list.size())
     oss << "\n  Entry " << key() << " have different size: self,other=" << _list.size() << "," << other._list.size();
 
-  if (oss.tellp() == noerror_pos && std::equal(_list.cbegin(), _list.end(), other._list.cbegin(),
-                                               [&oss](auto const& first, auto const& second) -> bool {
-                                                 auto result = first == second;
-                                                 if (result.first) return true;
-                                                 oss << result.second;
-                                                 return false;
-                                               }))
+  if (oss.tellp() == noerror_pos &&
+      std::equal(_list.cbegin(), _list.end(), other._list.cbegin(), [&oss](auto const& first, auto const& second) -> bool {
+        auto result = first == second;
+        if (result.first) return true;
+        oss << result.second;
+        return false;
+      }))
     return Success();
   else
     oss << "\n  Entry lists are different";

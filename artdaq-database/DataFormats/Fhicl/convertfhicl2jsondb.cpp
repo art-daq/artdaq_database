@@ -118,8 +118,8 @@ fcl2jsondb::operator datapair_t() try {
 
   if (value.protection != ::fhicl::Protection::NONE) {
     object[literal::protection] = fcl::protection_as_string(value.protection);
-    TLOG(13) << "fcl2jsondb() value type=<" << fcl::tag_as_string(value.tag) << ">, protection=<"
-             << fcl::protection_as_string(value.protection) << ">";
+    TLOG(13) << "fcl2jsondb() value type=<" << fcl::tag_as_string(value.tag) << ">, protection=<" << fcl::protection_as_string(value.protection)
+             << ">";
   }
 
   switch (value.tag) {
@@ -201,8 +201,7 @@ fcl2jsondb::operator datapair_t() try {
   throw ::fhicl::exception(::fhicl::cant_insert, self.first) << e.what();
 }
 
-json2fcldb::json2fcldb(args_tuple_t args)
-    : self{std::get<0>(args)}, parent{std::get<1>(args)}, opts{std::get<2>(args)} {}
+json2fcldb::json2fcldb(args_tuple_t args) : self{std::get<0>(args)}, parent{std::get<1>(args)}, opts{std::get<2>(args)} {}
 
 json2fcldb::operator fcl::value_t() try {
   auto const& self_value = std::get<1>(self);
@@ -366,8 +365,7 @@ json2fcldb::operator fcl::atom_t() try {
     }
   }
 
-  auto fcl_key = fcl::key_t(
-      name, (comment.find("#include ") == std::string::npos ? comment : std::string{apiliteral::nullstring}));
+  auto fcl_key = fcl::key_t(name, (comment.find("#include ") == std::string::npos ? comment : std::string{apiliteral::nullstring}));
 
   if (type != ::fhicl::TABLE && !override_comment) {  // table does not have annotation
     fcl_value.annotation = fcl::from_json_string(boost::get<std::string>(metadata_object.at(literal::annotation)));

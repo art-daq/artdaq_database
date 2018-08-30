@@ -38,11 +38,12 @@ std::ostream& operator<<(std::ostream&, artdaq::database::basictypes::FhiclData 
 }  // namespace artdaq
 
 namespace {
-template<>
-inline TraceStreamer& TraceStreamer::operator<<(const artdaq::database::basictypes::FhiclData& r)
-{
-  std::ostringstream s; s << r; msg_append(s.str().c_str());
+template <>
+inline TraceStreamer& TraceStreamer::operator<<(const artdaq::database::basictypes::FhiclData& r) {
+  std::ostringstream s;
+  s << r;
+  msg_append(s.str().c_str());
   return *this;
 }
-}
+}  // namespace
 #endif /* _ARTDAQ_DATABASE_BASICTYPES_FHICL_H_ */

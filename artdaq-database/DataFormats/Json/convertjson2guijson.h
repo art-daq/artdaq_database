@@ -75,8 +75,7 @@ class json_node_t final {
       return boost::get<T&>(value);
     } else if (_any.which() == 1) {
       auto& value = boost::get<json_any_cref_t>(_any);
-      TLOG(12) << "json_node_t() value_as() const any.which()=" << _any.which()
-               << " const value.which()=" << value.which();
+      TLOG(12) << "json_node_t() value_as() const any.which()=" << _any.which() << " const value.which()=" << value.which();
 
       return boost::get<T const&>(value);
     }
@@ -105,8 +104,8 @@ class json_node_t final {
     auto const node_name = unwrap(o).template value_as<const std::string>(literal::name);
     auto const node_type = unwrap(o).template value_as<const std::string>(literal::type);
 
-    TLOG(26) << "json_node_t() makeChild() node_name=<" << node_name << ">, node_type=<" << node_type
-             << ">, this->type()=<" << jsn::to_string(type()) << ">";
+    TLOG(26) << "json_node_t() makeChild() node_name=<" << node_name << ">, node_type=<" << node_type << ">, this->type()=<" << jsn::to_string(type())
+             << ">";
 
     if (type() == type_t::OBJECT) {
       object_t& object = value_as<object_t>();
@@ -181,8 +180,7 @@ json_node_t json_node_t::make_json_node(T const& t) {
 
 class db2gui final {
  public:
-  explicit db2gui(json_node_t data_node, json_node_t metadata_node)
-      : _data_node{std::move(data_node)}, _metadata_node{std::move(metadata_node)} {}
+  explicit db2gui(json_node_t data_node, json_node_t metadata_node) : _data_node{std::move(data_node)}, _metadata_node{std::move(metadata_node)} {}
 
   void operator()(json_node_t&) const;
 

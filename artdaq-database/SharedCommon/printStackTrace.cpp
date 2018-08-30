@@ -166,8 +166,8 @@ void terminateHandler() {
       char funcname[1024];
       int status = 0;
 
-      TLOG(11) << "Terminate called after throwing an instance of \'"
-               << abi::__cxa_demangle(typeid(ex).name(), funcname, &funcnamesize, &status) << "\'";
+      TLOG(11) << "Terminate called after throwing an instance of \'" << abi::__cxa_demangle(typeid(ex).name(), funcname, &funcnamesize, &status)
+               << "\'";
 
       TLOG(11) << " what(): " << ex.what();
 

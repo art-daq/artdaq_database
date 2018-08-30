@@ -147,8 +147,8 @@ object_id_t StorageProvider<JSONDocument, FileSystemDB>::writeDocument(JSONDocum
 
   if (isNew) {
     if (dbfs::check_if_file_exists(filename)) {
-      throw runtime_error("FileSystemDB") << "FileSystemDB failed inserting data, document already exist; filename= <"
-                                          << filename << ">, filter= <" << filter_document << ">";
+      throw runtime_error("FileSystemDB") << "FileSystemDB failed inserting data, document already exist; filename= <" << filename << ">, filter= <"
+                                          << filter_document << ">";
     }
   }
 

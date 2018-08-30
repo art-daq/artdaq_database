@@ -59,10 +59,9 @@ void assign_configuration(Options const& options, std::string& configs) {
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers =
-        std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::assignConfiguration},
-                                               {apiliteral::provider::filesystem, cf::filesystem::assignConfiguration},
-                                               {apiliteral::provider::ucon, cf::ucon::assignConfiguration}};
+    auto providers = std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::assignConfiguration},
+                                                            {apiliteral::provider::filesystem, cf::filesystem::assignConfiguration},
+                                                            {apiliteral::provider::ucon, cf::ucon::assignConfiguration}};
 
     return providers.at(name);
   };
@@ -106,10 +105,9 @@ void remove_configuration(Options const& options, std::string& configs) {
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers =
-        std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::removeConfiguration},
-                                               {apiliteral::provider::filesystem, cf::filesystem::removeConfiguration},
-                                               {apiliteral::provider::ucon, cf::ucon::removeConfiguration}};
+    auto providers = std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::removeConfiguration},
+                                                            {apiliteral::provider::filesystem, cf::filesystem::removeConfiguration},
+                                                            {apiliteral::provider::ucon, cf::ucon::removeConfiguration}};
 
     return providers.at(name);
   };
@@ -191,10 +189,9 @@ void find_configurations(Options const& options, std::string& configs) {
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers =
-        std::map<std::string, provider_call_returnslist_t>{{apiliteral::provider::mongo, cf::mongo::findConfigurations},
-                                               {apiliteral::provider::filesystem, cf::filesystem::findConfigurations},
-                                               {apiliteral::provider::ucon, cf::ucon::findConfigurations}};
+    auto providers = std::map<std::string, provider_call_returnslist_t>{{apiliteral::provider::mongo, cf::mongo::findConfigurations},
+                                                                        {apiliteral::provider::filesystem, cf::filesystem::findConfigurations},
+                                                                        {apiliteral::provider::ucon, cf::ucon::findConfigurations}};
 
     return providers.at(name);
   };
@@ -211,30 +208,30 @@ void find_configurations(Options const& options, std::string& configs) {
     case data_format_t::unknown:
     case data_format_t::fhicl:
     case data_format_t::xml: {
-        throw runtime_error("find_configurations") << "Unsupported data format.";
+      throw runtime_error("find_configurations") << "Unsupported data format.";
       break;
     }
 
-       case data_format_t::gui: {
-      std::ostringstream oss;      
+    case data_format_t::gui: {
+      std::ostringstream oss;
       oss << "{ \"search\": [\n";
-      for (auto const& search_result : search_results){
-	oss << search_result << ",";
+      for (auto const& search_result : search_results) {
+        oss << search_result << ",";
       }
 
       oss.seekp(-1, oss.cur);
-      oss << "] }";      
+      oss << "] }";
       returnValue = oss.str();
       returnValueChanged = true;
       break;
     }
 
     case data_format_t::csv: {
-      std::ostringstream oss;      
-      for (auto const& search_result : search_results){
-	oss << search_result.value_as<std::string>(apiliteral::name) << ",";
+      std::ostringstream oss;
+      for (auto const& search_result : search_results) {
+        oss << search_result.value_as<std::string>(apiliteral::name) << ",";
       }
-      
+
       returnValue = oss.str();
 
       if (returnValue.back() == ',') {
@@ -262,10 +259,9 @@ void configuration_composition(Options const& options, std::string& filters) {
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_call_t>{
-        {apiliteral::provider::mongo, cf::mongo::configurationComposition},
-        {apiliteral::provider::filesystem, cf::filesystem::configurationComposition},
-        {apiliteral::provider::ucon, cf::ucon::configurationComposition}};
+    auto providers = std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::configurationComposition},
+                                                            {apiliteral::provider::filesystem, cf::filesystem::configurationComposition},
+                                                            {apiliteral::provider::ucon, cf::ucon::configurationComposition}};
 
     return providers.at(name);
   };

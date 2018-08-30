@@ -25,14 +25,13 @@ int main(int argc, char* argv[]) {
   artdaq::database::useFakeTime(true);
 
   std::ostringstream descstr;
-  descstr << argv[0]
-          << " <-s <source-file>> <-c <compare-with-file>> <-t <test-name>> (available test names: xml2json,json2xml)";
+  descstr << argv[0] << " <-s <source-file>> <-c <compare-with-file>> <-t <test-name>> (available test names: xml2json,json2xml)";
 
   bpo::options_description desc = descstr.str();
 
   desc.add_options()("source,s", bpo::value<std::string>(), "Input source file.")(
-      "compare,c", bpo::value<std::string>(), "Expected result of convertion.")(
-      "testname,t", bpo::value<std::string>(), "Test name.")("help,h", "produce help message");
+      "compare,c", bpo::value<std::string>(), "Expected result of convertion.")("testname,t", bpo::value<std::string>(),
+                                                                                "Test name.")("help,h", "produce help message");
 
   bpo::variables_map vm;
 
@@ -83,8 +82,7 @@ int main(int argc, char* argv[]) {
   std::string compare((std::istreambuf_iterator<char>(is2)), std::istreambuf_iterator<char>());
 
   auto runTest = [](std::string const& name) {
-    auto tests =
-        std::map<std::string, test_case>{{"xml2json", test_convertxml2json}, {"json2xml", test_convertjson2xml}};
+    auto tests = std::map<std::string, test_case>{{"xml2json", test_convertxml2json}, {"json2xml", test_convertjson2xml}};
 
     std::cout << "Running test:<" << name << ">\n";
 

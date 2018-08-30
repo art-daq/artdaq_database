@@ -25,8 +25,8 @@ namespace db = artdaq::database;
 namespace jsonliteral = db::dataformats::literal;
 
 using artdaq::database::configuration::options::data_format_t;
-using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocument;
+using artdaq::database::docrecord::JSONDocumentBuilder;
 
 namespace artdaq {
 namespace database {
@@ -374,9 +374,7 @@ result_t json::read_configuration(std::string const& query_payload, std::string&
     for (auto const& confElement : confArray) {
       auto configuration = std::string{};
 
-      if (!jsn::JsonWriter{}.write(
-              boost::get<jsn::object_t>(boost::get<jsn::object_t>(confElement).at(jsonliteral::query)),
-              configuration)) {
+      if (!jsn::JsonWriter{}.write(boost::get<jsn::object_t>(boost::get<jsn::object_t>(confElement).at(jsonliteral::query)), configuration)) {
         throw runtime_error("read_configuration") << "read_configuration: Unable to write configuration";
       }
 
@@ -480,8 +478,7 @@ result_t json::export_collection(std::string const& query_payload) noexcept {
       oss << file_name << "/" << JSONDocumentBuilder{document}.getObjectOUID() << ".json";
 
       if (!db::write_buffer_to_file(document.to_string(), oss.str())) {
-        throw runtime_error("export_collection")
-            << "export_collection: Unable to write a json file; file=" << oss.str();
+        throw runtime_error("export_collection") << "export_collection: Unable to write a json file; file=" << oss.str();
       }
     }
 

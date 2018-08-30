@@ -25,8 +25,7 @@ class ovlKeyValueWithMask : public ovlKeyValue {
 };
 
 template <std::uint32_t mask>
-ovlKeyValueWithMask<mask>::ovlKeyValueWithMask(object_t::key_type const& key, value_t& value)
-    : ovlKeyValue(key, value) {}
+ovlKeyValueWithMask<mask>::ovlKeyValueWithMask(object_t::key_type const& key, value_t& value) : ovlKeyValue(key, value) {}
 
 template <std::uint32_t mask>
 result_t ovlKeyValueWithMask<mask>::operator==(ovlKeyValueWithMask const& other) const {

@@ -21,8 +21,8 @@ using artdaq::database::json::JsonReader;
 using artdaq::database::json::JsonWriter;
 
 using artdaq::database::Failure;
-using artdaq::database::Success;
 using artdaq::database::result_t;
+using artdaq::database::Success;
 
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
@@ -165,19 +165,31 @@ std::string JSONDocument::writeJson() const {
   return json;
 }
 
-std::string JSONDocument::to_string() const { if (_isDirty) {_cached_json_buffer = writeJson(); _isDirty=false;} return _cached_json_buffer; }
+std::string JSONDocument::to_string() const {
+  if (_isDirty) {
+    _cached_json_buffer = writeJson();
+    _isDirty = false;
+  }
+  return _cached_json_buffer;
+}
 
-JSONDocument::operator std::string() const {if (_isDirty) {_cached_json_buffer = writeJson(); _isDirty=false;} return _cached_json_buffer;}
+JSONDocument::operator std::string() const {
+  if (_isDirty) {
+    _cached_json_buffer = writeJson();
+    _isDirty = false;
+  }
+  return _cached_json_buffer;
+}
 
 bool JSONDocument::empty() const { return _value.empty(); }
 
 JSONDocument::JSONDocument(JsonData const& data) : _value{readJson(data)}, _cached_json_buffer(jsonliteral::empty_json), _isDirty(true) {}
 
-JSONDocument::JSONDocument(std::string const& json) : _value{readJson(json)}, _cached_json_buffer(jsonliteral::empty_json),_isDirty(true) {}
+JSONDocument::JSONDocument(std::string const& json) : _value{readJson(json)}, _cached_json_buffer(jsonliteral::empty_json), _isDirty(true) {}
 
-JSONDocument::JSONDocument(value_t value) : _value{std::move(value)}, _cached_json_buffer(jsonliteral::empty_json), _isDirty(true){}
+JSONDocument::JSONDocument(value_t value) : _value{std::move(value)}, _cached_json_buffer(jsonliteral::empty_json), _isDirty(true) {}
 
-JSONDocument::JSONDocument() : _value{object_t{}}, _cached_json_buffer(jsonliteral::empty_json), _isDirty(true){}
+JSONDocument::JSONDocument() : _value{object_t{}}, _cached_json_buffer(jsonliteral::empty_json), _isDirty(true) {}
 
 std::string const& JSONDocument::cached_json_buffer() const { return _cached_json_buffer; }
 
@@ -232,8 +244,7 @@ bool JSONDocument::saveToFile(std::string const& fileName) try {
   }
 
   if (boost::filesystem::exists(fileName)) {
-    boost::filesystem::copy_file(fileName, std::string{fileName} + ".bak",
-                                 boost::filesystem::copy_option::overwrite_if_exists);
+    boost::filesystem::copy_file(fileName, std::string{fileName} + ".bak", boost::filesystem::copy_option::overwrite_if_exists);
   }
 
   auto buffer = to_string();
@@ -243,24 +254,23 @@ bool JSONDocument::saveToFile(std::string const& fileName) try {
   throw runtime_error("JSONDocument") << "Failed calling saveToFile(): Caught exception:" << ex.what();
 }
 
-JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument doc) {  
+JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument doc) {
   _overlay.reset(nullptr);
-  
-  auto const document=std::move(doc);
-  
+
+  auto const document = std::move(doc);
+
   TLOG(24) << "createFrom() begin args";
-  
-#ifdef TESTBUILD        
+
+#ifdef TESTBUILD
   TLOG(24) << "createFrom() document=<" << document << ">";
-#endif 
-  
+#endif
+
   _createFromTemplate({std::string{template__empty_document}});
 
   {  // create a new document template using overlay classes
     auto ovl = std::make_unique<ovlDatabaseRecord>(_document._value);
     std::swap(_overlay, ovl);
   }
-
 
   _importUserData(document);
 
@@ -277,10 +287,10 @@ JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument doc) {
 void JSONDocumentBuilder::_importUserData(JSONDocument const& document) {
   TLOG(25) << "_importUserData() begin";
 
-#ifdef TESTBUILD        
+#ifdef TESTBUILD
   TLOG(25) << "_importUserData() document=<" << document << ">";
 #endif
-  
+
   // replace metadata if any
   try {
     auto path = ""s + jsonliteral::document + jsonliteral::dot + jsonliteral::metadata;
@@ -363,9 +373,8 @@ void JSONDocumentBuilder::_importUserData(JSONDocument const& document) {
   } catch (notfound_exception const&) {
     TLOG(38) << "_importUserData() No document.data";
   }
-  
+
   TLOG(25) << "_importUserData() end";
-  
 }
 
 std::string JSONDocument::value(JSONDocument const& document) {
@@ -388,13 +397,11 @@ std::string JSONDocument::value_at(JSONDocument const& document, std::size_t ind
   auto const& valueArray = boost::get<jsn::array_t>(docValue);
 
   if (valueArray.empty()) {
-    throw runtime_error("JSONDocument") << "Failed calling value_at(): valueArray is empty, document=<"
-                                        << document.cached_json_buffer() << ">";
+    throw runtime_error("JSONDocument") << "Failed calling value_at(): valueArray is empty, document=<" << document.cached_json_buffer() << ">";
   }
 
   if (valueArray.size() < index) {
-    throw runtime_error("JSONDocument") << "Failed to call value_at(); not enough elements, document=<"
-                                        << document.cached_json_buffer() << ">";
+    throw runtime_error("JSONDocument") << "Failed to call value_at(); not enough elements, document=<" << document.cached_json_buffer() << ">";
   }
 
   auto pos = valueArray.begin();
@@ -448,5 +455,3 @@ JSONDocument toJSONDocument<string_pair_t>(string_pair_t const& pair) {
 }  // namespace docrecord
 }  // namespace database
 }  // namespace artdaq
-
-
