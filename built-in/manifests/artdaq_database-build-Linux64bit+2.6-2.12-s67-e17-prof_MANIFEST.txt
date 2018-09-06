@@ -1,7 +1,7 @@
 boost                v1_66_0a         boost-1.66.0a-slf6-x86_64-e17-prof.tar.bz2                   -f Linux64bit+2.6-2.12    -q e17:prof       
 cetbuildtools        v7_02_01        cetbuildtools-7.02.01-noarch.tar.bz2                        -f NULL                                       
 cetlib_except        v1_02_00        cetlib_except-1.02.00-slf6-x86_64-e17-prof.tar.bz2          -f Linux64bit+2.6-2.12    -q e17:prof       
-cetlib               v3_03_00        cetlib-3.03.00-slf6-x86_64-e17-prof.tar.bz2                 -f Linux64bit+2.6-2.12    -q e17:prof       
+cetlib               v3_03_00b        cetlib-3.03.00b-slf6-x86_64-e17-prof.tar.bz2                 -f Linux64bit+2.6-2.12    -q e17:prof       
 cetpkgsupport        v1_13_00        cetpkgsupport-1.13.00-noarch.tar.bz2                        -f NULL
 cmake                v3_10_1          cmake-3.10.1-slf6-x86_64.tar.bz2                              -f Linux64bit+2.6-2.12                                                             
 fhiclcpp             v4_06_07        fhiclcpp-4.06.07-slf6-x86_64-e17-prof.tar.bz2               -f Linux64bit+2.6-2.12    -q e17:prof       
