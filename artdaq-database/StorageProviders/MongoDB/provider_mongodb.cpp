@@ -156,24 +156,21 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::findConfigurat
 
         auto tmp_config_name = configuration.find(jsonliteral::name);
         if (tmp_config_name == collectionDescriptor.end()) {
-          throw runtime_error("MongoDB")
-              << "MongoDB returned invalid database search, \"configurations.name\" is missing.";
+          throw runtime_error("MongoDB") << "MongoDB returned invalid database search, \"configurations.name\" is missing.";
         }
 
         auto name = db::replace_all(db::dequote(compat::to_json(tmp_config_name->get_value())), "\\/", "/");
 
         auto tmp_config_assigned = configuration.find(jsonliteral::assigned);
         if (tmp_config_assigned == collectionDescriptor.end()) {
-          throw runtime_error("MongoDB")
-              << "MongoDB returned invalid database search, \"configurations.assigned\" is missing.";
+          throw runtime_error("MongoDB") << "MongoDB returned invalid database search, \"configurations.assigned\" is missing.";
         }
         auto assigned = db::dequote(compat::to_json(tmp_config_assigned->get_value()));
 
         if (configuration_name_expected == name) {
           config_timestamps.clear();
 
-          config_timestamps[name].insert(
-              std::chrono::duration_cast<std::chrono::seconds>(db::to_timepoint(assigned).time_since_epoch()).count());
+          config_timestamps[name].insert(std::chrono::duration_cast<std::chrono::seconds>(db::to_timepoint(assigned).time_since_epoch()).count());
 
           goto exact_match;
         }
@@ -182,8 +179,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::findConfigurat
           continue;
         }
 
-        config_timestamps[name].insert(
-            std::chrono::duration_cast<std::chrono::seconds>(db::to_timepoint(assigned).time_since_epoch()).count());
+        config_timestamps[name].insert(std::chrono::duration_cast<std::chrono::seconds>(db::to_timepoint(assigned).time_since_epoch()).count());
       }
     }
   }
@@ -201,8 +197,7 @@ exact_match:
     // oss << db::quoted_(apiliteral::option::collection) <<":" << db::quoted_(collection_name) << ",";
     oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::mongo) << ",";
     oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
-    oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::confcomposition)
-        << ",";
+    oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::confcomposition) << ",";
     oss << db::quoted_(apiliteral::option::searchfilter) << ":"
         << "{";
     oss << db::quoted_(apiliteral::filter::configurations) << ": " << db::quoted_(cfg.second);
@@ -234,8 +229,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::configurationC
   auto collectionDescriptors = _provider->connection().list_collections(filter.view_document());
 
   for (auto const& collectionDescriptor : collectionDescriptors) {
-    TLOG(15) << "MongoDB::configurationComposition() found collection=<" << compat::to_json(collectionDescriptor)
-             << ">";
+    TLOG(15) << "MongoDB::configurationComposition() found collection=<" << compat::to_json(collectionDescriptor) << ">";
 
     // auto view = collectionDescriptor.view();
     auto element_name = collectionDescriptor.find(jsonliteral::name);
@@ -269,8 +263,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::configurationC
     };
 
     auto configuration_name_expected = compat::to_json(extract_value(apiliteral::filter::configurations));
-    TLOG(15) << "MongoDB::configurationComposition()  configuration_name_expected=<" << configuration_name_expected
-             << ">";
+    TLOG(15) << "MongoDB::configurationComposition()  configuration_name_expected=<" << configuration_name_expected << ">";
 
     mongocxx::pipeline stages;
     bbs::document project_stage;
@@ -319,8 +312,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::configurationC
           oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
           oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::mongo) << ",";
           oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
-          oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument)
-              << ",";
+          oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument) << ",";
           oss << db::quoted_(apiliteral::option::searchfilter) << ":"
               << "{";
           oss << db::quoted_(apiliteral::filter::configurations) << ": " << configuration_name;
@@ -407,8 +399,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::findVersions(J
       oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
       oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::mongo) << ",";
       oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
-      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument)
-          << ",";
+      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument) << ",";
       oss << db::quoted_(apiliteral::option::searchfilter) << ":"
           << "{";
       oss << db::quoted_(apiliteral::filter::version) << ": " << version_name;
@@ -518,8 +509,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::findEntities(J
         oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
         oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::mongo) << ",";
         oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
-        oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::findversions)
-            << ",";
+        oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::findversions) << ",";
         oss << db::quoted_(apiliteral::option::searchfilter) << ":"
             << "{";
         oss << db::quoted_(apiliteral::filter::entities) << ": " << entity_name;

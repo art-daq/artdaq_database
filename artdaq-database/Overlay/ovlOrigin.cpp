@@ -98,8 +98,7 @@ result_t ovlOrigin::operator==(ovlOrigin const& other) const {
   auto result = _created == other._created;
 
   if (!result.first) {
-    oss << "\n  Timestamps are different: self,other=" << quoted_(_created.timestamp()) << ","
-        << quoted_(other._created.timestamp());
+    oss << "\n  Timestamps are different: self,other=" << quoted_(_created.timestamp()) << "," << quoted_(other._created.timestamp());
   }
 
   result = *_rawdatalist == *other._rawdatalist;

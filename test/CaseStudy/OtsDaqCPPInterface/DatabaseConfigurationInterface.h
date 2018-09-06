@@ -45,8 +45,7 @@ class DatabaseConfigurationInterface : public ConfigurationInterface {
   config_version_map_t loadGlobalConfiguration(std::string const& /*configuration*/) const;
 
   // create a new global configuration from the contents map
-  void storeGlobalConfiguration(config_version_map_t const& /*configurationMap*/,
-                                std::string const& /*configuration*/) const;
+  void storeGlobalConfiguration(config_version_map_t const& /*configurationMap*/, std::string const& /*configuration*/) const;
 
  private:
 };

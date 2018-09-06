@@ -76,8 +76,8 @@ std::chrono::system_clock::time_point db::to_timepoint(std::string const& strtim
     return std::chrono::system_clock::from_time_t(std::mktime(&timeinfo)) + milliseconds;
   }
 
-  throw std::invalid_argument(std::string("Failed calling to_timepoint(): format mismatch; format=<") +
-                              apiliteral::timestamp_format + ">, timestamp=<" + strtime + ">");
+  throw std::invalid_argument(std::string("Failed calling to_timepoint(): format mismatch; format=<") + apiliteral::timestamp_format +
+                              ">, timestamp=<" + strtime + ">");
 }
 
 std::string db::confirm_iso8601_timestamp(std::string const& strtime) {
@@ -183,7 +183,7 @@ std::string db::generate_oid() {
 
   oid.erase(std::remove(oid.begin(), oid.end(), '-'), oid.end());
   oid.resize(24);
-  
+
   TLOG(12) << "generate_oid() end";
 
   return oid;
@@ -270,7 +270,6 @@ db::object_id_t db::extract_oid(std::string const& filter) {
   match.erase(match.find_last_not_of(" \n\r\t") + 1);
 
   auto dequote = [](auto s) {
-
     if (s[0] == '"' && s[s.length() - 1] == '"') {
       return s.substr(1, s.length() - 2);
     }
@@ -286,9 +285,8 @@ db::object_id_t db::extract_oid(std::string const& filter) {
 
 std::string db::trim(std::string const& s) {
   auto wsfront = std::find_if_not(s.begin(), s.end(), [](int c) { return std::isspace(c); });
-  return std::string(wsfront, std::find_if_not(s.rbegin(), std::string::const_reverse_iterator(wsfront),
-                                               [](int c) { return std::isspace(c); })
-                                  .base());
+  return std::string(wsfront,
+                     std::find_if_not(s.rbegin(), std::string::const_reverse_iterator(wsfront), [](int c) { return std::isspace(c); }).base());
 }
 
 std::string db::to_lower(std::string const& c) {

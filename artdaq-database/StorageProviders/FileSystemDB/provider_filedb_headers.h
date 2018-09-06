@@ -5,8 +5,8 @@
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb_index.h"
 #include "artdaq-database/StorageProviders/common.h"
 
-#include "artdaq-database/SharedCommon/sharedcommon_common.h"
 #include "artdaq-database/DataFormats/shared_literals.h"
+#include "artdaq-database/SharedCommon/sharedcommon_common.h"
 
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 

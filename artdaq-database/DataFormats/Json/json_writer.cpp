@@ -21,7 +21,7 @@ bool JsonWriter::write(object_t const& ast, std::string& out) {
   auto result = bool(false);
   auto buffer = std::string();
   buffer.reserve(10000);
-  
+
   auto sink = std::back_insert_iterator<std::string>(buffer);
 
   json_generator_grammar<decltype(sink)> grammar;
@@ -35,10 +35,10 @@ bool JsonWriter::write(object_t const& ast, std::string& out) {
   }
   TLOG(22) << "write() out=<" << out << ">";
 
-  if(out.size()>512){   
-      TLOG(23) << "heavy write() " << debug::getStackTrace();
+  if (out.size() > 512) {
+    TLOG(23) << "heavy write() " << debug::getStackTrace();
   }
-  
+
   TLOG(24) << "write() end ";
   return result;
 }

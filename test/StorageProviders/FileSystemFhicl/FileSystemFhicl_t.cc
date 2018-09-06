@@ -19,10 +19,8 @@ using test_case = bool (*)(const std::string&, const std::string&, const std::st
 
 bool test_insert(std::string const& /*source_fcl*/, std::string const& /*compare_fcl*/, std::string const& /*filter*/);
 bool test_search1(std::string const& /*source_fcl*/, std::string const& /*compare_fcl*/, std::string const& /*filter*/);
-bool test_search2(std::string const& /*source_fcl*/, std::string const& /*compare_fcl*/,
-                  std::string const& /*options*/);
-bool test_update(std::string const& /*source_fcl*/, std::string const& /*compare_fcl*/,
-                 std::string const& /*update_fcl*/);
+bool test_search2(std::string const& /*source_fcl*/, std::string const& /*compare_fcl*/, std::string const& /*options*/);
+bool test_update(std::string const& /*source_fcl*/, std::string const& /*compare_fcl*/, std::string const& /*update_fcl*/);
 
 int main(int argc, char* argv[]) try {
   artdaq::database::filesystem::debug::enable();
@@ -39,9 +37,8 @@ int main(int argc, char* argv[]) try {
   bpo::options_description desc = descstr.str();
 
   desc.add_options()("source,s", bpo::value<std::string>(), "Input source file.")(
-      "compare,c", bpo::value<std::string>(), "Expected result.")("testname,t", bpo::value<std::string>(),
-                                                                  "Test name.")("options,o", bpo::value<std::string>(),
-                                                                                "Test options file.")
+      "compare,c", bpo::value<std::string>(), "Expected result.")("testname,t", bpo::value<std::string>(), "Test name.")(
+      "options,o", bpo::value<std::string>(), "Test options file.")
 
       ("help,h", "produce help message");
 
@@ -145,8 +142,7 @@ bool test_insert(std::string const& source_fcl, std::string const& compare_fcl, 
 
   auto object_id = provider->writeDocument(json);
 
-  auto search =
-      JSONDocument{"{\"filter\":" + (filter.empty() ? object_id : filter) + ", \"collection\":\"" + collection + "\"}"};
+  auto search = JSONDocument{"{\"filter\":" + (filter.empty() ? object_id : filter) + ", \"collection\":\"" + collection + "\"}"};
 
   std::cout << "Search criteria " << search << "\n";
 
@@ -211,8 +207,7 @@ bool test_search1(std::string const& source_fcl, std::string const& compare_fcl,
 
   auto object_id = provider->writeDocument(json);
 
-  auto search =
-      JSONDocument{"{\"filter\":" + (filter.empty() ? object_id : filter) + ", \"collection\":\"" + collection + "\"}"};
+  auto search = JSONDocument{"{\"filter\":" + (filter.empty() ? object_id : filter) + ", \"collection\":\"" + collection + "\"}"};
 
   std::cout << "Search criteria " << search << "\n";
 
@@ -248,8 +243,7 @@ bool test_search1(std::string const& source_fcl, std::string const& compare_fcl,
   return false;
 }
 
-bool test_search2(std::string const& source_fcl, std::string const& compare_fcl,
-                  std::string const& options[[gnu::unused]]) {
+bool test_search2(std::string const& source_fcl, std::string const& compare_fcl, std::string const& options[[gnu::unused]]) {
   confirm(!source_fcl.empty());
   confirm(!compare_fcl.empty());
 
@@ -289,8 +283,7 @@ bool test_search2(std::string const& source_fcl, std::string const& compare_fcl,
 
   auto filter = oss.str();
 
-  auto search =
-      JSONDocument{"{\"filter\":" + (filter.empty() ? options : filter) + ", \"collection\":\"" + collection + "\"}"};
+  auto search = JSONDocument{"{\"filter\":" + (filter.empty() ? options : filter) + ", \"collection\":\"" + collection + "\"}"};
 
   std::cout << "Search criteria " << search << "\n";
 
@@ -358,8 +351,8 @@ bool test_update(std::string const& source_fcl, std::string const& compare_fcl, 
   auto payload = changes.findChild("document");
   found.replaceChild(payload, "document");
 
-  json = JSONDocument{"{\"document\":" + found.to_string() + ", \"filter\":" + object_id + ",\"collection\":\"" +
-                  collection + "\"}"};
+  json = JSONDocument{"{\"document\":" + found.to_string() + ", \"filter\":" + object_id + ",\"collection\":\"" + collection +
+                      "\"}"};
 
   object_id = provider->writeDocument(json);
 

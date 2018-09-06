@@ -147,8 +147,8 @@ object_id_t StorageProvider<JSONDocument, MongoDB>::writeDocument(JSONDocument c
   TLOG(14) << "MongoDB::writeDocument() Found " << found << " document(s).";
 
   if (found > 1) {
-    throw runtime_error("MongoDB") << "MongoDB failed inserting data, search filter is too wide; filter= <"
-                                   << filter_json << ">, returned count=" << found << ".";
+    throw runtime_error("MongoDB") << "MongoDB failed inserting data, search filter is too wide; filter= <" << filter_json
+                                   << ">, returned count=" << found << ".";
   }
   {
     auto user_doc = builder.extract();
@@ -161,8 +161,7 @@ object_id_t StorageProvider<JSONDocument, MongoDB>::writeDocument(JSONDocument c
     TLOG(14) << "MongoDB::writeDocument() Inserted _id=<" << id << ">";
   }
 
-  TLOG(14) << "MongoDB::writeDocument() Deleting documents matching filter=<" << compat::to_json(filter_bsondoc.view())
-           << ">";
+  TLOG(14) << "MongoDB::writeDocument() Deleting documents matching filter=<" << compat::to_json(filter_bsondoc.view()) << ">";
 
   auto result = collection.delete_one(filter_bsondoc.view());
 

@@ -53,16 +53,14 @@ value_t const& JSONDocument::findChildValue(path_t const& path) const try {
 
   auto tmpJson = std::string{};
 
-  std::function<value_t const&(value_t const&, std::size_t)> recurse = [&](value_t const& childValue,
-                                                                           std::size_t currentDepth) -> value_t const& {
+  std::function<value_t const&(value_t const&, std::size_t)> recurse = [&](value_t const& childValue, std::size_t currentDepth) -> value_t const& {
     TLOG(21) << "findChildValue() recurse() args currentDepth=" << currentDepth;
 
     auto const& path_token = path_tokens.at(currentDepth);
 
     if (type(childValue) != type_t::OBJECT) {
-      throw notfound_exception("JSONDocument")
-          << "Failed calling findChildValue(): Search failed for JSON element name=" << path_token
-          << ", findChildValue() recurse() value_t is not object_t; value=" << print_visitor(childValue);
+      throw notfound_exception("JSONDocument") << "Failed calling findChildValue(): Search failed for JSON element name=" << path_token
+                                               << ", findChildValue() recurse() value_t is not object_t; value=" << print_visitor(childValue);
     }
 
     auto const& childDocument = boost::get<object_t>(childValue);
@@ -70,9 +68,8 @@ value_t const& JSONDocument::findChildValue(path_t const& path) const try {
     tmpJson.clear();
 
     if (childDocument.count(path_token) == 0) {
-      throw notfound_exception("JSONDocument")
-          << "Failed calling findChildValue(): Search failed for JSON element name=" << path_token << ", search path =<"
-          << path << ">.";
+      throw notfound_exception("JSONDocument") << "Failed calling findChildValue(): Search failed for JSON element name=" << path_token
+                                               << ", search path =<" << path << ">.";
     }
 
     auto const& matchedValue = childDocument.at(path_token);
@@ -152,15 +149,13 @@ JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t con
 
   auto tmpJson = std::string{};
 
-  std::function<value_t(value_t&, std::size_t)> recurse = [&](value_t& childValue,
-                                                              std::size_t currentDepth) -> value_t {
+  std::function<value_t(value_t&, std::size_t)> recurse = [&](value_t& childValue, std::size_t currentDepth) -> value_t {
     TLOG(33) << "replaceChild() recurse() args currentDepth=" << currentDepth;
     auto const& path_token = path_tokens.at(currentDepth);
 
     if (currentDepth == 0 && type(childValue) != type_t::OBJECT) {
-      throw notfound_exception("JSONDocument")
-          << "Failed calling replaceChild(): Replace failed for" << path_token
-          << ", replaceChild() recurse() value_t is not object_t; value=" << print_visitor(childValue);
+      throw notfound_exception("JSONDocument") << "Failed calling replaceChild(): Replace failed for" << path_token
+                                               << ", replaceChild() recurse() value_t is not object_t; value=" << print_visitor(childValue);
     }
 
     auto& childDocument = boost::get<object_t>(childValue);
@@ -168,8 +163,8 @@ JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t con
     tmpJson.clear();
 
     if (childDocument.count(path_token) == 0) {
-      throw notfound_exception("JSONDocument")
-          << "Failed calling replaceChild(): Replace failed for " << path_token << ", search path =<" << path << ">.";
+      throw notfound_exception("JSONDocument") << "Failed calling replaceChild(): Replace failed for " << path_token << ", search path =<" << path
+                                               << ">.";
     }
 
     auto& matchedValue = childDocument.at(path_token);
@@ -183,8 +178,8 @@ JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t con
   };
 
   auto replaced_value = recurse(_value, path_tokens.size() - 1);
-  
-  _isDirty=true;
+
+  _isDirty = true;
 
   TLOG(34) << "replaceChild() Replace succeeded.";
 
@@ -210,16 +205,14 @@ JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t cons
 
   auto tmpJson = std::string{};
 
-  std::function<value_t(value_t&, std::size_t)> recurse = [&](value_t& childValue,
-                                                              std::size_t currentDepth) -> value_t {
+  std::function<value_t(value_t&, std::size_t)> recurse = [&](value_t& childValue, std::size_t currentDepth) -> value_t {
     TLOG(38) << "insertChild() recurse() args currentDepth=" << currentDepth;
 
     auto const& path_token = path_tokens.at(currentDepth);
 
     if (currentDepth == 0 && type(childValue) != type_t::OBJECT) {
-      throw notfound_exception("JSONDocument")
-          << "Failed calling insertChild(): Insert failed for" << path_token
-          << ", insertChild() recurse() value_t is not object_t; value=" << print_visitor(childValue);
+      throw notfound_exception("JSONDocument") << "Failed calling insertChild(): Insert failed for" << path_token
+                                               << ", insertChild() recurse() value_t is not object_t; value=" << print_visitor(childValue);
     }
 
     auto& childDocument = boost::get<object_t>(childValue);
@@ -229,12 +222,12 @@ JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t cons
     auto numberOfChildren = childDocument.count(path_token);
 
     if (currentDepth == 0 && numberOfChildren != 0) {
-      throw notfound_exception("JSONDocument") << "Failed calling insertChild(): Insert failed for" << path_token
-                                               << ", search path =<" << path << ">; Child exists, call replace instead";
+      throw notfound_exception("JSONDocument") << "Failed calling insertChild(): Insert failed for" << path_token << ", search path =<" << path
+                                               << ">; Child exists, call replace instead";
 
     } else if (currentDepth != 0 && numberOfChildren == 0) {
-      throw notfound_exception("JSONDocument")
-          << "Failed calling insertChild(): Insert failed for" << path_token << ", search path =<" << path << ">.";
+      throw notfound_exception("JSONDocument") << "Failed calling insertChild(): Insert failed for" << path_token << ", search path =<" << path
+                                               << ">.";
     } else if (currentDepth == 0 && numberOfChildren == 0) {
       auto const& returnValue = childDocument[path_token] = newValue;
       return returnValue;
@@ -246,8 +239,8 @@ JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t cons
   };
 
   auto inserted_value = recurse(_value, path_tokens.size() - 1);
-  
-  _isDirty=true;
+
+  _isDirty = true;
 
   TLOG(39) << "insertChild() Insert succeeded.";
 
@@ -266,8 +259,7 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) try {
 
   auto tmpJson = std::string{};
 
-  std::function<value_t(value_t&, std::size_t)> recurse = [&](value_t& childValue,
-                                                              std::size_t currentDepth) -> value_t {
+  std::function<value_t(value_t&, std::size_t)> recurse = [&](value_t& childValue, std::size_t currentDepth) -> value_t {
     TLOG(43) << "deleteChild() recurse() args currentDepth=" << currentDepth;
 
     auto const& path_token = path_tokens.at(currentDepth);
@@ -284,8 +276,8 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) try {
     tmpJson.clear();
 
     if (childDocument.count(path_token) == 0) {
-      throw notfound_exception("JSONDocument")
-          << "Failed calling deleteChild(): Delete failed for " << path_token << ", search path =<" << path << ">.";
+      throw notfound_exception("JSONDocument") << "Failed calling deleteChild(): Delete failed for " << path_token << ", search path =<" << path
+                                               << ">.";
     }
 
     auto& matchedValue = childDocument.at(path_token);
@@ -298,8 +290,8 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) try {
   };
 
   auto deleted_value = recurse(_value, path_tokens.size() - 1);
-  
-  _isDirty=true;
+
+  _isDirty = true;
 
   TLOG(44) << "deleteChild() Delete succeeded.";
 
@@ -321,7 +313,7 @@ JSONDocument JSONDocument::appendChild(JSONDocument const& newChild, path_t cons
 
   valueArray.push_back(newValue);
 
-  _isDirty=true;
+  _isDirty = true;
 
   TLOG(48) << "appendChild() Append succeeded.";
 
@@ -360,8 +352,8 @@ JSONDocument JSONDocument::removeChild(JSONDocument const& delChild, path_t cons
     }
   }
 
-  _isDirty=true;
-  
+  _isDirty = true;
+
   TLOG(53) << "removeChild() Remove succeeded.";
 
   return returnValue;

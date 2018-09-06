@@ -10,15 +10,15 @@
 namespace artdaq {
 namespace database {
 namespace docrecord {
-struct JSONDocument;
+class JSONDocument;
 }
 
 namespace filesystem {
 namespace index {
 
+using artdaq::database::object_id_t;
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::json::object_t;
-using artdaq::database::object_id_t;
 
 class SearchIndex final {
  public:
@@ -75,11 +75,9 @@ class SearchIndex final {
   template <typename TYPE>
   void _make_unique_sorted(jsn::array_t&) const;
 
-  std::vector<std::pair<std::string, std::string>> _indexed_filtered_innerjoin_over_ouid(std::string const&,
-                                                                                         std::string const&,
+  std::vector<std::pair<std::string, std::string>> _indexed_filtered_innerjoin_over_ouid(std::string const&, std::string const&,
                                                                                          std::string const&) const;
-  std::vector<std::string> _filtered_attribute_list(std::string const& attribute,
-                                                    std::string const& attribute_begins_with) const;
+  std::vector<std::string> _filtered_attribute_list(std::string const& attribute, std::string const& attribute_begins_with) const;
 
  private:
   bool _open(boost::filesystem::path const&);
@@ -102,8 +100,7 @@ void SearchIndex::_make_unique_sorted(jsn::array_t& ouids) const {
 
   tmp.reserve(ouids.size());
 
-  std::for_each(ouids.begin(), ouids.end(),
-                [&tmp](jsn::value_t const& value) { tmp.emplace_back(boost::get<TYPE>(value)); });
+  std::for_each(ouids.begin(), ouids.end(), [&tmp](jsn::value_t const& value) { tmp.emplace_back(boost::get<TYPE>(value)); });
 
   std::sort(tmp.begin(), tmp.end());
 

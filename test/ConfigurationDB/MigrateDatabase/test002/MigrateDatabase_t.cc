@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) try {
           continue;
         }
 
-        auto jsondoc= JSONDocument{source};
+        auto jsondoc = JSONDocument{source};
         JSONDocumentBuilder builder{JSONDocumentMigrator{jsondoc}};
         builder.setCollection({"({\"collection\":\")" + collection_name + "\"}"});
 
@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) try {
         oss << quoted_(jsonliteral::filter) << ":" << to_id(oid) << ",";
         oss << quoted_(jsonliteral::collection) << ":" << quoted_(collection_name) << "}";
 
-	auto doc = JSONDocument{oss.str()};
+        auto doc = JSONDocument{oss.str()};
         provider->writeDocument(doc);
         std::cout << " -> succeeded\n";
 

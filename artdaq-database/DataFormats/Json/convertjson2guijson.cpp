@@ -92,8 +92,7 @@ bool artdaq::database::json_db_to_gui(std::string const& db_json, std::string& g
   auto& document = unwrap(dbAST).value_as<const object_t>(literal::document);
 
   try {
-    db2gui{{unwrap(document).value_as<const object_t>(literal::data)},
-           {unwrap(document).value_as<const object_t>(literal::metadata)}}(gui_node);
+    db2gui{{unwrap(document).value_as<const object_t>(literal::data)}, {unwrap(document).value_as<const object_t>(literal::metadata)}}(gui_node);
 
     guiAST.back().key = literal::gui_data;
 
@@ -159,8 +158,7 @@ void db2gui::operator()(json_node_t& gui_node) const {
       object[literal::type] = std::string{literal::unknown};
       object[literal::name] = data_node.value<data_t>().key;
 
-      object[literal::comment] =
-          (metadata_node.hasMetadata() ? metadata_node.comment() : std::string{apiliteral::whitespace});
+      object[literal::comment] = (metadata_node.hasMetadata() ? metadata_node.comment() : std::string{apiliteral::whitespace});
 
       auto const& value = data_node.value<data_t>().value;
 
@@ -178,8 +176,7 @@ void db2gui::operator()(json_node_t& gui_node) const {
         type_name = (metadata_node.hasMetadata() ? metadata_node.typeName() : std::string{literal::string});
         object[literal::value] = value;
         try {
-          object[literal::annotation] =
-              (metadata_node.hasMetadata() ? metadata_node.annotation() : std::string{apiliteral::nullstring});
+          object[literal::annotation] = (metadata_node.hasMetadata() ? metadata_node.annotation() : std::string{apiliteral::nullstring});
         } catch (std::out_of_range const& ex) {
           TLOG(37) << "json_db_to_gui() missing annotation for string data; key" << data_node.value<data_t>().key;
           object[literal::annotation] = std::string{apiliteral::nullstring};
@@ -214,8 +211,7 @@ void db2gui::operator()(json_node_t& gui_node) const {
         auto idx = std::size_t{0};
 
         for (value_t const& value : data_node.value<array_t>()) {
-          TLOG(41) << "json_db_to_gui() operator() switch ARRAY child value="
-                   << boost::apply_visitor(print_visitor(), value);
+          TLOG(41) << "json_db_to_gui() operator() switch ARRAY child value=" << boost::apply_visitor(print_visitor(), value);
           auto datakey = std::to_string(idx++);
           auto data = data_t::make(datakey, value);
           db2gui{{data}, (metadata_node.hasMetadata() ? metadata_node.child(datakey) : json_node_t{false})}(array_node);
@@ -248,8 +244,7 @@ void db2gui::operator()(json_node_t& gui_node) const {
 
         for (data_t const& data : data_node.value<object_t>()) {
           TLOG(45) << "json_db_to_gui() operator() switch OBJECT child name=<" << data.key << ">";
-          db2gui{{data},
-                 (metadata_node.hasMetadata() ? metadata_node.child(data.key) : json_node_t{false})}(objects_node);
+          db2gui{{data}, (metadata_node.hasMetadata() ? metadata_node.child(data.key) : json_node_t{false})}(objects_node);
         }
       }
 
@@ -342,8 +337,7 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
       TLOG(56) << "json_gui_to_db() operator() switch ARRAY looping over children";
 
       for (value_t const& value : gui_node.value<array_t>()) {
-        TLOG(57) << "json_gui_to_db() operator() switch ARRAY child value="
-                 << boost::apply_visitor(print_visitor(), value);
+        TLOG(57) << "json_gui_to_db() operator() switch ARRAY child value=" << boost::apply_visitor(print_visitor(), value);
 
         if (value.type() == typeid(object_t)) {
           object_t const& child = jcunwrap(value);
@@ -370,8 +364,7 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
             auto children_metadata = json_node_t{metadata_node.makeChild<object_t, object_t>(child)};
 
             children_metadata.value_as<object_t>()[literal::type] = std::string{literal::sequence};
-            children_metadata.value_as<object_t>()[literal::comment] =
-                unwrap(child).value_as<const std::string>(literal::comment);
+            children_metadata.value_as<object_t>()[literal::comment] = unwrap(child).value_as<const std::string>(literal::comment);
 
             try {
               children_metadata.value_as<object_t>()[literal::annotation] =
@@ -386,14 +379,12 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
           } else if (type_name == literal::table || type_name == literal::object) {
             auto new_metadata_node = json_node_t{metadata_node.makeChild<object_t, object_t>(child)};
             new_metadata_node.value_as<object_t>()[literal::type] = std::string{literal::table};
-            new_metadata_node.value_as<object_t>()[literal::comment] =
-                unwrap(child).value_as<const std::string>(literal::comment);
+            new_metadata_node.value_as<object_t>()[literal::comment] = unwrap(child).value_as<const std::string>(literal::comment);
             new_metadata_node.value_as<object_t>()[literal::children] = object_t{};
 
             auto const& children_node = unwrap(child).value_as<const array_t>(literal::children);
 
-            auto children_metadata =
-                json_node_t{boost::get<object_t>(new_metadata_node.value_as<object_t>().at(literal::children))};
+            auto children_metadata = json_node_t{boost::get<object_t>(new_metadata_node.value_as<object_t>().at(literal::children))};
             auto children_data = json_node_t{data_node.makeChild<object_t, object_t>(child)};
 
             TLOG(60) << "json_gui_to_db() operator() switch ARRAY table";
@@ -408,16 +399,14 @@ void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& meta
             if (data_node.type() == type_t::ARRAY) {
               auto new_metadata_node = json_node_t{metadata_node.makeChildOfChildren<object_t, object_t>(child)};
               new_metadata_node.value_as<object_t>()[literal::type] = type_name;
-              new_metadata_node.value_as<object_t>()[literal::comment] =
-                  unwrap(child).value_as<const std::string>(literal::comment);
+              new_metadata_node.value_as<object_t>()[literal::comment] = unwrap(child).value_as<const std::string>(literal::comment);
               new_metadata_node.value_as<object_t>()[literal::annotation] =
                   artdaq::database::annotate(unwrap(child).value_as<const std::string>(literal::annotation));
               data_node.value_as<array_t>().push_back(child_value);
             } else {
               auto new_metadata_node = json_node_t{metadata_node.makeChild<object_t, object_t>(child)};
               new_metadata_node.value_as<object_t>()[literal::type] = type_name;
-              new_metadata_node.value_as<object_t>()[literal::comment] =
-                  unwrap(child).value_as<const std::string>(literal::comment);
+              new_metadata_node.value_as<object_t>()[literal::comment] = unwrap(child).value_as<const std::string>(literal::comment);
               new_metadata_node.value_as<object_t>()[literal::annotation] =
                   artdaq::database::annotate(unwrap(child).value_as<const std::string>(literal::annotation));
 

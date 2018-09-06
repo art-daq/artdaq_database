@@ -8,10 +8,7 @@ using result_t = artdaq::database::result_t;
 using artdaq::database::sharedtypes::unwrap;
 
 ovlBookkeeping::ovlBookkeeping(object_t::key_type const& key, value_t& bookkeeping)
-    : ovlKeyValue(key, bookkeeping),
-      _initOK(init(bookkeeping)),
-      _updates(make_updates(bookkeeping)),
-      _created(map_created(bookkeeping)) {}
+    : ovlKeyValue(key, bookkeeping), _initOK(init(bookkeeping)), _updates(make_updates(bookkeeping)), _created(map_created(bookkeeping)) {}
 
 bool& ovlBookkeeping::isReadonly() { return value_as<bool>(jsonliteral::isreadonly); }
 
@@ -127,30 +124,26 @@ result_t ovlBookkeeping::operator==(ovlBookkeeping const& other) const {
   auto result = _created == other._created;
 
   if (!result.first) {
-    oss << "\n  Timestamps are different: self,other=" << quoted_(_created.timestamp()) << ","
-        << quoted_(other._created.timestamp());
+    oss << "\n  Timestamps are different: self,other=" << quoted_(_created.timestamp()) << "," << quoted_(other._created.timestamp());
   }
 
-  if (oss.tellp() == noerror_pos &&
-      (useCompareMask() & DOCUMENT_COMPARE_MUTE_UPDATES) == DOCUMENT_COMPARE_MUTE_UPDATES) {
+  if (oss.tellp() == noerror_pos && (useCompareMask() & DOCUMENT_COMPARE_MUTE_UPDATES) == DOCUMENT_COMPARE_MUTE_UPDATES) {
     return Success();
   }
 
   if (_updates.size() != other._updates.size()) {
-    oss << "\n  Record update histories have different size: self,other=" << _updates.size() << ","
-        << other._updates.size();
+    oss << "\n  Record update histories have different size: self,other=" << _updates.size() << "," << other._updates.size();
   }
 
-  if (oss.tellp() == noerror_pos && std::equal(_updates.cbegin(), _updates.end(), other._updates.cbegin(),
-                                               [&oss](auto const& first, auto const& second) -> bool {
-                                                 auto result = first == second;
-                                                 if (result.first) {
-                                                   return true;
-                                                 }
-                                                 oss << "\n  Record update histories are different: self,other="
-                                                     << first.to_string() << "," << second.to_string();
-                                                 return false;
-                                               })) {
+  if (oss.tellp() == noerror_pos &&
+      std::equal(_updates.cbegin(), _updates.end(), other._updates.cbegin(), [&oss](auto const& first, auto const& second) -> bool {
+        auto result = first == second;
+        if (result.first) {
+          return true;
+        }
+        oss << "\n  Record update histories are different: self,other=" << first.to_string() << "," << second.to_string();
+        return false;
+      })) {
     return Success();
   }
 

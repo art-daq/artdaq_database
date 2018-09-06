@@ -40,11 +40,12 @@ std::istream& operator>>(std::istream&, artdaq::database::basictypes::JsonData&)
 }  // namespace artdaq
 
 namespace {
-template<>
-inline TraceStreamer& TraceStreamer::operator<<(const artdaq::database::basictypes::JsonData& r)
-{
-  std::ostringstream s; s << r; msg_append(s.str().c_str());
+template <>
+inline TraceStreamer& TraceStreamer::operator<<(const artdaq::database::basictypes::JsonData& r) {
+  std::ostringstream s;
+  s << r;
+  msg_append(s.str().c_str());
   return *this;
 }
-}
+}  // namespace
 #endif /* _ARTDAQ_DATABASE_BASICTYPES_JSON_H_ */

@@ -55,8 +55,7 @@ XmlData::XmlData(JsonData const& document) {
   auto results = std::smatch();
 
   if (!std::regex_search(document.json_buffer, results, ex)) {
-    throw std::runtime_error("JSON to XML convertion error, regex_search()==false; JSON buffer: " +
-                             document.json_buffer);
+    throw std::runtime_error("JSON to XML convertion error, regex_search()==false; JSON buffer: " + document.json_buffer);
   }
 
   if (results.size() != 1) {

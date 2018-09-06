@@ -94,8 +94,7 @@ std::unique_ptr<OVL> JSONDocumentBuilder::overlay(JSONDocument& document, object
 
   if (self_key.empty()) throw std::runtime_error("Errror: self_key is empty");
 
-  if (type(document._value) != type_t::OBJECT)
-    throw std::runtime_error("Errror: document._value is not a type_t::OBJECT type");
+  if (type(document._value) != type_t::OBJECT) throw std::runtime_error("Errror: document._value is not a type_t::OBJECT type");
 
   using artdaq::database::sharedtypes::unwrap;
 

@@ -24,8 +24,7 @@ using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 
 void prov::writeDocument(ManageDocumentOperation const& options, JSONDocument const& insert_payload) {
-  if (options.operation() != apiliteral::operation::writedocument &&
-      options.operation() != apiliteral::operation::overwritedocument) {
+  if (options.operation() != apiliteral::operation::writedocument && options.operation() != apiliteral::operation::overwritedocument) {
     throw runtime_error("write_document") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
@@ -89,11 +88,10 @@ std::vector<JSONDocument> prov::readDocuments(ManageDocumentOperation const& opt
 }
 
 std::vector<JSONDocument> prov::findConfigurations(ManageDocumentOperation const& options, JSONDocument const& search_payload) {
-  auto returnValue=std::vector<JSONDocument>{};
+  auto returnValue = std::vector<JSONDocument>{};
 
   if (options.operation() != apiliteral::operation::findconfigs) {
-    throw runtime_error("operation_findconfigs")
-        << "Wrong operation option; operation=<" << options.operation() << ">.";
+    throw runtime_error("operation_findconfigs") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
   if (options.provider() != apiliteral::provider::filesystem) {
@@ -120,40 +118,37 @@ std::vector<JSONDocument> prov::findConfigurations(ManageDocumentOperation const
     v.emplace_back(name);
     return true;
   };
-  
+
   for (auto const& search_result : search_results) {
     auto name = JSONDocument::value(search_result.findChild("filter").value());
 
     if (!isNew(name)) {
       continue;
-    }    
+    }
 
     TLOG(28) << "operation_findconfigs: configuration=<" << name << ">";
 
     std::ostringstream oss;
     oss << "{";
-    oss <<  quoted_(jsonliteral::name) << ":" <<  quoted_(name) << ",";
-    oss <<  quoted_(jsonliteral::query)<< ":" << search_result;
+    oss << quoted_(jsonliteral::name) << ":" << quoted_(name) << ",";
+    oss << quoted_(jsonliteral::query) << ":" << search_result;
     oss << "}\n";
-    
+
     returnValue.emplace_back(oss.str());
   }
 
   TLOG(30) << "operation_listcollections: end";
 
   return returnValue;
-   
 }
 
 JSONDocument prov::configurationComposition(ManageDocumentOperation const& options, JSONDocument const& search_payload) {
   if (options.operation() != apiliteral::operation::confcomposition) {
-    throw runtime_error("operation_confcomposition")
-        << "Wrong operation option; operation=<" << options.operation() << ">.";
+    throw runtime_error("operation_confcomposition") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
   if (options.provider() != apiliteral::provider::filesystem) {
-    throw runtime_error("operation_confcomposition")
-        << "Wrong provider option; provider=<" << options.provider() << ">.";
+    throw runtime_error("operation_confcomposition") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
   TLOG(28) << "operation_confcomposition: begin";
@@ -196,20 +191,20 @@ JSONDocument prov::configurationComposition(ManageDocumentOperation const& optio
       throw runtime_error("operation_confcomposition") << "Unsupported filter string, no match";
     }
 
-#ifdef extra_traces        
-        for (size_t i = 0; i < results.size(); ++i) {
-          std::ssub_match sub_match = results[i];
-          std::string piece = sub_match.str();
-          TLOG(28) << "operation_confcomposition: submatch*** " << i << ":" << piece;
-        }
-#endif  
+#ifdef extra_traces
+    for (size_t i = 0; i < results.size(); ++i) {
+      std::ssub_match sub_match = results[i];
+      std::string piece = sub_match.str();
+      TLOG(28) << "operation_confcomposition: submatch*** " << i << ":" << piece;
+    }
+#endif
     if (results.size() != 5) {
       throw runtime_error("operation_confcomposition") << "Unsupported filter string, wrong result count";
     }
 
     oss << printComma() << "{";
-    oss << quoted_("name") <<":\"" << results[1].str() << ":" << results[3].str() << "\",";
-    oss << quoted_("query") <<":" << query_payload;
+    oss << quoted_("name") << ":\"" << results[1].str() << ":" << results[3].str() << "\",";
+    oss << quoted_("query") << ":" << query_payload;
     oss << "}";
   }
 
@@ -219,11 +214,10 @@ JSONDocument prov::configurationComposition(ManageDocumentOperation const& optio
 }
 
 std::vector<JSONDocument> prov::findVersions(ManageDocumentOperation const& options, JSONDocument const& /*unused*/) {
-  auto returnValue=std::vector<JSONDocument>{};
+  auto returnValue = std::vector<JSONDocument>{};
 
   if (options.operation() != apiliteral::operation::findversions) {
-    throw runtime_error("operation_findversions")
-        << "Wrong operation option; operation=<" << options.operation() << ">.";
+    throw runtime_error("operation_findversions") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
   if (options.provider() != apiliteral::provider::filesystem) {
@@ -237,43 +231,43 @@ std::vector<JSONDocument> prov::findVersions(ManageDocumentOperation const& opti
   auto provider = DBI::DBProvider<JSONDocument>::create(database);
 
   auto search_results = provider->findVersions<JSONDocument>(options);
-  
+
   auto ex = std::regex(
       "\"version\"\\s*:\\s*\"((\\\\\"|[^\"])*)\"\\,\\s*"
       "\"entities\\.name\"\\s*:\\s*\"((\\\\\"|"
       "[^\"])*)\"");
-  
+
   for (auto const& search_result : search_results) {
     auto filter_json = search_result.findChild("filter").value();
-    
+
     TLOG(28) << "operation_findversions: filter_json=<" << filter_json << ">";
-    
+
     auto results = std::smatch();
 
     if (!std::regex_search(filter_json, results, ex)) {
       throw runtime_error("operation_findversions") << "Unsupported filter string, no match";
     }
-    
-#ifdef extra_traces    
+
+#ifdef extra_traces
     for (size_t i = 0; i < results.size(); ++i) {
-       std::ssub_match sub_match = results[i];
-       std::string piece = sub_match.str();
-       TLOG(28) << "operation_findversions: submatch*** " << i<< ": " << piece;
+      std::ssub_match sub_match = results[i];
+      std::string piece = sub_match.str();
+      TLOG(28) << "operation_findversions: submatch*** " << i << ": " << piece;
     }
 #endif
 
     if (results.size() != 5) {
       throw runtime_error("operation_findversions") << "Unsupported filter string, wrong result count";
     }
-    
+
     TLOG(28) << "operation_findversions: version=<" << results[1].str() << ">";
 
     std::ostringstream oss;
     oss << "{";
-    oss <<  quoted_(jsonliteral::name) << ":" <<  quoted_(results[1].str()) << ",";
-    oss <<  quoted_(jsonliteral::query)<< ":" << search_result;
+    oss << quoted_(jsonliteral::name) << ":" << quoted_(results[1].str()) << ",";
+    oss << quoted_(jsonliteral::query) << ":" << search_result;
     oss << "}\n";
-    
+
     returnValue.emplace_back(oss.str());
   }
 
@@ -283,11 +277,10 @@ std::vector<JSONDocument> prov::findVersions(ManageDocumentOperation const& opti
 }
 
 std::vector<JSONDocument> prov::findEntities(ManageDocumentOperation const& options, JSONDocument const& /*unused*/) {
-  auto returnValue=std::vector<JSONDocument>{};
+  auto returnValue = std::vector<JSONDocument>{};
 
   if (options.operation() != apiliteral::operation::findentities) {
-    throw runtime_error("operation_findentities")
-        << "Wrong operation option; operation=<" << options.operation() << ">.";
+    throw runtime_error("operation_findentities") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
   if (options.provider() != apiliteral::provider::filesystem) {
@@ -306,7 +299,7 @@ std::vector<JSONDocument> prov::findEntities(ManageDocumentOperation const& opti
 
   for (auto const& search_result : search_results) {
     auto filter_json = search_result.findChild("filter").value();
-    
+
     auto results = std::smatch();
 
     TLOG(28) << "operation_findentities: filter_json=<" << filter_json << ">";
@@ -315,27 +308,26 @@ std::vector<JSONDocument> prov::findEntities(ManageDocumentOperation const& opti
       throw runtime_error("operation_findentities") << "Unsupported filter string, no match";
     }
 
-#ifdef extra_traces    
-            for (size_t i = 0; i < results.size(); ++i) {
-              std::ssub_match sub_match = results[i];
-              std::string piece = sub_match.str();
-              TLOG(28) << "operation_findentities: submatch*** " << i<< ": " << piece ;
-            }
-#endif    
-
+#ifdef extra_traces
+    for (size_t i = 0; i < results.size(); ++i) {
+      std::ssub_match sub_match = results[i];
+      std::string piece = sub_match.str();
+      TLOG(28) << "operation_findentities: submatch*** " << i << ": " << piece;
+    }
+#endif
 
     if (results.size() != 4) {
       throw runtime_error("operation_findentities") << "Unsupported filter string, wrong result count";
     }
-    
+
     TLOG(28) << "operation_findentities: entity=<" << results[2].str() << ">";
 
     std::ostringstream oss;
     oss << "{";
-    oss <<  quoted_(jsonliteral::name) << ":" <<  quoted_(results[2].str()) << ",";
-    oss <<  quoted_(jsonliteral::query)<< ":" << search_result;
+    oss << quoted_(jsonliteral::name) << ":" << quoted_(results[2].str()) << ",";
+    oss << quoted_(jsonliteral::query) << ":" << search_result;
     oss << "}\n";
-    
+
     returnValue.emplace_back(oss.str());
   }
 
@@ -346,8 +338,7 @@ std::vector<JSONDocument> prov::findEntities(ManageDocumentOperation const& opti
 
 JSONDocument prov::assignConfiguration(ManageDocumentOperation const& options, JSONDocument const& search_payload) {
   if (options.operation() != apiliteral::operation::assignconfig) {
-    throw runtime_error("operation_assignconfig")
-        << "Wrong operation option; operation=<" << options.operation() << ">.";
+    throw runtime_error("operation_assignconfig") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
   if (options.provider() != apiliteral::provider::filesystem) {
@@ -358,7 +349,7 @@ JSONDocument prov::assignConfiguration(ManageDocumentOperation const& options, J
 
   auto new_options = options;
   new_options.operation(apiliteral::operation::readdocument);
-  auto search_str=std::string{"{\"filter\":"} + search_payload.to_string() + ", \"collection\":\"" + options.collection() + "\"}";
+  auto search_str = std::string{"{\"filter\":"} + search_payload.to_string() + ", \"collection\":\"" + options.collection() + "\"}";
   auto search = JSONDocument(search_str);
   TLOG(30) << "operation_addconfig: args search_payload=<" << search << ">";
 
@@ -369,8 +360,7 @@ JSONDocument prov::assignConfiguration(ManageDocumentOperation const& options, J
 
   new_options.operation(apiliteral::operation::writedocument);
 
-  auto update =
-      JSONDocument{"{\"filter\": " + builder.getObjectID().to_string() + ",  \"document\":" + builder.to_string() + "\n}"};
+  auto update = JSONDocument{"{\"filter\": " + builder.getObjectID().to_string() + ",  \"document\":" + builder.to_string() + "\n}"};
 
   // TLOG(30)<< "operation_addconfig: writeDocument() begin";
   filesystem::writeDocument(new_options, update);
@@ -390,8 +380,7 @@ JSONDocument prov::assignConfiguration(ManageDocumentOperation const& options, J
 
 JSONDocument prov::removeConfiguration(ManageDocumentOperation const& options, JSONDocument const& search_payload) {
   if (options.operation() != apiliteral::operation::removeconfig) {
-    throw runtime_error("operation_removeconfig")
-        << "Wrong operation option; operation=<" << options.operation() << ">.";
+    throw runtime_error("operation_removeconfig") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
   if (options.provider() != apiliteral::provider::filesystem) {
@@ -403,8 +392,7 @@ JSONDocument prov::removeConfiguration(ManageDocumentOperation const& options, J
   auto new_options = options;
   new_options.operation(apiliteral::operation::readdocument);
 
-  auto search =
-      JSONDocument{"{\"filter\":" + search_payload.to_string() + ", \"collection\":\"" + options.collection() + "\"}"};
+  auto search = JSONDocument{"{\"filter\":" + search_payload.to_string() + ", \"collection\":\"" + options.collection() + "\"}"};
   TLOG(30) << "operation_removeconfig: args search_payload=<" << search << ">";
 
   auto document = filesystem::readDocument(new_options, search);
@@ -414,8 +402,7 @@ JSONDocument prov::removeConfiguration(ManageDocumentOperation const& options, J
 
   new_options.operation(apiliteral::operation::writedocument);
 
-  auto update =
-      JSONDocument{"{\"filter\": " + builder.getObjectID().to_string() + ",  \"document\":" + builder.to_string() + "\n}"};
+  auto update = JSONDocument{"{\"filter\": " + builder.getObjectID().to_string() + ",  \"document\":" + builder.to_string() + "\n}"};
 
   // TLOG(30)<< "operation_addconfig: writeDocument() begin";
   filesystem::writeDocument(new_options, update);
@@ -434,25 +421,22 @@ JSONDocument prov::removeConfiguration(ManageDocumentOperation const& options, J
 }
 
 std::vector<JSONDocument> prov::findVersionAliases(cf::ManageAliasesOperation const& /*options*/, JSONDocument const& /*query_payload*/) {
-  auto returnValue=std::vector<JSONDocument>{};
+  auto returnValue = std::vector<JSONDocument>{};
 
   throw runtime_error("findVersionAliases") << "findVersionAliases: is not implemented";
-  
+
   return returnValue;
 }
 
-
 std::vector<JSONDocument> prov::listCollections(ManageDocumentOperation const& options, JSONDocument const& search_payload) {
-   auto returnValue=std::vector<JSONDocument>{};
+  auto returnValue = std::vector<JSONDocument>{};
 
   if (options.operation() != apiliteral::operation::listcollections) {
-    throw runtime_error("operation_listcollections")
-        << "Wrong operation option; operation=<" << options.operation() << ">.";
+    throw runtime_error("operation_listcollections") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
   if (options.provider() != apiliteral::provider::filesystem) {
-    throw runtime_error("operation_listcollections")
-        << "Wrong provider option; provider=<" << options.provider() << ">.";
+    throw runtime_error("operation_listcollections") << "Wrong provider option; provider=<" << options.provider() << ">.";
   }
 
   TLOG(30) << "operation_listcollections: begin";
@@ -469,10 +453,10 @@ std::vector<JSONDocument> prov::listCollections(ManageDocumentOperation const& o
 
     std::ostringstream oss;
     oss << "{";
-    oss <<  quoted_(jsonliteral::name) << ":" <<  quoted_(name) << ",";
-    oss <<  quoted_(jsonliteral::query)<< ":" << search_result;
+    oss << quoted_(jsonliteral::name) << ":" << quoted_(name) << ",";
+    oss << quoted_(jsonliteral::query) << ":" << search_result;
     oss << "}\n";
-    
+
     returnValue.emplace_back(oss.str());
   }
 
@@ -481,14 +465,11 @@ std::vector<JSONDocument> prov::listCollections(ManageDocumentOperation const& o
   return returnValue;
 }
 
-
-
 std::vector<JSONDocument> prov::listDatabases(ManageDocumentOperation const& options, JSONDocument const& search_payload) {
-  auto returnValue=std::vector<JSONDocument>{};
+  auto returnValue = std::vector<JSONDocument>{};
 
   if (options.operation() != apiliteral::operation::listdatabases) {
-    throw runtime_error("operation_listdatabases")
-        << "Wrong operation option; operation=<" << options.operation() << ">.";
+    throw runtime_error("operation_listdatabases") << "Wrong operation option; operation=<" << options.operation() << ">.";
   }
 
   if (options.provider() != apiliteral::provider::filesystem) {
@@ -509,10 +490,10 @@ std::vector<JSONDocument> prov::listDatabases(ManageDocumentOperation const& opt
 
     std::ostringstream oss;
     oss << "{";
-    oss <<  quoted_(jsonliteral::name) << ":" <<  quoted_(name) << ",";
-    oss <<  quoted_(jsonliteral::query)<< ":" << search_result;
+    oss << quoted_(jsonliteral::name) << ":" << quoted_(name) << ",";
+    oss << quoted_(jsonliteral::query) << ":" << search_result;
     oss << "}\n";
-    
+
     returnValue.emplace_back(oss.str());
   }
 
@@ -520,7 +501,6 @@ std::vector<JSONDocument> prov::listDatabases(ManageDocumentOperation const& opt
 
   return returnValue;
 }
-
 
 JSONDocument prov::readDbInfo(ManageDocumentOperation const& options, JSONDocument const& search_payload) {
   if (options.operation() != apiliteral::operation::readdbinfo) {

@@ -6,8 +6,8 @@
 namespace artdaq {
 namespace database {
 namespace docrecord {
-struct JSONDocument;
-}  // namespace basictypes
+class JSONDocument;
+}  // namespace docrecord
 namespace configuration {
 class ManageDocumentOperation;
 class ManageAliasesOperation;

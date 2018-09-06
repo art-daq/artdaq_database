@@ -212,8 +212,7 @@ struct table_of : vector_of<KVP> {
 };
 
 template <typename TABLE_OF, typename VECTOR_OF>
-using variant_value_of = boost::variant<boost::recursive_wrapper<TABLE_OF>, boost::recursive_wrapper<VECTOR_OF>,
-                                        std::string, decimal, integer, bool>;
+using variant_value_of = boost::variant<boost::recursive_wrapper<TABLE_OF>, boost::recursive_wrapper<VECTOR_OF>, std::string, decimal, integer, bool>;
 
 template <typename A>
 struct unwrapper {

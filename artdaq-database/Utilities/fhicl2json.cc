@@ -8,35 +8,31 @@
 #include <iterator>
 #include <regex>
 
+#include "artdaq-database/ConfigurationDB/configurationdb.h"
+#include "artdaq-database/DataFormats/Fhicl/fhicljsondb.h"
+#include "artdaq-database/DataFormats/Json/json_common.h"
+#include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/SharedCommon/printStackTrace.h"
 #include "artdaq-database/SharedCommon/process_exit_codes.h"
-#include "artdaq-database/ConfigurationDB/configurationdb.h"
-#include "artdaq-database/DataFormats/Json/json_common.h"
-#include "artdaq-database/DataFormats/Fhicl/fhicljsondb.h"
-#include "artdaq-database/JsonDocument/JSONDocument.h"
-
 
 namespace bpo = boost::program_options;
-namespace impl = artdaq::database::configuration::json;
 namespace fjlib = artdaq::database::fhicljson;
 
-using result_t= std::pair<bool, std::string>;
+using result_t = std::pair<bool, std::string>;
 
-result_t fhicl_to_json(std::string const& fcl, std::string const& filename); 
+result_t fhicl_to_json(std::string const& fcl, std::string const& filename);
 result_t json_to_fhicl(std::string const& jsn, std::string& filename);
 
 int main(int argc, char* argv[]) try {
-  //impl::enable_trace(); 
-  
+  // impl::enable_trace();
+
   std::ostringstream descstr;
   descstr << argv[0] << " <-c <config-file>> <other-options>";
 
   bpo::options_description desc = descstr.str();
 
-  desc.add_options()
-  ("config,c", bpo::value<std::string>(), "Configuration file.")
-  ("main,m", "Output the \"document.data.main\" subtree.")
-  ("help,h", "Produce help message.");
+  desc.add_options()("config,c", bpo::value<std::string>(), "Configuration file.")(
+      "main,m", "Output the \"document.data.main\" subtree.")("help,h", "Produce help message.");
 
   bpo::variables_map vm;
 
@@ -71,39 +67,37 @@ int main(int argc, char* argv[]) try {
 
   auto file_name = vm["config"].as<std::string>();
 
-  auto main=bool{false};
-  
+  auto main = bool{false};
+
   if (vm.count("main") != 0u) {
     main = true;
   }
 
-  
   std::ifstream is(file_name);
   std::string fhicl_buffer((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
   is.close();
 
-  auto json_buffer=std::string{};
-  
-  auto result=fhicl_to_json(fhicl_buffer, file_name);
-  
-  if(!result.first){
-    std::cerr << "Error: Convertion failed, error message: " <<  result.second <<"\n";
+  auto json_buffer = std::string{};
+
+  auto result = fhicl_to_json(fhicl_buffer, file_name);
+
+  if (!result.first) {
+    std::cerr << "Error: Convertion failed, error message: " << result.second << "\n";
     return process_exit_code::FAILURE;
   }
-  
-  if(main) {
-    auto json_subnode=std::string{"document.data.main"};
-    result ={true, artdaq::database::docrecord::JSONDocument(result.second).findChild(json_subnode).to_string()};
+
+  if (main) {
+    auto json_subnode = std::string{"document.data.main"};
+    result = {true, artdaq::database::docrecord::JSONDocument(result.second).findChild(json_subnode).to_string()};
   }
-  
+
   std::cout << result.second;
-  
+
   return process_exit_code::SUCCESS;
 } catch (...) {
   std::cerr << "Process exited with error: " << ::debug::current_exception_diagnostic_information();
   return process_exit_code::UNCAUGHT_EXCEPTION;
 }
-
 
 result_t fhicl_to_json(std::string const& fcl, std::string const& filename) {
   artdaq::database::set_default_locale();

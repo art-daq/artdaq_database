@@ -21,12 +21,12 @@ namespace database {
 namespace jsonconvert {
 namespace visitor {
 
+using boost::optional;
 using boost::fusion::at;
 using boost::fusion::extension::struct_member_name;
 using boost::fusion::result_of::size;
 using boost::fusion::result_of::value_at;
 using boost::fusion::traits::is_sequence;
-using boost::optional;
 
 using boost::mpl::eval_if;
 using boost::mpl::identity;
@@ -125,10 +125,9 @@ struct select_application {
   typedef
       // typename boost::mpl::eval_if<std::is_array<T>,
       // identity<array_application<Visitor, T>>,
-      typename boost::mpl::eval_if<
-          detail::is_vector<UserData>, identity<array_application<Visitor, UserData>>,
-          typename boost::mpl::eval_if<is_sequence<UserData>, identity<struct_application<Visitor, UserData>>,
-                                       identity<value_application<Visitor, UserData>>>>::type type;
+      typename boost::mpl::eval_if<detail::is_vector<UserData>, identity<array_application<Visitor, UserData>>,
+                                   typename boost::mpl::eval_if<is_sequence<UserData>, identity<struct_application<Visitor, UserData>>,
+                                                                identity<value_application<Visitor, UserData>>>>::type type;
 };
 
 }  // namespace detail

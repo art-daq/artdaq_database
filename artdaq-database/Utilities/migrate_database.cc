@@ -15,7 +15,6 @@ using namespace artdaq::database::configuration;
 
 namespace DBI = artdaq::database::filesystem;
 
-using artdaq::database::basictypes::JsonData;
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocumentMigrator;
@@ -101,7 +100,7 @@ int main(int argc, char* argv[]) try {
           std::cout << " -> failed\n";
           continue;
         }
-        auto doc=JSONDocument{source};
+        auto doc = JSONDocument{source};
         JSONDocumentBuilder builder{JSONDocumentMigrator{doc}};
         builder.setCollection({"{db::quoted_(apiliteral::option::collection):\""s + collection_name + "\"}"});
 

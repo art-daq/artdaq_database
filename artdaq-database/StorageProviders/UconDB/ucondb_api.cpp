@@ -56,8 +56,7 @@ std::list<std::string> dbuc::folders(const UconDBSPtr_t& provider) {
     if (CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &data_write)) &&
         // CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_HTTPAUTH, (long)CURLAUTH_DIGEST)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L)) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L)) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FILE, &ss)) &&
+        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L)) && CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FILE, &ss)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TIMEOUT, provider->timeout())) &&
         // CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 10L)) &&
@@ -113,8 +112,7 @@ std::list<std::string> dbuc::tags(const UconDBSPtr_t& provider, std::string cons
     if (CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &data_write)) &&
         // CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_HTTPAUTH, (long)CURLAUTH_DIGEST)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L)) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L)) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FILE, &ss)) &&
+        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L)) && CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FILE, &ss)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TIMEOUT, provider->timeout())) &&
         // CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 10L)) &&
@@ -170,8 +168,7 @@ std::list<std::string> dbuc::objects(const UconDBSPtr_t& provider, std::string c
     if (CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &data_write)) &&
         // CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_HTTPAUTH, (long)CURLAUTH_DIGEST)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L)) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L)) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FILE, &ss)) &&
+        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L)) && CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FILE, &ss)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TIMEOUT, provider->timeout())) &&
         // CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 10L)) &&
@@ -231,8 +228,7 @@ result_t dbuc::get_object(const UconDBSPtr_t& provider, std::string const& folde
     if (CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &data_write)) &&
         // CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_HTTPAUTH, (long)CURLAUTH_DIGEST)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L)) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L)) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FILE, &ss)) &&
+        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L)) && CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FILE, &ss)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TIMEOUT, provider->timeout())) &&
         // CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 10L)) &&
@@ -256,9 +252,8 @@ result_t dbuc::get_object(const UconDBSPtr_t& provider, std::string const& folde
   return Success(retValue);
 }
 
-result_t dbuc::put_object(const UconDBSPtr_t& provider, std::string const& folder, std::string const& buffer,
-                          std::string const& object, long const tv, std::list<std::string> const& tags,
-                          std::string const& key) {
+result_t dbuc::put_object(const UconDBSPtr_t& provider, std::string const& folder, std::string const& buffer, std::string const& object,
+                          long const tv, std::list<std::string> const& tags, std::string const& key) {
   confirm(!folder.empty());
   confirm(!buffer.empty());
   confirm(!object.empty());
@@ -314,14 +309,12 @@ result_t dbuc::put_object(const UconDBSPtr_t& provider, std::string const& folde
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_READFUNCTION, &data_read)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_HTTPAUTH, (long)CURLAUTH_DIGEST)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L)) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L)) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FILE, &oss)) &&
+        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L)) && CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FILE, &oss)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_INFILE, &iss)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TIMEOUT, provider->timeout())) &&
         // CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)size)) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 10L)) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L)) &&
+        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 10L)) && CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_USERPWD, provider->authentication().c_str())) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_URL, url.c_str()))) {
       code = curl_easy_perform(curl);
@@ -375,8 +368,7 @@ result_t dbuc::create_folder(const UconDBSPtr_t& provider, std::string const& fo
     if (CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &data_write)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_HTTPAUTH, (long)CURLAUTH_DIGEST)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L)) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L)) &&
-        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FILE, &ss)) &&
+        CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L)) && CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_FILE, &ss)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TIMEOUT, provider->timeout())) &&
         // CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L)) &&
         CURLE_OK == (code = curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 10L)) &&

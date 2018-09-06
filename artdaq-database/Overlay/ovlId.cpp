@@ -46,6 +46,5 @@ std::string& ovlId::oid(std::string const& id) {
 }
 
 result_t ovlId::operator==(ovlId const& other) const {
-  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_OUIDS) == DOCUMENT_COMPARE_MUTE_OUIDS) ? Success()
-                                                                                           : self() == other.self();
+  return ((useCompareMask() & DOCUMENT_COMPARE_MUTE_OUIDS) == DOCUMENT_COMPARE_MUTE_OUIDS) ? Success() : self() == other.self();
 }

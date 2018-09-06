@@ -85,9 +85,7 @@ result_t opts::remove_configuration(ManageDocumentOperation const& options) noex
   }
 }
 
-result_t opts::create_configuration(ManageDocumentOperation const& /*options*/) noexcept {
-  return Failure("Not Implemented");
-}
+result_t opts::create_configuration(ManageDocumentOperation const& /*options*/) noexcept { return Failure("Not Implemented"); }
 
 result_t json::find_configurations(std::string const& query_payload) noexcept {
   try {

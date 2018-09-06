@@ -69,12 +69,13 @@ void BulkOperations();
 }  // namespace database
 }  // namespace artdaq
 namespace {
-template<>
-inline TraceStreamer& TraceStreamer::operator<<(const artdaq::database::configuration::BulkOperations& r)
-{
-  std::ostringstream s; s << r.to_string(); msg_append(s.str().c_str());
+template <>
+inline TraceStreamer& TraceStreamer::operator<<(const artdaq::database::configuration::BulkOperations& r) {
+  std::ostringstream s;
+  s << r.to_string();
+  msg_append(s.str().c_str());
   return *this;
 }
-}
+}  // namespace
 #endif /* _ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATION_BULKOPERATIONS_H_ \
         */

@@ -125,8 +125,7 @@ bool db::read_buffer_from_file(std::string& buffer, std::string const& file_in_n
   if (!is.good()) {
     is.close();
 
-    throw invalid_argument("read_buffer_from_file")
-        << "Failed calling read_buffer_from_file(): Failed opening a file=" << file_in_name;
+    throw invalid_argument("read_buffer_from_file") << "Failed calling read_buffer_from_file(): Failed opening a file=" << file_in_name;
   }
 
   std::stringstream ss;
@@ -153,8 +152,7 @@ std::string db::make_temp_dir() {
   system_cmd += tmp_dir_name;
 
   if (0 != system(system_cmd.c_str())) {
-    throw runtime_error("make_temp_dir") << "make_temp_dir: Unable to create a temp directory; system_cmd="
-                                         << system_cmd;
+    throw runtime_error("make_temp_dir") << "make_temp_dir: Unable to create a temp directory; system_cmd=" << system_cmd;
   }
 
   return tmp_dir_name;
@@ -171,8 +169,7 @@ void db::delete_temp_dir(std::string const& tmp_dir_name) {
   auto system_cmd = std::string{"rm -rf "}.append(tmp_dir_name);
 
   if (0 != system(system_cmd.c_str())) {
-    throw runtime_error("delete_temp_dir")
-        << "delete_temp_dir: Unable to delete a temp directory; system_cmd=" << system_cmd;
+    throw runtime_error("delete_temp_dir") << "delete_temp_dir: Unable to delete a temp directory; system_cmd=" << system_cmd;
   }
 }
 
@@ -181,8 +178,7 @@ std::string const& db::dir_to_tarbzip2base64(std::string const& tmp_dir_name, st
   confirm(!bzip2base64.empty());
 
   if (!mkdirfile(bzip2base64)) {
-    throw runtime_error("dir_to_tarbzip2base64")
-        << "dir_to_tarbzip2base64: Unable to create a directory; path=" << bzip2base64;
+    throw runtime_error("dir_to_tarbzip2base64") << "dir_to_tarbzip2base64: Unable to create a directory; path=" << bzip2base64;
   }
 
   std::ostringstream oss;
@@ -190,8 +186,7 @@ std::string const& db::dir_to_tarbzip2base64(std::string const& tmp_dir_name, st
   oss << "|base64 --wrap=0 > " << bzip2base64;
 
   if (0 != system(oss.str().c_str())) {
-    throw runtime_error("dir_to_tarbzip2base64")
-        << "dir_to_tarbzip2base64: Unable to create a tar.bzip2 file; system_cmd=" << oss.str();
+    throw runtime_error("dir_to_tarbzip2base64") << "dir_to_tarbzip2base64: Unable to create a tar.bzip2 file; system_cmd=" << oss.str();
   }
 
   return bzip2base64;
@@ -202,16 +197,14 @@ std::string const& db::tarbzip2base64_to_dir(std::string const& bzip2base64, std
   confirm(!tmp_dir_name.empty());
 
   if (!mkdir(tmp_dir_name)) {
-    throw runtime_error("tarbzip2base64_to_dir")
-        << "tarbzip2base64_to_dir: Unable to create a directory; path=" << tmp_dir_name;
+    throw runtime_error("tarbzip2base64_to_dir") << "tarbzip2base64_to_dir: Unable to create a directory; path=" << tmp_dir_name;
   }
 
   std::ostringstream oss;
   oss << "cat " << bzip2base64 << " |base64 -d |tar xjf - -C " << tmp_dir_name;
 
   if (0 != system(oss.str().c_str())) {
-    throw runtime_error("tarbzip2base64_to_dir")
-        << "tarbzip2base64_to_dir: Unable to unzip configuration files; system_cmd=" << oss.str();
+    throw runtime_error("tarbzip2base64_to_dir") << "tarbzip2base64_to_dir: Unable to unzip configuration files; system_cmd=" << oss.str();
   }
 
   return tmp_dir_name;

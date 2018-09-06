@@ -70,7 +70,7 @@ constexpr auto ucon = "ucon";
 
 namespace option {
 constexpr auto path = "path";
-  
+
 constexpr auto operation = "operation";
 constexpr auto format = "dataformat";
 constexpr auto provider = "dbprovider";

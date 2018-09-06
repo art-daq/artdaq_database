@@ -36,8 +36,7 @@ auto make_error_msg = [](const char* msg) { return std::string("{error:\"").appe
 
 template <typename CONF>
 class MakeSerializable final {
-  static_assert(std::is_pointer<CONF>::value || std::is_reference<CONF>::value,
-                "Template parameter must be either a pointer or reference type");
+  static_assert(std::is_pointer<CONF>::value || std::is_reference<CONF>::value, "Template parameter must be either a pointer or reference type");
 
  public:
   template <class TYPE>
@@ -45,8 +44,7 @@ class MakeSerializable final {
     return writeDocumentImpl(data);
   } catch (std::exception const& e) {
     throw artdaq::database::exception("MakeSerializable::writeDocument")
-        << "Unable to write " << demangle(typeid(CONF).name()) << " into " << demangle(typeid(TYPE).name())
-        << "; Exception msg:" << e.what() << ".";
+        << "Unable to write " << demangle(typeid(CONF).name()) << " into " << demangle(typeid(TYPE).name()) << "; Exception msg:" << e.what() << ".";
   } catch (...) {
     throw artdaq::database::exception("MakeSerializable::writeDocument")
         << "Unable to write " << demangle(typeid(CONF).name()) << " into " << demangle(typeid(TYPE).name()) << ".";
@@ -57,8 +55,7 @@ class MakeSerializable final {
     return readDocumentImpl(data);
   } catch (std::exception const& e) {
     throw artdaq::database::exception("MakeSerializable::readDocument")
-        << "Unable to read " << demangle(typeid(CONF).name()) << " from " << demangle(typeid(TYPE).name())
-        << "; Exception msg:" << e.what() << ".";
+        << "Unable to read " << demangle(typeid(CONF).name()) << " from " << demangle(typeid(TYPE).name()) << "; Exception msg:" << e.what() << ".";
   } catch (...) {
     throw artdaq::database::exception("MakeSerializable::readDocument")
         << "Unable to read " << demangle(typeid(CONF).name()) << " from " << demangle(typeid(TYPE).name()) << ".";
@@ -101,8 +98,7 @@ class MakeSerializable final {
 
 template <typename CONF, template <typename ARG = CONF> class SERIALIZABLE>
 class ConfigurationSerializer final {
-  static_assert(std::is_pointer<CONF>::value || std::is_reference<CONF>::value,
-                "Template parameter must be either a pointer or reference type");
+  static_assert(std::is_pointer<CONF>::value || std::is_reference<CONF>::value, "Template parameter must be either a pointer or reference type");
 
  public:
   using Serializable_t = SERIALIZABLE<CONF>;
@@ -110,8 +106,7 @@ class ConfigurationSerializer final {
   static ConfigurationSerializer<CONF, SERIALIZABLE> wrap(CONF conf) { return {conf}; }
 
   template <class TYPE>
-  typename std::enable_if<std::is_same<TYPE, FhiclData>::value, cf::result_t>::type writeDocument(TYPE& data) const
-      noexcept try {
+  typename std::enable_if<std::is_same<TYPE, FhiclData>::value, cf::result_t>::type writeDocument(TYPE& data) const noexcept try {
     auto tmp = TYPE{""};
     auto result = Serializable_t{_conf}.template writeDocument<TYPE>(tmp);
 
@@ -123,8 +118,7 @@ class ConfigurationSerializer final {
   }
 
   template <class TYPE>
-  typename std::enable_if<std::is_same<TYPE, JsonData>::value, cf::result_t>::type writeDocument(TYPE& data) const
-      noexcept try {
+  typename std::enable_if<std::is_same<TYPE, JsonData>::value, cf::result_t>::type writeDocument(TYPE& data) const noexcept try {
     auto tmp = TYPE{"{}"};
     auto result = Serializable_t{_conf}.template writeDocument<TYPE>(tmp);
 
@@ -136,8 +130,7 @@ class ConfigurationSerializer final {
   }
 
   template <class TYPE>
-  typename std::enable_if<std::is_same<TYPE, FhiclData>::value, cf::result_t>::type readDocument(
-      TYPE const& data) noexcept try {
+  typename std::enable_if<std::is_same<TYPE, FhiclData>::value, cf::result_t>::type readDocument(TYPE const& data) noexcept try {
     auto result = Serializable_t{_conf}.template readDocument<TYPE>(data);
 
     return {result, {make_error_msg(result ? "Success" : "Failure")}};
@@ -146,8 +139,7 @@ class ConfigurationSerializer final {
   }
 
   template <class TYPE>
-  typename std::enable_if<std::is_same<TYPE, JsonData>::value, cf::result_t>::type readDocument(
-      TYPE const& data) noexcept try {
+  typename std::enable_if<std::is_same<TYPE, JsonData>::value, cf::result_t>::type readDocument(TYPE const& data) noexcept try {
     auto result = Serializable_t{_conf}.template readDocument<TYPE>(data);
 
     return {result, {make_error_msg(result ? "Success" : "Failure")}};
@@ -155,9 +147,7 @@ class ConfigurationSerializer final {
     return {false, {make_error_msg(e.what())}};
   }
 
-  std::string configurationName() const noexcept try {
-    return Serializable_t{_conf}.configurationName();
-  } catch (std::exception const&) {
+  std::string configurationName() const noexcept try { return Serializable_t{_conf}.configurationName(); } catch (std::exception const&) {
     using configurationClazz = typename std::remove_pointer<typename std::remove_reference<CONF>::type>::type;
 
     auto name = demangle(typeid(configurationClazz).name());
@@ -194,8 +184,7 @@ struct VersionInfo {
   void validate() const {
     confirm(!configuration.empty());
 
-    if (configuration.empty())
-      throw artdaq::database::invalid_option_exception("VersionInfo") << "Configuration name is empty";
+    if (configuration.empty()) throw artdaq::database::invalid_option_exception("VersionInfo") << "Configuration name is empty";
 
     confirm(!version.empty());
 

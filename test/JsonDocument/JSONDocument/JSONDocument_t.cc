@@ -57,9 +57,9 @@ int main(int argc, char* argv[]) try {
   auto name = [](auto const& conf) { return JSONDocument(conf).value_as<std::string>("operation"); };
 
   auto runTest = [](std::string const& name) {
-    auto tests = std::map<std::string, test_case>{
-        {"insertChild", test_insertChild}, {"replaceChild", test_replaceChild}, {"deleteChild", test_deleteChild},
-        {"findChild", test_findChild},     {"appendChild", test_appendChild},   {"removeChild", test_removeChild}};
+    auto tests = std::map<std::string, test_case>{{"insertChild", test_insertChild}, {"replaceChild", test_replaceChild},
+                                                  {"deleteChild", test_deleteChild}, {"findChild", test_findChild},
+                                                  {"appendChild", test_appendChild}, {"removeChild", test_removeChild}};
 
     std::cout << "Running test:<" << name << ">\n";
 

@@ -18,10 +18,10 @@ bool JsonReader::read(std::string const& in, object_t& ast) {
   confirm(ast.empty());
 
   TLOG(20) << "read() begin";
-  
-   if(in.size()>512){   
-      TLOG(21) << "heavy read() " << debug::getStackTrace();
-   }
+
+  if (in.size() > 512) {
+    TLOG(21) << "heavy read() " << debug::getStackTrace();
+  }
 
   TLOG(22) << "read() in=<" << in << ">";
 
@@ -39,12 +39,11 @@ bool JsonReader::read(std::string const& in, object_t& ast) {
   }
 
   TLOG(23) << "write() end ";
-  
+
   return result;
 }
 
-std::pair<bool, std::string> artdaq::database::json::compare_json_objects(std::string const& first,
-                                                                          std::string const& second) {
+std::pair<bool, std::string> artdaq::database::json::compare_json_objects(std::string const& first, std::string const& second) {
   confirm(!first.empty());
   confirm(!second.empty());
 

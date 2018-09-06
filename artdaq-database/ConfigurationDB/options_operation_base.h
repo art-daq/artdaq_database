@@ -15,7 +15,7 @@ namespace basictypes {
 struct JsonData;
 }
 namespace docrecord {
-class JSONDocument;  
+class JSONDocument;
 }
 
 namespace configuration {
@@ -60,7 +60,7 @@ class OperationBase {
   operator std::string() const;
 
   operator JSONDocument() const;
-  
+
   virtual bpo::options_description makeProgramOptions() const;
 
   virtual int readProgramOptions(bpo::variables_map const&);

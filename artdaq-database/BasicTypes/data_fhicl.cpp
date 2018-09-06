@@ -87,8 +87,7 @@ FhiclData::operator JsonData() const {
   auto json = JsonData("");
 
   if (!json.convert_from(*this)) {
-    throw ::fhicl::exception(::fhicl::parse_error, literal::data)
-        << ("FHICL to JSON convertion error; FHICL buffer: " + this->fhicl_buffer);
+    throw ::fhicl::exception(::fhicl::parse_error, literal::data) << ("FHICL to JSON convertion error; FHICL buffer: " + this->fhicl_buffer);
   }
 
   TLOG(16) << "FHICL  json=" << json;
@@ -97,7 +96,7 @@ FhiclData::operator JsonData() const {
 
   auto base64 = base64_encode(fhicl_buffer);
   TLOG(17) << "FHICL base64=" << base64;
-  
+
   std::ostringstream os;
 
   os << json;

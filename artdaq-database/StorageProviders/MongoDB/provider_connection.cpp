@@ -38,11 +38,8 @@ mongocxx::instance& getInstance() {
   return _instance;
 }
 
-DBConfig::DBConfig()
-    : uri{std::string{literal::MONGOURI} + literal::hostname + ":" + std::to_string(literal::port) + "/" +
-          literal::db_name} {
-  auto tmpURI = getenv("ARTDAQ_DATABASE_URI") != nullptr ? expand_environment_variables("${ARTDAQ_DATABASE_URI}")
-                                                         : std::string("");
+DBConfig::DBConfig() : uri{std::string{literal::MONGOURI} + literal::hostname + ":" + std::to_string(literal::port) + "/" + literal::db_name} {
+  auto tmpURI = getenv("ARTDAQ_DATABASE_URI") != nullptr ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
 
   auto prefixURI = std::string{literal::MONGOURI};
   if (tmpURI.length() > prefixURI.length() && std::equal(prefixURI.begin(), prefixURI.end(), tmpURI.begin())) {
@@ -73,8 +70,7 @@ mongocxx::database& MongoDB::connection() {
     return _connection;
   }
 
-  auto bson_document = compat::from_json(
-      "{" + make_database_metadata("artdaq", expand_environment_variables(_config.connectionURI())) + "}");
+  auto bson_document = compat::from_json("{" + make_database_metadata("artdaq", expand_environment_variables(_config.connectionURI())) + "}");
 
   auto result = collection.insert_one(bson_document.view());
 

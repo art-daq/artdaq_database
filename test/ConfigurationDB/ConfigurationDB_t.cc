@@ -30,9 +30,7 @@ int main(int argc, char* argv[]) try {
   std::unique_ptr<db::configuration::OperationBase> options;
   // artdaq::database::filesystem::index::shouldAutoRebuildSearchIndex(true);
 
-  auto make_opt_name = [](auto& long_name, auto& short_name) {
-    return std::string{long_name}.append(",").append(short_name);
-  };
+  auto make_opt_name = [](auto& long_name, auto& short_name) { return std::string{long_name}.append(",").append(short_name); };
 
   bpo::variables_map vm;
 
@@ -146,9 +144,8 @@ int main(int argc, char* argv[]) try {
   std::cout << "File sizes (exp,ret)=(" << std::distance(cmpdoc.begin(), cmpdoc.end()) << ","
             << std::distance(retdoc.begin(), retdoc.end()) << ")\n";
 
-  std::cout << "First mismatch at position " << std::distance(cmpdoc.begin(), mismatch.first) << ", (exp,ret)=(0x"
-            << std::hex << static_cast<unsigned int>(*mismatch.first) << ",0x"
-            << static_cast<unsigned int>(*mismatch.second) << ")\n";
+  std::cout << "First mismatch at position " << std::distance(cmpdoc.begin(), mismatch.first) << ", (exp,ret)=(0x" << std::hex
+            << static_cast<unsigned int>(*mismatch.first) << ",0x" << static_cast<unsigned int>(*mismatch.second) << ")\n";
 
   auto file_out_name = std::string(db::make_temp_dir())
                            .append("/")
