@@ -43,6 +43,8 @@ class JSONDocument final {
   // returns removed child
   JSONDocument removeChild(JSONDocument const&, path_t const&);
 
+  value_t extract();
+  
   std::string to_string() const;
   bool empty() const;
 
@@ -98,6 +100,9 @@ template <typename T>
 T JSONDocument::value_as(path_t const& path) const {
   return boost::lexical_cast<T>(findChild(path).value());
 }
+
+
+bool compareDocumentVersions(JSONDocument const&, JSONDocument const&);
 
 namespace debug {
 void JSONDocument();

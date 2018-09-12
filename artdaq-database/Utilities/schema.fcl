@@ -153,9 +153,21 @@ entity: "match.group(3)+'_'+match.group(4)+'_'+match.group(5)"
 
 collection: RunHistory 
 
-pattern: "(.*/)((EventBuilder|Aggregator|DataLogger|Dispatcher)_(.*[^_])_(\d+))(\.fcl$)" 
+pattern: "(.*/)((component|EventBuilder|Aggregator|DataLogger|Dispatcher)_(.*[^_])_(\d+))(\.fcl$)" 
 
 entity: "match.group(3)+'_'+match.group(4)+'_'+match.group(5)" 
+
+},  {
+
+collection: RunHistory 
+
+pattern: "(.*/)((component|EventBuilder|Aggregator|DataLogger|Dispatcher)(\d+))(\.fcl$)" 
+
+}, {
+
+collection: RunHistory 
+
+pattern: "(.*/)(boot|known_boardreaders_list|DataflowConfiguration)(\.fcl$)" 
 
 }, {
 

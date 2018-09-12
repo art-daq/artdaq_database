@@ -19,6 +19,7 @@ namespace cf = artdaq::database::configuration;
 
 namespace DBI = artdaq::database::filesystem;
 namespace prov = artdaq::database::configuration::filesystem;
+namespace docrec = artdaq::database::docrecord;
 
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
@@ -52,11 +53,15 @@ JSONDocument prov::readDocument(ManageDocumentOperation const& options, JSONDocu
   TLOG(26) << "read_document: "
            << "Search returned " << collection.size() << " results.";
 
-  if (collection.size() != 1) {
-    throw runtime_error("read_document") << "Search returned " << collection.size() << " results.";
+  if (collection.empty() ) {
+    throw runtime_error("read_document") << "No documents found.";
   }
 
-  auto data = JSONDocument{*collection.begin()};
+  auto data = JSONDocument{};
+  
+  std::swap(data,collection.size() > 1 ? *std::max_element(collection.begin(),collection.end(),docrec::compareDocumentVersions):
+    *collection.begin());
+
 
   TLOG(26) << "readDocument(): end";
 

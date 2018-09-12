@@ -10,6 +10,9 @@
 
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
+#include "artdaq-database/DataFormats/Fhicl/fhicl_common.h"
+#include "artdaq-database/DataFormats/Xml/xml_common.h"
+
 #include "artdaq-database/DataFormats/shared_literals.h"
 
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
@@ -38,6 +41,9 @@ using artdaq::database::basictypes::JsonData;
 using artdaq::database::basictypes::XmlData;
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
+using artdaq::database::fhicl::FhiclWriter;
+using artdaq::database::xml::XmlWriter;
+using artdaq::database::json::JsonWriter;
 
 using JsonAnyHandle_t = boost::variant<JsonData, JSONDocument>;
 
@@ -267,14 +273,7 @@ void read_document(Options const& options, std::string& conf) {
   auto format = options.format();
 
   if (format == data_format_t::origin) {
-    auto resultAst = jsn::object_t{};
-
-    if (!jsn::JsonReader{}.read(search_result, resultAst)) {
-      throw runtime_error("read_document") << "Invalid json data";
-    }
-
-    auto const& docAst = boost::get<jsn::object_t>(resultAst.at(jsonliteral::origin));
-    format = to_data_format(boost::get<std::string>(docAst.at(jsonliteral::format)));
+    format = to_data_format(search_result.value_as<std::string>(jsonliteral::origin_format));
 
     TLOG(34) << "read_document: format=<" << to_string(format) << ">";
   }
@@ -282,7 +281,7 @@ void read_document(Options const& options, std::string& conf) {
   switch (format) {
     default:
     case data_format_t::db: {
-      returnValue = search_result;
+      returnValue = std::move(search_result.to_string());
       returnValueChanged = true;
       break;
     }
@@ -297,16 +296,11 @@ void read_document(Options const& options, std::string& conf) {
     }
 
     case data_format_t::json: {
-      auto resultAst = jsn::object_t{};
-
-      if (!jsn::JsonReader{}.read(search_result, resultAst)) {
-        throw runtime_error("read_document") << "Invalid json data";
-      }
-
-      auto const& docAst = boost::get<jsn::object_t>(resultAst.at(jsonliteral::document));
-      auto const& dataAst = boost::get<jsn::object_t>(docAst.at(jsonliteral::data));
-
-      if (!jsn::JsonWriter{}.write(dataAst, returnValue)) {
+      jsn::value_t value = std::move(search_result.extract());
+      auto const& docAst = unwrap(value).value_as<const object_t>(jsonliteral::document);
+      auto const& dataAst=unwrap(docAst).value_as<const object_t>(jsonliteral::data);
+      
+      if (!JsonWriter{}.write(dataAst, returnValue)) {
         throw runtime_error("read_document") << "Invalid json data";
       }
 
@@ -318,32 +312,36 @@ void read_document(Options const& options, std::string& conf) {
       break;
 
     case data_format_t::fhicl: {
-      auto document = JSONDocument{search_result};
-      auto json = JsonData{document.findChild(jsonliteral::document).to_string()};
+      jsn::value_t value = std::move(search_result.extract());
+      auto const& docAst = unwrap(value).value_as<const object_t>(jsonliteral::document);
+        
+      auto fhicl_buffer = std::string();
 
-      auto fhicl = FhiclData{};
-      if (!json.convert_to<FhiclData>(fhicl)) {
-        TLOG(35) << "read_document: Unable to convert json data to fcl; json=<" << json << ">";
+      if (!FhiclWriter().write_data(docAst, fhicl_buffer)) {
+        TLOG(35) << "read_document: Unable to convert json data to fcl";
 
         throw runtime_error("read_document") << "Unable to reverse fhicl-to-json convertion";
       }
-      returnValue = fhicl.fhicl_buffer;
+
+      std::swap(returnValue,fhicl_buffer);
 
       returnValueChanged = true;
 
       break;
     }
     case data_format_t::xml: {
-      auto document = JSONDocument{search_result};
-      auto json = JsonData{document.findChild(jsonliteral::document).to_string()};
+      jsn::value_t value = std::move(search_result.extract());
+      auto const& docAst = unwrap(value).value_as<const object_t>(jsonliteral::document);
 
-      auto xml = XmlData{};
-      if (!json.convert_to<XmlData>(xml)) {
-        TLOG(36) << "read_document: Unable to convert json data to xml; json=<" << json << ">";
+      auto xml_buffer = std::string();
 
-        throw runtime_error("read_document") << "Unable to reverse xml-to-json convertion";
+      if (!XmlWriter().write(docAst, xml_buffer)) {
+        TLOG(35) << "read_document: Unable to convert json data to xml";
+
+        throw runtime_error("read_document") << "Unable to reverse fhicl-to-xml convertion";
       }
-      returnValue = xml.xml_buffer;
+
+      std::swap(returnValue,xml_buffer);
 
       returnValueChanged = true;
 
