@@ -95,6 +95,9 @@ constexpr auto string_singlequoted = "string_singlequoted";
 constexpr auto string_doublequoted = "string_doublequoted";
 constexpr auto string_unquoted = "string_unquoted";
 
+constexpr auto origin_format = "origin.format";
+constexpr auto document_data = "document.data";
+
 constexpr auto empty_json = "{}";
 namespace regex {
 constexpr auto parse_decimal = "-?\\d*\\.?\\d+e[+-]?\\d+";

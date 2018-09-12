@@ -50,13 +50,13 @@ def __allow_importing_incomplete_configurations():
       return True
   except KeyError:
     return False
-  
+
   return False
 
 def __remove_run(config):
   has_run = re.match(r'^\d+/(.*)', config)  
   return has_run.group(1) if has_run else config  
-  
+
 def __get_prefix(config):
   config = __remove_run(config)  
   match = re.match(r'(.*[^\d])(\d+$)', config)
@@ -65,7 +65,7 @@ def __get_prefix(config):
 def __ends_on_5digitnumber(config):
    match = re.match(r'.*[^\d](\d{5}$)', config)
    return True if match else False
-  
+
 def __increment_config_name(config):
   config = __remove_run(config)  
   match = re.match(r'(.*[^\d])(\d+$)', config)
@@ -81,10 +81,10 @@ def __latest_config_name(configNamePrefix):
     return None
 
   configs=list(c['name'].encode('ascii') for c in json.loads(result[1])['search'])
-  
+
   if not configs:
     return None
-  
+
   if __ends_on_5digitnumber(configNamePrefix):
     configs=list(config for config in configs if configNamePrefix==config)
   else:
@@ -92,20 +92,20 @@ def __latest_config_name(configNamePrefix):
 
   if not configs:
     return None 
-  
+
   configs.sort()
-  
+
   return configs[-1]
 
 def __read_document(query):
   query['dataformat']='origin'
-  
+
   result = conftoolg.read_document(json.dumps(query))
-  
+
   if result[0] is not True:
     __report_error(result)
     return (None,None)
-  
+
   return  (query['filter']['entities.name'].encode('ascii'),result[1],query['collection'].encode('ascii'))
 
 def __write_document(query,document):
@@ -330,9 +330,9 @@ def __exportConfiguration(config):
     
     if not os.path.exists(path):
       os.makedirs(path)
-    
+
     fcl_name = path+'/'+cfg[entity_name]+'.fcl'
-    
+
     with open(fcl_name, "w") as fcl_file:
       fcl_file.write(cfg[user_data])
 
@@ -346,15 +346,15 @@ def getLatestConfiguration(configNamePrefix):
 
 def importConfiguration(configNameOrconfigPrefix):
   configPrefix= __get_prefix(configNameOrconfigPrefix)
-  
+
   config = __latest_config_name(configPrefix)
-  
+
   config = __increment_config_name(config) if config else __increment_config_name(configPrefix)
 
   __copy_default_schema()
-  
+
   schema =__read_schema()   
-  
+
   cfg_composition =list( __composition_reader(['artdaq_processes','artdaq_includes','system_layout'], schema, __find_files('.',fcl_file_pattern)))
 
   excluded_files=__list_excluded_files(__get_prefix(config), schema, __find_files('.',any_file_pattern),cfg_composition)
@@ -397,47 +397,59 @@ def exportConfiguration(configNamePrefix):
 
 
 #bool /* status */ archiveConfiguration(std::string configuration_name,int run_number, std::map<std::string, std::string>); 
-def __archiveConfiguration(configuration_name,run_number,entity_userdata_map):
+def __archiveConfiguration(configuration_name,run_number,entity_userdata_map,update):
   if not entity_userdata_map or not configuration_name:
     return False
   
-  version=str(run_number)+"/"+configuration_name
+
+  configuration=str(run_number)+"/"+configuration_name
+  version=str(run_number)+"/"+configuration_name+"v1"
   found_versions=listVersions('SystemLayout')
 
   if version in found_versions:
-    print 'Error: Run ' +str(run_number) + ' already archived.'
-    return False
+    if not update:
+      print 'Error: Configuration ' + str(run_number)+"/"+configuration_name + ' is already archived.'
+      return False
+    else:
+      match = re.match(r'(.*[^\d])(\d+$)', version)
+      version=match.group(1) + str(int(match.group(2)) + 1) if match else version+str(1)
+      print 'Info: storing version '+ version
+
+  else:
+    if update:
+      print 'Error: Configuration ' +str(run_number)+"/"+configuration_name + ' is not archived.'
+      return False
   
   __copy_default_schema()
   
   for entry in entity_userdata_map:
     query = json.loads('{"operation" : "store", "dataformat":"fhicl", "filter":{}}')  
-    query['filter']['configurations.name']=version
+    query['filter']['configurations.name']=configuration
     query['collection']='RunHistory'
-    
+
     if entry == 'schema':
       query['collection']='SystemLayout'
-    
+
     query['filter']['version']=version
     query['filter']['entities.name']=entry       
     query['filter']['runs.name']=str(run_number) 
-  
+
     result=__write_document(query,entity_userdata_map[entry])
 
     if result[0] is not True:
       return False
-    
+
   return True  
 
-def archiveRunConfiguration(config,run_number):  
+def archiveRunConfiguration(config,run_number,update=False):
   try:
     artdaq_database_uri=os.environ['ARTDAQ_DATABASE_URI']
   except KeyError:
     print 'Error: ARTDAQ_DATABASE_URI is not set.'
     return False
-  
-  if artdaq_database_uri.startswith("mongodb://"):
-    return __archiveRunConfigurationWithBulkloader(config,run_number)
+
+  if artdaq_database_uri.startswith("mongodb://") and not update:
+    return __archiveConfigurationWithBulkloader(config,run_number,update)
 
   __copy_default_schema()
 
@@ -461,7 +473,7 @@ def archiveRunConfiguration(config,run_number):
   os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri+'_archive'
   print 'Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI']
 
-  result=__archiveConfiguration(config,run_number,entity_userdata_map)
+  result=__archiveConfiguration(config,run_number,entity_userdata_map,update)
 
   os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri
   print 'Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI']
@@ -475,8 +487,10 @@ def archiveRunConfiguration(config,run_number):
   return True  
 
 
+def updateArchivedRunConfiguration(config,run_number):
+  return archiveRunConfiguration(config,run_number,True)
 
-def __archiveRunConfigurationWithBulkloader(config,run_number):  
+def __archiveConfigurationWithBulkloader(config,run_number,update):
   try:
     artdaq_database_uri=os.environ['ARTDAQ_DATABASE_URI']
   except KeyError:
@@ -503,9 +517,13 @@ def __archiveRunConfigurationWithBulkloader(config,run_number):
     os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri
   
   if version in found_versions:
-    print 'Error: Run ' +str(run_number) + ' already archived.'
-    return False
-  
+    if update:
+      print 'Error: Configuration ' + str(run_number)+"/"+config + ' is already archived.'
+      return False
+  else:
+    if update:
+      print 'Error: Configuration ' +str(run_number)+"/"+config + ' is not archived.'
+
   __copy_default_schema()
   schema =__read_schema()
     
@@ -701,6 +719,7 @@ def help():
 #  print ' conftool.py exportDatabase #writes archives into the current directory'
 #  print ' conftool.py importDatabase #reads archives from the current directory'
   print ' conftool.py archiveRunConfiguration demo_safemode 23 #where 23 is a run number'
+  print ' conftool.py updateArchivedRunConfiguration demo_safemode 23 #where 23 is a run number'
   print ' conftool.py getListOfArchivedRunConfigurations 23 #where 23 is a run number'
   print ' conftool.py exportArchivedRunConfiguration 23/demo_safemode00003 #where 23/demo_safemode00003 is a configuration name'
   print ' conftool.py listDatabases'
@@ -738,7 +757,7 @@ if __name__ == "__main__":
     print 'Avaialble functions:'
     print  functions_list
     sys.exit(1)
-    
+
   getattr(conftoolg, 'enable_trace')()
   result = getattr(conftoolg, sys.argv[1])(*sys.argv[2:len(sys.argv)])
 
