@@ -1,10 +1,10 @@
-boost                v1_66_0a        boost-1.66.0a-slf6-x86_64-c2-debug.tar.bz2                   -f Linux64bit+2.6-2.12    -q c2:debug       
+boost                v1_66_0         boost-1.66.0-slf6-x86_64-c2-debug.tar.bz2                   -f Linux64bit+2.6-2.12    -q c2:debug       
 cetbuildtools        v7_02_01        cetbuildtools-7.02.01-noarch.tar.bz2                        -f NULL                                       
-cetlib_except        v1_02_00        cetlib_except-1.02.00-slf6-x86_64-c2-debug.tar.bz2          -f Linux64bit+2.6-2.12    -q c2:debug       
-cetlib               v3_03_00b       cetlib-3.03.00b-slf6-x86_64-c2-debug.tar.bz2                 -f Linux64bit+2.6-2.12    -q c2:debug       
+cetlib_except        v1_01_06        cetlib_except-1.01.06-slf6-x86_64-c2-debug.tar.bz2          -f Linux64bit+2.6-2.12    -q c2:debug       
+cetlib               v3_02_00        cetlib-3.02.00-slf6-x86_64-c2-debug.tar.bz2                 -f Linux64bit+2.6-2.12    -q c2:debug       
 cetpkgsupport        v1_13_00        cetpkgsupport-1.13.00-noarch.tar.bz2                        -f NULL
-cmake                v3_10_1         cmake-3.10.1-slf6-x86_64.tar.bz2                              -f Linux64bit+2.6-2.12                                                             
-fhiclcpp             v4_07_00        fhiclcpp-4.07.00-slf6-x86_64-c2-debug.tar.bz2               -f Linux64bit+2.6-2.12    -q c2:debug       
+cmake                v3_10_1          cmake-3.10.1-slf6-x86_64.tar.bz2                              -f Linux64bit+2.6-2.12                                                             
+fhiclcpp             v4_06_05        fhiclcpp-4.06.05-slf6-x86_64-c2-debug.tar.bz2               -f Linux64bit+2.6-2.12    -q c2:debug       
 gcc                  v6_4_0          gcc-6.4.0-slf6-x86_64.tar.bz2                                -f Linux64bit+2.6-2.12                       
 clang                v5_0_1          clang-5.0.1-slf6-x86_64.tar.bz2                               -f Linux64bit+2.6-2.12          
 python               v2_7_14b        python-2.7.14b-slf6-x86_64.tar.bz2                           -f Linux64bit+2.6-2.12                       
