@@ -403,18 +403,20 @@ def __archiveConfiguration(configuration_name,run_number,entity_userdata_map,upd
   
 
   configuration=str(run_number)+"/"+configuration_name
-  version=str(run_number)+"/"+configuration_name+"v1"
+  version=str(run_number)+"/"+configuration_name
   found_versions=listVersions('SystemLayout')
-
+  print found_versions
   if version in found_versions:
     if not update:
       print 'Error: Configuration ' + str(run_number)+"/"+configuration_name + ' is already archived.'
       return False
-    else:
-      match = re.match(r'(.*[^\d])(\d+$)', version)
-      version=match.group(1) + str(int(match.group(2)) + 1) if match else version+str(1)
+    else:      
+      versions = [v for v in found_versions if v.startswith(version)]
+      versions.sort()
+      version=versions[-1]
+      match = re.match(r'(.*[^\d]\d{5}v)(\d+$)', version)
+      version=match.group(1)+str(int(match.group(2)) + 1) if match else version+"v"+str(1)
       print 'Info: storing version '+ version
-
   else:
     if update:
       print 'Error: Configuration ' +str(run_number)+"/"+configuration_name + ' is not archived.'
@@ -515,14 +517,14 @@ def __archiveConfigurationWithBulkloader(config,run_number,update):
     return False
   finally:
     os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri
-  
   if version in found_versions:
-    if update:
+    if not update:
       print 'Error: Configuration ' + str(run_number)+"/"+config + ' is already archived.'
       return False
   else:
     if update:
       print 'Error: Configuration ' +str(run_number)+"/"+config + ' is not archived.'
+      return False
 
   __copy_default_schema()
   schema =__read_schema()
