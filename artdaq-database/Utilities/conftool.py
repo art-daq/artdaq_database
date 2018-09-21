@@ -386,6 +386,90 @@ def importConfiguration(configNameOrconfigPrefix):
   
   return True
 
+def __exportConfigurationWithBulkloader(config):
+  try:
+    artdaq_database_uri=os.environ['ARTDAQ_DATABASE_URI']
+  except KeyError:
+    print 'Error: ARTDAQ_DATABASE_URI is not set.'
+    return False
+
+  artdaq_database_remote_host=None
+  
+  try:
+    artdaq_database_remote_host=os.environ['ARTDAQ_DATABASE_REMOTEHOST']
+    print 'Info: ARTDAQ_DATABASE_REMOTEHOST is '+ artdaq_database_remote_host
+  except KeyError:
+    artdaq_database_remote_host=None
+
+  try:
+    os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri+'_archive'
+    found_configurations=getListOfAvailableRunConfigurations(config.split('/')[0])
+  except Exception,e:
+    print 'Error: Unable to query configurations.'    
+    return False
+  finally:
+    os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri
+  if config not in found_configurations:
+      print 'Error: Configuration ' +config + ' is not archived.'
+      return False
+
+
+  envvars = dict(os.environ)
+
+  keys = ['PATH', 'LD_LIBRARY_PATH', 'PYTHONPATH','ARTDAQ_DATABASE_DATADIR','ARTDAQ_DATABASE_CONFDIR']
+
+  setenvvars_command=' '.join('export {}="{}";'.format(k, v) for k, v in dict((k, envvars[k]) for k in keys if k in envvars).items())
+  setenvvars_command+='export ARTDAQ_DATABASE_URI="{}_archive";'.format(envvars['ARTDAQ_DATABASE_URI'])
+  setenvvars_command+='echo BULKDOWNLOADER is running on $(hostname -s) and ARTDAQ_DATABASE_URI=$ARTDAQ_DATABASE_URI'
+
+  data_files_dir= os.getcwd() if artdaq_database_remote_host is None else '$bulkloader_data_dir'
+  cddir_command='cd {}'.format(data_files_dir)
+
+  config_tokens=config.split('/')
+
+  bulkloader_command='bulkdownloader -r {} -c {} -p {} -t $(( $(nproc)/2 ))\nrc=$?'.format(
+      config_tokens[0],config_tokens[1],data_files_dir)
+
+  retcode_command='[[ $rc -eq 0 ]] && echo True || echo False'
+
+  sshopts='-o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" -o "BatchMode=yes" -o "LogLevel=QUIET"'  
+
+  scp_command1='export bulkloader_data_dir=/tmp/bulkloader/$(uuidgen);'
+  scp_command1+='mkdir -p $bulkloader_data_dir; cd $bulkloader_data_dir'
+
+  scp_command2='scp {} -r $bulkloader_data_dir/* {}:{}'.format(sshopts,socket.gethostname(),os.getcwd())
+
+  cleanup_commad='rm -rf /tmp/bulkloader/'
+
+  command=''
+
+  if artdaq_database_remote_host is None:      
+    command=';'.join([setenvvars_command,cddir_command,bulkloader_command,retcode_command])
+  else:
+    command='ssh {} {} \'{}\''.format(artdaq_database_remote_host,sshopts
+            ,';'.join([setenvvars_command,scp_command1,cddir_command,bulkloader_command,scp_command2,cleanup_commad,retcode_command]))
+
+  task=None
+  stdoutbuff=None
+  stderrbuff=None
+
+  try:
+    task = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
+    stdoutbuff,stderrbuff = task.communicate()
+    result=task.wait()
+  except Exception,e:
+    print 'Error: Failed running bulkdownloader over ssh on '+ artdaq_database_remote_host + '. Exception message: '+ str(e)
+    result=1
+
+  if result!=0 or not stdoutbuff.endswith("True\n"):
+    print stdoutbuff[:-7]
+    print stderrbuff    
+    return False
+
+  print stdoutbuff[:-6]
+
+  return True 
+
 def exportConfiguration(configNamePrefix):
   if not __ends_on_5digitnumber(configNamePrefix):
     print 'Error: Configuration does not have five digits at the end.'
@@ -609,6 +693,9 @@ def exportArchivedRunConfiguration(config):
   except KeyError:
     print 'Error: ARTDAQ_DATABASE_URI is not set.'
     return False
+
+  if artdaq_database_uri.startswith("mongodb://") and len(config.split('/'))==2:
+    return __exportConfigurationWithBulkloader(config)
 
   os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri+'_archive'
   print 'Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI']
