@@ -198,7 +198,7 @@ JSONDocument prov::configurationComposition(ManageDocumentOperation const& optio
       throw runtime_error("operation_confcomposition") << "Unsupported filter string, no match";
     }
 
-#ifdef extra_traces
+#ifdef EXTRA_TRACES
     for (size_t i = 0; i < results.size(); ++i) {
       std::ssub_match sub_match = results[i];
       std::string piece = sub_match.str();
@@ -256,7 +256,7 @@ std::vector<JSONDocument> prov::findVersions(ManageDocumentOperation const& opti
       throw runtime_error("operation_findversions") << "Unsupported filter string, no match";
     }
 
-#ifdef extra_traces
+#ifdef EXTRA_TRACES
     for (size_t i = 0; i < results.size(); ++i) {
       std::ssub_match sub_match = results[i];
       std::string piece = sub_match.str();
@@ -316,7 +316,7 @@ std::vector<JSONDocument> prov::findEntities(ManageDocumentOperation const& opti
       throw runtime_error("operation_findentities") << "Unsupported filter string, no match";
     }
 
-#ifdef extra_traces
+#ifdef EXTRA_TRACES
     for (size_t i = 0; i < results.size(); ++i) {
       std::ssub_match sub_match = results[i];
       std::string piece = sub_match.str();
