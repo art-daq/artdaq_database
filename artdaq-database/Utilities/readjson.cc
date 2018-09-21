@@ -56,9 +56,15 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::FAILURE;
   }
 
+  //int a;
+  //std::cout << "Continue ?";
+  //std::cin>>a;
+  //if(a==0)
+  //        return process_exit_code::FAILURE;
+
   auto out = std::string{};
   out.reserve(1000000);
-  for(int i=0; i<10; i++){
+  for(int i=0; i<100; i++){
   out.clear();
 
     if(!writer.write(doc_ast,out)){
