@@ -33,12 +33,12 @@ struct json_parser_grammar : qi::grammar<Iter, object_t(), ascii::space_type> {
 
     start = object_rule;
 
-    BOOST_SPIRIT_DEBUG_NODE(key_rule);
-    BOOST_SPIRIT_DEBUG_NODE(value_rule);
-    BOOST_SPIRIT_DEBUG_NODE(data_rule);
-    BOOST_SPIRIT_DEBUG_NODE(object_rule);
-    BOOST_SPIRIT_DEBUG_NODE(array_rule);
-    BOOST_SPIRIT_DEBUG_NODE(start);
+//     BOOST_SPIRIT_DEBUG_NODE(key_rule);
+//     BOOST_SPIRIT_DEBUG_NODE(value_rule);
+//     BOOST_SPIRIT_DEBUG_NODE(data_rule);
+//     BOOST_SPIRIT_DEBUG_NODE(object_rule);
+//     BOOST_SPIRIT_DEBUG_NODE(array_rule);
+//     BOOST_SPIRIT_DEBUG_NODE(start);
   }
 
   qi::rule<Iter, std::string(), ascii::space_type> quoted_string;

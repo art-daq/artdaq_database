@@ -120,7 +120,8 @@ void write_document(Options const& options, std::string& conf) {
 
         data = JSONDocument{value};
       }
-#ifdef TESTBUILD
+
+#ifdef EXTRA_TRACES
       // convert from fhicl to json and back to fhicl
       JsonData json = FhiclData{conf};
 

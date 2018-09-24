@@ -108,7 +108,7 @@ struct vector_of {
   */
   size_type size() const { return values.size(); }
 
-  void push_back(value_type const& val) { return values.push_back(val); }
+  void push_back(value_type const& val) { return values.emplace_back(val); }
 
   collection_type& operator()() { return values; }
 

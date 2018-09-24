@@ -47,23 +47,32 @@ int main(int argc, char* argv[]) try {
   auto json = std::string{};
   db::read_buffer_from_file(json, file_name);
 
-  
-  for (int i = 0; i < 100; i++) {
-    auto doc = JSONDocument(json);
-    auto docstring = std::string{"{\"aa\": 1}"};
-    auto newdoc = JSONDocument(docstring);
+  auto reader = jsn::JsonReader{};
+  auto writer = jsn::JsonWriter{};
 
-    auto path = std::string{"document.data.main.daq.fragment_receiver"};
+  jsn::object_t doc_ast;
 
-    std::cout << doc.replaceChild(newdoc, path);
+  if (!reader.read(json, doc_ast)) {
+    return process_exit_code::FAILURE;
   }
-  //   auto reader = jsn::JsonReader{};
-  //
-  //   jsn::object_t doc_ast;
-  //
-  //   if (!reader.read(json, doc_ast)) {
-  //     confirm(false);
-  //   }
+
+  //int a;
+  //std::cout << "Continue ?";
+  //std::cin>>a;
+  //if(a==0)
+  //        return process_exit_code::FAILURE;
+
+  auto out = std::string{};
+  out.reserve(1000000);
+  for(int i=0; i<100; i++){
+  out.clear();
+
+    if(!writer.write(doc_ast,out)){
+        return process_exit_code::FAILURE;
+    }
+
+    std::cout << (out.size()>100?"+":"-");
+  }
 
   return process_exit_code::SUCCESS;
 } catch (...) {

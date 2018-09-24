@@ -261,7 +261,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument doc) {
 
   TLOG(24) << "createFrom() begin args";
 
-#ifdef TESTBUILD
+#ifdef EXTRA_TRACES
   TLOG(24) << "createFrom() document=<" << document << ">";
 #endif
 
@@ -287,7 +287,7 @@ JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument doc) {
 void JSONDocumentBuilder::_importUserData(JSONDocument const& document) {
   TLOG(25) << "_importUserData() begin";
 
-#ifdef TESTBUILD
+#ifdef EXTRA_TRACES
   TLOG(25) << "_importUserData() document=<" << document << ">";
 #endif
 
