@@ -9,9 +9,6 @@ cet_make(
   artdaq-database_StorageProviders_MongoDB  
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
-  #${FHICLCPP}  
-  #${SQLITE3}
-  #${CETLIB}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}    
   )
 

@@ -6,6 +6,104 @@
 #           [USE_PRODUCT_NAME]
 #           [EXCLUDE <ignore these files>] )
 
+SET(MAKE_CETLIBEXCEPT_STATIC $ENV{MAKE_CETLIBEXCEPT_STATIC})
+IF(MAKE_CETLIBEXCEPT_STATIC)
+  string(TOUPPER ${MAKE_CETLIBEXCEPT_STATIC} MAKE_CETLIBEXCEPT_STATIC_UC )
+  if( ${MAKE_CETLIBEXCEPT_STATIC_UC} MATCHES "TRUE" )
+    set(CETLIBEXCEPT_IS_STATIC "TRUE")
+  endif()
+ENDIF()
+
+IF(CETLIBEXCEPT_IS_STATIC)
+  MESSAGE (STATUS "Making cetlib_except static")
+  
+  set(SOURCES
+    cetlib_except/cetlib_except/exception.cc
+    )
+    
+  set(LIBRARIES  
+    )
+    
+  add_library(${CETLIB_EXCEPT} STATIC ${SOURCES})
+  set_property(TARGET ${CETLIB_EXCEPT} PROPERTY POSITION_INDEPENDENT_CODE ON)
+  target_link_libraries(${CETLIB_EXCEPT} ${LIBRARIES})  
+else()
+  cet_make(
+    LIBRARY_NAME 
+    ${CETLIB_EXCEPT}
+    LIBRARIES
+    WITH_STATIC_LIBRARY
+    SUBDIRS
+    cetlib_except/cetlib_except
+    EXCLUDE
+    cetlib_except/cetlib_except/demangle.cc
+    cetlib_except/cetlib_except/exception_collector.cc
+  ) 
+ENDIF()
+
+SET(MAKE_CETLIB_STATIC $ENV{MAKE_CETLIB_STATIC})
+IF(MAKE_CETLIB_STATIC)
+  string(TOUPPER ${MAKE_CETLIB_STATIC} MAKE_CETLIB_STATIC_UC )
+  if( ${MAKE_CETLIB_STATIC_UC} MATCHES "TRUE" )
+    set(CETLIB_IS_STATIC "TRUE")
+  endif()
+ENDIF()
+
+IF(CETLIB_IS_STATIC)
+  MESSAGE (STATUS "Making cetlib static")
+  
+  set(SOURCES
+    cetlib/cetlib/canonical_number.cc
+    cetlib/cetlib/canonical_string.cc
+    cetlib/cetlib/include.cc
+    cetlib/cetlib/includer.cc
+    cetlib/cetlib/filepath_maker.cc
+    cetlib/cetlib/base_converter.cc
+    cetlib/cetlib/search_path.cc
+    cetlib/cetlib/filesystem.cc
+    cetlib/cetlib/getenv.cc
+    cetlib/cetlib/split_by_regex.cc
+    )
+
+  set(LIBRARIES  
+    ${CETLIB_EXCEPT}
+    ${Boost_FILESYSTEM_LIBRARY}
+    ${Boost_SYSTEM_LIBRARY}
+    )
+    
+  add_library(${CETLIB} STATIC ${SOURCES})
+  set_property(TARGET ${CETLIB} PROPERTY POSITION_INDEPENDENT_CODE ON)
+  target_link_libraries(${CETLIB} ${LIBRARIES})  
+else()
+  cet_make(
+    LIBRARY_NAME 
+    ${CETLIB}
+    LIBRARIES
+    ${CETLIB_EXCEPT}
+    ${Boost_FILESYSTEM_LIBRARY}
+    ${Boost_SYSTEM_LIBRARY}
+    WITH_STATIC_LIBRARY
+    SUBDIRS
+    cetlib/cetlib
+    EXCLUDE
+    cetlib/cetlib/BasicPluginFactory.cc
+    cetlib/cetlib/column_width.cc
+    cetlib/cetlib/cpu_timer.cc
+    cetlib/cetlib/crc32.cc
+    cetlib/cetlib/get-loadable-libraries.cc
+    cetlib/cetlib/inc-expand.cc
+    cetlib/cetlib/LibraryManager.cc
+    cetlib/cetlib/lpad.cc
+    cetlib/cetlib/MD5Digest.cc
+    cetlib/cetlib/nybbler.cc
+    cetlib/cetlib/PluginFactory.cc
+    cetlib/cetlib/replace_all.cc
+    cetlib/cetlib/rpad.cc
+    cetlib/cetlib/sha1.cc
+    cetlib/cetlib/simple_stats.cc
+    cetlib/cetlib/split_path.cc
+  ) 
+ENDIF()
 
 SET(MAKE_FHICLCPP_STATIC $ENV{MAKE_FHICLCPP_STATIC})
 IF(MAKE_FHICLCPP_STATIC)
@@ -27,16 +125,9 @@ IF(FHICLCPP_IS_STATIC)
     fhicl-cpp/fhiclcpp/Protection.cc
     )
 
-  find_library(CETLIB NAMES cetlib HINTS $ENV{CETLIB_LIB} )
-  find_library(CETLIBEXCEPT NAMES cetlib_except HINTS $ENV{CETLIB_EXCEPT_LIB} )
-    
   set(LIBRARIES  
     ${CETLIB}
-    ${CETLIBEXCEPT}
-    #${SQLITE3}
-    ${Boost_FILESYSTEM_LIBRARY}
-    ${Boost_SYSTEM_LIBRARY}
-    ${Boost_REGEX_LIBRARY}
+    ${CETLIB_EXCEPT}
     )
     
   add_library(${FHICLCPP} STATIC ${SOURCES})
@@ -47,12 +138,8 @@ else()
     LIBRARY_NAME 
     ${FHICLCPP}
     LIBRARIES
-    cetlib
-    cetlib_except
-    #${SQLITE3}
-    ${Boost_FILESYSTEM_LIBRARY}
-    ${Boost_SYSTEM_LIBRARY}
-    ${Boost_REGEX_LIBRARY}
+    ${CETLIB}
+    ${CETLIB_EXCEPT}
     WITH_STATIC_LIBRARY
     SUBDIRS
     fhicl-cpp/fhiclcpp
@@ -65,6 +152,7 @@ else()
     fhicl-cpp/fhiclcpp/make_ParameterSet.cc  
   ) 
 ENDIF()
+
 
 #install(DIRECTORY paramiko/build/lib DESTINATION ${flavorqual_dir})
 

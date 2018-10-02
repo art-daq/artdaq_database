@@ -1,10 +1,11 @@
 
 source: {
 #Success 1  above satom
-module_type: "RawInput" 
-
+module_type: "RawInput"  
+ 
 resume_after_timeout: true #Success 3 right of satom
-
+ 
 waiting_time: 900 //Success 2 right of satom
 
 }
+
