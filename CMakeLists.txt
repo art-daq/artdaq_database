@@ -53,13 +53,7 @@ cet_report_compiler_flags()
 # these are minimum required versions, not the actual product versions
 find_ups_boost  ( v1_57_0 )
 find_ups_product( cetbuildtools v5_08_00 )
-#find_ups_product( artdaq_utilities v1_02_00 )
-find_ups_product( cetlib v2_02_00 )
-find_ups_product( cetlib_except v1_01_00 )
-
-#find_ups_product( art v2_07_03 )
 find_ups_product( cetpkgsupport v1_11_00 )
-#find_ups_product( fhiclcpp v3_20_01 )
 find_ups_product( mongodb v3_4_6 )
 find_ups_product( TRACE v3_13_05 )
 find_ups_product( swig v3_0_12 )
@@ -72,6 +66,9 @@ endif()
 
 # buil-in libraries
 include(BuiltinFHICLCPP)
+include(BuiltinCETLIB)
+include(BuiltinCETLIBEXCEPT)
+
 #include(BuiltinPARAMICO)
 add_subdirectory(built-in)
 
