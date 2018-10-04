@@ -72,7 +72,6 @@ T& unwrapper<const value_t>::value_as() try {
   throw;
 }
 
-
 }  // namespace sharedtypes
 }  // namespace database
 }  // namespace artdaq

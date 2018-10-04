@@ -94,6 +94,7 @@ struct ConfigurationInterface final {
 
     opts.collection(serializer.configurationName());
     opts.version(version);
+
     if (!entity.empty()) opts.entity(entity);
 
     auto buffer = std::string{};
@@ -114,7 +115,7 @@ struct ConfigurationInterface final {
           << "Unsupported storage format " << demangle(typeid(TYPE).name()) << ",  use either JsonData or FhiclData.";
     }
 
-    auto data = TYPE{{"{}"}};
+    auto data = TYPE{"{}"};
 
     auto writeResult = serializer.template writeDocument<TYPE>(data);
 

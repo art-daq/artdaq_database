@@ -26,6 +26,7 @@ using artdaq::database::Success;
 
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
+using artdaq::database::sharedtypes::unwrap;
 
 namespace db = artdaq::database;
 namespace utl = db::docrecord;
@@ -43,8 +44,8 @@ bool matches(value_t const& left, value_t const& right) {
   }
 
   if (type(left) == type_t::OBJECT) {
-    auto const& leftObj = boost::get<object_t>(left);
-    auto const& rightObj = boost::get<object_t>(right);
+    auto const& leftObj =  unwrap(left).value_as<const object_t>();
+    auto const& rightObj = unwrap(right).value_as<const object_t>();
 
     // FIXME:GAL partial elements match
     // if (leftObj.size() != rightObj.size()) return false;
@@ -74,8 +75,8 @@ bool matches(value_t const& left, value_t const& right) {
     return true;
   }
   if (type(left) == type_t::ARRAY) {
-    auto const& leftObj = boost::get<jsn::array_t>(left);
-    auto const& rightObj = boost::get<jsn::array_t>(right);
+    auto const& leftObj = unwrap(left).value_as<const array_t>();
+    auto const& rightObj = unwrap(left).value_as<const array_t>();
 
     if (leftObj.size() != rightObj.size()) {
       return false;
@@ -197,16 +198,16 @@ value_t const& JSONDocument::getPayloadValueForKey(object_t::key_type const& key
   confirm(!key.empty());
 
   TLOG(21) << "getPayloadValueForKey() document=<" << cached_json_buffer() << ">";
+ 
+  if (unwrap(_value).value_as<const object_t>().count("payload") == 1) {
+    auto const& value = unwrap(_value).value<const object_t>("payload");
 
-  if (boost::get<object_t>(_value).count("payload") == 1) {
-    auto const& value = boost::get<object_t>(_value).at("payload");
-
-    if (type(value) == type_t::OBJECT && boost::get<object_t>(value).count(key) == 1) {
-      return boost::get<object_t>(value).at(key);
+    if (type(value) == type_t::OBJECT && unwrap(value).value_as<const object_t>().count(key) == 1) {
+      return unwrap(value).value<const object_t>(key);
     }
-    { return value; }
-  } else if (boost::get<object_t>(_value).size() == 1) {
-    return boost::get<object_t>(_value).begin()->value;
+    return value; 
+  } else if (unwrap(_value).value_as<const object_t>().size() == 1) {
+    return unwrap(_value).value_as<const object_t>().begin()->value;
   }
 
   return _value;
@@ -394,7 +395,7 @@ std::string JSONDocument::value_at(JSONDocument const& document, std::size_t ind
 
   auto docValue = document.getPayloadValueForKey("0");
 
-  auto const& valueArray = boost::get<jsn::array_t>(docValue);
+  auto const& valueArray = unwrap(docValue).value_as<const array_t>();
 
   if (valueArray.empty()) {
     throw runtime_error("JSONDocument") << "Failed calling value_at(): valueArray is empty, document=<" << document.cached_json_buffer() << ">";
