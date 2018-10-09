@@ -127,6 +127,10 @@ function run_build() {
   source ${srcdir}/artdaq-database/ups/setup_for_development ${build_flag} ${basequal} ${squal}
 
   ups active
+  export MAKE_FHICLCPP_STATIC=TRUE
+  export MAKE_CETLIBEXCEPT_STATIC=TRUE
+  export MAKE_CETLIB_STATIC=TRUE
+
 
   unset RUN_TESTS
   CETPKG_J=$(nproc)
