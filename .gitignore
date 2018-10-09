@@ -13,3 +13,4 @@ built-in/cetlib_except
 bin/*
 obj/*
 *.vcxproj*
+*.orig

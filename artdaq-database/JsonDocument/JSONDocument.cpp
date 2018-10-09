@@ -11,6 +11,7 @@ using artdaq::database::json::array_t;
 using artdaq::database::json::object_t;
 using artdaq::database::json::type_t;
 using artdaq::database::json::value_t;
+using artdaq::database::sharedtypes::unwrap;
 
 using namespace artdaq::database;
 using artdaq::database::docrecord::JSONDocument;
@@ -63,7 +64,7 @@ value_t const& JSONDocument::findChildValue(path_t const& path) const try {
                                                << ", findChildValue() recurse() value_t is not object_t; value=" << print_visitor(childValue);
     }
 
-    auto const& childDocument = boost::get<object_t>(childValue);
+    auto const& childDocument = unwrap(childValue).value_as<const object_t>();
 
     tmpJson.clear();
 
@@ -103,7 +104,7 @@ JSONDocument JSONDocument::findChild(path_t const& path) const try {
 
   auto returnValue = JSONDocument();
 
-  auto& document = boost::get<object_t>(returnValue._value);
+  auto& document = unwrap(returnValue._value).value_as<object_t>();
   document[path] = found_value;
 
   TLOG(26) << "findChild() Find succeeded.";
@@ -158,7 +159,7 @@ JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t con
                                                << ", replaceChild() recurse() value_t is not object_t; value=" << print_visitor(childValue);
     }
 
-    auto& childDocument = boost::get<object_t>(childValue);
+    auto& childDocument = unwrap(childValue).value_as<object_t>();
 
     tmpJson.clear();
 
@@ -215,7 +216,7 @@ JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t cons
                                                << ", insertChild() recurse() value_t is not object_t; value=" << print_visitor(childValue);
     }
 
-    auto& childDocument = boost::get<object_t>(childValue);
+    auto& childDocument = unwrap(childValue).value_as<object_t>();
 
     tmpJson.clear();
 
@@ -271,7 +272,7 @@ JSONDocument JSONDocument::deleteChild(path_t const& path) try {
                                                << print_visitor(childValue);
     }
 
-    auto& childDocument = boost::get<object_t>(childValue);
+    auto& childDocument = unwrap(childValue).value_as<object_t>();
 
     tmpJson.clear();
 
@@ -309,7 +310,7 @@ JSONDocument JSONDocument::appendChild(JSONDocument const& newChild, path_t cons
 
   TLOG(47) << "appendChild() new child value=" << print_visitor(newValue);
 
-  auto& valueArray = boost::get<array_t>(findChildValue(path));
+  auto& valueArray = unwrap(findChildValue(path)).value_as<array_t>();
 
   valueArray.push_back(newValue);
 
@@ -341,13 +342,13 @@ JSONDocument JSONDocument::removeChild(JSONDocument const& delChild, path_t cons
 
   TLOG(51) << "removeChild() delete value=" << print_visitor(deleteValue);
 
-  auto& deletionCandidates = boost::get<array_t>(findChildValue(path));
+  auto& deletionCandidates = unwrap(findChildValue(path)).value_as<array_t>();
 
   auto returnValue = JSONDocument();
 
-  auto& deletedVariant = boost::get<object_t>(returnValue._value)["0"] = array_t{};
+  auto& deletedVariant = unwrap(returnValue._value).value_as<object_t>()["0"] = array_t{};
 
-  auto& deletedValues = boost::get<array_t>(deletedVariant);
+  auto& deletedValues = unwrap(deletedVariant).value_as<array_t>();
 
   auto candidateIter(deletionCandidates.begin()), end(deletionCandidates.end());
   while (candidateIter != end) {

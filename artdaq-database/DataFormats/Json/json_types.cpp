@@ -1,5 +1,4 @@
 #include "artdaq-database/DataFormats/common.h"
-
 #include "artdaq-database/DataFormats/Json/json_types.h"
 
 #ifdef TRACE_NAME
@@ -8,50 +7,44 @@
 
 #define TRACE_NAME "json_types.cpp"
 
-using artdaq::database::sharedtypes::unwrapper;
 namespace artdaq {
 namespace database {
 namespace sharedtypes {
 
-template <>
-template <>
-jsn::object_t& unwrapper<jsn::object_t&>::value_as() {
-  return boost::get<jsn::object_t&>(any);
-}
-template <>
-template <>
-jsn::array_t& unwrapper<jsn::array_t&>::value_as() {
-  return boost::get<jsn::array_t&>(any);
-}
-/*
-template <>
-template <>
-jsn::object_t const& unwrapper<const jsn::object_t>::value_as<const jsn::object_t>(std::string const& name)  try {
-  confirm(!name.empty());
-  return boost::get<jsn::object_t>(any.at(name));
-} catch (...) {
-  throw;
-}
+using artdaq::database::json::object_t;
+using artdaq::database::json::value_t;
+using artdaq::database::json::array_t;
 
 template <>
 template <>
-std::string const& unwrapper<const jsn::object_t>::value_as<const std::string>(std::string const& name)  try {
-  confirm(!name.empty());
-  return boost::get<std::string>(any.at(name));
-} catch (...) {
-  throw;
+object_t& unwrapper<object_t&>::value_as() {
+  return boost::get<object_t&>(any);
+}
+template <>
+template <>
+array_t& unwrapper<array_t&>::value_as() {
+  return boost::get<array_t&>(any);
 }
 
 template <>
+ unwrapper<value_t>::unwrapper(value_t& a)
+ : any(a) {}
+
 template <>
-jsn::array_t const& unwrapper<const jsn::object_t>::value_as<const jsn::array_t>(std::string const& name)  try {
-  confirm(!name.empty());
-  return boost::get<jsn::array_t>(any.at(name));
-} catch (...) {
-  throw;
-}
-*/
+ unwrapper<const value_t>::unwrapper(const value_t& a)
+ : any(a) {}
+
+template <>
+ unwrapper<object_t>::unwrapper(object_t& a)
+ : any(a) {}
+
+template <>
+ unwrapper<const object_t>::unwrapper(const object_t& a)
+ : any(a) {}
+
 }  // namespace sharedtypes
+
+
 
 namespace json {
 constexpr auto noerror = "Success";

@@ -3,15 +3,18 @@
 
 #include "artdaq-database/DataFormats/Json/json_types.h"
 
-namespace dbt = artdaq::database::sharedtypes;
 
 using artdaq::database::json::array_t;
 using artdaq::database::json::object_t;
 using artdaq::database::json::value_t;
 
+namespace artdaq {
+namespace database {
+namespace sharedtypes {
+
 template <>
 template <typename T>
-T& dbt::unwrapper<object_t>::value_as(std::string const& name) try {
+T& unwrapper<object_t>::value_as(std::string const& name) try {
   confirm(!name.empty());
 
   return boost::get<T>(any.at(name));
@@ -21,7 +24,7 @@ T& dbt::unwrapper<object_t>::value_as(std::string const& name) try {
 
 template <>
 template <typename T>
-T& dbt::unwrapper<const object_t>::value_as(std::string const& name) try {
+T& unwrapper<const object_t>::value_as(std::string const& name) try {
   confirm(!name.empty());
 
   return boost::get<T>(any.at(name));
@@ -31,25 +34,30 @@ T& dbt::unwrapper<const object_t>::value_as(std::string const& name) try {
 
 template <>
 template <typename T>
-T& dbt::unwrapper<value_t>::value_as(std::string const& name) try {
+T& unwrapper<value_t>::value_as(std::string const& name) try {
   confirm(!name.empty());
-  return boost::get<T>(boost::get<object_t>(any).at(name));
+  auto& o= boost::get<object_t>(any);
+  auto& v = o.at(name);
+  return boost::get<T>(v);
 } catch (...) {
   throw;
 }
 
 template <>
 template <typename T>
-T& dbt::unwrapper<const value_t>::value_as(std::string const& name) try {
+T& unwrapper<const value_t>::value_as(std::string const& name) try {
+  static_assert(std::is_const<T>(),"Template argument T is not a const-qualified type.");
   confirm(!name.empty());
-  return boost::get<T>(boost::get<object_t>(any).at(name));
+  auto const& o = boost::get<const object_t>(any);
+  auto const& v = o.at(name);
+  return boost::get<T>(v);
 } catch (...) {
   throw;
 }
 
 template <>
 template <typename T>
-T& dbt::unwrapper<value_t>::value_as() try {
+T& unwrapper<value_t>::value_as() try {
   return boost::get<T>(any);
 } catch (...) {
   throw;
@@ -57,10 +65,14 @@ T& dbt::unwrapper<value_t>::value_as() try {
 
 template <>
 template <typename T>
-T& dbt::unwrapper<const value_t>::value_as() try {
+T& unwrapper<const value_t>::value_as() try {
+  static_assert(std::is_const<T>(),"Template argument T is not a const-qualified type.");
   return boost::get<T>(any);
 } catch (...) {
   throw;
 }
 
+}  // namespace sharedtypes
+}  // namespace database
+}  // namespace artdaq
 #endif /* _ARTDAQ_DATABASE_JSONTYPES_IMPL_H_ */

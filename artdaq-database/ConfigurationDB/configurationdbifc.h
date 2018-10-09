@@ -19,6 +19,7 @@ namespace impl = cf::opts;
 
 using artdaq::database::basictypes::FhiclData;
 using artdaq::database::basictypes::JsonData;
+using artdaq::database::sharedtypes::unwrap;
 using cf::options::data_format_t;
 
 constexpr auto apiname = "ConfigurationInterface";
@@ -93,6 +94,7 @@ struct ConfigurationInterface final {
 
     opts.collection(serializer.configurationName());
     opts.version(version);
+
     if (!entity.empty()) opts.entity(entity);
 
     auto buffer = std::string{};
@@ -113,7 +115,7 @@ struct ConfigurationInterface final {
           << "Unsupported storage format " << demangle(typeid(TYPE).name()) << ",  use either JsonData or FhiclData.";
     }
 
-    auto data = TYPE{{"{}"}};
+    auto data = TYPE{"{}"};
 
     auto writeResult = serializer.template writeDocument<TYPE>(data);
 
@@ -255,12 +257,12 @@ struct ConfigurationInterface final {
       if (!jsn::JsonReader().read(apiCallResult.second, resultAST))
         throw artdaq::database::runtime_exception(apifunctname) << "Invalid JSON:" << apiCallResult.second;
       try {
-        auto const& searches = boost::get<jsn::array_t>(resultAST.at(jsonliteral::search));
+        auto const& searches = unwrap(resultAST).value_as<const jsn::array_t>(jsonliteral::search);
 
         for (auto const search : searches) {
-          auto const& query = boost::get<jsn::object_t>(search).at(jsonliteral::query);
-          auto const& filter = boost::get<jsn::object_t>(query).at(jsonliteral::filter);
-          auto const& version = boost::get<std::string>(boost::get<jsn::object_t>(filter).at(apiliteral::filter::version));
+          auto const& query = unwrap(search).value_as<const jsn::object_t>(jsonliteral::query);
+          auto const& filter = unwrap(query).value_as<const jsn::object_t>(jsonliteral::filter);
+          auto const& version = unwrap(filter).value_as<const std::string>(apiliteral::filter::version);
           returnList.emplace_back(version);
         }
       } catch (std::exception const& e) {
@@ -309,12 +311,12 @@ struct ConfigurationInterface final {
         throw artdaq::database::runtime_exception(apifunctname) << "Invalid JSON:" << apiCallResult.second;
 
       try {
-        auto const& searches = boost::get<jsn::array_t>(resultAST.at(jsonliteral::search));
+        auto const& searches = unwrap(resultAST).value_as<jsn::array_t>(jsonliteral::search);
 
-        for (auto const search : searches) {
-          auto const& query = boost::get<jsn::object_t>(search).at(jsonliteral::query);
-          auto const& filter = boost::get<jsn::object_t>(query).at(jsonliteral::filter);
-          auto const& configuration = boost::get<std::string>(boost::get<jsn::object_t>(filter).at(apiliteral::filter::configurations));
+        for (auto const& search : searches) {
+          auto const& query =  unwrap(search).value_as<const jsn::object_t>(jsonliteral::query);
+          auto const& filter = unwrap(query).value_as<const jsn::object_t>(jsonliteral::filter);
+          auto const& configuration = unwrap(filter).value_as<const std::string>(apiliteral::filter::configurations);
           returnSet.insert(configuration);
         }
       } catch (std::exception const& e) {
@@ -341,11 +343,11 @@ struct ConfigurationInterface final {
 
     auto returnList = VersionInfoList_t{};  // RVO
 
-    auto to_VersionInfo = [](auto const& query) {
-      auto const& configuration = boost::get<std::string>(boost::get<jsn::object_t>(query).at(apiliteral::option::collection));
-      auto const& filter = boost::get<jsn::object_t>(query).at(jsonliteral::filter);
-      auto const& version = boost::get<std::string>(boost::get<jsn::object_t>(filter).at(apiliteral::filter::version));
-      auto const& entity = boost::get<std::string>(boost::get<jsn::object_t>(filter).at(apiliteral::filter::entities));
+    auto to_VersionInfo = [](jsn::object_t const& query) {
+      auto const& configuration = unwrap(query).value_as<const std::string>(apiliteral::option::collection);
+      auto const& filter = unwrap(query).value_as<const jsn::object_t>(jsonliteral::filter);
+      auto const& version = unwrap(filter).value_as<const std::string>(apiliteral::filter::version);
+      auto const& entity = unwrap(filter).value_as<const std::string>(apiliteral::filter::entities);
       return VersionInfo{configuration, version, entity};
     };
 
@@ -366,15 +368,16 @@ struct ConfigurationInterface final {
         throw artdaq::database::runtime_exception(apifunctname) << "Invalid JSON:" << apiCallResult.second;
 
       try {
-        for (auto const search : boost::get<jsn::array_t>(resultAST.at(jsonliteral::search))) {
+        auto& search_array=unwrap(resultAST).value_as<jsn::array_t>(jsonliteral::search);
+        for (auto search : search_array) {
           auto buffer = std::string{};
 
           {
-            auto query = boost::get<jsn::object_t>(search).at(jsonliteral::query);
+            auto& query = unwrap(search).value_as<jsn::object_t>(jsonliteral::query);
 
-            boost::get<jsn::object_t>(query).at("operation") = std::string{apiliteral::operation::findversions};
+            query[apiliteral::option::operation] = std::string{apiliteral::operation::findversions};
 
-            if (!jsn::JsonWriter().write(boost::get<jsn::object_t>(query), buffer))
+            if (!jsn::JsonWriter().write(query, buffer))
               throw artdaq::database::runtime_exception(apifunctname) << "Invalid JSON:" << apiCallResult.second;
           }
 
@@ -387,13 +390,13 @@ struct ConfigurationInterface final {
           if (!jsn::JsonReader().read(apiCall2Result.second, result2AST))
             throw artdaq::database::runtime_exception(apifunctname) << "Invalid JSON:" << apiCall2Result.second;
 
-          auto const& searches2 = boost::get<jsn::array_t>(result2AST.at(jsonliteral::search));
+          auto const& searches2 = unwrap(result2AST).value_as<jsn::array_t>(jsonliteral::search);
 
           if (searches2.size() != 1)
             throw artdaq::database::runtime_exception(apifunctname)
                 << "Invalid JSON:" << apiCall2Result.second << "Too many results found, expected one.";
 
-          auto const& version_query = boost::get<jsn::object_t>(*searches2.begin()).at(jsonliteral::query);
+          auto const& version_query = unwrap(*searches2.begin()).value_as<const jsn::object_t>(jsonliteral::query);
 
           returnList.emplace_back(to_VersionInfo(version_query));
         }
@@ -428,7 +431,7 @@ struct ConfigurationInterface final {
 
     auto payloadAST = jsn::object_t{};
     payloadAST[apiliteral::operations] = jsn::array_t{};
-    auto& operations = boost::get<jsn::array_t>(payloadAST[apiliteral::operations]);
+    auto& operations = unwrap(payloadAST).value_as<jsn::array_t>(apiliteral::operations);
 
     for (auto const& versionInfo : versionInfoList) {
       versionInfo.validate();
@@ -440,7 +443,7 @@ struct ConfigurationInterface final {
       op[apiliteral::option::operation] = std::string{apiliteral::operation::assignconfig};
       op[jsonliteral::filter] = jsn::object_t{};
 
-      auto& filter = boost::get<jsn::object_t>(op[jsonliteral::filter]);
+      auto& filter = unwrap(op).value_as<jsn::object_t>(jsonliteral::filter);
 
       filter[apiliteral::filter::version] = versionInfo.version;
       filter[apiliteral::filter::entities] = versionInfo.entity;
@@ -486,12 +489,12 @@ struct ConfigurationInterface final {
     if (!jsn::JsonReader().read(apiCallResult.second, payloadAST))
       throw artdaq::database::runtime_exception(apifunctname) << "JsonWriter failed, invalid payloadAST.";
 
-    jsn::array_t const& searchResults = boost::get<jsn::array_t>(payloadAST.at(jsonliteral::search));
+    jsn::array_t const& searchResults = unwrap(payloadAST).value_as<jsn::array_t>(jsonliteral::search);
 
     for (auto const& searchResult : searchResults) {
-      auto const& query = boost::get<jsn::object_t>(searchResult).at(jsonliteral::query);
-      auto const& collection = boost::get<jsn::object_t>(query).at(apiliteral::option::collection);
-      returnSet.insert(boost::get<std::string>(collection));
+      auto const& query = unwrap(searchResult).value_as<const jsn::object_t>(jsonliteral::query);
+      auto const& collection = unwrap(query).value_as<const std::string>(apiliteral::option::collection);
+      returnSet.insert(collection);
     }
 
     return returnSet;
