@@ -282,7 +282,7 @@ void read_document(Options const& options, std::string& conf) {
   switch (format) {
     default:
     case data_format_t::db: {
-      returnValue = std::move(search_result.to_string());
+      returnValue=search_result.to_string();
       returnValueChanged = true;
       break;
     }
@@ -297,7 +297,7 @@ void read_document(Options const& options, std::string& conf) {
     }
 
     case data_format_t::json: {
-      jsn::value_t value = std::move(search_result.extract());
+      jsn::value_t value = search_result.extract();
       auto const& docAst = unwrap(value).value_as<const object_t>(jsonliteral::document);
       auto const& dataAst=unwrap(docAst).value_as<const object_t>(jsonliteral::data);
       
@@ -313,7 +313,7 @@ void read_document(Options const& options, std::string& conf) {
       break;
 
     case data_format_t::fhicl: {
-      jsn::value_t value = std::move(search_result.extract());
+      jsn::value_t value = search_result.extract();
       auto const& docAst = unwrap(value).value_as<const object_t>(jsonliteral::document);
         
       auto fhicl_buffer = std::string();
@@ -331,7 +331,7 @@ void read_document(Options const& options, std::string& conf) {
       break;
     }
     case data_format_t::xml: {
-      jsn::value_t value = std::move(search_result.extract());
+      jsn::value_t value = search_result.extract();
       auto const& docAst = unwrap(value).value_as<const object_t>(jsonliteral::document);
 
       auto xml_buffer = std::string();

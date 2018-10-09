@@ -2,7 +2,6 @@
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "test/common.h"
 
-using artdaq::database::docrecord::JSONDocument;
 
 namespace bpo = boost::program_options;
 using namespace artdaq::database;
