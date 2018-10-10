@@ -19,7 +19,7 @@ perllib  product_dir
 
 #
 product		version		optional
-boost           v1_66_0a        -
+boost           v1_66_0        -
 mongodb 	    v3_4_6c
 python          v2_7_14b        s64
 python          v2_7_14b        s65
