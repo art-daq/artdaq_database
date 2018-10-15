@@ -5,6 +5,9 @@
 #           [SUBDIRS <source subdirectory>] (e.g., detail)
 #           [USE_PRODUCT_NAME]
 #           [EXCLUDE <ignore these files>] )
+cet_add_compiler_flags(-fvisibility=hidden)
+
+cet_add_compiler_flags(-fvisibility=hidden)
 
 SET(MAKE_CETLIBEXCEPT_STATIC $ENV{MAKE_CETLIBEXCEPT_STATIC})
 IF(MAKE_CETLIBEXCEPT_STATIC)

@@ -36,7 +36,6 @@ using cf::options::data_format_t;
 
 using Options = cf::ManageDocumentOperation;
 
-using artdaq::database::basictypes::FhiclData;
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::basictypes::XmlData;
 using artdaq::database::docrecord::JSONDocument;
@@ -57,8 +56,8 @@ bool json_gui_to_db(std::string const&, std::string&);
 namespace artdaq {
 namespace database {
 namespace fhicljson {
-bool fhicl_to_ast(std::string const& fcl, std::string const& filename, jsn::object_t& json);
-bool fhicl_to_json(std::string const& fcl, std::string const& filename, std::string& json);
+bool fhicl_to_ast(std::string const& fcl, std::string const& filename, jsn::object_t& json) __attribute__ ((visibility ("default")));
+bool fhicl_to_json(std::string const& fcl, std::string const& filename, std::string& json) __attribute__ ((visibility ("default"))) ;
 
 }  // namespace fhicljson
 namespace configuration {
@@ -219,7 +218,7 @@ void write_document(Options const& options, std::string& conf) {
     }
   }
 
-  auto insert_payload = JSONDocument{{"{\"document\":{}" + filter + ", \"collection\":\"" + options.collection() + "\"}"}};
+  auto insert_payload = JSONDocument{{"{\"document\":{}" + filter + R"(, "collection":")" + options.collection() + "\"}"}};
 
   TLOG(30) << "write_document: insert_payload=<" << insert_payload << ">";
 
@@ -254,7 +253,7 @@ void read_document(Options const& options, std::string& conf) {
   validate_dbprovider_name(options.provider());
 
   auto search_payload =
-      JsonData{"{\"filter\":" + options.query_filter_to_JsonData().json_buffer + +", \"collection\":\"" + options.collection() + "\"}"};
+      JsonData{"{\"filter\":" + options.query_filter_to_JsonData().json_buffer + +R"(, "collection":")" + options.collection() + "\"}"};
 
   TLOG(33) << "read_document: search_payload=<" << search_payload << ">";
 
