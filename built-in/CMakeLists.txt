@@ -6,6 +6,8 @@
 #           [USE_PRODUCT_NAME]
 #           [EXCLUDE <ignore these files>] )
 
+cet_add_compiler_flags(-fvisibility=hidden)
+
 SET(MAKE_CETLIBEXCEPT_STATIC $ENV{MAKE_CETLIBEXCEPT_STATIC})
 IF(MAKE_CETLIBEXCEPT_STATIC)
   string(TOUPPER ${MAKE_CETLIBEXCEPT_STATIC} MAKE_CETLIBEXCEPT_STATIC_UC )
