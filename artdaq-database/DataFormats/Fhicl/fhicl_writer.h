@@ -63,11 +63,11 @@ struct fhicl_include_generator_grammar : karma::grammar<Iter, includes_t()> {
 };
 
 struct FhiclWriter final {
-  bool write_data(jsn::object_t const&, std::string&) __attribute__ ((visibility ("default"))) ;
+  bool write_data(jsn::object_t const&, std::string&);
 };
 
 namespace debug {
-void FhiclWriter() __attribute__ ((visibility ("default"))) ;
+void FhiclWriter();
 }
 }  // namespace fhicl
 }  // namespace database

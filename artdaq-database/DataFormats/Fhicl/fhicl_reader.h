@@ -100,7 +100,7 @@ struct FhiclReader final {
 };
 
 namespace debug {
-void FhiclReader() __attribute__ ((visibility ("default"))) ;
+void FhiclReader();
 }
 }  // namespace fhicl
 }  // namespace database
