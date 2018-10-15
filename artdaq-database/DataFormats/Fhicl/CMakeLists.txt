@@ -1,3 +1,4 @@
+#cet_add_compiler_flags(-fvisibility=hidden)
 cet_make(
   LIBRARIES
   artdaq-database_SharedCommon
