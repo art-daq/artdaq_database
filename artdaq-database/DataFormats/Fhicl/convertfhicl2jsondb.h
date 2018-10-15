@@ -88,10 +88,10 @@ struct json2fcldb final {
   extra_opts const& opts;
 };
 
-bool fhicl_to_ast(std::string const& fcl, std::string const& filename, jsn::object_t& json) __attribute__ ((visibility ("default"))) ;
+bool fhicl_to_ast(std::string const& fcl, std::string const& filename, jsn::object_t& json);
 
 namespace debug {
-void FCL2JSON() __attribute__ ((visibility ("default"))) ;
+void FCL2JSON();
 }
 
 }  // namespace fhicljson

@@ -29,7 +29,7 @@ using artdaq::database::fhicl::FhiclWriter;
 namespace artdaq {
 namespace database {
 namespace fhicljson {
-bool fhicl_to_ast(std::string const& fcl, std::string const& filename, jsn::object_t& json) __attribute__ ((visibility ("default"))) ;
+bool fhicl_to_ast(std::string const& fcl, std::string const& filename, jsn::object_t& json);
 }  // namespace fhicljson
 }  // namespace database
 }  // namespace artdaq
