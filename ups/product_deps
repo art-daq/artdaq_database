@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_database  v1_04_66
+parent artdaq_database  v1_04_67
 defaultqual	e15:s64
 
 # These optional lines define the installed directories where
@@ -19,8 +19,10 @@ perllib  product_dir
 
 #
 product		version		optional
-boost           v1_66_0        -
-mongodb 	    v3_4_6c
+boost           v1_66_0        s64
+boost           v1_66_0        s65
+boost           v1_66_0a       s67
+mongodb         v3_4_6c
 python          v2_7_14b        s64
 python          v2_7_14b        s65
 python          v2_7_14b        s67
