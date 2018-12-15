@@ -14,3 +14,4 @@ bin/*
 obj/*
 *.vcxproj*
 *.orig
+.ycm_extra_conf.py
