@@ -14,6 +14,7 @@ import shutil
 import time
 import subprocess
 import socket
+import hashlib
 
 fhicl_schema='schema.fcl'
 
@@ -231,6 +232,25 @@ def __list_excluded_files(config,layout,files,configuration_composition):
 def __create_entity_userdata_map(cfgs):
   return dict( (cfg[1],open(cfg[2], 'r').read()) for cfg in cfgs)
 
+def __hashConfiguration(entity_userdata_map):
+  if not entity_userdata_map:
+    return False
+
+  hashes=[]
+
+  for entity in entity_userdata_map:
+    if entity == 'schema':
+      continue;
+    hash = hashlib.md5(entity_userdata_map[entity]).hexdigest()
+    hashes.append(entity  + ':' + hash)
+
+  hashes.sort()
+  hash = hashlib.md5(','.join(hashes)).hexdigest()
+  hashes.append('configuration'+':'+ hash)
+  entity_userdata_map['hashes']='\n'.join(hashes)
+  return True 
+
+
 def getListOfAvailableRunConfigurations(searchString='*'):
   query = json.loads('{"operation" : "findconfigs", "dataformat":"gui", "filter":{}}')
   query['filter']['configurations.name']=searchString if searchString.endswith('*') else searchString+'*'
@@ -368,16 +388,22 @@ def importConfiguration(configNameOrconfigPrefix):
 	  + 'set ARTDAQ_DATABASE_ALLOW_INCOMPLETE_CONFIGURATIONS to TRUE to allow.'
         return False 
 
+  entity_userdata_map=__create_entity_userdata_map(cfg_composition)
+  __hashConfiguration(entity_userdata_map)
+
+  cfg_composition.append(['Hashes','hashes','./hashes.fcl'])
+  cfg_composition_dict=dict(zip(iter([cfg[1] for cfg in cfg_composition]),iter(cfg_composition)))
+
   print ('New configuration', config)
    
-  for entry in cfg_composition:
+  for entry in entity_userdata_map:
     query = json.loads('{"operation" : "store", "dataformat":"fhicl", "filter":{}}')  
     query['filter']['configurations.name']=config
-    query['collection']=entry[0]
+    query['collection']=cfg_composition_dict[entry][0]
     query['filter']['version']=config+'-ver001'
-    query['filter']['entities.name']=entry[1]       
+    query['filter']['entities.name']=entry
   
-    result=__write_document(query,open(entry[2], 'r').read())
+    result=__write_document(query,entity_userdata_map[entry])
     print ('Import',entry)    
     if result[0] is not True:
       return False
@@ -479,13 +505,14 @@ def exportConfiguration(configNamePrefix):
 
   return __exportConfiguration(config)
 
-
 #bool /* status */ archiveConfiguration(std::string configuration_name,int run_number, std::map<std::string, std::string>); 
 def __archiveConfiguration(configuration_name,run_number,entity_userdata_map,update):
   if not entity_userdata_map or not configuration_name:
     return False
-  
 
+  if not __hashConfiguration(entity_userdata_map):
+    return False
+  
   configuration=str(run_number)+"/"+configuration_name
   version=str(run_number)+"/"+configuration_name
   found_versions=listVersions('SystemLayout')
