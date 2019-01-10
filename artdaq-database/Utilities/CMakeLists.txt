@@ -29,6 +29,13 @@ cet_make_exec(readfhicl
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
+cet_make_exec(refactorfhicl
+  LIBRARIES
+  artdaq-database_SharedCommon
+  artdaq-database_DataFormats_Fhicl
+  ${Boost_PROGRAM_OPTIONS_LIBRARY}
+)
+
 cet_make_exec(fhicl2json
   LIBRARIES
   artdaq-database_SharedCommon
