@@ -36,7 +36,7 @@ _complete_conftool(){
   elif [  ${COMP_WORDS[COMP_CWORD-1]} = "importConfiguration" ];then
     complete_list=$(conftool.py getListOfAvailableRunConfigurationPrefixes)
   fi
-  
+
   COMPREPLY=($(compgen -W '${complete_list[@]}' -- "$current_string"))
   return 0
 }
