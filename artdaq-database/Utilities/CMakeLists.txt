@@ -29,12 +29,14 @@ cet_make_exec(readfhicl
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
+if (NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 cet_make_exec(refactorfhicl
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_DataFormats_Fhicl
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
+endif()
 
 cet_make_exec(fhicl2json
   LIBRARIES
