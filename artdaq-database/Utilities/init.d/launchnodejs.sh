@@ -1,18 +1,18 @@
- #/bin/bash
+#/bin/bash
 
 daqswdir=/home/pduser/daqsw
- 
+
 artdaq_database_ver=v1_04_04
 
 daqsw_qqual="e10:prof:s41"
 
 if [ ! -d "${daqswdir}" ]; then
-   echo ${daqswdir} is missing.
-   exit 1
+	echo ${daqswdir} is missing.
+	exit 1
 fi
 
 if [ ! -d "${daqswdir}/databases/logs" ]; then
-   mkdir -p ${daqswdir}/databases/logs
+	mkdir -p ${daqswdir}/databases/logs
 fi
 
 
