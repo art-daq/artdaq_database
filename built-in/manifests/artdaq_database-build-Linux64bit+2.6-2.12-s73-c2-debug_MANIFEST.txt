@@ -1,0 +1,14 @@
+boost                v1_66_0a        boost-1.66.0a-slf6-x86_64-c2-debug.tar.bz2                   -f Linux64bit+2.6-2.12    -q c2:debug       
+cetbuildtools        v7_02_01        cetbuildtools-7.02.01-noarch.tar.bz2                        -f NULL                                       
+cetpkgsupport        v1_13_00        cetpkgsupport-1.13.00-noarch.tar.bz2                        -f NULL
+cmake                v3_10_1         cmake-3.10.1-slf6-x86_64.tar.bz2                              -f Linux64bit+2.6-2.12                                                             
+gcc                  v6_4_0          gcc-6.4.0-slf6-x86_64.tar.bz2                                -f Linux64bit+2.6-2.12                       
+clang                v5_0_1          clang-5.0.1-slf6-x86_64.tar.bz2                               -f Linux64bit+2.6-2.12          
+python               v2_7_14b        python-2.7.14b-slf6-x86_64.tar.bz2                           -f Linux64bit+2.6-2.12                       
+messagefacility      v2_02_01        messagefacility-2.02.01-slf6-x86_64-c2-debug.tar.bz2        -f Linux64bit+2.6-2.12    -q c2:debug       
+mongodb              v3_4_6c         mongodb-3.4.6c-slf6-x86_64-c2-debug.tar.bz2                   -f Linux64bit+2.6-2.12    -q c2:debug       
+sqlite               v3_20_01_00     sqlite-3.20.01.00-slf6-x86_64.tar.bz2                       -f Linux64bit+2.6-2.12                       
+swig                 v3_0_12c        swig-3.0.12c-slf6-x86_64-c2-debug.tar.bz2                     -f Linux64bit+2.6-2.12    -q c2:debug       
+TRACE                v3_13_09        TRACE-3.13.09-slf6-x86_64.tar.bz2                           -f Linux64bit+2.6-2.12                       
+ups                  v6_0_7          ups-6.0.7-Linux64bit+2.6-2.12.tar.bz2                      -f Linux64bit+2.6-2.12                 
+nodejs               v4_5_0          nodejs-4.5.0-noarch.tar.bz2                                 -f Linux64bit+2.6-2.12                       
