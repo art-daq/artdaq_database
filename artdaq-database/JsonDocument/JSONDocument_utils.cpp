@@ -44,7 +44,7 @@ bool matches(value_t const& left, value_t const& right) {
   }
 
   if (type(left) == type_t::OBJECT) {
-    auto const& leftObj =  unwrap(left).value_as<const object_t>();
+    auto const& leftObj = unwrap(left).value_as<const object_t>();
     auto const& rightObj = unwrap(right).value_as<const object_t>();
 
     // FIXME:GAL partial elements match
@@ -198,14 +198,14 @@ value_t const& JSONDocument::getPayloadValueForKey(object_t::key_type const& key
   confirm(!key.empty());
 
   TLOG(21) << "getPayloadValueForKey() document=<" << cached_json_buffer() << ">";
- 
+
   if (unwrap(_value).value_as<const object_t>().count("payload") == 1) {
     auto const& value = unwrap(_value).value<const object_t>("payload");
 
     if (type(value) == type_t::OBJECT && unwrap(value).value_as<const object_t>().count(key) == 1) {
       return unwrap(value).value<const object_t>(key);
     }
-    return value; 
+    return value;
   } else if (unwrap(_value).value_as<const object_t>().size() == 1) {
     return unwrap(_value).value_as<const object_t>().begin()->value;
   }
