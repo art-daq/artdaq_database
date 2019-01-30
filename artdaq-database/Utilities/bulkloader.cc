@@ -34,9 +34,8 @@ int main(int argc, char* argv[]) try {
 
   bpo::options_description desc = descstr.str();
 
-  desc.add_options()("path,p", bpo::value<std::string>(), "Path to fhicl files.")(
-      "run,r", bpo::value<std::size_t>(), "Run number.")("threads,t", bpo::value<std::size_t>(), "Thread count.")(
-      "debug,d", bpo::value<bool>(), "Read configuration from database.")(
+  desc.add_options()("path,p", bpo::value<std::string>(), "Path to fhicl files.")("run,r", bpo::value<std::size_t>(), "Run number.")(
+      "threads,t", bpo::value<std::size_t>(), "Thread count.")("debug,d", bpo::value<bool>(), "Read configuration from database.")(
       "configuration,c", bpo::value<std::string>(), "Configuration Name.")("help,h", "produce help message");
 
   bpo::variables_map vm;

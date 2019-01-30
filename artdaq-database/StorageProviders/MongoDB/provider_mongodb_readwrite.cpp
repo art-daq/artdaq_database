@@ -64,7 +64,6 @@ object_id_t StorageProvider<JSONDocument, MongoDB>::writeDocument(JSONDocument c
   auto user_document = arg.findChildDocument(jsonliteral::document);
 
   auto filter_document = JSONDocument{};
-
   try {
     filter_document = arg.findChildDocument(jsonliteral::filter);
   } catch (...) {

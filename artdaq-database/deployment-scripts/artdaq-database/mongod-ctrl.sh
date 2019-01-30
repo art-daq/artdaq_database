@@ -10,39 +10,39 @@ unset http_proxy
 unset https_proxy
 
 if [ -z ${MONGOD_DATABASE_NAME+x} ]; then
-        echo "Error: MONGOD_DATABASE_NAME is unset. Aborting."; exit $rc_failure;  else
-        echo "Info: MONGOD_DATABASE_NAME is set to '$MONGOD_DATABASE_NAME'";
+  echo "Error: MONGOD_DATABASE_NAME is unset. Aborting."; exit $rc_failure;  else
+  echo "Info: MONGOD_DATABASE_NAME is set to '$MONGOD_DATABASE_NAME'";
 fi
 
 if [ -z ${MONGOD_BASE_DIR+x} ]; then
-        echo "Error: MONGOD_BASE_DIR is unset. Aborting."; exit $rc_failure;  else
-        echo "Info: MONGOD_BASE_DIR is set to '$MONGOD_BASE_DIR'";
+  echo "Error: MONGOD_BASE_DIR is unset. Aborting."; exit $rc_failure;  else
+  echo "Info: MONGOD_BASE_DIR is set to '$MONGOD_BASE_DIR'";
 fi
 
 MONGOD_ENV_FILE=${MONGOD_BASE_DIR}/${MONGOD_DATABASE_NAME}/mongod.env
 
 if [ ! -f ${MONGOD_ENV_FILE} ]; then
-        echo "Error: ${MONGOD_ENV_FILE} not found! Aborting."; exit $rc_failure ; else
-        source ${MONGOD_ENV_FILE}
+  echo "Error: ${MONGOD_ENV_FILE} not found! Aborting."; exit $rc_failure ; else
+  source ${MONGOD_ENV_FILE}
 fi
 
 if [ -z ${MONGOD_UPS_VER+x} ]; then
-        echo "Error: MONGOD_UPS_VER is unset. Aborting.";exit $rc_failure;  else
-        echo "Info: MONGOD_UPS_VER is set to '$MONGOD_UPS_VER'";
+  echo "Error: MONGOD_UPS_VER is unset. Aborting.";exit $rc_failure;  else
+  echo "Info: MONGOD_UPS_VER is set to '$MONGOD_UPS_VER'";
 fi
 
 if [ -z ${MONGOD_UPS_QUAL+x} ]; then
-        echo "Error: MONGOD_UPS_QUAL is unset. Aborting.";exit $rc_failure;  else
-        echo "Info: MONGOD_UPS_QUAL is set to '$MONGOD_UPS_QUAL'";
+  echo "Error: MONGOD_UPS_QUAL is unset. Aborting.";exit $rc_failure;  else
+  echo "Info: MONGOD_UPS_QUAL is set to '$MONGOD_UPS_QUAL'";
 fi
 
 if [ -z ${MONGOD_PORT+x} ]; then
-        echo "Error: MONGOD_PORT is unset. Aborting.";exit $rc_failure;  else
-        echo "Info: MONGOD_PORT is set to '$MONGOD_PORT'";
+  echo "Error: MONGOD_PORT is unset. Aborting.";exit $rc_failure;  else
+  echo "Info: MONGOD_PORT is set to '$MONGOD_PORT'";
 fi
 
 if ! [[ ${MONGOD_PORT} == ?(-)+([0-9]) ]]; then
-	echo "Error: MONGOD_PORT is Not a number"; exit $rc_failure;
+  echo "Error: MONGOD_PORT is Not a number"; exit $rc_failure;
 fi
 
 
@@ -52,13 +52,13 @@ unsetup_all  >/dev/null 2>&1
 setup mongodb ${MONGOD_UPS_VER} -q ${MONGOD_UPS_QUAL} 
 RC=$?
 if [ $RC -ne 0 ]; then
-	echo "Error: Failed setting mongodb. Aborting. "; exit $rc_failure;
+  echo "Error: Failed setting mongodb. Aborting. "; exit $rc_failure;
 fi
 
 mongod_bin=$(command -v mongod)
 if [ -z "$mongo_bin" ] &&  [ ! -x ${mongod_bin} ]; then
-	echo "Error: mongodb was not setup. Aborting."; exit $rc_failure; else
-        echo "Info: mongod found: '${mongod_bin}'";
+  echo "Error: mongodb was not setup. Aborting."; exit $rc_failure; else
+  echo "Info: mongod found: '${mongod_bin}'";
 fi
 
 MONGOD_PID=${MONGOD_BASE_DIR}/${MONGOD_DATABASE_NAME}/var/tmp/mongod.pid
@@ -66,19 +66,19 @@ MONGOD_PID=${MONGOD_BASE_DIR}/${MONGOD_DATABASE_NAME}/var/tmp/mongod.pid
 MONGOD_DIR=$(dirname ${MONGOD_PID})
 
 if [ ! -d ${MONGOD_DIR} ]; then
-	mkdir -p ${MONGOD_DIR} >/dev/null 2>&1
+  mkdir -p ${MONGOD_DIR} >/dev/null 2>&1
 fi
 
 MONGOD_DATA_DIR=$(dirname ${MONGOD_ENV_FILE})/data
 
 if [ ! -d ${MONGOD_DATA_DIR} ]; then
-        mkdir -p ${MONGOD_DATA_DIR} >/dev/null 2>&1
+  mkdir -p ${MONGOD_DATA_DIR} >/dev/null 2>&1
 fi
 
 MONGOD_LOGS_DIR=$(dirname ${MONGOD_ENV_FILE})/logs
 
 if [ ! -d ${MONGOD_LOGS_DIR} ]; then
-        mkdir -p ${MONGOD_LOGS_DIR} >/dev/null 2>&1
+  mkdir -p ${MONGOD_LOGS_DIR} >/dev/null 2>&1
 fi
 
 MONGOD_LOG=${MONGOD_LOGS_DIR}/mongod-$(date -d "today" +"%Y%m%d%H%M").log
@@ -90,23 +90,23 @@ MONGOD_LOCK=${MONGOD_DIR}/mongod.lock
 
 start()
 {
-#  ulimit -f unlimited
-#  ulimit -t unlimited
-#  ulimit -v unlimited
-#  ulimit -n 64000
-#  ulimit -m unlimited
-#  ulimit -u 64000
+  #  ulimit -f unlimited
+  #  ulimit -t unlimited
+  #  ulimit -v unlimited
+  #  ulimit -n 64000
+  #  ulimit -m unlimited
+  #  ulimit -u 64000
 
   echo -n $"Starting mongod: "
 
   ${MONGOD_NUMA_CTRL} ${mongod_bin} \
-	--dbpath=${MONGOD_DATA_DIR} \
- 	--pidfilepath=${MONGOD_PID} \
-	--port=${MONGOD_PORT} \
-	--bind_ip=127.0.0.1 \
-	--logpath=${MONGOD_LOG} \
-	--logappend \
-	--fork # >/dev/null 2>&1
+    --dbpath=${MONGOD_DATA_DIR} \
+    --pidfilepath=${MONGOD_PID} \
+    --port=${MONGOD_PORT} \
+    --bind_ip=127.0.0.1 \
+    --logpath=${MONGOD_LOG} \
+    --logappend \
+    --fork # >/dev/null 2>&1
 
   RETVAL=$?
   echo
@@ -123,8 +123,8 @@ stop()
 }
 
 restart () {
-        stop
-        start
+  stop
+  start
 }
 
 _killproc()
