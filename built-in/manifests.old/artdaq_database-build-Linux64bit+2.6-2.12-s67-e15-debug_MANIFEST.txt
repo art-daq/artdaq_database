@@ -8,7 +8,7 @@ fhiclcpp             v4_06_07        fhiclcpp-4.06.07-slf6-x86_64-e15-debug.tar.
 gcc                  v6_4_0          gcc-6.4.0-slf6-x86_64.tar.bz2                                -f Linux64bit+2.6-2.12                       
 python               v2_7_14b        python-2.7.14b-slf6-x86_64.tar.bz2                           -f Linux64bit+2.6-2.12                       
 messagefacility      v2_02_01        messagefacility-2.02.01-slf6-x86_64-e15-debug.tar.bz2        -f Linux64bit+2.6-2.12    -q e15:debug       
-mongodb              v3_4_6c         mongodb-3.4.6c-slf6-x86_64-e15-debug.tar.bz2                   -f Linux64bit+2.6-2.12    -q e15:debug       
+mongodb              v3_4_6d         mongodb-3.4.6d-slf6-x86_64-e15-debug.tar.bz2                   -f Linux64bit+2.6-2.12    -q e15:debug       
 sqlite               v3_20_01_00     sqlite-3.20.01.00-slf6-x86_64.tar.bz2                       -f Linux64bit+2.6-2.12                       
 swig                 v3_0_12c        swig-3.0.12c-slf6-x86_64-e15-debug.tar.bz2                     -f Linux64bit+2.6-2.12    -q e15:debug       
 tbb                  v2018_2         tbb-2018.2-slf6-x86_64-e15-debug.tar.bz2                     -f Linux64bit+2.6-2.12    -q e15:debug       
