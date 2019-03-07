@@ -179,10 +179,10 @@ function stash_artifacts() {
 function patch_products() {
 #fix mongodb
   cd ${productsdir}/mongodb/v3_4_6d
-  find ./ -name  "mongodbConfig.cmake" -type f -print        | xargs -n 1 sed -i "s/3.4.6b/3.4.6c/g"
-  find ./ -name  "mongodbConfig.cmake" -type f -print        | xargs -n 1 sed -i "s/v3_4_6b/v3_4_6d/g"
-  find ./ -name  "mongodbConfigVersion.cmake" -type f -print | xargs -n 1 sed -i "s/3.4.6b/3.4.6c/g"
-  find ./ -name  "mongodbConfigVersion.cmake" -type f -print | xargs -n 1 sed -i "s/v3_4_6b/v3_4_6d/g"
+  find ./ -name  "mongodbConfig.cmake" -type f -print        | xargs -n 1 sed -i "s/3.4.6c/3.4.6d/g"
+  find ./ -name  "mongodbConfig.cmake" -type f -print        | xargs -n 1 sed -i "s/v3_4_6c/v3_4_6d/g"
+  find ./ -name  "mongodbConfigVersion.cmake" -type f -print | xargs -n 1 sed -i "s/3.4.6c/3.4.6d/g"
+  find ./ -name  "mongodbConfigVersion.cmake" -type f -print | xargs -n 1 sed -i "s/v3_4_6c/v3_4_6d/g"
 #  find ./ -name  "mongodb.table" -type f -print              | xargs -n 1 sed -i '/clang/{n;d}'
 }	
 

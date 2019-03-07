@@ -17,7 +17,7 @@ ARTDAQ_DB_NAME=artdaq_db
 # Main program starts at the bottom of this file.
 #----------------------------------------------------------------
 MONGOD_UPS_QUAL="e15:prof"
-MONGOD_UPS_VER=v3_4_6c
+MONGOD_UPS_VER=v3_4_6d
 
 
 MONGOD_PORT=27037
