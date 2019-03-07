@@ -8,11 +8,11 @@ fhiclcpp             v4_03_02        fhiclcpp-4.03.02-slf6-x86_64-e10-debug.tar.
 gcc                  v4_9_3a         gcc-4.9.3a-slf6-x86_64.tar.bz2                                -f Linux64bit+2.6-2.12                       
 python               v2_7_13b        python-2.7.13b-slf6-x86_64.tar.bz2                            -f Linux64bit+2.6-2.12                       
 messagefacility      v1_18_03        messagefacility-1.18.03-slf6-x86_64-e10-debug.tar.bz2        -f Linux64bit+2.6-2.12    -q e10:debug       
-mongodb              v3_4_6c         mongodb-3.4.6c-slf6-x86_64-e10-debug.tar.bz2                   -f Linux64bit+2.6-2.12    -q e10:debug       
+mongodb              v3_4_6d         mongodb-3.4.6d-slf6-x86_64-e10-debug.tar.bz2                   -f Linux64bit+2.6-2.12    -q e10:debug       
 qt                   v5_7_1          qt-5.7.1-slf6-x86_64-e10.tar.bz2                              -f Linux64bit+2.6-2.12    -q e10             
 sqlite               v3_16_02_00a    sqlite-3.16.02.00a-slf6-x86_64.tar.bz2                        -f Linux64bit+2.6-2.12                       
 swig                 v3_0_12c        swig-3.0.12c-slf6-x86_64-e10-debug.tar.bz2                     -f Linux64bit+2.6-2.12    -q e10:debug       
 tbb                  v2017_3c        tbb-2017.3c-slf6-x86_64-e10-debug.tar.bz2                     -f Linux64bit+2.6-2.12    -q e10:debug       
-TRACE                v3_13_11        TRACE-3.13.11-slf6-x86_64.tar.bz2                            -f Linux64bit+2.6-2.12                       
+TRACE                v3_13_12        TRACE-3.13.11-slf6-x86_64.tar.bz2                            -f Linux64bit+2.6-2.12                       
 ups                  v5_2_0          ups-5.2.0-Linux64bit+2.6-2.12.tar.bz2                       -f Linux64bit+2.6-2.12                       
 nodejs               v4_5_0          nodejs-4.5.0-noarch.tar.bz2                                  -f Linux64bit+2.6-2.12                       
