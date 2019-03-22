@@ -31,7 +31,7 @@ python			v2_7_14b		s73
 TRACE           v3_13_12    -       only_for_build
 swig            v3_0_12c	-		only_for_build
 nodejs		    v4_5_0		-		only_for_build
-cetbuildtools	v7_02_01	-		only_for_build
+cetbuildtools	v7_12_01	-		only_for_build
 end_product_list
 
 # -nq- means there is no qualifier
