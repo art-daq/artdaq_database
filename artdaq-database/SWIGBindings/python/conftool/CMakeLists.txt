@@ -1,4 +1,4 @@
-create_python_addon ( ADDON_NAME "conftoolg"
+create_python_addon ( ADDON_NAME "conftoolp"
 					  LIBRARIES
 					  artdaq-database_ConfigurationDB
 					  INCLUDES

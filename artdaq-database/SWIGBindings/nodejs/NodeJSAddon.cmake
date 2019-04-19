@@ -1,4 +1,5 @@
 cmake_policy(VERSION 3.0.1) # We've made this work for 3.0.1.
+cmake_policy(SET CMP0078 OLD)
 
 include(CetParseArgs)
 
@@ -60,9 +61,9 @@ macro (create_nodejs_addon)
 
         list(APPEND CNA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR} ${NODE_INCLUDE_DIRS})
 
-		SET(SWIG_MODULE_${CNA_ADDON_NAME}_EXTRA_DEPS ${SWIG_DEPENDS})
+	SET(SWIG_MODULE_${CNA_ADDON_NAME}_EXTRA_DEPS ${SWIG_DEPENDS})
         #swig_add_module (${CNA_ADDON_NAME} javascript ${NODEJS_ADDON_SOURCES} ${LIB_SOURCES})
-		swig_add_library(${CNA_ADDON_NAME} LANGUAGE javascript SOURCES ${NODEJS_ADDON_SOURCES} ${LIB_SOURCES})
+	swig_add_library(${CNA_ADDON_NAME} LANGUAGE javascript SOURCES ${NODEJS_ADDON_SOURCES} ${LIB_SOURCES})
 
         swig_link_libraries (${CNA_ADDON_NAME} ${CNA_LIBRARIES})
 

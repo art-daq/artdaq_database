@@ -1,5 +1,7 @@
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb_headers.h"
 
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 #ifdef TRACE_NAME
 #undef TRACE_NAME
 #endif
