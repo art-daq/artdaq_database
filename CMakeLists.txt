@@ -101,6 +101,8 @@ add_subdirectory(artdaq-database)
 # doc- Documentation
 #add_subdirectory(doc)
 
+add_dependencies(artdaq-database_StorageProviders_MongoDB mongo-cxx-driver)
+
 
 # ups - table and config files
 add_subdirectory(ups)
