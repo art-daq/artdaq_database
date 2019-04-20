@@ -1,4 +1,6 @@
 cmake_policy(VERSION 3.0.1) # We've made this work for 3.0.1.
+cmake_policy(SET CMP0078 OLD)
+
 include(CetParseArgs)
 
 set(CAN_BUILD true)
@@ -36,7 +38,7 @@ macro (create_python_addon)
         cet_parse_args( PIA "ADDON_NAME;LIBRARIES;INCLUDES" "" ${ARGN})
         # there are no default arguments
         if( PIA_DEFAULT_ARGS )
-            message(FATAL_ERROR  " undefined arguments ${CNA_DEFAULT_ARGS} \n ${create_python_addon_usage}")
+            message(FATAL_ERROR  " undefined arguments ${PIA_DEFAULT_ARGS} \n ${create_python_addon_usage}")
         endif()
 
     set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -Wno-register")
@@ -50,18 +52,21 @@ macro (create_python_addon)
 
     INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
-    swig_add_module (${PIA_ADDON_NAME} python ${PIA_SOURCES} ${LIB_SOURCES})
+    set (UseSWIG_TARGET_NAME_PREFERENCE STANDARD)
+ 
+    swig_add_library(${PIA_ADDON_NAME} LANGUAGE python SOURCES ${PIA_SOURCES} ${LIB_SOURCES})
     swig_link_libraries (${PIA_ADDON_NAME} ${PIA_LIBRARIES})
 
+    
     set(PIA_ADDON_LIBNAME _${PIA_ADDON_NAME})
 
     install (FILES ${TOP_CMAKE_BINARY_DIR}/lib/${PIA_ADDON_LIBNAME}.so 
       PERMISSIONS OWNER_EXECUTE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_READ WORLD_EXECUTE
       DESTINATION ${flavorqual_dir}/python/)
-      
+    
     install (FILES ${CMAKE_CURRENT_BINARY_DIR}/${PIA_ADDON_NAME}.py DESTINATION ${flavorqual_dir}/python/)
 
-    add_custom_command(TARGET ${PIA_ADDON_LIBNAME} POST_BUILD 
+    add_custom_command(TARGET ${PIA_ADDON_NAME} POST_BUILD 
       COMMAND echo "**** Exports for ${TOP_CMAKE_BINARY_DIR}/../lib/${PIA_ADDON_LIBNAME}.so"
       COMMAND echo "**** BEGIN"
       COMMAND /usr/bin/nm ${TOP_CMAKE_BINARY_DIR}/lib/${PIA_ADDON_LIBNAME}.so | /bin/egrep -e \"^[a-f0-9]{1,16} [T]\" | /usr/bin/c++filt  

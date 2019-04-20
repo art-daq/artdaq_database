@@ -1,12 +1,14 @@
 #include "artdaq-database/StorageProviders/MongoDB/mongo_json.h"
 #include "artdaq-database/SharedCommon/helper_functions.h"
 
-#include <bsoncxx/builder/core.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/builder/basic/kvp.hpp>
 
 std::string compat::to_json(const bsoncxx::types::value& value) {
-  auto core = bsoncxx::builder::core(true);
-  core.append(value);
-  auto buff = bsoncxx::to_json(core.view_document());
+  using bsoncxx::builder::basic::kvp;
+  auto doc = bsoncxx::builder::basic::document{};
+  doc.append(kvp("dummy",value));  
+  std::string buff = bsoncxx::to_json(doc.view());   
   auto fpos = buff.find(':') + 1;
   auto nchars = buff.rfind('}') - fpos;
   return artdaq::database::trim(buff.substr(fpos, nchars));

@@ -22,6 +22,8 @@
 #include <mongocxx/pipeline.hpp>
 #include <utility>
 
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 #ifdef TRACE_NAME
 #undef TRACE_NAME
 #endif

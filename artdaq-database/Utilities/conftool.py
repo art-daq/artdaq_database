@@ -4,7 +4,7 @@
 # ~/conftool.py list_databases '{"operation" : "listdatabases", "dataformat":"csv", "filter":{}}'
 import sys
 import inspect
-import conftoolg
+import conftoolp
 import json
 import re
 import fnmatch

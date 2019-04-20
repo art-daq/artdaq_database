@@ -51,10 +51,10 @@ ENDIF()
 cet_report_compiler_flags()
 
 # these are minimum required versions, not the actual product versions
-find_ups_boost  ( v1_57_0 )
+find_ups_boost  ( v1_66_0 )
 find_ups_product( cetbuildtools v5_08_00 )
 find_ups_product( cetpkgsupport v1_11_00 )
-find_ups_product( mongodb v3_4_6 )
+find_ups_product( mongodb v4_0_8 )
 find_ups_product( TRACE v3_13_05 )
 find_ups_product( swig v3_0_12 )
 
@@ -65,10 +65,10 @@ if(BTYPE_UC STREQUAL DEBUG)
 endif()
 
 # buil-in libraries
+include(BuiltinMONGOCXX)
 include(BuiltinFHICLCPP)
 include(BuiltinCETLIB)
 include(BuiltinCETLIBEXCEPT)
-
 #include(BuiltinPARAMICO)
 add_subdirectory(built-in)
 
@@ -76,10 +76,11 @@ add_subdirectory(built-in)
 #include(NodeJSAddon)
 
 # MongoDB Libraries
-#set(BSONCXXLIB bsoncxx)
-#set(MONGOCXXLIB mongocxx)
-find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_LIB} )
-find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_LIB} )
+set(BSONCXXLIB bsoncxx)
+set(MONGOCXXLIB mongocxx)
+
+#find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_LIB} )
+#find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_LIB} )
 
 # testing
 SET(RUN_TESTS $ENV{RUN_TESTS})
@@ -99,6 +100,8 @@ add_subdirectory(artdaq-database)
 
 # doc- Documentation
 #add_subdirectory(doc)
+
+add_dependencies(artdaq-database_StorageProviders_MongoDB mongo-cxx-driver)
 
 
 # ups - table and config files

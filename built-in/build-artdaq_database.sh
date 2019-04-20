@@ -19,6 +19,7 @@ working_dir=${WORKSPACE}
 version=${VERSION}
 qual_set="${QUAL}"
 build_type=${BUILDTYPE}
+git_branch=${ARTDAQ_DATABASE_GITBRANCH}
 
 squal=$(echo $qual_set | cut -d":" -f1 )
 basequal=$(echo $qual_set | cut -d":" -f2 )
@@ -71,7 +72,7 @@ function checkout_source() {
 
   git clone http://cdcvs.fnal.gov/projects/artdaq-utilities-database ${srcdir}/artdaq-database
   cd ${srcdir}/artdaq-database
-  git checkout develop
+  git checkout ${git_branch}
 }
 
 function pull_products() {
@@ -183,6 +184,9 @@ function patch_products() {
   find ./ -name  "mongodbConfig.cmake" -type f -print        | xargs -n 1 sed -i "s/v3_4_6c/v3_4_6d/g"
   find ./ -name  "mongodbConfigVersion.cmake" -type f -print | xargs -n 1 sed -i "s/3.4.6c/3.4.6d/g"
   find ./ -name  "mongodbConfigVersion.cmake" -type f -print | xargs -n 1 sed -i "s/v3_4_6c/v3_4_6d/g"
+  cd ${productsdir}/mongodb/v4_0_8
+  find ./ -name  "libbson-1.0-config.cmake" -type f -print   | xargs -n 1 sed -i "s|/include/libbson-1.0|/../include/libbson-1.0|g" 
+  find ./ -name  "libmongoc-1.0-config.cmake" -type f -print | xargs -n 1 sed -i "s|/include/libmongoc-1.0|/../include/libmongoc-1.0|g"  
 #  find ./ -name  "mongodb.table" -type f -print              | xargs -n 1 sed -i '/clang/{n;d}'
 }	
 
