@@ -65,10 +65,10 @@ if(BTYPE_UC STREQUAL DEBUG)
 endif()
 
 # buil-in libraries
+include(BuiltinMONGOCXX)
 include(BuiltinFHICLCPP)
 include(BuiltinCETLIB)
 include(BuiltinCETLIBEXCEPT)
-include(BuiltinMONGOCXX)
 #include(BuiltinPARAMICO)
 add_subdirectory(built-in)
 
