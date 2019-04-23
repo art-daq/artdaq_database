@@ -5,9 +5,9 @@ cmake                v3_13_2         cmake-3.13.2-slf6-x86_64.tar.bz2           
 gcc                  v6_4_0          gcc-6.4.0-slf6-x86_64.tar.bz2                                -f Linux64bit+2.6-2.12                       
 python               v2_7_14b        python-2.7.14b-slf6-x86_64.tar.bz2                           -f Linux64bit+2.6-2.12                       
 messagefacility      v2_01_06        messagefacility-2.01.06-slf6-x86_64-e15-prof.tar.bz2        -f Linux64bit+2.6-2.12    -q e15:prof       
-mongodb              v4_0_8         mongodb-4.0.8-slf6-x86_64-e15-prof.tar.bz2                   -f Linux64bit+2.6-2.12    -q e15:prof       
+mongodb              v4_0_8a        mongodb-4.0.8a-slf6-x86_64-e15-prof.tar.bz2                   -f Linux64bit+2.6-2.12    -q e15:prof       
 sqlite               v3_20_01_00     sqlite-3.20.01.00-slf6-x86_64.tar.bz2                       -f Linux64bit+2.6-2.12                       
-swig                 v3_0_12c        swig-3.0.12c-slf6-x86_64-e15-prof.tar.bz2                     -f Linux64bit+2.6-2.12    -q e15:prof       
+swig                 v3_0_12d        swig-3.0.12d-slf6-x86_64-e15-prof.tar.bz2                     -f Linux64bit+2.6-2.12    -q e15:prof       
 TRACE                v3_13_12        TRACE-3.13.12-slf6-x86_64.tar.bz2                           -f Linux64bit+2.6-2.12                       
 ups                  v6_0_7          ups-6.0.7-Linux64bit+2.6-2.12.tar.bz2                      -f Linux64bit+2.6-2.12                 
 nodejs               v4_5_0          nodejs-4.5.0-noarch.tar.bz2                                 -f Linux64bit+2.6-2.12                       
