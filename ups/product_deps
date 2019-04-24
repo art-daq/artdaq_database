@@ -19,17 +19,19 @@ perllib  product_dir
 
 #
 product		version		optional
-boost           v1_66_0        s64
-boost           v1_66_0        s65
-boost           v1_66_0a       s67
-boost		v1_66_0a       s73
-mongodb         v4_0_8
+boost           v1_66_0         s64
+boost           v1_66_0         s65
+boost           v1_66_0a        s67
+boost		v1_66_0a        s73
+boost		v1_69_0         s82
+mongodb         v4_0_8a
 python          v2_7_14b        s64
 python          v2_7_14b        s65
 python          v2_7_14b        s67
 python		v2_7_14b	s73
+python		v2_7_15a	s82
 TRACE           v3_13_12    	-   	only_for_build
-swig            v3_0_12c	-	only_for_build
+swig            v3_0_12d	-	only_for_build
 nodejs		v4_5_0		-	only_for_build
 cetbuildtools	v7_12_01	-	only_for_build
 end_product_list
@@ -37,6 +39,14 @@ end_product_list
 # -nq- means there is no qualifier
 # a "-" means the dependent product is not required by the parent and will not be setup
 qualifier	boost  	   mongodb	python	TRACE    swig		nodejs	notes
+e19:s82:debug   e19:debug  e19:debug 	-nq-	-nq-     e19:debug	-nq-	-std=c++17
+e19:s82:prof    e19:prof   e19:prof	-nq-	-nq-     e19:prof	-nq-	-std=c++17
+c7:s82:debug   	c7:debug   c7:debug 	-nq-	-nq-     c7:debug	-nq-	-std=c++17
+c7:s82:prof    	c7:prof	   c7:prof	-nq-	-nq-     c7:prof	-nq-	-std=c++17
+e17:s82:debug   e17:debug  e17:debug 	-nq-	-nq-     e17:debug	-nq-	-std=c++17
+e17:s82:prof    e17:prof   e17:prof	-nq-	-nq-     e17:prof	-nq-	-std=c++17
+c2:s82:debug   	c2:debug   c2:debug 	-nq-	-nq-     c2:debug	-nq-	-std=c++17
+c2:s82:prof    	c2:prof	   c2:prof	-nq-	-nq-     c2:prof	-nq-	-std=c++17
 e17:s73:debug   e17:debug  e17:debug 	-nq-	-nq-     e17:debug	-nq-	-std=c++17
 e17:s73:prof    e17:prof   e17:prof	-nq-	-nq-     e17:prof	-nq-	-std=c++17
 c2:s73:debug   	c2:debug   c2:debug 	-nq-	-nq-     c2:debug	-nq-	-std=c++17
@@ -51,10 +61,8 @@ c2:s65:debug   	c2:debug   c2:debug 	-nq-	-nq-     c2:debug	-nq-	-std=c++17
 c2:s65:prof    	c2:prof	   c2:prof	-nq-	-nq-     c2:prof	-nq-	-std=c++17
 e15:s65:debug   e15:debug  e15:debug 	-nq-	-nq-     e15:debug	-nq-	-std=c++14
 e15:s65:prof    e15:prof   e15:prof	-nq-	-nq-     e15:prof	-nq-	-std=c++14
-c2:s64:debug   	c2:debug   c2:debug 	-nq-	-nq-     c2:debug	-nq-	-std=c++17
-c2:s64:prof    	c2:prof	   c2:prof	-nq-	-nq-     c2:prof	-nq-	-std=c++17
-e15:s64:debug   e15:debug  e15:debug 	-nq-	-nq-     e15:debug	-nq-	-std=c++14
-e15:s64:prof    e15:prof   e15:prof	-nq-	-nq-     e15:prof	-nq-	-std=c++14
+
+
 end_qualifier_list
 
 
@@ -66,8 +74,8 @@ envSet(ARTDAQ_DATABASE_CONFDIR, "${${UPS_PROD_NAME_UC}_FQ_DIR}/conf")
 envSet( ARTDAQ_DATABASE_URI,"filesystemdb://${ARTDAQ_DATABASE_DATADIR}/filesystemdb/test_db")
 
 #envPrepend(PYTHONPATH, "${${UPS_PROD_NAME_UC}_FQ_DIR}/python:${${UPS_PROD_NAME_UC}_FQ_DIR}/lib/python2.7/site-packages")
-envPrepend(PYTHONPATH, "${${UPS_PROD_NAME_UC}_FQ_DIR}/python)
-
+envPrepend(PYTHONPATH, "${${UPS_PROD_NAME_UC}_FQ_DIR}/python")
+envPrepend(LD_LIBRARY_PATH, "${MONGODB_FQ_DIR}/lib64")
 
 table_fragment_end
 
