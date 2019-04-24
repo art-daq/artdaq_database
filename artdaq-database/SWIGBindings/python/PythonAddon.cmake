@@ -41,8 +41,16 @@ macro (create_python_addon)
             message(FATAL_ERROR  " undefined arguments ${PIA_DEFAULT_ARGS} \n ${create_python_addon_usage}")
         endif()
 
-    set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-stringop-truncation -Wno-cast-function-type -Wno-unused-parameter -Wno-register")
+    set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -Wno-register")
 
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wno-bad-function-cast -Wno-string-conversion")
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-bad-function-cast -Wno-string-conversion")
+    elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+        SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wno-cast-function-type -Wno-stringop-truncation")
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-cast-function-type -Wno-stringop-truncation")
+    endif()
+    
     file(GLOB PIA_SOURCES  *.i)
     file(GLOB LIB_SOURCES  *.cpp)
 
@@ -55,7 +63,7 @@ macro (create_python_addon)
     set (UseSWIG_TARGET_NAME_PREFERENCE STANDARD)
  
     swig_add_library(${PIA_ADDON_NAME} LANGUAGE python SOURCES ${PIA_SOURCES} ${LIB_SOURCES})
-    swig_link_libraries (${PIA_ADDON_NAME} ${PIA_LIBRARIES})
+    TARGET_LINK_LIBRARIES (${PIA_ADDON_NAME} ${PIA_LIBRARIES})
 
     
     set(PIA_ADDON_LIBNAME _${PIA_ADDON_NAME})

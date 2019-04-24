@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.2)
 
-if ( NOT EXISTS ${TOP_CMAKE_SOURCE_DIR}/built-in/mongo-cxx-driver/lib64 )
+if ( NOT EXISTS ${TOP_CMAKE_SOURCE_DIR}/built-in/mongo-cxx-driver/lib65 )
     include(ExternalProject)
     string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC)
     set(MYCMAKE_BUILD_TYPE "Release")
