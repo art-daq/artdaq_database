@@ -74,7 +74,7 @@ def __increment_config_name(config):
 def __latest_config_name(configNamePrefix):
   query = json.loads('{"operation" : "findconfigs", "dataformat":"gui", "filter":{}}')
   query['filter']['configurations.name']=configNamePrefix+'*'
-  result = conftoolg.find_configurations(json.dumps(query))
+  result = conftoolp.find_configurations(json.dumps(query))
 
   if result[0] is not True:
     __report_error(result)
@@ -100,7 +100,7 @@ def __latest_config_name(configNamePrefix):
 def __read_document(query):
   query['dataformat']='origin'
 
-  result = conftoolg.read_document(json.dumps(query))
+  result = conftoolp.read_document(json.dumps(query))
 
   if result[0] is not True:
     __report_error(result)
@@ -109,7 +109,7 @@ def __read_document(query):
   return  (query['filter']['entities.name'].encode('ascii'),result[1],query['collection'].encode('ascii'))
 
 def __write_document(query,document):
-  result = conftoolg.write_document(json.dumps(query),document)
+  result = conftoolp.write_document(json.dumps(query),document)
 
   if result[0] is not True:
     __report_error(result)
@@ -131,7 +131,7 @@ def __read_fhicl_schema():
 def __read_schema():
   layout_fhicl = __read_fhicl_schema()
   fhicl_file=fhicl_schema
-  result = conftoolg.fhicl_to_json(layout_fhicl, fhicl_file)
+  result = conftoolp.fhicl_to_json(layout_fhicl, fhicl_file)
   if result[0] is not True:
     __report_error(result)
     return None
@@ -254,7 +254,7 @@ def getListOfAvailableRunConfigurations(searchString='*'):
   query = json.loads('{"operation" : "findconfigs", "dataformat":"gui", "filter":{}}')
   query['filter']['configurations.name']=searchString if searchString.endswith('*') else searchString+'*'
 
-  result = conftoolg.find_configurations(json.dumps(query))
+  result = conftoolp.find_configurations(json.dumps(query))
 
   if result[0] is not True:
     __report_error(result)
@@ -286,7 +286,7 @@ def getListOfAvailableRunConfigurationPrefixes(searchString='*'):
   query = json.loads('{"operation" : "findconfigs", "dataformat":"gui", "filter":{}}')
   query['filter']['configurations.name']=searchString if searchString.endswith('*') else searchString+'*'
 
-  result = conftoolg.find_configurations(json.dumps(query))
+  result = conftoolp.find_configurations(json.dumps(query))
 
   if result[0] is not True:
     __report_error(result)
@@ -302,7 +302,7 @@ def __getConfigurationComposition(config):
   query = json.loads('{"operation" : "buildfilter", "dataformat":"gui", "filter":{}}')
   query['filter']['configurations.name']=config
 
-  result = conftoolg.configuration_composition(json.dumps(query))
+  result = conftoolp.configuration_composition(json.dumps(query))
 
   if result[0] is not True:
     __report_error(result)
@@ -730,7 +730,7 @@ def exportArchivedRunConfiguration(config):
   return result
 
 def listDatabases():
-  result = conftoolg.list_databases('{"operation" : "listdatabases", "dataformat":"csv", "filter":{}}')
+  result = conftoolp.list_databases('{"operation" : "listdatabases", "dataformat":"csv", "filter":{}}')
   if result[0] is not True:
     __report_error(result)
     return None
@@ -742,7 +742,7 @@ def listVersions(collection_name):
   query['collection']=collection_name
   query['filter']['entities.name']="*"
 
-  result = conftoolg.find_versions (json.dumps(query))
+  result = conftoolp.find_versions (json.dumps(query))
   if result[0] is not True:
     __report_error(result)
     return None
@@ -754,7 +754,7 @@ def json_to_fhicl(filename):
   with open(filename,"r") as json_file:
     layout_json = json.load(json_file)
 
-  result = conftoolg.json_to_fhicl(layout_json,filename)
+  result = conftoolp.json_to_fhicl(layout_json,filename)
   if result[0] is not True:
     __report_error(result)
     return None
@@ -768,7 +768,7 @@ def fhicl_to_json(filename):
   with open(filename,"r") as fhicl_file:
     layout_fhicl = fhicl_file.read()
 
-  result = conftoolg.fhicl_to_json(layout_fhicl,filename)
+  result = conftoolp.fhicl_to_json(layout_fhicl,filename)
   if result[0] is not True:
     __report_error(result)
     return None
@@ -779,7 +779,7 @@ def fhicl_to_json(filename):
   return result[1]
 
 def listCollections():
-  result = conftoolg.list_collections('{"operation" : "listcollections", "dataformat":"csv", "filter":{}}')
+  result = conftoolp.list_collections('{"operation" : "listcollections", "dataformat":"csv", "filter":{}}')
   if result[0] is not True:
     __report_error(result)
     return None
@@ -787,7 +787,7 @@ def listCollections():
   return result[1].split(',')
 
 def listConfigurations():
-  result = conftoolg.find_configurations('{"operation" : "findconfigs", "dataformat":"csv", "filter":{}}')
+  result = conftoolp.find_configurations('{"operation" : "findconfigs", "dataformat":"csv", "filter":{}}')
   if result[0] is not True:
     __report_error(result)
     return None
@@ -795,7 +795,7 @@ def listConfigurations():
   return result[1].split(',')
 
 def readDatabaseInfo():
-  result = conftoolg.read_dbinfo('{"operation" : "readdbinfo", "dataformat":"json", "filter":{}}')
+  result = conftoolp.read_dbinfo('{"operation" : "readdbinfo", "dataformat":"json", "filter":{}}')
   if result[0] is not True:
     __report_error(result)
     return None
@@ -804,7 +804,7 @@ def readDatabaseInfo():
 
 def exportDatabase():
   print ('ARTDAQ_DATABASE_URI',os.environ['ARTDAQ_DATABASE_URI'])
-  result = conftoolg.export_database('{"operation" : "exportdatabase", "dataformat":"json", "source": ".",  "filter":{}}')
+  result = conftoolp.export_database('{"operation" : "exportdatabase", "dataformat":"json", "source": ".",  "filter":{}}')
   if result[0] is not True:
     __report_error(result)
 
@@ -812,7 +812,7 @@ def exportDatabase():
 
 def importDatabase():
   print ('ARTDAQ_DATABASE_URI',os.environ['ARTDAQ_DATABASE_URI'])
-  result = conftoolg.import_database('{"operation" : "importdatabase", "dataformat":"json", "source": ".", "filter":{}}')
+  result = conftoolp.import_database('{"operation" : "importdatabase", "dataformat":"json", "source": ".", "filter":{}}')
   if result[0] is not True:
     __report_error(result)
 
@@ -850,7 +850,7 @@ if __name__ == "__main__":
     sys.exit(1)
 
   if sys.argv[1] in [o[0] for o in inspect.getmembers(sys.modules[__name__]) if inspect.isfunction(o[1])]:
-    getattr(conftoolg, 'enable_trace')()
+    getattr(conftoolp, 'enable_trace')()
     thefunc=getattr(sys.modules[__name__], sys.argv[1])
     args = inspect.getargspec(thefunc)
     result = thefunc(*sys.argv[2:len(args[0]) + 2]) if args else thefunc()
@@ -862,15 +862,15 @@ if __name__ == "__main__":
 
     sys.exit(0)
 
-  functions_list = [o[0] for o in inspect.getmembers(conftoolg) if inspect.isbuiltin(o[1])]
+  functions_list = [o[0] for o in inspect.getmembers(conftoolp) if inspect.isbuiltin(o[1])]
   if sys.argv[1] not in functions_list:
     print 'Error: Unrecognised API function.'
     print 'Avaialble functions:'
     print  functions_list
     sys.exit(1)
 
-  getattr(conftoolg, 'enable_trace')()
-  result = getattr(conftoolg, sys.argv[1])(*sys.argv[2:len(sys.argv)])
+  getattr(conftoolp, 'enable_trace')()
+  result = getattr(conftoolp, sys.argv[1])(*sys.argv[2:len(sys.argv)])
 
   if result[0] is True:
     print result[1]

@@ -41,7 +41,7 @@ macro (create_python_addon)
             message(FATAL_ERROR  " undefined arguments ${PIA_DEFAULT_ARGS} \n ${create_python_addon_usage}")
         endif()
 
-    set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -Wno-register")
+    set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-stringop-truncation -Wno-cast-function-type -Wno-unused-parameter -Wno-register")
 
     file(GLOB PIA_SOURCES  *.i)
     file(GLOB LIB_SOURCES  *.cpp)

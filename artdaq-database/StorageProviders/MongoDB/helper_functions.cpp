@@ -54,12 +54,14 @@ JSONDocument rewrite_query_with_regex(JSONDocument const& query, std::vector<std
 
     if (value == "*") {
       regex_value["$regex"] = std::string(".*");
+      regex_value["$options"] = std::string("m");
       continue;
     }
 
     value.pop_back();
 
     regex_value["$regex"] = std::string("^") + value + ".*";
+    regex_value["$options"] = std::string("m");
   }
 
   auto buffer = std::string{};
