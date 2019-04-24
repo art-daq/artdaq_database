@@ -50,7 +50,15 @@ macro (create_nodejs_addon)
         execute_process(COMMAND printf %d%02d%02d ${V8_STRING_MAJOR} ${V8_STRING_MINOR} ${V8_STRING_PATCH} OUTPUT_VARIABLE V8_DEFINE_STRING)
         message("V8_DEFINE_STRING is ${V8_DEFINE_STRING}")
 
-        set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Wno-cast-function-type -Wno-unused-parameter")
+        set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
+
+        if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+            SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wno-bad-function-cast -Wno-string-conversion")
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-bad-function-cast -Wno-string-conversion")
+        elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+            SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wno-cast-function-type -Wno-stringop-truncation")
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-cast-function-type -Wno-stringop-truncation")
+        endif()
 
         file(GLOB NODEJS_ADDON_SOURCES  *.i)
         file(GLOB LIB_SOURCES  *.cpp)
@@ -65,7 +73,7 @@ macro (create_nodejs_addon)
         #swig_add_module (${CNA_ADDON_NAME} javascript ${NODEJS_ADDON_SOURCES} ${LIB_SOURCES})
 	swig_add_library(${CNA_ADDON_NAME} LANGUAGE javascript SOURCES ${NODEJS_ADDON_SOURCES} ${LIB_SOURCES})
 
-        swig_link_libraries (${CNA_ADDON_NAME} ${CNA_LIBRARIES})
+        TARGET_LINK_LIBRARIES (${CNA_ADDON_NAME} ${CNA_LIBRARIES})
 
         target_include_directories ( ${CNA_ADDON_NAME} PUBLIC ${CNA_INCLUDES})
         #include_directories(${CNA_INCLUDES})

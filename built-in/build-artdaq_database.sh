@@ -187,6 +187,9 @@ function patch_products() {
   cd ${productsdir}/mongodb/v4_0_8
   find ./ -name  "libbson-1.0-config.cmake" -type f -print   | xargs -n 1 sed -i "s|/include/libbson-1.0|/../include/libbson-1.0|g" 
   find ./ -name  "libmongoc-1.0-config.cmake" -type f -print | xargs -n 1 sed -i "s|/include/libmongoc-1.0|/../include/libmongoc-1.0|g"  
+  cd ${productsdir}/mongodb/v4_0_8a
+  find ./ -name  "libbson-1.0-config.cmake" -type f -print   | xargs -n 1 sed -i "s|/include/libbson-1.0|/../include/libbson-1.0|g" 
+  find ./ -name  "libmongoc-1.0-config.cmake" -type f -print | xargs -n 1 sed -i "s|/include/libmongoc-1.0|/../include/libmongoc-1.0|g"  
 #  find ./ -name  "mongodb.table" -type f -print              | xargs -n 1 sed -i '/clang/{n;d}'
 }	
 
