@@ -71,6 +71,13 @@ def __increment_config_name(config):
   match = re.match(r'(.*[^\d])(\d+$)', config)
   return  match.group(1) + str(int(match.group(2)) + 1).zfill(5) if match else config+str(1).zfill(5)
 
+def __archiveuri_from_uri(uri):
+  match = re.match(r'.*://.*/(.*?(?=(?:\?)|$))',uri)
+  if not match.group(1):
+    print('Error: Invalid URI ', uri)
+    sys.exit(1)
+  return  uri.replace(match.group(1),match.group(1)+'_archive')
+
 def __latest_config_name(configNamePrefix):
   query = json.loads('{"operation" : "findconfigs", "dataformat":"gui", "filter":{}}')
   query['filter']['configurations.name']=configNamePrefix+'*'
@@ -120,8 +127,8 @@ def __find_files(directory, pattern):
   for root, dirs, files in os.walk(directory):
     for basename in files:
       if fnmatch.fnmatch(basename, pattern):
-	filename = os.path.join(root, basename)
-	yield filename
+        filename = os.path.join(root, basename)
+        yield filename
 
 
 def __read_fhicl_schema():
@@ -270,7 +277,7 @@ def getListOfArchivedRunConfigurations(searchString='*'):
     print 'Error: ARTDAQ_DATABASE_URI is not set.'
     return False
 
-  os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri+'_archive'
+  os.environ['ARTDAQ_DATABASE_URI']=__archiveuri_from_uri(artdaq_database_uri)
   print 'Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI']
 
   result=getListOfAvailableRunConfigurations(searchString)
@@ -427,7 +434,7 @@ def __exportConfigurationWithBulkloader(config):
     artdaq_database_remote_host=None
 
   try:
-    os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri+'_archive'
+    os.environ['ARTDAQ_DATABASE_URI']=__archiveuri_from_uri(artdaq_database_uri)
     found_configurations=getListOfAvailableRunConfigurations(config.split('/')[0])
   except Exception,e:
     print 'Error: Unable to query configurations.'
@@ -444,7 +451,7 @@ def __exportConfigurationWithBulkloader(config):
   keys = ['PATH', 'LD_LIBRARY_PATH', 'PYTHONPATH','ARTDAQ_DATABASE_DATADIR','ARTDAQ_DATABASE_CONFDIR']
 
   setenvvars_command=' '.join('export {}="{}";'.format(k, v) for k, v in dict((k, envvars[k]) for k in keys if k in envvars).items())
-  setenvvars_command+='export ARTDAQ_DATABASE_URI="{}_archive";'.format(envvars['ARTDAQ_DATABASE_URI'])
+  setenvvars_command+='export ARTDAQ_DATABASE_URI="{}";'.format(__archiveuri_from_uri (envvars['ARTDAQ_DATABASE_URI']))
   setenvvars_command+='echo BULKDOWNLOADER is running on $(hostname -s) and ARTDAQ_DATABASE_URI=$ARTDAQ_DATABASE_URI'
 
   data_files_dir= os.getcwd() if artdaq_database_remote_host is None else '$bulkloader_data_dir'
@@ -582,7 +589,7 @@ def archiveRunConfiguration(config,run_number,update=False):
 
   entity_userdata_map=__create_entity_userdata_map(cfg_composition)
 
-  os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri+'_archive'
+  os.environ['ARTDAQ_DATABASE_URI']=__archiveuri_from_uri(artdaq_database_uri)
   print 'Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI']
 
   result=__archiveConfiguration(config,run_number,entity_userdata_map,update)
@@ -620,7 +627,7 @@ def __archiveConfigurationWithBulkloader(config,run_number,update):
   version=str(run_number)+"/"+config
 
   try:
-    os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri+'_archive'
+    os.environ['ARTDAQ_DATABASE_URI']=__archiveuri_from_uri(artdaq_database_uri)
     found_versions=listVersions('SystemLayout')
   except Exception,e:
     print 'Error: Unable to query versions.'
@@ -657,7 +664,7 @@ def __archiveConfigurationWithBulkloader(config,run_number,update):
   keys = ['PATH', 'LD_LIBRARY_PATH', 'PYTHONPATH','ARTDAQ_DATABASE_DATADIR','ARTDAQ_DATABASE_CONFDIR']
 
   setenvvars_command=' '.join('export {}="{}";'.format(k, v) for k, v in dict((k, envvars[k]) for k in keys if k in envvars).items())
-  setenvvars_command+='export ARTDAQ_DATABASE_URI="{}_archive";'.format(envvars['ARTDAQ_DATABASE_URI'])
+  setenvvars_command+='export ARTDAQ_DATABASE_URI="{}";'.format(__archiveuri_from_uri(envvars['ARTDAQ_DATABASE_URI']))
   setenvvars_command+='echo BULKLOADER is running on $(hostname -s) and ARTDAQ_DATABASE_URI=$ARTDAQ_DATABASE_URI'
 
   data_files_dir= os.getcwd() if artdaq_database_remote_host is None else '$bulkloader_data_dir'
@@ -686,7 +693,7 @@ def __archiveConfigurationWithBulkloader(config,run_number,update):
   task=None
   stdoutbuff=None
   stderrbuff=None
-
+  #print ('command >>>>', command, '<<<< ' ) 
   try:
     task = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
     stdoutbuff,stderrbuff = task.communicate()
@@ -719,7 +726,7 @@ def exportArchivedRunConfiguration(config):
   if artdaq_database_uri.startswith("mongodb://") and len(config.split('/'))==2:
     return __exportConfigurationWithBulkloader(config)
 
-  os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri+'_archive'
+  os.environ['ARTDAQ_DATABASE_URI']=__archiveuri_from_uri(artdaq_database_uri)
   print 'Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI']
 
   result=__exportConfiguration(config)
