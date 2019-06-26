@@ -205,22 +205,46 @@ json2fcldb::json2fcldb(args_tuple_t args) : self{std::get<0>(args)}, parent{std:
 
 json2fcldb::operator fcl::value_t() try {
   auto const& self_value = std::get<1>(self);
-
   if (self_value.type() == typeid(bool)) {
     return fcl::value_t(unwrap(self_value).value_as<const bool>());
   }
+
   if (self_value.type() == typeid(integer)) {
     return fcl::value_t(unwrap(self_value).value_as<const integer>());
   }
+
   if (self_value.type() == typeid(decimal)) {
     return fcl::value_t(unwrap(self_value).value_as<const decimal>());
   }
+
   if (self_value.type() == typeid(std::string)) {
     auto value = fcl::from_json_string(unwrap(self_value).value_as<const std::string>());
+    auto const& self_metadata = std::get<2>(self);
+    auto const& metadata_object = unwrap(self_metadata).value_as<const jsn::object_t>();
+    auto type_name = boost::get<std::string>(metadata_object.at(literal::type));
+
+    if (type_name == literal::number) {
+      return fcl::value_t(value);
+    }
+
+    if (type_name == literal::string) {
+      return fcl::value_t(need_quotes(value) ? db::quoted_(value) : value);
+    } else if (type_name == literal::string_unquoted) {
+      return fcl::value_t(value);
+    } else if (type_name == literal::string_singlequoted) {
+      return fcl::value_t(db::quoted_(value, '\''));
+    } else if (type_name == literal::string_doublequoted) {
+      return fcl::value_t(db::quoted_(value, '\"'));
+    }
+
     return fcl::value_t(need_quotes(value) ? db::quoted_(value) : value);
-  } else if (self_value.type() == typeid(jsn::object_t)) {
+  }
+
+  if (self_value.type() == typeid(jsn::object_t)) {
     return fcl::value_t(operator fcl::atom_t().value);
-  } else if (self_value.type() == typeid(jsn::array_t)) {
+  }
+
+  if (self_value.type() == typeid(jsn::array_t)) {
     return fcl::value_t(operator fcl::atom_t().value);
   }
 
