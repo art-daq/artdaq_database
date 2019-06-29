@@ -5,7 +5,7 @@ cmake                v3_13_2         cmake-3.13.2-sl7-x86_64.tar.bz2            
 gcc                  v6_4_0          gcc-6.4.0-sl7-x86_64.tar.bz2                                -f Linux64bit+3.10-2.17                       
 python               v2_7_14b        python-2.7.14b-sl7-x86_64.tar.bz2                           -f Linux64bit+3.10-2.17                       
 messagefacility      v2_01_06        messagefacility-2.01.06-slf7-x86_64-e15-prof.tar.bz2        -f Linux64bit+3.10-2.17    -q e15:prof       
-mongodb              v4_0_8a        mongodb-4.0.8a-sl7-x86_64-e15-prof.tar.bz2                   -f Linux64bit+3.10-2.17    -q e15:prof       
+mongodb              v4_0_8b        mongodb-4.0.8b-sl7-x86_64-e15-prof.tar.bz2                   -f Linux64bit+3.10-2.17    -q e15:prof       
 sqlite               v3_20_01_00     sqlite-3.20.01.00-sl7-x86_64.tar.bz2                       -f Linux64bit+3.10-2.17                       
 swig                 v3_0_12d        swig-3.0.12d-sl7-x86_64-e15-prof.tar.bz2                     -f Linux64bit+3.10-2.17    -q e15:prof       
 TRACE                v3_13_12        TRACE-3.13.12-slf7-x86_64.tar.bz2                           -f Linux64bit+3.10-2.17                       
