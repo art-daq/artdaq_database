@@ -6,7 +6,7 @@ gcc                  v8_2_0          gcc-8.2.0-sl7-x86_64.tar.bz2               
 clang                v7_0_0          clang-7.0.0-sl7-x86_64.tar.bz2                               -f Linux64bit+3.10-2.17          
 python               v2_7_15a        python-2.7.15a-sl7-x86_64.tar.bz2                           -f Linux64bit+3.10-2.17                       
 messagefacility      v2_04_03        messagefacility-2.04.03-slf7-x86_64-c7-prof.tar.bz2        -f Linux64bit+3.10-2.17    -q c7:prof       
-mongodb              v4_0_8a         mongodb-4.0.8a-sl7-x86_64-c7-prof.tar.bz2                   -f Linux64bit+3.10-2.17    -q c7:prof       
+mongodb              v4_0_8b         mongodb-4.0.8b-sl7-x86_64-c7-prof.tar.bz2                   -f Linux64bit+3.10-2.17    -q c7:prof       
 sqlite               v3_26_00_00     sqlite-3.26.00.00-sl7-x86_64.tar.bz2                       -f Linux64bit+3.10-2.17                       
 swig                 v3_0_12d        swig-3.0.12d-sl7-x86_64-c7-prof.tar.bz2                     -f Linux64bit+3.10-2.17    -q c7:prof       
 TRACE                v3_13_12        TRACE-3.13.12-slf7-x86_64.tar.bz2                           -f Linux64bit+3.10-2.17                       
