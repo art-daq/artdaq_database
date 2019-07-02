@@ -2,6 +2,7 @@
 
 # using python 2.7
 # ~/conftool.py list_databases '{"operation" : "listdatabases", "dataformat":"csv", "filter":{}}'
+from __future__ import print_function
 import sys
 import inspect
 import conftoolp
@@ -38,10 +39,10 @@ def __copy_default_schema():
     sys.exit(1)
 
   shutil.copyfile(schema,fhicl_schema)
-  print 'Info: Copied ' + schema + ' to ' + fhicl_schema
+  print ('Info: Copied ' + schema + ' to ' + fhicl_schema)
 
 def __report_error(result):
-  print >> sys.stderr, 'Error:' + result[1]
+  print ('Error:' + result[1], file=sys.stderr)
 
 def __allow_importing_incomplete_configurations():
   try:
@@ -87,7 +88,7 @@ def __latest_config_name(configNamePrefix):
     __report_error(result)
     return None
 
-  configs=list(c['name'].encode('ascii') for c in json.loads(result[1])['search'])
+  configs=list(c['name'] for c in json.loads(result[1])['search'])
 
   if not configs:
     return None
@@ -113,7 +114,7 @@ def __read_document(query):
     __report_error(result)
     return (None,None)
 
-  return  (query['filter']['entities.name'].encode('ascii'),result[1],query['collection'].encode('ascii'))
+  return  (query['filter']['entities.name'],result[1],query['collection'])
 
 def __write_document(query,document):
   result = conftoolp.write_document(json.dumps(query),document)
@@ -157,58 +158,58 @@ def __validate_schema(schema):
   errors_count=0
   for l in ['artdaq_processes','artdaq_includes','system_layout','run_history']:
     if l not in schema:
-      print 'Error: Invalid schema.fcl; A top level ' + l + ' sequence is missing.'
+      print ('Error: Invalid schema.fcl; A top level ' + l + ' sequence is missing.')
       errors_count+=1
       continue
     if isinstance(schema[l], list) is not True:
-      print 'Error: Invalid schema.fcl; A top level ' + l + ' is not a sequence type.'
+      print ('Error: Invalid schema.fcl; A top level ' + l + ' is not a sequence type.')
       errors_count+=1
       continue
     idx=-1
     for d in schema[l]:
       idx+=1
       if isinstance(d, dict) is not True:
-	print 'Error: Invalid schema.fcl; A top level ' + l + ' is not a sequence of tables type.'
-	errors_count+=1
-	break
+        print ('Error: Invalid schema.fcl; A top level ' + l + ' is not a sequence of tables type.')
+        errors_count+=1
+        break
       error_message='Error: Schema rule ' + l +':['+to_string(d)+ '] '
       if 'collection' not in d or 'pattern' not in d:
-        print error_message + 'is missing either \"collection\" or \"pattern\" key-value pairs.'
+        print (error_message + 'is missing either \"collection\" or \"pattern\" key-value pairs.')
         errors_count+=1
         continue
-      r=d['pattern'].encode('ascii')
+      r=d['pattern']
       try:
         if re.compile(r).groups < 3:
-          print error_message + ' has an invalid regular expression in the \"pattern\" key-value pair.'\
+          print (error_message + ' has an invalid regular expression in the \"pattern\" key-value pair.'\
            + '\n Regular expressions must have at least three capturing groups, example : (.*)(metadata)(\.fcl$) or (.*)(ssp\d+(_hw_cfg|))(\.fcl$).'\
-           + '\n The second capturing group is used as a default value for the \"entity\" key-value pair, e.g. entity:\"match.group(2)\"'
+           + '\n The second capturing group is used as a default value for the \"entity\" key-value pair, e.g. entity:\"match.group(2)\"')
           errors_count+=1
           continue
       except re.error:
-	print error_message + ' has an invalid regular expression in the \"pattern\" key-value pair.'
+        print (error_message + ' has an invalid regular expression in the \"pattern\" key-value pair.')
         errors_count+=1
         continue
       if 'entity' in d:
-        entity=d['entity'].encode('ascii')
+        entity=d['entity']
         match = re.match(r'(.*)((gr1)(gr2)(gr3)(gr4)(gr5)(gr6)(gr7)(gr8)(gr9))(\.fcl$)', './demo/gr1gr2gr3gr4gr5gr6gr7gr8gr9.fcl')
-        entity_name_rule=d['entity'].encode('ascii')
+        entity_name_rule=d['entity']
         try:
-	  entity_name = eval(entity_name_rule)
+          entity_name = eval(entity_name_rule)
         except Exception as e:
-	  print error_message + ' has an invalid eval expression in the \"entity\" key-value pair. Exception message:' + e.__doc__ \
-	    + '\nDetails: Suppose the entity key-value pair if defined as \'entity: \"match.group(3)+\'-\'+match.group(4)+\'-\'+match.group(7)\"\''\
-	    + '\n and the pattern key-value pair if defined as \'pattern: \"(.*)((gr1)(gr2)(gr3)(gr4)(gr5)(gr6)(gr7)(gr8)(gr9))(\.fcl$)\"\''\
-	    + '\n then the evaluated entity/process name for a file \"./demo/gr1gr2gr3gr4gr5gr6gr7gr8gr9.fcl\" is \"gr1-gr2-rg5\".'\
-	    + '\n And the exported configuration file will be \"gr1-gr2-rg5.fcl\".'
+          print (error_message + ' has an invalid eval expression in the \"entity\" key-value pair. Exception message:' + e.__doc__ \
+            + '\nDetails: Suppose the entity key-value pair if defined as \'entity: \"match.group(3)+\'-\'+match.group(4)+\'-\'+match.group(7)\"\''\
+            + '\n and the pattern key-value pair if defined as \'pattern: \"(.*)((gr1)(gr2)(gr3)(gr4)(gr5)(gr6)(gr7)(gr8)(gr9))(\.fcl$)\"\''\
+            + '\n then the evaluated entity/process name for a file \"./demo/gr1gr2gr3gr4gr5gr6gr7gr8gr9.fcl\" is \"gr1-gr2-rg5\".'\
+            + '\n And the exported configuration file will be \"gr1-gr2-rg5.fcl\".')
           errors_count+=1
           continue
   if errors_count > 0:
     timestamp = time.strftime('%Y-%m-%d_%H%M%S', time.localtime())
     saved_fcl_name= './'+fhicl_schema + '.' + timestamp
     shutil.move(fhicl_schema,saved_fcl_name)
-    print 'Info: Old schema.fcl was renamed to ' + saved_fcl_name
+    print ('Info: Old schema.fcl was renamed to ' + saved_fcl_name)
     __copy_default_schema()
-    print 'Info: Replaced schema.fcl with the default one; review schema.fcl and re-run the import command.'
+    print ('Info: Replaced schema.fcl with the default one; review schema.fcl and re-run the import command.')
     exit(1)
 
 
@@ -217,14 +218,14 @@ def __composition_reader(subsets,layout,files):
   for f in files:
     for l in subsets:
       for d in layout[l]:
-	match = re.match(d['pattern'].encode('ascii'), f)
-	if match:
-	  entity_name=match.group(2)
-	  if 'entity' in d:
-	    entity_name_rule=d['entity'].encode('ascii')
-	    entity_name = eval(entity_name_rule)
-	  entity_userdata_map=((d['collection'].encode('ascii'), entity_name, f ))
-	  yield entity_userdata_map
+        match = re.match(d['pattern'], f)
+        if match:
+          entity_name=match.group(2)
+          if 'entity' in d:
+            entity_name_rule=d['entity']
+            entity_name = eval(entity_name_rule)
+          entity_userdata_map=((d['collection'], entity_name, f ))
+          yield entity_userdata_map
 
 def __list_excluded_files(config,layout,files,configuration_composition):
   excluded_files=list(files)
@@ -247,11 +248,11 @@ def __hashConfiguration(entity_userdata_map):
   for entity in entity_userdata_map:
     if entity == 'schema':
       continue;
-    hash = hashlib.md5(entity_userdata_map[entity]).hexdigest()
+    hash = hashlib.md5(entity_userdata_map[entity].encode('ascii')).hexdigest()
     hashes.append(entity  + ':' + hash)
 
   hashes.sort()
-  hash = hashlib.md5(','.join(hashes)).hexdigest()
+  hash = hashlib.md5(','.join(hashes).encode('ascii')).hexdigest()
   hashes.append('configuration'+':'+ hash)
   entity_userdata_map['hashes']='\n'.join(hashes)
   return True
@@ -267,23 +268,23 @@ def getListOfAvailableRunConfigurations(searchString='*'):
     __report_error(result)
     return None
 
-  return list(c['name'].encode('ascii') for c in json.loads(result[1])['search'])
+  return list(c['name'] for c in json.loads(result[1])['search'])
 
 
 def getListOfArchivedRunConfigurations(searchString='*'):
   try:
     artdaq_database_uri=os.environ['ARTDAQ_DATABASE_URI']
   except KeyError:
-    print 'Error: ARTDAQ_DATABASE_URI is not set.'
+    print ('Error: ARTDAQ_DATABASE_URI is not set.')
     return False
 
   os.environ['ARTDAQ_DATABASE_URI']=__archiveuri_from_uri(artdaq_database_uri)
-  print 'Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI']
+  print ('Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI'])
 
   result=getListOfAvailableRunConfigurations(searchString)
 
   os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri
-  print 'Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI']
+  print ('Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI'])
 
   return result
 
@@ -299,7 +300,7 @@ def getListOfAvailableRunConfigurationPrefixes(searchString='*'):
     __report_error(result)
     return None
 
-  configs=list(c['name'].encode('ascii') for c in json.loads(result[1])['search'])
+  configs=list(c['name'] for c in json.loads(result[1])['search'])
   return list(set( __get_prefix(c) for c in configs))
 
 def __getConfigurationComposition(config):
@@ -324,7 +325,7 @@ def __exportConfiguration(config):
   collection=2
 
   if not __ends_on_5digitnumber(config):
-    print 'Error: Configuration does not have five digits at the end.'
+    print ('Error: Configuration does not have five digits at the end.')
     return False
 
   cfgs = __getConfigurationComposition(config)
@@ -335,9 +336,12 @@ def __exportConfiguration(config):
   for cfg in cfgs:
     if cfg[entity_name] == 'schema' and cfg[collection]=='SystemLayout':
       with open(fhicl_schema, "w") as fcl_file:
-	fcl_file.write(cfg[user_data])
-	print ('Exported',(cfg[collection],cfg[entity_name],fhicl_schema))
-	break
+        fcl_file.write(cfg[user_data])
+        cfg_entry=(cfg[collection],cfg[entity_name],fhicl_schema)
+        if sys.version_info[0] < 3:
+          cfg_entry= (cfg_entry[0].encode('ascii'),cfg_entry[1].encode('ascii'),cfg_entry[2].encode('ascii'))
+        print ('Exported',cfg_entry)
+        break
 
   __copy_default_schema()
 
@@ -362,13 +366,22 @@ def __exportConfiguration(config):
     with open(fcl_name, "w") as fcl_file:
       fcl_file.write(cfg[user_data])
 
-    print ('Exported',(cfg[collection],cfg[entity_name],fcl_name))
+
+
+    cfg_entry=(cfg[collection],cfg[entity_name],fcl_name)
+    if sys.version_info[0] < 3:
+      cfg_entry= (cfg_entry[0].encode('ascii'),cfg_entry[1].encode('ascii'),cfg_entry[2].encode('ascii'))
+
+    print('Exported',cfg_entry)
 
   return True
 
 #std::map<std::string /*entityName*/, std::string /*FHiCL document*/> getLatestConfiguration(std::string const& configNamePrefix);
 def getLatestConfiguration(configNamePrefix):
-  return dict((cfg[0],cfg[1]) for cfg in __getLatestConfiguration(configNamePrefix))
+  configs = __getConfigurationComposition(configNamePrefix)
+  if configs is None:
+    return None
+  return dict((cfg[0], cfg[1]) for cfg in configs)
 
 def importConfiguration(configNameOrconfigPrefix):
   configPrefix= __get_prefix(configNameOrconfigPrefix)
@@ -386,18 +399,18 @@ def importConfiguration(configNameOrconfigPrefix):
   excluded_files=__list_excluded_files(__get_prefix(config), schema, __find_files('.',any_file_pattern),cfg_composition)
 
   if len(excluded_files)>0:
-      print 'Warning: The following files will be excluded from being loaded into the artdaq database ' \
-	+ ', '.join(excluded_files) + '. Update ' + fhicl_schema + ' to include them.'
+      print ('Warning: The following files will be excluded from being loaded into the artdaq database '
+        + ', '.join(excluded_files) + '. Update ' + fhicl_schema + ' to include them.')
 
       if not __allow_importing_incomplete_configurations():
-        print 'Error: Importing of incomplete configurations is not allowed; ' \
-	  + 'set ARTDAQ_DATABASE_ALLOW_INCOMPLETE_CONFIGURATIONS to TRUE to allow.'
+        print ('Error: Importing of incomplete configurations is not allowed;'
+          + 'set ARTDAQ_DATABASE_ALLOW_INCOMPLETE_CONFIGURATIONS to TRUE to allow.')
         return False
 
   entity_userdata_map=__create_entity_userdata_map(cfg_composition)
   __hashConfiguration(entity_userdata_map)
 
-  cfg_composition.append(['Hashes','hashes','./hashes.fcl'])
+  cfg_composition.append(('Hashes','hashes','./hashes.fcl'))
   cfg_composition_dict=dict(zip(iter([cfg[1] for cfg in cfg_composition]),iter(cfg_composition)))
 
   print ('New configuration', config)
@@ -410,8 +423,14 @@ def importConfiguration(configNameOrconfigPrefix):
     query['filter']['entities.name']=entry
 
     result=__write_document(query,entity_userdata_map[entry])
-    print ('Import',entry)
-    if result[0] is not True:
+
+    cfg_entry=cfg_composition_dict[entry]
+    if sys.version_info[0] < 3:
+      cfg_entry= (cfg_entry[0].encode('ascii'),cfg_entry[1].encode('ascii'),cfg_entry[2].encode('ascii'))
+
+    print('Imported',cfg_entry)
+
+  if result[0] is not True:
       return False
 
   print ('New configuration', config)
@@ -422,27 +441,27 @@ def __exportConfigurationWithBulkloader(config):
   try:
     artdaq_database_uri=os.environ['ARTDAQ_DATABASE_URI']
   except KeyError:
-    print 'Error: ARTDAQ_DATABASE_URI is not set.'
+    print ('Error: ARTDAQ_DATABASE_URI is not set.')
     return False
 
   artdaq_database_remote_host=None
 
   try:
     artdaq_database_remote_host=os.environ['ARTDAQ_DATABASE_REMOTEHOST']
-    print 'Info: ARTDAQ_DATABASE_REMOTEHOST is '+ artdaq_database_remote_host
+    print ('Info: ARTDAQ_DATABASE_REMOTEHOST is '+ artdaq_database_remote_host)
   except KeyError:
     artdaq_database_remote_host=None
 
   try:
     os.environ['ARTDAQ_DATABASE_URI']=__archiveuri_from_uri(artdaq_database_uri)
     found_configurations=getListOfAvailableRunConfigurations(config.split('/')[0])
-  except Exception,e:
-    print 'Error: Unable to query configurations.'
+  except Exception:
+    print ('Error: Unable to query configurations.')
     return False
   finally:
     os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri
   if config not in found_configurations:
-      print 'Error: Configuration ' +config + ' is not archived.'
+      print ('Error: Configuration ' +config + ' is not archived.')
       return False
 
 
@@ -489,16 +508,16 @@ def __exportConfigurationWithBulkloader(config):
     task = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
     stdoutbuff,stderrbuff = task.communicate()
     result=task.wait()
-  except Exception,e:
-    print 'Error: Failed running bulkdownloader over ssh on '+ artdaq_database_remote_host + '. Exception message: '+ str(e)
+  except Exception as e:
+    print ('Error: Failed running bulkdownloader over ssh on '+ artdaq_database_remote_host + '. Exception message: '+ str(e))
     result=1
 
   if result!=0 or not stdoutbuff.endswith("True\n"):
-    print stdoutbuff[:-7]
-    print stderrbuff
+    print (stdoutbuff[:-7])
+    print (stderrbuff)
     return False
 
-  print stdoutbuff[:-6]
+  print (stdoutbuff[:-6])
 
   return True
 
@@ -522,10 +541,10 @@ def __archiveConfiguration(configuration_name,run_number,entity_userdata_map,upd
   configuration=str(run_number)+"/"+configuration_name
   version=str(run_number)+"/"+configuration_name
   found_versions=listVersions('SystemLayout')
-  print found_versions
+  #print (found_versions)
   if version in found_versions:
     if not update:
-      print 'Error: Configuration ' + str(run_number)+"/"+configuration_name + ' is already archived.'
+      print ('Error: Configuration ' + str(run_number)+"/"+configuration_name + ' is already archived.')
       return False
     else:
       versions = [v for v in found_versions if v.startswith(version)]
@@ -533,10 +552,10 @@ def __archiveConfiguration(configuration_name,run_number,entity_userdata_map,upd
       version=versions[-1]
       match = re.match(r'(.*[^\d]\d{5}v)(\d+$)', version)
       version=match.group(1)+str(int(match.group(2)) + 1) if match else version+"v"+str(1)
-      print 'Info: storing version '+ version
+      print ('Info: storing version '+ version)
   else:
     if update:
-      print 'Error: Configuration ' +str(run_number)+"/"+configuration_name + ' is not archived.'
+      print ('Error: Configuration ' +str(run_number)+"/"+configuration_name + ' is not archived.')
       return False
 
   __copy_default_schema()
@@ -564,7 +583,7 @@ def archiveRunConfiguration(config,run_number,update=False):
   try:
     artdaq_database_uri=os.environ['ARTDAQ_DATABASE_URI']
   except KeyError:
-    print 'Error: ARTDAQ_DATABASE_URI is not set.'
+    print ('Error: ARTDAQ_DATABASE_URI is not set.')
     return False
 
   if artdaq_database_uri.startswith("mongodb://") and not update:
@@ -579,29 +598,31 @@ def archiveRunConfiguration(config,run_number,update=False):
   excluded_files=__list_excluded_files(__get_prefix(config), schema, __find_files('.',any_file_pattern),cfg_composition)
 
   if len(excluded_files)>0:
-      print 'Warning: The following files will be excluded from being loaded into the artdaq database ' \
-	+ ', '.join(excluded_files) + '. Update ' + fhicl_schema + ' to include them.'
+      print ('Warning: The following files will be excluded from being loaded into the artdaq database ' \
+	+ ', '.join(excluded_files) + '. Update ' + fhicl_schema + ' to include them.')
 
       if not __allow_importing_incomplete_configurations():
-	  print 'Error: Importing of incomplete configurations is not allowed; ' \
-	    + 'set ARTDAQ_DATABASE_ALLOW_INCOMPLETE_CONFIGURATIONS to TRUE to allow.'
-	  return False
+        print ('Error: Importing of incomplete configurations is not allowed; '
+          + 'set ARTDAQ_DATABASE_ALLOW_INCOMPLETE_CONFIGURATIONS to TRUE to allow.')
+        return False
 
   entity_userdata_map=__create_entity_userdata_map(cfg_composition)
 
   os.environ['ARTDAQ_DATABASE_URI']=__archiveuri_from_uri(artdaq_database_uri)
-  print 'Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI']
+  print ('Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI'])
 
   result=__archiveConfiguration(config,run_number,entity_userdata_map,update)
 
   os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri
-  print 'Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI']
+  print ('Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI'])
 
   if result is not True:
      return False
 
-  for entry in cfg_composition:
-    print ('Archive',entry)
+  for cfg_entry in cfg_composition:
+    if sys.version_info[0] < 3:
+      cfg_entry =(cfg_entry[0].encode('ascii'),cfg_entry[1].encode('ascii'),cfg_entry[2].encode('ascii'))
+    print ('Archived',cfg_entry)
 
   return True
 
@@ -613,14 +634,14 @@ def __archiveConfigurationWithBulkloader(config,run_number,update):
   try:
     artdaq_database_uri=os.environ['ARTDAQ_DATABASE_URI']
   except KeyError:
-    print 'Error: ARTDAQ_DATABASE_URI is not set.'
+    print ('Error: ARTDAQ_DATABASE_URI is not set.')
     return False
 
   artdaq_database_remote_host=None
 
   try:
     artdaq_database_remote_host=os.environ['ARTDAQ_DATABASE_REMOTEHOST']
-    print 'Info: ARTDAQ_DATABASE_REMOTEHOST is '+ artdaq_database_remote_host
+    print ('Info: ARTDAQ_DATABASE_REMOTEHOST is '+ artdaq_database_remote_host)
   except KeyError:
     artdaq_database_remote_host=None
 
@@ -629,18 +650,18 @@ def __archiveConfigurationWithBulkloader(config,run_number,update):
   try:
     os.environ['ARTDAQ_DATABASE_URI']=__archiveuri_from_uri(artdaq_database_uri)
     found_versions=listVersions('SystemLayout')
-  except Exception,e:
-    print 'Error: Unable to query versions.'
+  except Exception:
+    print ('Error: Unable to query versions.')
     return False
   finally:
     os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri
   if version in found_versions:
     if not update:
-      print 'Error: Configuration ' + str(run_number)+"/"+config + ' is already archived.'
+      print ('Error: Configuration ' + str(run_number)+"/"+config + ' is already archived.')
       return False
   else:
     if update:
-      print 'Error: Configuration ' +str(run_number)+"/"+config + ' is not archived.'
+      print ('Error: Configuration ' +str(run_number)+"/"+config + ' is not archived.')
       return False
 
   __copy_default_schema()
@@ -651,13 +672,13 @@ def __archiveConfigurationWithBulkloader(config,run_number,update):
   excluded_files=__list_excluded_files(__get_prefix(config), schema, __find_files('.',any_file_pattern),cfg_composition)
 
   if len(excluded_files)>0:
-      print 'Warning: The following files will be excluded from being loaded into the artdaq database ' \
-	+ ', '.join(excluded_files) + '. Update ' + fhicl_schema + ' to include them.'
+      print ('Warning: The following files will be excluded from being loaded into the artdaq database ' \
+	+ ', '.join(excluded_files) + '. Update ' + fhicl_schema + ' to include them.')
 
       if not __allow_importing_incomplete_configurations():
-	  print 'Error: Importing of incomplete configurations is not allowed; ' \
-	    + 'set ARTDAQ_DATABASE_ALLOW_INCOMPLETE_CONFIGURATIONS to TRUE to allow.'
-	  return False
+        print ('Error: Importing of incomplete configurations is not allowed; '
+          + 'set ARTDAQ_DATABASE_ALLOW_INCOMPLETE_CONFIGURATIONS to TRUE to allow.')
+        return False
 
   envvars = dict(os.environ)
 
@@ -693,24 +714,26 @@ def __archiveConfigurationWithBulkloader(config,run_number,update):
   task=None
   stdoutbuff=None
   stderrbuff=None
-  #print ('command >>>>', command, '<<<< ' ) 
+  #print ('command >>>>', command, '<<<< ' )
   try:
     task = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
     stdoutbuff,stderrbuff = task.communicate()
     result=task.wait()
-  except Exception,e:
-    print 'Error: Failed running bulkloader over ssh on '+ artdaq_database_remote_host + '. Exception message: '+ str(e)
+  except Exception as e:
+    print ('Error: Failed running bulkloader over ssh on '+ artdaq_database_remote_host + '. Exception message: '+ str(e))
     result=1
 
   if result!=0 or not stdoutbuff.endswith("True\n"):
-    print stdoutbuff[:-7]
-    print stderrbuff
+    print (stdoutbuff[:-7])
+    print (stderrbuff)
     return False
 
-  print stdoutbuff[:-6]
+  print (stdoutbuff[:-6])
 
-  for entry in cfg_composition:
-    print ('Archive',entry)
+  for cfg_entry in cfg_composition:
+    if sys.version_info[0] < 3:
+      cfg_entry =(cfg_entry[0].encode('ascii'),cfg_entry[1].encode('ascii'),cfg_entry[2].encode('ascii'))
+    print ('Archived',cfg_entry)
 
   return True
 
@@ -720,19 +743,19 @@ def exportArchivedRunConfiguration(config):
   try:
     artdaq_database_uri=os.environ['ARTDAQ_DATABASE_URI']
   except KeyError:
-    print 'Error: ARTDAQ_DATABASE_URI is not set.'
+    print ('Error: ARTDAQ_DATABASE_URI is not set.')
     return False
 
   if artdaq_database_uri.startswith("mongodb://") and len(config.split('/'))==2:
     return __exportConfigurationWithBulkloader(config)
 
   os.environ['ARTDAQ_DATABASE_URI']=__archiveuri_from_uri(artdaq_database_uri)
-  print 'Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI']
+  print ('Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI'])
 
   result=__exportConfiguration(config)
 
   os.environ['ARTDAQ_DATABASE_URI']=artdaq_database_uri
-  print 'Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI']
+  print ('Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI'])
 
   return result
 
@@ -826,23 +849,23 @@ def importDatabase():
   return result[0]
 
 def help():
-  print 'Usage: conftool.py [operation] [config name prefix]'
-  print ''
-  print 'Example:'
-  print ' conftool.py exportConfiguration demo_safemode00003'
-  print ' conftool.py importConfiguration demo_safemode'
-  print ' conftool.py getListOfAvailableRunConfigurationPrefixes'
-  print ' conftool.py getListOfAvailableRunConfigurations'
-  print ' conftool.py getListOfAvailableRunConfigurations demo_'
-#  print ' conftool.py exportDatabase #writes archives into the current directory'
-#  print ' conftool.py importDatabase #reads archives from the current directory'
-  print ' conftool.py archiveRunConfiguration demo_safemode 23 #where 23 is a run number'
-  print ' conftool.py updateArchivedRunConfiguration demo_safemode 23 #where 23 is a run number'
-  print ' conftool.py getListOfArchivedRunConfigurations 23 #where 23 is a run number'
-  print ' conftool.py exportArchivedRunConfiguration 23/demo_safemode00003 #where 23/demo_safemode00003 is a configuration name'
-  print ' conftool.py listDatabases'
-  print ' conftool.py listCollections'
-  print ' conftool.py readDatabaseInfo'
+  print ('Usage: conftool.py [operation] [config name prefix]')
+  print ('')
+  print ('Example:')
+  print (' conftool.py exportConfiguration demo_safemode00003')
+  print (' conftool.py importConfiguration demo_safemode')
+  print (' conftool.py getListOfAvailableRunConfigurationPrefixes')
+  print (' conftool.py getListOfAvailableRunConfigurations')
+  print (' conftool.py getListOfAvailableRunConfigurations demo_')
+#  print (' conftool.py exportDatabase #writes archives into the current  directory')
+#  print (' conftool.py importDatabase #reads archives from the current  directory')
+  print (' conftool.py archiveRunConfiguration demo_safemode 23 #where 23 is a run number')
+  print (' conftool.py updateArchivedRunConfiguration demo_safemode 23 #where 23 is a run number')
+  print (' conftool.py getListOfArchivedRunConfigurations 23 #where 23 is a run number')
+  print (' conftool.py exportArchivedRunConfiguration 23/demo_safemode00003 #where 23/demo_safemode00003 is a configuration name')
+  print (' conftool.py listDatabases')
+  print (' conftool.py listCollections')
+  print (' conftool.py readDatabaseInfo')
   return True
 
 if __name__ == "__main__":
@@ -853,36 +876,40 @@ if __name__ == "__main__":
   try:
     artdaq_database_uri=os.environ['ARTDAQ_DATABASE_URI']
   except KeyError:
-    print 'Error: ARTDAQ_DATABASE_URI is not set.'
+    print ('Error: ARTDAQ_DATABASE_URI is not set.')
     sys.exit(1)
 
   if sys.argv[1] in [o[0] for o in inspect.getmembers(sys.modules[__name__]) if inspect.isfunction(o[1])]:
     getattr(conftoolp, 'enable_trace')()
     thefunc=getattr(sys.modules[__name__], sys.argv[1])
-    args = inspect.getargspec(thefunc)
+
+    if sys.version_info[0] < 3:
+      args = inspect.getargspec(thefunc)
+    else:
+      args = inspect.getfullargspec(thefunc)
+
     result = thefunc(*sys.argv[2:len(args[0]) + 2]) if args else thefunc()
 
     if type(result) is list:
-      print '\n'.join([ str(el) for el in result ])
+      print ('\n'.join([ str(el) for el in result ]))
     else:
-      print result
+      print (result)
 
     sys.exit(0)
 
   functions_list = [o[0] for o in inspect.getmembers(conftoolp) if inspect.isbuiltin(o[1])]
   if sys.argv[1] not in functions_list:
-    print 'Error: Unrecognised API function.'
-    print 'Avaialble functions:'
-    print  functions_list
+    print ('Error: Unrecognised API function.')
+    print ('Avaialble functions:')
+    print  (functions_list)
     sys.exit(1)
 
   getattr(conftoolp, 'enable_trace')()
   result = getattr(conftoolp, sys.argv[1])(*sys.argv[2:len(sys.argv)])
 
   if result[0] is True:
-    print result[1]
+    print (result[1])
     sys.exit(0)
   else:
     __report_error(result)
     sys.exit(1)
-
