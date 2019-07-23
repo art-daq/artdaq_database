@@ -61,6 +61,9 @@ class StorageProvider final {
   template <typename FILTER>
   std::vector<FILTER> databaseMetadata(FILTER const&);
 
+  template <typename FILTER>
+  std::vector<FILTER> searchCollection(FILTER const&);
+
  private:
   std::shared_ptr<IMPL> _provider;
 };

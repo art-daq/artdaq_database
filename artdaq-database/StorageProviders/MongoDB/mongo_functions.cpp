@@ -40,3 +40,24 @@ bsoncxx::types::value extract_value_from_document(bsoncxx::document::value const
 
   return element->get_value();
 }
+
+mongocxx::pipeline pipeline_from_document(bsoncxx::document::view_or_value const& document ){
+	mongocxx::pipeline pipeline;
+  confirm(!document.is_owning());
+ 	auto view = document.view();
+	confirm(!view.empty());
+
+	for(auto const& kvp: view){
+	 auto const & key=  kvp.key().to_string();
+   auto document=[&kvp](){ auto doc= bsoncxx::builder::core(false); doc.concatenate(kvp.get_document());return doc; };
+
+	 if(key=="$match"){
+		 pipeline.match(document().view_document());
+	 }else if (key == "$project") {
+		 pipeline.project(document().view_document()); 
+	 }
+
+	}
+
+  return pipeline;
+}

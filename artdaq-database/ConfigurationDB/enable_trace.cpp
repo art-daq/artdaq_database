@@ -16,12 +16,14 @@ void t::enable_trace() {
   artdaq::database::configuration::debug::ManageConfigs();
   artdaq::database::configuration::debug::ManageDocuments();
   artdaq::database::configuration::debug::Metadata();
+	artdaq::database::configuration::debug::SearchCollection();
 
   artdaq::database::configuration::debug::detail::ExportImport();
   artdaq::database::configuration::debug::detail::ManageAliases();
   artdaq::database::configuration::debug::detail::ManageConfigs();
   artdaq::database::configuration::debug::detail::ManageDocuments();
   artdaq::database::configuration::debug::detail::Metadata();
+	artdaq::database::configuration::debug::detail::SearchCollection();
 
   artdaq::database::configuration::debug::options::OperationBase();
   artdaq::database::configuration::debug::options::BulkOperations();

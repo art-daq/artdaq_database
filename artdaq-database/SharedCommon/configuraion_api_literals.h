@@ -60,6 +60,9 @@ constexpr auto exportconfig = "exportconfig";
 constexpr auto importconfig = "importconfig";
 constexpr auto exportcollection = "exportcollection";
 constexpr auto importcollection = "importcollection";
+
+constexpr auto searchcollection = "searchcollection";
+
 }  // namespace operation
 
 namespace provider {
@@ -110,6 +113,7 @@ constexpr auto configuration_alias = "configuration_alias";
 
 namespace format {
 constexpr auto gui = "gui";
+constexpr auto json = "json";
 }
 
 namespace msg {

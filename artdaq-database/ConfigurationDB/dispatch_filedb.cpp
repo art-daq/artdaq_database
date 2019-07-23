@@ -541,6 +541,14 @@ JSONDocument prov::readDbInfo(ManageDocumentOperation const& options, JSONDocume
   return {oss.str()};
 }
 
+std::vector<JSONDocument> prov::searchCollection(ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/) {
+  auto returnValue = std::vector<JSONDocument>{};
+
+  throw runtime_error("findVersionAliases") << "findVersionAliases: is not implemented";
+
+  return returnValue;
+}
+
 void cf::debug::FileSystemDB() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);

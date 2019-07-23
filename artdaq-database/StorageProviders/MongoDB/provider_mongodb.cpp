@@ -43,6 +43,9 @@ namespace apiliteral = db::configapi::literal;
 
 // bsoncxx::types::value extract_value_from_document(bsoncxx::document::value
 // const& document, std::string const& key);
+
+mongocxx::pipeline pipeline_from_document(bsoncxx::document::view_or_value const&);
+
 namespace artdaq {
 namespace database {
 
@@ -644,6 +647,73 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::databaseMetada
   oss << "}";
   return readDocument(JSONDocument{oss.str()});
 }
+
+
+
+
+template <>
+template <>
+std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::searchCollection(JSONDocument const& query_payload) {
+  confirm(!query_payload.empty());
+  auto returnCollection = std::vector<JSONDocument>();
+
+  TLOG(20) << "MongoDB::searchCollection() begin";
+  TLOG(20) << "MongoDB::searchCollection() args data=<" << query_payload << ">";
+
+  auto bson_document = compat::from_json(query_payload);
+
+  auto extract_value = [&bson_document](auto const& name) {
+    auto view = bson_document.view();
+    auto element = view.find(name);
+
+    if (element == view.end()) {
+      throw runtime_error("MongoDB") << "Search JSONDocument is missing the \"" << name << "\" element.";
+    }
+
+    return element->get_value();
+  };
+
+  auto collection_name = dequote(compat::to_json(extract_value(apiliteral::option::collection)));
+
+  auto collection = _provider->connection().collection(collection_name);
+
+//  auto search = JSONDocument{compat::to_json(extract_value(apiliteral::option::searchfilter))};
+
+
+  mongocxx::pipeline stages=pipeline_from_document(extract_value(apiliteral::option::searchfilter).get_document().value );
+
+
+  TLOG(20) << "MongoDB::findVersions()  query_payload=<" << compat::to_json(stages.view_array()) << ">";
+
+  auto cursor = collection.aggregate(stages);
+
+  for (auto const& view : cursor) {
+    auto results = view.find("results")->get_array();
+
+
+    for (auto const& result : results.value) {
+      auto result_json = compat::to_json(result.get_value());
+
+      std::ostringstream oss;
+      oss << "{";
+      oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
+      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::mongo) << ",";
+      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::json) << ",";
+      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::searchcollection) << ",";
+      oss << db::quoted_(apiliteral::option::result) << ":" << compat::to_json(result.get_value());
+      oss << "}";
+
+      TLOG(20) << "MongoDB::searchCollection search result =<" << oss.str() << ">";
+
+      returnCollection.emplace_back(oss.str());
+    }
+  }
+
+
+  return returnCollection;
+}
+
+
 
 namespace mongo {
 namespace debug {

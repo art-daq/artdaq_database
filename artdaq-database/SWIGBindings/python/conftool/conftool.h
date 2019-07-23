@@ -40,6 +40,9 @@ result_t import_database(std::string const& query_payload);       // exportimpor
 result_t export_collection(std::string const& query_payload);     // exportimport
 result_t import_collection(std::string const& query_payload);     // exportimport
 
+
+result_t search_collection(std::string const& query_payload);    // search collection
+
 result_t list_databases(std::string const& query_payload);    // metadata
 result_t read_dbinfo(std::string const& query_payload);       // metadata
 result_t list_collections(std::string const& query_payload);  // metadata

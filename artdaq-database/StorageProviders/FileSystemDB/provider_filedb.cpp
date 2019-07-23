@@ -453,6 +453,22 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::databaseM
   return returnCollection;
 }
 
+
+template <>
+template <>
+std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::searchCollection(JSONDocument const& query_payload) {
+  confirm(!query_payload.empty());
+  auto returnCollection = std::vector<JSONDocument>();
+
+  TLOG(15) << "StorageProvider::FileSystemDB::searchCollection() begin";
+  TLOG(15) << "StorageProvider::FileSystemDB::searchCollection() args data=<" << query_payload << ">";
+
+  throw runtime_error("FileSystemDB") << "StorageProvider::FileSystemDB::searchCollection() is not implemented";
+
+  return returnCollection;
+}
+
+
 namespace filesystem {
 namespace debug {
 void enable() {
