@@ -1,7 +1,7 @@
 boost            v1_66_0a     boost-1.66.0a-slf6-x86_64-c2-prof.tar.bz2            -f  Linux64bit+2.6-2.12  -q  c2:prof
 cetbuildtools    v7_13_02     cetbuildtools-7.13.02-noarch.tar.bz2                 -f  NULL
 cetpkgsupport    v1_13_00     cetpkgsupport-1.13.00-noarch.tar.bz2                 -f  NULL
-cmake            v3_13_2      cmake-3.13.2-slf6-x86_64.tar.bz2                     -f  Linux64bit+2.6-2.12
+cmake            v3_14_3      cmake-3.14.3-slf6-x86_64.tar.bz2                     -f  Linux64bit+2.6-2.12
 gcc              v6_4_0       gcc-6.4.0-slf6-x86_64.tar.bz2                        -f  Linux64bit+2.6-2.12
 clang            v5_0_1       clang-5.0.1-slf6-x86_64.tar.bz2                      -f  Linux64bit+2.6-2.12
 python           v2_7_14b     python-2.7.14b-slf6-x86_64.tar.bz2                   -f  Linux64bit+2.6-2.12
