@@ -1,7 +1,7 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_database  v1_04_73
-defaultqual	e15:s65
+parent artdaq_database  v1_04_74
+defaultqual	e17:s82
 
 # These optional lines define the installed directories where
 # headers, libraries, and executables will be found
@@ -24,21 +24,31 @@ boost           v1_66_0         s65
 boost           v1_66_0a        s67
 boost		v1_66_0a        s73
 boost		v1_69_0         s82
+boost		v1_70_0         s87
 mongodb         v4_0_8b
 python          v2_7_14b        s64
 python          v2_7_14b        s65
 python          v2_7_14b        s67
 python		v2_7_14b	s73
 python		v2_7_15a	s82
-TRACE           v3_13_12    	-   	only_for_build
+python		v2_7_15a	s87
+TRACE           v3_14_02    	-   	only_for_build
 swig            v3_0_12d	-	only_for_build
 nodejs		v4_5_0		-	only_for_build
-cetbuildtools	v7_12_01	-	only_for_build
+cetbuildtools	v7_13_02	-	only_for_build
 end_product_list
 
 # -nq- means there is no qualifier
 # a "-" means the dependent product is not required by the parent and will not be setup
 qualifier	boost  	   mongodb	python	TRACE    swig		nodejs	notes
+e19:s87:debug   e19:debug  e19:debug 	-nq-	-nq-     e19:debug	-nq-	-std=c++17
+e19:s87:prof    e19:prof   e19:prof	-nq-	-nq-     e19:prof	-nq-	-std=c++17
+c7:s87:debug   	c7:debug   c7:debug 	-nq-	-nq-     c7:debug	-nq-	-std=c++17
+c7:s87:prof    	c7:prof	   c7:prof	-nq-	-nq-     c7:prof	-nq-	-std=c++17
+e17:s87:debug   e17:debug  e17:debug 	-nq-	-nq-     e17:debug	-nq-	-std=c++17
+e17:s87:prof    e17:prof   e17:prof	-nq-	-nq-     e17:prof	-nq-	-std=c++17
+c2:s87:debug   	c2:debug   c2:debug 	-nq-	-nq-     c2:debug	-nq-	-std=c++17
+c2:s87:prof    	c2:prof	   c2:prof	-nq-	-nq-     c2:prof	-nq-	-std=c++17
 e19:s82:debug   e19:debug  e19:debug 	-nq-	-nq-     e19:debug	-nq-	-std=c++17
 e19:s82:prof    e19:prof   e19:prof	-nq-	-nq-     e19:prof	-nq-	-std=c++17
 c7:s82:debug   	c7:debug   c7:debug 	-nq-	-nq-     c7:debug	-nq-	-std=c++17
