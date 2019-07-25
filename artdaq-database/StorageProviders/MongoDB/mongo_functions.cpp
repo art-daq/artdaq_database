@@ -41,23 +41,42 @@ bsoncxx::types::value extract_value_from_document(bsoncxx::document::value const
   return element->get_value();
 }
 
-mongocxx::pipeline pipeline_from_document(bsoncxx::document::view_or_value const& document ){
-	mongocxx::pipeline pipeline;
-  confirm(!document.is_owning());
- 	auto view = document.view();
-	confirm(!view.empty());
+mongocxx::pipeline pipeline_from_document(bsoncxx::array::view const& view_array) {
+  mongocxx::pipeline pipeline;
+  confirm(!view_array.empty());
 
-	for(auto const& kvp: view){
-	 auto const & key=  kvp.key().to_string();
-   auto document=[&kvp](){ auto doc= bsoncxx::builder::core(false); doc.concatenate(kvp.get_document());return doc; };
+  for (auto const& element : view_array) {
+    const auto stage = bsoncxx::document::view{element.get_document()};
 
-	 if(key=="$match"){
-		 pipeline.match(document().view_document());
-	 }else if (key == "$project") {
-		 pipeline.project(document().view_document()); 
-	 }
+    auto length = std::distance(stage.cbegin(), stage.cend());
+    if (length != 1) {
+      throw runtime_error("MongoDB") << "Invalid MongoDB search; an aggregation pipeline must have only one"
+                                     << " key-value-pair on each stage, stage=<" << compat::to_json(stage) << ">, length=" << length << ".";
+    }
 
-	}
+    auto const& kvp = *stage.begin();
+    auto const& key = kvp.key();
+
+    auto document = [&kvp]() {
+      auto doc = bsoncxx::builder::core(false);
+      doc.concatenate(kvp.get_document());
+      return doc;
+    };
+
+    if (key == "$match") {
+      pipeline.match(document().view_document());
+    } else if (key == "$project") {
+      pipeline.project(document().view_document());
+    } else if (key == "$group") {
+      pipeline.project(document().view_document());
+    } else if (key == "$sort") {
+      pipeline.project(document().view_document());
+    } else if (key == "$addFields") {
+      pipeline.project(document().view_document());
+    } else if (key == "$unwind") {
+      pipeline.project(document().view_document());
+    }
+  }
 
   return pipeline;
 }

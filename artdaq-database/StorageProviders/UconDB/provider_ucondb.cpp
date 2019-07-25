@@ -118,7 +118,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::listDatabases(J
 
 template <>
 template <>
-std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::databaseMetadata(JSONDocument const& query_payload[[gnu::unused]]) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::databaseMetadata(JSONDocument const& query_payload [[gnu::unused]]) {
   confirm(!query_payload.empty());
   auto returnCollection = std::vector<JSONDocument>();
 

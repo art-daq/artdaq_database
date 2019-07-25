@@ -1,0 +1,5 @@
+[
+	{ "$match": { "document.data.daq.event_builder.mpi_buffer_count" : 1@RAND_NAME@ } },
+	{ "$project": { "value": "$document.data.daq.event_builder.mpi_buffer_count" } }
+]
+

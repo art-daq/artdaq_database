@@ -7,8 +7,18 @@
 std::string compat::to_json(const bsoncxx::types::value& value) {
   using bsoncxx::builder::basic::kvp;
   auto doc = bsoncxx::builder::basic::document{};
-  doc.append(kvp("dummy",value));  
-  std::string buff = bsoncxx::to_json(doc.view());   
+  doc.append(kvp("dummy", value));
+  std::string buff = bsoncxx::to_json(doc.view());
+  auto fpos = buff.find(':') + 1;
+  auto nchars = buff.rfind('}') - fpos;
+  return artdaq::database::trim(buff.substr(fpos, nchars));
+}
+
+std::string compat::to_json(const bsoncxx::types::b_array& array) {
+  using bsoncxx::builder::basic::kvp;
+  auto doc = bsoncxx::builder::basic::document{};
+  doc.append(kvp("dummy", array));
+  std::string buff = bsoncxx::to_json(doc.view());
   auto fpos = buff.find(':') + 1;
   auto nchars = buff.rfind('}') - fpos;
   return artdaq::database::trim(buff.substr(fpos, nchars));

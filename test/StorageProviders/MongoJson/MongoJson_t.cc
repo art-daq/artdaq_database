@@ -21,6 +21,7 @@ bool test_insert(std::string const& /*source*/, std::string const& /*compare*/, 
 bool test_search1(std::string const& /*source*/, std::string const& /*compare*/, std::string const& /*filter*/);
 bool test_search2(std::string const& /*source*/, std::string const& /*compare*/, std::string const& /*options*/);
 bool test_update(std::string const& /*source*/, std::string const& /*compare*/, std::string const& /*update*/);
+bool test_search_collection(std::string const& /*source*/, std::string const& /*compare*/, std::string const& /*options*/);
 
 int main(int argc, char* argv[]) try {
   artdaq::database::mongo::debug::enable();
@@ -36,9 +37,8 @@ int main(int argc, char* argv[]) try {
 
   bpo::options_description desc = descstr.str();
 
-  desc.add_options()("source,s", bpo::value<std::string>(), "Input source file.")(
-      "compare,c", bpo::value<std::string>(), "Expected result.")("testname,t", bpo::value<std::string>(), "Test name.")(
-      "options,o", bpo::value<std::string>(), "Test options file.")
+  desc.add_options()("source,s", bpo::value<std::string>(), "Input source file.")("compare,c", bpo::value<std::string>(), "Expected result.")(
+      "testname,t", bpo::value<std::string>(), "Test name.")("options,o", bpo::value<std::string>(), "Test options file.")
 
       ("help,h", "produce help message");
 
@@ -98,7 +98,12 @@ int main(int argc, char* argv[]) try {
 
   auto runTest = [](std::string const& name) {
     auto tests = std::map<std::string, test_case>{
-        {"insert", test_insert}, {"update", test_update}, {"search1", test_search1}, {"search2", test_search2}};
+        {"insert", test_insert},
+        {"update", test_update},
+        {"search1", test_search1},
+        {"search2", test_search2},
+        {"search_collection", test_search_collection},
+    };
 
     std::cout << "Running test:<" << name << ">\n";
 
@@ -237,7 +242,7 @@ bool test_search1(std::string const& source, std::string const& compare, std::st
   return false;
 }
 
-bool test_search2(std::string const& source, std::string const& compare, std::string const& options[[gnu::unused]]) {
+bool test_search2(std::string const& source, std::string const& compare, std::string const& options [[gnu::unused]]) {
   confirm(!source.empty());
   confirm(!compare.empty());
 
@@ -281,6 +286,63 @@ bool test_search2(std::string const& source, std::string const& compare, std::st
   std::cout << "Search criteria " << search << "\n";
 
   auto results = provider->readDocument(search);
+
+  if (results.size() != repeatCount) {
+    std::cout << "Search returned " << results.size() << " results.\n";
+
+    for (auto&& element : results) {
+      std::cout << element << "\n";
+    }
+    return false;
+  }
+
+  return true;
+}
+
+bool test_search_collection(std::string const& source, std::string const& compare, std::string const& options [[gnu::unused]]) {
+  confirm(!source.empty());
+  confirm(!compare.empty());
+
+  using artdaq::database::docrecord::JSONDocument;
+
+  namespace DBI = artdaq::database::mongo;
+
+  auto config = DBI::DBConfig{};
+  auto database = DBI::DB::create(config);
+  auto provider = DBI::DBProvider<JSONDocument>::create(database);
+
+  auto collection = std::string("testJSON_V002");
+
+  auto json = JSONDocument{"{\"document\":" + source + ", \"collection\":\"" + collection + "\"}"};
+
+  auto repeatCount = std::size_t{5};
+
+  auto object_ids = std::vector<std::string>();
+
+  std::ostringstream oss;
+  oss << R"({"_id" : { "$in" : [)";
+
+  auto nodata_pos = oss.tellp();
+
+  for (int i = repeatCount; i != 0; i--) {
+    auto object_id = provider->writeDocument(json);
+    object_ids.push_back(object_id);
+    oss << JSONDocument(object_id).findChildDocument("_id").to_string() << ",";
+  }
+
+  if (oss.tellp() != nodata_pos) {
+    oss.seekp(-1, oss.cur);
+  }
+
+  oss << "]} }";
+
+  auto filter = oss.str();
+
+  auto search = JSONDocument{"{\"filter\":" + (options.empty() ? filter : options) + ", \"collection\":\"" + collection + "\"}"};
+
+  std::cout << "Search criteria " << search << "\n";
+
+  auto results = provider->searchCollection(search);
 
   if (results.size() != repeatCount) {
     std::cout << "Search returned " << results.size() << " results.\n";
@@ -342,8 +404,7 @@ bool test_update(std::string const& source, std::string const& compare, std::str
   std::cout << "Update result=<" << found.to_string() << ">\n";
   std::cout << "Displaced value=<" << displaced.to_string() << ">\n";
 
-  json = JSONDocument{"{\"document\":" + found.to_string() + ", \"filter\":" + object_id + ",\"collection\":\"" + collection +
-                      "\"}"};
+  json = JSONDocument{"{\"document\":" + found.to_string() + ", \"filter\":" + object_id + ",\"collection\":\"" + collection + "\"}"};
 
   object_id = provider->writeDocument(json);
   search = JSONDocument{"{\"filter\":" + object_id + ", \"collection\":\"" + collection + "\"}"};

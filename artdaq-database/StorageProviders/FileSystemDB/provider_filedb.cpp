@@ -419,7 +419,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::listDatab
 
 template <>
 template <>
-std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::databaseMetadata(JSONDocument const& query_payload[[gnu::unused]]) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::databaseMetadata(JSONDocument const& query_payload [[gnu::unused]]) {
   confirm(!query_payload.empty());
   auto returnCollection = std::vector<JSONDocument>();
 
@@ -453,7 +453,6 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::databaseM
   return returnCollection;
 }
 
-
 template <>
 template <>
 std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::searchCollection(JSONDocument const& query_payload) {
@@ -467,7 +466,6 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::searchCol
 
   return returnCollection;
 }
-
 
 namespace filesystem {
 namespace debug {
