@@ -183,4 +183,11 @@ collection: SystemLayout
 
 pattern: "^(?!.*common_code)(.*)(schema)(\.fcl$)" 
 
+}, {
+
+collection: Flags
+
+pattern: "^(?!.*common_code)(.*)(flags)(\.fcl$)"
+
 }] 
+

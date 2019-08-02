@@ -335,10 +335,21 @@ def __exportConfiguration(config):
       return False
 
   for cfg in cfgs:
-    if cfg[entity_name] == 'schema' and cfg[collection]=='SystemLayout':
+    if cfg[entity_name] == 'schema' and cfg[collection] == 'SystemLayout':
       with open(fhicl_schema, "w") as fcl_file:
         fcl_file.write(cfg[user_data])
         cfg_entry=(cfg[collection],cfg[entity_name],fhicl_schema)
+        if sys.version_info[0] < 3:
+          cfg_entry= (cfg_entry[0].encode('ascii'),cfg_entry[1].encode('ascii'),cfg_entry[2].encode('ascii'))
+        print ('Exported',cfg_entry)
+        break
+
+  for cfg in cfgs:
+    if cfg[entity_name] == 'flags' and cfg[collection] == 'Flags':
+      fhicl_file=cfg[entity_name]+'.fcl'
+      with open(fhicl_file , "w") as fcl_file:
+        fcl_file.write(cfg[user_data])
+        cfg_entry=(cfg[collection],cfg[entity_name],fhicl_file)
         if sys.version_info[0] < 3:
           cfg_entry= (cfg_entry[0].encode('ascii'),cfg_entry[1].encode('ascii'),cfg_entry[2].encode('ascii'))
         print ('Exported',cfg_entry)
@@ -354,7 +365,7 @@ def __exportConfiguration(config):
     include_dirs.append(l['collection'])
 
   for cfg in cfgs:
-    if cfg[entity_name]=='schema':
+    if cfg[entity_name]=='schema' or cfg[entity_name]=='flags':
       continue
 
     path = cfg[collection] if cfg[collection] in include_dirs else __get_prefix(config)
@@ -430,9 +441,11 @@ def __importConfiguration(configNameOrconfigPrefix, update=False):
         return False
 
   entity_userdata_map=__create_entity_userdata_map(cfg_composition)
-  __hashConfiguration(entity_userdata_map)
 
-  cfg_composition.append(('Hashes','hashes','./hashes.fcl'))
+  if not update:
+    __hashConfiguration(entity_userdata_map)
+    cfg_composition.append(('Hashes','hashes','./hashes.fcl'))
+
   cfg_composition_dict=dict(zip(iter([cfg[1] for cfg in cfg_composition]),iter(cfg_composition)))
 
   for entry in entity_userdata_map:
@@ -454,8 +467,10 @@ def __importConfiguration(configNameOrconfigPrefix, update=False):
 
     print('Imported',cfg_entry)
 
-
-  print ('New configuration', config)
+  if update:
+    print('Updated configuration', config)
+  else:
+    print('New configuration', config)
 
   return True
 
