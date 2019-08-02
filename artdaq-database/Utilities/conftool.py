@@ -317,6 +317,7 @@ def __getConfigurationComposition(config):
     return None
 
   print ('Last configuration',config)
+  #print ('Composition:', result[1])
   return list(__read_document(c['query']) for c in json.loads(result[1])['search'])
 
 def __exportConfiguration(config):
@@ -383,12 +384,33 @@ def getLatestConfiguration(configNamePrefix):
     return None
   return dict((cfg[0], cfg[1]) for cfg in configs)
 
-def importConfiguration(configNameOrconfigPrefix):
+def __importConfiguration(configNameOrconfigPrefix, update=False):
   configPrefix= __get_prefix(configNameOrconfigPrefix)
 
-  config = __latest_config_name(configPrefix)
+  if configNameOrconfigPrefix == configPrefix and update is True:
+    print ('Error: Updates are not allowed using the configuration prefix; configNameOrconfigPrefix=', configNameOrconfigPrefix)
 
-  config = __increment_config_name(config) if config else __increment_config_name(configPrefix)
+  if update:
+    config=configNameOrconfigPrefix
+    version=config+'-ver001'
+    found_versions=listVersions('SystemLayout')
+    print (found_versions)
+    if version in found_versions:
+      versions = [v for v in found_versions if v.startswith(config)]
+      versions.sort()
+      version=versions[-1]
+      match = re.match(r'(.*[^\d]\d{5}-ver)(\d+$)', version)
+      version=match.group(1)+str(int(match.group(2)) + 1).zfill(3) if match else config+"-ver"+str(1).zfill(3)
+      print ('Updating configuration', config )
+      print ('Info: Storing version '+ version)
+    else:
+      print ('Error: Configuration update failed; configuration '+ configNameOrconfigPrefix + ' is not found.')
+      return False
+  else:
+    config = __latest_config_name(configPrefix)
+    config = __increment_config_name(config) if config else __increment_config_name(configPrefix)
+    version = config+'-ver001'
+    print ('New configuration', config)
 
   __copy_default_schema()
 
@@ -413,13 +435,11 @@ def importConfiguration(configNameOrconfigPrefix):
   cfg_composition.append(('Hashes','hashes','./hashes.fcl'))
   cfg_composition_dict=dict(zip(iter([cfg[1] for cfg in cfg_composition]),iter(cfg_composition)))
 
-  print ('New configuration', config)
-
   for entry in entity_userdata_map:
     query = json.loads('{"operation" : "store", "dataformat":"fhicl", "filter":{}}')
     query['filter']['configurations.name']=config
     query['collection']=cfg_composition_dict[entry][0]
-    query['filter']['version']=config+'-ver001'
+    query['filter']['version']=version
     query['filter']['entities.name']=entry
 
     result=__write_document(query,entity_userdata_map[entry])
@@ -428,10 +448,12 @@ def importConfiguration(configNameOrconfigPrefix):
     if sys.version_info[0] < 3:
       cfg_entry= (cfg_entry[0].encode('ascii'),cfg_entry[1].encode('ascii'),cfg_entry[2].encode('ascii'))
 
+    if result[0] is not True:
+      print ('Failed importing', cfg_entry)
+      return False
+
     print('Imported',cfg_entry)
 
-  if result[0] is not True:
-      return False
 
   print ('New configuration', config)
 
@@ -521,6 +543,12 @@ def __exportConfigurationWithBulkloader(config):
 
   return True
 
+def importConfiguration(configNameOrconfigPrefix):
+  __importConfiguration(configNameOrconfigPrefix)
+
+def updateConfigurationFlags(configNameOrconfigPrefix):
+  __importConfiguration(configNameOrconfigPrefix,True)
+
 def exportConfiguration(configNamePrefix):
   #if not __ends_on_5digitnumber(configNamePrefix):
   #  print 'Error: Configuration does not have five digits at the end.'
@@ -598,8 +626,8 @@ def archiveRunConfiguration(config,run_number,update=False):
   excluded_files=__list_excluded_files(__get_prefix(config), schema, __find_files('.',any_file_pattern),cfg_composition)
 
   if len(excluded_files)>0:
-      print ('Warning: The following files will be excluded from being loaded into the artdaq database ' \
-	+ ', '.join(excluded_files) + '. Update ' + fhicl_schema + ' to include them.')
+      print ('Warning: The following files will be excluded from being loaded into the artdaq database '
+        + ', '.join(excluded_files) + '. Update ' + fhicl_schema + ' to include them.')
 
       if not __allow_importing_incomplete_configurations():
         print ('Error: Importing of incomplete configurations is not allowed; '
@@ -854,6 +882,7 @@ def help():
   print ('Example:')
   print (' conftool.py exportConfiguration demo_safemode00003')
   print (' conftool.py importConfiguration demo_safemode')
+  print (' conftool.py updateConfigurationFlags demo_safemode00003')
   print (' conftool.py getListOfAvailableRunConfigurationPrefixes')
   print (' conftool.py getListOfAvailableRunConfigurations')
   print (' conftool.py getListOfAvailableRunConfigurations demo_')
