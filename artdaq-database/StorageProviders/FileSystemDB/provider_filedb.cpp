@@ -136,7 +136,21 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::configura
                 "returned "
              << configentityname_pairs.size() << " configurations.";
 
+    auto seenValues = std::list<std::string>{};
+
+    auto hasSeenValue = [& v = seenValues](auto const& name) {
+      confirm(!name.empty());
+      if (std::find(v.begin(), v.end(), name) != v.end()) {
+        return false;
+      }
+
+      v.emplace_back(name);
+      return true;
+    };
+
     for (auto const& configentityname_pair : configentityname_pairs) {
+      if (!hasSeenValue(configentityname_pair.second)) continue;
+
       std::ostringstream oss;
 
       oss << "{";

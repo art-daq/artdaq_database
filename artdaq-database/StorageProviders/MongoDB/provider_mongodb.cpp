@@ -288,6 +288,18 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::configurationC
 
     auto cursor = collection.aggregate(stages);
 
+    auto seenValues = std::list<std::string>{};
+
+    auto hasSeenValue = [& v = seenValues](auto const& name) {
+      confirm(!name.empty());
+      if (std::find(v.begin(), v.end(), name) != v.end()) {
+        return false;
+      }
+
+      v.emplace_back(name);
+      return true;
+    };
+
     for (auto const& view : cursor) {
       TLOG(15) << "MongoDB::configurationComposition()  value=<" << compat::to_json(view) << ">";
 
@@ -309,6 +321,8 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::configurationC
           if (configuration_name != configuration_name_expected) {
             continue;
           }
+
+          if (!hasSeenValue(entity_name)) continue;
 
           std::ostringstream oss;
           oss << "{";
