@@ -44,7 +44,7 @@ namespace apiliteral = db::configapi::literal;
 // bsoncxx::types::value extract_value_from_document(bsoncxx::document::value
 // const& document, std::string const& key);
 
-mongocxx::pipeline pipeline_from_document(bsoncxx::array::view const&);
+mongocxx::pipeline pipeline_from_document(bsoncxx::document::value const&);
 
 namespace artdaq {
 namespace database {
@@ -684,26 +684,15 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::searchCollecti
     return element->get_value();
   };
 
-  auto extract_array = [&bson_document](auto const& name) {
-    auto view = bson_document.view();
-    auto element = view.find(name);
-
-    if (element == view.end()) {
-      throw runtime_error("MongoDB") << "Search JSONDocument is missing the \"" << name << "\" element.";
-    }
-
-    return element->get_array();
-  };
-
   auto collection_name = dequote(compat::to_json(extract_value(apiliteral::option::collection)));
 
   auto collection = _provider->connection().collection(collection_name);
 
-  auto const& search = extract_array(apiliteral::option::searchfilter);
+  auto const search = compat::to_json(extract_value(apiliteral::option::searchfilter));
 
-  TLOG(20) << "MongoDB::searchcollection() search=<" << compat::to_json(search) << ">";
+  TLOG(20) << "MongoDB::searchcollection() search=<" << search << ">";
 
-  mongocxx::pipeline stages = pipeline_from_document(search.value);
+  mongocxx::pipeline stages = pipeline_from_document(compat::from_json(search));
 
   TLOG(20) << "MongoDB::searchcollection()  query_payload=<" << compat::to_json(stages.view_array()) << ">";
 

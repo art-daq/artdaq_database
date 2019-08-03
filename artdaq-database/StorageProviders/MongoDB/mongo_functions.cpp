@@ -41,9 +41,10 @@ bsoncxx::types::value extract_value_from_document(bsoncxx::document::value const
   return element->get_value();
 }
 
-mongocxx::pipeline pipeline_from_document(bsoncxx::array::view const& view_array) {
+mongocxx::pipeline pipeline_from_document(bsoncxx::document::value const& document) {
   mongocxx::pipeline pipeline;
-  confirm(!view_array.empty());
+  auto view = document.view();
+  auto view_array = view.find("pipeline")->get_array().value;
 
   for (auto const& element : view_array) {
     const auto stage = bsoncxx::document::view{element.get_document()};
@@ -68,13 +69,13 @@ mongocxx::pipeline pipeline_from_document(bsoncxx::array::view const& view_array
     } else if (key == "$project") {
       pipeline.project(document().view_document());
     } else if (key == "$group") {
-      pipeline.project(document().view_document());
+      pipeline.group(document().view_document());
     } else if (key == "$sort") {
-      pipeline.project(document().view_document());
+      pipeline.sort(document().view_document());
     } else if (key == "$addFields") {
-      pipeline.project(document().view_document());
+      pipeline.add_fields(document().view_document());
     } else if (key == "$unwind") {
-      pipeline.project(document().view_document());
+      pipeline.unwind(document().view_document());
     }
   }
 

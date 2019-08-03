@@ -109,12 +109,13 @@ constexpr auto version = "version";
 constexpr auto version_alias = "alias";
 constexpr auto run = "run";
 constexpr auto configuration_alias = "configuration_alias";
+constexpr auto pipeline = "pipeline";
 }  // namespace filter
 
 namespace format {
 constexpr auto gui = "gui";
 constexpr auto json = "json";
-}
+}  // namespace format
 
 namespace msg {
 constexpr auto empty_filter = "Search filter is empty";

@@ -46,9 +46,9 @@ namespace detail {
 
 using provider_searchcollection_t = std::vector<JSONDocument> (*)(const Options&, const JSONDocument&);
 
-void search_collection(Options const& options, std::string& collections) {
-  confirm(collections.empty());
-  confirm(options.operation() == apiliteral::operation::listcollections);
+void search_collection(Options const& options, std::string& results) {
+  confirm(results.empty());
+  confirm(options.operation() == apiliteral::operation::searchcollection);
 
   TLOG(23) << "search_collection: begin";
   TLOG(23) << "search_collection args query_payload=<" << options << ">";
@@ -56,14 +56,14 @@ void search_collection(Options const& options, std::string& collections) {
   validate_dbprovider_name(options.provider());
 
   auto dispatch_persistence_provider = [](std::string const& name) {
-    auto providers = std::map<std::string, provider_searchcollection_t>{{apiliteral::provider::mongo, cf::mongo::listCollections},
-                                                                       {apiliteral::provider::filesystem, cf::filesystem::listCollections},
-                                                                       {apiliteral::provider::ucon, cf::ucon::listCollections}};
+    auto providers = std::map<std::string, provider_searchcollection_t>{{apiliteral::provider::mongo, cf::mongo::searchCollection},
+                                                                        {apiliteral::provider::filesystem, cf::filesystem::searchCollection},
+                                                                        {apiliteral::provider::ucon, cf::ucon::searchCollection}};
 
     return providers.at(name);
   };
 
-  auto search_results = dispatch_persistence_provider(options.provider())(options, options.collection_to_JsonData());
+  auto search_results = dispatch_persistence_provider(options.provider())(options, options);
 
   auto returnValue = std::string{};
   auto returnValueChanged = bool{false};
@@ -74,7 +74,7 @@ void search_collection(Options const& options, std::string& collections) {
     case data_format_t::gui:
     case data_format_t::unknown:
     case data_format_t::fhicl:
-		case data_format_t::csv:
+    case data_format_t::csv:
     case data_format_t::xml: {
       throw runtime_error("search_collection") << "Unsupported data format.";
       break;
@@ -96,7 +96,7 @@ void search_collection(Options const& options, std::string& collections) {
   }
 
   if (returnValueChanged) {
-    collections.swap(returnValue);
+    results.swap(returnValue);
   }
 
   TLOG(23) << "search_collection: end";
