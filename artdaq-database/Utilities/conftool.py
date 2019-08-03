@@ -270,6 +270,55 @@ def getListOfAvailableRunConfigurations(searchString='*'):
 
   return list(c['name'] for c in json.loads(result[1])['search'])
 
+def __getFlagsMaskFromFile(filename='flags.fcl'):
+  with open (filename, "r") as flagsfile:
+    fhicl_buffer="".join(l for l in flagsfile.readlines())
+    result = conftoolp.fhicl_to_json(fhicl_buffer,filename)
+    if result[0] is not True:
+      __report_error(result)
+      return None
+    flags = json.loads(result[1])['document']['data']['main']
+    return dict( {f, flags[f]}  for f in flags if re.match(r'(^flag_)([A-Za-z]+)$', f))
+
+def __getListOfMaskedRunConfigurations(useMask=True):
+  query = json.loads('{"operation" : "searchcollection", "collection":"Flags","dataformat":"json", "filter":{"pipeline":[] } }')
+  pipeline= query['filter']['pipeline']
+
+  if useMask:
+    flags = __getFlagsMaskFromFile()
+    fixed_flags={}
+    for k in flags:
+      fixed_flags['document.data.main.{}'.format(k)] = flags[k]
+    pipeline.append(json.loads('{ "$match":'+ json.dumps(fixed_flags) +'}'))
+
+  pipeline.append(json.loads('{"$project":{"_id": 0, "config":"$configurations.name","version":"$version"}}'))
+  pipeline.append(json.loads('{"$unwind":{"path":"$config"} }'))
+  pipeline.append(json.loads('{"$sort":{ "config": 1, "version": 1}}'))
+  pipeline.append(json.loads('{"$group":{"_id": "$config","version": { "$last": "$version" }}}'))
+  pipeline.append(json.loads('{"$project":{"_id": 0, "config":"$_id","version":"$version"}}'))
+  pipeline.append(json.loads('{"$sort":{ "config": 1, "version": 1}}'))
+  #print (json.dumps(pipeline))
+  result = conftoolp.search_collection(json.dumps(query))
+
+  if result[0] is not True:
+    __report_error(result)
+    return None
+  #print (result[1])
+
+  cvs=  list (c['query']['result'] for c in json.loads(result[1])['search'])
+
+  result = {}
+
+  for p in cvs:
+    result[p['config']]=p['version']
+
+  return result
+
+def getListOfMaskedRunConfigurations():
+  mask= __getListOfMaskedRunConfigurations()
+  last= __getListOfMaskedRunConfigurations(False)
+  return list ( c for c in mask if last[c] == mask[c] )
+
 
 def getListOfArchivedRunConfigurations(searchString='*'):
   try:
@@ -901,6 +950,7 @@ def help():
   print (' conftool.py getListOfAvailableRunConfigurationPrefixes')
   print (' conftool.py getListOfAvailableRunConfigurations')
   print (' conftool.py getListOfAvailableRunConfigurations demo_')
+  print (' conftool.py getListOfMaskedRunConfigurations')
 #  print (' conftool.py exportDatabase #writes archives into the current  directory')
 #  print (' conftool.py importDatabase #reads archives from the current  directory')
   print (' conftool.py archiveRunConfiguration demo_safemode 23 #where 23 is a run number')
