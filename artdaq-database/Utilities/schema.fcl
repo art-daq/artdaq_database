@@ -189,5 +189,11 @@ collection: Flags
 
 pattern: "^(?!.*common_code)(.*)(flags)(\.fcl$)"
 
+}, {
+
+collection: Hashes
+
+pattern: "^(?!.*common_code)(.*)(hashes)(\.fcl$)"
+
 }] 
 

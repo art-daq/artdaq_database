@@ -17,6 +17,7 @@ import socket
 import hashlib
 
 fhicl_schema = 'schema.fcl'
+flags_file = 'flags.fcl'
 
 any_file_pattern = '*.*'
 fcl_file_pattern = '*.fcl'
@@ -36,7 +37,7 @@ def __copy_default_schema():
         schema = os.path.dirname(os.path.realpath(__file__))+'/../conf' + fhicl_schema
 
     if not os.path.isfile(schema):
-        print ('File not found', schema)
+        print ('Error: Cannot open {}. File not found.'.format(schema))
         sys.exit(1)
 
     shutil.copyfile(schema, fhicl_schema)
@@ -196,7 +197,7 @@ def __validate_schema(schema):
             error_message = 'Error: Schema rule ' + l + ':['+to_string(d) + '] '
 
             if 'collection' not in d or 'pattern' not in d:
-                print (error_message + 'is missing either \"collection\" or \"pattern\" key-value pairs.')
+                print (error_message + 'is missing either "collection" or "pattern" key-value pairs.')
                 errors_count += 1
                 continue
 
@@ -206,29 +207,31 @@ def __validate_schema(schema):
                 if re.compile(r).groups < 3:
                     print (
                         error_message +
-                        r' has an invalid regular expression in the \"pattern\" key-value pair.' +
-                        r'\n Regular expressions must have at least three capturing groups, example : (.*)(metadata)(\.fcl$) or (.*)(ssp\d+(_hw_cfg|))(\.fcl$).' +
-                        r'\n The second capturing group is used as a default value for the \"entity\" key-value pair, e.g. entity:\"match.group(2)\"')
+                        ' has an invalid regular expression in the "pattern" key-value pair.' +
+                        '\n Regular expressions must have at least three capturing groups, example : (.*)(metadata)(\.fcl$) or (.*)(ssp\d+(_hw_cfg|))(\.fcl$).' +
+                        '\n The second capturing group is used as a default value for the "entity" key-value pair, e.g. entity:"match.group(2)"')
                     errors_count += 1
                     continue
             except re.error:
-                print (error_message + ' has an invalid regular expression in the \"pattern\" key-value pair.')
+                print (error_message + ' has an invalid regular expression in the "pattern" key-value pair.')
                 errors_count += 1
                 continue
 
             if 'entity' in d:
+                entity=d['entity'].encode('ascii')
+                match = re.match(r'(.*)((gr1)(gr2)(gr3)(gr4)(gr5)(gr6)(gr7)(gr8)(gr9))(\.fcl$)', './demo/gr1gr2gr3gr4gr5gr6gr7gr8gr9.fcl')
                 entity_name_rule = d['entity']
                 try:
                     eval(entity_name_rule)
                 except Exception as e:
                     print (
                         error_message +
-                        r' has an invalid eval expression in the \"entity\" key-value pair. Exception message:' +
+                        ' has an invalid eval expression in the "entity" key-value pair. Exception message:' +
                         e.__doc__ +
-                        r'\nDetails: Suppose the entity key-value pair if defined as \'entity: \"match.group(3)+\'-\'+match.group(4)+\'-\'+match.group(7)\"\'' +
-                        r'\n and the pattern key-value pair if defined as \'pattern: \"(.*)((gr1)(gr2)(gr3)(gr4)(gr5)(gr6)(gr7)(gr8)(gr9))(\.fcl$)\"\'' +
-                        r'\n then the evaluated entity/process name for a file \"./demo/gr1gr2gr3gr4gr5gr6gr7gr8gr9.fcl\" is \"gr1-gr2-rg5\".' +
-                        r'\n And the exported configuration file will be \"gr1-gr2-rg5.fcl\".')
+                        '\nDetails: Suppose the entity key-value pair if defined as \'entity: "match.group(3)+\'-\'+match.group(4)+\'-\'+match.group(7)"\'' +
+                        '\n and the pattern key-value pair if defined as \'pattern: "(.*)((gr1)(gr2)(gr3)(gr4)(gr5)(gr6)(gr7)(gr8)(gr9))(\.fcl$)"\'' +
+                        '\n then the evaluated entity/process name for a file "./demo/gr1gr2gr3gr4gr5gr6gr7gr8gr9.fcl" is "gr1-gr2-rg5".' +
+                        '\n And the exported configuration file will be "gr1-gr2-rg5.fcl".')
                     errors_count += 1
                     continue
 
@@ -305,8 +308,12 @@ def getListOfAvailableRunConfigurations(searchString='*'):
 
 def __getFlagsMaskFromFile(filename):
     if not os.path.isfile(filename):
-        print ('Error: File not found', filename)
-        sys.exit(1)
+        if filename == flags_file:
+            print ('Warning: Cannot open {}. File not found.'.format(filename))
+            return dict()
+        else:
+            print ('Error: Cannot open {}. File not found.'.format(filename))
+            sys.exit(1)
 
     with open(filename, 'r') as flagsfile:
         fhicl_buffer = "".join(l for l in flagsfile.readlines())
@@ -353,7 +360,7 @@ def __getListOfMaskedRunConfigurations(flags, useMask=True):
     return result
 
 
-def getListOfMaskedRunConfigurations(filename='./flags.fcl'):
+def getListOfMaskedRunConfigurations(filename=flags_file):
     flags = __getFlagsMaskFromFile(filename)
 
     if not flags:
@@ -366,7 +373,7 @@ def getListOfMaskedRunConfigurations(filename='./flags.fcl'):
     return [c for c in mask if last[c] == mask[c]]
 
 
-def getListOfAvailableRunConfigurationsSubtractMasked(filename='./flags.fcl'):
+def getListOfAvailableRunConfigurationsSubtractMasked(filename=flags_file):
     m = getListOfMaskedRunConfigurations(filename)
     a = getListOfAvailableRunConfigurations('*')
     return [c for c in a if c not in m]
@@ -441,9 +448,10 @@ def __exportConfiguration(config):
     for special_file in special_files:
         for cfg in cfgs:
             if cfg[entity_name] == special_file[0] and cfg[collection] == special_file[1]:
-                with open(fhicl_schema, 'w') as fcl_file:
+                file_name =  cfg[entity_name] + '.fcl'
+                with open(file_name, 'w') as fcl_file:
                     fcl_file.write(cfg[user_data])
-                    cfg_entry = (cfg[collection], cfg[entity_name], fhicl_schema)
+                    cfg_entry = (cfg[collection], cfg[entity_name], file_name)
                     if sys.version_info[0] < 3:
                         cfg_entry = (cfg_entry[0].encode('ascii'), cfg_entry[1].encode('ascii'), cfg_entry[2].encode('ascii'))
                     print ('Exported', cfg_entry)
@@ -499,11 +507,18 @@ def __importConfiguration(configNameOrconfigPrefix, update=False, updateFlagsOnl
     if update:
         config = configNameOrconfigPrefix
         version = config+'-ver001'
-        found_versions = listVersions('SystemLayout')
-        print (found_versions)
-        if version in found_versions:
+
+        collection_name = 'SystemLayout'
+        if updateFlagsOnly:
+            collection_name = 'Flags'
+
+        found_versions = listVersions(collection_name)
+        # print (found_versions)
+        if version in found_versions or updateFlagsOnly:
             versions = sorted([v for v in found_versions if v.startswith(config)])
-            version = versions[-1]
+            version = config+'-ver000'
+            if versions:
+                version = versions[-1]
             match = re.match(r'(.*[^\d]\d{5}-ver)(\d+$)', version)
             version = match.group(1)+str(int(match.group(2)) + 1).zfill(3) if match else config+'-ver'+str(1).zfill(3)
             print ('Updating configuration', config)
@@ -538,7 +553,7 @@ def __importConfiguration(configNameOrconfigPrefix, update=False, updateFlagsOnl
             return False
 
     if update and  updateFlagsOnly:
-      cfg_composition = [ cfg for fcg in cfg_composition if cfg[1] == 'flags' ]
+      cfg_composition = [ cfg for cfg in cfg_composition if cfg[1] == 'flags' ]
 
     entity_userdata_map = __create_entity_userdata_map(cfg_composition)
 
@@ -664,7 +679,7 @@ def importConfiguration(configNameOrconfigPrefix):
 
 
 def updateConfigurationFlags(configNameOrconfigPrefix):
-    __importConfiguration(configNameOrconfigPrefix, True)
+    __importConfiguration(configNameOrconfigPrefix, True, True)
 
 
 def exportConfiguration(configNamePrefix):
@@ -1012,8 +1027,8 @@ def help():
     print (' conftool.py getListOfAvailableRunConfigurationPrefixes')
     print (' conftool.py getListOfAvailableRunConfigurations')
     print (' conftool.py getListOfAvailableRunConfigurations demo_')
-    print (' conftool.py getListOfAvailableRunConfigurationsSubtractMasked flags.fcl')
-    print (' conftool.py getListOfMaskedRunConfigurations flags.fcl')
+    print (' conftool.py getListOfAvailableRunConfigurationsSubtractMasked  {} #file with configuration flags'.format(flags_file))
+    print (' conftool.py getListOfMaskedRunConfigurations {} #file with configuation flags'.format(flags_file))
     # print (' conftool.py exportDatabase #writes archives into the current  directory')
     # print (' conftool.py importDatabase #reads archives from the current  directory')
     print (' conftool.py archiveRunConfiguration demo_safemode 23 #where 23 is a run number')
