@@ -136,7 +136,21 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::configura
                 "returned "
              << configentityname_pairs.size() << " configurations.";
 
+    auto seenValues = std::list<std::string>{};
+
+    auto hasSeenValue = [& v = seenValues](auto const& name) {
+      confirm(!name.empty());
+      if (std::find(v.begin(), v.end(), name) != v.end()) {
+        return false;
+      }
+
+      v.emplace_back(name);
+      return true;
+    };
+
     for (auto const& configentityname_pair : configentityname_pairs) {
+      if (!hasSeenValue(configentityname_pair.second)) continue;
+
       std::ostringstream oss;
 
       oss << "{";
@@ -419,7 +433,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::listDatab
 
 template <>
 template <>
-std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::databaseMetadata(JSONDocument const& query_payload[[gnu::unused]]) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::databaseMetadata(JSONDocument const& query_payload [[gnu::unused]]) {
   confirm(!query_payload.empty());
   auto returnCollection = std::vector<JSONDocument>();
 
@@ -449,6 +463,20 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::databaseM
 
     returnCollection.emplace_back(json);
   }
+
+  return returnCollection;
+}
+
+template <>
+template <>
+std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::searchCollection(JSONDocument const& query_payload) {
+  confirm(!query_payload.empty());
+  auto returnCollection = std::vector<JSONDocument>();
+
+  TLOG(15) << "StorageProvider::FileSystemDB::searchCollection() begin";
+  TLOG(15) << "StorageProvider::FileSystemDB::searchCollection() args data=<" << query_payload << ">";
+
+  throw runtime_error("FileSystemDB") << "StorageProvider::FileSystemDB::searchCollection() is not implemented";
 
   return returnCollection;
 }

@@ -39,6 +39,7 @@ JSONDocument assignConfiguration(cf::ManageDocumentOperation const& /*options*/,
 JSONDocument removeConfiguration(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
 
 std::vector<JSONDocument> listCollections(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
+std::vector<JSONDocument> searchCollection(cf::ManageDocumentOperation const& /*options*/, JSONDocument const&  /*query_payload*/); 
 std::vector<JSONDocument> listDatabases(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
 JSONDocument readDbInfo(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
 }  // namespace filesystem

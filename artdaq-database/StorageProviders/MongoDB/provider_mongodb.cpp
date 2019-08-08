@@ -43,6 +43,9 @@ namespace apiliteral = db::configapi::literal;
 
 // bsoncxx::types::value extract_value_from_document(bsoncxx::document::value
 // const& document, std::string const& key);
+
+mongocxx::pipeline pipeline_from_document(bsoncxx::document::value const&);
+
 namespace artdaq {
 namespace database {
 
@@ -285,6 +288,18 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::configurationC
 
     auto cursor = collection.aggregate(stages);
 
+    auto seenValues = std::list<std::string>{};
+
+    auto hasSeenValue = [& v = seenValues](auto const& name) {
+      confirm(!name.empty());
+      if (std::find(v.begin(), v.end(), name) != v.end()) {
+        return false;
+      }
+
+      v.emplace_back(name);
+      return true;
+    };
+
     for (auto const& view : cursor) {
       TLOG(15) << "MongoDB::configurationComposition()  value=<" << compat::to_json(view) << ">";
 
@@ -306,6 +321,8 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::configurationC
           if (configuration_name != configuration_name_expected) {
             continue;
           }
+
+          if (!hasSeenValue(entity_name)) continue;
 
           std::ostringstream oss;
           oss << "{";
@@ -634,7 +651,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::listDatabases(
 
 template <>
 template <>
-std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::databaseMetadata(JSONDocument const& query_payload[[gnu::unused]]) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::databaseMetadata(JSONDocument const& query_payload [[gnu::unused]]) {
   confirm(!query_payload.empty());
 
   std::ostringstream oss;
@@ -644,6 +661,63 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::databaseMetada
   oss << "}";
   return readDocument(JSONDocument{oss.str()});
 }
+
+template <>
+template <>
+std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::searchCollection(JSONDocument const& query_payload) {
+  confirm(!query_payload.empty());
+  auto returnCollection = std::vector<JSONDocument>();
+
+  TLOG(20) << "MongoDB::searchCollection() begin";
+  TLOG(20) << "MongoDB::searchCollection() args data=<" << query_payload << ">";
+
+  auto bson_document = compat::from_json(query_payload);
+
+  auto extract_value = [&bson_document](auto const& name) {
+    auto view = bson_document.view();
+    auto element = view.find(name);
+
+    if (element == view.end()) {
+      throw runtime_error("MongoDB") << "Search JSONDocument is missing the \"" << name << "\" element.";
+    }
+
+    return element->get_value();
+  };
+
+  auto collection_name = dequote(compat::to_json(extract_value(apiliteral::option::collection)));
+
+  auto collection = _provider->connection().collection(collection_name);
+
+  auto const search = compat::to_json(extract_value(apiliteral::option::searchfilter));
+
+  TLOG(20) << "MongoDB::searchcollection() search=<" << search << ">";
+
+  mongocxx::pipeline stages = pipeline_from_document(compat::from_json(search));
+
+  TLOG(20) << "MongoDB::searchcollection()  query_payload=<" << compat::to_json(stages.view_array()) << ">";
+
+  auto cursor = collection.aggregate(stages);
+
+  for (auto const& view : cursor) {
+    auto result_json = compat::to_json(view);
+    TLOG(20) << "MongoDB::searchCollection() result_json=" << result_json;
+
+    std::ostringstream oss;
+    oss << "{";
+    oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
+    oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::mongo) << ",";
+    oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::json) << ",";
+    oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::searchcollection) << ",";
+    oss << db::quoted_(apiliteral::option::result) << ":" << result_json;
+    oss << "}";
+
+    TLOG(20) << "MongoDB::searchCollection() final search result =<" << oss.str() << ">";
+
+    returnCollection.emplace_back(oss.str());
+  }
+
+  return returnCollection;
+}  // namespace database
 
 namespace mongo {
 namespace debug {

@@ -6,6 +6,7 @@
 #include "artdaq-database/ConfigurationDB/dboperation_manageconfigs.h"
 #include "artdaq-database/ConfigurationDB/dboperation_managedocument.h"
 #include "artdaq-database/ConfigurationDB/dboperation_metadata.h"
+#include "artdaq-database/ConfigurationDB/dboperation_searchcollection.h"
 
 namespace artdaq {
 namespace database {

@@ -534,6 +534,41 @@ JSONDocument prov::readDbInfo(ManageDocumentOperation const& options, JSONDocume
   return *database_metadata;
 }
 
+std::vector<JSONDocument> prov::searchCollection(ManageDocumentOperation const& options, JSONDocument const& query_payload) {
+  auto returnValue = std::vector<JSONDocument>{};
+
+  if (options.operation() != apiliteral::operation::searchcollection) {
+    throw runtime_error("operation_searchcollection") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  }
+
+  if (options.provider() != apiliteral::provider::mongo) {
+    throw runtime_error("operation_searchgollection") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  }
+
+  TLOG(30) << "operation_searchcollection: begin";
+
+  auto config = DBI::DBConfig{};
+  auto database = DBI::DB::create(config);
+  auto provider = DBI::DBProvider<JSONDocument>::create(database);
+
+  auto search_results = provider->searchCollection(query_payload);
+
+  for (auto const& search_result : search_results) {
+
+    std::ostringstream oss;
+    oss << "{";
+    oss << quoted_(jsonliteral::query) << ":" << search_result;
+    oss << "}\n";
+
+    returnValue.emplace_back(oss.str());
+  }
+
+  TLOG(30) << "operation_listdatabases: end";
+
+  return returnValue;
+}
+
+
 std::vector<JSONDocument> prov::findVersionAliases(cf::ManageAliasesOperation const& /*options*/, JSONDocument const& /*query_payload*/) {
   auto returnValue = std::vector<JSONDocument>{};
 
