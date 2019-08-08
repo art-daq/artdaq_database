@@ -56,7 +56,7 @@ mongocxx::pipeline pipeline_from_document(bsoncxx::document::value const& docume
     }
 
     auto const& kvp = *stage.begin();
-    auto const& key = kvp.key();
+    auto const key = std::string(kvp.key());
 
     auto document = [&kvp]() {
       auto doc = bsoncxx::builder::core(false);
