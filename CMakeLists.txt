@@ -54,7 +54,7 @@ cet_report_compiler_flags()
 find_ups_boost  ( v1_66_0 )
 find_ups_product( cetbuildtools v5_08_00 )
 find_ups_product( cetpkgsupport v1_11_00 )
-find_ups_product( mongodb v4_0_8b )
+find_ups_product( mongodb v4_0_8 )  # find_ups_product doesn't like v4_0_8b
 find_ups_product( TRACE v3_13_05 )
 find_ups_product( swig v3_0_12 )
 
