@@ -34,9 +34,15 @@ int main(int argc, char* argv[]) try {
 
   bpo::options_description desc = descstr.str();
 
-  desc.add_options()("path,p", bpo::value<std::string>(), "Path to fhicl files.")("run,r", bpo::value<std::size_t>(), "Run number.")(
-      "threads,t", bpo::value<std::size_t>(), "Thread count.")("debug,d", bpo::value<bool>(), "Read configuration from database.")(
-      "configuration,c", bpo::value<std::string>(), "Configuration Name.")("help,h", "produce help message");
+  // clang-format off
+  desc.add_options()
+    ("path,p", bpo::value<std::string>(), "Path to fhicl files.")
+    ("run,r", bpo::value<std::size_t>(), "Run number.")
+    ("threads,t", bpo::value<std::size_t>(), "Thread count.")
+    ("debug,d", bpo::value<bool>(), "Read configuration from database.")
+    ("configuration,c", bpo::value<std::string>(), "Configuration Name.")
+    ("help,h", "produce help message");
+  // clang-format on
 
   bpo::variables_map vm;
 
@@ -55,21 +61,18 @@ int main(int argc, char* argv[]) try {
 
   if (vm.count("path") == 0u) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no path to fhicl files given.\n"
-              << "For usage and an options list, please do '" << argv[0] << " --help"
-              << "'.\n";
+              << "For usage and an options list, please do '" << argv[0] << " --help'.\n";
     return process_exit_code::INVALID_ARGUMENT | 1;
   }
 
   if (vm.count("configuration") == 0u) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no configuration name given.\n"
-              << "For usage and an options list, please do '" << argv[0] << " --help"
-              << "'.\n";
+              << "For usage and an options list, please do '" << argv[0] << " --help'.\n";
     return process_exit_code::INVALID_ARGUMENT | 2;
   }
   if (vm.count("run") == 0u) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no run number given.\n"
-              << "For usage and an options list, please do '" << argv[0] << " --help"
-              << "'.\n";
+              << "For usage and an options list, please do '" << argv[0] << " --help'.\n";
     return process_exit_code::INVALID_ARGUMENT | 3;
   }
 
@@ -103,22 +106,27 @@ int main(int argc, char* argv[]) try {
   std::mutex file_names_mutex;
 
   std::atomic<int> loaded_file_count{0};
+  std::atomic<int> total_error_count{0};
+
   std::vector<std::thread> workers;
 
   auto const stropts = options1.writeJsonData();
 
   for (std::size_t i = 0; i < nproc; i++) {
-    workers.emplace_back([&file_names, &file_names_mutex, &loaded_file_count, stropts]() {
+    workers.emplace_back([&file_names, &file_names_mutex, &loaded_file_count, &total_error_count, stropts]() {
       auto file_name = std::string{};
       auto entity = std::string{jsonliteral::notprovided};
       auto options = Options{"Worker"};
       int filecount = 0;
+      int errorcount = 0;
+
       options.readJsonData(stropts);
       while (true) {
         {
           std::lock_guard<std::mutex> lock(file_names_mutex);
           if (file_names.empty()) {
             loaded_file_count.fetch_add(filecount);
+            total_error_count.fetch_add(errorcount);
             return;
           }
           file_name = file_names.back();
@@ -136,7 +144,9 @@ int main(int argc, char* argv[]) try {
             options.collection("SystemLayout");
             options.entity(jsonliteral::schema);
           }
-          write_document(options, file_name);
+
+          if (write_document(options, file_name) != process_exit_code::SUCCESS) errorcount++;
+
           filecount++;
         }
       }
@@ -170,6 +180,11 @@ int main(int argc, char* argv[]) try {
     if (result == 0) {
       return process_exit_code::FAILURE;
     }
+  }
+
+  if (total_error_count > 0) {
+    std::cerr << "Error: Failed to load " << total_error_count << " file(s).\n";
+    return process_exit_code::FAILURE;
   }
 
   return process_exit_code::SUCCESS;
