@@ -1068,6 +1068,9 @@ if __name__ == "__main__":
         else:
             print (result)
 
+        if isinstance(result,bool) and (result is False):
+            sys.exit(1)
+
         sys.exit(0)
 
     functions_list = [o[0] for o in inspect.getmembers(conftoolp) if inspect.isbuiltin(o[1])]
