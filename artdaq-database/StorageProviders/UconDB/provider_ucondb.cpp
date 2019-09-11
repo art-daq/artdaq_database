@@ -22,8 +22,8 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::findConfigurati
   confirm(!query_payload.empty());
   auto returnCollection = std::vector<JSONDocument>();
 
-  TLOG(15) << "StorageProvider::FileSystemDB::findConfigurations() begin";
-  TLOG(15) << "StorageProvider::FileSystemDB::findConfigurations() args data=<" << query_payload << ">";
+  TLOG(15) << "StorageProvider::UconDB::findConfigurations() begin";
+  TLOG(15) << "StorageProvider::UconDB::findConfigurations() args data=<" << query_payload << ">";
 
   throw runtime_error("UconDB") << "StorageProvider::UconDB::findConfigurations() is not implemented";
 
@@ -118,11 +118,25 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::listDatabases(J
 
 template <>
 template <>
-std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::databaseMetadata(JSONDocument const& query_payload[[gnu::unused]]) {
+std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::databaseMetadata(JSONDocument const& query_payload [[gnu::unused]]) {
   confirm(!query_payload.empty());
   auto returnCollection = std::vector<JSONDocument>();
 
   throw runtime_error("UconDB") << "StorageProvider::UconDB::databaseMetadata() is not implemented";
+
+  return returnCollection;
+}
+
+template <>
+template <>
+std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::searchCollection(JSONDocument const& query_payload) {
+  confirm(!query_payload.empty());
+  auto returnCollection = std::vector<JSONDocument>();
+
+  TLOG(15) << "StorageProvider::UconDB::searchCollection() begin";
+  TLOG(15) << "StorageProvider::UconDB::searchCollection() args data=<" << query_payload << ">";
+
+  throw runtime_error("UconDB") << "StorageProvider::UconDB::searchCollection() is not implemented";
 
   return returnCollection;
 }

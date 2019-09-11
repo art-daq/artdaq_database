@@ -184,6 +184,12 @@ result_t import_collection(std::string const& query_payload) {
   return impl::import_collection(query_payload);
 }
 
+result_t search_collection(std::string const& query_payload) {
+  set_default_locale();
+
+  return impl::search_collection(query_payload);
+}
+
 result_t fhicl_to_json(std::string const& fcl, std::string const& filename) {
   set_default_locale();
   auto retValue = std::string{};

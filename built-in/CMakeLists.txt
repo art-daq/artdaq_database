@@ -72,6 +72,8 @@ IF(CETLIB_IS_STATIC)
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     )
+
+  include_directories( ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib )
     
   add_library(${CETLIB} STATIC ${SOURCES})
   set_property(TARGET ${CETLIB} PROPERTY POSITION_INDEPENDENT_CODE ON)
@@ -131,6 +133,8 @@ IF(FHICLCPP_IS_STATIC)
     ${CETLIB}
     ${CETLIB_EXCEPT}
     )
+    
+  include_directories( ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp )
     
   add_library(${FHICLCPP} STATIC ${SOURCES})
   set_property(TARGET ${FHICLCPP} PROPERTY POSITION_INDEPENDENT_CODE ON)
