@@ -38,12 +38,14 @@ int main(int argc, char* argv[]) try {
 
   bpo::options_description desc = descstr.str();
 
+  // clang-format off
   desc.add_options()
     ("path,p", bpo::value<std::string>(), "Path to fhicl files.")
     ("run,r", bpo::value<std::size_t>(), "Run number.")
     ("threads,t", bpo::value<std::size_t>(), "Thread count.")
     ("configuration,c", bpo::value<std::string>(), "Configuration Name.")
     ("help,h", "produce help message");
+  // clang-format on
 
   bpo::variables_map vm;
 
@@ -62,21 +64,18 @@ int main(int argc, char* argv[]) try {
 
   if (vm.count("path") == 0u) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no path to fhicl files given.\n"
-              << "For usage and an options list, please do '" << argv[0] << " --help"
-              << "'.\n";
+              << "For usage and an options list, please do '" << argv[0] << " --help'.\n";
     return process_exit_code::INVALID_ARGUMENT | 1;
   }
 
   if (vm.count("configuration") == 0u) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no configuration name given.\n"
-              << "For usage and an options list, please do '" << argv[0] << " --help"
-              << "'.\n";
+              << "For usage and an options list, please do '" << argv[0] << " --help'.\n";
     return process_exit_code::INVALID_ARGUMENT | 2;
   }
   if (vm.count("run") == 0u) {
     std::cerr << "Exception from command line processing in " << argv[0] << ": no run number given.\n"
-              << "For usage and an options list, please do '" << argv[0] << " --help"
-              << "'.\n";
+              << "For usage and an options list, please do '" << argv[0] << " --help'.\n";
     return process_exit_code::INVALID_ARGUMENT | 3;
   }
 
@@ -89,7 +88,7 @@ int main(int argc, char* argv[]) try {
   auto dir_path = vm[apiliteral::option::path].as<std::string>();
   auto configuration = vm[apiliteral::option::configuration].as<std::string>();
   auto run = std::to_string(vm[apiliteral::option::run].as<std::size_t>());
-  auto confprefix=configuration.substr(0,configuration.find_last_not_of("0123456789")+1);
+  auto confprefix = configuration.substr(0, configuration.find_last_not_of("0123456789") + 1);
 
   auto options1 = Options{argv[0]};
   options1.operation(apiliteral::operation::confcomposition);
@@ -98,57 +97,58 @@ int main(int argc, char* argv[]) try {
   auto confcomp = std::string{};
   auto result = configuration_composition(options1, confcomp);
   if (result != process_exit_code::SUCCESS) {
-      return result;
+    return result;
   }
 
   std::vector<std::thread> workers;
 
-  auto ast= jsn::object_t{};
+  auto ast = jsn::object_t{};
 
-  if(!jsn::JsonReader().read(confcomp,ast)){
-     return process_exit_code::FAILURE;
+  if (!jsn::JsonReader().read(confcomp, ast)) {
+    return process_exit_code::FAILURE;
   }
-  
+
   auto const& results = unwrap(ast).value_as<const jsn::array_t>(jsonliteral::search);
 
-  auto writer= jsn::JsonWriter{};
-  auto buff= std::string{};
-  
-  auto queries = std::vector<std::pair<std::string,std::string>>{};
+  auto writer = jsn::JsonWriter{};
+  auto buff = std::string{};
 
-  for(auto& result : results){
-       buff.clear();
-       auto const& query = unwrap(result).value_as<const jsn::object_t>(jsonliteral::query);
-       auto const& filter = unwrap(query).value_as<const jsn::object_t>(apiliteral::option::searchfilter );
-       auto const& collection = unwrap(query).value_as<const std::string>(apiliteral::option::collection);
-       auto const& entity = unwrap(filter).value_as<const std::string>(apiliteral::filter::entities);
-       if(!writer.write(query,buff)){
-           std::cerr << "Failed serializing query\n";
-            return process_exit_code::FAILURE;
-       }
-       auto file_name= std::string{dir_path};
-       if(file_name.back()!='/') file_name+="/";
-       
-       if(collection!="SystemLayout"){
-        file_name+=confprefix;
-        file_name+="/";
-       }
-       
-       file_name+=entity;
-       file_name+=".fcl";
-       queries.emplace_back(file_name,buff);
+  auto queries = std::vector<std::pair<std::string, std::string>>{};
+
+  for (auto& result : results) {
+    buff.clear();
+    auto const& query = unwrap(result).value_as<const jsn::object_t>(jsonliteral::query);
+    auto const& filter = unwrap(query).value_as<const jsn::object_t>(apiliteral::option::searchfilter);
+    auto const& collection = unwrap(query).value_as<const std::string>(apiliteral::option::collection);
+    auto const& entity = unwrap(filter).value_as<const std::string>(apiliteral::filter::entities);
+    if (!writer.write(query, buff)) {
+      std::cerr << "Failed serializing query\n";
+      return process_exit_code::FAILURE;
+    }
+    auto file_name = std::string{dir_path};
+    if (file_name.back() != '/') file_name += "/";
+
+    if (collection != "SystemLayout") {
+      file_name += confprefix;
+      file_name += "/";
+    }
+
+    file_name += entity;
+    file_name += ".fcl";
+    queries.emplace_back(file_name, buff);
   }
 
-
-  std::mutex queries_mutex;  
+  std::mutex queries_mutex;
   auto file_names = std::vector<std::string>{};
   std::mutex file_names_mutex;
-  
+  std::atomic<int> total_error_count{0};
+
   for (std::size_t i = 0; i < nproc; i++) {
-    workers.emplace_back([&queries, &queries_mutex, &file_names, &file_names_mutex]() {
+    workers.emplace_back([&queries, &queries_mutex, &file_names, &file_names_mutex, &total_error_count]() {
       auto my_file_names = std::vector<std::string>{};
-      auto file_name=std::string{};
-      auto query=std::string{};
+      auto file_name = std::string{};
+      auto query = std::string{};
+      int errorcount = 0;
 
       auto options = Options{"Worker"};
       while (true) {
@@ -156,7 +156,8 @@ int main(int argc, char* argv[]) try {
           std::lock_guard<std::mutex> lock(queries_mutex);
           if (queries.empty()) {
             std::lock_guard<std::mutex> lock(file_names_mutex);
-            std::copy (my_file_names.begin(), my_file_names.end(), std::back_inserter(file_names));
+            std::copy(my_file_names.begin(), my_file_names.end(), std::back_inserter(file_names));
+            total_error_count.fetch_add(errorcount);
             return;
           }
           file_name = std::move(queries.back().first);
@@ -165,9 +166,9 @@ int main(int argc, char* argv[]) try {
         }
         options.readJsonData(query);
         options.format(cfo::data_format_t::fhicl);
-        read_document(options, file_name);
+        if (read_document(options, file_name) != process_exit_code::SUCCESS) errorcount++;
         my_file_names.emplace_back(file_name);
-        }
+      }
     });
   }
 
@@ -188,6 +189,10 @@ int main(int argc, char* argv[]) try {
 
   std::cout << oss.str();
 
+  if (total_error_count > 0) {
+    std::cerr << "Error: Failed to export " << total_error_count << "file(s).\n";
+  }
+
   return process_exit_code::SUCCESS;
 } catch (...) {
   std::cerr << "Process exited with exception: " << boost::current_exception_diagnostic_information();
@@ -199,7 +204,7 @@ int read_document(Options const& options, std::string const& file_name) try {
   auto test_document = std::string{};
   auto result = cf::opts::read_document(options, test_document);
   if (result.first && db::write_buffer_to_file(test_document, file_name)) {
-    return process_exit_code::SUCCESS;  
+    return process_exit_code::SUCCESS;
   }
 
   std::cerr << "Failed writing file:" << file_name << "\n";
