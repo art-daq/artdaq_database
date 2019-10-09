@@ -34,7 +34,7 @@ python		v2_7_15a	s82
 python		v2_7_15a	s83
 python		v2_7_15a	s85
 python		v2_7_15a	s87
-TRACE           v3_15_02    	-   	only_for_build
+TRACE           v3_15_03    	-   	only_for_build
 swig            v3_0_12d	-	only_for_build
 nodejs		v4_5_0		-	only_for_build
 cetbuildtools	v7_13_02	-	only_for_build
