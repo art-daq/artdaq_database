@@ -50,7 +50,7 @@ macro (create_nodejs_addon)
         execute_process(COMMAND printf %d%02d%02d ${V8_STRING_MAJOR} ${V8_STRING_MINOR} ${V8_STRING_PATCH} OUTPUT_VARIABLE V8_DEFINE_STRING)
         message("V8_DEFINE_STRING is ${V8_DEFINE_STRING}")
 
-        set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
+        set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -Wno-unused-result")
 
         if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
             SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wno-bad-function-cast -Wno-string-conversion")
@@ -67,7 +67,7 @@ macro (create_nodejs_addon)
         set_source_files_properties (${NODEJS_ADDON_SOURCES} PROPERTIES CPLUSPLUS ON)
         set_source_files_properties (${NODEJS_ADDON_SOURCES} PROPERTIES SWIG_FLAGS "-node")
 
-        list(APPEND CNA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR} ${NODE_INCLUDE_DIRS})
+				list(APPEND CNA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR} ${NODE_INCLUDE_DIRS} ${NODE_INCLUDE_DIRS}/node )
 
 	SET(SWIG_MODULE_${CNA_ADDON_NAME}_EXTRA_DEPS ${SWIG_DEPENDS})
         #swig_add_module (${CNA_ADDON_NAME} javascript ${NODEJS_ADDON_SOURCES} ${LIB_SOURCES})
