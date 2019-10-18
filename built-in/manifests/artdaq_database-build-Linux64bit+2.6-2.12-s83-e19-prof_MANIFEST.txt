@@ -10,4 +10,4 @@ sqlite           v3_26_00_00  sqlite-3.26.00.00-slf6-x86_64.tar.bz2             
 swig             v3_0_12d     swig-3.0.12d-slf6-x86_64-e19-prof.tar.bz2             -f  Linux64bit+2.6-2.12  -q  e19:prof
 TRACE            v3_15_03     TRACE-3.15.03-slf6-x86_64.tar.bz2                     -f  Linux64bit+2.6-2.12
 ups              v6_0_7       ups-6.0.7-Linux64bit+2.6-2.12.tar.bz2                 -f  Linux64bit+2.6-2.12
-nodejs           v4_5_0       nodejs-4.5.0-noarch.tar.bz2                           -f  Linux64bit+2.6-2.12
+nodejs           v10_15_0     nodejs-10.15.0-noarch.tar.bz2                         -f  Linux64bit+2.6-2.12
