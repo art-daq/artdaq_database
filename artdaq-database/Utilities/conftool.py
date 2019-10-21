@@ -327,6 +327,10 @@ def __getFlagsMaskFromFile(filename):
 
 
 def __getListOfMaskedRunConfigurations(flags, useMask=True):
+    if not artdaq_database_uri.startswith("mongodb://"):
+        print ('Warning: __getListOfMaskedRunConfigurations is not implemented; returning an empty result.')
+        return {}
+
     query = json.loads('{"operation" : "searchcollection", "collection":"Flags","dataformat":"json", "filter":{"pipeline":[] } }')
     pipeline = query['filter']['pipeline']
 
