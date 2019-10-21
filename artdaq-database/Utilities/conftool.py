@@ -294,6 +294,12 @@ def __hashConfiguration(entity_userdata_map):
 
 
 def getListOfAvailableRunConfigurations(searchString='*'):
+    try:
+        artdaq_database_uri = os.environ['ARTDAQ_DATABASE_URI']
+    except KeyError:
+        print ('Error: ARTDAQ_DATABASE_URI is not set.')
+        return False
+
     query = json.loads('{"operation" : "findconfigs", "dataformat":"gui", "filter":{}}')
     query['filter']['configurations.name'] = searchString if searchString.endswith('*') else searchString+'*'
 
