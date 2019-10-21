@@ -365,12 +365,17 @@ def __getListOfMaskedRunConfigurations(flags, useMask=True):
 
 
 def getListOfMaskedRunConfigurations(filename=flags_file):
+    try:
+        artdaq_database_uri = os.environ['ARTDAQ_DATABASE_URI']
+    except KeyError:
+        print ('Error: ARTDAQ_DATABASE_URI is not set.')
+        return False
+
     flags = __getFlagsMaskFromFile(filename)
 
     if not flags:
         print('Warning: No flags were read from ' + filename)
         return []
-
     mask = __getListOfMaskedRunConfigurations(flags)
     last = __getListOfMaskedRunConfigurations(flags, False)
 
@@ -402,6 +407,12 @@ def getListOfArchivedRunConfigurations(searchString='*'):
 
 
 def getListOfAvailableRunConfigurationPrefixes(searchString='*'):
+    try:
+        artdaq_database_uri = os.environ['ARTDAQ_DATABASE_URI']
+    except KeyError:
+        print ('Error: ARTDAQ_DATABASE_URI is not set.')
+        return False
+
     query = json.loads('{"operation" : "findconfigs", "dataformat":"gui", "filter":{}}')
     query['filter']['configurations.name'] = searchString if searchString.endswith('*') else searchString+'*'
 
