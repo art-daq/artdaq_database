@@ -22,7 +22,11 @@ flags_file = 'flags.fcl'
 any_file_pattern = '*.*'
 fcl_file_pattern = '*.fcl'
 
-artdaq_database_uri = None
+try:
+    artdaq_database_uri= os.environ['ARTDAQ_DATABASE_URI']
+except KeyError:
+    print ('Error: ARTDAQ_DATABASE_URI is not set.')
+    sys.exit(1)
 
 
 def __copy_default_schema():
@@ -294,12 +298,6 @@ def __hashConfiguration(entity_userdata_map):
 
 
 def getListOfAvailableRunConfigurations(searchString='*'):
-    try:
-        artdaq_database_uri = os.environ['ARTDAQ_DATABASE_URI']
-    except KeyError:
-        print ('Error: ARTDAQ_DATABASE_URI is not set.')
-        return False
-
     query = json.loads('{"operation" : "findconfigs", "dataformat":"gui", "filter":{}}')
     query['filter']['configurations.name'] = searchString if searchString.endswith('*') else searchString+'*'
 
@@ -371,12 +369,6 @@ def __getListOfMaskedRunConfigurations(flags, useMask=True):
 
 
 def getListOfMaskedRunConfigurations(filename=flags_file):
-    try:
-        artdaq_database_uri = os.environ['ARTDAQ_DATABASE_URI']
-    except KeyError:
-        print ('Error: ARTDAQ_DATABASE_URI is not set.')
-        return False
-
     flags = __getFlagsMaskFromFile(filename)
 
     if not flags:
@@ -395,12 +387,6 @@ def getListOfAvailableRunConfigurationsSubtractMasked(filename=flags_file):
 
 
 def getListOfArchivedRunConfigurations(searchString='*'):
-    try:
-        artdaq_database_uri = os.environ['ARTDAQ_DATABASE_URI']
-    except KeyError:
-        print ('Error: ARTDAQ_DATABASE_URI is not set.')
-        return False
-
     os.environ['ARTDAQ_DATABASE_URI'] = __archiveuri_from_uri(artdaq_database_uri)
     print ('Info: ARTDAQ_DATABASE_URI was set to ' + os.environ['ARTDAQ_DATABASE_URI'])
 
@@ -413,12 +399,6 @@ def getListOfArchivedRunConfigurations(searchString='*'):
 
 
 def getListOfAvailableRunConfigurationPrefixes(searchString='*'):
-    try:
-        artdaq_database_uri = os.environ['ARTDAQ_DATABASE_URI']
-    except KeyError:
-        print ('Error: ARTDAQ_DATABASE_URI is not set.')
-        return False
-
     query = json.loads('{"operation" : "findconfigs", "dataformat":"gui", "filter":{}}')
     query['filter']['configurations.name'] = searchString if searchString.endswith('*') else searchString+'*'
 
@@ -612,12 +592,6 @@ def __importConfiguration(configNameOrconfigPrefix, update=False, updateFlagsOnl
 
 
 def __exportConfigurationWithBulkloader(config):
-    try:
-        artdaq_database_uri = os.environ['ARTDAQ_DATABASE_URI']
-    except KeyError:
-        print ('Error: ARTDAQ_DATABASE_URI is not set.')
-        return False
-
     artdaq_database_remote_host = None
 
     try:
@@ -762,12 +736,6 @@ def __archiveConfiguration(configuration_name, run_number, entity_userdata_map, 
 
 
 def archiveRunConfiguration(config, run_number, update=False):
-    try:
-        artdaq_database_uri = os.environ['ARTDAQ_DATABASE_URI']
-    except KeyError:
-        print ('Error: ARTDAQ_DATABASE_URI is not set.')
-        return False
-
     if artdaq_database_uri.startswith("mongodb://") and not update:
         return __archiveConfigurationWithBulkloader(config, run_number, update)
 
@@ -814,12 +782,6 @@ def updateArchivedRunConfiguration(config, run_number):
 
 
 def __archiveConfigurationWithBulkloader(config, run_number, update):
-    try:
-        artdaq_database_uri = os.environ['ARTDAQ_DATABASE_URI']
-    except KeyError:
-        print ('Error: ARTDAQ_DATABASE_URI is not set.')
-        return False
-
     artdaq_database_remote_host = None
 
     try:
@@ -921,12 +883,6 @@ def __archiveConfigurationWithBulkloader(config, run_number, update):
 
 
 def exportArchivedRunConfiguration(config):
-    try:
-        artdaq_database_uri = os.environ['ARTDAQ_DATABASE_URI']
-    except KeyError:
-        print ('Error: ARTDAQ_DATABASE_URI is not set.')
-        return False
-
     if artdaq_database_uri.startswith("mongodb://") and len(config.split('/')) == 2:
         return __exportConfigurationWithBulkloader(config)
 
@@ -1066,12 +1022,6 @@ if __name__ == "__main__":
     if len(sys.argv) == 1 or sys.argv[1] in ['--h', '-h', 'h', '--help', '-help', 'help', '--info', 'info']:
         help()
         sys.exit(0)
-
-    try:
-        artdaq_database_uri = os.environ['ARTDAQ_DATABASE_URI']
-    except KeyError:
-        print ('Error: ARTDAQ_DATABASE_URI is not set.')
-        sys.exit(1)
 
     if sys.argv[1] in [o[0] for o in inspect.getmembers(sys.modules[__name__]) if inspect.isfunction(o[1])]:
         getattr(conftoolp, 'enable_trace')()
