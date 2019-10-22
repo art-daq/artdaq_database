@@ -167,7 +167,7 @@ pattern: "(.*/)((component|EventBuilder|Aggregator|DataLogger|Dispatcher)(\d+))(
 
 collection: RunHistory 
 
-pattern: "(.*/)(RunHistory|boot|known_boardreaders_list|DataflowConfiguration)(\.fcl$)" 
+pattern: "(.*/)(RunHistory|RunHistory2|boot|known_boardreaders_list|DataflowConfiguration)(\.fcl$)" 
 
 }, {
 
