@@ -24,6 +24,7 @@ std::vector<JSONDocument> readDocuments(cf::ManageDocumentOperation const& /*opt
 JSONDocument markDocumentReadonly(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
 JSONDocument markDocumentDeleted(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
 std::vector<JSONDocument> findVersions(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
+std::vector<JSONDocument> findRuns(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
 std::vector<JSONDocument> findEntities(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
 JSONDocument addEntity(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
 JSONDocument removeEntity(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
@@ -39,7 +40,7 @@ JSONDocument assignConfiguration(cf::ManageDocumentOperation const& /*options*/,
 JSONDocument removeConfiguration(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
 
 std::vector<JSONDocument> listCollections(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
-std::vector<JSONDocument> searchCollection(cf::ManageDocumentOperation const& /*options*/, JSONDocument const&  /*query_payload*/); 
+std::vector<JSONDocument> searchCollection(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
 std::vector<JSONDocument> listDatabases(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
 JSONDocument readDbInfo(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
 }  // namespace filesystem

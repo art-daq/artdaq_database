@@ -62,6 +62,21 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::findVersions(JS
 
 template <>
 template <>
+std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::findRuns(JSONDocument const& filter) {
+  confirm(!filter.empty());
+
+  auto returnCollection = std::vector<JSONDocument>();
+
+  TLOG(15) << "StorageProvider::UconDB::findRuns() begin";
+  TLOG(15) << "StorageProvider::UconDB::findRuns() args data=<" << filter << ">";
+
+  throw runtime_error("UconDB") << "StorageProvider::UconDB::findRuns() is not implemented";
+
+  return returnCollection;
+}
+
+template <>
+template <>
 std::vector<JSONDocument> StorageProvider<JSONDocument, UconDB>::findEntities(JSONDocument const& filter) {
   confirm(!filter.empty());
   auto returnCollection = std::vector<JSONDocument>();

@@ -9,8 +9,8 @@
 #include "artdaq-database/ConfigurationDB/configuration_dbproviders.h"
 
 #include "artdaq-database/BasicTypes/basictypes.h"
-#include "artdaq-database/DataFormats/Json/json_common.h"
 #include "artdaq-database/DataFormats/Fhicl/fhicl_common.h"
+#include "artdaq-database/DataFormats/Json/json_common.h"
 #include "artdaq-database/DataFormats/Xml/xml_common.h"
 
 #include "artdaq-database/DataFormats/shared_literals.h"
@@ -42,8 +42,8 @@ using artdaq::database::basictypes::XmlData;
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::fhicl::FhiclWriter;
-using artdaq::database::xml::XmlWriter;
 using artdaq::database::json::JsonWriter;
+using artdaq::database::xml::XmlWriter;
 
 using JsonAnyHandle_t = boost::variant<JsonData, JSONDocument>;
 
@@ -282,7 +282,7 @@ void read_document(Options const& options, std::string& conf) {
   switch (format) {
     default:
     case data_format_t::db: {
-      returnValue=search_result.to_string();
+      returnValue = search_result.to_string();
       returnValueChanged = true;
       break;
     }
@@ -299,8 +299,8 @@ void read_document(Options const& options, std::string& conf) {
     case data_format_t::json: {
       jsn::value_t value = search_result.extract();
       auto const& docAst = unwrap(value).value_as<const object_t>(jsonliteral::document);
-      auto const& dataAst=unwrap(docAst).value_as<const object_t>(jsonliteral::data);
-      
+      auto const& dataAst = unwrap(docAst).value_as<const object_t>(jsonliteral::data);
+
       if (!JsonWriter{}.write(dataAst, returnValue)) {
         throw runtime_error("read_document") << "Invalid json data";
       }
@@ -315,7 +315,7 @@ void read_document(Options const& options, std::string& conf) {
     case data_format_t::fhicl: {
       jsn::value_t value = search_result.extract();
       auto const& docAst = unwrap(value).value_as<const object_t>(jsonliteral::document);
-        
+
       auto fhicl_buffer = std::string();
 
       if (!FhiclWriter().write_data(docAst, fhicl_buffer)) {
@@ -324,7 +324,7 @@ void read_document(Options const& options, std::string& conf) {
         throw runtime_error("read_document") << "Unable to reverse fhicl-to-json convertion";
       }
 
-      std::swap(returnValue,fhicl_buffer);
+      std::swap(returnValue, fhicl_buffer);
 
       returnValueChanged = true;
 
@@ -342,7 +342,7 @@ void read_document(Options const& options, std::string& conf) {
         throw runtime_error("read_document") << "Unable to reverse fhicl-to-xml convertion";
       }
 
-      std::swap(returnValue,xml_buffer);
+      std::swap(returnValue, xml_buffer);
 
       returnValueChanged = true;
 
@@ -424,6 +424,75 @@ void find_versions(Options const& options, std::string& versions) {
   }
 
   TLOG(40) << "find_versions: end";
+}
+
+void find_runs(Options const& options, std::string& runs) {
+  confirm(runs.empty());
+  confirm(options.operation() == apiliteral::operation::findruns);
+
+  TLOG(38) << "find_runs: begin";
+  TLOG(39) << "find_runs args options=<" << options << ">";
+
+  validate_dbprovider_name(options.provider());
+
+  auto dispatch_persistence_provider = [](std::string const& name) {
+    auto providers = std::map<std::string, provider_call_t>{{apiliteral::provider::mongo, cf::mongo::findRuns},
+                                                            {apiliteral::provider::filesystem, cf::filesystem::findRuns},
+                                                            {apiliteral::provider::ucon, cf::ucon::findRuns}};
+
+    return providers.at(name);
+  };
+
+  auto search_results = dispatch_persistence_provider(options.provider())(options, options.query_filter_to_JsonData());
+
+  auto returnValue = std::string{};
+  auto returnValueChanged = bool{false};
+
+  switch (options.format()) {
+    default:
+    case data_format_t::db:
+    case data_format_t::json:
+    case data_format_t::unknown:
+    case data_format_t::fhicl: {
+      throw runtime_error("find_runs") << "Unsupported data format.";
+      break;
+    }
+    case data_format_t::gui: {
+      std::ostringstream oss;
+      oss << "{ \"search\": [\n";
+      for (auto const& search_result : search_results) {
+        oss << search_result << ",";
+      }
+
+      oss.seekp(-1, oss.cur);
+      oss << "] }";
+      returnValue = oss.str();
+      returnValueChanged = true;
+      break;
+    }
+
+    case data_format_t::csv: {
+      std::ostringstream oss;
+      for (auto const& search_result : search_results) {
+        oss << search_result.value_as<std::string>(apiliteral::name) << ",";
+      }
+
+      returnValue = oss.str();
+
+      if (returnValue.back() == ',') {
+        returnValue.pop_back();
+      }
+
+      returnValueChanged = true;
+      break;
+    }
+  }
+
+  if (returnValueChanged) {
+    runs.swap(returnValue);
+  }
+
+  TLOG(40) << "find_runs: end";
 }
 
 void find_entities(Options const& options, std::string& entities) {

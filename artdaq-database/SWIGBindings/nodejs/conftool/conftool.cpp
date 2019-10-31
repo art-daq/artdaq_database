@@ -43,6 +43,12 @@ result_t find_configuration_versions_ui(std::string const& query_payload) {
   return impl::find_versions(query_payload);
 }
 
+result_t find_configuration_runs_ui(std::string const& query_payload) {
+  set_default_locale();
+
+  return impl::find_runs(query_payload);
+}
+
 result_t find_configuration_entities_ui(std::string const& query_payload) {
   set_default_locale();
 
@@ -115,7 +121,6 @@ result_t import_collection(std::string const& query_payload) {
 
   return impl::import_collection(query_payload);
 }
-
 
 result_t search_collection(std::string const& query_payload) {
   set_default_locale();

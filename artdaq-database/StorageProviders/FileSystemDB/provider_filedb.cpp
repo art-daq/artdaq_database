@@ -276,6 +276,105 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::findVersi
 
 template <>
 template <>
+std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::findRuns(JSONDocument const& filter) {
+  confirm(!filter.empty());
+  auto returnCollection = std::vector<JSONDocument>();
+
+  TLOG(15) << "FileSystemDB::findRuns() begin";
+  TLOG(15) << "FileSystemDB::findRuns() args data=<" << filter << ">";
+
+  auto query_payload_document = JSONDocument{filter};
+
+  auto collection_name = query_payload_document.findChild(apiliteral::option::collection).value();
+  auto query_payload = query_payload_document.findChild(apiliteral::option::searchfilter).value();
+
+  auto collection = _provider->connection() + collection_name;
+  collection = expand_environment_variables(collection);
+
+  TLOG(15) << "FileSystemDB::readDocument() collection_path=<" << collection << ">.";
+
+  auto dir_name = dbfs::mkdir(collection).append("/");
+
+  auto index_path = boost::filesystem::path(dir_name.c_str()).append(dbfsl::search_index);
+
+  SearchIndex search_index(index_path);
+
+  jsn::object_t search_ast;
+
+  if (!jsn::JsonReader{}.read(query_payload, search_ast)) {
+    TLOG(15) << "FileSystemDB::index::findRunsByEntityName()"
+             << " Failed to create an AST from search.";
+    return returnCollection;
+  }
+#if 0
+  if (search_ast.count(apiliteral::filter::configurations) == 0) {
+    auto versionentityname_pairs = search_index.findRunsByEntityName(query_payload);
+
+    TLOG(15) << "FileSystemDB::findRunsByEntityName() search returned " << versionentityname_pairs.size() << " configurations.";
+
+    for (auto const& versionentityname_pair : versionentityname_pairs) {
+      std::ostringstream oss;
+
+      oss << "{";
+      oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
+      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem) << ",";
+      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
+      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument) << ",";
+      oss << db::quoted_(apiliteral::option::searchfilter) << ":"
+          << "{";
+      oss << db::quoted_(apiliteral::filter::version) << ":" << db::quoted_(versionentityname_pair.second);
+      oss << "," << db::quoted_(apiliteral::filter::entities) << ":" << db::quoted_(versionentityname_pair.first);
+      oss << "}";
+      oss << "}";
+
+      TLOG(15) << "FileSystemDB::findRuns() found document=<" << oss.str() << ">";
+
+      returnCollection.emplace_back(oss.str());
+    }
+  } else {
+    auto entityName = std::string{"notprovided"};
+
+    try {
+      entityName = boost::get<std::string>(search_ast.at(apiliteral::filter::entities));
+
+      TLOG(15) << "FileSystemDB::findRunsByGlobalConfigName"
+               << " Found entity filter=<" << entityName << ">.";
+
+    } catch (...) {
+    }
+
+    auto versionentityname_pairs = search_index.findRunsByGlobalConfigName(query_payload);
+
+    TLOG(15) << "FileSystemDB::findRunsByGlobalConfigName() "
+                "search returned "
+             << versionentityname_pairs.size() << " configurations.";
+
+    for (auto const& versionentityname_pair : versionentityname_pairs) {
+      std::ostringstream oss;
+
+      oss << "{";
+      oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
+      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem) << ",";
+      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
+      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument) << ",";
+      oss << db::quoted_(apiliteral::option::searchfilter) << ":"
+          << "{";
+      oss << db::quoted_(apiliteral::filter::version) << ":" << db::quoted_(versionentityname_pair.second);
+      oss << "," << db::quoted_(apiliteral::filter::entities) << ":" << db::quoted_(entityName);
+      oss << "}";
+      oss << "}";
+
+      TLOG(15) << "FileSystemDB::findRuns() found document=<" << oss.str() << ">";
+
+      returnCollection.emplace_back(oss.str());
+    }
+  }
+#endif
+  return returnCollection;
+}
+
+template <>
+template <>
 std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::findEntities(JSONDocument const& filter) {
   confirm(!filter.empty());
   auto returnCollection = std::vector<JSONDocument>();

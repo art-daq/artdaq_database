@@ -11,6 +11,7 @@ result_t add_configuration_to_global_configuration_ui(std::string const& query_p
 result_t create_new_global_configuration_ui(std::string const& query_payload);
 result_t find_configuration_versions_ui(std::string const& query_payload);
 result_t find_configuration_entities_ui(std::string const& query_payload);
+result_t find_configuration_runs_ui(std::string const& query_payload);
 result_t load_globalconfiguration_ui(std::string const& query_payload);
 result_t store_globalconfiguration_ui(std::string const& query_payload, std::string const& json_document);
 result_t list_databases(std::string const& query_payload);
@@ -24,7 +25,7 @@ result_t import_database(std::string const& query_payload);       // exportimpor
 result_t export_collection(std::string const& query_payload);     // exportimport
 result_t import_collection(std::string const& query_payload);     // exportimport
 
-result_t search_collection(std::string const& query_payload); //search collection
+result_t search_collection(std::string const& query_payload);  // search collection
 
 void enable_trace();
 void set_default_locale();

@@ -47,6 +47,9 @@ class StorageProvider final {
   std::vector<FILTER> findVersions(FILTER const&);
 
   template <typename FILTER>
+  std::vector<FILTER> findRuns(FILTER const&);
+
+  template <typename FILTER>
   std::vector<FILTER> findEntities(FILTER const&);
 
   template <typename FILTER>

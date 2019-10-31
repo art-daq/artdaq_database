@@ -30,6 +30,7 @@ namespace detail {
 void write_document(ManageDocumentOperation const&, std::string&);
 void read_document(ManageDocumentOperation const&, std::string&);
 void find_versions(ManageDocumentOperation const&, std::string&);
+void find_runs(ManageDocumentOperation const&, std::string&);
 void find_entities(ManageDocumentOperation const&, std::string&);
 void add_entity(ManageDocumentOperation const&, std::string&);
 void remove_entity(ManageDocumentOperation const&, std::string&);
@@ -66,6 +67,18 @@ result_t opts::find_versions(ManageDocumentOperation const& options) noexcept {
     auto returnValue = std::string{};
 
     detail::find_versions(options, returnValue);
+
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(::debug::current_exception_diagnostic_information());
+  }
+}
+
+result_t opts::find_runs(ManageDocumentOperation const& options) noexcept {
+  try {
+    auto returnValue = std::string{};
+
+    detail::find_runs(options, returnValue);
 
     return Success(returnValue);
   } catch (...) {
@@ -189,6 +202,25 @@ result_t json::find_versions(std::string const& query_payload) noexcept {
     auto returnValue = std::string{};
 
     detail::find_versions(options, returnValue);
+
+    return Success(returnValue);
+  } catch (...) {
+    return Failure(::debug::current_exception_diagnostic_information());
+  }
+}
+
+result_t json::find_runs(std::string const& query_payload) noexcept {
+  try {
+    if (query_payload.empty()) {
+      return Failure(msg_EmptyFilter);
+    }
+
+    auto options = ManageDocumentOperation{apiliteral::operation::findruns};
+    options.readJsonData({query_payload});
+
+    auto returnValue = std::string{};
+
+    detail::find_runs(options, returnValue);
 
     return Success(returnValue);
   } catch (...) {

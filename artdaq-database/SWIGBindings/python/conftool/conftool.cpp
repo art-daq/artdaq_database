@@ -37,6 +37,12 @@ result_t find_versions(std::string const& query_payload) {
   return impl::find_versions(query_payload);
 }
 
+result_t find_runs(std::string const& query_payload) {
+  set_default_locale();
+
+  return impl::find_runs(query_payload);
+}
+
 result_t add_version_alias(std::string const& query_payload) {
   set_default_locale();
 

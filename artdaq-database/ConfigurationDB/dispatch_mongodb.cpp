@@ -56,14 +56,14 @@ JSONDocument prov::readDocument(ManageDocumentOperation const& options, JSONDocu
   TLOG(26) << "read_document: "
            << "Search returned " << collection.size() << " results.";
 
-  if (collection.empty() ) {
+  if (collection.empty()) {
     throw runtime_error("read_document") << "No documents found.";
   }
 
   auto data = JSONDocument{};
-  
-  std::swap(data,collection.size() > 1 ? *std::max_element(collection.begin(),collection.end(),docrec::compareDocumentVersions):
-    *collection.begin());
+
+  std::swap(data,
+            collection.size() > 1 ? *std::max_element(collection.begin(), collection.end(), docrec::compareDocumentVersions) : *collection.begin());
 
   TLOG(26) << "readDocument(): end";
 
@@ -280,6 +280,69 @@ std::vector<JSONDocument> prov::findVersions(ManageDocumentOperation const& opti
   }
 
   TLOG(30) << "operation_findversions: end";
+
+  return returnValue;
+}
+
+std::vector<JSONDocument> prov::findRuns(ManageDocumentOperation const& options, JSONDocument const& /*unused*/) {
+  auto returnValue = std::vector<JSONDocument>{};
+
+  if (options.operation() != apiliteral::operation::findruns) {
+    throw runtime_error("operation_findruns") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  }
+
+  if (options.provider() != apiliteral::provider::mongo) {
+    throw runtime_error("operation_findruns") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  }
+
+  TLOG(30) << "operation_findruns: begin";
+
+  auto config = DBI::DBConfig{};
+  auto database = DBI::DB::create(config);
+  auto provider = DBI::DBProvider<JSONDocument>::create(database);
+
+  auto search_results = provider->findRuns<JSONDocument>(options);
+
+  auto ex = std::regex(
+      "\"run\"\\s*:\\s*\"((\\\\\"|[^\"])*)\"\\,\\s*"
+      "\"entities\\.name\"\\s*:\\s*\"((\\\\\"|"
+      "[^\"])*)\"");
+
+  for (auto const& search_result : search_results) {
+    auto filter_json = search_result.findChild("filter").value();
+
+    TLOG(28) << "operation_findruns: filter_json=<" << filter_json << ">";
+
+    auto results = std::smatch();
+
+    if (!std::regex_search(filter_json, results, ex)) {
+      throw runtime_error("operation_findruns") << "Unsupported filter string, no match";
+    }
+
+#ifdef EXTRA_TRACES
+    for (size_t i = 0; i < results.size(); ++i) {
+      std::ssub_match sub_match = results[i];
+      std::string piece = sub_match.str();
+      TLOG(28) << "operation_findruns: submatch*** " << i << ": " << piece;
+    }
+#endif
+
+    if (results.size() != 5) {
+      throw runtime_error("operation_findruns") << "Unsupported filter string, wrong result count";
+    }
+
+    TLOG(28) << "operation_findruns: run=<" << results[1].str() << ">";
+
+    std::ostringstream oss;
+    oss << "{";
+    oss << quoted_(jsonliteral::name) << ":" << quoted_(results[1].str()) << ",";
+    oss << quoted_(jsonliteral::query) << ":" << search_result;
+    oss << "}\n";
+
+    returnValue.emplace_back(db::replace_all(oss.str(), "\\\\/", "/"));
+  }
+
+  TLOG(30) << "operation_findruns: end";
 
   return returnValue;
 }
@@ -554,7 +617,6 @@ std::vector<JSONDocument> prov::searchCollection(ManageDocumentOperation const& 
   auto search_results = provider->searchCollection(query_payload);
 
   for (auto const& search_result : search_results) {
-
     std::ostringstream oss;
     oss << "{";
     oss << quoted_(jsonliteral::query) << ":" << search_result;
@@ -567,7 +629,6 @@ std::vector<JSONDocument> prov::searchCollection(ManageDocumentOperation const& 
 
   return returnValue;
 }
-
 
 std::vector<JSONDocument> prov::findVersionAliases(cf::ManageAliasesOperation const& /*options*/, JSONDocument const& /*query_payload*/) {
   auto returnValue = std::vector<JSONDocument>{};

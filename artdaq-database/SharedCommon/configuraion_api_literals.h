@@ -31,6 +31,7 @@ constexpr auto readdbinfo = "readdbinfo";
 
 constexpr auto findconfigs = "findconfigs";
 constexpr auto findversions = "findversions";
+constexpr auto findruns = "findruns";
 
 constexpr auto findentities = "findentities";
 constexpr auto addentity = "addentity";

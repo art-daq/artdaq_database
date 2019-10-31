@@ -435,6 +435,87 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::findVersions(J
 
 template <>
 template <>
+std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::findRuns(JSONDocument const& query_payload) {
+  confirm(!query_payload.empty());
+  auto returnCollection = std::vector<JSONDocument>();
+
+  TLOG(15) << "MongoDB::findRuns() begin";
+  TLOG(15) << "MongoDB::findRuns() args data=<" << query_payload << ">";
+
+  auto bson_document = compat::from_json(query_payload);
+
+  auto extract_value = [&bson_document](auto const& name) {
+    auto view = bson_document.view();
+    auto element = view.find(name);
+
+    if (element == view.end()) {
+      throw runtime_error("MongoDB") << "Search JSONDocument is missing the \"" << name << "\" element.";
+    }
+
+    return element->get_value();
+  };
+
+  auto collection_name = dequote(compat::to_json(extract_value(apiliteral::option::collection)));
+
+  auto collection = _provider->connection().collection(collection_name);
+
+  auto search = JSONDocument{compat::to_json(extract_value(apiliteral::option::searchfilter))};
+
+  auto fields = std::vector<std::string>{};
+  fields.emplace_back(apiliteral::filter::entities);
+  auto regex_search = mongo::rewrite_query_with_regex(search, fields);
+  TLOG(15) << "MongoDB::findRuns() args regex_search=<" << regex_search << ">";
+
+  mongocxx::pipeline stages;
+  bbs::document project_stage;
+  auto match_stage = bsoncxx::builder::core(false);
+  auto bson_search = compat::from_json(regex_search);
+  match_stage.concatenate(bson_search.view());
+
+  project_stage << "_id" << 0 << "run"
+                << "$run"
+                << "entities"
+                << "$entities.name";
+
+  stages.match(match_stage.view_document()).project(project_stage.view());
+
+  TLOG(15) << "MongoDB::findRuns()  query_payload=<" << compat::to_json(stages.view_array()) << ">";
+
+  auto cursor = collection.aggregate(stages);
+
+  for (auto const& view : cursor) {
+    auto run = view.find("run");
+    auto run_name = compat::to_json(run->get_value());
+
+    auto entities = view.find("entities")->get_array();
+
+    for (auto const& entity : entities.value) {
+      auto entity_name = compat::to_json(entity.get_value());
+
+      std::ostringstream oss;
+      oss << "{";
+      oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
+      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::mongo) << ",";
+      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
+      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument) << ",";
+      oss << db::quoted_(apiliteral::option::searchfilter) << ":"
+          << "{";
+      oss << db::quoted_(apiliteral::filter::run) << ": " << run_name;
+      oss << "," << db::quoted_(apiliteral::filter::entities) << ": " << entity_name;
+      oss << "}";
+      oss << "}";
+
+      TLOG(14) << "MongoDB::findRuns() found document=<" << oss.str() << ">";
+
+      returnCollection.emplace_back(oss.str());
+    }
+  }
+
+  return returnCollection;
+}
+
+template <>
+template <>
 std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::findEntities(JSONDocument const& search) {
   confirm(!search.empty());
   auto returnCollection = std::vector<JSONDocument>();

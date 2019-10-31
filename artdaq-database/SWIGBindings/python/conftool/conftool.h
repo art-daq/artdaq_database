@@ -12,6 +12,7 @@ result_t mark_document_readonly(std::string const& query_payload);              
 result_t mark_document_deleted(std::string const& query_payload);                             // manage doc
 result_t find_versions(std::string const& query_payload);                                     // manage doc
 result_t find_entities(std::string const& query_payload);                                     // manage doc
+result_t find_runs(std::string const& query_payload);                                         // manage doc
 result_t add_entity(std::string const& query_payload);                                        // manage doc
 result_t remove_entity(std::string const& query_payload);                                     // manage doc
 
@@ -40,8 +41,7 @@ result_t import_database(std::string const& query_payload);       // exportimpor
 result_t export_collection(std::string const& query_payload);     // exportimport
 result_t import_collection(std::string const& query_payload);     // exportimport
 
-
-result_t search_collection(std::string const& query_payload);    // search collection
+result_t search_collection(std::string const& query_payload);  // search collection
 
 result_t list_databases(std::string const& query_payload);    // metadata
 result_t read_dbinfo(std::string const& query_payload);       // metadata

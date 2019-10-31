@@ -18,6 +18,7 @@ result_t read_document(ManageDocumentOperation const& /*options*/, std::string& 
 result_t mark_document_readonly(ManageDocumentOperation const& /*options*/) noexcept;
 result_t mark_document_deleted(ManageDocumentOperation const& /*options*/) noexcept;
 result_t find_versions(ManageDocumentOperation const& /*options*/) noexcept;
+result_t find_runs(ManageDocumentOperation const& /*options*/) noexcept;
 result_t find_entities(ManageDocumentOperation const& /*options*/) noexcept;
 result_t add_entity(ManageDocumentOperation const& /*options*/) noexcept;
 result_t remove_entity(ManageDocumentOperation const& /*options*/) noexcept;
@@ -29,6 +30,7 @@ result_t read_document(std::string const& /*task_payload*/, std::string& /*conf*
 result_t mark_document_readonly(std::string const& /*task_payload*/) noexcept;
 result_t mark_document_deleted(std::string const& /*task_payload*/) noexcept;
 result_t find_versions(std::string const& /*task_payload*/) noexcept;
+result_t find_runs(std::string const& /*task_payload*/) noexcept;
 result_t find_entities(std::string const& /*task_payload*/) noexcept;
 result_t add_entity(std::string const& /*task_payload*/) noexcept;
 result_t remove_entity(std::string const& /*task_payload*/) noexcept;
