@@ -292,11 +292,10 @@ struct ConfigurationInterface final {
       auto opts = ManageDocumentOperation{apiname};
       opts.operation(apiliteral::operation::findconfigs);
       opts.format(data_format_t::gui);
+      opts.configuration("*");
 
       if (!mongosearch.empty()) {
-        if (opts.provider() == apiliteral::provider::mongo && mongosearch != "*") {
-          opts.configuration(mongosearch);
-        } else if (opts.provider() == apiliteral::provider::filesystem) {
+        if (opts.provider() == apiliteral::provider::mongo || opts.provider() == apiliteral::provider::filesystem) {
           opts.configuration(mongosearch);
         }
       }
@@ -314,7 +313,7 @@ struct ConfigurationInterface final {
         auto const& searches = unwrap(resultAST).value_as<jsn::array_t>(jsonliteral::search);
 
         for (auto const& search : searches) {
-          auto const& query =  unwrap(search).value_as<const jsn::object_t>(jsonliteral::query);
+          auto const& query = unwrap(search).value_as<const jsn::object_t>(jsonliteral::query);
           auto const& filter = unwrap(query).value_as<const jsn::object_t>(jsonliteral::filter);
           auto const& configuration = unwrap(filter).value_as<const std::string>(apiliteral::filter::configurations);
           returnSet.insert(configuration);
@@ -368,7 +367,7 @@ struct ConfigurationInterface final {
         throw artdaq::database::runtime_exception(apifunctname) << "Invalid JSON:" << apiCallResult.second;
 
       try {
-        auto& search_array=unwrap(resultAST).value_as<jsn::array_t>(jsonliteral::search);
+        auto& search_array = unwrap(resultAST).value_as<jsn::array_t>(jsonliteral::search);
         for (auto search : search_array) {
           auto buffer = std::string{};
 

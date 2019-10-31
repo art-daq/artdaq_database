@@ -1,4 +1,5 @@
-#define BOOST_TEST_MODULE (databaseconfiguration test)
+#define BOOST_TEST_DYN_LINK
+#define BOOST_TEST_MODULE (DatabaseConfigurationInterface test)
 
 #include <boost/test/auto_unit_test.hpp>
 
@@ -80,7 +81,11 @@ TestData fixture;
 
 BOOST_AUTO_TEST_SUITE(databaseconfiguration_test)
 
-BOOST_AUTO_TEST_CASE(configure_tests) { std::cout << "TestData::version=" << fixture.version() << "\n"; }
+BOOST_AUTO_TEST_CASE(configure_tests) {
+  std::cout << "TestData::version=" << fixture.version() << "\n";
+  std::cout << "ARTDAQ_DATABASE_URI=" << (getenv("ARTDAQ_DATABASE_URI") != nullptr ? getenv("ARTDAQ_DATABASE_URI") : std::string("notprovided"))
+            << "\n";
+}
 
 BOOST_AUTO_TEST_CASE(write_document) {
   std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();
@@ -145,10 +150,50 @@ BOOST_AUTO_TEST_CASE(load_configuration) {
   BOOST_CHECK_EQUAL(map.at(cfg2->getConfigurationName()), fixture.version() + 2);
 }
 
-BOOST_AUTO_TEST_CASE(find_all_configurations) {
+BOOST_AUTO_TEST_CASE(find_all_configurations_all) {
   auto ifc = DatabaseConfigurationInterface();
 
   auto list = ifc.findAllGlobalConfigurations();
+
+  BOOST_CHECK_EQUAL(list.size(), fixture.oldConfigCount() + 1);
+
+  auto configName = std::string{"config"} + std::to_string(fixture.version());
+
+  auto found = (std::find(list.begin(), list.end(), configName) != list.end());
+
+  BOOST_CHECK_EQUAL(found, true);
+}
+
+BOOST_AUTO_TEST_CASE(find_all_configurations_wildcard) {
+  auto ifc = DatabaseConfigurationInterface();
+
+  auto list = ifc.findAllGlobalConfigurations("*");
+
+  BOOST_CHECK_EQUAL(list.size(), fixture.oldConfigCount() + 1);
+
+  auto configName = std::string{"config"} + std::to_string(fixture.version());
+
+  auto found = (std::find(list.begin(), list.end(), configName) != list.end());
+
+  BOOST_CHECK_EQUAL(found, true);
+}
+
+BOOST_AUTO_TEST_CASE(find_all_configurations_fullname) {
+  auto ifc = DatabaseConfigurationInterface();
+
+  auto configName = std::string{"config"} + std::to_string(fixture.version());
+
+  auto list = ifc.findAllGlobalConfigurations(configName);
+
+  auto found = (std::find(list.begin(), list.end(), configName) != list.end());
+
+  BOOST_CHECK_EQUAL(found, true);
+}
+
+BOOST_AUTO_TEST_CASE(find_all_configurations_prefix) {
+  auto ifc = DatabaseConfigurationInterface();
+
+  auto list = ifc.findAllGlobalConfigurations("config*");
 
   BOOST_CHECK_EQUAL(list.size(), fixture.oldConfigCount() + 1);
 
