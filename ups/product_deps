@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_database  v1_04_78
+parent artdaq_database  v1_04_79
 defaultqual	e17:s82
 
 # These optional lines define the installed directories where

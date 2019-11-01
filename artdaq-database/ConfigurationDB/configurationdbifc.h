@@ -294,11 +294,14 @@ struct ConfigurationInterface final {
       opts.format(data_format_t::gui);
 
       if (!mongosearch.empty()) {
-        if (opts.provider() == apiliteral::provider::mongo && mongosearch != "*") {
-          opts.configuration(mongosearch);
-        } else if (opts.provider() == apiliteral::provider::filesystem) {
-          opts.configuration(mongosearch);
+        if (opts.provider() == apiliteral::provider::mongo) {
+          if (mongosearch != "*")
+            opts.configuration(mongosearch);
+          else
+            opts.configuration("");
         }
+      } else if (opts.provider() == apiliteral::provider::filesystem) {
+        opts.configuration(mongosearch);
       }
 
       auto apiCallResult = impl::find_configurations(opts);
@@ -314,7 +317,7 @@ struct ConfigurationInterface final {
         auto const& searches = unwrap(resultAST).value_as<jsn::array_t>(jsonliteral::search);
 
         for (auto const& search : searches) {
-          auto const& query =  unwrap(search).value_as<const jsn::object_t>(jsonliteral::query);
+          auto const& query = unwrap(search).value_as<const jsn::object_t>(jsonliteral::query);
           auto const& filter = unwrap(query).value_as<const jsn::object_t>(jsonliteral::filter);
           auto const& configuration = unwrap(filter).value_as<const std::string>(apiliteral::filter::configurations);
           returnSet.insert(configuration);
@@ -332,7 +335,7 @@ struct ConfigurationInterface final {
     }
 
     return returnSet;  // RVO
-  }
+  }                    // namespace configuration
 
   //==============================================================================
   //
@@ -368,7 +371,7 @@ struct ConfigurationInterface final {
         throw artdaq::database::runtime_exception(apifunctname) << "Invalid JSON:" << apiCallResult.second;
 
       try {
-        auto& search_array=unwrap(resultAST).value_as<jsn::array_t>(jsonliteral::search);
+        auto& search_array = unwrap(resultAST).value_as<jsn::array_t>(jsonliteral::search);
         for (auto search : search_array) {
           auto buffer = std::string{};
 
@@ -509,7 +512,7 @@ struct ConfigurationInterface final {
   ConfigurationInterface(ConfigurationInterface const&) = delete;
   ConfigurationInterface& operator=(ConfigurationInterface const&) = delete;
   ConfigurationInterface& operator=(ConfigurationInterface&&) = delete;
-};
+};  // namespace configuration
 
 }  // namespace configuration
 }  // namespace database
