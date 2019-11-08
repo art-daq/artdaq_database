@@ -30,12 +30,28 @@ bool db::useFakeTime(bool useFakeTime = false) {
 void db::set_default_locale() { std::setlocale(LC_ALL, apiliteral::database_format_locale); }
 
 std::string db::timestamp() {
-  auto now = std::chrono::system_clock::now();
+  auto now = std::chrono::steady_clock::now();
   return db::to_string(now);
 }
 
-std::string db::to_string(std::chrono::system_clock::time_point const& tp) {
-  std::time_t time = std::chrono::system_clock::to_time_t(tp);
+std::time_t steady_clock_to_time_t(std::chrono::steady_clock::time_point const& tp) {
+  using namespace std::chrono;
+  static auto system_clock = system_clock::now();
+  static auto steady_clock = steady_clock::now();
+
+  return system_clock::to_time_t(system_clock + duration_cast<system_clock::duration>(tp - steady_clock));
+}
+
+std::chrono::steady_clock::time_point steady_clock_from_time_t(std::time_t const& t) {
+  using namespace std::chrono;
+  static auto system_clock = system_clock::now();
+  static auto steady_clock = steady_clock::now();
+
+  return {steady_clock + (system_clock::from_time_t(t) - system_clock)};
+}
+
+std::string db::to_string(std::chrono::steady_clock::time_point const& tp) {
+  std::time_t time = steady_clock_to_time_t(tp);
   char buff[40];
   std::strftime(buff, sizeof(buff), apiliteral::timestamp_format, std::localtime(&time));
   auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch()).count() % 1000;
@@ -57,7 +73,7 @@ std::string db::to_string(std::chrono::system_clock::time_point const& tp) {
   return {buff};
 }
 
-std::chrono::system_clock::time_point db::to_timepoint(std::string const& strtime) {
+std::chrono::steady_clock::time_point db::to_timepoint(std::string const& strtime) {
   confirm(!strtime.empty());
   if (strtime.empty()) {
     throw std::invalid_argument("Failed calling to_timepoint(): Invalid strtime; strtime is empty");
@@ -73,7 +89,7 @@ std::chrono::system_clock::time_point db::to_timepoint(std::string const& strtim
 
   if (strptime(tmptime.c_str(), apiliteral::timestamp_format, &timeinfo) != nullptr) {
     timeinfo.tm_isdst = -1;
-    return std::chrono::system_clock::from_time_t(std::mktime(&timeinfo)) + milliseconds;
+    return steady_clock_from_time_t(std::mktime(&timeinfo)) + milliseconds;
   }
 
   throw std::invalid_argument(std::string("Failed calling to_timepoint(): format mismatch; format=<") + apiliteral::timestamp_format +
@@ -93,7 +109,7 @@ std::string db::confirm_iso8601_timestamp(std::string const& strtime) {
   auto timeinfo = std::tm();
   if (strptime(strtime.c_str(), apiliteral::timestamp_format_old, &timeinfo) != nullptr) {
     timeinfo.tm_isdst = -1;
-    return db::to_string(std::chrono::system_clock::from_time_t(std::mktime(&timeinfo)));
+    return db::to_string(steady_clock_from_time_t(std::mktime(&timeinfo)));
   }
   throw std::invalid_argument(std::string("Failed calling confirm_iso8601_timestamp(): format mismatch; format=<") +
                               apiliteral::timestamp_format_old + ">, timestamp=<" + strtime + ">");

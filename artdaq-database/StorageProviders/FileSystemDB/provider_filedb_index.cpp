@@ -283,6 +283,32 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findAllGlobalConfi
   return _indexed_filtered_innerjoin_over_ouid(apiliteral::filter::entities, apiliteral::filter::configurations, configFilter);
 }
 
+std::vector<std::pair<std::string, std::string>> SearchIndex::findAllRuns(JSONDocument const& search) {
+  confirm(!search.empty());
+  auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
+  TLOG(15) << "StorageProvider::FileSystemDB::index::findAllRuns() begin";
+  TLOG(15) << "StorageProvider::FileSystemDB::index::findAllRuns() args search=<" << search << ">.";
+
+  auto reader = JsonReader{};
+
+  object_t search_ast;
+
+  if (!reader.read(search, search_ast)) {
+    TLOG(15) << "StorageProvider::FileSystemDB::index::findAllRuns() Failed to create an AST from search.";
+    return returnCollection;
+  }
+
+  auto configFilter = std::string{};
+
+  try {
+    configFilter = boost::get<std::string>(search_ast.at(apiliteral::filter::runs));
+    TLOG(15) << "StorageProvider::FileSystemDB::index::findAllRuns() Found filter=<" << configFilter << ">.";
+  } catch (...) {
+  }
+
+  return _indexed_filtered_innerjoin_over_ouid(apiliteral::filter::entities, apiliteral::filter::configurations, configFilter);
+}
+
 std::vector<std::string> SearchIndex::getConfigurationAssignedTimestamps(JSONDocument const& search) {
   confirm(!search.empty());
   auto returnCollection = std::vector<std::string>{};
@@ -321,6 +347,49 @@ std::vector<std::string> SearchIndex::getConfigurationAssignedTimestamps(JSONDoc
 
   } catch (std::out_of_range const&) {
     TLOG(24) << "StorageProvider::FileSystemDB::index::getConfigurationAssignedTimestamps() SearchIndex is corrupt";
+  }
+
+  return returnCollection;
+}
+
+std::vector<std::string> SearchIndex::getRunAssignedTimestamps(JSONDocument const& search) {
+  confirm(!search.empty());
+  auto returnCollection = std::vector<std::string>{};
+  TLOG(15) << "StorageProvider::FileSystemDB::index::getRunAssignedTimestamps() begin";
+  TLOG(15) << "StorageProvider::FileSystemDB::index::getRunAssignedTimestamps() args search=<" << search << ">.";
+  auto reader = JsonReader{};
+
+  object_t search_ast;
+
+  if (!reader.read(search, search_ast)) {
+    TLOG(15) << "StorageProvider::FileSystemDB::index::getRunAssignedTimestamps() "
+             << "Failed to create an AST from search.";
+    return returnCollection;
+  }
+
+  auto configFilter = std::string{};
+
+  try {
+    configFilter = boost::get<std::string>(search_ast.at(apiliteral::filter::runs));
+    TLOG(15) << "StorageProvider::FileSystemDB::index::getRunAssignedTimestamps() Found filter=<" << configFilter << ">.";
+  } catch (...) {
+  }
+
+  try {
+    auto const& config_list = boost::get<jsn::object_t>(_index.at("runs.assigned"));
+
+    auto const& config_timestamps = boost::get<jsn::array_t>(config_list.at(configFilter));
+
+    returnCollection.reserve(config_timestamps.size());
+
+    for (auto const& timespamp : config_timestamps) {
+      returnCollection.push_back(unwrap(timespamp).value_as<const std::string>());
+    }
+
+    TLOG(25) << "StorageProvider::FileSystemDB::index::getRunAssignedTimestamps() Found " << returnCollection.size() << " timespamps";
+
+  } catch (std::out_of_range const&) {
+    TLOG(24) << "StorageProvider::FileSystemDB::index::getRunAssignedTimestamps() SearchIndex is corrupt";
   }
 
   return returnCollection;
@@ -391,6 +460,9 @@ bool SearchIndex::addDocument(JSONDocument const& document, object_id_t const& o
       for (auto const& run : runs) {
         auto run_name = boost::get<std::string>(boost::get<jsn::object_t>(run).at(jsonliteral::name));
         _addRun(ouid, run_name);
+
+        auto assigned = boost::get<std::string>(boost::get<jsn::object_t>(run).at(jsonliteral::assigned));
+        _addRunAssigned(assigned, run_name);
       }
     } catch (...) {
       TLOG(15) << "StorageProvider::FileSystemDB::index::addDocument() Failed to add run.";
@@ -458,7 +530,11 @@ bool SearchIndex::removeDocument(JSONDocument const& document, object_id_t const
     for (auto const& run : runs) {
       auto run_name = boost::get<std::string>(boost::get<jsn::object_t>(run).at(jsonliteral::name));
       _removeRun(ouid, run_name);
+
+      auto assigned = boost::get<std::string>(boost::get<jsn::object_t>(run).at(jsonliteral::assigned));
+      _removeRunAssigned(assigned, run_name);
     }
+
     return true;
 
   } catch (...) {
@@ -742,6 +818,27 @@ void SearchIndex::_addRun(object_id_t const& ouid, std::string const& run) {
   _make_unique_sorted<std::string>(ouids);
 }
 
+void SearchIndex::_addRunAssigned(timestamp_t const& timespamp, std::string const& run) {
+  confirm(!timespamp.empty());
+  confirm(!run.empty());
+
+  TLOG(15) << "StorageProvider::FileSystemDB::index::_addRunAssigned() begin";
+  TLOG(15) << "StorageProvider::FileSystemDB::index::_addRunAssigned() args timespamp=<" << timespamp << ">.";
+  TLOG(15) << "StorageProvider::FileSystemDB::index::_addRunAssigned() args run=<" << run << ">.";
+
+  auto& runs = boost::get<jsn::object_t>(_index.at("runs.assigned"));
+  auto& run_timestamp_list = runs[run];
+
+  if (run_timestamp_list.type() == typeid(bool)) {
+    run_timestamp_list = jsn::array_t{};
+  }
+
+  auto& timespamps = boost::get<jsn::array_t>(run_timestamp_list);
+  timespamps.push_back(timespamp);
+
+  _make_unique_sorted<timestamp_t>(timespamps);
+}
+
 std::vector<object_id_t> SearchIndex::_matchVersion(std::string const& version) const {
   auto ouids = std::vector<object_id_t>{};
 
@@ -1010,6 +1107,35 @@ void SearchIndex::_removeRun(object_id_t const& old_ouid, std::string const& run
     run_ouid_list.swap(new_run_ouid_list);
   } catch (std::out_of_range const&) {
     TLOG(15) << "StorageProvider::FileSystemDB::index::_removeRun() Run not found, run=<" << run << ">.";
+  }
+}
+
+void SearchIndex::_removeRunAssigned(timestamp_t const& old_timestamp, std::string const& run) {
+  confirm(!old_timestamp.empty());
+  confirm(!run.empty());
+
+  TLOG(15) << "StorageProvider::FileSystemDB::index::_removeRunAssigned() begin";
+  TLOG(15) << "StorageProvider::FileSystemDB::index::_removeRunAssigned() args timestamp=<" << old_timestamp << ">.";
+  TLOG(15) << "StorageProvider::FileSystemDB::index::_removeRunAssigned() args run=<" << run << ">.";
+
+  auto& runs = boost::get<jsn::object_t>(_index.at("runs.assigned"));
+
+  try {
+    auto& run_timestamp_list = boost::get<jsn::array_t>(runs.at(run));
+    auto new_run_timestamp_list = jsn::array_t{};
+
+    for (auto& run_timestamp : run_timestamp_list) {
+      auto this_timestamp = unwrap(run_timestamp).value_as<timestamp_t>();
+
+      if (this_timestamp != old_timestamp) {
+        new_run_timestamp_list.push_back(this_timestamp);
+      } else {
+        TLOG(15) << "StorageProvider::FileSystemDB::index::_removeRunAssigned() removed timespamp=<" << old_timestamp << ">.";
+      }
+    }
+    run_timestamp_list.swap(new_run_timestamp_list);
+  } catch (std::out_of_range const&) {
+    TLOG(18) << "StorageProvider::FileSystemDB::index::_removeRunAssigned() Run not found, run=<" << run << ">.";
   }
 }
 

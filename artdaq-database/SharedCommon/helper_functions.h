@@ -52,13 +52,13 @@ inline void confirm(bool expr) {
 
 namespace artdaq {
 namespace database {
-using std::chrono::system_clock;
+using std::chrono::steady_clock;
 
 enum class quotation_type_t { NONE = 0, SINGLE = 1, DOUBLE };
 
 std::string timestamp();
-std::string to_string(system_clock::time_point const& tp);
-system_clock::time_point to_timepoint(std::string const& strtime);
+std::string to_string(steady_clock::time_point const& tp);
+steady_clock::time_point to_timepoint(std::string const& strtime);
 std::string confirm_iso8601_timestamp(std::string const& strtime);
 
 bool useFakeTime(bool);

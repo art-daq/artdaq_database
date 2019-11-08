@@ -276,100 +276,77 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::findVersi
 
 template <>
 template <>
-std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::findRuns(JSONDocument const& filter) {
-  confirm(!filter.empty());
+std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::findRuns(JSONDocument const& query_payload) {
+  confirm(!query_payload.empty());
   auto returnCollection = std::vector<JSONDocument>();
 
+  using timestamp_t = unsigned long long;
+  using ordered_timestamps_t = std::set<timestamp_t>;
+  using run_timestamps_t = std::map<std::string, ordered_timestamps_t>;
+  auto run_timestamps = run_timestamps_t();
+
+  auto reverse_timestamp_cmp = [](const timestamp_t& a, const timestamp_t& b) { return a > b; };
+  using timestamp_runs_t = std::multimap<timestamp_t, std::string, decltype(reverse_timestamp_cmp)>;
+
+  auto timestamp_runs = timestamp_runs_t(reverse_timestamp_cmp);
+
   TLOG(15) << "FileSystemDB::findRuns() begin";
-  TLOG(15) << "FileSystemDB::findRuns() args data=<" << filter << ">";
+  TLOG(15) << "FileSystemDB::findRuns() args data=<" << query_payload << ">";
 
-  auto query_payload_document = JSONDocument{filter};
-
-  auto collection_name = query_payload_document.findChild(apiliteral::option::collection).value();
-  auto query_payload = query_payload_document.findChild(apiliteral::option::searchfilter).value();
-
-  auto collection = _provider->connection() + collection_name;
+  auto collection = _provider->connection();
   collection = expand_environment_variables(collection);
 
-  TLOG(15) << "FileSystemDB::readDocument() collection_path=<" << collection << ">.";
-
   auto dir_name = dbfs::mkdir(collection).append("/");
+  auto collection_names = dbfs::find_subdirs(dir_name);
 
-  auto index_path = boost::filesystem::path(dir_name.c_str()).append(dbfsl::search_index);
+  for (auto const& collection_name : collection_names) {
+    TLOG(15) << "FileSystemDB::findRuns() querying "
+                "collection_name=<"
+             << collection_name << ">";
 
-  SearchIndex search_index(index_path);
+    auto index_path = boost::filesystem::path(dir_name.c_str()).append(collection_name).append(dbfsl::search_index);
 
-  jsn::object_t search_ast;
+    SearchIndex search_index(index_path);
 
-  if (!jsn::JsonReader{}.read(query_payload, search_ast)) {
-    TLOG(15) << "FileSystemDB::index::findRunsByEntityName()"
-             << " Failed to create an AST from search.";
-    return returnCollection;
-  }
-#if 0
-  if (search_ast.count(apiliteral::filter::configurations) == 0) {
-    auto versionentityname_pairs = search_index.findRunsByEntityName(query_payload);
+    auto runentityname_pairs = search_index.findAllRuns(query_payload);
 
-    TLOG(15) << "FileSystemDB::findRunsByEntityName() search returned " << versionentityname_pairs.size() << " configurations.";
-
-    for (auto const& versionentityname_pair : versionentityname_pairs) {
+    TLOG(15) << "FileSystemDB::findRuns() search returned " << runentityname_pairs.size() << " runs.";
+    for (auto const& runentityname_pair : runentityname_pairs) {
+      auto const& name = runentityname_pair.first;
       std::ostringstream oss;
-
-      oss << "{";
-      oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
-      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem) << ",";
-      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
-      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument) << ",";
-      oss << db::quoted_(apiliteral::option::searchfilter) << ":"
-          << "{";
-      oss << db::quoted_(apiliteral::filter::version) << ":" << db::quoted_(versionentityname_pair.second);
-      oss << "," << db::quoted_(apiliteral::filter::entities) << ":" << db::quoted_(versionentityname_pair.first);
-      oss << "}";
-      oss << "}";
-
-      TLOG(15) << "FileSystemDB::findRuns() found document=<" << oss.str() << ">";
-
-      returnCollection.emplace_back(oss.str());
-    }
-  } else {
-    auto entityName = std::string{"notprovided"};
-
-    try {
-      entityName = boost::get<std::string>(search_ast.at(apiliteral::filter::entities));
-
-      TLOG(15) << "FileSystemDB::findRunsByGlobalConfigName"
-               << " Found entity filter=<" << entityName << ">.";
-
-    } catch (...) {
-    }
-
-    auto versionentityname_pairs = search_index.findRunsByGlobalConfigName(query_payload);
-
-    TLOG(15) << "FileSystemDB::findRunsByGlobalConfigName() "
-                "search returned "
-             << versionentityname_pairs.size() << " configurations.";
-
-    for (auto const& versionentityname_pair : versionentityname_pairs) {
-      std::ostringstream oss;
-
-      oss << "{";
-      oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
-      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem) << ",";
-      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
-      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument) << ",";
-      oss << db::quoted_(apiliteral::option::searchfilter) << ":"
-          << "{";
-      oss << db::quoted_(apiliteral::filter::version) << ":" << db::quoted_(versionentityname_pair.second);
-      oss << "," << db::quoted_(apiliteral::filter::entities) << ":" << db::quoted_(entityName);
-      oss << "}";
-      oss << "}";
-
-      TLOG(15) << "FileSystemDB::findRuns() found document=<" << oss.str() << ">";
-
-      returnCollection.emplace_back(oss.str());
+      oss << "{" << db::quoted_(apiliteral::filter::runs) << ":" << db::quoted_(name) << "}";
+      auto timestamps = search_index.getRunAssignedTimestamps(oss.str());
+      for (auto const& assigned : timestamps) {
+        run_timestamps[name].insert(std::chrono::duration_cast<std::chrono::seconds>(db::to_timepoint(assigned).time_since_epoch()).count());
+      }
     }
   }
-#endif
+
+  for (auto const& cfg : run_timestamps) {
+    timestamp_runs.emplace(*cfg.second.rbegin(), cfg.first);
+  }
+
+  // keys are sorted the reverse chronological order
+  for (auto const& cfg : timestamp_runs) {
+    std::ostringstream oss;
+    oss << "{";
+    // oss << db::quoted_(apiliteral::option::collection) <<":" << db::quoted_(collection_name) << ",";
+
+    oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::filesystem) << ",";
+    oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
+    oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::confcomposition) << ",";
+    oss << db::quoted_(apiliteral::option::searchfilter) << ":"
+        << "{";
+    oss << db::quoted_(apiliteral::filter::run) << ": " << db::quoted_(cfg.second);
+    oss << db::quoted_(apiliteral::filter::assigned) << ": "
+        << db::quoted_(db::to_string(std::chrono::time_point<std::chrono::steady_clock>(std::chrono::seconds(cfg.first))));
+    oss << "}";
+    oss << "}";
+    TLOG(15) << "FileSystemDB::findRuns() found document=<" << oss.str() << ">";
+
+    returnCollection.emplace_back(oss.str());
+  }
+
   return returnCollection;
 }
 

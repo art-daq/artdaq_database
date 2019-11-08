@@ -109,6 +109,8 @@ constexpr auto runs = "runs.name";
 constexpr auto version = "version";
 constexpr auto version_alias = "alias";
 constexpr auto run = "run";
+constexpr auto assigned = "assigned";
+constexpr auto removed = "removed";
 constexpr auto configuration_alias = "configuration_alias";
 constexpr auto pipeline = "pipeline";
 }  // namespace filter

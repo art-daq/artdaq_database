@@ -31,7 +31,7 @@ int read_document(Options const& /*options*/, std::string const& /*file_name*/);
 int configuration_composition(Options const& /*options*/, std::string& /*confcomp*/);
 
 int main(int argc, char* argv[]) try {
-  auto start = std::chrono::high_resolution_clock::now();
+  auto start = std::chrono::steady_clock::now();
 
   std::ostringstream descstr;
   descstr << argv[0] << " <-p <path>> <other-options>";
@@ -176,7 +176,7 @@ int main(int argc, char* argv[]) try {
     worker.join();
   }
 
-  auto elapsed_time = std::chrono::high_resolution_clock::now() - start;
+  auto elapsed_time = std::chrono::steady_clock::now() - start;
 
   std::stringstream oss;
 

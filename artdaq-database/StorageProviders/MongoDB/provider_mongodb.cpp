@@ -467,48 +467,49 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::findRuns(JSOND
   TLOG(15) << "MongoDB::findRuns() args regex_search=<" << regex_search << ">";
 
   mongocxx::pipeline stages;
-  bbs::document project_stage;
+  bbs::document project_stage, unwind_stage, sort_stage;
   auto match_stage = bsoncxx::builder::core(false);
   auto bson_search = compat::from_json(regex_search);
   match_stage.concatenate(bson_search.view());
 
   project_stage << "_id" << 0 << "run"
-                << "$run"
-                << "entities"
-                << "$entities.name";
+                << "$runs.name"
+                << "assigned"
+                << "$runs.assigned";
 
   stages.match(match_stage.view_document()).project(project_stage.view());
+
+  unwind_stage << "path"
+               << "$run";
+  stages.unwind(unwind_stage.view());
+
+  sort_stage << "assigned" << 1 << "run" << 1;
+  stages.sort(sort_stage.view());
 
   TLOG(15) << "MongoDB::findRuns()  query_payload=<" << compat::to_json(stages.view_array()) << ">";
 
   auto cursor = collection.aggregate(stages);
 
   for (auto const& view : cursor) {
-    auto run = view.find("run");
-    auto run_name = compat::to_json(run->get_value());
+    auto run_name = compat::to_json(view.find("run")->get_value());
+    auto assigned = compat::to_json(view.find("assigned")->get_value());
 
-    auto entities = view.find("entities")->get_array();
+    std::ostringstream oss;
+    oss << "{";
+    oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
+    oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::mongo) << ",";
+    oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
+    oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument) << ",";
+    oss << db::quoted_(apiliteral::option::searchfilter) << ":"
+        << "{";
+    oss << db::quoted_(apiliteral::filter::run) << ": " << run_name;
+    oss << db::quoted_(apiliteral::filter::assigned) << ": " << assigned;
+    oss << "}";
+    oss << "}";
 
-    for (auto const& entity : entities.value) {
-      auto entity_name = compat::to_json(entity.get_value());
+    TLOG(14) << "MongoDB::findRuns() found document=<" << oss.str() << ">";
 
-      std::ostringstream oss;
-      oss << "{";
-      oss << db::quoted_(apiliteral::option::collection) << ":" << db::quoted_(collection_name) << ",";
-      oss << db::quoted_(apiliteral::option::provider) << ":" << db::quoted_(apiliteral::provider::mongo) << ",";
-      oss << db::quoted_(apiliteral::option::format) << ":" << db::quoted_(apiliteral::format::gui) << ",";
-      oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument) << ",";
-      oss << db::quoted_(apiliteral::option::searchfilter) << ":"
-          << "{";
-      oss << db::quoted_(apiliteral::filter::run) << ": " << run_name;
-      oss << "," << db::quoted_(apiliteral::filter::entities) << ": " << entity_name;
-      oss << "}";
-      oss << "}";
-
-      TLOG(14) << "MongoDB::findRuns() found document=<" << oss.str() << ">";
-
-      returnCollection.emplace_back(oss.str());
-    }
+    returnCollection.emplace_back(oss.str());
   }
 
   return returnCollection;
@@ -700,6 +701,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::listDatabases(
     TLOG(19) << "MongoDB::listDatabases() found databases=<" << compat::to_json(databaseDescriptor) << ">";
 
     auto element_name = databaseDescriptor.find(jsonliteral::name);
+    auto element_name = databaseDescriptor.find(jsonliteral::name);
 
     if (element_name == databaseDescriptor.end()) {
       throw runtime_error("MongoDB") << "MongoDB returned invalid database descriptor.";
@@ -814,5 +816,3 @@ void enable() {
 }  // namespace debug
 }  // namespace mongo
 
-}  // namespace database
-}  // namespace artdaq
