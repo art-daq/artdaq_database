@@ -32,7 +32,9 @@ struct DBConfig final {
 class MongoDB final {
  public:
   static std::shared_ptr<MongoDB> create(DBConfig const& config) {
-    return std::make_shared<MongoDB, DBConfig const&, PassKeyIdiom const&>(config, {});
+    // reuse mongodb connection
+    static auto instance_sptr = std::make_shared<MongoDB, DBConfig const&, PassKeyIdiom const&>(config, {});
+    return instance_sptr;
   }
 
   class PassKeyIdiom final {
