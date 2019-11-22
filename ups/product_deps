@@ -1,7 +1,7 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_database  v1_04_79
-defaultqual	e17:s82
+parent artdaq_database  v1_04_80
+defaultqual	e17:s83
 
 # These optional lines define the installed directories where
 # headers, libraries, and executables will be found
@@ -26,6 +26,8 @@ boost		v1_69_0         s82
 boost		v1_69_0         s83
 boost		v1_66_0a        s85
 boost		v1_70_0         s87
+boost		v1_69_0         s92
+boost		v1_70_0         s94
 mongodb         v4_0_8b
 python          v2_7_14b        s65
 python          v2_7_14b        s67
@@ -34,15 +36,33 @@ python		v2_7_15a	s82
 python		v2_7_15a	s83
 python		v2_7_15a	s85
 python		v2_7_15a	s87
-TRACE           v3_15_03    	-   	only_for_build
+python		v2_7_15a	s92
+python		v2_7_15a	s94
+TRACE           v3_15_05    	-   	only_for_build
 swig            v4_0_0	        -	only_for_build
 nodejs		v10_15_0	-	only_for_build
-cetbuildtools	v7_13_02	-	only_for_build
+cetbuildtools	v7_14_00	-	only_for_build
 end_product_list
 
 # -nq- means there is no qualifier
 # a "-" means the dependent product is not required by the parent and will not be setup
 qualifier	boost  	   mongodb	python	TRACE    swig		nodejs	notes
+e19:s94:debug   e19:debug  e19:debug 	-nq-	-nq-     e19:debug	-nq-	-std=c++17
+e19:s94:debug   e19:debug  e19:debug 	-nq-	-nq-     e19:debug	-nq-	-std=c++17
+e19:s94:prof    e19:prof   e19:prof	-nq-	-nq-     e19:prof	-nq-	-std=c++17
+c7:s94:debug   	c7:debug   c7:debug 	-nq-	-nq-     c7:debug	-nq-	-std=c++17
+c7:s94:prof    	c7:prof	   c7:prof	-nq-	-nq-     c7:prof	-nq-	-std=c++17
+e17:s94:debug   e17:debug  e17:debug 	-nq-	-nq-     e17:debug	-nq-	-std=c++17
+e17:s94:prof    e17:prof   e17:prof	-nq-	-nq-     e17:prof	-nq-	-std=c++17
+c2:s94:debug   	c2:debug   c2:debug 	-nq-	-nq-     c2:debug	-nq-	-std=c++17
+c2:s94:prof    	c2:prof	   c2:prof	-nq-	-nq-     c2:prof	-nq-	-std=c++17
+e19:s92:prof    e19:prof   e19:prof	-nq-	-nq-     e19:prof	-nq-	-std=c++17
+c7:s92:debug   	c7:debug   c7:debug 	-nq-	-nq-     c7:debug	-nq-	-std=c++17
+c7:s92:prof    	c7:prof	   c7:prof	-nq-	-nq-     c7:prof	-nq-	-std=c++17
+e17:s92:debug   e17:debug  e17:debug 	-nq-	-nq-     e17:debug	-nq-	-std=c++17
+e17:s92:prof    e17:prof   e17:prof	-nq-	-nq-     e17:prof	-nq-	-std=c++17
+c2:s92:debug   	c2:debug   c2:debug 	-nq-	-nq-     c2:debug	-nq-	-std=c++17
+c2:s92:prof    	c2:prof	   c2:prof	-nq-	-nq-     c2:prof	-nq-	-std=c++17
 e19:s87:debug   e19:debug  e19:debug 	-nq-	-nq-     e19:debug	-nq-	-std=c++17
 e19:s87:prof    e19:prof   e19:prof	-nq-	-nq-     e19:prof	-nq-	-std=c++17
 c7:s87:debug   	c7:debug   c7:debug 	-nq-	-nq-     c7:debug	-nq-	-std=c++17
