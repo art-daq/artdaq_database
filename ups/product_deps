@@ -48,7 +48,6 @@ end_product_list
 # a "-" means the dependent product is not required by the parent and will not be setup
 qualifier	boost  	   mongodb	python	TRACE    swig		nodejs	notes
 e19:s94:debug   e19:debug  e19:debug 	-nq-	-nq-     e19:debug	-nq-	-std=c++17
-e19:s94:debug   e19:debug  e19:debug 	-nq-	-nq-     e19:debug	-nq-	-std=c++17
 e19:s94:prof    e19:prof   e19:prof	-nq-	-nq-     e19:prof	-nq-	-std=c++17
 c7:s94:debug   	c7:debug   c7:debug 	-nq-	-nq-     c7:debug	-nq-	-std=c++17
 c7:s94:prof    	c7:prof	   c7:prof	-nq-	-nq-     c7:prof	-nq-	-std=c++17
@@ -57,6 +56,7 @@ e17:s94:prof    e17:prof   e17:prof	-nq-	-nq-     e17:prof	-nq-	-std=c++17
 c2:s94:debug   	c2:debug   c2:debug 	-nq-	-nq-     c2:debug	-nq-	-std=c++17
 c2:s94:prof    	c2:prof	   c2:prof	-nq-	-nq-     c2:prof	-nq-	-std=c++17
 e19:s92:prof    e19:prof   e19:prof	-nq-	-nq-     e19:prof	-nq-	-std=c++17
+e19:s92:debug   e19:debug  e19:debug 	-nq-	-nq-     e19:debug	-nq-	-std=c++17
 c7:s92:debug   	c7:debug   c7:debug 	-nq-	-nq-     c7:debug	-nq-	-std=c++17
 c7:s92:prof    	c7:prof	   c7:prof	-nq-	-nq-     c7:prof	-nq-	-std=c++17
 e17:s92:debug   e17:debug  e17:debug 	-nq-	-nq-     e17:debug	-nq-	-std=c++17
