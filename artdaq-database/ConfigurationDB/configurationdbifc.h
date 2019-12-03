@@ -295,9 +295,14 @@ struct ConfigurationInterface final {
       opts.configuration("*");
 
       if (!mongosearch.empty()) {
-        if (opts.provider() == apiliteral::provider::mongo || opts.provider() == apiliteral::provider::filesystem) {
-          opts.configuration(mongosearch);
+        if (opts.provider() == apiliteral::provider::mongo) {
+          if (mongosearch != "*")
+            opts.configuration(mongosearch);
+          else
+            opts.configuration("");
         }
+      } else if (opts.provider() == apiliteral::provider::filesystem) {
+        opts.configuration(mongosearch);
       }
 
       auto apiCallResult = impl::find_configurations(opts);
@@ -331,7 +336,7 @@ struct ConfigurationInterface final {
     }
 
     return returnSet;  // RVO
-  }
+  }                    // namespace configuration
 
   //==============================================================================
   //
@@ -508,7 +513,7 @@ struct ConfigurationInterface final {
   ConfigurationInterface(ConfigurationInterface const&) = delete;
   ConfigurationInterface& operator=(ConfigurationInterface const&) = delete;
   ConfigurationInterface& operator=(ConfigurationInterface&&) = delete;
-};
+};  // namespace configuration
 
 }  // namespace configuration
 }  // namespace database
