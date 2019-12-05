@@ -467,24 +467,33 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::findRuns(JSOND
   TLOG(15) << "MongoDB::findRuns() args regex_search=<" << regex_search << ">";
 
   mongocxx::pipeline stages;
-  bbs::document project_stage, unwind_stage, sort_stage;
   auto match_stage = bsoncxx::builder::core(false);
   auto bson_search = compat::from_json(regex_search);
   match_stage.concatenate(bson_search.view());
 
-  project_stage << "_id" << 0 << "run"
-                << "$runs.name"
-                << "assigned"
-                << "$runs.assigned";
+  stages.match(match_stage.view_document());
+  stages.project(bbs::document{} << "_id" << 0 << "run"
+                                 << "$runs.name"
+                                 << "assigned"
+                                 << "$runs.assigned" << bbs::finalize);
 
-  stages.match(match_stage.view_document()).project(project_stage.view());
+  stages.unwind(bbs::document{} << "path"
+                                << "$run" << bbs::finalize);
 
-  unwind_stage << "path"
-               << "$run";
-  stages.unwind(unwind_stage.view());
+  stages.unwind(bbs::document{} << "path"
+                                << "$assigned" << bbs::finalize);
 
-  sort_stage << "assigned" << 1 << "run" << 1;
-  stages.sort(sort_stage.view());
+  stages.group(bbs::document{} << "_id"
+                               << "$run"
+                               << "assigned" << bbs::open_document << "$max"
+                               << "$assigned" << bbs::close_document << bbs::finalize);
+
+  stages.project(bbs::document{} << "_id" << 0 << "run"
+                                 << "$_id"
+                                 << "assigned"
+                                 << "$assigned" << bbs::finalize);
+
+  stages.sort(bbs::document{} << "assigned" << 1 << "run" << 1 << bbs::finalize);
 
   TLOG(15) << "MongoDB::findRuns()  query_payload=<" << compat::to_json(stages.view_array()) << ">";
 
@@ -502,7 +511,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::findRuns(JSOND
     oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::readdocument) << ",";
     oss << db::quoted_(apiliteral::option::searchfilter) << ":"
         << "{";
-    oss << db::quoted_(apiliteral::filter::run) << ": " << run_name;
+    oss << db::quoted_(apiliteral::filter::run) << ": " << run_name << ",";
     oss << db::quoted_(apiliteral::filter::assigned) << ": " << assigned;
     oss << "}";
     oss << "}";
@@ -701,7 +710,6 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::listDatabases(
     TLOG(19) << "MongoDB::listDatabases() found databases=<" << compat::to_json(databaseDescriptor) << ">";
 
     auto element_name = databaseDescriptor.find(jsonliteral::name);
-    auto element_name = databaseDescriptor.find(jsonliteral::name);
 
     if (element_name == databaseDescriptor.end()) {
       throw runtime_error("MongoDB") << "MongoDB returned invalid database descriptor.";
@@ -816,3 +824,5 @@ void enable() {
 }  // namespace debug
 }  // namespace mongo
 
+}  // namespace database
+}  // namespace artdaq

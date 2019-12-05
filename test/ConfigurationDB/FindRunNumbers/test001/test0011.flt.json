@@ -1,0 +1,7 @@
+{
+    "filter" : {"runs.name" : "*"},
+    "collection":"artdaq_Aggregator",
+    "dbprovider":"mongo",
+    "operation":"findruns",
+    "dataformat":"gui"
+}

@@ -303,10 +303,7 @@ std::vector<JSONDocument> prov::findRuns(ManageDocumentOperation const& options,
 
   auto search_results = provider->findRuns<JSONDocument>(options);
 
-  auto ex = std::regex(
-      "\"run\"\\s*:\\s*\"((\\\\\"|[^\"])*)\"\\,\\s*"
-      "\"entities\\.name\"\\s*:\\s*\"((\\\\\"|"
-      "[^\"])*)\"");
+  auto ex = std::regex("\"run\"\\s*:\\s*\"([^\"]*)\"\\s*\\,\\s*\"assigned\"\\s*:\\s\"([^\"]*)\"");
 
   for (auto const& search_result : search_results) {
     auto filter_json = search_result.findChild("filter").value();
@@ -327,7 +324,7 @@ std::vector<JSONDocument> prov::findRuns(ManageDocumentOperation const& options,
     }
 #endif
 
-    if (results.size() != 5) {
+    if (results.size() != 3) {
       throw runtime_error("operation_findruns") << "Unsupported filter string, wrong result count";
     }
 

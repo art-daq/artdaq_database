@@ -1,0 +1,26 @@
+
+{ "search": [
+  {
+    "name" : "200@TEST_RUN_NUMBER@",
+    "query" : {
+      "dbprovider" : "filesystem",
+      "dataformat" : "gui",
+      "operation" : "buildfilter",
+      "filter" : {
+        "run" : "200@TEST_RUN_NUMBER@",
+        "assigned" : "2017-07-18T12:48:10.123-0500"
+      }
+    }
+  },{
+  "name" : "100@TEST_RUN_NUMBER@",
+  "query" : {
+    "dbprovider" : "filesystem",
+    "dataformat" : "gui",
+    "operation" : "buildfilter",
+    "filter" : {
+      "run" : "100@TEST_RUN_NUMBER@",
+      "assigned" : "2017-07-18T12:48:10.123-0500"
+    }
+  }
+  }] 
+}

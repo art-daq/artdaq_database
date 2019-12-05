@@ -27,7 +27,7 @@ class SearchIndex final {
 
   std::vector<object_id_t> findDocumentIDs(JSONDocument const&);
   std::vector<std::pair<std::string, std::string>> findAllGlobalConfigurations(JSONDocument const&);
-  std::vector<std::pair<std::string, std::string>> findAllRuns(JSONDocument const&);
+  std::vector<std::string> findAllRuns(JSONDocument const&);
   std::vector<std::pair<std::string, std::string>> findVersionsByGlobalConfigName(JSONDocument const&);
   std::vector<std::pair<std::string, std::string>> findVersionsByEntityName(JSONDocument const&);
 

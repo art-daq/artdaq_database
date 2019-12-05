@@ -308,16 +308,15 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::findRuns(
 
     SearchIndex search_index(index_path);
 
-    auto runentityname_pairs = search_index.findAllRuns(query_payload);
+    auto runs = search_index.findAllRuns(query_payload);
 
-    TLOG(15) << "FileSystemDB::findRuns() search returned " << runentityname_pairs.size() << " runs.";
-    for (auto const& runentityname_pair : runentityname_pairs) {
-      auto const& name = runentityname_pair.first;
+    TLOG(15) << "FileSystemDB::findRuns() search returned " << runs.size() << " runs.";
+    for (auto const& run : runs) {
       std::ostringstream oss;
-      oss << "{" << db::quoted_(apiliteral::filter::runs) << ":" << db::quoted_(name) << "}";
+      oss << "{" << db::quoted_(apiliteral::filter::runs) << ":" << db::quoted_(run) << "}";
       auto timestamps = search_index.getRunAssignedTimestamps(oss.str());
       for (auto const& assigned : timestamps) {
-        run_timestamps[name].insert(std::chrono::duration_cast<std::chrono::seconds>(db::to_timepoint(assigned).time_since_epoch()).count());
+        run_timestamps[run].insert(std::chrono::duration_cast<std::chrono::seconds>(db::to_timepoint(assigned).time_since_epoch()).count());
       }
     }
   }
@@ -337,7 +336,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::findRuns(
     oss << db::quoted_(apiliteral::option::operation) << ":" << db::quoted_(apiliteral::operation::confcomposition) << ",";
     oss << db::quoted_(apiliteral::option::searchfilter) << ":"
         << "{";
-    oss << db::quoted_(apiliteral::filter::run) << ": " << db::quoted_(cfg.second);
+    oss << db::quoted_(apiliteral::filter::run) << ": " << db::quoted_(cfg.second) << ",";
     oss << db::quoted_(apiliteral::filter::assigned) << ": "
         << db::quoted_(db::to_string(std::chrono::time_point<std::chrono::steady_clock>(std::chrono::seconds(cfg.first))));
     oss << "}";

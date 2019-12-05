@@ -12,7 +12,7 @@ cet_make_exec(ConfigurationDB_t
 ) 
 
 
-add_subdirectory(ReadWrite)
+#add_subdirectory(ReadWrite)
 #add_subdirectory(UtilsOperations)
 #add_subdirectory(ManageConfigs)
 #add_subdirectory(BulkOperations)
@@ -25,3 +25,4 @@ add_subdirectory(ReadWrite)
 
 ##add_subdirectory(Utils)
 
+add_subdirectory(FindRunNumbers)

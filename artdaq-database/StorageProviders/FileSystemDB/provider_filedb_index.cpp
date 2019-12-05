@@ -283,9 +283,9 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findAllGlobalConfi
   return _indexed_filtered_innerjoin_over_ouid(apiliteral::filter::entities, apiliteral::filter::configurations, configFilter);
 }
 
-std::vector<std::pair<std::string, std::string>> SearchIndex::findAllRuns(JSONDocument const& search) {
+std::vector<std::string> SearchIndex::findAllRuns(JSONDocument const& search) {
   confirm(!search.empty());
-  auto returnCollection = std::vector<std::pair<std::string, std::string>>{};
+  auto returnCollection = std::vector<std::string>{};
   TLOG(15) << "StorageProvider::FileSystemDB::index::findAllRuns() begin";
   TLOG(15) << "StorageProvider::FileSystemDB::index::findAllRuns() args search=<" << search << ">.";
 
@@ -298,15 +298,15 @@ std::vector<std::pair<std::string, std::string>> SearchIndex::findAllRuns(JSONDo
     return returnCollection;
   }
 
-  auto configFilter = std::string{};
+  auto runFilter = std::string{};
 
   try {
-    configFilter = boost::get<std::string>(search_ast.at(apiliteral::filter::runs));
-    TLOG(15) << "StorageProvider::FileSystemDB::index::findAllRuns() Found filter=<" << configFilter << ">.";
+    runFilter = boost::get<std::string>(search_ast.at(apiliteral::filter::runs));
+    TLOG(15) << "StorageProvider::FileSystemDB::index::findAllRuns() Found filter=<" << runFilter << ">.";
   } catch (...) {
   }
 
-  return _indexed_filtered_innerjoin_over_ouid(apiliteral::filter::entities, apiliteral::filter::configurations, configFilter);
+  return _filtered_attribute_list(apiliteral::filter::runs, runFilter);
 }
 
 std::vector<std::string> SearchIndex::getConfigurationAssignedTimestamps(JSONDocument const& search) {

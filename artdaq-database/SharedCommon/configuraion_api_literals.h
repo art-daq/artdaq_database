@@ -141,7 +141,7 @@ constexpr auto empty_search_result = "{\"search\":[ ]}";
 constexpr auto empty_filesystem_index =
     "{\"ouid\":[], \"version\":{},\"configurations.name\":{}, "
     "\"entities.name\":{},\"aliases.active.name\":{}, "
-    "\"runs.name\":{},\"configurations.assigned\":{} }";
+    "\"runs.name\":{},\"configurations.assigned\":{},\"runs.assigned\":{} }";
 
 constexpr auto bzip2base64 = "ascii.tar.bzip2.base64";
 constexpr auto tmpdirprefix = "/tmp/adb";
