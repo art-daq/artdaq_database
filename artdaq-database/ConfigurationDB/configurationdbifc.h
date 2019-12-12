@@ -281,9 +281,9 @@ struct ConfigurationInterface final {
   }
 
   //==============================================================================
-  // returns a set of global configuration names matching the mongosearch
+  // returns a set of global configuration names matching the search
   // criteria, or all global configuration names if criteria is emapty.
-  std::set<std::string> findGlobalConfigurations(std::string const& mongosearch) const {
+  std::set<std::string> findGlobalConfigurations(std::string const& search) const {
     auto returnSet = std::set<std::string>{};  // RVO
 
     constexpr auto apifunctname = "ConfigurationInterface::findGlobalConfigurations";
@@ -294,15 +294,12 @@ struct ConfigurationInterface final {
       opts.format(data_format_t::gui);
       opts.configuration("*");
 
-      if (!mongosearch.empty()) {
-        if (opts.provider() == apiliteral::provider::mongo) {
-          if (mongosearch != "*")
-            opts.configuration(mongosearch);
-          else
-            opts.configuration("");
+      if (!search.empty()) {
+        if (opts.provider() == apiliteral::provider::mongo && search == "*") {
+          opts.configuration("");
+        } else {
+          opts.configuration(search);
         }
-      } else if (opts.provider() == apiliteral::provider::filesystem) {
-        opts.configuration(mongosearch);
       }
 
       auto apiCallResult = impl::find_configurations(opts);
