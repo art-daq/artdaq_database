@@ -294,13 +294,7 @@ struct ConfigurationInterface final {
       opts.format(data_format_t::gui);
       opts.configuration("*");
 
-      if (!search.empty()) {
-        if (opts.provider() == apiliteral::provider::mongo && search == "*") {
-          opts.configuration("");
-        } else {
-          opts.configuration(search);
-        }
-      }
+      if (!search.empty()) opts.configuration(search);
 
       auto apiCallResult = impl::find_configurations(opts);
 
