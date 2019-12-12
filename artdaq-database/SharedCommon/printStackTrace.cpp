@@ -23,6 +23,10 @@
 #undef TRACE_NAME
 #endif
 
+#ifndef TRACE_LVL
+#define TRACE_LVL 11
+#endif
+
 #define TRACE_NAME "printStackTrace.cpp"
 
 namespace debug {
@@ -145,12 +149,12 @@ void signalHandler(int signum) {
   }
 
   if (name != nullptr) {
-    TLOG(11) << "Caught signal " << signum << " (" << name << ")";
+    TLOG(TRACE_LVL) << __func__ << ": Caught signal " << signum << " (" << name << ")";
   } else {
-    TLOG(11) << "Caught signal " << signum;
+    TLOG(TRACE_LVL) << __func__ << ": Caught signal " << signum;
   }
 
-  TLOG(11) << "" << getStackTrace();
+  TLOG(TRACE_LVL) << __func__ << ": " << getStackTrace();
 
   exit(signum);
 }
@@ -166,28 +170,28 @@ void terminateHandler() {
       char funcname[1024];
       int status = 0;
 
-      TLOG(11) << "Terminate called after throwing an instance of \'" << abi::__cxa_demangle(typeid(ex).name(), funcname, &funcnamesize, &status)
-               << "\'";
+      TLOG(TRACE_LVL) << __func__ << ": Terminate called after throwing an instance of \'"
+                      << abi::__cxa_demangle(typeid(ex).name(), funcname, &funcnamesize, &status) << "\'";
 
-      TLOG(11) << " what(): " << ex.what();
+      TLOG(TRACE_LVL) << __func__ << ": what(): " << ex.what();
 
-      TLOG(11) << " details: " << pending;
+      TLOG(TRACE_LVL) << __func__ << ": details: " << pending;
 
     } catch (...) {
-      TLOG(11) << "Terminate called after throwing an instance of unknown exception";
+      TLOG(TRACE_LVL) << __func__ << ": Terminate called after throwing an instance of unknown exception";
     }
   } else {
-    TLOG(11) << "Terminate called";
+    TLOG(TRACE_LVL) << __func__ << ": Terminate called";
   }
 
-  TLOG(11) << getStackTrace();
+  TLOG(TRACE_LVL) << __func__ << ": " << getStackTrace();
 
   exit(SIGTERM);
 }
 
 void uncaughtExceptionHandler() {
-  TLOG(11) << "Unexpected handler function called.";
-  TLOG(11) << getCxaThrowStack();
+  TLOG(TRACE_LVL) << __func__ << ": Unexpected handler function called.";
+  TLOG(TRACE_LVL) << __func__ << ": " << getCxaThrowStack();
   terminateHandler();
 }
 

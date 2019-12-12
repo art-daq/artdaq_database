@@ -39,7 +39,7 @@ class DatabaseConfigurationInterface : public ConfigurationInterface {
   std::set<std::string /*name*/> listConfigurationsTypes() const;
 
   // find all global configurations in database
-  std::set<std::string /*name*/> findAllGlobalConfigurations() const;
+  std::set<std::string /*name*/> findAllGlobalConfigurations(std::string const& /*search*/ = "") const;
 
   // return the contents of a global configuration
   config_version_map_t loadGlobalConfiguration(std::string const& /*configuration*/) const;

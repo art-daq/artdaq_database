@@ -178,7 +178,8 @@ void db2gui::operator()(json_node_t& gui_node) const {
         try {
           object[literal::annotation] = (metadata_node.hasMetadata() ? metadata_node.annotation() : std::string{apiliteral::nullstring});
         } catch (std::out_of_range const& ex) {
-          TLOG(37) << "json_db_to_gui() missing annotation for string data; key" << data_node.value<data_t>().key;
+          auto buff = std::string{"json_db_to_gui() missing annotation for string data; key"}.append(data_node.value<data_t>().key);
+          TLOG(37) << buff;
           object[literal::annotation] = std::string{apiliteral::nullstring};
         }
       }
@@ -322,7 +323,7 @@ bool artdaq::database::json_gui_to_db(std::string const& gui_json, std::string& 
   return true;
 }
 
-void gui2db::operator()(json_node_t& data_node[[gnu::unused]], json_node_t& metadata_node[[gnu::unused]]) const {
+void gui2db::operator()(json_node_t& data_node [[gnu::unused]], json_node_t& metadata_node [[gnu::unused]]) const {
   TLOG(54) << "json_gui_to_db() operator() begin";
 
   auto gui_node = gui_node_t(_gui_node);

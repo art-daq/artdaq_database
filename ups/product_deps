@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_database  v1_04_80a
+parent artdaq_database  v1_04_81
 defaultqual	e17:s83
 
 # These optional lines define the installed directories where
@@ -26,7 +26,7 @@ boost		v1_69_0         s82
 boost		v1_69_0         s83
 boost		v1_66_0a        s85
 boost		v1_70_0         s87
-boost       v1_70_0         s89
+boost           v1_70_0         s89
 boost		v1_69_0         s92
 boost		v1_70_0         s94
 mongodb         v4_0_8b
@@ -37,7 +37,7 @@ python		v2_7_15a	s82
 python		v2_7_15a	s83
 python		v2_7_15a	s85
 python		v2_7_15a	s87
-python      v2_7_15a    s89
+python          v2_7_15a        s89
 python		v2_7_15a	s92
 python		v2_7_15a	s94
 TRACE           v3_15_05    	-   	only_for_build

@@ -125,10 +125,10 @@ std::set<std::string /*name*/> DatabaseConfigurationInterface::listConfiguration
 }
 
 // find all global configurations in database
-std::set<std::string /*name*/> DatabaseConfigurationInterface::findAllGlobalConfigurations() const try {
+std::set<std::string /*name*/> DatabaseConfigurationInterface::findAllGlobalConfigurations(std::string const& search) const try {
   auto ifc = db::ConfigurationInterface{default_dbprovider};
 
-  return ifc.findGlobalConfigurations("*");
+  return ifc.findGlobalConfigurations(search);
 } catch (std::exception const& e) {
   std::cout << "DBI Exception:" << e.what() << "\n";
   throw std::runtime_error(e.what());
