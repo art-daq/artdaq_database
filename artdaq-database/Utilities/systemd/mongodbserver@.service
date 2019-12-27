@@ -1,0 +1,36 @@
+# The mongodbserver service unit file
+#
+# Quick HowTo:
+# 1. Copy this file to /etc/systemd/system/mongodbserver@experiment_v4x_db.service
+# 2. Run "systemctl daemon-reload"
+# 3. Run "systemctl enable mongodbserver@experiment_v4x_db.service"
+# 5. Run "systemctl start mongodbserver@experiment_v4x_db.service"
+# 
+# 6. Check status "systemctl status mongodbserver@experiment_v4x_db.service"
+# 7. Stop "systemctl stop mongodbserver@experiment_v4x_db.service"
+
+
+[Unit]
+Description=Mongo database service
+After=syslog.target network.target
+
+[Service]
+Type=forking
+User=artdaq
+Group=artdaq
+
+EnvironmentFile=/data/artdaq_database/%i/mongod.env
+ExecStart=/data/artdaq_database/mongod-ctrl.sh start 
+ExecStop=/data/artdaq_database/mongod-ctrl.sh stop 
+#PIDFile=/data/artdaq_database/%i/var/tmp/mongod-%H.pid
+
+TimeoutSec=60
+Restart=always
+StartLimitInterval=200
+StartLimitBurst=1
+RestartSec=300
+
+[Install]
+WantedBy=multi-user.target
+
+

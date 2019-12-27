@@ -1,0 +1,36 @@
+# The mongodbarbiter service unit file
+#
+# Quick HowTo:
+# 1. Copy this file to /etc/systemd/system/mongodbarbiter@experiment_v4x_db.service
+# 2. Run "systemctl daemon-reload"
+# 3. Run "systemctl enable mongodbarbiter@experiment_v4x_db.service"
+# 5. Run "systemctl start mongodbarbiter@experiment_v4x_db.service"
+# 
+# 6. Check status "systemctl status mongodbarbiter@experiment_v4x_db.service"
+# 7. Stop "systemctl stop mongodbarbiter@experiment_v4x_db.service"
+
+
+[Unit]
+Description=Mongo database Arbiter
+After=syslog.target network.target
+
+[Service]
+Type=forking
+User=artdaq
+Group=artdaq
+
+EnvironmentFile=/data/artdaq_database/%i/mongod.env
+ExecStart=/data/artdaq_database/mongod-ctrl.sh start_arbiter 
+ExecStop=/data/artdaq_database/mongod-ctrl.sh stop_arbiter 
+#PIDFile=/data/artdaq_database/%i/var/tmp/mongod-%H-arb.pid
+
+TimeoutSec=60
+Restart=always
+StartLimitInterval=200
+StartLimitBurst=1
+RestartSec=300
+
+[Install]
+WantedBy=multi-user.target
+
+

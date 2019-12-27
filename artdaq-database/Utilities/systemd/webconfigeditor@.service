@@ -1,0 +1,33 @@
+# Quick HowTo:
+# 1. Copy this file to /etc/systemd/system/webconfigeditor@experiment_v4x_db.service
+# 2. Run "systemctl daemon-reload"
+# 3. Run "systemctl enable webconfigeditor@experiment_v4x_db.service"
+# 5. Run "systemctl start webconfigeditor@experiment_v4x_db.service"
+# 
+# 6. Check status "systemctl status webconfigeditor@experiment_v4x_db.service"
+# 7. Stop "systemctl stop webconfigeditor@experiment_v4x_db.service"
+
+[Unit]
+Description=WebConfigEditor service
+After=syslog.target network.target
+
+[Service]
+Type=forking
+User=experimentdaq
+Group=experiment
+
+EnvironmentFile=/data/artdaq_database/%i/webconfigeditor.env
+#Environment=NODE_ENV=production
+#ExecStartPre=/data/artdaq_database/webconfigeditor-ctrl.sh clean 
+ExecStart=/data/artdaq_database/webconfigeditor-ctrl.sh start 
+ExecStop=/data/artdaq_database/webconfigeditor-ctrl.sh stop 
+#ExecStopPost=/data/artdaq_database/webconfigeditor-ctrl.sh clean 
+PIDFile=/data/artdaq_database/%i/var/tmp/webconfigeditor.pid
+
+
+Restart=always
+RestartSec=120
+
+[Install]
+WantedBy=multi-user.target
+
