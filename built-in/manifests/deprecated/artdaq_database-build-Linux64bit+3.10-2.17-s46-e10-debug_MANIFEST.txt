@@ -1,9 +1,9 @@
 boost            v1_63_0a      boost-1.63.0a-sl7-x86_64-e10-debug.tar.bz2             -f  Linux64bit+3.10-2.17  -q  e10:debug
-cetbuildtools    v7_13_02      cetbuildtools-7.13.02-noarch.tar.bz2                   -f  NULL
+cetbuildtools    v7_14_00      cetbuildtools-7.14.00-noarch.tar.bz2                   -f  NULL
 cetlib_except    v1_01_00      cetlib_except-1.01.00-slf7-x86_64-e10-debug.tar.bz2    -f  Linux64bit+3.10-2.17  -q  e10:debug
 cetlib           v2_02_00      cetlib-2.02.00-slf7-x86_64-e10-debug.tar.bz2           -f  Linux64bit+3.10-2.17  -q  e10:debug
-cetpkgsupport    v1_13_00      cetpkgsupport-1.13.00-noarch.tar.bz2                   -f  NULL
-cmake            v3_13_2       cmake-3.13.2-sl7-x86_64.tar.bz2                        -f  Linux64bit+3.10-2.17
+cetpkgsupport    v1_14_01      cetpkgsupport-1.14.01-noarch.tar.bz2                   -f  NULL
+cmake            v3_14_3       cmake-3.14.3-sl7-x86_64.tar.bz2                        -f  Linux64bit+3.10-2.17
 fhiclcpp         v4_03_02      fhiclcpp-4.03.02-slf7-x86_64-e10-debug.tar.bz2         -f  Linux64bit+3.10-2.17  -q  e10:debug
 gcc              v4_9_3a       gcc-4.9.3a-sl7-x86_64.tar.bz2                          -f  Linux64bit+3.10-2.17
 python           v2_7_13b      python-2.7.13b-sl7-x86_64.tar.bz2                      -f  Linux64bit+3.10-2.17
@@ -13,6 +13,6 @@ qt               v5_7_1        qt-5.7.1-sl7-x86_64-e10.tar.bz2                  
 sqlite           v3_16_02_00a  sqlite-3.16.02.00a-sl7-x86_64.tar.bz2                  -f  Linux64bit+3.10-2.17
 swig             v3_0_12d      swig-3.0.12d-sl7-x86_64-e10-debug.tar.bz2              -f  Linux64bit+3.10-2.17  -q  e10:debug
 tbb              v2017_3c      tbb-2017.3c-sl7-x86_64-e10-debug.tar.bz2               -f  Linux64bit+3.10-2.17  -q  e10:debug
-TRACE            v3_15_02      TRACE-3.15.02-slf7-x86_64.tar.bz2                      -f  Linux64bit+3.10-2.17
+TRACE            v3_15_05      TRACE-3.15.05-slf7-x86_64.tar.bz2                      -f  Linux64bit+3.10-2.17
 ups              v5_2_0        ups-5.2.0-Linux64bit+3.10-2.17.tar.bz2                 -f  Linux64bit+3.10-2.17
 nodejs           v4_5_0        nodejs-4.5.0-noarch.tar.bz2                            -f  Linux64bit+3.10-2.17
