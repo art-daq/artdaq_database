@@ -26,9 +26,9 @@ find_program(mongod_bin name mongod HINTS $ENV{HOME} $ENV{MONGODB_FQ_DIR})
 configure_file("CTestCustom.cmake.in" ${CMAKE_BINARY_DIR}/CTestCustom.cmake)
 
 #test order is important
-add_subdirectory(JsonDocument)
-add_subdirectory(Overlay)
-add_subdirectory(DataFormats)
+#add_subdirectory(JsonDocument)
+#add_subdirectory(Overlay)
+#add_subdirectory(DataFormats)
 add_subdirectory(StorageProviders)
 
 add_subdirectory(ConfigurationDB)
