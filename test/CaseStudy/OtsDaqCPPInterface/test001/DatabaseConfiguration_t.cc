@@ -259,6 +259,26 @@ BOOST_AUTO_TEST_CASE(find_configuration_version) {
   BOOST_CHECK_EQUAL(found2, true);
 }
 
+BOOST_AUTO_TEST_CASE(find_configuration_version_loop) {
+  auto ifc = DatabaseConfigurationInterface();
+
+  std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();
+
+  auto list = ifc.getVersions(cfg1.get());
+
+  for (auto n = 0u; n < 1000u; n++) {
+    list = ifc.getVersions(cfg1.get());
+  }
+
+  auto found1 = (std::find(list.begin(), list.end(), fixture.version()) != list.end());
+
+  BOOST_CHECK_EQUAL(found1, true);
+
+  auto found2 = (std::find(list.begin(), list.end(), fixture.version() + 1) != list.end());
+
+  BOOST_CHECK_EQUAL(found2, true);
+}
+
 BOOST_AUTO_TEST_CASE(find_latest_configuration_version) {
   auto ifc = DatabaseConfigurationInterface();
 
