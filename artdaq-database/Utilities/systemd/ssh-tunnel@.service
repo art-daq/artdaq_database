@@ -1,0 +1,20 @@
+#cp /data/artdaq_database/ssh-tunnel@.service /etc/systemd/system/
+#systemctl daemon-reload
+#systemctl enable ssh-tunnel@experimentdaq01.service
+#systemctl restart ssh-tunnel@experimentdaq01.service
+
+[Unit]
+ Description=artdaq_database ssh tunnel
+ After=syslog.target network.target
+
+[Service]
+ Type=forking
+ User=experimentdaq
+ ExecStart=/data/artdaq_database/ssh-tunnel-ctr.sh %i
+ Restart=always
+ RestartSec=60
+
+[Install]
+ WantedBy=multi-user.target
+ 
+
