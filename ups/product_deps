@@ -58,6 +58,8 @@ c7:s89:debug       c7:debug     c7:debug     -nq-    -nq-     c7:debug       -nq
 c7:s89:prof        c7:prof      c7:prof      -nq-    -nq-     c7:prof        -nq-    -std=c++17
 c7:s92:debug       c7:debug     c7:debug     -nq-    -nq-     c7:debug       -nq-    -std=c++17
 c7:s92:prof        c7:prof      c7:prof      -nq-    -nq-     c7:prof        -nq-    -std=c++17
+c7:s94:debug       c7:debug     c7:debug     -nq-    -nq-     c7:debug       -nq-    -std=c++17
+c7:s94:prof        c7:prof      c7:prof      -nq-    -nq-     c7:prof        -nq-    -std=c++17
 c7:py2:s94:debug   c7:debug     c7:debug     -nq-    -nq-     c7:debug       -nq-    -std=c++17
 c7:py2:s94:prof    c7:prof      c7:prof      -nq-    -nq-     c7:prof        -nq-    -std=c++17
 e17:s83:debug      e17:debug    e17:debug    -nq-    -nq-     e17:debug      -nq-    -std=c++17
