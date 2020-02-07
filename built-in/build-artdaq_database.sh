@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# build in $WORKSPACE/build
-# copyback directory is $WORKSPACE/copyBack
+# build in ${working_dir}/build
+# copyback directory is ${working_dir}/copyBack
 
 usage()
 {
@@ -15,14 +15,14 @@ Options:
 EOF
 }
 
-working_dir=${WORKSPACE}
+working_dir=${WORKSPACE:-${HOME}/builds}
 version=${VERSION}
 qual_set="${QUAL}"
-build_type=${BUILDTYPE}
-git_branch=${ARTDAQ_DATABASE_GITBRANCH}
+build_type=${BUILDTYPE:-prof}
+git_branch=${ARTDAQ_DATABASE_GITBRANCH:-develop}
 
-squal=$(echo $qual_set | cut -d":" -f1 )
-basequal=$(echo $qual_set | cut -d":" -f2 )
+squal=${qual_set%:*}
+basequal=${qual_set##*:}
 
 dotver=$(echo ${version} | sed -e 's/_/./g' | sed -e 's/^v//')
 
@@ -48,19 +48,18 @@ set -x
 
 srcdir=${working_dir}/source
 blddir=${working_dir}/build
-productsdir=$WORKSPACE/products
-
+productsdir=${working_dir}/products
 
 
 function cleanup() {
 # start with clean directories
 rm -rf ${blddir}
 rm -rf ${srcdir}
-rm -rf $WORKSPACE/copyBack 
+rm -rf ${working_dir}/copyBack 
 # now make the dfirectories
 mkdir -p ${srcdir} || return 11
 mkdir -p ${blddir} || return 12
-mkdir -p $WORKSPACE/copyBack || return 13
+mkdir -p ${working_dir}/copyBack || return 13
 }
 
 function checkout_source() {
@@ -70,9 +69,15 @@ function checkout_source() {
 
   cd ${blddir} || return 21
 
-  git clone http://cdcvs.fnal.gov/projects/artdaq-utilities-database ${srcdir}/artdaq-database
-  cd ${srcdir}/artdaq-database
-  git checkout ${git_branch}
+  local_src=/mnt/sde/mu2etrg/lukhanin-develop001/srcs/artdaq-utilities-database
+	if [[ -d ${local_src} ]]; then
+	 	mkdir -p ${srcdir}/artdaq-database 
+		cp -r  ${local_src}/* ${srcdir}/artdaq-database/
+	else 
+	  git clone http://cdcvs.fnal.gov/projects/artdaq-utilities-database ${srcdir}/artdaq-database
+    cd ${srcdir}/artdaq-database
+    git checkout ${git_branch}
+	fi
 }
 
 function pull_products() {
@@ -93,7 +98,7 @@ function pull_products() {
   chmod +x ${productsdir}/pullProducts
 
   # we pull what we can so we don't have to build everything
-  ${productsdir}/pullProducts -l ${productsdir} ${flvr} artdaq_database-build ${squal}-${basequal} ${build_type}
+	${productsdir}/pullProducts -l ${productsdir} ${flvr} artdaq_database-build $(echo  ${squal}| sed -e 's/:/-/g')-${basequal} ${build_type}
   
   # Remove any artdaq_database that came with the bundle
   if [ -d ${productsdir}/artdaq_database ]; then
@@ -121,11 +126,12 @@ function run_build() {
   fi
   set +x
 
-  prodblddir=${blddir}/build-artdaq_database-${squal}${basequal}-${build_type}
+  prodblddir=${blddir}/build-artdaq_database-$(echo ${qual_set} | sed -e 's/://g')${build_type}
+
   mkdir -p  ${prodblddir}  || return 42
   cd ${prodblddir}
 
-  source ${srcdir}/artdaq-database/ups/setup_for_development ${build_flag} ${basequal} ${squal}
+	source ${srcdir}/artdaq-database/ups/setup_for_development ${build_flag} ${basequal} $(echo  ${squal} | sed -e 's/:/ /g')
 
   ups active
   export MAKE_FHICLCPP_STATIC=TRUE
@@ -136,26 +142,39 @@ function run_build() {
   unset RUN_TESTS
   CETPKG_J=$(nproc)
   buildtool -p -j$CETPKG_J 2>&1 |tee ${blddir}/build_artdaq-database.log || \
-  { mv ${blddir}/*.log  $WORKSPACE/copyBack/
+  { mv ${blddir}/*.log  ${working_dir}/copyBack/
     return 43 
   }
 
   export RUN_TESTS=true
   buildtool -j$CETPKG_J 2>&1 |tee ${blddir}/build_tests_artdaq-database.log || \
-  { mv ${blddir}/*.log  $WORKSPACE/copyBack/
+  { mv ${blddir}/*.log  ${working_dir}/copyBack/
     return 44 
   }
 
   CETPKG_J=1
-  
+   
+ 	export TRACE_NAME=$(echo ${qual_set} | sed -e 's/://g')${build_type}
+  export TRACE_FILE=/tmp/trace_buffer_$TRACE_NAME
+	[[ -f $TRACE_FILE ]] &&  rm $TRACE_FILE
+
+  export TRACE_MSGMAX=2000
+  export TRACE_NUMENTS=100000
+  tinfo
+  tenv
+  treset
+
   export PATH=${prodblddir}/bin:$PATH
   export LD_LIBRARY_PATH=${prodblddir}/lib:$LD_LIBRARY_PATH
 
   buildtool -t -j$CETPKG_J 2>&1 |tee ${blddir}/test_artdaq-database.log || \
-  { mv ${blddir}/*.log  $WORKSPACE/copyBack/
-    mv ${prodblddir}/{test,Testing}  $WORKSPACE/copyBack/
+  { mv ${blddir}/*.log  ${working_dir}/copyBack/
+    mv ${prodblddir}/{test,Testing}  ${working_dir}/copyBack/
+		tshow > ${working_dir}/copyBack/trace-$TRACE_NAME.txt 
     return 45 
   }
+
+	tshow > ${working_dir}/copyBack/trace-$TRACE_NAME.txt 
 }
 
 function stash_artifacts() {
@@ -163,12 +182,12 @@ function stash_artifacts() {
   echo "move files"
   echo
 
-  mv ${prodblddir}/*.bz2  $WORKSPACE/copyBack/
-  mv ${blddir}/*.bz2  $WORKSPACE/copyBack/
-  mv ${blddir}/*.txt  $WORKSPACE/copyBack/
-  mv ${blddir}/*.log  $WORKSPACE/copyBack/
-  mv ${blddir}  $WORKSPACE/copyBack/
-  mv ${srcdir}  $WORKSPACE/copyBack/
+  mv ${prodblddir}/*.bz2  ${working_dir}/copyBack/
+  mv ${blddir}/*.bz2  ${working_dir}/copyBack/
+  mv ${blddir}/*.txt  ${working_dir}/copyBack/
+  mv ${blddir}/*.log  ${working_dir}/copyBack/
+  mv ${blddir}  ${working_dir}/copyBack/
+  mv ${srcdir}  ${working_dir}/copyBack/
 
   echo
   echo "cleanup"
