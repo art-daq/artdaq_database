@@ -1,5 +1,5 @@
 boost            v1_70_0      boost-1.70.0-sl7-x86_64-c7-prof.tar.bz2              -f  Linux64bit+3.10-2.17  -q  c7:prof
-cetbuildtools    v7_14_00     cetbuildtools-7.14.00-noarch.tar.bz2                 -f  NULL
+cetbuildtools    v7_15_01     cetbuildtools-7.15.01-noarch.tar.bz2                 -f  NULL
 cetpkgsupport    v1_14_01     cetpkgsupport-1.14.01-noarch.tar.bz2                 -f  NULL
 cmake            v3_14_3      cmake-3.14.3-sl7-x86_64.tar.bz2                      -f  Linux64bit+3.10-2.17
 gcc              v8_2_0       gcc-8.2.0-sl7-x86_64.tar.bz2                         -f  Linux64bit+3.10-2.17
@@ -9,6 +9,6 @@ messagefacility  v2_04_03     messagefacility-2.04.03-slf7-x86_64-c7-prof.tar.bz
 mongodb          v4_0_8b      mongodb-4.0.8b-sl7-x86_64-c7-prof.tar.bz2            -f  Linux64bit+3.10-2.17  -q  c7:prof
 sqlite           v3_26_00_00  sqlite-3.26.00.00-sl7-x86_64.tar.bz2                 -f  Linux64bit+3.10-2.17
 swig             v4_0_0       swig-4.0.0-sl7-x86_64-c7-prof.tar.bz2                -f  Linux64bit+3.10-2.17  -q  c7:prof
-TRACE            v3_15_05     TRACE-3.15.05-sl7-x86_64.tar.bz2                     -f  Linux64bit+3.10-2.17
+TRACE            v3_15_07     TRACE-3.15.07-sl7-x86_64.tar.bz2                     -f  Linux64bit+3.10-2.17
 ups              v6_0_7       ups-6.0.7-Linux64bit+3.10-2.17.tar.bz2               -f  Linux64bit+3.10-2.17
 nodejs           v10_15_0     nodejs-10.15.0-noarch.tar.bz2                        -f  Linux64bit+3.10-2.17
