@@ -28,11 +28,12 @@ boost           v1_70_0         s94
 boost           v1_70_0         s95
 boost           v1_70_0         s96
 mongodb         v4_0_8b
-python          v3_7_2          py3
+python          v2_7_15a        s83
+python          v2_7_15a        s85
+python          v2_7_15a        s87
+python          v2_7_15a        s89
+python          v2_7_15a        s92
 python          v2_7_15a        py2
-python          v2_7_15a        !s94
-python          v2_7_15a        !s95
-python          v2_7_15a        !s96
 python          v3_7_2          -default-
 TRACE           v3_15_07        -       only_for_build
 swig            v4_0_0          -       only_for_build
