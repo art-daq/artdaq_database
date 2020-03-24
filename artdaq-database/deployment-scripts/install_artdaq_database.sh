@@ -4,9 +4,9 @@
 # overriden in $HOME/artdaq_database.env file if it exits. 
 # Main program starts at the bottom of this file.
 #----------------------------------------------------------------
-ARTDAQ_UPS_QUAL="e15:prof:s64"
-ARTDAQ_DB_UPS_VER=v1_04_69
-WEBEDITOR_UPS_VER=v1_01_01c
+ARTDAQ_UPS_QUAL="e19:prof:s89"
+ARTDAQ_DB_UPS_VER=v1_04_84
+WEBEDITOR_UPS_VER=v1_01_07
 
 
 ARTDAQ_BASE_DIR=/tmp/artdaq
@@ -16,8 +16,8 @@ ARTDAQ_DB_NAME=artdaq_db
 # overriden in $HOME/artdaq_database.env file if it exits. 
 # Main program starts at the bottom of this file.
 #----------------------------------------------------------------
-MONGOD_UPS_QUAL="e15:prof"
-MONGOD_UPS_VER=v3_4_6d
+MONGOD_UPS_QUAL="e19:prof"
+MONGOD_UPS_VER=v4_0_8b
 
 
 MONGOD_PORT=27037
@@ -26,13 +26,13 @@ WEBEDITOR_BASE_PORT=8880
 INACTIVE_DATABASES="cern_pddaq_v3x_db cern_pddaq_v3_db artdaq_db"
 
 INSTALL_TESTDATA_URI="https://cdcvs.fnal.gov/redmine/projects/artdaq-utilities/repository/database/revisions/develop/raw/test/testdata/np04_teststand_tests.taz"
+
+ARTDAQ_DB_ENV="$HOME/artdaq_database.env"
 #----------------------------------------------------------------
 # Implementaion
 # Main program starts at the bottom of this file.
 #----------------------------------------------------------------
 
-WEBEDITOR_UPS_QUAL=${ARTDAQ_UPS_QUAL}
-ARTDAQ_DB_UPS_QUAL=${ARTDAQ_UPS_QUAL}
 
 required_tools_list=(wget tar bzip2 gunzip sed find id basename crontab cat cut uniq tee)
 
@@ -50,8 +50,25 @@ ARTDAQ_DB_MANIFESTURL="notset"
 run_as_user=$(id -u -n )
 run_as_group=$(id -g -n ${run_as_user})
 
-source ${PRODUCTS_BASE_DIR}/setup
-unsetup_all  >/dev/null 2>&1 
+
+function configure_artdaqdb_env() {
+  printf "#-----------------------INSTALLING ARTDAQ DATABASE-----------------\n"
+
+  if [ ! -f ${ARTDAQ_DB_ENV} ]; then
+    echo "Warning: ${ARTDAQ_DB_ENV} is not found! Using reasonable defaults."; else
+    echo "Info: Found ${ARTDAQ_DB_ENV} found! Sourcing it."
+    printf "#-----------------------file contents begin----------------------\n"
+    cat ${ARTDAQ_DB_ENV}
+    printf "#-----------------------file contents end------------------------\n"  
+    source <(sed -E -n 's/[^#]+/export &/ p' ${ARTDAQ_DB_ENV})
+  fi
+
+  WEBEDITOR_UPS_QUAL=${ARTDAQ_UPS_QUAL}
+  ARTDAQ_DB_UPS_QUAL=${ARTDAQ_UPS_QUAL}
+  PRODUCTS_BASE_DIR=${ARTDAQ_BASE_DIR}/products
+  source ${PRODUCTS_BASE_DIR}/setup
+  unsetup_all  >/dev/null 2>&1 
+}
 
 function configure_pull_products() {
   ARTDAQ_DB_PULLPRODUCTS="slf7 artdaq_database-${ARTDAQ_DB_UPS_VER} $(echo $ARTDAQ_UPS_QUAL | cut -d":" -f3 )-$(echo $ARTDAQ_UPS_QUAL | cut -d":" -f1 ) $(echo $ARTDAQ_UPS_QUAL | cut -d":" -f2 )"
@@ -118,12 +135,7 @@ function have_artdaq_node_server(){
     printf "Info: WEBEDITOR_UPS_VER is set to '${WEBEDITOR_UPS_VER}'\n"
   fi
 
-  if [ -z ${WEBEDITOR_UPS_QUAL+x} ]; then
-    printf "Error: WEBEDITOR_UPS_QUAL is unset. Aborting.\n";return $rc_failure;  else
-    printf "Info: WEBEDITOR_UPS_QUAL is set to '${WEBEDITOR_UPS_QUAL}'\n"
-  fi
-
-  setup artdaq_node_server ${WEBEDITOR_UPS_VER} -q ${WEBEDITOR_UPS_QUAL} 
+  setup artdaq_node_server ${WEBEDITOR_UPS_VER} 
   RC=$?
   if [ $RC -ne 0 ]; then
     printf "Error: Failed setting artdaq_node_server. Aborting.\n"; return $rc_failure;
@@ -382,8 +394,7 @@ return $rc_success
 function copy_shell_scripts(){
   #----------------------------------------------------------------
   #-----------------------copy shell scripts-----------------------
-  filenames=(${ARTDAQ_DATABASE_DIR}/deployment-scripts/artdaq-database/\
-    {initd_functions,backup_artdaq_database.sh,webconfigeditor-ctrl.sh,mongod-ctrl.sh,setup_database.sh})
+  filenames=( ${ARTDAQ_DATABASE_DIR}/deployment-scripts/artdaq-database/{initd_functions,backup_artdaq_database.sh,webconfigeditor-ctrl.sh,mongod-ctrl.sh,setup_database.sh} )
       #----------------------------------------------------------------
       for filename in ${filenames[@]}
       do 
@@ -442,7 +453,7 @@ function copy_shell_scripts(){
 
 
       function check_mongod_instance(){
-        export ARTDAQ_DATABASE_URI="mongodb://127.0.0.1:${MONGOD_PORT}/cern_pddaq_db"
+        export ARTDAQ_DATABASE_URI="mongodb://127.0.0.1:${MONGOD_PORT}/${ARTDAQ_DB_NAME}"
         source <(sed -E -n 's/[^#]+/export &/ p'  ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/mongod.env)
 
         conftool_bin=$(command -v conftool.py)
@@ -493,7 +504,7 @@ function copy_shell_scripts(){
 
 
   function run_conftool_tests(){
-    export ARTDAQ_DATABASE_URI="mongodb://127.0.0.1:${MONGOD_PORT}/cern_pddaq_db"
+    export ARTDAQ_DATABASE_URI="mongodb://127.0.0.1:${MONGOD_PORT}/${ARTDAQ_DB_NAME}"
     #rm -rf ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/var/tmp/artdaqdb_test_data-*
     rm -rf /tmp/artdaqdb_test_data-*
 
@@ -556,8 +567,8 @@ function copy_shell_scripts(){
 
     printf "\nInfo: Running conftool.py tests\n"
 
-    test1=("\"listCollections\"" "\"SystemLayout\nRCEs\nSSPs\nexpert_options\nComponents\nTiming\nAggregators\nEventBuilders\ncommon_code\"")
-    test2=("\"listDatabases\"" "\"cern_pddaq_db\"")
+    test1=("\"listCollections\"" "\"common_code\nAggregators\nRCEs\nTiming\nexpert_options\nSSPs\nEventBuilders\nComponents\nHashes\nSystemLayout\n\"")
+    test2=("\"listDatabases\"" "\"config\nfnal_testdaq_v3x_db\n\"")
     test3=("\"getListOfAvailableRunConfigurationPrefixes\"" "\"np04_teststand_tests\"")
     test4=("\"getListOfAvailableRunConfigurations\"" "\"np04_teststand_tests00001\"")
     test5=("\"getListOfAvailableRunConfigurations np04_teststand\"" "\"np04_teststand_tests00001\"")
@@ -933,7 +944,8 @@ function pull_products(){
 
   local ups_tar_suffix=${TMP_PAR_LIST[0]}-x86_64-$(echo $ARTDAQ_UPS_QUAL | cut -d":" -f1 )-$(echo $ARTDAQ_UPS_QUAL | cut -d":" -f3 )-$(echo $ARTDAQ_UPS_QUAL | cut -d":" -f2 )
   echo "artdaq_database      ${ARTDAQ_DB_UPS_VER}        artdaq_database-$(echo $ARTDAQ_DB_UPS_VER|sed 's/_/./g'|sed -e 's/^v//')-${ups_tar_suffix}.tar.bz2     -f ${this_ups_flavor}    -q ${ARTDAQ_UPS_QUAL}" > ${ARTDAQ_DB_MANIFEST}
-  echo "artdaq_node_server   ${WEBEDITOR_UPS_VER}        artdaq_node_server-$(echo $WEBEDITOR_UPS_VER|sed 's/_/./g'|sed -e 's/^v//')-${ups_tar_suffix}.tar.bz2  -f ${this_ups_flavor}    -q ${ARTDAQ_UPS_QUAL}" >>${ARTDAQ_DB_MANIFEST}
+
+  echo "artdaq_node_server   ${WEBEDITOR_UPS_VER}        artdaq_node_server-$(echo $WEBEDITOR_UPS_VER|sed 's/_/./g'|sed -e 's/^v//')-${TMP_PAR_LIST[0]}-x86_64.tar.bz2  -f ${this_ups_flavor}  " >>${ARTDAQ_DB_MANIFEST}
 
   cat ${ARTDAQ_DB_MANIFEST_RAW} >> ${ARTDAQ_DB_MANIFEST}
   if [ $? -ne 0 ]; then
@@ -951,25 +963,6 @@ function pull_products(){
   ./pullProducts -l ../products ${ARTDAQ_DB_PULLPRODUCTS}
   if [ $? -ne 0 ]; then
     printf "Error: Failed pulling artdaq_database product bundle. Aborting.\n"; return $rc_failure
-  fi
-
-
-  local ARTDAQ_DB_CUR_VER=$(grep artdaq_database ${products_dir}/artdaq_node_server/${WEBEDITOR_UPS_VER}/ups/artdaq_node_server.table |cut -d' ' -f7|uniq)
-
-  if [ ! "${ARTDAQ_DB_CUR_VER}" == "${ARTDAQ_DB_UPS_VER}" ]; then
-    printf "Info: Updating the version of artdaq_database in artdaq_node_server.table from ${ARTDAQ_DB_CUR_VER} to ${ARTDAQ_DB_UPS_VER}.\n" 
-
-    sed -i "s/${ARTDAQ_DB_CUR_VER}/${ARTDAQ_DB_UPS_VER}/g" ${products_dir}/artdaq_node_server/${WEBEDITOR_UPS_VER}/ups/artdaq_node_server.table
-    if [ $? -ne 0 ]; then
-      printf "Error: Failed updating the version of artdaq_database in artdaq_node_server.table. Do this manually. Aborting.\n"; return $rc_failure
-    fi
-
-    ARTDAQ_DB_CUR_VER=$(grep artdaq_database ${products_dir}/artdaq_node_server/${WEBEDITOR_UPS_VER}/ups/artdaq_node_server.table |cut -d' ' -f7|uniq)
-
-    if [ "${ARTDAQ_DB_CUR_VER}" == "${ARTDAQ_DB_UPS_VER}" ]; then
-      printf "Info: Update succeeded.\n"; else
-      printf "Error: Failed updating the version of artdaq_database in artdaq_node_server.table. Do this manually. Aborting.\n"; return $rc_failure
-    fi
   fi
 
   sed -i "s/8080/${WEBEDITOR_BASE_PORT}/g" ${products_dir}/artdaq_node_server/${WEBEDITOR_UPS_VER}/config.json
@@ -994,31 +987,21 @@ function pull_products(){
 # Main program starts here.
 #----------------------------------------------------------------
 
-ARTDAQ_DB_ENV="$HOME/artdaq_database.env"
-
 reset
-printf "#-----------------------INSTALLING ARTDAQ DATABASE-----------------\n"
 
-if [ ! -f ${ARTDAQ_DB_ENV} ]; then
-  echo "Warning: ${ARTDAQ_DB_ENV} is not found! Using reasonable defaults."; else
-  echo "Info: Found ${ARTDAQ_DB_ENV} found! Sourcing it."
-  printf "#-----------------------file contents begin----------------------\n"
-  cat ${ARTDAQ_DB_ENV}
-  printf "#-----------------------file contents end------------------------\n"  
-  source <(sed -E -n 's/[^#]+/export &/ p' ${ARTDAQ_DB_ENV})
-fi
+configure_artdaqdb_env
 
 printf "\n\nAre you capturing the output with tee?\n Example: ./install_artdaq_database.sh | tee install.log\n"
 printf "\nPlease answer \"YesIam!\" or \"no\"."
 
-while $user_prompts; do
-  read answer
-  case $answer in
-    [YesIam!]* ) break;;
-    [Nn]* ) echo "Aborting installation...."; exit $rc_failure;;
-    * ) echo "Please answer \"YesIam!\" or \"no\".";;
-  esac
-done
+#while $user_prompts; do
+#  read answer
+#  case $answer in
+#    [YesIam!]* ) break;;
+#    [Nn]* ) echo "Aborting installation...."; exit $rc_failure;;
+#    * ) echo "Please answer \"YesIam!\" or \"no\".";;
+#  esac
+#done
 
 printf "\n\n"
 printf "During the installation you will be prompted to run two shell scripts as root.\n"
@@ -1030,23 +1013,26 @@ printf "\n\n"
 
 read -p "Press CTRL-C to abort or any other key to resume this script." answer
 
-DATABASE_BASE_DIR=$(dirname ${ARTDAQ_BASE_DIR})/database
+DATABASE_BASE_DIR=${ARTDAQ_BASE_DIR}/database
 PRODUCTS_BASE_DIR=${ARTDAQ_BASE_DIR}/products
 
-configure_pull_products
-if [[ $? -ne $rc_success ]]; then 
-  exit $?
-fi
+#configure_pull_products
+#if [[ $? -ne $rc_success ]]; then 
+#  exit $?
+#fi
 
-pull_products
-if [[ $? -ne $rc_success ]]; then 
-  exit $?
-fi
+#pull_products
+#if [[ $? -ne $rc_success ]]; then 
+#  exit $?
+#fi
 
 #apply_patches
 #if [[ $? -ne $rc_success ]]; then
 #   exit $?
 #fi
+
+source ${PRODUCTS_BASE_DIR}/setup
+unsetup_all  >/dev/null 2>&1 
 
 printf "Info: Configuring artdaq_database services to run using the following credentials:\n"
 printf "\t\tuser=${run_as_user}, group=${run_as_group}\n"

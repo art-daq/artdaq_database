@@ -66,7 +66,7 @@ fi
 
 
 DBBACKUP_DIR="${MONGOD_BASE_DIR}/${MONGOD_DATABASE_NAME}/backup/$(date +%Y%m%d%H%M%S)"
-DBBACKUP_LIST="cern_pddaq_db cern_pddaq_db_archive"
+DBBACKUP_LIST="${MONGOD_DATABASE_NAME} ${MONGOD_DATABASE_NAME}_archive"
 
 #exit $rc_failure
 unset http_proxy
