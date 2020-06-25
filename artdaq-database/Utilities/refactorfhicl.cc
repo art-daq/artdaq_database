@@ -52,10 +52,10 @@ std::ostream& operator<<(std::ostream& out, std::tuple<std::string const&, fhicl
     out << key << " : "
         << "{\n";
     std::stringstream ss;
-   // ::fhicl::extended_value::table_t const& tab = value;
-   // for (auto& entry : tab) {
-   //   ss << std::make_tuple<std::string const&, fhicl::extended_value const&, std::size_t>(entry.first,entry.second, il + 1, in_prolog);
-   // }
+    // ::fhicl::extended_value::table_t const& tab = value;
+    // for (auto& entry : tab) {
+    //   ss << std::make_tuple<std::string const&, fhicl::extended_value const&, std::size_t>(entry.first,entry.second, il + 1, in_prolog);
+    // }
 
     auto tmp_file = std::string{key}.append(lookup_version(key, ss.str())).append(".fcl");
 
@@ -159,8 +159,15 @@ int main(int argc, char* argv[]) try {
 
     auto regex = std::regex{"(#include\\s)([^'\"]*)"};
 
-    std::for_each(std::sregex_iterator(conf.begin(), conf.end(), regex), std::sregex_iterator(),
-                  [&conf, &idx](auto& m) { conf.replace(m.position(), m.length(), "fhicl_pound_include_" + std::to_string(idx++) + ":"); });
+    std::smatch match;
+    auto begin = conf.cbegin();
+    size_t offset = 0;
+
+    while (std::regex_search(begin, conf.cend(), match, regex)) {
+      conf.replace(offset + match.position(), match.length(), "fhicl_pound_include_" + std::to_string(idx++) + ":");
+      offset += match.position() + match.length();
+      std::advance(begin, match.position() + match.length());
+    }
   }
 
   ::fhicl::intermediate_table fhicl_table;
