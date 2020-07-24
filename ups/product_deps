@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_database  v1_04_84
+parent artdaq_database  v1_04_85
 defaultqual	e17:s83
 
 # These optional lines define the installed directories where
@@ -35,10 +35,10 @@ python          v2_7_15a        s89
 python          v2_7_15a        s92
 python          v2_7_15a        py2
 python          v3_7_2          -default-
-TRACE           v3_15_07        -       only_for_build
+TRACE           v3_15_09        -       only_for_build
 swig            v4_0_0          -       only_for_build
 nodejs          v10_15_0        -       only_for_build
-cetbuildtools   v7_15_01        -       only_for_build
+cetbuildtools   v7_17_01        -       only_for_build
 end_product_list
 
 # -nq- means there is no qualifier
