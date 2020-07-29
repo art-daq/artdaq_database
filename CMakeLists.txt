@@ -51,7 +51,7 @@ ENDIF()
 cet_report_compiler_flags()
 
 # these are minimum required versions, not the actual product versions
-find_ups_boost  ( v1_70_0 )
+find_ups_boost  ( v1_66_0a )
 find_ups_product( cetbuildtools v7_15_01 )
 find_ups_product( cetpkgsupport v1_14_01 )
 find_ups_product( mongodb v4_0_8 )  # find_ups_product doesn't like v4_0_8b
