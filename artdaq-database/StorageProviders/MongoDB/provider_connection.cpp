@@ -20,6 +20,8 @@
 #include <mongocxx/instance.hpp>
 #include <mongocxx/options/find.hpp>
 #include <mongocxx/pipeline.hpp>
+#include <mutex>
+#include <thread>
 #include <utility>
 
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -47,6 +49,21 @@ DBConfig::DBConfig() : uri{std::string{literal::MONGOURI} + literal::hostname + 
   if (tmpURI.length() > prefixURI.length() && std::equal(prefixURI.begin(), prefixURI.end(), tmpURI.begin())) {
     uri = tmpURI;
   }
+}
+
+std::shared_ptr<MongoDB> MongoDB::create(DBConfig const& config) {
+  // reuse mongodb connection
+  static std::mutex instances_mutex;
+  static auto instances = std::unordered_map<std::string, std::shared_ptr<MongoDB>>();
+
+  std::ostringstream oss;
+  oss << "Thread=" << std::this_thread::get_id() << ",URI=" << config.connectionURI();
+  auto key = oss.str();
+
+  TLOG(11) << "StorageProvider::MongoDB::create " << key;
+
+  std::lock_guard<std::mutex> guard(instances_mutex);
+  return instances.try_emplace(key, std::make_shared<MongoDB, DBConfig const&, PassKeyIdiom const&>(config, {})).first->second;
 }
 
 DBConfig::DBConfig(const std::string& uri_) : uri{uri_} { confirm(!uri_.empty()); }
@@ -78,7 +95,24 @@ mongocxx::database& MongoDB::connection() {
 
   auto object_id = object_id_t(compat::to_json(result->inserted_id()));
 
-  TLOG(15) << "StorageProvider::MongoDB::connection created metadata record id=" << object_id;
+  TLOG(12) << "StorageProvider::MongoDB::connection created metadata record id=" << object_id;
 
   return _connection;
 }
+
+namespace artdaq {
+namespace database {
+namespace mongo {
+namespace debug {
+void connection() {
+  TRACE_CNTL("name", TRACE_NAME);
+  TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
+
+  TLOG(10) << "artdaq::database::mongo trace_enable";
+}
+}  // namespace debug
+}  // namespace mongo
+}  // namespace database
+}  // namespace artdaq
