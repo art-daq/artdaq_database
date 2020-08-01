@@ -22,6 +22,7 @@
 #include <mongocxx/pipeline.hpp>
 #include <mutex>
 #include <thread>
+#include <unordered_map>
 #include <utility>
 
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
