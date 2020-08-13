@@ -1,11 +1,12 @@
 #!/bin/bash
 
 new_package_versions=(
-   "TRACE:v3_15_09"
-   "cetbuildtools:v7_17_01"
-	 "cetpkgsupport:v1_14_01"
-	 "cmake:v3_17_3"
+#   "TRACE:v3_15_09"
+#   "cetbuildtools:v7_17_01"
+#   "cetpkgsupport:v1_14_01"
+#   "cmake:v3_17_3"
 #   "boost:v1_69_0"
+   "swig:v4_0_0"
 )
 
 function update_package_version() {
