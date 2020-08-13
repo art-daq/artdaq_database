@@ -6,7 +6,8 @@ new_package_versions=(
 #   "cetpkgsupport:v1_14_01"
 #   "cmake:v3_17_3"
 #   "boost:v1_69_0"
-   "swig:v4_0_0"
+   "swig:v4_0_2"
+	 "mongodb:v4_0_8c"
 )
 
 function update_package_version() {
