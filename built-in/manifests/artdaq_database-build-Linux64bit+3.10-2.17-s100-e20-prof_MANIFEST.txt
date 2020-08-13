@@ -4,7 +4,6 @@ cetpkgsupport    v1_14_01     cetpkgsupport-1.14.01-noarch.tar.bz2              
 cmake            v3_17_3      cmake-3.17.3-sl7-x86_64.tar.bz2                       -f  Linux64bit+3.10-2.17
 gcc              v9_3_0       gcc-9.3.0-sl7-x86_64.tar.bz2                          -f  Linux64bit+3.10-2.17
 python           v3_8_3b      python-3.8.3b-sl7-x86_64.tar.bz2                      -f  Linux64bit+3.10-2.17
-messagefacility  v2_07_01     messagefacility-2.07.01-slf7-x86_64-e20-prof.tar.bz2  -f  Linux64bit+3.10-2.17  -q  e20:prof
 mongodb          v4_0_8b      mongodb-4.0.8b-sl7-x86_64-e20-prof.tar.bz2            -f  Linux64bit+3.10-2.17  -q  e20:prof
 sqlite           v3_32_03_00  sqlite-3.32.03.00-sl7-x86_64.tar.bz2                  -f  Linux64bit+3.10-2.17
 swig             v4_0_0       swig-4.0.0-sl7-x86_64-e20-prof.tar.bz2                -f  Linux64bit+3.10-2.17  -q  e20:prof
