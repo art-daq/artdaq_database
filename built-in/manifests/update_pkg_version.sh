@@ -1,13 +1,13 @@
 #!/bin/bash
 
 new_package_versions=(
-#   "TRACE:v3_15_09"
+   "TRACE:v3_16_00"
 #   "cetbuildtools:v7_17_01"
 #   "cetpkgsupport:v1_14_01"
 #   "cmake:v3_17_3"
 #   "boost:v1_69_0"
-   "swig:v4_0_2"
-	 "mongodb:v4_0_8c"
+#   "swig:v4_0_2"
+#	 "mongodb:v4_0_8c"
 )
 
 function update_package_version() {
