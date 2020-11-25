@@ -1,11 +1,11 @@
 #!/bin/bash
 
 new_package_versions=(
-   "TRACE:v3_16_00"
+   "TRACE:v3_16_02"
 #   "cetbuildtools:v7_17_01"
 #   "cetpkgsupport:v1_14_01"
 #   "cmake:v3_17_3"
-#   "boost:v1_69_0"
+#   "boost:v1_70_0"
 #   "swig:v4_0_2"
 #	 "mongodb:v4_0_8c"
 )

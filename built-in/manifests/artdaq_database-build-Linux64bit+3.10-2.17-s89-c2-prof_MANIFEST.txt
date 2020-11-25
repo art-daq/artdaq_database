@@ -9,6 +9,6 @@ messagefacility  v2_05_00     messagefacility-2.05.00-slf7-x86_64-c2-prof.tar.bz
 mongodb          v4_0_8c      mongodb-4.0.8c-sl7-x86_64-c2-prof.tar.bz2            -f  Linux64bit+3.10-2.17  -q  c2:prof
 sqlite           v3_26_00_00  sqlite-3.26.00.00-sl7-x86_64.tar.bz2                 -f  Linux64bit+3.10-2.17
 swig             v4_0_2       swig-4.0.2-sl7-x86_64-c2-prof.tar.bz2                -f  Linux64bit+3.10-2.17  -q  c2:prof
-TRACE            v3_16_00     TRACE-3.16.00-sl7-x86_64.tar.bz2                     -f  Linux64bit+3.10-2.17
+TRACE            v3_16_02     TRACE-3.16.02-sl7-x86_64.tar.bz2                     -f  Linux64bit+3.10-2.17
 ups              v6_0_7       ups-6.0.7-Linux64bit+3.10-2.17.tar.bz2               -f  Linux64bit+3.10-2.17
 nodejs           v10_15_0     nodejs-10.15.0-noarch.tar.bz2                        -f  Linux64bit+3.10-2.17

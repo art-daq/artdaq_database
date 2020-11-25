@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_database  v1_04_89
+parent artdaq_database  v1_04_90
 defaultqual	e19:py2:s97
 
 # These optional lines define the installed directories where
@@ -30,6 +30,7 @@ boost           v1_70_0         s96
 boost           v1_70_0         s97
 boost           v1_73_0         s101
 boost           v1_70_0         s102
+boost           v1_70_0         s103
 mongodb         v4_0_8c
 python          v2_7_15a        s83
 python          v2_7_15a        s85
@@ -39,7 +40,7 @@ python          v2_7_15a        s92
 python          v3_8_3b         s101
 python          v2_7_15a        py2
 python          v3_7_2          -default-
-TRACE           v3_16_00        -       only_for_build
+TRACE           v3_16_02        -       only_for_build
 swig            v4_0_2          -       only_for_build
 nodejs          v10_15_0        -       only_for_build
 cetbuildtools   v7_17_01        -       only_for_build
@@ -91,6 +92,10 @@ c7:s102:debug      c7:debug     c7:debug     -nq-    -nq-     c7:debug       -nq
 c7:s102:prof       c7:prof      c7:prof      -nq-    -nq-     c7:prof        -nq-    -std=c++17
 c7:py2:s102:debug  c7:debug     c7:debug     -nq-    -nq-     c7:debug       -nq-    -std=c++17
 c7:py2:s102:prof   c7:prof      c7:prof      -nq-    -nq-     c7:prof        -nq-    -std=c++17
+c7:s103:debug      c7:debug     c7:debug     -nq-    -nq-     c7:debug       -nq-    -std=c++17
+c7:s103:prof       c7:prof      c7:prof      -nq-    -nq-     c7:prof        -nq-    -std=c++17
+c7:py2:s103:debug  c7:debug     c7:debug     -nq-    -nq-     c7:debug       -nq-    -std=c++17
+c7:py2:s103:prof   c7:prof      c7:prof      -nq-    -nq-     c7:prof        -nq-    -std=c++17
 
 e17:s83:debug      e17:debug    e17:debug    -nq-    -nq-     e17:debug      -nq-    -std=c++17
 e17:s83:prof       e17:prof     e17:prof     -nq-    -nq-     e17:prof       -nq-    -std=c++17
@@ -135,6 +140,10 @@ e19:s102:debug     e19:debug    e19:debug    -nq-    -nq-     e19:debug      -nq
 e19:s102:prof      e19:prof     e19:prof     -nq-    -nq-     e19:prof       -nq-    -std=c++17
 e19:py2:s102:debug e19:debug    e19:debug    -nq-    -nq-     e19:debug      -nq-    -std=c++17
 e19:py2:s102:prof  e19:prof     e19:prof     -nq-    -nq-     e19:prof       -nq-    -std=c++17
+e19:s103:debug     e19:debug    e19:debug    -nq-    -nq-     e19:debug      -nq-    -std=c++17
+e19:s103:prof      e19:prof     e19:prof     -nq-    -nq-     e19:prof       -nq-    -std=c++17
+e19:py2:s103:debug e19:debug    e19:debug    -nq-    -nq-     e19:debug      -nq-    -std=c++17
+e19:py2:s103:prof  e19:prof     e19:prof     -nq-    -nq-     e19:prof       -nq-    -std=c++17
 
 e20:s101:debug     e20:debug    e20:debug    -nq-    -nq-     e20:debug      -nq-    -std=c++17
 e20:s101:prof      e20:prof     e20:prof     -nq-    -nq-     e20:prof       -nq-    -std=c++17
