@@ -127,9 +127,13 @@ BOOST_AUTO_TEST_CASE(store_configuration) {
 
   auto configName = std::string{"config"} + std::to_string(fixture.version());
 
-  auto list = ifc.findAllGlobalConfigurations();
+  auto configs = ifc.findAllGlobalConfigurations();
 
-  fixture.updateConfigCount(list.size());
+  fixture.updateConfigCount(configs.size());
+
+  std::cout << "Found configs (store_configuration): ";
+  for (auto config : configs) std::cout << config << ",";
+  std::cout << "\n";
 
   ifc.storeGlobalConfiguration(map, configName);
 }
@@ -153,13 +157,17 @@ BOOST_AUTO_TEST_CASE(load_configuration) {
 BOOST_AUTO_TEST_CASE(find_all_configurations_all) {
   auto ifc = DatabaseConfigurationInterface();
 
-  auto list = ifc.findAllGlobalConfigurations();
+  auto configs = ifc.findAllGlobalConfigurations();
 
-  BOOST_CHECK_EQUAL(list.size(), fixture.oldConfigCount() + 1);
+  std::cout << "Found configs (find_all_configurations_all): ";
+  for (auto config : configs) std::cout << config << ",";
+  std::cout << "\n";
+
+  BOOST_CHECK_EQUAL(configs.size(), fixture.oldConfigCount() + 1);
 
   auto configName = std::string{"config"} + std::to_string(fixture.version());
 
-  auto found = (std::find(list.begin(), list.end(), configName) != list.end());
+  auto found = (std::find(configs.begin(), configs.end(), configName) != configs.end());
 
   BOOST_CHECK_EQUAL(found, true);
 }
@@ -167,13 +175,17 @@ BOOST_AUTO_TEST_CASE(find_all_configurations_all) {
 BOOST_AUTO_TEST_CASE(find_all_configurations_wildcard) {
   auto ifc = DatabaseConfigurationInterface();
 
-  auto list = ifc.findAllGlobalConfigurations("*");
+  auto configs = ifc.findAllGlobalConfigurations("*");
 
-  BOOST_CHECK_EQUAL(list.size(), fixture.oldConfigCount() + 1);
+  std::cout << "Found configs (find_all_configurations_wildcard): ";
+  for (auto config : configs) std::cout << config << ",";
+  std::cout << "\n";
+
+  BOOST_CHECK_EQUAL(configs.size(), fixture.oldConfigCount() + 1);
 
   auto configName = std::string{"config"} + std::to_string(fixture.version());
 
-  auto found = (std::find(list.begin(), list.end(), configName) != list.end());
+  auto found = (std::find(configs.begin(), configs.end(), configName) != configs.end());
 
   BOOST_CHECK_EQUAL(found, true);
 }
@@ -183,9 +195,13 @@ BOOST_AUTO_TEST_CASE(find_all_configurations_fullname) {
 
   auto configName = std::string{"config"} + std::to_string(fixture.version());
 
-  auto list = ifc.findAllGlobalConfigurations(configName);
+  auto configs = ifc.findAllGlobalConfigurations(configName);
 
-  auto found = (std::find(list.begin(), list.end(), configName) != list.end());
+  std::cout << "Found configs (find_all_configurations_fullname): ";
+  for (auto config : configs) std::cout << config << ",";
+  std::cout << "\n";
+
+  auto found = (std::find(configs.begin(), configs.end(), configName) != configs.end());
 
   BOOST_CHECK_EQUAL(found, true);
 }
@@ -193,13 +209,17 @@ BOOST_AUTO_TEST_CASE(find_all_configurations_fullname) {
 BOOST_AUTO_TEST_CASE(find_all_configurations_prefix) {
   auto ifc = DatabaseConfigurationInterface();
 
-  auto list = ifc.findAllGlobalConfigurations("config*");
+  auto configs = ifc.findAllGlobalConfigurations("config*");
 
-  BOOST_CHECK_EQUAL(list.size(), fixture.oldConfigCount() + 1);
+  std::cout << "Found configs (find_all_configurations_prefix): ";
+  for (auto config : configs) std::cout << config << ",";
+  std::cout << "\n";
+
+  BOOST_CHECK_EQUAL(configs.size(), fixture.oldConfigCount() + 1);
 
   auto configName = std::string{"config"} + std::to_string(fixture.version());
 
-  auto found = (std::find(list.begin(), list.end(), configName) != list.end());
+  auto found = (std::find(configs.begin(), configs.end(), configName) != configs.end());
 
   BOOST_CHECK_EQUAL(found, true);
 }
@@ -239,6 +259,26 @@ BOOST_AUTO_TEST_CASE(find_configuration_version) {
   BOOST_CHECK_EQUAL(found2, true);
 }
 
+BOOST_AUTO_TEST_CASE(find_configuration_version_loop) {
+  auto ifc = DatabaseConfigurationInterface();
+
+  std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();
+
+  auto list = ifc.getVersions(cfg1.get());
+
+  for (auto n = 0u; n < 1000u; n++) {
+    list = ifc.getVersions(cfg1.get());
+  }
+
+  auto found1 = (std::find(list.begin(), list.end(), fixture.version()) != list.end());
+
+  BOOST_CHECK_EQUAL(found1, true);
+
+  auto found2 = (std::find(list.begin(), list.end(), fixture.version() + 1) != list.end());
+
+  BOOST_CHECK_EQUAL(found2, true);
+}
+
 BOOST_AUTO_TEST_CASE(find_latest_configuration_version) {
   auto ifc = DatabaseConfigurationInterface();
 
@@ -248,13 +288,13 @@ BOOST_AUTO_TEST_CASE(find_latest_configuration_version) {
 
   auto list = ifc.getVersions(cfg1.get());
 
-  std::cout << "Found versions\n";
-
+  std::cout << "Found versions:";
   for (auto version : list) {
     std::cout << std::to_string(version) << ", ";
   }
+  std::cout << "\n";
 
-  std::cout << "\nGot latest version" << std::to_string(version) << "\n";
+  std::cout << "Got latest version" << std::to_string(version) << "\n";
 }
 
 BOOST_AUTO_TEST_CASE(overwrite_document) {

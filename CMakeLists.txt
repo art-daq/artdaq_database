@@ -13,8 +13,8 @@
 #  make package
 # ======================================================================
 
-# use cmake 3.2 or later
-cmake_minimum_required (VERSION 3.2)
+# use cmake 3.17 or later
+cmake_minimum_required (VERSION 3.17)
 
 project(artdaq-database)
 
@@ -51,12 +51,12 @@ ENDIF()
 cet_report_compiler_flags()
 
 # these are minimum required versions, not the actual product versions
-find_ups_boost  ( v1_66_0 )
-find_ups_product( cetbuildtools v5_08_00 )
-find_ups_product( cetpkgsupport v1_11_00 )
+find_ups_boost  ( v1_66_0a )
+find_ups_product( cetbuildtools v7_15_01 )
+find_ups_product( cetpkgsupport v1_14_01 )
 find_ups_product( mongodb v4_0_8 )  # find_ups_product doesn't like v4_0_8b
-find_ups_product( TRACE v3_13_05 )
-find_ups_product( swig v3_0_12 )
+find_ups_product( TRACE v3_15_09 )
+find_ups_product( swig v4_0_0 )
 
 # Debug streamer.
 string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC)

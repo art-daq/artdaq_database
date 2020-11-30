@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# using python 2.7
+# using python 2.7 or 3.7
 # ~/conftool.py list_databases '{"operation" : "listdatabases", "dataformat":"csv", "filter":{}}'
 from __future__ import print_function
 import sys

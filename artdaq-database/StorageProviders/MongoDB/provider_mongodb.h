@@ -11,6 +11,7 @@ namespace database {
 namespace mongo {
 namespace debug {
 void enable();
+void connection();
 void ReadWrite();
 }  // namespace debug
 
@@ -31,9 +32,7 @@ struct DBConfig final {
 
 class MongoDB final {
  public:
-  static std::shared_ptr<MongoDB> create(DBConfig const& config) {
-    return std::make_shared<MongoDB, DBConfig const&, PassKeyIdiom const&>(config, {});
-  }
+  static std::shared_ptr<MongoDB> create(DBConfig const& config);
 
   class PassKeyIdiom final {
    private:

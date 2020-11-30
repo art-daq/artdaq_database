@@ -20,3 +20,7 @@ x: 1.23e2 //1.23e2
 y: -0.45600E+3 // -0.45600E+3
 #comment @erase 
 p: @erase // @erase
+ 
+#include "/doc/test4/file.fcl" 
+ 
+#include "/doc/test5/file.fcl" 

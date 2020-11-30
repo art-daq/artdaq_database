@@ -1,5 +1,6 @@
 cmake_policy(VERSION 3.0.1) # We've made this work for 3.0.1.
 cmake_policy(SET CMP0078 OLD)
+cmake_policy(SET CMP0086 OLD)
 
 include(CetParseArgs)
 
@@ -44,8 +45,8 @@ macro (create_python_addon)
     set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -Wno-register")
 
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wno-bad-function-cast -Wno-string-conversion")
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-bad-function-cast -Wno-string-conversion")
+        SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wno-bad-function-cast -Wno-string-conversion -Wno-deprecated-declarations")
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-bad-function-cast -Wno-string-conversion -Wno-deprecated-declarations")
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wno-cast-function-type -Wno-stringop-truncation")
         SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-cast-function-type -Wno-stringop-truncation")
