@@ -1,5 +1,5 @@
-#include "artdaq-database/DataFormats/common.h"
 #include "artdaq-database/DataFormats/Json/json_types.h"
+#include "artdaq-database/DataFormats/common.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -11,9 +11,9 @@ namespace artdaq {
 namespace database {
 namespace sharedtypes {
 
+using artdaq::database::json::array_t;
 using artdaq::database::json::object_t;
 using artdaq::database::json::value_t;
-using artdaq::database::json::array_t;
 
 template <>
 template <>
@@ -27,24 +27,18 @@ array_t& unwrapper<array_t&>::value_as() {
 }
 
 template <>
- unwrapper<value_t>::unwrapper(value_t& a)
- : any(a) {}
+unwrapper<value_t>::unwrapper(value_t& a) : any(a) {}
 
 template <>
- unwrapper<const value_t>::unwrapper(const value_t& a)
- : any(a) {}
+unwrapper<const value_t>::unwrapper(const value_t& a) : any(a) {}
 
 template <>
- unwrapper<object_t>::unwrapper(object_t& a)
- : any(a) {}
+unwrapper<object_t>::unwrapper(object_t& a) : any(a) {}
 
 template <>
- unwrapper<const object_t>::unwrapper(const object_t& a)
- : any(a) {}
+unwrapper<const object_t>::unwrapper(const object_t& a) : any(a) {}
 
 }  // namespace sharedtypes
-
-
 
 namespace json {
 constexpr auto noerror = "Success";

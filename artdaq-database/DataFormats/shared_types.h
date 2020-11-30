@@ -216,7 +216,7 @@ using variant_value_of = boost::variant<boost::recursive_wrapper<TABLE_OF>, boos
 
 template <typename A>
 struct unwrapper {
-  unwrapper(A& );
+  unwrapper(A&);
 
   template <typename T>
   T& value_as();
@@ -241,7 +241,7 @@ struct unwrapper {
 };
 
 template <typename A>
-unwrapper<A> unwrap(A& any) {  
+unwrapper<A> unwrap(A& any) {
   return unwrapper<A>(any);
 }
 }  // namespace sharedtypes

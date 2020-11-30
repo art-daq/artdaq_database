@@ -3,7 +3,6 @@
 
 #include "artdaq-database/DataFormats/Json/json_types.h"
 
-
 using artdaq::database::json::array_t;
 using artdaq::database::json::object_t;
 using artdaq::database::json::value_t;
@@ -36,7 +35,7 @@ template <>
 template <typename T>
 T& unwrapper<value_t>::value_as(std::string const& name) try {
   confirm(!name.empty());
-  auto& o= boost::get<object_t>(any);
+  auto& o = boost::get<object_t>(any);
   auto& v = o.at(name);
   return boost::get<T>(v);
 } catch (...) {
@@ -46,7 +45,7 @@ T& unwrapper<value_t>::value_as(std::string const& name) try {
 template <>
 template <typename T>
 T& unwrapper<const value_t>::value_as(std::string const& name) try {
-  static_assert(std::is_const<T>(),"Template argument T is not a const-qualified type.");
+  static_assert(std::is_const<T>(), "Template argument T is not a const-qualified type.");
   confirm(!name.empty());
   auto const& o = boost::get<const object_t>(any);
   auto const& v = o.at(name);
@@ -66,7 +65,7 @@ T& unwrapper<value_t>::value_as() try {
 template <>
 template <typename T>
 T& unwrapper<const value_t>::value_as() try {
-  static_assert(std::is_const<T>(),"Template argument T is not a const-qualified type.");
+  static_assert(std::is_const<T>(), "Template argument T is not a const-qualified type.");
   return boost::get<T>(any);
 } catch (...) {
   throw;

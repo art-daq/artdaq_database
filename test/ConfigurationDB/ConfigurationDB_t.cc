@@ -141,8 +141,7 @@ int main(int argc, char* argv[]) try {
   std::cout << "expected:\n" << cmpdoc << "\n";
 
   auto mismatch = std::mismatch(cmpdoc.begin(), cmpdoc.end(), retdoc.begin());
-  std::cout << "File sizes (exp,ret)=(" << std::distance(cmpdoc.begin(), cmpdoc.end()) << ","
-            << std::distance(retdoc.begin(), retdoc.end()) << ")\n";
+  std::cout << "File sizes (exp,ret)=(" << std::distance(cmpdoc.begin(), cmpdoc.end()) << "," << std::distance(retdoc.begin(), retdoc.end()) << ")\n";
 
   std::cout << "First mismatch at position " << std::distance(cmpdoc.begin(), mismatch.first) << ", (exp,ret)=(0x" << std::hex
             << static_cast<unsigned int>(*mismatch.first) << ",0x" << static_cast<unsigned int>(*mismatch.second) << ")\n";

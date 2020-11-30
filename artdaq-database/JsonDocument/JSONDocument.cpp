@@ -324,11 +324,11 @@ JSONDocument JSONDocument::appendChild(JSONDocument const& newChild, path_t cons
   throw;
 }
 
-value_t JSONDocument::extract() { 
-    value_t tmp=jsn::object_t{};
-    std::swap(tmp,_value);
-    _isDirty=true;
-    return tmp; 
+value_t JSONDocument::extract() {
+  value_t tmp = jsn::object_t{};
+  std::swap(tmp, _value);
+  _isDirty = true;
+  return tmp;
 }
 
 bool matches(value_t const&, value_t const&);
@@ -372,8 +372,8 @@ JSONDocument JSONDocument::removeChild(JSONDocument const& delChild, path_t cons
 }
 
 constexpr auto version = "version";
-bool dbdr::compareDocumentVersions(JSONDocument const& a, JSONDocument const& b){ 
- return a.value_as<std::string>(version)< b.value_as<std::string>(version);
+bool dbdr::compareDocumentVersions(JSONDocument const& a, JSONDocument const& b) {
+  return a.value_as<std::string>(version) < b.value_as<std::string>(version);
 }
 
 void dbdr::debug::JSONDocument() {

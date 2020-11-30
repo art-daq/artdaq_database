@@ -140,8 +140,8 @@ int write_document_file(Options const& options, std::string const& file_src_name
 
   using namespace artdaq::database::configuration::json;
 
-  cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string&>(
-      apiliteral::operation::writedocument, write_document, options_string, test_document);
+  cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string&>(apiliteral::operation::writedocument,
+                                                                                                      write_document, options_string, test_document);
 
   auto result = cf::getOperations().at(options.operation())->invoke();
 

@@ -2,7 +2,6 @@
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "test/common.h"
 
-
 namespace bpo = boost::program_options;
 using namespace artdaq::database;
 
@@ -16,8 +15,8 @@ int main(int argc, char* argv[]) try {
 
   bpo::options_description desc = descstr.str();
 
-  desc.add_options()("config,c", bpo::value<std::string>(), "Configuration file.")(
-      "outputformat,f", bpo::value<std::string>(), "Output file format.")("help,h", "produce help message");
+  desc.add_options()("config,c", bpo::value<std::string>(), "Configuration file.")("outputformat,f", bpo::value<std::string>(),
+                                                                                   "Output file format.")("help,h", "produce help message");
 
   bpo::variables_map vm;
 
@@ -55,22 +54,22 @@ int main(int argc, char* argv[]) try {
     return process_exit_code::FAILURE;
   }
 
-  //int a;
-  //std::cout << "Continue ?";
-  //std::cin>>a;
-  //if(a==0)
+  // int a;
+  // std::cout << "Continue ?";
+  // std::cin>>a;
+  // if(a==0)
   //        return process_exit_code::FAILURE;
 
   auto out = std::string{};
   out.reserve(1000000);
-  for(int i=0; i<100; i++){
-  out.clear();
+  for (int i = 0; i < 100; i++) {
+    out.clear();
 
-    if(!writer.write(doc_ast,out)){
-        return process_exit_code::FAILURE;
+    if (!writer.write(doc_ast, out)) {
+      return process_exit_code::FAILURE;
     }
 
-    std::cout << (out.size()>100?"+":"-");
+    std::cout << (out.size() > 100 ? "+" : "-");
   }
 
   return process_exit_code::SUCCESS;

@@ -29,7 +29,7 @@ bool ConfWriter::write(jsn::object_t const& json_object, std::string& out) {
 
   TLOG(13) << "write() create conf begin";
 
-  for (auto const& data[[gnu::unused]] : data_node) {
+  for (auto const& data [[gnu::unused]] : data_node) {
     // TODO loop over json AST and convert it to XML
   }
 

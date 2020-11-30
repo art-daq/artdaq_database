@@ -16,7 +16,7 @@ using namespace boost::spirit;
 template <typename Iter>
 struct fhicl_generator_grammar : karma::grammar<Iter, table_t()> {
   fhicl_generator_grammar() : fhicl_generator_grammar::base_type(start) {
-    variant_value_rule =  string | karma::long_ | karma::double_ | karma::bool_ |table_rule | sequence_rule ;
+    variant_value_rule = string | karma::long_ | karma::double_ | karma::bool_ | table_rule | sequence_rule;
 
     annotated_value_rule = variant_value_rule << -annotation;
 

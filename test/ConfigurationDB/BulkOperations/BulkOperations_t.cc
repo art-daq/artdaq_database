@@ -86,8 +86,7 @@ int main(int argc, char* argv[]) try {
 
   using namespace artdaq::database::configuration::json;
 
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(operation_name, create_configuration,
-                                                                                  options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(operation_name, create_configuration, options_string);
 
   std::cout << "Running test:<" << operation_name << ">\n";
 
@@ -112,8 +111,7 @@ int main(int argc, char* argv[]) try {
 
   using cfo::data_format_t;
 
-  if (options.format() == data_format_t::gui || options.format() == data_format_t::db ||
-      options.format() == data_format_t::json) {
+  if (options.format() == data_format_t::gui || options.format() == data_format_t::db || options.format() == data_format_t::json) {
     auto compare_result = artdaq::database::json::compare_json_objects(returned, expected);
     if (compare_result.first) {
       std::cout << "returned:\n" << returned << "\n";
@@ -137,8 +135,8 @@ int main(int argc, char* argv[]) try {
   std::cout << "expected:\n" << expected << "\n";
 
   auto mismatch = std::mismatch(expected.begin(), expected.end(), returned.begin());
-  std::cout << "File sizes (exp,ret)=(" << std::distance(expected.begin(), expected.end()) << ","
-            << std::distance(returned.begin(), returned.end()) << ")\n";
+  std::cout << "File sizes (exp,ret)=(" << std::distance(expected.begin(), expected.end()) << "," << std::distance(returned.begin(), returned.end())
+            << ")\n";
 
   std::cout << "First mismatch at position " << std::distance(expected.begin(), mismatch.first) << ", (exp,ret)=(0x" << std::hex
             << static_cast<unsigned int>(*mismatch.first) << ",0x" << static_cast<unsigned int>(*mismatch.second) << ")\n";

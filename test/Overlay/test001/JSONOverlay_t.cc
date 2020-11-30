@@ -19,9 +19,8 @@ int main(int argc, char* argv[]) try {
 
   bpo::options_description desc = descstr.str();
 
-  desc.add_options()("source,s", bpo::value<std::string>(), "Source file.")(
-      "result,x", bpo::value<std::string>(), "Result file.")("mask,m", bpo::value<uint32_t>(), "Compare mask file.")(
-      "fail,f", "Test should fail.")("help,h", "produce help message");
+  desc.add_options()("source,s", bpo::value<std::string>(), "Source file.")("result,x", bpo::value<std::string>(), "Result file.")(
+      "mask,m", bpo::value<uint32_t>(), "Compare mask file.")("fail,f", "Test should fail.")("help,h", "produce help message");
 
   bpo::variables_map vm;
 

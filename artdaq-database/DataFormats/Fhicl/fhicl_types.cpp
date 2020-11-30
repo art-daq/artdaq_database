@@ -1,5 +1,5 @@
-#include "artdaq-database/DataFormats/common.h"
 #include "artdaq-database/DataFormats/Fhicl/fhicl_types.h"
+#include "artdaq-database/DataFormats/common.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -14,12 +14,10 @@ namespace sharedtypes {
 using artdaq::database::fhicl::value_t;
 
 template <>
- unwrapper<value_t>::unwrapper(value_t& a)
- : any(a) {}
+unwrapper<value_t>::unwrapper(value_t& a) : any(a) {}
 
 template <>
- unwrapper<const value_t>::unwrapper(const value_t& a)
- : any(a) {}
+unwrapper<const value_t>::unwrapper(const value_t& a) : any(a) {}
 
 }  // namespace sharedtypes
 }  // namespace database

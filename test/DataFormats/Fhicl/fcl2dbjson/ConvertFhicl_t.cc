@@ -35,8 +35,7 @@ int main(int argc, char* argv[]) try {
   bpo::options_description desc = descstr.str();
 
   desc.add_options()("source,s", bpo::value<std::string>(), "Input source file.")(
-      "compare,c", bpo::value<std::string>(), "Expected result of convertion.")("testname,t", bpo::value<std::string>(),
-                                                                                "Test name.")
+      "compare,c", bpo::value<std::string>(), "Expected result of convertion.")("testname,t", bpo::value<std::string>(), "Test name.")
 
       ("help,h", "produce help message");
 
@@ -133,8 +132,8 @@ bool test_convert2fcl(std::string const& input, std::string const& compare) {
     std::cerr << "expected:\n" << compare << "\n";
 
     auto mismatch = std::mismatch(compare.begin(), compare.end(), output.begin());
-    std::cerr << "File sizes (exp,ret)=(" << std::distance(compare.begin(), compare.end()) << ","
-              << std::distance(output.begin(), output.end()) << ")\n";
+    std::cerr << "File sizes (exp,ret)=(" << std::distance(compare.begin(), compare.end()) << "," << std::distance(output.begin(), output.end())
+              << ")\n";
 
     std::cerr << "First mismatch at position " << std::distance(compare.begin(), mismatch.first) << ", (exp,ret)=(0x" << std::hex
               << static_cast<unsigned int>(*mismatch.first) << ",0x" << static_cast<unsigned int>(*mismatch.second) << ")\n";
@@ -215,8 +214,8 @@ bool test_roundconvertfcl(std::string const& input, std::string const& compare) 
     std::cerr << "tmp:\n" << tmp << "\n";
 
     auto mismatch = std::mismatch(compare.begin(), compare.end(), output.begin());
-    std::cerr << "File sizes (exp,ret)=(" << std::distance(compare.begin(), compare.end()) << ","
-              << std::distance(output.begin(), output.end()) << ")\n";
+    std::cerr << "File sizes (exp,ret)=(" << std::distance(compare.begin(), compare.end()) << "," << std::distance(output.begin(), output.end())
+              << ")\n";
 
     std::cerr << "First mismatch at position " << std::distance(compare.begin(), mismatch.first) << ", (exp,ret)=(0x" << std::hex
               << static_cast<unsigned int>(*mismatch.first) << ",0x" << static_cast<unsigned int>(*mismatch.second) << ")\n";

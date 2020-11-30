@@ -74,12 +74,11 @@ int main(int argc, char* argv[]) {
   auto name = [](auto const& conf) { return JSONDocument(conf).value_as<std::string>("operation"); };
 
   auto runTest = [](std::string const& name) {
-    auto tests =
-        std::map<std::string, test_case>{{"buildDocument", test_buildDocument}, {"addAlias", test_addAlias},
-                                         {"addEntity", test_addEntity},         {"removeAlias", test_removeAlias},
-                                         {"removeEntity", test_removeEntity},   {"markDeleted", test_markDeleted},
-                                         {"markReadonly", test_markReadonly},   {"addToGlobalConfig", test_addToGlobalConfig},
-                                         {"setVersion", test_setVersion}};
+    auto tests = std::map<std::string, test_case>{{"buildDocument", test_buildDocument}, {"addAlias", test_addAlias},
+                                                  {"addEntity", test_addEntity},         {"removeAlias", test_removeAlias},
+                                                  {"removeEntity", test_removeEntity},   {"markDeleted", test_markDeleted},
+                                                  {"markReadonly", test_markReadonly},   {"addToGlobalConfig", test_addToGlobalConfig},
+                                                  {"setVersion", test_setVersion}};
 
     std::cout << "Running test:<" << name << ">\n";
 
@@ -92,13 +91,13 @@ int main(int argc, char* argv[]) {
 }
 
 namespace literal {
-constexpr auto operation[[gnu::unused]] = "operation";
-constexpr auto path[[gnu::unused]] = "path";
-constexpr auto beginstate[[gnu::unused]] = "begin-state";
-constexpr auto delta[[gnu::unused]] = "delta";
-constexpr auto endstate[[gnu::unused]] = "end-state";
-constexpr auto returnedvalue[[gnu::unused]] = "returned-value";
-constexpr auto mustsucceed[[gnu::unused]] = "must-succeed";
+constexpr auto operation [[gnu::unused]] = "operation";
+constexpr auto path [[gnu::unused]] = "path";
+constexpr auto beginstate [[gnu::unused]] = "begin-state";
+constexpr auto delta [[gnu::unused]] = "delta";
+constexpr auto endstate [[gnu::unused]] = "end-state";
+constexpr auto returnedvalue [[gnu::unused]] = "returned-value";
+constexpr auto mustsucceed [[gnu::unused]] = "must-succeed";
 }  // namespace literal
 
 bool test_buildDocument(std::string const& conf) {
