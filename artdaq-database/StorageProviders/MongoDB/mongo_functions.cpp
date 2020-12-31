@@ -30,7 +30,7 @@
 
 using namespace artdaq::database;
 
-bsoncxx::types::value extract_value_from_document(bsoncxx::document::value const& document, std::string const& key) {
+bsoncxx::types::bson_value::view extract_value_from_document(bsoncxx::document::value const& document, std::string const& key) {
   auto view = document.view();
   auto element = view.find(key);
 

@@ -4,7 +4,7 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/builder/basic/kvp.hpp>
 
-std::string compat::to_json(const bsoncxx::types::value& value) {
+std::string compat::to_json(const bsoncxx::types::bson_value::view& value) {
   using bsoncxx::builder::basic::kvp;
   auto doc = bsoncxx::builder::basic::document{};
   doc.append(kvp("dummy", value));
@@ -24,7 +24,7 @@ std::string compat::to_json(const bsoncxx::types::b_array& array) {
   return artdaq::database::trim(buff.substr(fpos, nchars));
 }
 
-std::string compat::to_json_unescaped(const bsoncxx::types::value& value) {
+std::string compat::to_json_unescaped(const bsoncxx::types::bson_value::view& value) {
   std::stringstream ss;
   ss << compat::to_json(value);
   auto retValue = ss.str();

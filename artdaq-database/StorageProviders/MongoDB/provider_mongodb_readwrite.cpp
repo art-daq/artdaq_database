@@ -45,7 +45,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::readDocument(J
 
   auto filter_bsondoc = compat::from_json(filter_json);
 
-  auto size = collection.count(filter_bsondoc.view());
+  auto size = collection.count_documents(filter_bsondoc.view());
 
   TLOG(13) << "MongoDB::readDocument() Found " << size << " document(s).";
 
@@ -129,7 +129,7 @@ object_id_t StorageProvider<JSONDocument, MongoDB>::writeDocument(JSONDocument c
 
   auto filter_bsondoc = compat::from_json(filter_json);
 
-  auto found = collection.count(filter_bsondoc.view());
+  auto found = collection.count_documents(filter_bsondoc.view());
 
   if (!isNew && found == 0) {
     isNew = true;

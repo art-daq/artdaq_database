@@ -21,16 +21,16 @@ if ( NOT EXISTS ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp )
     message("Downloading fhicl-cpp source")
 
     execute_process(COMMAND rm -rf ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp
-		    WORKING_DIRECTORY  ${TOP_CMAKE_SOURCE_DIR}/built-in)
-    
+         WORKING_DIRECTORY  ${TOP_CMAKE_SOURCE_DIR}/built-in)
+
     execute_process(COMMAND git clone http://cdcvs.fnal.gov/projects/fhicl-cpp ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp
-                    WORKING_DIRECTORY  ${TOP_CMAKE_SOURCE_DIR}/built-in)
+         WORKING_DIRECTORY  ${TOP_CMAKE_SOURCE_DIR}/built-in)
 
     execute_process(COMMAND  git checkout tags/v4_07_00
-		    WORKING_DIRECTORY  ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp)
-		    
+         WORKING_DIRECTORY  ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp)
+
     execute_process(COMMAND  git apply ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp-v4_07_00.patch
-                    WORKING_DIRECTORY  ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp)
+         WORKING_DIRECTORY  ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp)
 endif()
 
 include_directories(built-in/fhicl-cpp)

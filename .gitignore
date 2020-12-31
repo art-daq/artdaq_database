@@ -10,6 +10,7 @@ built-in/paramiko
 built-in/cetlib
 built-in/cetlib_except
 built-in/mongo-cxx-driver
+built-in/mongo-c-driver
 .editorconfig
 bin/*
 obj/*

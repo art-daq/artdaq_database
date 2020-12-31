@@ -65,7 +65,8 @@ if(BTYPE_UC STREQUAL DEBUG)
 endif()
 
 # buil-in libraries
-#include(BuiltinMONGOCXX)
+include(BuiltinMONGOC)
+include(BuiltinMONGOCXX)
 include(BuiltinFHICLCPP)
 include(BuiltinCETLIB)
 include(BuiltinCETLIBEXCEPT)
@@ -76,11 +77,15 @@ add_subdirectory(built-in)
 #include(NodeJSAddon)
 
 # MongoDB Libraries
-#set(BSONCXXLIB bsoncxx)
-#set(MONGOCXXLIB mongocxx)
+set(BSONCLIB bsonc)
+set(MONGOCLIB mongoc)
+set(BSONCXXLIB bsoncxx)
+set(MONGOCXXLIB mongocxx)
 
-find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_LIB} )
-find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_LIB} )
+#find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_LIB} )
+#find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_LIB} )
+#find_library(BSONCLIB NAMES bsonc HINTS $ENV{MONGODB_LIB} )
+#find_library(MONGOCLIB NAMES mongoc HINTS $ENV{MONGODB_LIB} )
 
 # testing
 SET(RUN_TESTS $ENV{RUN_TESTS})
@@ -101,7 +106,8 @@ add_subdirectory(artdaq-database)
 # doc- Documentation
 #add_subdirectory(doc)
 
-#add_dependencies(artdaq-database_StorageProviders_MongoDB mongo-cxx-driver)
+add_dependencies(mongo-cxx-driver mongo-c-driver )
+add_dependencies(artdaq-database_StorageProviders_MongoDB mongo-cxx-driver)
 
 
 # ups - table and config files
