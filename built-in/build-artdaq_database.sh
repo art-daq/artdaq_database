@@ -250,5 +250,8 @@ if [ $RC -ne 0 ]; then
    echo "Error: Failed stashing artdaq_database build artifacts. Aborting. "; exit 1
 fi
 
+[[ $(ls ${copyback_dir}/artdaq_database*.tar.bz2 |wc -l ) -eq 1 ]] \
+      ||  { echo "Error: No artdaq_database*.tar.bz2 found in the copyBack directory."; exit 2; }
+
 exit 0
 
