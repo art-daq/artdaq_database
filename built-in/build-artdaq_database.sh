@@ -95,11 +95,14 @@ function pull_products() {
   cp ${srcdir}/artdaq-database/built-in/manifests/artdaq_database-build-*MANIFEST.txt  ${productsdir}/
 
   curl --fail --silent --location --insecure -O http://scisoft.fnal.gov/scisoft/bundles/tools/pullProducts || exit 1
-  chmod +x ${productsdir}/pullProducts
+  curl --fail --silent --location --insecure -O https//scisoft.fnal.gov/scisoft/bundles/tools/pullPackage || exit 1
+  chmod +x ${productsdir}/pull*
 
   # we pull what we can so we don't have to build everything
-	${productsdir}/pullProducts -l ${productsdir} ${flvr} artdaq_database-build $(echo  ${squal}| sed -e 's/:/-/g')-${basequal} ${build_type}
-  
+  ${productsdir}/pullProducts -l ${productsdir} ${flvr} artdaq_database-build $(echo  ${squal}| sed -e 's/:/-/g')-${basequal} ${build_type}
+
+  ${pullProducts}/pullPackage ${productsdir} sl7  git-v2_20_1
+
   # Remove any artdaq_database that came with the bundle
   if [ -d ${productsdir}/artdaq_database ]; then
     echo "Removing ${productsdir}/artdaq_database"
@@ -132,6 +135,8 @@ function run_build() {
   cd ${prodblddir}
 
 	source ${srcdir}/artdaq-database/ups/setup_for_development ${build_flag} ${basequal} $(echo  ${squal} | sed -e 's/:/ /g')
+
+	setup git
 
   ups active
   export MAKE_FHICLCPP_STATIC=TRUE
