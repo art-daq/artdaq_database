@@ -95,7 +95,7 @@ function pull_products() {
   cp ${srcdir}/artdaq-database/built-in/manifests/artdaq_database-build-*MANIFEST.txt  ${productsdir}/
 
   curl --fail --silent --location --insecure -O http://scisoft.fnal.gov/scisoft/bundles/tools/pullProducts || exit 1
-  curl --fail --silent --location --insecure -O https//scisoft.fnal.gov/scisoft/bundles/tools/pullPackage || exit 1
+  curl --fail --silent --location --insecure -O http://scisoft.fnal.gov/scisoft/bundles/tools/pullPackage || exit 1
   chmod +x ${productsdir}/pull*
 
   # we pull what we can so we don't have to build everything
