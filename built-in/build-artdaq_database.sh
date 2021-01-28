@@ -110,7 +110,8 @@ function pull_products() {
   fi
 
   set +x
-  source ${productsdir}/setups
+
+  source ${productsdir}/setup
   set -x
 }
 
@@ -134,9 +135,8 @@ function run_build() {
   mkdir -p  ${prodblddir}  || return 42
   cd ${prodblddir}
 
-	source ${srcdir}/artdaq-database/ups/setup_for_development ${build_flag} ${basequal} $(echo  ${squal} | sed -e 's/:/ /g')
-
-	setup git 
+  source ${srcdir}/artdaq-database/ups/setup_for_development ${build_flag} ${basequal} $(echo  ${squal} | sed -e 's/:/ /g')
+  setup git 
 
   ups active
   export MAKE_FHICLCPP_STATIC=TRUE
@@ -250,8 +250,8 @@ if [ $RC -ne 0 ]; then
    echo "Error: Failed stashing artdaq_database build artifacts. Aborting. "; exit 1
 fi
 
-[[ $(ls ${copyback_dir}/artdaq_database*.tar.bz2 |wc -l ) -eq 1 ]] \
-      ||  { echo "Error: No artdaq_database*.tar.bz2 found in the copyBack directory."; exit 2; }
+[[ $(ls ${working_dir}/copyBack/artdaq_database*.tar.bz2 |wc -l ) -eq 1 ]] \
+      ||  { echo "Error: No artdaq_database*.tar.bz2 found in the copyBack directory."; exit 1; }
 
 exit 0
 
