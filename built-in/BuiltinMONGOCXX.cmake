@@ -32,6 +32,7 @@ if ( NOT EXISTS ${TOP_CMAKE_SOURCE_DIR}/built-in/mongo-cxx-driver/lib64 )
     LOG_BUILD ON
     LOG_INSTALL ON
     LOG_UPDATE ON
+    DEPENDS mongo-c-driver
 
     PATCH_COMMAND ""
     UPDATE_COMMAND ""

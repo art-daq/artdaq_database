@@ -6,8 +6,6 @@
 #include "artdaq-database/StorageProviders/UconDB/provider_ucondb.h"
 #include "artdaq-database/StorageProviders/storage_providers.h"
 
-#include <bsoncxx/json.hpp>
-
 namespace bpo = boost::program_options;
 using namespace artdaq::database;
 
