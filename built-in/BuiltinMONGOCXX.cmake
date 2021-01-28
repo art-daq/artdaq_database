@@ -10,11 +10,11 @@ if ( NOT EXISTS ${TOP_CMAKE_SOURCE_DIR}/built-in/mongo-cxx-driver/lib64 )
     endif()
 
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    SET(MYCMAKE_C_FLAGS   "${CMAKE_C_FLAGS_${BTYPE_UC}}   -Wno-uninitialized")
-    SET(MYCMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_${BTYPE_UC}} -Wno-uninitialized")
+    SET(MYCMAKE_C_FLAGS   "${CMAKE_C_FLAGS_${BTYPE_UC}}   -Wno-uninitialized -Wno-unused-variable")
+    SET(MYCMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_${BTYPE_UC}} -Wno-uninitialized -Wno-unused-variable")
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    SET(MYCMAKE_C_FLAGS   "${CMAKE_C_FLAGS_${BTYPE_UC}}   -Wno-maybe-uninitialized")
-    SET(MYCMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_${BTYPE_UC}} -Wno-maybe-uninitialized")
+    SET(MYCMAKE_C_FLAGS   "${CMAKE_C_FLAGS_${BTYPE_UC}}   -Wno-maybe-uninitialized -Wno-unused-variable")
+    SET(MYCMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_${BTYPE_UC}} -Wno-maybe-uninitialized -Wno-unused-variable")
     endif()
 
     if( full_qualifier MATCHES "e15")
@@ -26,7 +26,7 @@ if ( NOT EXISTS ${TOP_CMAKE_SOURCE_DIR}/built-in/mongo-cxx-driver/lib64 )
     ExternalProject_Add(
     mongo-cxx-driver
     GIT_REPOSITORY https://github.com/mongodb/mongo-cxx-driver
-    GIT_TAG r3.6.0
+    GIT_TAG r3.6.2
     LOG_DOWNLOAD ON
     LOG_CONFIGURE ON
     LOG_BUILD ON
@@ -40,7 +40,7 @@ if ( NOT EXISTS ${TOP_CMAKE_SOURCE_DIR}/built-in/mongo-cxx-driver/lib64 )
         -DCMAKE_BUILD_PARALLEL_LEVEL=${CMAKE_BUILD_PARALLEL_LEVEL}
         -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER} 
         -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} 
-        -DBUILD_TESTING=Off -DBUILD_SHARED_LIBS=On
+				-DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=ON
         -DCMAKE_CXX_FLAGS=${MYCMAKE_CXX_FLAGS}
         -DCMAKE_C_FLAGS=${MYCMAKE_C_FLAGS}
         -DCMAKE_CXX_STANDARD=${MYCMAKE_CXX_STANDARD}
