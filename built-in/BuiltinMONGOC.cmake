@@ -10,10 +10,10 @@ if ( NOT EXISTS ${TOP_CMAKE_SOURCE_DIR}/built-in/mongo-c-driver/lib64 )
     endif()
 
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-      SET(MYCMAKE_C_FLAGS   "${CMAKE_C_FLAGS_${BTYPE_UC}} -Wno-uninitialized -Wno-unused-parameter -Wno-sign-compare -Wno-missing-field-initializers")
-      SET(MYCMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_${BTYPE_UC}} -Wno-uninitialized -Wno-unused-parameter -Wno-sign-compare -Wno-missing-field-initializers")
+      SET(MYCMAKE_C_FLAGS   "${CMAKE_C_FLAGS_${BTYPE_UC}}   -Wno-uninitialized -Wno-unused-parameter -Wno-sign-compare -Wno-missing-field-initializers -Wno-missing-braces")
+      SET(MYCMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_${BTYPE_UC}} -Wno-uninitialized -Wno-unused-parameter -Wno-sign-compare -Wno-missing-field-initializers -Wno-missing-braces")
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-      SET(MYCMAKE_C_FLAGS   "${CMAKE_C_FLAGS_${BTYPE_UC}} -Wno-maybe-uninitialized -Wno-unused-parameter -Wno-sign-compare -Wno-missing-field-initializers -Wno-old-style-declaration")
+      SET(MYCMAKE_C_FLAGS   "${CMAKE_C_FLAGS_${BTYPE_UC}}   -Wno-maybe-uninitialized -Wno-unused-parameter -Wno-sign-compare -Wno-missing-field-initializers -Wno-old-style-declaration")
       SET(MYCMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_${BTYPE_UC}} -Wno-maybe-uninitialized -Wno-unused-parameter -Wno-sign-compare -Wno-missing-field-initializers -Wno-old-style-declaration")
     endif()
 
