@@ -659,7 +659,7 @@ def __exportConfigurationWithBulkloader(config):
         print ('Error: Failed running bulkdownloader over ssh on ' + artdaq_database_remote_host + '. Exception message: ' + str(e))
         result = 1
 
-    if result != 0 or not stdoutbuff.endswith("True\n"):
+    if result != 0 or not stdoutbuff.decode('ascii').endswith("True\n"):
         print (stdoutbuff[:-7])
         print (stderrbuff)
         return False
@@ -867,7 +867,7 @@ def __archiveConfigurationWithBulkloader(config, run_number, update):
         print ('Error: Failed running bulkloader over ssh on ' + artdaq_database_remote_host + '. Exception message: ' + str(e))
         result = 1
 
-    if result != 0 or not stdoutbuff.endswith("True\n"):
+    if result != 0 or not stdoutbuff.decode('ascii').endswith("True\n"):
         print (stdoutbuff[:-7])
         print (stderrbuff)
         return False
