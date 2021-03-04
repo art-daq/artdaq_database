@@ -95,11 +95,14 @@ function pull_products() {
   cp ${srcdir}/artdaq-database/built-in/manifests/artdaq_database-build-*MANIFEST.txt  ${productsdir}/
 
   curl --fail --silent --location --insecure -O http://scisoft.fnal.gov/scisoft/bundles/tools/pullProducts || exit 1
-  chmod +x ${productsdir}/pullProducts
+  curl --fail --silent --location --insecure -O http://scisoft.fnal.gov/scisoft/bundles/tools/pullPackage || exit 1
+  chmod +x ${productsdir}/pull*
 
   # we pull what we can so we don't have to build everything
-	${productsdir}/pullProducts -l ${productsdir} ${flvr} artdaq_database-build $(echo  ${squal}| sed -e 's/:/-/g')-${basequal} ${build_type}
-  
+  ${productsdir}/pullProducts -l ${productsdir} ${flvr} artdaq_database-build $(echo  ${squal}| sed -e 's/:/-/g')-${basequal} ${build_type}
+
+  ${productsdir}/pullPackage ${productsdir} sl7  git-v2_20_1
+
   # Remove any artdaq_database that came with the bundle
   if [ -d ${productsdir}/artdaq_database ]; then
     echo "Removing ${productsdir}/artdaq_database"
@@ -107,7 +110,8 @@ function pull_products() {
   fi
 
   set +x
-  source ${productsdir}/setups
+
+  source ${productsdir}/setup
   set -x
 }
 
@@ -131,7 +135,8 @@ function run_build() {
   mkdir -p  ${prodblddir}  || return 42
   cd ${prodblddir}
 
-	source ${srcdir}/artdaq-database/ups/setup_for_development ${build_flag} ${basequal} $(echo  ${squal} | sed -e 's/:/ /g')
+  source ${srcdir}/artdaq-database/ups/setup_for_development ${build_flag} ${basequal} $(echo  ${squal} | sed -e 's/:/ /g')
+  setup git 
 
   ups active
   export MAKE_FHICLCPP_STATIC=TRUE
@@ -244,6 +249,9 @@ RC=$?
 if [ $RC -ne 0 ]; then
    echo "Error: Failed stashing artdaq_database build artifacts. Aborting. "; exit 1
 fi
+
+[[ $(ls ${working_dir}/copyBack/artdaq_database*.tar.bz2 |wc -l ) -eq 1 ]] \
+      ||  { echo "Error: No artdaq_database*.tar.bz2 found in the copyBack directory."; exit 1; }
 
 exit 0
 

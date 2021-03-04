@@ -14,6 +14,7 @@ namespace bpo = boost::program_options;
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 namespace ovl = artdaq::database::overlay;
+namespace adb = artdaq::database;
 
 using test_case = bool (*)(const std::string&);
 
@@ -131,7 +132,7 @@ bool test_buildDocument(std::string const& conf) {
       return false;
     }
 
-  } catch (cet::exception const& e) {
+  } catch (adb::exception const& e) {
     if (mustsucceed) {
       throw;
     }
@@ -168,7 +169,7 @@ bool test_addAlias(std::string const& conf) {
       return false;
     }
 
-  } catch (cet::exception const& e) {
+  } catch (adb::exception const& e) {
     if (mustsucceed) {
       throw;
     }
@@ -205,7 +206,7 @@ bool test_removeAlias(std::string const& conf) {
       return false;
     }
 
-  } catch (cet::exception const& e) {
+  } catch (adb::exception const& e) {
     if (mustsucceed) {
       throw;
     }
@@ -242,7 +243,7 @@ bool test_addToGlobalConfig(std::string const& conf) {
       return false;
     }
 
-  } catch (cet::exception const& e) {
+  } catch (adb::exception const& e) {
     if (mustsucceed) {
       throw;
     }
@@ -279,7 +280,7 @@ bool test_setVersion(std::string const& conf) {
       return false;
     }
 
-  } catch (cet::exception const& e) {
+  } catch (adb::exception const& e) {
     if (mustsucceed) {
       throw;
     }
@@ -315,7 +316,7 @@ bool test_markReadonly(std::string const& conf) {
       return false;
     }
 
-  } catch (cet::exception const& e) {
+  } catch (adb::exception const& e) {
     if (mustsucceed) {
       throw;
     }
@@ -351,7 +352,7 @@ bool test_markDeleted(std::string const& conf) {
       return false;
     }
 
-  } catch (cet::exception const& e) {
+  } catch (adb::exception const& e) {
     if (mustsucceed) {
       throw;
     }
@@ -388,7 +389,7 @@ bool test_addEntity(std::string const& conf) {
       return false;
     }
 
-  } catch (cet::exception const& e) {
+  } catch (adb::exception const& e) {
     if (mustsucceed) {
       throw;
     }
@@ -425,7 +426,7 @@ bool test_removeEntity(std::string const& conf) {
       return false;
     }
 
-  } catch (cet::exception const& e) {
+  } catch (adb::exception const& e) {
     if (mustsucceed) {
       throw;
     }

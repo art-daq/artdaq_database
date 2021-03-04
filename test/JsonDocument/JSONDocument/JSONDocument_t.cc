@@ -3,6 +3,7 @@
 
 namespace bpo = boost::program_options;
 using artdaq::database::docrecord::JSONDocument;
+namespace adb = artdaq::database;
 
 using test_case = bool (*)(const std::string&);
 
@@ -116,7 +117,7 @@ bool test_insertChild(std::string const& conf) {
       std::cerr << "expected:\n" << expected << "\n";
       return false;
     }
-  } catch (cet::exception const& e) {
+  } catch (adb::exception const& e) {
     if (mustsucceed) {
       throw;
     }
@@ -153,7 +154,7 @@ bool test_replaceChild(std::string const& conf) {
       std::cerr << "expected:\n" << expected << "\n";
       return false;
     }
-  } catch (cet::exception const& e) {
+  } catch (adb::exception const& e) {
     if (mustsucceed) {
       throw;
     }
@@ -185,7 +186,7 @@ bool test_deleteChild(std::string const& conf) {
       std::cout << "Error returned!=expected.\n";
       return false;
     }
-  } catch (cet::exception const& e) {
+  } catch (adb::exception const& e) {
     if (mustsucceed) {
       throw;
     }
@@ -219,7 +220,7 @@ bool test_findChild(std::string const& conf) {
       std::cout << "Error returned!=expected.\n";
       return false;
     }
-  } catch (cet::exception const& e) {
+  } catch (adb::exception const& e) {
     if (mustsucceed) {
       throw;
     }
@@ -258,7 +259,7 @@ bool test_appendChild(std::string const& conf) {
       std::cerr << "expected:\n" << expected << "\n";
       return false;
     }
-  } catch (cet::exception const& e) {
+  } catch (adb::exception const& e) {
     if (mustsucceed) {
       throw;
     }
@@ -296,7 +297,7 @@ bool test_removeChild(std::string const& conf) {
       return false;
     }
 
-  } catch (cet::exception const& e) {
+  } catch (adb::exception const& e) {
     if (mustsucceed) {
       throw;
     }

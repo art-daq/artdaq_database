@@ -54,7 +54,6 @@ cet_report_compiler_flags()
 find_ups_boost  ( v1_66_0a )
 find_ups_product( cetbuildtools v7_15_01 )
 find_ups_product( cetpkgsupport v1_14_01 )
-find_ups_product( mongodb v4_0_8 )  # find_ups_product doesn't like v4_0_8b
 find_ups_product( TRACE v3_15_09 )
 find_ups_product( swig v4_0_0 )
 
@@ -65,7 +64,8 @@ if(BTYPE_UC STREQUAL DEBUG)
 endif()
 
 # buil-in libraries
-#include(BuiltinMONGOCXX)
+include(BuiltinMONGOC)
+include(BuiltinMONGOCXX)
 include(BuiltinFHICLCPP)
 include(BuiltinCETLIB)
 include(BuiltinCETLIBEXCEPT)
@@ -76,11 +76,15 @@ add_subdirectory(built-in)
 #include(NodeJSAddon)
 
 # MongoDB Libraries
-#set(BSONCXXLIB bsoncxx)
-#set(MONGOCXXLIB mongocxx)
+set(BSONCLIB bsonc)
+set(MONGOCLIB mongoc)
+set(BSONCXXLIB bsoncxx)
+set(MONGOCXXLIB mongocxx)
 
-find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_LIB} )
-find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_LIB} )
+#find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_LIB} )
+#find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_LIB} )
+#find_library(BSONCLIB NAMES bsonc HINTS $ENV{MONGODB_LIB} )
+#find_library(MONGOCLIB NAMES mongoc HINTS $ENV{MONGODB_LIB} )
 
 # testing
 SET(RUN_TESTS $ENV{RUN_TESTS})
@@ -101,7 +105,8 @@ add_subdirectory(artdaq-database)
 # doc- Documentation
 #add_subdirectory(doc)
 
-#add_dependencies(artdaq-database_StorageProviders_MongoDB mongo-cxx-driver)
+add_dependencies(mongo-cxx-driver mongo-c-driver )
+add_dependencies(artdaq-database_StorageProviders_MongoDB mongo-cxx-driver)
 
 
 # ups - table and config files

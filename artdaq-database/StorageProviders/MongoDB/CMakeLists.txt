@@ -8,5 +8,7 @@ cet_make(
   ${MONGOCXXLIB}
 )
 
+add_dependencies(artdaq-database_StorageProviders_MongoDB  mongo-cxx-driver)
+
 install_headers()
 install_source()

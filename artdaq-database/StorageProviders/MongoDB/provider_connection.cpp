@@ -86,7 +86,7 @@ mongocxx::database& MongoDB::connection() {
   auto collection = _connection.collection(system_metadata);
   auto filter = bsoncxx::builder::core(false);
 
-  if (collection.count(filter.view_document()) > 0) {
+  if (collection.count_documents(filter.view_document()) > 0) {
     return _connection;
   }
 

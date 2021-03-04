@@ -1,20 +1,21 @@
 #ifndef _ARTDAQ_DATABASE_DOCRECORD_EXCEPTIONS_H_
 #define _ARTDAQ_DATABASE_DOCRECORD_EXCEPTIONS_H_
 
-#include "cetlib_except/coded_exception.h"
+#include "artdaq-database/SharedCommon/shared_exceptions.h"
 
 namespace artdaq {
 namespace database {
 namespace docrecord {
+using artdaq::database::exception;
 
-class notfound_exception : public cet::exception {
+class notfound_exception : public exception {
  public:
-  explicit notfound_exception(std::string const& category_) : cet::exception(category_) {}
+  explicit notfound_exception(std::string const& category_) : exception(category_) {}
 };
 
-class readonly_exception : public cet::exception {
+class readonly_exception : public exception {
  public:
-  explicit readonly_exception(std::string const& category_) : cet::exception(category_) {}
+  explicit readonly_exception(std::string const& category_) : exception(category_) {}
 };
 
 }  // namespace docrecord
