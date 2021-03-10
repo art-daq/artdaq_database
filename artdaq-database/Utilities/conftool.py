@@ -75,7 +75,10 @@ def __get_prefix(config):
 
 
 def __ends_on_5digitnumber(config):
-    match = re.match(r'.*[^\d](\d{5}$)', config)
+    if config is  None:
+        return False
+
+    match = re.match(r'.*[^\d](\d{5}$)', config )
     return True if match else False
 
 
@@ -683,6 +686,9 @@ def exportConfiguration(configNamePrefix):
     #  return False
 
     config = __latest_config_name(configNamePrefix)
+    if config is None:
+        print('Error: Configuration %s is not present in the database.' % configNamePrefix)
+        return False
 
     return __exportConfiguration(config)
 
