@@ -16,7 +16,7 @@
 # use cmake 3.17 or later
 cmake_minimum_required (VERSION 3.17)
 
-project(artdaq-database)
+project(artdaq_database v1_05_00)
 
 SET ( CETBUILDTOOLS_VERSION $ENV{CETBUILDTOOLS_VERSION} )
 IF (NOT CETBUILDTOOLS_VERSION)
