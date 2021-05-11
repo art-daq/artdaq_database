@@ -23,7 +23,7 @@ if ( NOT EXISTS ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp )
     execute_process(COMMAND rm -rf ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp
          WORKING_DIRECTORY  ${TOP_CMAKE_SOURCE_DIR}/built-in)
 
-    execute_process(COMMAND git clone ssh://p-artdaq-utilities@cdcvs.fnal.gov/cvs/projects/fhicl-cpp ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp
+    execute_process(COMMAND git clone https://cdcvs.fnal.gov/projects/fhicl-cpp ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp
          WORKING_DIRECTORY  ${TOP_CMAKE_SOURCE_DIR}/built-in)
 
     execute_process(COMMAND  git checkout tags/v4_07_00
