@@ -75,7 +75,10 @@ def __get_prefix(config):
 
 
 def __ends_on_5digitnumber(config):
-    match = re.match(r'.*[^\d](\d{5}$)', config)
+    if config is  None:
+        return False
+
+    match = re.match(r'.*[^\d](\d{5}$)', config )
     return True if match else False
 
 
@@ -222,7 +225,7 @@ def __validate_schema(schema):
                 continue
 
             if 'entity' in d:
-                entity=d['entity'].encode('ascii')
+                entity=d['entity'].encode('utf-8')
                 match = re.match(r'(.*)((gr1)(gr2)(gr3)(gr4)(gr5)(gr6)(gr7)(gr8)(gr9))(\.fcl$)', './demo/gr1gr2gr3gr4gr5gr6gr7gr8gr9.fcl')
                 entity_name_rule = d['entity']
                 try:
@@ -287,11 +290,11 @@ def __hashConfiguration(entity_userdata_map):
     for entity in entity_userdata_map:
         if entity == 'schema':
             continue
-        hash = hashlib.md5(entity_userdata_map[entity].encode('ascii')).hexdigest()
+        hash = hashlib.md5(entity_userdata_map[entity].encode('utf-8')).hexdigest()
         hashes.append(entity + ':' + hash)
 
     hashes.sort()
-    hash = hashlib.md5(','.join(hashes).encode('ascii')).hexdigest()
+    hash = hashlib.md5(','.join(hashes).encode('utf-8')).hexdigest()
     hashes.append('configuration'+':' + hash)
     entity_userdata_map['hashes'] = '\n'.join(hashes)
     return True
@@ -454,7 +457,7 @@ def __exportConfiguration(config):
                     fcl_file.write(cfg[user_data])
                     cfg_entry = (cfg[collection], cfg[entity_name], file_name)
                     if sys.version_info[0] < 3:
-                        cfg_entry = (cfg_entry[0].encode('ascii'), cfg_entry[1].encode('ascii'), cfg_entry[2].encode('ascii'))
+                        cfg_entry = (cfg_entry[0].encode('utf-8'), cfg_entry[1].encode('utf-8'), cfg_entry[2].encode('utf-8'))
                     print ('Exported', cfg_entry)
                     break
 
@@ -486,7 +489,7 @@ def __exportConfiguration(config):
 
         cfg_entry = (cfg[collection], cfg[entity_name], fcl_name)
         if sys.version_info[0] < 3:
-            cfg_entry = (cfg_entry[0].encode('ascii'), cfg_entry[1].encode('ascii'), cfg_entry[2].encode('ascii'))
+            cfg_entry = (cfg_entry[0].encode('utf-8'), cfg_entry[1].encode('utf-8'), cfg_entry[2].encode('utf-8'))
         print('Exported', cfg_entry)
 
     return True
@@ -575,7 +578,7 @@ def __importConfiguration(configNameOrconfigPrefix, update=False, updateFlagsOnl
 
         cfg_entry = cfg_composition_dict[entry]
         if sys.version_info[0] < 3:
-            cfg_entry = (cfg_entry[0].encode('ascii'), cfg_entry[1].encode('ascii'), cfg_entry[2].encode('ascii'))
+            cfg_entry = (cfg_entry[0].encode('utf-8'), cfg_entry[1].encode('utf-8'), cfg_entry[2].encode('utf-8'))
 
         if result[0] is not True:
             print ('Failed importing', cfg_entry)
@@ -659,7 +662,7 @@ def __exportConfigurationWithBulkloader(config):
         print ('Error: Failed running bulkdownloader over ssh on ' + artdaq_database_remote_host + '. Exception message: ' + str(e))
         result = 1
 
-    if result != 0 or not stdoutbuff.endswith("True\n"):
+    if result != 0 or not stdoutbuff.decode('utf-8').endswith("True\n"):
         print (stdoutbuff[:-7])
         print (stderrbuff)
         return False
@@ -683,6 +686,9 @@ def exportConfiguration(configNamePrefix):
     #  return False
 
     config = __latest_config_name(configNamePrefix)
+    if config is None:
+        print('Error: Configuration %s is not present in the database.' % configNamePrefix)
+        return False
 
     return __exportConfiguration(config)
 
@@ -771,7 +777,7 @@ def archiveRunConfiguration(config, run_number, update=False):
 
     for cfg_entry in cfg_composition:
         if sys.version_info[0] < 3:
-            cfg_entry = (cfg_entry[0].encode('ascii'), cfg_entry[1].encode('ascii'), cfg_entry[2].encode('ascii'))
+            cfg_entry = (cfg_entry[0].encode('utf-8'), cfg_entry[1].encode('utf-8'), cfg_entry[2].encode('utf-8'))
         print ('Archived', cfg_entry)
 
     return True
@@ -867,7 +873,7 @@ def __archiveConfigurationWithBulkloader(config, run_number, update):
         print ('Error: Failed running bulkloader over ssh on ' + artdaq_database_remote_host + '. Exception message: ' + str(e))
         result = 1
 
-    if result != 0 or not stdoutbuff.endswith("True\n"):
+    if result != 0 or not stdoutbuff.decode('utf-8').endswith("True\n"):
         print (stdoutbuff[:-7])
         print (stderrbuff)
         return False
@@ -876,7 +882,7 @@ def __archiveConfigurationWithBulkloader(config, run_number, update):
 
     for cfg_entry in cfg_composition:
         if sys.version_info[0] < 3:
-            cfg_entry = (cfg_entry[0].encode('ascii'), cfg_entry[1].encode('ascii'), cfg_entry[2].encode('ascii'))
+            cfg_entry = (cfg_entry[0].encode('utf-8'), cfg_entry[1].encode('utf-8'), cfg_entry[2].encode('utf-8'))
         print ('Archived', cfg_entry)
 
     return True
