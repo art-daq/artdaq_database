@@ -22,7 +22,7 @@ if ( NOT EXISTS ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib )
     execute_process(COMMAND rm -rf ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib
        WORKING_DIRECTORY  ${TOP_CMAKE_SOURCE_DIR}/built-in)
 
-    execute_process(COMMAND git clone http://cdcvs.fnal.gov/projects/cetlib ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib
+    execute_process(COMMAND git clone ssh://p-artdaq-utilities@cdcvs.fnal.gov/cvs/projects/cetlib ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib
        WORKING_DIRECTORY  ${TOP_CMAKE_SOURCE_DIR}/built-in)
 
     execute_process(COMMAND  git checkout tags/v3_03_00b

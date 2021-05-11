@@ -131,7 +131,7 @@ index 9689269..2c87411 100644
 +    , raw_value{detail::rtrim_whitespace(std::move(raw_value))}
 +    , src_info{src}
 +  {}
-+  
++
    bool
    is_a(value_tag t) const
    {
@@ -245,7 +245,7 @@ index c7cb85f..e864ebe 100644
 +     (iter_pos >> table  >>iter_pos) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), TABLE   , qi::_2, qi::_1, qi::_3, ref(s)) ]      |
 +     (iter_pos >> vp.catchall >> iter_pos) [ _val = phx::bind(&xvalue_dp<iter_t>, ref(in_prolog), STRING  , qi::_2, qi::_1, qi::_3, ref(s)) ]
 +);
-+    
++
  #ifdef __clang__
  #pragma clang diagnostic pop
  #endif

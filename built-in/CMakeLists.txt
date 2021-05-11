@@ -72,7 +72,7 @@ IF(CETLIB_IS_STATIC)
     )
 
   set(LIBRARIES  
-    ${CETLIB_EXCEPT}
+    ${CETLIB_EXCEPT_LIB}
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     )
@@ -81,7 +81,7 @@ IF(CETLIB_IS_STATIC)
     
   add_library(${CETLIB} STATIC ${SOURCES})
   set_property(TARGET ${CETLIB} PROPERTY POSITION_INDEPENDENT_CODE ON)
-  target_link_libraries(${CETLIB} ${LIBRARIES})  
+  target_link_libraries(${CETLIB} ${LIBRARIES})
 else()
   cet_make(
     LIBRARY_NAME 
@@ -136,8 +136,8 @@ IF(FHICLCPP_IS_STATIC)
     )
 
   set(LIBRARIES  
-    ${CETLIB}
-    ${CETLIB_EXCEPT}
+    ${CETLIB_LIB}
+    ${CETLIB_EXCEPT_LIB}
     )
     
   include_directories( ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp )
