@@ -20,17 +20,12 @@ ENDIF()
 
 IF(CETLIBEXCEPT_IS_STATIC)
   MESSAGE (STATUS "Making cetlib_except static")
-  
-  set(SOURCES
+  cet_make_library(LIBRARY_NAME ${CETLIB_EXCEPT} STATIC SOURCE 
     cetlib_except/cetlib_except/exception.cc
     )
     
-  set(LIBRARIES  
-    )
-    
-  add_library(${CETLIB_EXCEPT} STATIC ${SOURCES})
   set_property(TARGET ${CETLIB_EXCEPT} PROPERTY POSITION_INDEPENDENT_CODE ON)
-  target_link_libraries(${CETLIB_EXCEPT} ${LIBRARIES})  
+
 else()
   cet_make(
     LIBRARY_NAME 
@@ -58,7 +53,7 @@ ENDIF()
 IF(CETLIB_IS_STATIC)
   MESSAGE (STATUS "Making cetlib static")
   
-  set(SOURCES
+  cet_make_library(LIBRARY_NAME ${CETLIB} STATIC SOURCE 
     cetlib/cetlib/canonical_number.cc
     cetlib/cetlib/canonical_string.cc
     cetlib/cetlib/include.cc
@@ -69,19 +64,14 @@ IF(CETLIB_IS_STATIC)
     cetlib/cetlib/filesystem.cc
     cetlib/cetlib/getenv.cc
     cetlib/cetlib/split_by_regex.cc
-    )
-
-  set(LIBRARIES  
+    LIBRARIES  
     ${CETLIB_EXCEPT_LIB}
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     )
-
-  include_directories( ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib )
-    
-  add_library(${CETLIB} STATIC ${SOURCES})
+        
   set_property(TARGET ${CETLIB} PROPERTY POSITION_INDEPENDENT_CODE ON)
-  target_link_libraries(${CETLIB} ${LIBRARIES})
+
 else()
   cet_make(
     LIBRARY_NAME 
@@ -126,25 +116,18 @@ ENDIF()
 IF(FHICLCPP_IS_STATIC)
   MESSAGE (STATUS "Making FHiCL static")
   
-  set(SOURCES
+  cet_make_library(LIBRARY_NAME ${FHICLCPP} STATIC SOURCE 
     fhicl-cpp/fhiclcpp/exception.cc
     fhicl-cpp/fhiclcpp/extended_value.cc
     fhicl-cpp/fhiclcpp/intermediate_table.cc
     fhicl-cpp/fhiclcpp/parse.cc
     fhicl-cpp/fhiclcpp/parse_shims.cc
     fhicl-cpp/fhiclcpp/Protection.cc
-    )
-
-  set(LIBRARIES  
+   LIBRARIES  
     ${CETLIB_LIB}
     ${CETLIB_EXCEPT_LIB}
     )
-    
-  include_directories( ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp )
-    
-  add_library(${FHICLCPP} STATIC ${SOURCES})
   set_property(TARGET ${FHICLCPP} PROPERTY POSITION_INDEPENDENT_CODE ON)
-  target_link_libraries(${FHICLCPP} ${LIBRARIES})  
 else()
   cet_make(
     LIBRARY_NAME 
