@@ -22,7 +22,7 @@
 #include <mongocxx/pipeline.hpp>
 #include <mutex>
 #include <thread>
-#include <filesystem>
+#include <boost/filesystem.hpp>
 #include <unordered_map>
 #include <utility>
 
@@ -53,11 +53,11 @@ DBConfig::DBConfig() : uri{std::string{literal::MONGOURI} + literal::hostname + 
   }
 
   auto clientCert = getenv("ARTDAQ_DATABASE_CLIENT_CERT") != nullptr ? expand_environment_variables("${ARTDAQ_DATABASE_CLIENT_CERT}") : std::string("");
-  if (!clientCert.empty() && std::filesystem::exists(std::filesystem::path(clientCert))){
+  if (!clientCert.empty() && boost::filesystem::exists(boost::filesystem::path(clientCert))){
     uri+="&tls=true&authMechanism=MONGODB-X509&tlsCertificateKeyFile="+clientCert;
 
     auto caCert = getenv("ARTDAQ_DATABASE_CA_CERT") != nullptr ? expand_environment_variables("${ARTDAQ_DATABASE_CA_CERT}") : std::string("");
-    if (!caCert.empty() && std::filesystem::exists(std::filesystem::path(caCert)))
+    if (!caCert.empty() && boost::filesystem::exists(boost::filesystem::path(caCert)))
       uri+="&tlsCAFile="+caCert;
   }
 }

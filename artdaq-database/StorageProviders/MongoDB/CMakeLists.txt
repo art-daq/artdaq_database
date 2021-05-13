@@ -6,7 +6,6 @@ cet_make(
   artdaq-database_StorageProviders
   ${BSONCXXLIB}
   ${MONGOCXXLIB}
-  -lstdc++fs
 )
 
 add_dependencies(artdaq-database_StorageProviders_MongoDB  mongo-cxx-driver)
