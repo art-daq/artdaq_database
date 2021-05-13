@@ -22,6 +22,7 @@
 #include <mongocxx/pipeline.hpp>
 #include <mutex>
 #include <thread>
+#include <filesystem>
 #include <unordered_map>
 #include <utility>
 
@@ -43,12 +44,21 @@ mongocxx::instance& getInstance() {
   return _instance;
 }
 
-DBConfig::DBConfig() : uri{std::string{literal::MONGOURI} + literal::hostname + ":" + std::to_string(literal::port) + "/" + literal::db_name} {
+DBConfig::DBConfig() : uri{std::string{literal::MONGOURI} + literal::hostname + ":" + std::to_string(literal::port) + "/" + literal::db_name}{
   auto tmpURI = getenv("ARTDAQ_DATABASE_URI") != nullptr ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
 
   auto prefixURI = std::string{literal::MONGOURI};
   if (tmpURI.length() > prefixURI.length() && std::equal(prefixURI.begin(), prefixURI.end(), tmpURI.begin())) {
     uri = tmpURI;
+  }
+
+  auto clientCert = getenv("ARTDAQ_DATABASE_CLIENT_CERT") != nullptr ? expand_environment_variables("${ARTDAQ_DATABASE_CLIENT_CERT}") : std::string("");
+  if (!clientCert.empty() && std::filesystem::exists(std::filesystem::path(clientCert))){
+    uri+="&tls=true&authMechanism=MONGODB-X509&tlsCertificateKeyFile="+clientCert;
+
+    auto caCert = getenv("ARTDAQ_DATABASE_CA_CERT") != nullptr ? expand_environment_variables("${ARTDAQ_DATABASE_CA_CERT}") : std::string("");
+    if (!caCert.empty() && std::filesystem::exists(std::filesystem::path(caCert)))
+      uri+="&tlsCAFile="+caCert;
   }
 }
 
@@ -73,7 +83,10 @@ MongoDB::MongoDB(DBConfig config, PassKeyIdiom const& /*unused*/)
     : _config{std::move(config)},
       _instance{getInstance()},
       _client{mongocxx::uri{_config.connectionURI()}},
-      _connection{_client[_client.uri().database()]} {}
+      _connection{_client[_client.uri().database()]} {
+				_client.start_session();
+
+			}
 
 mongocxx::cursor MongoDB::list_databases() {
   connection();

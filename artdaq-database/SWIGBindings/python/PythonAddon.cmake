@@ -65,10 +65,16 @@ macro (create_python_addon)
     else()
         set( this_build_path $ENV{CETPKG_BUILD} )
     endif()
-          
-     add_custom_command(TARGET ${PIA_ADDON_NAME} POST_BUILD 
-                        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/${PIA_ADDON_NAME}.py ${this_build_path}/${artdaq_LIBRARY_DIR}
-     )
+
+    add_custom_command(TARGET ${PIA_ADDON_NAME} POST_BUILD 
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/${PIA_ADDON_NAME}.py ${this_build_path}/${artdaq_LIBRARY_DIR})
+
+    install (FILES ${this_build_path}/${artdaq_database_LIBRARY_DIR}/${PIA_ADDON_LIBNAME}.so 
+      PERMISSIONS OWNER_EXECUTE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_READ WORLD_EXECUTE
+      DESTINATION ${flavorqual_dir}/python/)
+
+    install (FILES ${this_build_path}/${PIA_ADDON_NAME}.py DESTINATION ${flavorqual_dir}/python/)
+
 
     else(CAN_BUILD)
         message("Compatible version of Swig found. NOT building ${PIA_ADDON_NAME}")
