@@ -89,7 +89,7 @@ def __increment_config_name(config):
 
 
 def __archiveuri_from_uri(uri):
-    match = re.match(r'.*://.*/(.*?(?=(?:\?)|$))', uri)
+    match = re.match(r'.*://.*?/(.*?(?=(?:\?)|$))', uri)
 
     if not match.group(1):
         print('Error: Invalid URI ', uri)
