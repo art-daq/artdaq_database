@@ -26,6 +26,9 @@ cet_make_exec(readfhicl
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_DataFormats_Fhicl
+  ${FHICLCPP}
+  ${CETLIB}
+  ${CETLIB_EXCEPT}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
@@ -34,6 +37,9 @@ cet_make_exec(refactorfhicl
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_DataFormats_Fhicl
+  ${FHICLCPP}
+  ${CETLIB}
+  ${CETLIB_EXCEPT}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 endif()
