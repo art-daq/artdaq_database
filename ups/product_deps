@@ -26,18 +26,20 @@ boost           v1_73_0         s105
 boost           v1_73_0         s106
 boost           v1_75_0         s107
 boost           v1_75_0         s108
+boost           v1_75_0         s109
 python          v3_8_3b         s104
 python          v3_8_3b         s105
 python          v3_8_3b         s106
 python          v3_9_2          s107
 python          v3_9_2          s108
+python          v3_9_2          s109
 python          v2_7_15a        py2
 python          v3_7_2          -default-
 mongodb         v4_0_8c         -       only_for_build
 TRACE           v3_17_01        -       only_for_build
 swig            v4_0_2          -       only_for_build
 nodejs          v10_15_0        -       only_for_build
-cetbuildtools   v8_07_02        -       only_for_build
+cetbuildtools   v8_08_02        -       only_for_build
 end_product_list
 
 # -nq- means there is no qualifier
@@ -61,6 +63,8 @@ c7:s107:debug      c7:debug     c7:debug     -nq-    -nq-     c7:debug       -nq
 c7:s107:prof       c7:prof      c7:prof      -nq-    -nq-     c7:prof        -nq-    -std=c++17
 c7:s108:debug      c7:debug     c7:debug     -nq-    -nq-     c7:debug       -nq-    -std=c++17
 c7:s108:prof       c7:prof      c7:prof      -nq-    -nq-     c7:prof        -nq-    -std=c++17
+c7:s109:debug      c7:debug     c7:debug     -nq-    -nq-     c7:debug       -nq-    -std=c++17
+c7:s109:prof       c7:prof      c7:prof      -nq-    -nq-     c7:prof        -nq-    -std=c++17
 
 e19:s97:debug      e19:debug    e19:debug    -nq-    -nq-     e19:debug      -nq-    -std=c++17
 e19:s97:prof       e19:prof     e19:prof     -nq-    -nq-     e19:prof       -nq-    -std=c++17
@@ -80,6 +84,8 @@ e19:s107:debug     e19:debug    e19:debug    -nq-    -nq-     e19:debug      -nq
 e19:s107:prof      e19:prof     e19:prof     -nq-    -nq-     e19:prof       -nq-    -std=c++17
 e19:s108:debug     e19:debug    e19:debug    -nq-    -nq-     e19:debug      -nq-    -std=c++17
 e19:s108:prof      e19:prof     e19:prof     -nq-    -nq-     e19:prof       -nq-    -std=c++17
+e19:s109:debug     e19:debug    e19:debug    -nq-    -nq-     e19:debug      -nq-    -std=c++17
+e19:s109:prof      e19:prof     e19:prof     -nq-    -nq-     e19:prof       -nq-    -std=c++17
 
 e20:s104:debug     e20:debug    e20:debug    -nq-    -nq-     e20:debug      -nq-    -std=c++17
 e20:s104:prof      e20:prof     e20:prof     -nq-    -nq-     e20:prof       -nq-    -std=c++17
@@ -91,6 +97,8 @@ e20:s107:debug     e20:debug    e20:debug    -nq-    -nq-     e20:debug      -nq
 e20:s107:prof      e20:prof     e20:prof     -nq-    -nq-     e20:prof       -nq-    -std=c++17
 e20:s108:debug     e20:debug    e20:debug    -nq-    -nq-     e20:debug      -nq-    -std=c++17
 e20:s108:prof      e20:prof     e20:prof     -nq-    -nq-     e20:prof       -nq-    -std=c++17
+e20:s109:debug     e20:debug    e20:debug    -nq-    -nq-     e20:debug      -nq-    -std=c++17
+e20:s109:prof      e20:prof     e20:prof     -nq-    -nq-     e20:prof       -nq-    -std=c++17
 end_qualifier_list
 
 
