@@ -25,7 +25,7 @@ if ( NOT EXISTS ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib_except )
     execute_process(COMMAND git clone https://cdcvs.fnal.gov/projects/cetlib_except ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib_except
         WORKING_DIRECTORY  ${TOP_CMAKE_SOURCE_DIR}/built-in)
 
-    execute_process(COMMAND  git checkout tags/v1_02_00
+    execute_process(COMMAND  git checkout tags/v1_07_02
         WORKING_DIRECTORY  ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib_except)
 
 #    execute_process(COMMAND  git apply ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib_except-v1_02_00.patch
