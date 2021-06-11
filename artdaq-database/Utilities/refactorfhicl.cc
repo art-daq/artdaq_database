@@ -170,13 +170,11 @@ int main(int argc, char* argv[]) try {
     }
   }
 
-  ::fhicl::intermediate_table fhicl_table;
-
   if (!fully_resolve) {
     ::shims::isSnippetMode(true);
   }
 
-  parse_document(conf, fhicl_table);
+  auto fhicl_table = parse_document(conf);
 
   if (!artdaq::database::mkdir(target_path)) {
     std::cerr << "ERROR: unable to create the \"" << target_path << "\" directory.";

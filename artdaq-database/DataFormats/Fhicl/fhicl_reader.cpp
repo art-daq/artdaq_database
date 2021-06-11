@@ -79,13 +79,11 @@ bool FhiclReader::read_data(std::string const& in, jsn::object_t& json_object) {
 
     TLOG(24) << "read_data() regex includes end";
 
-    ::fhicl::intermediate_table fhicl_table;
-
     ::shims::isSnippetMode(true);
 
     TLOG(25) << "read_data() parse_document begin";
 
-    ::fhicl::parse_document(conf, fhicl_table);
+    auto fhicl_table = ::fhicl::parse_document(conf);
 
     TLOG(26) << "read_data() parse_document end";
 

@@ -101,7 +101,7 @@ index 1e8eed8..423f609 100644
 -                 std::any const value,
 -                 std::string src = {})
 -    : in_prolog{in_prolog}, tag{tag}, value{value}, src_info{move(src)}
-+                 boost::any const value,
++                 std::any const value,
 +                 std::string const& src = {})
 +    : in_prolog{in_prolog}
 +    , tag{tag}
@@ -112,7 +112,7 @@ index 1e8eed8..423f609 100644
 +
 +  extended_value(bool const in_prolog,
 +                 value_tag const tag,
-+                 boost::any const value,
++                 std::any const value,
 +                 raw_value_t raw_value,
 +                 Protection const protection,
 +                 std::string const& src = {})
@@ -126,7 +126,7 @@ index 1e8eed8..423f609 100644
 +
 +  extended_value(bool const in_prolog,
 +                 value_tag const tag,
-+                 boost::any const value,
++                 std::any const value,
 +                 raw_value_t raw_value,
 +                 std::string const& src = {})
 +    : in_prolog{in_prolog}
@@ -149,15 +149,6 @@ diff --git a/fhiclcpp/parse.cc b/fhiclcpp/parse.cc
 index 951532e..b6e7f17 100644
 --- a/fhiclcpp/parse.cc
 +++ b/fhiclcpp/parse.cc
-@@ -135,7 +135,7 @@ namespace {
-     }
- 
-     v.protection = static_cast<Protection>(m);
--    check_protection(v, name);
-+        check_protection(v, name);
-   }
- 
-   std::string
 @@ -193,9 +193,10 @@ namespace {
              value_tag const t,
              std::any const v,
@@ -170,159 +161,6 @@ index 951532e..b6e7f17 100644
    }
  
    complex_t
-@@ -242,13 +243,13 @@ namespace {
-              intermediate_table& t,
-              FwdIter const pos,
-              cet::includer const& s) try {
--    set_protection(name, m, value);
--    t.insert(name, value);
--  }
--  catch (fhicl::exception& e) {
-+      set_protection(name, m, value);
-+      t.insert(name, value);
-+    }
-+    catch (fhicl::exception& e) {
-     throw fhicl::exception(fhicl::error::parse_error, "Error in assignment:", e)
--      << " at " << s.highlighted_whereis(pos) << '\n';
--  }
-+        << " at " << s.highlighted_whereis(pos) << '\n';
-+    }
- 
-   template <typename FwdIter>
-   void
-@@ -257,13 +258,13 @@ namespace {
-             bool const in_prolog,
-             FwdIter const pos,
-             cet::includer const& s) try {
--    t.erase(name, in_prolog);
--  }
--  catch (fhicl::exception& e) {
--    throw fhicl::exception(
--      fhicl::error::parse_error, "Error in erase attempt:", e)
--      << " at " << s.highlighted_whereis(pos) << '\n';
--  }
-+      t.erase(name, in_prolog);
-+    }
-+    catch (fhicl::exception& e) {
-+      throw fhicl::exception(
-+        fhicl::error::parse_error, "Error in erase attempt:", e)
-+        << " at " << s.highlighted_whereis(pos) << '\n';
-+    }
- 
-   void
-   map_insert(std::string const& name,
-@@ -283,13 +284,13 @@ namespace {
-           << i->second.pretty_src_info() << ")\n";
-       }
-       switch (i->second.protection) {
--      case Protection::NONE:
--        break;
--      case Protection::PROTECT_IGNORE:
--        // Do not overwrite protected binding.
--        return;
--      case Protection::PROTECT_ERROR:
--        throw fhicl::exception(fhicl::error::protection_violation)
-+        case Protection::NONE:
-+          break;
-+        case Protection::PROTECT_IGNORE:
-+          // Do not overwrite protected binding.
-+          return;
-+        case Protection::PROTECT_ERROR:
-+          throw fhicl::exception(fhicl::error::protection_violation)
-           << '"' << name << "\" is protected on " << i->second.pretty_src_info()
-           << '\n';
-       }
-@@ -305,12 +306,12 @@ namespace {
-                  table_t& t,
-                  FwdIter const pos,
-                  cet::includer const& s) try {
--    map_insert(name, m, value, t);
--  }
--  catch (fhicl::exception& e) {
-+      map_insert(name, m, value, t);
-+    }
-+    catch (fhicl::exception& e) {
-     throw fhicl::exception(fhicl::error::parse_error, "Error in assignment:", e)
--      << " at " << s.highlighted_whereis(pos) << '\n';
--  }
-+        << " at " << s.highlighted_whereis(pos) << '\n';
-+    }
- 
-   template <typename FwdIter>
-   void
-@@ -342,16 +343,16 @@ namespace {
-             << element.pretty_src_info() << ")\n";
-         }
-         switch (element.protection) {
--        case Protection::NONE:
--          break;
--        case Protection::PROTECT_IGNORE:
--          continue;
--        case Protection::PROTECT_ERROR:
--          throw fhicl::exception(fhicl::error::protection_violation)
-+          case Protection::NONE:
-+            break;
-+          case Protection::PROTECT_IGNORE:
-+            continue;
-+          case Protection::PROTECT_ERROR:
-+            throw fhicl::exception(fhicl::error::protection_violation)
-             << "@table::" << name << ": inserting name " << name
--            << "would violate protection on existing item"
--            << "\n(previous definition on " << element.pretty_src_info()
--            << ")\n";
-+              << "would violate protection on existing item"
-+              << "\n(previous definition on " << element.pretty_src_info()
-+              << ")\n";
-         }
-       }
-       element = value;
-@@ -422,16 +423,16 @@ namespace {
-     if (i == t.end())
-       return;
- 
--    switch (i->second.protection) {
--    case Protection::NONE:
--      t.erase(name);
--    case Protection::PROTECT_IGNORE:
--      break;
--    case Protection::PROTECT_ERROR:
--      throw fhicl::exception(fhicl::error::protection_violation)
--        << "Unable to erase " << name << " due to protection.\n";
-+      switch (i->second.protection) {
-+        case Protection::NONE:
-+          t.erase(name);
-+        case Protection::PROTECT_IGNORE:
-+          break;
-+        case Protection::PROTECT_ERROR:
-+          throw fhicl::exception(fhicl::error::protection_violation)
-+            << "Unable to erase " << name << " due to protection.\n";
-+      }
-     }
--  }
- 
-   template <typename FwdIter>
-   void
-@@ -439,13 +440,13 @@ namespace {
-                 table_t& t,
-                 FwdIter pos,
-                 cet::includer const& s) try {
--    map_erase(name, t);
--  }
--  catch (fhicl::exception& e) {
--    throw fhicl::exception(
--      fhicl::error::parse_error, "Error in erase attempt:", e)
--      << " at " << s.highlighted_whereis(pos) << '\n';
--  }
-+      map_erase(name, t);
-+    }
-+    catch (fhicl::exception& e) {
-+      throw fhicl::exception(
-+        fhicl::error::parse_error, "Error in erase attempt:", e)
-+        << " at " << s.highlighted_whereis(pos) << '\n';
-+    }
- 
-   // ----------------------------------------------------------------------
- 
 @@ -646,66 +647,19 @@ namespace {
  #pragma clang diagnostic ignored "-Wunsequenced"
  #endif
@@ -403,27 +241,6 @@ index 951532e..b6e7f17 100644
  #ifdef __clang__
  #pragma clang diagnostic pop
  #endif
-@@ -817,14 +771,14 @@ namespace {
-       return std::move(p.tbl);
-     }
- 
--    auto e = fhicl::exception(fhicl::parse_error, "detected at or near")
--             << s.highlighted_whereis(begin) << "\n";
--    if (unparsed.find("BEGIN_PROLOG"s) == 0ull) {
--      e << "PROLOG blocks must be both contiguous and not nested.\n";
-+      auto e = fhicl::exception(fhicl::parse_error, "detected at or near")
-+               << s.highlighted_whereis(begin) << "\n";
-+      if (unparsed.find("BEGIN_PROLOG"s) == 0ull) {
-+        e << "PROLOG blocks must be both contiguous and not nested.\n";
-+      }
-+      throw e;
-     }
--    throw e;
-   }
--}
- 
- fhicl::intermediate_table
- fhicl::parse_document(std::string const& filename, cet::filepath_maker& maker)
 diff --git a/fhiclcpp/parse_shims.h b/fhiclcpp/parse_shims.h
 index d1f5dae..c70be82 100644
 --- a/fhiclcpp/parse_shims.h
