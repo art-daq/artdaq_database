@@ -15,7 +15,6 @@ foreach(INCLUDE_DIR ${CURRENT_INCLUDE_DIRECTORIES})
     message(STATUS "include='${INCLUDE_DIR}'")
 endforeach()
 
-set(FHICLCPP artdaq-database_fhiclcpp)
 
 if ( NOT EXISTS ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp )
     message("Downloading fhicl-cpp source")

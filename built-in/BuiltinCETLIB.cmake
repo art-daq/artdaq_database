@@ -15,8 +15,6 @@ foreach(INCLUDE_DIR ${CURRENT_INCLUDE_DIRECTORIES})
     message(STATUS "include='${INCLUDE_DIR}'")
 endforeach()
 
-set(CETLIB artdaq-database_cetlib)
-
 if ( NOT EXISTS ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib )
     message("Downloading cetlib source")
     execute_process(COMMAND rm -rf ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib

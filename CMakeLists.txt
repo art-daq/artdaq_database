@@ -64,6 +64,7 @@ if(BTYPE_UC STREQUAL DEBUG)
 endif()
 
 # buil-in libraries
+include(BuiltinTargets)
 include(BuiltinMONGOC)
 include(BuiltinMONGOCXX)
 include(BuiltinFHICLCPP)

@@ -50,6 +50,8 @@ cet_make_exec(fhicl2json
   artdaq-database_JsonDocument
   artdaq-database_DataFormats_Fhicl
   ${FHICLCPP}
+  ${CETLIB}
+  ${CETLIB_EXCEPT}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
@@ -66,6 +68,8 @@ cet_make_exec(bulkloader
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
   ${FHICLCPP}
+  ${CETLIB}
+  ${CETLIB_EXCEPT}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
   -lpthread
 )
@@ -83,6 +87,8 @@ cet_make_exec(bulkdownloader
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
   ${FHICLCPP}
+  ${CETLIB}
+  ${CETLIB_EXCEPT}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
   -lpthread
 )

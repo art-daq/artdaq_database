@@ -15,7 +15,6 @@ foreach(INCLUDE_DIR ${CURRENT_INCLUDE_DIRECTORIES})
     message(STATUS "include='${INCLUDE_DIR}'")
 endforeach()
 
-set(CETLIB_EXCEPT artdaq-database_cetlibexcept)
 
 if ( NOT EXISTS ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib_except )
     message("Downloading cetlib_except source")

@@ -8,23 +8,19 @@
 
 cet_add_compiler_flags(-fvisibility=hidden)
 
-SET(MAKE_CETLIBEXCEPT_STATIC $ENV{MAKE_CETLIBEXCEPT_STATIC})
-IF(MAKE_CETLIBEXCEPT_STATIC)
-  string(TOUPPER ${MAKE_CETLIBEXCEPT_STATIC} MAKE_CETLIBEXCEPT_STATIC_UC )
-  if( ${MAKE_CETLIBEXCEPT_STATIC_UC} MATCHES "TRUE" )
-    set(CETLIBEXCEPT_IS_STATIC "TRUE")
-  endif()
-ELSE()
-   set(CETLIBEXCEPT_IS_STATIC "TRUE")
-ENDIF()
-
 IF(CETLIBEXCEPT_IS_STATIC)
   MESSAGE (STATUS "Making cetlib_except static")
-  cet_make_library(LIBRARY_NAME ${CETLIB_EXCEPT} STATIC SOURCE 
+  
+  set(SOURCES
     cetlib_except/cetlib_except/exception.cc
     )
     
-  set_property(TARGET ${CETLIB_EXCEPT} PROPERTY POSITION_INDEPENDENT_CODE ON)
+  set(LIBRARIES  
+    )
+    
+  add_library(${CETLIB_EXCEPT_TARGET} OBJECT ${SOURCES})
+  set_property(TARGET ${CETLIB_EXCEPT_TARGET} PROPERTY POSITION_INDEPENDENT_CODE ON)
+  target_link_libraries(${CETLIB_EXCEPT_TARGET} ${LIBRARIES})  
 
 else()
   cet_make(
@@ -40,20 +36,10 @@ else()
   ) 
 ENDIF()
 
-SET(MAKE_CETLIB_STATIC $ENV{MAKE_CETLIB_STATIC})
-IF(MAKE_CETLIB_STATIC)
-  string(TOUPPER ${MAKE_CETLIB_STATIC} MAKE_CETLIB_STATIC_UC )
-  if( ${MAKE_CETLIB_STATIC_UC} MATCHES "TRUE" )
-    set(CETLIB_IS_STATIC "TRUE")
-  endif()
-ELSE()
-   set(CETLIB_IS_STATIC "TRUE")
-ENDIF()
-
 IF(CETLIB_IS_STATIC)
   MESSAGE (STATUS "Making cetlib static")
   
-  cet_make_library(LIBRARY_NAME ${CETLIB} STATIC SOURCE 
+  set(SOURCES
     cetlib/cetlib/canonical_number.cc
     cetlib/cetlib/canonical_string.cc
     cetlib/cetlib/include.cc
@@ -64,13 +50,19 @@ IF(CETLIB_IS_STATIC)
     cetlib/cetlib/filesystem.cc
     cetlib/cetlib/getenv.cc
     cetlib/cetlib/split_by_regex.cc
-    LIBRARIES  
-    ${CETLIB_EXCEPT_LIB}
+    )
+
+  set(LIBRARIES  
+    ${CETLIB_EXCEPT}
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     )
-        
-  set_property(TARGET ${CETLIB} PROPERTY POSITION_INDEPENDENT_CODE ON)
+
+  include_directories( ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib )
+    
+  add_library(${CETLIB_TARGET} OBJECT ${SOURCES})
+  set_property(TARGET ${CETLIB_TARGET} PROPERTY POSITION_INDEPENDENT_CODE ON)
+  target_link_libraries(${CETLIB_TARGET} ${LIBRARIES})  
 
 else()
   cet_make(
@@ -103,31 +95,29 @@ else()
   ) 
 ENDIF()
 
-SET(MAKE_FHICLCPP_STATIC $ENV{MAKE_FHICLCPP_STATIC})
-IF(MAKE_FHICLCPP_STATIC)
-  string(TOUPPER ${MAKE_FHICLCPP_STATIC} MAKE_FHICLCPP_STATIC_UC )
-  if( ${MAKE_FHICLCPP_STATIC_UC} MATCHES "TRUE" )
-    set(FHICLCPP_IS_STATIC "TRUE")
-  endif()
-ELSE()
-	set(FHICLCPP_IS_STATIC "TRUE")
-ENDIF()
-
 IF(FHICLCPP_IS_STATIC)
   MESSAGE (STATUS "Making FHiCL static")
   
-  cet_make_library(LIBRARY_NAME ${FHICLCPP} STATIC SOURCE 
+  set(SOURCES
     fhicl-cpp/fhiclcpp/exception.cc
     fhicl-cpp/fhiclcpp/extended_value.cc
     fhicl-cpp/fhiclcpp/intermediate_table.cc
     fhicl-cpp/fhiclcpp/parse.cc
     fhicl-cpp/fhiclcpp/parse_shims.cc
     fhicl-cpp/fhiclcpp/Protection.cc
-   LIBRARIES  
-    ${CETLIB_LIB}
-    ${CETLIB_EXCEPT_LIB}
     )
-  set_property(TARGET ${FHICLCPP} PROPERTY POSITION_INDEPENDENT_CODE ON)
+
+  set(LIBRARIES  
+    ${CETLIB}
+    ${CETLIB_EXCEPT}
+    )
+    
+  include_directories( ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp )
+    
+  add_library(${FHICLCPP_TARGET} OBJECT ${SOURCES})
+  set_property(TARGET ${FHICLCPP_TARGET} PROPERTY POSITION_INDEPENDENT_CODE ON)
+  target_link_libraries(${FHICLCPP_TARGET} ${LIBRARIES})  
+
 else()
   cet_make(
     LIBRARY_NAME 
