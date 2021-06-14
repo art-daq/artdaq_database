@@ -106,6 +106,7 @@ cet_make_exec(migrate_database
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB  
   ${Boost_PROGRAM_OPTIONS_LIBRARY} 
+  ${CETLIB_EXCEPT}
 )
 
 cet_make_exec(rebuild_database_index
@@ -120,6 +121,7 @@ cet_make_exec(rebuild_database_index
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB  
   ${Boost_PROGRAM_OPTIONS_LIBRARY} 
+  ${CETLIB_EXCEPT}
 )
 
 cet_make_exec(fixtestjson
@@ -127,6 +129,7 @@ cet_make_exec(fixtestjson
   artdaq-database_SharedCommon
   artdaq-database_DataFormats_Fhicl
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
+  ${CETLIB_EXCEPT}
 )
 
 

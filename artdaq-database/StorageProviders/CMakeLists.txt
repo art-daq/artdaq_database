@@ -1,6 +1,7 @@
 cet_make(
   LIBRARIES
   artdaq-database_SharedCommon
+  ${CETLIB_EXCEPT}
 )
 
 
