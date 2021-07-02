@@ -16,7 +16,7 @@
 # use cmake 3.17 or later
 cmake_minimum_required (VERSION 3.17)
 
-project(artdaq_database VERSION 1.05.03)
+project(artdaq_database VERSION 1.05.04)
 
 SET ( CETBUILDTOOLS_VERSION $ENV{CETBUILDTOOLS_VERSION} )
 IF (NOT CETBUILDTOOLS_VERSION)
@@ -36,6 +36,7 @@ set(CMAKE_MODULE_PATH
 include(CetCMakeEnv)
 
 cet_cmake_env()
+set(artdaq_database_OLD_STYLE_CONFIG_VARS TRUE)
 
 cet_set_compiler_flags(DIAGS VIGILANT WERROR NO_UNDEFINED EXTRA_FLAGS -pedantic )
 
@@ -43,7 +44,8 @@ IF (SANITIZE_ADDRESS)
   string(TOUPPER ${SANITIZE_ADDRESS} SANITIZE_ADDRESS_UC )
   if( ${SANITIZE_ADDRESS_UC} MATCHES "TRUE" )
     MESSAGE (STATUS "Enable  -fsanitize=address")
-    cet_add_compiler_flags(-fsanitize=address)
+			add_compile_options(-fsanitize=address -Wno-unused-command-line-argument)
+			add_link_options(-lasan)
   endif()
 ENDIF()
 

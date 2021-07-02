@@ -19,36 +19,63 @@ perllib  product_dir
 
 #
 product         version         optional
-boost           v1_75_0         s108
-boost           v1_75_0         s109
-python          v3_9_2          s108
-python          v3_9_2          s109
-python          v2_7_15a        py2
-python          v3_7_2          -default-
+boost           v1_73_0         s105
+boost           v1_73_0         s106
+boost           v1_73_0         s110
+boost           v1_75_0         -default-
+python          v3_8_3b         s105
+python          v3_8_3b         s106
+python          v3_8_3b         s110
+python          v3_9_2          -default-
 mongodb         v4_0_8c         -       only_for_build
 TRACE           v3_17_01        -       only_for_build
 swig            v4_0_2          -       only_for_build
 nodejs          v10_15_0        -       only_for_build
-cetbuildtools   v8_08_02        -       only_for_build
+cetbuildtools   v8_10_01        -       only_for_build
 end_product_list
 
 # -nq- means there is no qualifier
 # a "-" means the dependent product is not required by the parent and will not be setup
 qualifier          boost        mongodb      python  TRACE    swig           nodejs  notes
+c7:s105:debug      c7:debug     c7:debug     -nq-    -nq-     c7:debug       -nq-    -std=c++17
+c7:s105:prof       c7:prof      c7:prof      -nq-    -nq-     c7:prof        -nq-    -std=c++17
+c7:s106:debug      c7:debug     c7:debug     -nq-    -nq-     c7:debug       -nq-    -std=c++17
+c7:s106:prof       c7:prof      c7:prof      -nq-    -nq-     c7:prof        -nq-    -std=c++17
 c7:s108:debug      c7:debug     c7:debug     -nq-    -nq-     c7:debug       -nq-    -std=c++17
 c7:s108:prof       c7:prof      c7:prof      -nq-    -nq-     c7:prof        -nq-    -std=c++17
 c7:s109:debug      c7:debug     c7:debug     -nq-    -nq-     c7:debug       -nq-    -std=c++17
 c7:s109:prof       c7:prof      c7:prof      -nq-    -nq-     c7:prof        -nq-    -std=c++17
-
+c7:s110:debug      c7:debug     c7:debug     -nq-    -nq-     c7:debug       -nq-    -std=c++17
+c7:s110:prof       c7:prof      c7:prof      -nq-    -nq-     c7:prof        -nq-    -std=c++17
+c7:s111:debug      c7:debug     c7:debug     -nq-    -nq-     c7:debug       -nq-    -std=c++17
+c7:s111:prof       c7:prof      c7:prof      -nq-    -nq-     c7:prof        -nq-    -std=c++17
+ 
+e19:s105:debug     e19:debug    e19:debug    -nq-    -nq-     e19:debug      -nq-    -std=c++17
+e19:s105:prof      e19:prof     e19:prof     -nq-    -nq-     e19:prof       -nq-    -std=c++17
+e19:s106:debug     e19:debug    e19:debug    -nq-    -nq-     e19:debug      -nq-    -std=c++17
+e19:s106:prof      e19:prof     e19:prof     -nq-    -nq-     e19:prof       -nq-    -std=c++17
 e19:s108:debug     e19:debug    e19:debug    -nq-    -nq-     e19:debug      -nq-    -std=c++17
 e19:s108:prof      e19:prof     e19:prof     -nq-    -nq-     e19:prof       -nq-    -std=c++17
 e19:s109:debug     e19:debug    e19:debug    -nq-    -nq-     e19:debug      -nq-    -std=c++17
 e19:s109:prof      e19:prof     e19:prof     -nq-    -nq-     e19:prof       -nq-    -std=c++17
+e19:s110:debug     e19:debug    e19:debug    -nq-    -nq-     e19:debug      -nq-    -std=c++17
+e19:s110:prof      e19:prof     e19:prof     -nq-    -nq-     e19:prof       -nq-    -std=c++17
+e19:s111:debug     e19:debug    e19:debug    -nq-    -nq-     e19:debug      -nq-    -std=c++17
+e19:s111:prof      e19:prof     e19:prof     -nq-    -nq-     e19:prof       -nq-    -std=c++17
 
+e20:s105:debug     e20:debug    e20:debug    -nq-    -nq-     e20:debug      -nq-    -std=c++17
+e20:s105:prof      e20:prof     e20:prof     -nq-    -nq-     e20:prof       -nq-    -std=c++17
+e20:s106:debug     e20:debug    e20:debug    -nq-    -nq-     e20:debug      -nq-    -std=c++17
+e20:s106:prof      e20:prof     e20:prof     -nq-    -nq-     e20:prof       -nq-    -std=c++17
 e20:s108:debug     e20:debug    e20:debug    -nq-    -nq-     e20:debug      -nq-    -std=c++17
 e20:s108:prof      e20:prof     e20:prof     -nq-    -nq-     e20:prof       -nq-    -std=c++17
 e20:s109:debug     e20:debug    e20:debug    -nq-    -nq-     e20:debug      -nq-    -std=c++17
 e20:s109:prof      e20:prof     e20:prof     -nq-    -nq-     e20:prof       -nq-    -std=c++17
+e20:s110:debug     e20:debug    e20:debug    -nq-    -nq-     e20:debug      -nq-    -std=c++17
+e20:s110:prof      e20:prof     e20:prof     -nq-    -nq-     e20:prof       -nq-    -std=c++17
+e20:s111:debug     e20:debug    e20:debug    -nq-    -nq-     e20:debug      -nq-    -std=c++17
+e20:s111:prof      e20:prof     e20:prof     -nq-    -nq-     e20:prof       -nq-    -std=c++17
+
 end_qualifier_list
 
 
