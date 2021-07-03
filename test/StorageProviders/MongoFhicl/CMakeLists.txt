@@ -9,6 +9,7 @@ cet_make_exec(MongoFhicl_t
   ${FHICLCPP}
   #${SQLITE3}
   ${CETLIB}
+  ${CETLIB_EXCEPT}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}    
 ) 
 

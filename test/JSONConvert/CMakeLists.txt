@@ -10,7 +10,7 @@ cet_make_exec(JSONConvert_t
   artdaq-database_StorageProviders_UconDB
   ${FHICLCPP}
   ${CETLIB}
-  #${SQLITE3}
+  ${CETLIB_EXCEPT}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}  
 ) 
 

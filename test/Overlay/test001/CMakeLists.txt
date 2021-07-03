@@ -5,6 +5,7 @@ cet_make_exec(JSONOverlay_t
   
   artdaq-database_Overlay
   ${CETLIB}
+  ${CETLIB_EXCEPT}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 ) 
 

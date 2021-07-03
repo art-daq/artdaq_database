@@ -2,8 +2,9 @@ cet_make_exec(JSONDocumentBuilder_t
   LIBRARIES
   
   artdaq-database_JsonDocument
-  ${CETLIB}
   ${FHICLCPP} 
+  ${CETLIB}
+  ${CETLIB_EXCEPT}
   #${SQLITE3}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 ) 
