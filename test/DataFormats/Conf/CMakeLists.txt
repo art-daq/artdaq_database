@@ -3,7 +3,7 @@ cet_make_exec(CONFConvert_t
   
   artdaq-database_DataFormats_Json
   artdaq-database_DataFormats_Conf
-  ${CETLIB}
+  cetlib
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 ) 
 

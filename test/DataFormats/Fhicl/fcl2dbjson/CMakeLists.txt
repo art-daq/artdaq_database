@@ -3,9 +3,9 @@ cet_make_exec(ConvertFhicl_t
   
   artdaq-database_DataFormats_Json
   artdaq-database_DataFormats_Fhicl
-  ${FHICLCPP}
-  ${CETLIB}
-  ${CETLIB_EXCEPT}
+  fhiclcpp
+  cetlib
+  cetlib_except
   #${SQLITE3}
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 ) 

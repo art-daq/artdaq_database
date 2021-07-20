@@ -2,9 +2,9 @@ cet_make(
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_DataFormats_Json
-  ${FHICLCPP}
-  ${CETLIB}
-  ${CETLIB_EXCEPT}
+  fhiclcpp
+  cetlib
+  cetlib_except
   )
   if(FHICLCPP_IS_STATIC)
   add_dependencies(artdaq-database_SharedCommon ${FHICLCPP_TARGET})

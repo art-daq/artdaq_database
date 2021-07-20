@@ -17,10 +17,10 @@ cet_make_exec(DatabaseConfiguration_t
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB  
-  ${FHICLCPP}
+  fhiclcpp
   #${SQLITE3}
-  ${CETLIB}
-  ${CETLIB_EXCEPT}
+  cetlib
+  cetlib_except
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 	${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}	
 ) 

@@ -13,7 +13,7 @@ cet_make(
   artdaq-database_JsonDocument
   artdaq-database_StorageProviders
   ${CURL_LIBRARIES}
-  ${CETLIB_EXCEPT}
+  cetlib_except
 )
 
 install_headers()

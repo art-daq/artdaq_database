@@ -9,9 +9,9 @@ cet_make_exec(MigrateDatabase_t
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB  
-  ${FHICLCPP}
+  fhiclcpp
   #${SQLITE3}
-  ${CETLIB}
+  cetlib
   ${Boost_PROGRAM_OPTIONS_LIBRARY}  
 )
 

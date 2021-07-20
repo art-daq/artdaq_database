@@ -17,6 +17,8 @@ bindir      fq_dir      bin
 fcldir      -
 perllib  product_dir
 
+old_style_config_vars
+
 #
 product         version         optional
 boost           v1_73_0         s105
@@ -31,7 +33,7 @@ mongodb         v4_0_8c         -       only_for_build
 TRACE           v3_17_01        -       only_for_build
 swig            v4_0_2          -       only_for_build
 nodejs          v10_15_0        -       only_for_build
-cetbuildtools   v8_10_01        -       only_for_build
+cetbuildtools   v8_11_00        -       only_for_build
 end_product_list
 
 # -nq- means there is no qualifier

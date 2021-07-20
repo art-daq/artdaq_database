@@ -6,10 +6,10 @@ cet_make_exec(FileSystemFhicl_t
   artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
   artdaq-database_StorageProviders_FileSystemDB
-  ${FHICLCPP}
+  fhiclcpp
   #${SQLITE3}
-  ${CETLIB}
-  ${CETLIB_EXCEPT}
+  cetlib
+  cetlib_except
   ${Boost_PROGRAM_OPTIONS_LIBRARY}    
 ) 
 
