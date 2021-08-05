@@ -1,179 +1,234 @@
 
 artdaq_processes: [{
 
-collection: COB1RCEs 
+collection: GPSs 
 
-pattern: "^(?!.*common_code)(.*/)(cob1_rce\d+(_hw_cfg|))(\.fcl$)" 
+pattern: '(.*/)(gps(\d*|_standard))(\.fcl$)'
+
+}, {
+ collection: Other
+ pattern : '(.*/)(dummygenerator|pmt_oldstandard|crt_north_test_inner|v0pmt_standard)(\.fcl$)'
+},  {
+
+collection: Triggers 
+
+pattern: '(.*/)(icarustrigger(|test))(\.fcl$)' 
 
 }, {
 
-collection: COB2RCEs 
+collection: WRs 
 
-pattern: "^(?!.*common_code)(.*/)(cob2_rce\d+(_hw_cfg|))(\.fcl$)" 
-
-}, {
-
-collection: COB3RCEs 
-
-pattern: "^(?!.*common_code)(.*/)(cob3_rce\d+(_hw_cfg|))(\.fcl$)" 
+pattern: '(.*/)(wr(\d*|_pull|_standard))(\.fcl$)' 
 
 }, {
 
-collection: COB4RCEs 
+collection: XARAs 
 
-pattern: "^(?!.*common_code)(.*/)(cob4_rce\d+(_hw_cfg|))(\.fcl$)" 
-
-}, {
-
-collection: COB5RCEs 
-
-pattern: "^(?!.*common_code)(.*/)(cob5_rce\d+(_hw_cfg|))(\.fcl$)" 
+pattern: '(.*/)(xara(\d+|_standard))(\.fcl$)' 
 
 }, {
 
-collection: COB6RCEs 
 
-pattern: "^(?!.*common_code)(.*/)(cob6_rce\d+(_hw_cfg|))(\.fcl$)" 
+collection: MBBs 
 
-}, {
-
-collection: RCEs 
-
-pattern: "^(?!.*common_code)(.*/)(rce\d+(_hw_cfg|))(\.fcl$)" 
+pattern: '(.*/)(mbb(\d+|_standard))(\.fcl$)' 
 
 }, {
+
 
 collection: WIBs 
 
-pattern: "^(?!.*common_code)(.*/)(wib\d+(_hw_cfg|))(\.fcl$)" 
+pattern: '(.*/)(wib(\d+|_standard))(\.fcl$)' 
 
 }, {
 
-collection: WIBTests 
 
-pattern: "^(?!.*common_code)(.*/)(wibtest\d+(_hw_cfg|))(\.fcl$)" 
+collection: PTBs 
 
-}, {
-
-collection: SSPs 
-
-pattern: "^(?!.*common_code)(.*/)(ssp\d+(_hw_cfg|))(\.fcl$)" 
+pattern: '(.*/)(ptb(\d+|_standard))(\.fcl$)' 
 
 }, {
 
-collection: PENs 
+collection: CRTs 
 
-pattern: "^(?!.*common_code)(.*/)(pen\d+(_hw_cfg|))(\.fcl$)" 
-
-}, {
-
-collection: Felixes 
-
-pattern: "^(?!.*common_code)(.*/)([Ff]elix\d+(_hw_cfg|))(\.fcl$)" 
+pattern: '(.*/)((|icarus|icarus_)crt(|_feb)(\d+(|[a-zA-Z]{3})|_bitstream_\d+|_standard|_common|_noise))(\.fcl$)' 
 
 }, {
+collection: PMTs 
 
-collection: Timing 
-
-pattern: "^(?!.*common_code)(.*/)(timing[_|]\d+(_hw_cfg|))(\.fcl$)" 
+pattern: '(.*/)((|icarus)pmt_standard_(even|odd|(|we|ww|ew|ee)(|top|bot)\d+))(\.fcl$)' 
 
 }, {
 
 collection: PMTs 
 
-pattern: "^(?!.*common_code)(.*/)(pmt\d+(_hw_cfg|))(\.fcl$)" 
+pattern: '(.*/)((|icarus)pmt((|we|ww|ew|ee)(|top|bot)\d+|x\d+|_standard(|_pmt\d+link\d+)))(\.fcl$)' 
+
+}, {
+
+collection: NevisTPCs 
+
+pattern: '(.*/)((fake_|)NevisTPC(2|NU)Stream(CALIB|CTRL|EXT)_driver)(\.fcl$)' 
 
 }, {
 
 collection: TPCs 
 
-pattern: "^(?!.*common_code)(.*/)(tpc\d+(_hw_cfg|))(\.fcl$)" 
-
-}, {
-
-collection: Components 
-
-pattern: "^(?!.*common_code)(.*/)(component\d*(_hw_cfg|))(\.fcl$)" 
-
-}, {
-
-collection: BoardReaders 
-
-pattern: "^(?!.*common_code)(.*/)(BoardReader\d+)(\.fcl$)" 
+pattern: '(.*/)(((|icarus)tpc)((|we|ww|ew|ee)\d+(|b|t|m|n\d+)|_standard(|_n\d+)))(\.fcl$)' 
 
 }, {
 
 collection: EventBuilders 
 
-pattern: "^(?!.*common_code)(.*/)(EventBuilder\d+)(\.fcl$)" 
-
-}, {
-
-collection: Aggregators 
-
-pattern: "^(?!.*common_code)(.*/)(Aggregator\d+)(\.fcl$)" 
+pattern: '(.*/)(EventBuilder(\d+|_standard))(\.fcl$)' 
 
 }, {
 
 collection: DataLoggers 
 
-pattern: "^(?!.*common_code)(.*/)(DataLogger\d+)(\.fcl$)" 
+pattern: '(.*/)(DataLogger(\d+|_standard))(\.fcl$)' 
 
 }, {
 
 collection: Dispatchers 
 
-pattern: "^(?!.*common_code)(.*/)(Dispatcher\d+)(\.fcl$)" 
+pattern: '(.*/)(Dispatcher(\d+|_standard))(\.fcl$)' 
 
 }, {
 
-collection: expert_options 
+collection: RoutingManager 
 
-pattern: "^(?!.*common_code)(.*/)((rce_expert_run_options|ssp_expert_run_options|user_run_options).*)(\.fcl$)" 
+pattern: '(.*/)(RoutingManager(\d+|_standard))(\.fcl$)' 
+
+}, {
+
+collection: UserSettings
+
+pattern: '(.*/)(user_setings)(\.fcl$)' 
+
+}, {
+
+collection: Boot
+
+pattern: '(.*/)(boot)(\.fcl$)' 
+
+}, {
+
+collection: KnownBoardreasers
+
+pattern: '(.*/)(known_boardreaders_list)(\.fcl$)' 
+
+}, {
+
+collection: CriticalProcesses
+
+pattern: '(.*/)(critical_process_list)(\.fcl$)' 
+
+}, {
+
+collection: DataflowConfiguration 
+
+pattern: '(.*/)(DataflowConfiguration)(\.fcl$)' 
+
+}, {
+
+collection: Hashes 
+
+pattern: '(.*/)(hashes)(\.fcl$)' 
 
 }] 
 
-artdaq_includes: [{
-
-collection: common_code 
-
-pattern: "(.*/)common_code\/(.*)(\.fcl$)" 
-
-}] 
+artdaq_includes: [] 
 
 run_history: [{
 
-collection: RunHistory 
+collection: RunHistory
 
-pattern: "(.*/)((BoardReader_TOY\d+|BoardReader)_(.*[^_])_(\d+))(\.fcl$)" 
+pattern: '(.*/)(icarustrigger|icarustriggertest|dummygenerator|sbnToySimulator)(\.fcl$)' 
 
-entity: "match.group(3)+'_'+match.group(4)+'_'+match.group(5)" 
+}, {
+
+collection: RunHistory
+
+pattern: '(.*/)(component(\d*|_standard))(\.fcl$)' 
+
+}, {
+
+collection: RunHistory
+
+pattern: '(.*/)(gps(\d*|_standard))(\.fcl$)' 
 
 }, {
 
 collection: RunHistory 
 
-pattern: "(.*/)((component|EventBuilder|Aggregator|DataLogger|Dispatcher)_(.*[^_])_(\d+))(\.fcl$)" 
-
-entity: "match.group(3)+'_'+match.group(4)+'_'+match.group(5)" 
-
-},  {
-
-collection: RunHistory 
-
-pattern: "(.*/)((component|EventBuilder|Aggregator|DataLogger|Dispatcher)(\d+))(\.fcl$)" 
+pattern: '(.*/)(wr(\d*|_pull|_standard))(\.fcl$)' 
 
 }, {
 
 collection: RunHistory 
 
-pattern: "(.*/)(RunHistory|RunHistory2|boot|known_boardreaders_list|DataflowConfiguration)(\.fcl$)" 
+pattern: '(.*/)(xara(\d+|_standard))(\.fcl$)' 
+
+}, {
+
+
+collection: RunHistory 
+
+pattern: '(.*/)(mbb(\d+|_standard))(\.fcl$)' 
+
+}, {
+
+
+collection: RunHistory 
+
+pattern: '(.*/)(wib(\d+|_standard))(\.fcl$)' 
 
 }, {
 
 collection: RunHistory 
 
-pattern: "(.*/)(metadata)(\.fcl$)" 
+pattern: '(.*/)(ptb(\d+|_standard))(\.fcl$)' 
+
+}, {
+
+collection: RunHistory 
+
+pattern: '(.*/)((|icarus|icarus_)crt(|_feb)(\d+(|[a-zA-Z]{3})|_bitstream_\d+|_standard|_common|_noise))(\.fcl$)' 
+
+}, {
+collection: RunHistory 
+
+pattern: '(.*/)((|icarus)pmt_standard_(even|odd|(|we|ww|ew|ee)(|top|bot)\d+))(\.fcl$)' 
+}, {
+
+
+collection: RunHistory 
+
+pattern: '(.*/)((|icarus)pmt((|we|ww|ew|ee)(|top|bot)\d+|x\d+|_standard))(\.fcl$)' 
+}, {
+
+collection: RunHistory 
+
+pattern: '(.*/)((fake_|)NevisTPC(2|NU)Stream(CALIB|CTRL|EXT)_driver)(\.fcl$)' 
+
+}, {
+
+collection: RunHistory 
+
+pattern: '(.*/)(((|icarus)tpc)((|we|ww|ew|ee)\d+(|b|t|m|n\d+)|_standard(|_n\d+)))(\.fcl$)' 
+
+}, {
+
+collection: RunHistory 
+
+pattern: '(.*/)((EventBuilder|DataLogger|Dispatcher|RoutingManager)(\d+|_standard))(\.fcl$)' 
+
+}, {
+
+collection: RunHistory 
+
+pattern: '(.*/)(user_setings|metadata|boot|(known_boardreaders|critical_process)_list|DataflowConfiguration|RunHistory(|2))(\.fcl$)' 
 
 }] 
 
@@ -181,19 +236,12 @@ system_layout: [{
 
 collection: SystemLayout 
 
-pattern: "^(?!.*common_code)(.*)(schema)(\.fcl$)" 
+pattern: '(.*)(schema)(\.fcl$)' 
 
 }, {
 
-collection: Flags
+collection: Flags 
 
-pattern: "^(?!.*common_code)(.*)(flags)(\.fcl$)"
-
-}, {
-
-collection: Hashes
-
-pattern: "^(?!.*common_code)(.*)(hashes)(\.fcl$)"
+pattern: '(.*)(flags)(\.fcl$)' 
 
 }] 
-
