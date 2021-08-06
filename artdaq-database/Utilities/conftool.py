@@ -441,7 +441,6 @@ def __exportConfiguration(config):
     if not __ends_on_5digitnumber(config):
         print ('Error: Configuration does not have five digits at the end.')
         return False
-
     cfgs = __getConfigurationComposition(config)
 
     if not cfgs:
@@ -454,6 +453,8 @@ def __exportConfiguration(config):
             if cfg[entity_name] == special_file[0] and cfg[collection] == special_file[1]:
                 file_name =  cfg[entity_name] + '.fcl'
                 with open(file_name, 'w') as fcl_file:
+                    if file_name == 'schema.fcl':
+                        cfg=[cfg[entity_name],cfg[user_data].replace('"', "'"),cfg[collection]]
                     fcl_file.write(cfg[user_data])
                     cfg_entry = (cfg[collection], cfg[entity_name], file_name)
                     if sys.version_info[0] < 3:
