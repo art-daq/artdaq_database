@@ -8,16 +8,6 @@
 
 cet_add_compiler_flags(-fvisibility=hidden)
 
-SET(MAKE_CETLIBEXCEPT_STATIC $ENV{MAKE_CETLIBEXCEPT_STATIC})
-IF(MAKE_CETLIBEXCEPT_STATIC)
-  string(TOUPPER ${MAKE_CETLIBEXCEPT_STATIC} MAKE_CETLIBEXCEPT_STATIC_UC )
-  if( ${MAKE_CETLIBEXCEPT_STATIC_UC} MATCHES "TRUE" )
-    set(CETLIBEXCEPT_IS_STATIC "TRUE")
-  endif()
-ELSE()
-   set(CETLIBEXCEPT_IS_STATIC "TRUE")
-ENDIF()
-
 IF(CETLIBEXCEPT_IS_STATIC)
   MESSAGE (STATUS "Making cetlib_except static")
   
@@ -28,13 +18,14 @@ IF(CETLIBEXCEPT_IS_STATIC)
   set(LIBRARIES  
     )
     
-  add_library(${CETLIB_EXCEPT} STATIC ${SOURCES})
-  set_property(TARGET ${CETLIB_EXCEPT} PROPERTY POSITION_INDEPENDENT_CODE ON)
-  target_link_libraries(${CETLIB_EXCEPT} ${LIBRARIES})  
+  add_library(${CETLIB_EXCEPT_TARGET} OBJECT ${SOURCES})
+  set_property(TARGET ${CETLIB_EXCEPT_TARGET} PROPERTY POSITION_INDEPENDENT_CODE ON)
+  target_link_libraries(${CETLIB_EXCEPT_TARGET} ${LIBRARIES})  
+
 else()
   cet_make(
     LIBRARY_NAME 
-    ${CETLIB_EXCEPT}
+    cetlib_except
     LIBRARIES
     WITH_STATIC_LIBRARY
     SUBDIRS
@@ -43,16 +34,6 @@ else()
     cetlib_except/cetlib_except/demangle.cc
     cetlib_except/cetlib_except/exception_collector.cc
   ) 
-ENDIF()
-
-SET(MAKE_CETLIB_STATIC $ENV{MAKE_CETLIB_STATIC})
-IF(MAKE_CETLIB_STATIC)
-  string(TOUPPER ${MAKE_CETLIB_STATIC} MAKE_CETLIB_STATIC_UC )
-  if( ${MAKE_CETLIB_STATIC_UC} MATCHES "TRUE" )
-    set(CETLIB_IS_STATIC "TRUE")
-  endif()
-ELSE()
-   set(CETLIB_IS_STATIC "TRUE")
 ENDIF()
 
 IF(CETLIB_IS_STATIC)
@@ -72,22 +53,23 @@ IF(CETLIB_IS_STATIC)
     )
 
   set(LIBRARIES  
-    ${CETLIB_EXCEPT}
+    cetlib_except
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     )
 
   include_directories( ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib )
     
-  add_library(${CETLIB} STATIC ${SOURCES})
-  set_property(TARGET ${CETLIB} PROPERTY POSITION_INDEPENDENT_CODE ON)
-  target_link_libraries(${CETLIB} ${LIBRARIES})  
+  add_library(${CETLIB_TARGET} OBJECT ${SOURCES})
+  set_property(TARGET ${CETLIB_TARGET} PROPERTY POSITION_INDEPENDENT_CODE ON)
+  target_link_libraries(${CETLIB_TARGET} ${LIBRARIES})  
+
 else()
   cet_make(
     LIBRARY_NAME 
-    ${CETLIB}
+    cetlib
     LIBRARIES
-    ${CETLIB_EXCEPT}
+    cetlib_except
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     WITH_STATIC_LIBRARY
@@ -113,16 +95,6 @@ else()
   ) 
 ENDIF()
 
-SET(MAKE_FHICLCPP_STATIC $ENV{MAKE_FHICLCPP_STATIC})
-IF(MAKE_FHICLCPP_STATIC)
-  string(TOUPPER ${MAKE_FHICLCPP_STATIC} MAKE_FHICLCPP_STATIC_UC )
-  if( ${MAKE_FHICLCPP_STATIC_UC} MATCHES "TRUE" )
-    set(FHICLCPP_IS_STATIC "TRUE")
-  endif()
-ELSE()
-	set(FHICLCPP_IS_STATIC "TRUE")
-ENDIF()
-
 IF(FHICLCPP_IS_STATIC)
   MESSAGE (STATUS "Making FHiCL static")
   
@@ -136,22 +108,23 @@ IF(FHICLCPP_IS_STATIC)
     )
 
   set(LIBRARIES  
-    ${CETLIB}
-    ${CETLIB_EXCEPT}
+    cetlib
+    cetlib_except
     )
     
   include_directories( ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp )
     
-  add_library(${FHICLCPP} STATIC ${SOURCES})
-  set_property(TARGET ${FHICLCPP} PROPERTY POSITION_INDEPENDENT_CODE ON)
-  target_link_libraries(${FHICLCPP} ${LIBRARIES})  
+  add_library(${FHICLCPP_TARGET} OBJECT ${SOURCES})
+  set_property(TARGET ${FHICLCPP_TARGET} PROPERTY POSITION_INDEPENDENT_CODE ON)
+  target_link_libraries(${FHICLCPP_TARGET} ${LIBRARIES})  
+
 else()
   cet_make(
     LIBRARY_NAME 
-    ${FHICLCPP}
+    fhiclcpp
     LIBRARIES
-    ${CETLIB}
-    ${CETLIB_EXCEPT}
+    cetlib
+    cetlib_except
     WITH_STATIC_LIBRARY
     SUBDIRS
     fhicl-cpp/fhiclcpp

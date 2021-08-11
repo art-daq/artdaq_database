@@ -4,7 +4,8 @@ cet_make_exec(JSONOverlay_t
   artdaq-database_DataFormats_Json
   
   artdaq-database_Overlay
-  ${CETLIB}
+  cetlib
+  cetlib_except
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 ) 
 

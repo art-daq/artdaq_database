@@ -4,6 +4,7 @@ cet_make(
   artdaq-database_BasicTypes
   artdaq-database_JsonDocument
   artdaq-database_StorageProviders
+  cetlib_except
 )
 
 install_headers()

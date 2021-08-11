@@ -16,7 +16,7 @@
 # use cmake 3.17 or later
 cmake_minimum_required (VERSION 3.17)
 
-project(artdaq-database)
+project(artdaq_database VERSION 1.05.06)
 
 SET ( CETBUILDTOOLS_VERSION $ENV{CETBUILDTOOLS_VERSION} )
 IF (NOT CETBUILDTOOLS_VERSION)
@@ -43,15 +43,16 @@ IF (SANITIZE_ADDRESS)
   string(TOUPPER ${SANITIZE_ADDRESS} SANITIZE_ADDRESS_UC )
   if( ${SANITIZE_ADDRESS_UC} MATCHES "TRUE" )
     MESSAGE (STATUS "Enable  -fsanitize=address")
-    cet_add_compiler_flags(-fsanitize=address)
+			add_compile_options(-fsanitize=address -Wno-unused-command-line-argument)
+			add_link_options(-lasan)
   endif()
 ENDIF()
 
 
-cet_report_compiler_flags()
+#cet_report_compiler_flags()
 
 # these are minimum required versions, not the actual product versions
-find_ups_boost  ( v1_66_0a )
+find_ups_boost  ( v1_66_0 )
 find_ups_product( cetbuildtools v7_15_01 )
 find_ups_product( cetpkgsupport v1_14_01 )
 find_ups_product( TRACE v3_15_09 )
@@ -64,6 +65,7 @@ if(BTYPE_UC STREQUAL DEBUG)
 endif()
 
 # buil-in libraries
+include(BuiltinTargets)
 include(BuiltinMONGOC)
 include(BuiltinMONGOCXX)
 include(BuiltinFHICLCPP)

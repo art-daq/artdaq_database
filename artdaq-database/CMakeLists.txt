@@ -1,7 +1,7 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${TOP_CMAKE_SOURCE_DIR}
  ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp
  ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib
- $ENV{MONGODB_INC}) # this is really bad -- we don't know why find_ups_product isn't doing this
+ ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib_except)
 
 IF (FORMAT_WITH_CLANG)
   string(TOUPPER ${FORMAT_WITH_CLANG} FORMAT_WITH_CLANG_UC )
@@ -10,7 +10,7 @@ IF (FORMAT_WITH_CLANG)
   endif()
 ENDIF()
 
-message(STATUS "FHICLCPP='${FHICLCPP}'")
+message(STATUS "FHICLCPP='fhiclcpp'")
 
 install(DIRECTORY deployment-scripts DESTINATION ${product}/${version})
 cet_script(deployment-scripts/install_artdaq_database.sh)

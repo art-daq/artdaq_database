@@ -143,6 +143,7 @@ function run_build() {
   export MAKE_CETLIBEXCEPT_STATIC=TRUE
   export MAKE_CETLIB_STATIC=TRUE
 
+  export CETPKG_INSTALL=${working_dir}/copyBack/
 
   unset RUN_TESTS
   CETPKG_J=$(nproc)

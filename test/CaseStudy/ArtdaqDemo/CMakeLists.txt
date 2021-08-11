@@ -9,9 +9,10 @@ cet_make_exec(ArtdaqDemo_t
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
-  ${FHICLCPP}
+  fhiclcpp
   #${SQLITE3}
-  ${CETLIB}
+  cetlib
+  cetlib_except
   ${Boost_PROGRAM_OPTIONS_LIBRARY}  
 ) 
 

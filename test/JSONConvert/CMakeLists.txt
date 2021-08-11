@@ -8,9 +8,9 @@ cet_make_exec(JSONConvert_t
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
-  ${FHICLCPP}
-  ${CETLIB}
-  #${SQLITE3}
+  fhiclcpp
+  cetlib
+  cetlib_except
   ${Boost_PROGRAM_OPTIONS_LIBRARY}  
 ) 
 

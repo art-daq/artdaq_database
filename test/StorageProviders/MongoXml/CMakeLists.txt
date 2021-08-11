@@ -6,9 +6,10 @@ cet_make_exec(MongoXml_t
   artdaq-database_DataFormats_Xml
   artdaq-database_JsonDocument
   artdaq-database_StorageProviders_MongoDB
-  #${FHICLCPP}
+  #fhiclcpp
   #${SQLITE3}
-  ${CETLIB}
+  cetlib
+  cetlib_except
   ${Boost_PROGRAM_OPTIONS_LIBRARY}  
 ) 
 

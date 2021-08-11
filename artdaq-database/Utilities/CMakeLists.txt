@@ -26,6 +26,9 @@ cet_make_exec(readfhicl
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_DataFormats_Fhicl
+  fhiclcpp
+  cetlib
+  cetlib_except
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
@@ -34,6 +37,9 @@ cet_make_exec(refactorfhicl
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_DataFormats_Fhicl
+  fhiclcpp
+  cetlib
+  cetlib_except
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 endif()
@@ -43,7 +49,9 @@ cet_make_exec(fhicl2json
   artdaq-database_SharedCommon
   artdaq-database_JsonDocument
   artdaq-database_DataFormats_Fhicl
-  ${FHICLCPP}
+  fhiclcpp
+  cetlib
+  cetlib_except
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
@@ -59,7 +67,9 @@ cet_make_exec(bulkloader
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
-  ${FHICLCPP}
+  fhiclcpp
+  cetlib
+  cetlib_except
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
   -lpthread
 )
@@ -76,7 +86,9 @@ cet_make_exec(bulkdownloader
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
-  ${FHICLCPP}
+  fhiclcpp
+  cetlib
+  cetlib_except
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
   -lpthread
 )
@@ -94,6 +106,7 @@ cet_make_exec(migrate_database
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB  
   ${Boost_PROGRAM_OPTIONS_LIBRARY} 
+  cetlib_except
 )
 
 cet_make_exec(rebuild_database_index
@@ -108,6 +121,7 @@ cet_make_exec(rebuild_database_index
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB  
   ${Boost_PROGRAM_OPTIONS_LIBRARY} 
+  cetlib_except
 )
 
 cet_make_exec(fixtestjson
@@ -115,6 +129,7 @@ cet_make_exec(fixtestjson
   artdaq-database_SharedCommon
   artdaq-database_DataFormats_Fhicl
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
+  cetlib_except
 )
 
 

@@ -10,6 +10,7 @@ cet_make(
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
   ${Boost_PROGRAM_OPTIONS_LIBRARY}    
+  cetlib_except
   )
 
 install_headers()
