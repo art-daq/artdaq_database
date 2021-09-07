@@ -16,19 +16,15 @@
 # use cmake 3.17 or later
 cmake_minimum_required (VERSION 3.17)
 
-project(artdaq_database VERSION 1.05.06)
+find_package(cetmodules)
 
-SET ( CETBUILDTOOLS_VERSION $ENV{CETBUILDTOOLS_VERSION} )
-IF (NOT CETBUILDTOOLS_VERSION)
-    MESSAGE (FATAL_ERROR "ERROR: setup cetbuildtools to get the cmake modules")
-ENDIF()
+project(artdaq_database VERSION 1.05.07)
 
 set(TOP_CMAKE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(TOP_CMAKE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 set(CMAKE_MODULE_PATH
     $ENV{ARTDAQ_UTILITIES_DIR}/Modules
-    $ENV{CETBUILDTOOLS_DIR}/Modules
     ${CMAKE_MODULE_PATH}
     ${TOP_CMAKE_SOURCE_DIR}/Modules
     ${TOP_CMAKE_SOURCE_DIR}/built-in)
@@ -53,7 +49,6 @@ ENDIF()
 
 # these are minimum required versions, not the actual product versions
 find_ups_boost  ( v1_66_0 )
-find_ups_product( cetbuildtools v7_15_01 )
 find_ups_product( cetpkgsupport v1_14_01 )
 find_ups_product( TRACE v3_15_09 )
 find_ups_product( swig v4_0_0 )
@@ -110,9 +105,5 @@ add_subdirectory(artdaq-database)
 add_dependencies(mongo-cxx-driver mongo-c-driver )
 add_dependencies(artdaq-database_StorageProviders_MongoDB mongo-cxx-driver)
 
+cet_cmake_config()
 
-# ups - table and config files
-add_subdirectory(ups)
-
-# packaging utility
-include(UseCPack)
