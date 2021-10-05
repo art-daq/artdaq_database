@@ -55,12 +55,12 @@ mongocxx::pipeline pipeline_from_document(bsoncxx::document::value const& docume
                                      << " key-value-pair on each stage, stage=<" << compat::to_json(stage) << ">, length=" << length << ".";
     }
 
-    auto const& kvp = *stage.begin();
-    auto const key = std::string(kvp.key());
+    auto kvp = stage.cbegin();
+    auto key = std::string(kvp->key());
 
     auto document = [&kvp]() {
       auto doc = bsoncxx::builder::core(false);
-      doc.concatenate(kvp.get_document());
+      doc.concatenate(kvp->get_document());
       return doc;
     };
 
