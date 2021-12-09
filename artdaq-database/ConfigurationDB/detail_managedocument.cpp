@@ -10,7 +10,9 @@
 
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
+#ifdef USE_FHICLCPP
 #include "artdaq-database/DataFormats/Fhicl/fhicl_common.h"
+#endif
 #include "artdaq-database/DataFormats/Xml/xml_common.h"
 
 #include "artdaq-database/DataFormats/shared_literals.h"
@@ -36,12 +38,14 @@ using cf::options::data_format_t;
 
 using Options = cf::ManageDocumentOperation;
 
+#ifdef USE_FHICLCPP
 using artdaq::database::basictypes::FhiclData;
+using artdaq::database::fhicl::FhiclWriter;
+#endif
 using artdaq::database::basictypes::JsonData;
 using artdaq::database::basictypes::XmlData;
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
-using artdaq::database::fhicl::FhiclWriter;
 using artdaq::database::xml::XmlWriter;
 using artdaq::database::json::JsonWriter;
 
@@ -56,11 +60,12 @@ bool json_gui_to_db(std::string const&, std::string&);
 
 namespace artdaq {
 namespace database {
+#ifdef USE_FHICLCPP
 namespace fhicljson {
 bool fhicl_to_ast(std::string const& fcl, std::string const& filename, jsn::object_t& json);
 bool fhicl_to_json(std::string const& fcl, std::string const& filename, std::string& json);
-
 }  // namespace fhicljson
+#endif
 namespace configuration {
 namespace detail {
 using provider_write_t = void (*)(const Options&, const JSONDocument&);
@@ -110,6 +115,7 @@ void write_document(Options const& options, std::string& conf) {
 
       break;
     }
+#ifdef USE_FHICLCPP
     case data_format_t::fhicl: {
       {
         auto value = jsn::value_t{jsn::object_t{}};
@@ -141,6 +147,7 @@ void write_document(Options const& options, std::string& conf) {
 #endif
       break;
     }
+#endif
     case data_format_t::xml: {
       // convert from xml to json and back to xml
       JsonData tmp = XmlData{conf};
@@ -177,10 +184,13 @@ void write_document(Options const& options, std::string& conf) {
   auto filter = std::string{", \"filter\":"};
   filter.append(options.query_filter_to_JsonData());
 
+#if USE_FHICLCPP
   if (options.format() == data_format_t::fhicl) {
     TLOG(29) << "write_document: building fhicl document";
     builder = std::make_unique<JSONDocumentBuilder>(boost::get<JSONDocument>(data));
-  } else if (options.format() != data_format_t::db && options.format() != data_format_t::gui) {
+  } else 
+#endif
+      if (options.format() != data_format_t::db && options.format() != data_format_t::gui) {
     builder = std::make_unique<JSONDocumentBuilder>();
     builder->createFromData(boost::get<JSONDocument>(data));
   } else if (options.format() == data_format_t::gui) {
@@ -312,6 +322,7 @@ void read_document(Options const& options, std::string& conf) {
       throw runtime_error("read_document") << "Invalid data format; data format=" << cf::to_string(options.format()) << ".";
       break;
 
+#ifdef USE_FHICLCPP
     case data_format_t::fhicl: {
       jsn::value_t value = search_result.extract();
       auto const& docAst = unwrap(value).value_as<const object_t>(jsonliteral::document);
@@ -330,6 +341,7 @@ void read_document(Options const& options, std::string& conf) {
 
       break;
     }
+#endif
     case data_format_t::xml: {
       jsn::value_t value = search_result.extract();
       auto const& docAst = unwrap(value).value_as<const object_t>(jsonliteral::document);

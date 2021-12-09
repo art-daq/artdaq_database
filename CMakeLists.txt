@@ -44,7 +44,9 @@ IF (SANITIZE_ADDRESS)
   endif()
 ENDIF()
 
-
+if(NOT DEFINED $ENV{CETLIB_LIB})
+  set(USE_FHICLCPP TRUE)
+endif()
 #cet_report_compiler_flags()
 
 # these are minimum required versions, not the actual product versions
@@ -60,14 +62,19 @@ if(BTYPE_UC STREQUAL DEBUG)
 endif()
 
 # buil-in libraries
-include(BuiltinTargets)
 include(BuiltinMONGOC)
 include(BuiltinMONGOCXX)
-include(BuiltinFHICLCPP)
-include(BuiltinCETLIB)
-include(BuiltinCETLIBEXCEPT)
+if(USE_FHICLCPP)
+  include(BuiltinTargets)
+  include(BuiltinFHICLCPP)
+  include(BuiltinCETLIB)
+  include(BuiltinCETLIBEXCEPT)
+  add_subdirectory(built-in)
+else()
+  find_ups_product(cetlib v3_00_00)
+  find_ups_product(cetlib_except v1_07_00)
+endif()
 #include(BuiltinPARAMICO)
-add_subdirectory(built-in)
 
 # Build Node Addons
 #include(NodeJSAddon)
