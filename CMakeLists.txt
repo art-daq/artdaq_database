@@ -44,8 +44,12 @@ IF (SANITIZE_ADDRESS)
   endif()
 ENDIF()
 
-if(NOT DEFINED $ENV{CETLIB_LIB})
+string(FIND ${artdaq_database_EXEC_PREFIX} "ots" OTS_FOUND)
+if(${OTS_FOUND} EQUAL -1)
+    MESSAGE( STATUS "Enable built-in FHICLCPP")
   set(USE_FHICLCPP TRUE)
+  else()
+  MESSAGE(STATUS "DISABLE built-in FHICLCPP")
 endif()
 #cet_report_compiler_flags()
 
