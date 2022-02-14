@@ -18,7 +18,7 @@ cmake_minimum_required (VERSION 3.17)
 
 find_package(cetmodules)
 
-project(artdaq_database VERSION 1.05.07)
+project(artdaq_database VERSION 1.05.09)
 
 set(TOP_CMAKE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(TOP_CMAKE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
@@ -44,7 +44,13 @@ IF (SANITIZE_ADDRESS)
   endif()
 ENDIF()
 
-
+string(FIND ${artdaq_database_EXEC_PREFIX} "ots" OTS_FOUND)
+if(${OTS_FOUND} EQUAL -1)
+    MESSAGE( STATUS "Enable built-in FHICLCPP")
+  set(USE_FHICLCPP TRUE)
+  else()
+  MESSAGE(STATUS "DISABLE built-in FHICLCPP")
+endif()
 #cet_report_compiler_flags()
 
 # these are minimum required versions, not the actual product versions
@@ -60,14 +66,19 @@ if(BTYPE_UC STREQUAL DEBUG)
 endif()
 
 # buil-in libraries
-include(BuiltinTargets)
 include(BuiltinMONGOC)
 include(BuiltinMONGOCXX)
-include(BuiltinFHICLCPP)
-include(BuiltinCETLIB)
-include(BuiltinCETLIBEXCEPT)
+if(USE_FHICLCPP)
+  include(BuiltinTargets)
+  include(BuiltinFHICLCPP)
+  include(BuiltinCETLIB)
+  include(BuiltinCETLIBEXCEPT)
+  add_subdirectory(built-in)
+else()
+  find_ups_product(cetlib v3_00_00)
+  find_ups_product(cetlib_except v1_07_00)
+endif()
 #include(BuiltinPARAMICO)
-add_subdirectory(built-in)
 
 # Build Node Addons
 #include(NodeJSAddon)

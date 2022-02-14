@@ -2,7 +2,6 @@ cet_make_exec(conftool
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_BasicTypes
-  artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
   artdaq-database_ConfigurationDB
@@ -15,13 +14,13 @@ cet_make_exec(conftool
 cet_make_exec(readjson
   LIBRARIES
   artdaq-database_SharedCommon
-  artdaq-database_DataFormats_Fhicl
+  artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
 
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
-
+if(USE_FHICL)
 cet_make_exec(readfhicl
   LIBRARIES
   artdaq-database_SharedCommon
@@ -54,20 +53,19 @@ cet_make_exec(fhicl2json
   cetlib_except
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
+endif()
 
 cet_make_exec(bulkloader
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_BasicTypes
   
-  artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
   artdaq-database_ConfigurationDB
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
-  fhiclcpp
   cetlib
   cetlib_except
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
@@ -79,14 +77,12 @@ cet_make_exec(bulkdownloader
   artdaq-database_SharedCommon
   artdaq-database_BasicTypes
 
-  artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
   artdaq-database_ConfigurationDB
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
-  fhiclcpp
   cetlib
   cetlib_except
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
@@ -98,7 +94,6 @@ cet_make_exec(migrate_database
   LIBRARIES
     
   artdaq-database_BasicTypes
-  artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
   artdaq-database_ConfigurationDB
@@ -113,7 +108,6 @@ cet_make_exec(rebuild_database_index
   LIBRARIES
     
   artdaq-database_BasicTypes
-  artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
   artdaq-database_ConfigurationDB
@@ -127,7 +121,7 @@ cet_make_exec(rebuild_database_index
 cet_make_exec(fixtestjson
   LIBRARIES
   artdaq-database_SharedCommon
-  artdaq-database_DataFormats_Fhicl
+  artdaq-database_DataFormats_Json
   ${Boost_PROGRAM_OPTIONS_LIBRARY}
   cetlib_except
 )
