@@ -12,4 +12,5 @@ ups            v6_0_7       ups-6.0.7-Linux64bit+3.10-2.17.tar.bz2       -f  Lin
 nodejs         v10_15_0     nodejs-10.15.0-noarch.tar.bz2                -f  Linux64bit+3.10-2.17
 cetlib         v3_14_00     cetlib-3.14.00-x86_64-e20-debug.tar.bz2      -f Linux64bit+3.10-2.17 -q e20:debug         
 hep_concurrency      v1_07_05        hep_concurrency-1.07.05-slf7-x86_64-e20-debug.tar.bz2        -f Linux64bit+3.10-2.17    -q e20:debug  
-cetlib_except        v1_07_05        cetlib_except-1.07.05-slf7-x86_64-e20-debug.tar.bz2          -f Linux64bit+3.10-2.17    -q e20:debug    
+cetlib_except        v1_07_05        cetlib_except-1.07.05-slf7-x86_64-e20-debug.tar.bz2          -f Linux64bit+3.10-2.17    -q e20:debug          
+tbb                  v2021_4_0       tbb-2021.4.0-sl7-x86_64-e20.tar.bz2                          -f Linux64bit+3.10-2.17    -q e20      
