@@ -18,7 +18,7 @@ cmake_minimum_required (VERSION 3.17)
 
 find_package(cetmodules)
 
-project(artdaq_database VERSION 1.06.00)
+project(artdaq_database VERSION 1.06.01)
 
 set(TOP_CMAKE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(TOP_CMAKE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
