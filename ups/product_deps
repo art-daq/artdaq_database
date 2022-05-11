@@ -1,7 +1,7 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
 parent artdaq_database
-defaultqual	e20:s112:prof
+defaultqual	e20:s112
 
 chains current
 
