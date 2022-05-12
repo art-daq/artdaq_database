@@ -154,7 +154,7 @@ function run_build() {
   }
 
   export RUN_TESTS=true
-  buildtool -j$CETPKG_J 2>&1 |tee ${blddir}/build_tests_artdaq-database.log || \
+  buildtool -p -j$CETPKG_J 2>&1 |tee ${blddir}/build_tests_artdaq-database.log || \
   { mv ${blddir}/*.log  ${working_dir}/copyBack/
     return 44 
   }
