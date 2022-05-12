@@ -20,7 +20,7 @@ version=${VERSION}
 qual_set="${QUAL}"
 build_type=${BUILDTYPE:-prof}
 git_branch=${ARTDAQ_DATABASE_GITBRANCH:-develop}
-skip_tests="${SKIP_TESTS}"
+skip_tests="${SKIP_TESTS:-false}"
 
 squal=${qual_set%:*}
 basequal=${qual_set##*:}
@@ -154,15 +154,14 @@ function run_build() {
   }
 
   export RUN_TESTS=true
-  buildtool -p -j$CETPKG_J 2>&1 |tee ${blddir}/build_tests_artdaq-database.log || \
+  buildtool -j$CETPKG_J 2>&1 |tee ${blddir}/build_tests_artdaq-database.log || \
   { mv ${blddir}/*.log  ${working_dir}/copyBack/
     return 44 
   }
 
-  if [ "x$skip_tests" != "x" ];then
-    return 0
-  fi
-  if [ "x$skip_tests" == "xTRUE"];then
+
+  echo "Checking whether to skip running tests: skip_tests=${skip_tests}"
+  if [ "x$skip_tests" == "xtrue" ];then
     return 0
   fi
 
