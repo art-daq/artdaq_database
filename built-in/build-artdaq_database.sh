@@ -20,6 +20,7 @@ version=${VERSION}
 qual_set="${QUAL}"
 build_type=${BUILDTYPE:-prof}
 git_branch=${ARTDAQ_DATABASE_GITBRANCH:-develop}
+skip_tests="${SKIP_TESTS}"
 
 squal=${qual_set%:*}
 basequal=${qual_set##*:}
@@ -157,6 +158,13 @@ function run_build() {
   { mv ${blddir}/*.log  ${working_dir}/copyBack/
     return 44 
   }
+
+  if [ "x$skip_tests" != "x" ];then
+    return 0
+  fi
+  if [ "x$skip_tests" == "xTRUE"];then
+    return 0
+  fi
 
   CETPKG_J=1
    
