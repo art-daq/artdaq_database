@@ -12,7 +12,7 @@ IF(CETLIBEXCEPT_IS_STATIC)
   MESSAGE (STATUS "Making cetlib_except static")
   
   set(SOURCES
-    cetlib_except/cetlib_except/exception.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib_except/cetlib_except/exception.cc
     )
     
   set(LIBRARIES  
@@ -29,10 +29,10 @@ else()
     LIBRARIES
     WITH_STATIC_LIBRARY
     SUBDIRS
-    cetlib_except/cetlib_except
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib_except/cetlib_except
     EXCLUDE
-    cetlib_except/cetlib_except/demangle.cc
-    cetlib_except/cetlib_except/exception_collector.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib_except/cetlib_except/demangle.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib_except/cetlib_except/exception_collector.cc
   ) 
 ENDIF()
 
@@ -40,16 +40,16 @@ IF(CETLIB_IS_STATIC)
   MESSAGE (STATUS "Making cetlib static")
   
   set(SOURCES
-    cetlib/cetlib/canonical_number.cc
-    cetlib/cetlib/canonical_string.cc
-    cetlib/cetlib/include.cc
-    cetlib/cetlib/includer.cc
-    cetlib/cetlib/filepath_maker.cc
-    cetlib/cetlib/base_converter.cc
-    cetlib/cetlib/search_path.cc
-    cetlib/cetlib/filesystem.cc
-    cetlib/cetlib/getenv.cc
-    cetlib/cetlib/split_by_regex.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/canonical_number.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/canonical_string.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/include.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/includer.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/filepath_maker.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/base_converter.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/search_path.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/filesystem.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/getenv.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/split_by_regex.cc
     )
 
   set(LIBRARIES  
@@ -74,24 +74,24 @@ else()
     ${Boost_SYSTEM_LIBRARY}
     WITH_STATIC_LIBRARY
     SUBDIRS
-    cetlib/cetlib
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib
     EXCLUDE
-    cetlib/cetlib/BasicPluginFactory.cc
-    cetlib/cetlib/column_width.cc
-    cetlib/cetlib/cpu_timer.cc
-    cetlib/cetlib/crc32.cc
-    cetlib/cetlib/get-loadable-libraries.cc
-    cetlib/cetlib/inc-expand.cc
-    cetlib/cetlib/LibraryManager.cc
-    cetlib/cetlib/lpad.cc
-    cetlib/cetlib/MD5Digest.cc
-    cetlib/cetlib/nybbler.cc
-    cetlib/cetlib/PluginFactory.cc
-    cetlib/cetlib/replace_all.cc
-    cetlib/cetlib/rpad.cc
-    cetlib/cetlib/sha1.cc
-    cetlib/cetlib/simple_stats.cc
-    cetlib/cetlib/split_path.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/BasicPluginFactory.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/column_width.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/cpu_timer.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/crc32.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/get-loadable-libraries.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/inc-expand.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/LibraryManager.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/lpad.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/MD5Digest.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/nybbler.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/PluginFactory.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/replace_all.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/rpad.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/sha1.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/simple_stats.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib/cetlib/split_path.cc
   ) 
 ENDIF()
 
@@ -99,12 +99,12 @@ IF(FHICLCPP_IS_STATIC)
   MESSAGE (STATUS "Making FHiCL static")
   
   set(SOURCES
-    fhicl-cpp/fhiclcpp/exception.cc
-    fhicl-cpp/fhiclcpp/extended_value.cc
-    fhicl-cpp/fhiclcpp/intermediate_table.cc
-    fhicl-cpp/fhiclcpp/parse.cc
-    fhicl-cpp/fhiclcpp/parse_shims.cc
-    fhicl-cpp/fhiclcpp/Protection.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp/fhiclcpp/exception.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp/fhiclcpp/extended_value.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp/fhiclcpp/intermediate_table.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp/fhiclcpp/parse.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp/fhiclcpp/parse_shims.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp/fhiclcpp/Protection.cc
     )
 
   set(LIBRARIES  
@@ -127,14 +127,14 @@ else()
     cetlib_except
     WITH_STATIC_LIBRARY
     SUBDIRS
-    fhicl-cpp/fhiclcpp
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp/fhiclcpp
     EXCLUDE
-    fhicl-cpp/fhiclcpp/ParameterSet.cc
-    fhicl-cpp/fhiclcpp/ParameterSetID.cc
-    fhicl-cpp/fhiclcpp/ParameterSetRegistry.cc
-    fhicl-cpp/fhiclcpp/DatabaseSupport.cc
-    fhicl-cpp/fhiclcpp/coding.cc  
-    fhicl-cpp/fhiclcpp/make_ParameterSet.cc  
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp/fhiclcpp/ParameterSet.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp/fhiclcpp/ParameterSetID.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp/fhiclcpp/ParameterSetRegistry.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp/fhiclcpp/DatabaseSupport.cc
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp/fhiclcpp/coding.cc  
+    ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp/fhiclcpp/make_ParameterSet.cc  
   ) 
 ENDIF()
 

@@ -1,4 +1,4 @@
-cet_make_exec(conftool
+cet_make_exec(NAME conftool
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_BasicTypes
@@ -11,7 +11,7 @@ cet_make_exec(conftool
   ${Boost_PROGRAM_OPTIONS_LIBRARY}  
 ) 
 
-cet_make_exec(readjson
+cet_make_exec(NAME readjson
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_DataFormats_Json
@@ -21,7 +21,7 @@ cet_make_exec(readjson
 )
 
 if(USE_FHICL)
-cet_make_exec(readfhicl
+cet_make_exec(NAME readfhicl
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_DataFormats_Fhicl
@@ -32,7 +32,7 @@ cet_make_exec(readfhicl
 )
 
 if (NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-cet_make_exec(refactorfhicl
+cet_make_exec(NAME refactorfhicl
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_DataFormats_Fhicl
@@ -43,7 +43,7 @@ cet_make_exec(refactorfhicl
 )
 endif()
 
-cet_make_exec(fhicl2json
+cet_make_exec(NAME fhicl2json
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_JsonDocument
@@ -55,7 +55,7 @@ cet_make_exec(fhicl2json
 )
 endif()
 
-cet_make_exec(bulkloader
+cet_make_exec(NAME bulkloader
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_BasicTypes
@@ -72,7 +72,7 @@ cet_make_exec(bulkloader
   -lpthread
 )
 
-cet_make_exec(bulkdownloader
+cet_make_exec(NAME bulkdownloader
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_BasicTypes
@@ -90,7 +90,7 @@ cet_make_exec(bulkdownloader
 )
 
 
-cet_make_exec(migrate_database
+cet_make_exec(NAME migrate_database
   LIBRARIES
     
   artdaq-database_BasicTypes
@@ -104,7 +104,7 @@ cet_make_exec(migrate_database
   cetlib_except
 )
 
-cet_make_exec(rebuild_database_index
+cet_make_exec(NAME rebuild_database_index
   LIBRARIES
     
   artdaq-database_BasicTypes
@@ -118,7 +118,7 @@ cet_make_exec(rebuild_database_index
   cetlib_except
 )
 
-cet_make_exec(fixtestjson
+cet_make_exec(NAME fixtestjson
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_DataFormats_Json
