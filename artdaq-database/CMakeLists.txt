@@ -1,7 +1,7 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${TOP_CMAKE_SOURCE_DIR}
- ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp
- ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib
- ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib_except)
+ ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp
+ ${TOP_CMAKE_BINARY_DIR}/built-in/cetlib
+ ${TOP_CMAKE_BINARY_DIR}/built-in/cetlib_except)
 
 IF (FORMAT_WITH_CLANG)
   string(TOUPPER ${FORMAT_WITH_CLANG} FORMAT_WITH_CLANG_UC )
