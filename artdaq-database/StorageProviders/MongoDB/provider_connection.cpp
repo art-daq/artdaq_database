@@ -16,13 +16,13 @@
 #include <bsoncxx/types.hpp>
 #include <bsoncxx/types/value.hpp>
 
+#include <boost/filesystem.hpp>
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
 #include <mongocxx/options/find.hpp>
 #include <mongocxx/pipeline.hpp>
 #include <mutex>
 #include <thread>
-#include <boost/filesystem.hpp>
 #include <unordered_map>
 #include <utility>
 
@@ -44,7 +44,7 @@ mongocxx::instance& getInstance() {
   return _instance;
 }
 
-DBConfig::DBConfig() : uri{std::string{literal::MONGOURI} + literal::hostname + ":" + std::to_string(literal::port) + "/" + literal::db_name}{
+DBConfig::DBConfig() : uri{std::string{literal::MONGOURI} + literal::hostname + ":" + std::to_string(literal::port) + "/" + literal::db_name} {
   auto tmpURI = getenv("ARTDAQ_DATABASE_URI") != nullptr ? expand_environment_variables("${ARTDAQ_DATABASE_URI}") : std::string("");
 
   auto prefixURI = std::string{literal::MONGOURI};
@@ -52,13 +52,13 @@ DBConfig::DBConfig() : uri{std::string{literal::MONGOURI} + literal::hostname + 
     uri = tmpURI;
   }
 
-  auto clientCert = getenv("ARTDAQ_DATABASE_CLIENT_CERT") != nullptr ? expand_environment_variables("${ARTDAQ_DATABASE_CLIENT_CERT}") : std::string("");
-  if (!clientCert.empty() && boost::filesystem::exists(boost::filesystem::path(clientCert))){
-    uri+="&tls=true&authMechanism=MONGODB-X509&tlsCertificateKeyFile="+clientCert;
+  auto clientCert =
+      getenv("ARTDAQ_DATABASE_CLIENT_CERT") != nullptr ? expand_environment_variables("${ARTDAQ_DATABASE_CLIENT_CERT}") : std::string("");
+  if (!clientCert.empty() && boost::filesystem::exists(boost::filesystem::path(clientCert))) {
+    uri += "&tls=true&authMechanism=MONGODB-X509&tlsCertificateKeyFile=" + clientCert;
 
     auto caCert = getenv("ARTDAQ_DATABASE_CA_CERT") != nullptr ? expand_environment_variables("${ARTDAQ_DATABASE_CA_CERT}") : std::string("");
-    if (!caCert.empty() && boost::filesystem::exists(boost::filesystem::path(caCert)))
-      uri+="&tlsCAFile="+caCert;
+    if (!caCert.empty() && boost::filesystem::exists(boost::filesystem::path(caCert))) uri += "&tlsCAFile=" + caCert;
   }
 }
 
@@ -84,9 +84,8 @@ MongoDB::MongoDB(DBConfig config, PassKeyIdiom const& /*unused*/)
       _instance{getInstance()},
       _client{mongocxx::uri{_config.connectionURI()}},
       _connection{_client[_client.uri().database()]} {
-				_client.start_session();
-
-			}
+  _client.start_session();
+}
 
 mongocxx::cursor MongoDB::list_databases() {
   connection();

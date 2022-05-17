@@ -188,7 +188,7 @@ void write_document(Options const& options, std::string& conf) {
   if (options.format() == data_format_t::fhicl) {
     TLOG(29) << "write_document: building fhicl document";
     builder = std::make_unique<JSONDocumentBuilder>(boost::get<JSONDocument>(data));
-  } else 
+  } else
 #endif
       if (options.format() != data_format_t::db && options.format() != data_format_t::gui) {
     builder = std::make_unique<JSONDocumentBuilder>();
