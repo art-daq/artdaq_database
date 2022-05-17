@@ -1,7 +1,7 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${TOP_CMAKE_SOURCE_DIR}
- ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp
- ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib
- ${TOP_CMAKE_SOURCE_DIR}/built-in/cetlib_except)
+ ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp
+ ${TOP_CMAKE_BINARY_DIR}/built-in/cetlib
+ ${TOP_CMAKE_BINARY_DIR}/built-in/cetlib_except)
 
 IF (FORMAT_WITH_CLANG)
   string(TOUPPER ${FORMAT_WITH_CLANG} FORMAT_WITH_CLANG_UC )
@@ -11,6 +11,10 @@ IF (FORMAT_WITH_CLANG)
 ENDIF()
 
 message(STATUS "FHICLCPP='fhiclcpp'")
+
+if(USE_FHICLCPP)
+  set(FHICLCPP_DATAFORMAT_LIB artdaq-database_DataFormats_Fhicl)
+endif()
 
 install(DIRECTORY deployment-scripts DESTINATION ${product}/${version})
 cet_script(deployment-scripts/install_artdaq_database.sh)

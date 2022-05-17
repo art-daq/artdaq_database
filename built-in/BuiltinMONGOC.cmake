@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.2)
 
-if ( NOT EXISTS ${TOP_CMAKE_SOURCE_DIR}/built-in/mongo-c-driver/lib64 )
+if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64 )
     include(ExternalProject)
     string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC)
     set(MYCMAKE_BUILD_TYPE "Release")
@@ -26,7 +26,7 @@ if ( NOT EXISTS ${TOP_CMAKE_SOURCE_DIR}/built-in/mongo-c-driver/lib64 )
     ExternalProject_Add(
     mongo-c-driver
     GIT_REPOSITORY https://github.com/mongodb/mongo-c-driver
-    GIT_TAG 1.17.5
+    GIT_TAG 1.19.2
     LOG_DOWNLOAD ON
     LOG_CONFIGURE ON
     LOG_BUILD ON
@@ -44,16 +44,16 @@ if ( NOT EXISTS ${TOP_CMAKE_SOURCE_DIR}/built-in/mongo-c-driver/lib64 )
         -DCMAKE_CXX_FLAGS=${MYCMAKE_CXX_FLAGS}
         -DCMAKE_C_FLAGS=${MYCMAKE_C_FLAGS}
         -DCMAKE_CXX_STANDARD=${MYCMAKE_CXX_STANDARD}
-        -DCMAKE_INSTALL_PREFIX:PATH=${TOP_CMAKE_SOURCE_DIR}/built-in/mongo-c-driver 
+        -DCMAKE_INSTALL_PREFIX:PATH=${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver 
     )
 else()
     add_custom_target( mongo-c-driver )
 endif()
 
-include_directories(${TOP_CMAKE_SOURCE_DIR}/built-in/mongo-c-driver/include/libbson-1.0)
-include_directories(${TOP_CMAKE_SOURCE_DIR}/built-in/mongo-c-driver/include/libmongoc-1.0)
-link_directories(${TOP_CMAKE_SOURCE_DIR}/built-in/mongo-c-driver/lib64)
+include_directories(${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/include/libbson-1.0)
+include_directories(${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/include/libmongoc-1.0)
+link_directories(${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64)
 
-install(DIRECTORY ${TOP_CMAKE_SOURCE_DIR}/built-in/mongo-c-driver/include/libbson-1.0/ DESTINATION ${product}/${version}/include )
-install(DIRECTORY ${TOP_CMAKE_SOURCE_DIR}/built-in/mongo-c-driver/include/libmongoc-1.0/ DESTINATION ${product}/${version}/include )
-install(DIRECTORY ${TOP_CMAKE_SOURCE_DIR}/built-in/mongo-c-driver/lib64/ DESTINATION ${flavorqual_dir}/lib )
+install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/include/libbson-1.0/ DESTINATION ${product}/${version}/include )
+install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/include/libmongoc-1.0/ DESTINATION ${product}/${version}/include )
+install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/ DESTINATION ${flavorqual_dir}/lib )
