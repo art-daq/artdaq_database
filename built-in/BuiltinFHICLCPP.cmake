@@ -19,7 +19,7 @@ endforeach()
 if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp )
     message("Downloading fhicl-cpp source")
 
-    execute_process(COMMAND git clone --branch v4_15_01 https://cdcvs.fnal.gov/projects/fhicl-cpp  WORKING_DIRECTORY  ${TOP_CMAKE_BINARY_DIR}/built-in
+    execute_process(COMMAND git clone --branch v4_15_01 https://github.com/art-framework-suite/fhicl-cpp.git  WORKING_DIRECTORY  ${TOP_CMAKE_BINARY_DIR}/built-in
   RESULT_VARIABLE STATUS
   OUTPUT_VARIABLE OUTPUT1 )
 if(STATUS AND NOT STATUS EQUAL 0)
@@ -60,6 +60,7 @@ IF(FHICLCPP_IS_STATIC)
   set(LIBRARIES  
     cetlib
     cetlib_except
+    Boost::headers
     )
     
   include_directories( ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp )

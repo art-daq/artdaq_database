@@ -14,20 +14,19 @@
 # ======================================================================
 
 # use cmake 3.17 or later
-cmake_minimum_required (VERSION 3.17)
+cmake_minimum_required (VERSION 3.19 FATAL_ERROR)
 
-find_package(cetmodules)
+find_package(cetmodules 3.08.00 REQUIRED)
 
 project(artdaq_database VERSION 1.06.01)
 
 set(TOP_CMAKE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(TOP_CMAKE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
-set(CMAKE_MODULE_PATH
-    $ENV{ARTDAQ_UTILITIES_DIR}/Modules
-    ${CMAKE_MODULE_PATH}
-    ${CMAKE_CURRENT_SOURCE_DIR}/Modules
-    ${CMAKE_CURRENT_SOURCE_DIR}/built-in)
+
+# Find our own CMake modules, and tell everyone else where to find them.
+cet_cmake_module_directories(Modules BINARY)
+list(PREPEND CMAKE_MODULE_PATH ${TOP_CMAKE_SOURCE_DIR}/built-in)
 
 include(CetCMakeEnv)
 
@@ -53,17 +52,13 @@ if(${OTS_FOUND} EQUAL -1)
 endif()
 #cet_report_compiler_flags()
 
-# these are minimum required versions, not the actual product versions
-find_ups_boost  ( v1_66_0 )
-find_ups_product( cetpkgsupport v1_14_01 )
-find_ups_product( TRACE v3_15_09 )
-find_ups_product( swig v4_0_0 )
-
 # Debug streamer.
 string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC)
 if(BTYPE_UC STREQUAL DEBUG)
   add_definitions(-DDEBUGME)
 endif()
+
+find_package(Boost COMPONENTS filesystem program_options system REQUIRED)
 
 # buil-in libraries
 include(BuiltinMONGOC)
@@ -75,8 +70,8 @@ if(USE_FHICLCPP)
   include(BuiltinCETLIB)
   include(BuiltinCETLIBEXCEPT)
 else()
-  find_ups_product(cetlib v3_00_00)
-  find_ups_product(cetlib_except v1_07_00)
+#  find_ups_product(cetlib v3_00_00)
+#  find_ups_product(cetlib_except v1_07_00)
 endif()
 #include(BuiltinPARAMICO)
 
