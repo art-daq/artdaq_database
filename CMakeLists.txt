@@ -18,7 +18,7 @@ cmake_minimum_required (VERSION 3.19 FATAL_ERROR)
 
 find_package(cetmodules 3.08.00 REQUIRED)
 
-project(artdaq_database VERSION 1.06.01)
+project(artdaq_database VERSION 1.07.00)
 
 set(TOP_CMAKE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(TOP_CMAKE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
@@ -59,6 +59,7 @@ if(BTYPE_UC STREQUAL DEBUG)
 endif()
 
 find_package(Boost COMPONENTS filesystem program_options system REQUIRED)
+find_package(TRACE REQUIRED)
 
 # buil-in libraries
 include(BuiltinMONGOC)
@@ -70,8 +71,8 @@ if(USE_FHICLCPP)
   include(BuiltinCETLIB)
   include(BuiltinCETLIBEXCEPT)
 else()
-#  find_ups_product(cetlib v3_00_00)
-#  find_ups_product(cetlib_except v1_07_00)
+  find_package(cetlib 3.00.00 REQUIRED)
+  find_package(cetlib_except 1.07.00 REQUIRED)
 endif()
 #include(BuiltinPARAMICO)
 
