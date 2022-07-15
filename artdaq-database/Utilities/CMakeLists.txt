@@ -8,7 +8,7 @@ cet_make_exec(NAME conftool
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}  
+  Boost::program_options  
 ) 
 
 cet_make_exec(NAME readjson
@@ -17,7 +17,7 @@ cet_make_exec(NAME readjson
   artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
 
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}
+  Boost::program_options
 )
 
 if(USE_FHICL)
@@ -28,7 +28,7 @@ cet_make_exec(NAME readfhicl
   fhiclcpp
   cetlib
   cetlib_except
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}
+  Boost::program_options
 )
 
 if (NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -39,7 +39,7 @@ cet_make_exec(NAME refactorfhicl
   fhiclcpp
   cetlib
   cetlib_except
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}
+  Boost::program_options
 )
 endif()
 
@@ -51,7 +51,7 @@ cet_make_exec(NAME fhicl2json
   fhiclcpp
   cetlib
   cetlib_except
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}
+  Boost::program_options
 )
 endif()
 
@@ -68,7 +68,7 @@ cet_make_exec(NAME bulkloader
   artdaq-database_StorageProviders_UconDB
   cetlib
   cetlib_except
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}
+  Boost::program_options
   -lpthread
 )
 
@@ -85,7 +85,7 @@ cet_make_exec(NAME bulkdownloader
   artdaq-database_StorageProviders_UconDB
   cetlib
   cetlib_except
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}
+  Boost::program_options
   -lpthread
 )
 
@@ -100,7 +100,7 @@ cet_make_exec(NAME migrate_database
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB  
-  ${Boost_PROGRAM_OPTIONS_LIBRARY} 
+  Boost::program_options 
   cetlib_except
 )
 
@@ -114,7 +114,7 @@ cet_make_exec(NAME rebuild_database_index
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB  
-  ${Boost_PROGRAM_OPTIONS_LIBRARY} 
+  Boost::program_options 
   cetlib_except
 )
 
@@ -122,7 +122,7 @@ cet_make_exec(NAME fixtestjson
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_DataFormats_Json
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}
+  Boost::program_options
   cetlib_except
 )
 
