@@ -138,7 +138,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, FileSystemDB>::configura
 
     auto seenValues = std::list<std::string>{};
 
-    auto hasSeenValue = [& v = seenValues](auto const& name) {
+    auto hasSeenValue = [&v = seenValues](auto const& name) {
       confirm(!name.empty());
       if (std::find(v.begin(), v.end(), name) != v.end()) {
         return false;

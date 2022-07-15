@@ -290,7 +290,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::configurationC
 
     auto seenValues = std::list<std::string>{};
 
-    auto hasSeenValue = [& v = seenValues](auto const& name) {
+    auto hasSeenValue = [&v = seenValues](auto const& name) {
       confirm(!name.empty());
       if (std::find(v.begin(), v.end(), name) != v.end()) {
         return false;
@@ -590,7 +590,7 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::findEntities(J
 
     auto seenValues = std::list<std::string>{};
 
-    auto isNew = [& v = seenValues](auto const& name) {
+    auto isNew = [&v = seenValues](auto const& name) {
       confirm(!name.empty());
       if (std::find(v.begin(), v.end(), name) != v.end()) {
         return false;

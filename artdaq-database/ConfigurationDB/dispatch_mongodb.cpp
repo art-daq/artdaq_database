@@ -115,7 +115,7 @@ std::vector<JSONDocument> prov::findConfigurations(ManageDocumentOperation const
   auto seenValues = std::list<std::string>{};
   seenValues.emplace_back(apiliteral::notprovided);
 
-  auto isNew = [& v = seenValues](auto const& name) {
+  auto isNew = [&v = seenValues](auto const& name) {
     confirm(!name.empty());
     if (std::find(v.begin(), v.end(), name) != v.end()) {
       return false;
