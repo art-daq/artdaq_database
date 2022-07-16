@@ -34,7 +34,7 @@ cetlib          v3_13_04        s112
 cetlib          v3_14_00        s114
 cetlib          v3_15_00        -default-
 mongodb         v4_0_8c         -       only_for_build
-TRACE           v3_17_04        -       only_for_build
+TRACE           v3_17_05        -       only_for_build
 swig            v4_0_2          -       only_for_build
 nodejs          v10_15_0        -       only_for_build
 cetmodules      v3_16_00        -       only_for_build
