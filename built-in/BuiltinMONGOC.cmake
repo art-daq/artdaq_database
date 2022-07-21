@@ -50,10 +50,23 @@ else()
     add_custom_target( mongo-c-driver )
 endif()
 
-include_directories(${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/include/libbson-1.0)
-include_directories(${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/include/libmongoc-1.0)
-link_directories(${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64)
-
-install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/include/libbson-1.0/ DESTINATION ${product}/${version}/include )
-install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/include/libmongoc-1.0/ DESTINATION ${product}/${version}/include )
-install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/ DESTINATION ${flavorqual_dir}/lib )
+install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/include/ DESTINATION ${flavorqual_dir}/include )
+install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/ DESTINATION ${flavorqual_dir}/lib64/ FILES_MATCHING PATTERN "*.so*" PATTERN "cmake" EXCLUDE)
+install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/ DESTINATION ${flavorqual_dir}/lib64/ FILES_MATCHING PATTERN "*.a" PATTERN "cmake" EXCLUDE)
+install(FILES ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/bson-1.0/bson-targets.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/bson-1.0/bson-targets-debug.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/bson-1.0/bson-1.0-config.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/bson-1.0/bson-1.0-config-version.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/libbson-1.0/libbson-1.0-config.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/libbson-1.0/libbson-1.0-config-version.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/libbson-static-1.0/libbson-static-1.0-config.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/libbson-static-1.0/libbson-static-1.0-config-version.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/libmongoc-1.0/libmongoc-1.0-config.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/libmongoc-1.0/libmongoc-1.0-config-version.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/libmongoc-static-1.0/libmongoc-static-1.0-config.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/libmongoc-static-1.0/libmongoc-static-1.0-config-version.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/mongoc-1.0/mongoc-targets.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/mongoc-1.0/mongoc-targets-debug.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/mongoc-1.0/mongoc-1.0-config.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/mongoc-1.0/mongoc-1.0-config-version.cmake 
+        DESTINATION ${flavorqual_dir}/lib/artdaq_database/cmake/)
