@@ -83,7 +83,7 @@ envSet( ARTDAQ_DATABASE_URI,"filesystemdb://${ARTDAQ_DATABASE_DATADIR}/filesyste
 
 #envPrepend(PYTHONPATH, "${${UPS_PROD_NAME_UC}_FQ_DIR}/python:${${UPS_PROD_NAME_UC}_FQ_DIR}/lib/python2.7/site-packages")
 envPrepend(PYTHONPATH, "${${UPS_PROD_NAME_UC}_FQ_DIR}/python")
-#envPrepend(LD_LIBRARY_PATH, "${MONGODB_FQ_DIR}/lib64")
+envPrepend(LD_LIBRARY_PATH, "${${UPS_PROD_NAME_UC}_FQ_DIR}/lib64")
 
 table_fragment_end
 
