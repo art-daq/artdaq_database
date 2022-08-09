@@ -31,14 +31,12 @@ int main(int argc, char* argv[]) try {
 
   auto returned = std::string{result.second};
 
-  if (options->operation() == apiliteral::operation::readdocument ||
-      options->operation() == apiliteral::operation::readconfiguration) {
+  if (options->operation() == apiliteral::operation::readdocument || options->operation() == apiliteral::operation::readconfiguration) {
     db::write_buffer_to_file(returned, options->resultFileName());
     std::cout << "Wrote file:" << options->resultFileName() << "\n";
 
     return process_exit_code::SUCCESS;
-  } else if (options->operation() == apiliteral::operation::writedocument ||
-             options->operation() == apiliteral::operation::writeconfiguration) {
+  } else if (options->operation() == apiliteral::operation::writedocument || options->operation() == apiliteral::operation::writeconfiguration) {
     /* db::write_buffer_to_file(returned,options->resultFileName());
      std::cout << "Wrote responce to file:" << file_res_name << "\n";
      */

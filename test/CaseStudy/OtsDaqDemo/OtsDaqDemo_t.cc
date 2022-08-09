@@ -94,22 +94,20 @@ int main(int argc, char* argv[]) try {
   cf::registerOperation<cf::opsig_str_rstr_t, cf::opsig_str_rstr_t::FP, std::string const&, std::string&>(
       apiliteral::operation::readdocument, read_document, options_string, test_document);
 
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findconfigs,
-                                                                                  find_configurations, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::confcomposition,
-                                                                                  configuration_composition, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::assignconfig,
-                                                                                  assign_configuration, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findversions,
-                                                                                  find_versions, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findentities,
-                                                                                  find_entities, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::addversionalias,
-                                                                                  add_version_alias, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::rmversionalias,
-                                                                                  remove_version_alias, options_string);
-  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findversionalias,
-                                                                                  find_version_aliases, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findconfigs, find_configurations,
+                                                                                  options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::confcomposition, configuration_composition,
+                                                                                  options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::assignconfig, assign_configuration,
+                                                                                  options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findversions, find_versions, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findentities, find_entities, options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::addversionalias, add_version_alias,
+                                                                                  options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::rmversionalias, remove_version_alias,
+                                                                                  options_string);
+  cf::registerOperation<cf::opsig_str_t, cf::opsig_str_t::FP, std::string const&>(apiliteral::operation::findversionalias, find_version_aliases,
+                                                                                  options_string);
   try {
     db::read_buffer_from_file(test_document, file_src_name);
     cf::registerOperation<cf::opsig_strstr_t, cf::opsig_strstr_t::FP, std::string const&, std::string const&>(
@@ -140,8 +138,7 @@ int main(int argc, char* argv[]) try {
 
   using cfo::data_format_t;
 
-  if (options.format() == data_format_t::gui || options.format() == data_format_t::db ||
-      options.format() == data_format_t::json) {
+  if (options.format() == data_format_t::gui || options.format() == data_format_t::db || options.format() == data_format_t::json) {
     auto compare_result = artdaq::database::json::compare_json_objects(returned, expected);
     if (compare_result.first) {
       std::cout << "returned:\n" << returned << "\n";
@@ -165,8 +162,8 @@ int main(int argc, char* argv[]) try {
   std::cout << "expected:\n" << expected << "\n";
 
   auto mismatch = std::mismatch(expected.begin(), expected.end(), returned.begin());
-  std::cout << "File sizes (exp,ret)=(" << std::distance(expected.begin(), expected.end()) << ","
-            << std::distance(returned.begin(), returned.end()) << ")\n";
+  std::cout << "File sizes (exp,ret)=(" << std::distance(expected.begin(), expected.end()) << "," << std::distance(returned.begin(), returned.end())
+            << ")\n";
 
   std::cout << "First mismatch at position " << std::distance(expected.begin(), mismatch.first) << ", (exp,ret)=(0x" << std::hex
             << static_cast<unsigned int>(*mismatch.first) << ",0x" << static_cast<unsigned int>(*mismatch.second) << ")\n";

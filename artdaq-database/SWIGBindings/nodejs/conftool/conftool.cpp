@@ -116,7 +116,6 @@ result_t import_collection(std::string const& query_payload) {
   return impl::import_collection(query_payload);
 }
 
-
 result_t search_collection(std::string const& query_payload) {
   set_default_locale();
 

@@ -56,14 +56,14 @@ JSONDocument prov::readDocument(ManageDocumentOperation const& options, JSONDocu
   TLOG(26) << "read_document: "
            << "Search returned " << collection.size() << " results.";
 
-  if (collection.empty() ) {
+  if (collection.empty()) {
     throw runtime_error("read_document") << "No documents found.";
   }
 
   auto data = JSONDocument{};
-  
-  std::swap(data,collection.size() > 1 ? *std::max_element(collection.begin(),collection.end(),docrec::compareDocumentVersions):
-    *collection.begin());
+
+  std::swap(data,
+            collection.size() > 1 ? *std::max_element(collection.begin(), collection.end(), docrec::compareDocumentVersions) : *collection.begin());
 
   TLOG(26) << "readDocument(): end";
 
@@ -115,7 +115,7 @@ std::vector<JSONDocument> prov::findConfigurations(ManageDocumentOperation const
   auto seenValues = std::list<std::string>{};
   seenValues.emplace_back(apiliteral::notprovided);
 
-  auto isNew = [& v = seenValues](auto const& name) {
+  auto isNew = [&v = seenValues](auto const& name) {
     confirm(!name.empty());
     if (std::find(v.begin(), v.end(), name) != v.end()) {
       return false;
@@ -554,7 +554,6 @@ std::vector<JSONDocument> prov::searchCollection(ManageDocumentOperation const& 
   auto search_results = provider->searchCollection(query_payload);
 
   for (auto const& search_result : search_results) {
-
     std::ostringstream oss;
     oss << "{";
     oss << quoted_(jsonliteral::query) << ":" << search_result;
@@ -567,7 +566,6 @@ std::vector<JSONDocument> prov::searchCollection(ManageDocumentOperation const& 
 
   return returnValue;
 }
-
 
 std::vector<JSONDocument> prov::findVersionAliases(cf::ManageAliasesOperation const& /*options*/, JSONDocument const& /*query_payload*/) {
   auto returnValue = std::vector<JSONDocument>{};

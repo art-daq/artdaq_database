@@ -15,7 +15,7 @@ using namespace boost::spirit;
 template <typename Iter>
 struct json_generator_grammar : karma::grammar<Iter, object_t()> {
   json_generator_grammar() : json_generator_grammar::base_type(start) {
-    value_rule = quoted_string | karma::long_ | karma::double_ | karma::bool_|object_rule | array_rule;
+    value_rule = quoted_string | karma::long_ | karma::double_ | karma::bool_ | object_rule | array_rule;
 
     quoted_string = '"' << karma::string << '"';
 
@@ -29,12 +29,12 @@ struct json_generator_grammar : karma::grammar<Iter, object_t()> {
 
     start = object_rule;
 
-//     BOOST_SPIRIT_DEBUG_NODE(key_rule);
-//     BOOST_SPIRIT_DEBUG_NODE(value_rule);
-//     BOOST_SPIRIT_DEBUG_NODE(data_rule);
-//     BOOST_SPIRIT_DEBUG_NODE(object_rule);
-//     BOOST_SPIRIT_DEBUG_NODE(array_rule);
-//     BOOST_SPIRIT_DEBUG_NODE(start);
+    //     BOOST_SPIRIT_DEBUG_NODE(key_rule);
+    //     BOOST_SPIRIT_DEBUG_NODE(value_rule);
+    //     BOOST_SPIRIT_DEBUG_NODE(data_rule);
+    //     BOOST_SPIRIT_DEBUG_NODE(object_rule);
+    //     BOOST_SPIRIT_DEBUG_NODE(array_rule);
+    //     BOOST_SPIRIT_DEBUG_NODE(start);
   }
 
   karma::rule<Iter, std::string()> quoted_string;

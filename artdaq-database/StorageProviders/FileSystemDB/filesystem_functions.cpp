@@ -173,7 +173,7 @@ std::list<std::string> dbfs::find_siblingdirs(std::string const& d) {
   return find_subdirs(path);
 }
 
-file_paths_t dbfs::list_files_in_directory(boost::filesystem::path const& path, std::string const& ext[[gnu::unused]]) {
+file_paths_t dbfs::list_files_in_directory(boost::filesystem::path const& path, std::string const& ext [[gnu::unused]]) {
   auto result = file_paths_t{};
 
   if (!boost::filesystem::exists(boost::filesystem::status(path))) {

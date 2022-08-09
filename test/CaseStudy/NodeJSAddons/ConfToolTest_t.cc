@@ -61,9 +61,8 @@ int main(int argc, char* argv[]) try {
   bpo::options_description desc = descstr.str();
 
   desc.add_options()("source,s", bpo::value<std::string>(), "Configuration source file name.")(
-      "compare,c", bpo::value<std::string>(), "Expected return file name.")(
-      "filter,f", bpo::value<std::string>(), "Search filter file name.")("operation,o", bpo::value<std::string>(),
-                                                                         "Operation [load/store].")
+      "compare,c", bpo::value<std::string>(), "Expected return file name.")("filter,f", bpo::value<std::string>(), "Search filter file name.")(
+      "operation,o", bpo::value<std::string>(), "Operation [load/store].")
 
       ("help,h", "produce help message");
 

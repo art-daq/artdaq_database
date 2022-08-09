@@ -36,9 +36,8 @@ int main(int argc, char* argv[]) try {
 
   bpo::options_description desc = descstr.str();
 
-  desc.add_options()("source,s", bpo::value<std::string>(), "Input source file.")(
-      "compare,c", bpo::value<std::string>(), "Expected result.")("testname,t", bpo::value<std::string>(), "Test name.")(
-      "options,o", bpo::value<std::string>(), "Test options file.")
+  desc.add_options()("source,s", bpo::value<std::string>(), "Input source file.")("compare,c", bpo::value<std::string>(), "Expected result.")(
+      "testname,t", bpo::value<std::string>(), "Test name.")("options,o", bpo::value<std::string>(), "Test options file.")
 
       ("help,h", "produce help message");
 
@@ -97,8 +96,8 @@ int main(int argc, char* argv[]) try {
   }
 
   auto runTest = [](std::string const& name) {
-    auto tests = std::map<std::string, test_case>{
-        {"insert", test_insert}, {"update", test_update}, {"search1", test_search1}, {"search2", test_search2}};
+    auto tests =
+        std::map<std::string, test_case>{{"insert", test_insert}, {"update", test_update}, {"search1", test_search1}, {"search2", test_search2}};
 
     std::cout << "Running test:<" << name << ">\n";
 
@@ -244,7 +243,7 @@ bool test_search1(std::string const& source_fcl, std::string const& compare_fcl,
   return false;
 }
 
-bool test_search2(std::string const& source_fcl, std::string const& compare_fcl, std::string const& options[[gnu::unused]]) {
+bool test_search2(std::string const& source_fcl, std::string const& compare_fcl, std::string const& options [[gnu::unused]]) {
   confirm(!source_fcl.empty());
   confirm(!compare_fcl.empty());
 
@@ -352,8 +351,7 @@ bool test_update(std::string const& source_fcl, std::string const& compare_fcl, 
   auto payload = changes.findChild("document");
   found.replaceChild(payload, "document");
 
-  json = JSONDocument{"{\"document\":" + found.to_string() + ", \"filter\":" + object_id + ",\"collection\":\"" + collection +
-                      "\"}"};
+  json = JSONDocument{"{\"document\":" + found.to_string() + ", \"filter\":" + object_id + ",\"collection\":\"" + collection + "\"}"};
 
   object_id = provider->writeDocument(json);
 

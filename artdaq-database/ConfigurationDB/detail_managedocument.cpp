@@ -46,8 +46,8 @@ using artdaq::database::basictypes::JsonData;
 using artdaq::database::basictypes::XmlData;
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
-using artdaq::database::xml::XmlWriter;
 using artdaq::database::json::JsonWriter;
+using artdaq::database::xml::XmlWriter;
 
 using JsonAnyHandle_t = boost::variant<JsonData, JSONDocument>;
 
@@ -188,7 +188,7 @@ void write_document(Options const& options, std::string& conf) {
   if (options.format() == data_format_t::fhicl) {
     TLOG(29) << "write_document: building fhicl document";
     builder = std::make_unique<JSONDocumentBuilder>(boost::get<JSONDocument>(data));
-  } else 
+  } else
 #endif
       if (options.format() != data_format_t::db && options.format() != data_format_t::gui) {
     builder = std::make_unique<JSONDocumentBuilder>();
@@ -292,7 +292,7 @@ void read_document(Options const& options, std::string& conf) {
   switch (format) {
     default:
     case data_format_t::db: {
-      returnValue=search_result.to_string();
+      returnValue = search_result.to_string();
       returnValueChanged = true;
       break;
     }
@@ -309,8 +309,8 @@ void read_document(Options const& options, std::string& conf) {
     case data_format_t::json: {
       jsn::value_t value = search_result.extract();
       auto const& docAst = unwrap(value).value_as<const object_t>(jsonliteral::document);
-      auto const& dataAst=unwrap(docAst).value_as<const object_t>(jsonliteral::data);
-      
+      auto const& dataAst = unwrap(docAst).value_as<const object_t>(jsonliteral::data);
+
       if (!JsonWriter{}.write(dataAst, returnValue)) {
         throw runtime_error("read_document") << "Invalid json data";
       }
@@ -326,7 +326,7 @@ void read_document(Options const& options, std::string& conf) {
     case data_format_t::fhicl: {
       jsn::value_t value = search_result.extract();
       auto const& docAst = unwrap(value).value_as<const object_t>(jsonliteral::document);
-        
+
       auto fhicl_buffer = std::string();
 
       if (!FhiclWriter().write_data(docAst, fhicl_buffer)) {
@@ -335,7 +335,7 @@ void read_document(Options const& options, std::string& conf) {
         throw runtime_error("read_document") << "Unable to reverse fhicl-to-json convertion";
       }
 
-      std::swap(returnValue,fhicl_buffer);
+      std::swap(returnValue, fhicl_buffer);
 
       returnValueChanged = true;
 
@@ -354,7 +354,7 @@ void read_document(Options const& options, std::string& conf) {
         throw runtime_error("read_document") << "Unable to reverse fhicl-to-xml convertion";
       }
 
-      std::swap(returnValue,xml_buffer);
+      std::swap(returnValue, xml_buffer);
 
       returnValueChanged = true;
 

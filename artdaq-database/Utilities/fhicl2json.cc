@@ -31,8 +31,8 @@ int main(int argc, char* argv[]) try {
 
   bpo::options_description desc = descstr.str();
 
-  desc.add_options()("config,c", bpo::value<std::string>(), "Configuration file.")(
-      "main,m", "Output the \"document.data.main\" subtree.")("help,h", "Produce help message.");
+  desc.add_options()("config,c", bpo::value<std::string>(), "Configuration file.")("main,m", "Output the \"document.data.main\" subtree.")(
+      "help,h", "Produce help message.");
 
   bpo::variables_map vm;
 

@@ -34,8 +34,8 @@ int main(int argc, char* argv[]) {
   bpo::options_description desc = descstr.str();
 
   desc.add_options()("source,s", bpo::value<std::string>(), "Input source file.")(
-      "compare,c", bpo::value<std::string>(), "Expected result of convertion.")("testname,t", bpo::value<std::string>(),
-                                                                                "Test name.")("help,h", "produce help message");
+      "compare,c", bpo::value<std::string>(), "Expected result of convertion.")("testname,t", bpo::value<std::string>(), "Test name.")(
+      "help,h", "produce help message");
 
   bpo::variables_map vm;
 
