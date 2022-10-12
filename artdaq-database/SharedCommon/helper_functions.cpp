@@ -48,7 +48,16 @@ std::string db::to_string(std::chrono::system_clock::time_point const& tp) {
 
   snprintf(buff + 30, 5, FORMAT_DURATION_MILLISECONDS, milliseconds);
 
+  // We know that we're only copying 3 out of 9 potential bytes, it's okay...
+#ifndef __clang__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+#endif
   strncpy(buff + 20, buff + 30, 3);
+
+#ifndef __clang__
+#pragma GCC diagnostic pop
+#endif
 
   if (useFakeTime()) {
     return apiliteral::timestamp_faketime;
