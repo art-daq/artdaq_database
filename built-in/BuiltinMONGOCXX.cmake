@@ -34,7 +34,7 @@ if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64 )
     LOG_INSTALL ON
     LOG_UPDATE ON
     DEPENDS mongo-c-driver
-
+    BUILD_BYPRODUCTS "${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/libmongocxx.so" "${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/libbsoncxx.so"
     #PATCH_COMMAND cd ${TOP_CMAKE_BINARY_DIR}/mongo-cxx-driver-prefix/src/mongo-cxx-driver && git apply ${TOP_CMAKE_SOURCE_DIR}/built-in/mongocxx-r366.patch
     UPDATE_COMMAND ""
     CMAKE_ARGS -DCMAKE_BUILD_TYPE=${MYCMAKE_BUILD_TYPE}
@@ -70,7 +70,7 @@ if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64 )
       INTERFACE_INCLUDE_DIRECTORIES "${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/include/mongocxx/v_noabi"
       IMPORTED_LOCATION "${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/libmongocxx.so"
       )
-      add_dependencies(mongo::mongocxx_shared MONGOCXX::bsoncxx)
+      add_dependencies(mongo::mongocxx_shared mongocxx::bsoncxx)
   endif()
 
 
