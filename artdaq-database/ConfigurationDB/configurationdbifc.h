@@ -259,7 +259,7 @@ struct ConfigurationInterface final {
       try {
         auto const& searches = unwrap(resultAST).value_as<const jsn::array_t>(jsonliteral::search);
 
-        for (auto const search : searches) {
+        for (auto const& search : searches) {
           auto const& query = unwrap(search).value_as<const jsn::object_t>(jsonliteral::query);
           auto const& filter = unwrap(query).value_as<const jsn::object_t>(jsonliteral::filter);
           auto const& version = unwrap(filter).value_as<const std::string>(apiliteral::filter::version);
