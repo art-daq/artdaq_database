@@ -1,0 +1,16 @@
+ 
+#include "EventBuilder_standard.fcl" 
+
+daq1.metrics.graphite.namespace: "icarus.evb10." 
+
+daq2.metrics.evbFile.fileName: "/daq/log/me'trics/evb1'0_'#met'rics.log" 
+
+daq3.metrics.evbFile.fileName: "/daq/log/metr'ics/evb10_#metrics.log" 
+
+daq4.metrics.evbFile.fileName: "/daq/log/metr'ic#s'/evb10_#metrics.log" 
+
+daq5.metrics.evbFile.fileName: '/daq/log/metr"ics/evb10_#metrics.log' // #_%to.root' #_%to.root'
+
+outputs6.normalOutput.fileName: "/data/daq/data_dl10_run%R_%#_%to.root" // #_%to.root' #_%to.root'
+
+outputs7.testOutput.fileName: "/data/test_daq/data_dl10_run%R_%#_%to.root" #  #_%to.root " #_%to.root" 'sdfas #dfas'
