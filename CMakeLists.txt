@@ -58,7 +58,7 @@ if(BTYPE_UC STREQUAL DEBUG)
   add_definitions(-DDEBUGME)
 endif()
 
-find_package(Boost COMPONENTS filesystem program_options system REQUIRED)
+find_package(Boost COMPONENTS filesystem program_options system unit_test_framework REQUIRED)
 find_package(TRACE REQUIRED)
 
 # buil-in libraries

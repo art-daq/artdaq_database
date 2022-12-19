@@ -1,4 +1,4 @@
-cet_make_exec(ValidateJson_t
+cet_make_exec(NAME ValidateJson_t
   LIBRARIES
     
   artdaq-database_BasicTypes
@@ -12,7 +12,7 @@ cet_make_exec(ValidateJson_t
   fhiclcpp
   #${SQLITE3}
   cetlib
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}  
+  Boost::program_options
 )
 
 SET ( TEST_NAME "ValidateJson" )

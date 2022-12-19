@@ -1,4 +1,4 @@
-cet_make_exec(FileSystemFhicl_t
+cet_make_exec(NAME FileSystemFhicl_t
   LIBRARIES
     
   artdaq-database_BasicTypes
@@ -10,7 +10,7 @@ cet_make_exec(FileSystemFhicl_t
   #${SQLITE3}
   cetlib
   cetlib_except
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}    
+  Boost::program_options
 ) 
 
 add_subdirectory(test001)

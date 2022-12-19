@@ -6,7 +6,7 @@ link_libraries(
 )
 
 
-cet_make_exec(DatabaseConfiguration_t
+cet_make_exec(NAME DatabaseConfiguration_t
   LIBRARIES
     
   artdaq-database_BasicTypes
@@ -21,8 +21,8 @@ cet_make_exec(DatabaseConfiguration_t
   #${SQLITE3}
   cetlib
   cetlib_except
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}
-	${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}	
+  Boost::program_options
+  Boost::unit_test_framework
 ) 
 
 MESSAGE("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}f")

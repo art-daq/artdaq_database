@@ -1,11 +1,11 @@
-cet_make_exec(MongoJson_t
+cet_make_exec(NAME MongoJson_t
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
   artdaq-database_StorageProviders_MongoDB
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}  
+  Boost::program_options
 ) 
 
 add_subdirectory(test001)
