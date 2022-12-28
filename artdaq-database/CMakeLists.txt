@@ -16,7 +16,7 @@ if(USE_FHICLCPP)
   set(FHICLCPP_DATAFORMAT_LIB artdaq-database_DataFormats_Fhicl)
 endif()
 
-install(DIRECTORY deployment-scripts DESTINATION ${product}/${version})
+install(DIRECTORY deployment-scripts DESTINATION ./${product}/${version})
 cet_script(deployment-scripts/install_artdaq_database.sh)
 
 add_subdirectory(BuildInfo)
