@@ -41,6 +41,12 @@ IF (SANITIZE_ADDRESS)
   endif()
 ENDIF()
 
+string(FIND "x${artdaq_database_EXEC_PREFIX}" "ots" OTS_FOUND)
+if(${OTS_FOUND} GREATER -1)
+  MESSAGE(STATUS "DISABLE built-in FHICLCPP")
+  set(USE_FHICLCPP FALSE)
+endif()
+
 if(DEFINED ENV{USE_FHICLCPP})
   if($ENV{USE_FHICLCPP} STREQUAL "0")
     MESSAGE( STATUS "Disable built-in FHICLCPP")
