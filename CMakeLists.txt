@@ -23,14 +23,12 @@ project(artdaq_database VERSION 1.07.01)
 set(TOP_CMAKE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(TOP_CMAKE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
+include(CetCMakeEnv)
+cet_cmake_env()
 
 # Find our own CMake modules, and tell everyone else where to find them.
 cet_cmake_module_directories(Modules BINARY)
 list(PREPEND CMAKE_MODULE_PATH ${TOP_CMAKE_SOURCE_DIR}/built-in)
-
-include(CetCMakeEnv)
-
-cet_cmake_env()
 
 cet_set_compiler_flags(DIAGS VIGILANT WERROR NO_UNDEFINED EXTRA_FLAGS -pedantic )
 
