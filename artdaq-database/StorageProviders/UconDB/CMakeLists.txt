@@ -12,7 +12,7 @@ cet_make(
   artdaq-database_BasicTypes
   artdaq-database_JsonDocument
   artdaq-database_StorageProviders
-  ${CURL_LIBRARIES}
+  CURL::libcurl
   cetlib_except
 )
 
