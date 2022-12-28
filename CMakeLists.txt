@@ -51,7 +51,7 @@ if(DEFINED ENV{USE_FHICLCPP})
   if($ENV{USE_FHICLCPP} STREQUAL "0")
     MESSAGE( STATUS "Disable built-in FHICLCPP")
     set(USE_FHICLCPP FALSE)
-  else
+  else()
     MESSAGE( STATUS "Enable built-in FHICLCPP")
     set(USE_FHICLCPP TRUE)
   endif()
