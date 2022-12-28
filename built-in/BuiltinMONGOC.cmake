@@ -27,7 +27,7 @@ if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64 )
     ExternalProject_Add(
     mongo-c-driver
     GIT_REPOSITORY https://github.com/mongodb/mongo-c-driver
-    GIT_TAG 1.19.2
+    GIT_TAG 1.23.1
     LOG_DOWNLOAD ON
     LOG_CONFIGURE ON
     LOG_BUILD ON

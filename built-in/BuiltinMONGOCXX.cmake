@@ -27,7 +27,7 @@ if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64 )
     ExternalProject_Add(
     mongo-cxx-driver
     GIT_REPOSITORY https://github.com/mongodb/mongo-cxx-driver
-    GIT_TAG r3.6.6
+    GIT_TAG r3.7.0
     LOG_DOWNLOAD ON
     LOG_CONFIGURE ON
     LOG_BUILD ON
