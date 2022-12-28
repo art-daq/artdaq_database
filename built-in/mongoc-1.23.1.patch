@@ -1,0 +1,12 @@
+diff --git a/build/mongodl.py b/build/mongodl.py
+index 9baff98d3..fd17b5360 100644
+--- a/build/mongodl.py
++++ b/build/mongodl.py
+@@ -33,6 +33,7 @@ DISTRO_ID_MAP = {
+     'opensuse': 'sles',
+     'redhat': 'rhel',
+     'rocky': 'rhel',
++    'almalinux': 'rhel',
+ }
+ 
+ DISTRO_VERSION_MAP = {

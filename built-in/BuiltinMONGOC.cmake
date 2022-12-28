@@ -33,8 +33,8 @@ if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64 )
     LOG_BUILD ON
     LOG_INSTALL ON
     LOG_UPDATE ON
-
-    PATCH_COMMAND	 ""
+    
+    PATCH_COMMAND cd ${TOP_CMAKE_BINARY_DIR}/mongo-c-driver-prefix/src/mongo-c-driver && git apply ${TOP_CMAKE_SOURCE_DIR}/built-in/mongoc-1.23.1.patch
     UPDATE_COMMAND ""
     CMAKE_ARGS -DCMAKE_BUILD_TYPE=${MYCMAKE_BUILD_TYPE}
         -DCMAKE_BUILD_PARALLEL_LEVEL=${CMAKE_BUILD_PARALLEL_LEVEL}
