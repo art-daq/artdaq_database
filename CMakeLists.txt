@@ -41,12 +41,19 @@ IF (SANITIZE_ADDRESS)
   endif()
 ENDIF()
 
-string(FIND ${artdaq_database_EXEC_PREFIX} "ots" OTS_FOUND)
-if(${OTS_FOUND} EQUAL -1)
+if(DEFINED ENV{USE_FHICLCPP})
+  if($ENV{USE_FHICLCPP} STREQUAL "0")
+    MESSAGE( STATUS "Disable built-in FHICLCPP")
+    set(USE_FHICLCPP FALSE)
+  else
+    MESSAGE( STATUS "Enable built-in FHICLCPP")
+    set(USE_FHICLCPP TRUE)
+  endif()
+endif()
+
+if(NOT DEFINED USE_FHICLCPP)
     MESSAGE( STATUS "Enable built-in FHICLCPP")
   set(USE_FHICLCPP TRUE)
-  else()
-  MESSAGE(STATUS "DISABLE built-in FHICLCPP")
 endif()
 #cet_report_compiler_flags()
 
