@@ -69,7 +69,7 @@ if(BTYPE_UC STREQUAL DEBUG)
   add_definitions(-DDEBUGME)
 endif()
 
-find_package(Boost COMPONENTS filesystem program_options system REQUIRED)
+find_package(Boost QUIET COMPONENTS filesystem program_options system REQUIRED)
 find_package(TRACE REQUIRED)
 
 # buil-in libraries
@@ -82,8 +82,8 @@ if(USE_FHICLCPP)
   include(BuiltinCETLIB)
   include(BuiltinCETLIBEXCEPT)
 else()
-  find_package(cetlib 3.13.00 REQUIRED)
-  find_package(cetlib_except 1.07.00 REQUIRED)
+  find_package(cetlib 3.13.00 REQUIRED QUIET)
+  find_package(cetlib_except 1.07.00 REQUIRED QUIET)
 endif()
 #include(BuiltinPARAMICO)
 

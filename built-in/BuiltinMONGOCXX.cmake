@@ -7,7 +7,7 @@ if(BTYPE_UC STREQUAL DEBUG)
     set(MYCMAKE_BUILD_TYPE "Debug")
 endif()
 
-if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64 )
+if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/libmongocxx.so )
     include(ExternalProject)
 
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
