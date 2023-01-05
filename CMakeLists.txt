@@ -23,23 +23,43 @@ project(artdaq_database VERSION 1.07.01)
 set(TOP_CMAKE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(TOP_CMAKE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
+include(CetCMakeEnv)
+cet_cmake_env()
 
 # Find our own CMake modules, and tell everyone else where to find them.
 cet_cmake_module_directories(Modules BINARY)
 list(PREPEND CMAKE_MODULE_PATH ${TOP_CMAKE_SOURCE_DIR}/built-in)
 
-include(CetCMakeEnv)
-
-cet_cmake_env()
-
 cet_set_compiler_flags(DIAGS VIGILANT WERROR NO_UNDEFINED EXTRA_FLAGS -pedantic )
 
-string(FIND ${artdaq_database_EXEC_PREFIX} "ots" OTS_FOUND)
-if(${OTS_FOUND} EQUAL -1)
+IF (SANITIZE_ADDRESS)
+  string(TOUPPER ${SANITIZE_ADDRESS} SANITIZE_ADDRESS_UC )
+  if( ${SANITIZE_ADDRESS_UC} MATCHES "TRUE" )
+    MESSAGE (STATUS "Enable  -fsanitize=address")
+			add_compile_options(-fsanitize=address -Wno-unused-command-line-argument)
+			add_link_options(-lasan)
+  endif()
+ENDIF()
+
+string(FIND "x${artdaq_database_EXEC_PREFIX}" "ots" OTS_FOUND)
+if(${OTS_FOUND} GREATER -1)
+  MESSAGE(STATUS "DISABLE built-in FHICLCPP")
+  set(USE_FHICLCPP FALSE)
+endif()
+
+if(DEFINED ENV{USE_FHICLCPP})
+  if($ENV{USE_FHICLCPP} STREQUAL "0")
+    MESSAGE( STATUS "Disable built-in FHICLCPP")
+    set(USE_FHICLCPP FALSE)
+  else()
+    MESSAGE( STATUS "Enable built-in FHICLCPP")
+    set(USE_FHICLCPP TRUE)
+  endif()
+endif()
+
+if(NOT DEFINED USE_FHICLCPP)
     MESSAGE( STATUS "Enable built-in FHICLCPP")
   set(USE_FHICLCPP TRUE)
-  else()
-  MESSAGE(STATUS "DISABLE built-in FHICLCPP")
 endif()
 #cet_report_compiler_flags()
 

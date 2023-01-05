@@ -1,5 +1,7 @@
 cet_enable_asserts()
 
+find_package(Boost COMPONENTS filesystem program_options system unit_test_framework REQUIRED)
+
 IF (FORMAT_WITH_CLANG)
   string(TOUPPER ${FORMAT_WITH_CLANG} FORMAT_WITH_CLANG_UC )
   if( ${FORMAT_WITH_CLANG_UC} MATCHES "TRUE" )
