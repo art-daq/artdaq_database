@@ -64,7 +64,6 @@ endif()
 #cet_report_compiler_flags()
 
 # Debug streamer.
-# Debug streamer.
 string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC)
 if(BTYPE_UC STREQUAL DEBUG)
   add_definitions(-DDEBUGME)
