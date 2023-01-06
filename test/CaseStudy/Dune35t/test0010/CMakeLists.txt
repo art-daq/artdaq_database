@@ -1,4 +1,4 @@
-cet_make_exec(ExportDune35tData_t
+cet_make_exec(NAME ExportDune35tData_t
   LIBRARIES
     
   artdaq-database_BasicTypes
@@ -12,7 +12,7 @@ cet_make_exec(ExportDune35tData_t
   artdaq-database_StorageProviders_UconDB
   fhiclcpp
   cetlib
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}  
+  Boost::program_options
 ) 
 
 

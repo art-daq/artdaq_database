@@ -8,7 +8,7 @@ cet_make(
   artdaq-database_StorageProviders_MongoDB  
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}    
+  Boost::program_options
   cetlib_except
   )
 
