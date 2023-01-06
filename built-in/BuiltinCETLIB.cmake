@@ -55,8 +55,8 @@ IF(CETLIB_IS_STATIC)
 
   set(LIBRARIES  
     cetlib_except
-    ${Boost_FILESYSTEM_LIBRARY}
-    ${Boost_SYSTEM_LIBRARY}
+    Boost::filesystem
+    Boost::system
     )
 
   include_directories( ${TOP_CMAKE_BINARY_DIR}/built-in/cetlib )
@@ -71,8 +71,8 @@ else()
     cetlib
     LIBRARIES
     cetlib_except
-    ${Boost_FILESYSTEM_LIBRARY}
-    ${Boost_SYSTEM_LIBRARY}
+    Boost::filesystem
+    Boost::system
     WITH_STATIC_LIBRARY
     SUBDIRS
     ${TOP_CMAKE_BINARY_DIR}/built-in/cetlib/cetlib

@@ -1,4 +1,4 @@
-cet_make_exec(JSONConvert_t
+cet_make_exec(NAME JSONConvert_t
   LIBRARIES
     
   artdaq-database_BasicTypes
@@ -11,7 +11,7 @@ cet_make_exec(JSONConvert_t
   fhiclcpp
   cetlib
   cetlib_except
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}  
+  Boost::program_options
 ) 
 
 
