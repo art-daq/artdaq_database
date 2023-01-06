@@ -7,7 +7,7 @@ if(BTYPE_UC STREQUAL DEBUG)
     set(MYCMAKE_BUILD_TYPE "Debug")
 endif()
 
-if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64 )
+if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/libmongocxx.so )
     include(ExternalProject)
 
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -27,7 +27,7 @@ if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64 )
     ExternalProject_Add(
     mongo-cxx-driver
     GIT_REPOSITORY https://github.com/mongodb/mongo-cxx-driver
-    GIT_TAG r3.6.6
+    GIT_TAG r3.7.0
     LOG_DOWNLOAD ON
     LOG_CONFIGURE ON
     LOG_BUILD ON
@@ -74,22 +74,22 @@ if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64 )
   endif()
 
 
-install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/include/ DESTINATION ${flavorqual_dir}/include )
-install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/ DESTINATION ${flavorqual_dir}/lib64/ FILES_MATCHING PATTERN "*.so*" PATTERN "cmake" EXCLUDE PATTERN "pkgconfig" EXCLUDE)
-install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/ DESTINATION ${flavorqual_dir}/lib64/ FILES_MATCHING PATTERN "*.a" PATTERN "cmake" EXCLUDE PATTERN "pkgconfig" EXCLUDE)
+install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/include/ DESTINATION ./${flavorqual_dir}/include )
+install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/ DESTINATION ./${flavorqual_dir}/lib64/ FILES_MATCHING PATTERN "*.so*" PATTERN "cmake" EXCLUDE PATTERN "pkgconfig" EXCLUDE)
+install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/ DESTINATION ./${flavorqual_dir}/lib64/ FILES_MATCHING PATTERN "*.a" PATTERN "cmake" EXCLUDE PATTERN "pkgconfig" EXCLUDE)
 set(TARGET_FILES 
-              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/bsoncxx-3.6.6/bsoncxx_targets-$<LOWER_CASE:${MYCMAKE_BUILD_TYPE}>.cmake 
-              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/mongocxx-3.6.6/mongocxx_targets-$<LOWER_CASE:${MYCMAKE_BUILD_TYPE}>.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/bsoncxx-3.7.0/bsoncxx_targets-$<LOWER_CASE:${MYCMAKE_BUILD_TYPE}>.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/mongocxx-3.7.0/mongocxx_targets-$<LOWER_CASE:${MYCMAKE_BUILD_TYPE}>.cmake 
 )
-install(FILES ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/bsoncxx-3.6.6/bsoncxx_targets.cmake 
-              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/bsoncxx-3.6.6/bsoncxx-config.cmake 
-              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/bsoncxx-3.6.6/bsoncxx-config-version.cmake 
-              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/libbsoncxx-3.6.6/libbsoncxx-config.cmake 
-              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/libbsoncxx-3.6.6/libbsoncxx-config-version.cmake 
-              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/libmongocxx-3.6.6/libmongocxx-config.cmake 
-              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/libmongocxx-3.6.6/libmongocxx-config-version.cmake 
-              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/mongocxx-3.6.6/mongocxx_targets.cmake 
-              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/mongocxx-3.6.6/mongocxx-config.cmake 
-              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/mongocxx-3.6.6/mongocxx-config-version.cmake 
+install(FILES ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/bsoncxx-3.7.0/bsoncxx_targets.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/bsoncxx-3.7.0/bsoncxx-config.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/bsoncxx-3.7.0/bsoncxx-config-version.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/libbsoncxx-3.7.0/libbsoncxx-config.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/libbsoncxx-3.7.0/libbsoncxx-config-version.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/libmongocxx-3.7.0/libmongocxx-config.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/libmongocxx-3.7.0/libmongocxx-config-version.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/mongocxx-3.7.0/mongocxx_targets.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/mongocxx-3.7.0/mongocxx-config.cmake 
+              ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/cmake/mongocxx-3.7.0/mongocxx-config-version.cmake 
               ${TARGET_FILES}
-        DESTINATION ${flavorqual_dir}/lib/artdaq_database/cmake/)
+        DESTINATION ./${flavorqual_dir}/lib/artdaq_database/cmake/)
