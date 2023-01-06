@@ -27,14 +27,14 @@ if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64 )
     ExternalProject_Add(
     mongo-c-driver
     GIT_REPOSITORY https://github.com/mongodb/mongo-c-driver
-    GIT_TAG 1.19.2
+    GIT_TAG 1.23.1
     LOG_DOWNLOAD ON
     LOG_CONFIGURE ON
     LOG_BUILD ON
     LOG_INSTALL ON
     LOG_UPDATE ON
-
-    PATCH_COMMAND	 ""
+    
+    PATCH_COMMAND cd ${TOP_CMAKE_BINARY_DIR}/mongo-c-driver-prefix/src/mongo-c-driver && git apply ${TOP_CMAKE_SOURCE_DIR}/built-in/mongoc-1.23.1.patch
     UPDATE_COMMAND ""
     CMAKE_ARGS -DCMAKE_BUILD_TYPE=${MYCMAKE_BUILD_TYPE}
         -DCMAKE_BUILD_PARALLEL_LEVEL=${CMAKE_BUILD_PARALLEL_LEVEL}
@@ -51,9 +51,9 @@ else()
     add_custom_target( mongo-c-driver )
 endif()
 
-install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/include/ DESTINATION ${flavorqual_dir}/include )
-install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/ DESTINATION ${flavorqual_dir}/lib64/ FILES_MATCHING PATTERN "*.so*" PATTERN "cmake" EXCLUDE)
-install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/ DESTINATION ${flavorqual_dir}/lib64/ FILES_MATCHING PATTERN "*.a" PATTERN "cmake" EXCLUDE)
+install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/include/ DESTINATION ./${flavorqual_dir}/include )
+install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/ DESTINATION ./${flavorqual_dir}/lib64/ FILES_MATCHING PATTERN "*.so*" PATTERN "cmake" EXCLUDE)
+install(DIRECTORY ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/ DESTINATION ./${flavorqual_dir}/lib64/ FILES_MATCHING PATTERN "*.a" PATTERN "cmake" EXCLUDE)
 set(TARGET_FILES 
               ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/bson-1.0/bson-targets-$<LOWER_CASE:${MYCMAKE_BUILD_TYPE}>.cmake 
               ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/mongoc-1.0/mongoc-targets-$<LOWER_CASE:${MYCMAKE_BUILD_TYPE}>.cmake 
@@ -73,4 +73,4 @@ install(FILES ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/bson-1
               ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/mongoc-1.0/mongoc-1.0-config.cmake 
               ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/mongoc-1.0/mongoc-1.0-config-version.cmake 
               ${TARGET_FILES}
-        DESTINATION ${flavorqual_dir}/lib/artdaq_database/cmake/)
+        DESTINATION ./${flavorqual_dir}/lib/artdaq_database/cmake/)

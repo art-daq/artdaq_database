@@ -68,9 +68,9 @@ macro (create_python_addon)
 
     install (FILES ${this_build_path}/${artdaq_database_LIBRARY_DIR}/${PIA_ADDON_LIBNAME}.so 
       PERMISSIONS OWNER_EXECUTE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_READ WORLD_EXECUTE
-      DESTINATION ${flavorqual_dir}/python/)
+      DESTINATION ./${flavorqual_dir}/python/)
 
-    install (FILES ${this_build_path}/${PIA_ADDON_NAME}.py DESTINATION ${flavorqual_dir}/python/)
+    install (FILES ${this_build_path}/${PIA_ADDON_NAME}.py DESTINATION ./${flavorqual_dir}/python/)
 
 
     else(CAN_BUILD)
