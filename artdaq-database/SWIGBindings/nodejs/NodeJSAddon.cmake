@@ -31,7 +31,7 @@ function(create_node_package_json NODEJS_ADDON_NAME)
     if(NODEJS_CAN_BUILD)
         configure_file (${CMAKE_CURRENT_LIST_DIR}/package.json.in ${CMAKE_CURRENT_BINARY_DIR}/package.json @ONLY)
         install(FILES ${CMAKE_CURRENT_BINARY_DIR}/package.json
-                DESTINATION ${flavorqual_dir}/lib/node_modules/${NODEJS_ADDON_NAME} )
+                DESTINATION ./${flavorqual_dir}/lib/node_modules/${NODEJS_ADDON_NAME} )
     endif(NODEJS_CAN_BUILD)
 endfunction()
 
@@ -91,7 +91,7 @@ macro (create_nodejs_addon)
             set( this_build_path $ENV{CETPKG_BUILD} )
         endif()
 
-        install (FILES ${this_build_path}/lib/${CNA_ADDON_NAME}.node DESTINATION ${flavorqual_dir}/lib/node_modules/${CNA_ADDON_NAME})
+        install (FILES ${this_build_path}/lib/${CNA_ADDON_NAME}.node DESTINATION ./${flavorqual_dir}/lib/node_modules/${CNA_ADDON_NAME})
 
         # add_custom_command(TARGET ${CNA_ADDON_NAME} POST_BUILD 
         # COMMAND echo "**** Exports for ${this_build_path}/lib/${CNA_ADDON_NAME}.node"

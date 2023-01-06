@@ -127,7 +127,7 @@ cet_make_exec(NAME fixtestjson
 )
 
 
-install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/schema.fcl DESTINATION ${flavorqual_dir}/conf/)
+install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/schema.fcl DESTINATION ./${flavorqual_dir}/conf/)
 
 cet_script(conftool.py)
 
