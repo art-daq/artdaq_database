@@ -52,11 +52,12 @@ struct fhicl_comments_parser_grammar : qi::grammar<Iter, comments_t(), qi::blank
 
     whitespace_rule = *(ascii::char_ - (lit("#") | lit("//")));
 
-    whitespace_b4quotedstring_rule = *(ascii::char_ - (lit("\"") | lit("#") | lit("//")));
+    whitespace_b4quotedstring_rule = *(ascii::char_ - (lit("\"") | lit("\'") | lit("#") | lit("//")));
 
-    quoted_string_rule = '"' >> +(ascii::char_ - '"') >> '"';
+    double_quoted_string_rule = lit("\"") >> +(ascii::char_ - lit("\"")) >> lit("\"");
+    single_quoted_string_rule = lit("\'") >> +(ascii::char_ - lit("\'")) >> lit("\'");
 
-    padded_quoted_string_rule = whitespace_b4quotedstring_rule >> *(quoted_string_rule >> whitespace_b4quotedstring_rule);
+    padded_quoted_string_rule = whitespace_b4quotedstring_rule >> *((double_quoted_string_rule|single_quoted_string_rule) >> whitespace_b4quotedstring_rule);
 
     string_rule = +(ascii::char_ - (eol | eoi));
 
@@ -65,7 +66,7 @@ struct fhicl_comments_parser_grammar : qi::grammar<Iter, comments_t(), qi::blank
     comments_rule = (padded_quoted_string_rule >> whitespace_rule >> comment_rule) % eol;
   }
 
-  qi::rule<Iter> whitespace_rule, whitespace_b4quotedstring_rule, padded_quoted_string_rule, quoted_string_rule;
+  qi::rule<Iter> whitespace_rule, whitespace_b4quotedstring_rule, padded_quoted_string_rule, double_quoted_string_rule, single_quoted_string_rule;
   qi::rule<Iter, std::string()> string_rule;
   qi::rule<Iter, linenum_comment_t()> comment_rule;
   qi::rule<Iter, comments_t(), qi::blank_type> comments_rule;
