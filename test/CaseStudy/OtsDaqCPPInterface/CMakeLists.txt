@@ -3,6 +3,7 @@ cet_make(
   LIBRARIES
   artdaq-database_ConfigurationDB
   cetlib_except
+  Boost::unit_test_framework
   )
 
 add_subdirectory(test001)

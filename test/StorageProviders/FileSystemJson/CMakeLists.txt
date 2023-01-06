@@ -1,11 +1,11 @@
-cet_make_exec(FileSystemJson_t
+cet_make_exec(NAME FileSystemJson_t
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
   artdaq-database_StorageProviders_FileSystemDB
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}  
+  Boost::program_options
 ) 
 
 add_subdirectory(test001)

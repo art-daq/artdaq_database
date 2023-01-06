@@ -1,4 +1,4 @@
-cet_make_exec(ConfigurationDB_t
+cet_make_exec(NAME ConfigurationDB_t
   LIBRARIES
     
   artdaq-database_BasicTypes

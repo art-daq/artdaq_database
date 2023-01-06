@@ -1,6 +1,5 @@
 cet_enable_asserts()
 
-find_package(Boost COMPONENTS filesystem program_options system unit_test_framework REQUIRED)
 
 IF (FORMAT_WITH_CLANG)
   string(TOUPPER ${FORMAT_WITH_CLANG} FORMAT_WITH_CLANG_UC )
@@ -11,6 +10,35 @@ ENDIF()
 
 # Make sure tests have correct environment settings.
 include(CetTest)
+
+
+string(FIND "x${artdaq_database_EXEC_PREFIX}" "ots" OTS_FOUND)
+if(${OTS_FOUND} GREATER -1)
+  MESSAGE(STATUS "DISABLE built-in FHICLCPP")
+  set(USE_FHICLCPP FALSE)
+endif()
+
+if(DEFINED ENV{USE_FHICLCPP})
+  if($ENV{USE_FHICLCPP} STREQUAL "0")
+    MESSAGE( STATUS "Disable built-in FHICLCPP")
+    set(USE_FHICLCPP FALSE)
+  else()
+    MESSAGE( STATUS "Enable built-in FHICLCPP")
+    set(USE_FHICLCPP TRUE)
+  endif()
+endif()
+
+if(NOT DEFINED USE_FHICLCPP)
+    MESSAGE( STATUS "Enable built-in FHICLCPP")
+  set(USE_FHICLCPP TRUE)
+endif()
+
+if(USE_FHICLCPP)
+  include_directories(${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp)
+  include_directories(${TOP_CMAKE_BINARY_DIR}/built-in/cetlib)
+  include_directories(${TOP_CMAKE_BINARY_DIR}/built-in/cetlib_except)
+ 
+endif()
 
 set(ARTDAQ_DATABASE_URI_FILESYSTEM "filesystemdb://${CMAKE_BINARY_DIR}/databases/filesystemdb/test_db")
 set(ARTDAQ_DATABASE_URI_MONGO "mongodb://127.0.0.1:27017/test_db")

@@ -1,4 +1,4 @@
-cet_make_exec(ConfToolTest_t
+cet_make_exec(NAME ConfToolTest_t
   LIBRARIES
     
   artdaq-database_BasicTypes
@@ -11,7 +11,7 @@ cet_make_exec(ConfToolTest_t
   fhiclcpp
   #${SQLITE3}
   cetlib
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}  
+  Boost::program_options
 ) 
 
 

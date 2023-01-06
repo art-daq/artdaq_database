@@ -6,9 +6,9 @@ cet_make(
   cetlib
   cetlib_except
   )
-  if(FHICLCPP_IS_STATIC)
-  add_dependencies(artdaq-database_SharedCommon ${FHICLCPP_TARGET})
-  endif()
+if(FHICLCPP_IS_STATIC)
+  add_dependencies(artdaq-database_DataFormats_Fhicl ${FHICLCPP_TARGET})
+endif()
 
 install_headers()
 install_source()
