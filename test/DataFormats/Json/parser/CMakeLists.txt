@@ -1,4 +1,4 @@
-cet_make_exec(readjson_t
+cet_make_exec(NAME readjson_t
   LIBRARIES
   
   artdaq-database_DataFormats_Json
@@ -6,7 +6,7 @@ cet_make_exec(readjson_t
   cetlib
   cetlib_except
   #${SQLITE3}
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}
+  Boost::program_options
 ) 
 
 add_subdirectory(test001)

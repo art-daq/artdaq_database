@@ -1,4 +1,4 @@
-cet_make_exec(JSONOverlay_t
+cet_make_exec(NAME JSONOverlay_t
   LIBRARIES
   
   artdaq-database_DataFormats_Json
@@ -6,7 +6,7 @@ cet_make_exec(JSONOverlay_t
   artdaq-database_Overlay
   cetlib
   cetlib_except
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}
+  Boost::program_options
 ) 
 
 SET ( TEST_NAME "compare" )

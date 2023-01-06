@@ -1,4 +1,4 @@
-cet_make_exec(ArtdaqDemo_t
+cet_make_exec(NAME ArtdaqDemo_t
   LIBRARIES
     
   artdaq-database_BasicTypes
@@ -13,7 +13,7 @@ cet_make_exec(ArtdaqDemo_t
   #${SQLITE3}
   cetlib
   cetlib_except
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}  
+  Boost::program_options
 ) 
 
 

@@ -1,4 +1,4 @@
-cet_make_exec(JSONDocument_t
+cet_make_exec(NAME JSONDocument_t
   LIBRARIES
   
   artdaq-database_JsonDocument
@@ -6,7 +6,7 @@ cet_make_exec(JSONDocument_t
   cetlib
   cetlib_except
   #${SQLITE3}
-  ${Boost_PROGRAM_OPTIONS_LIBRARY}
+  Boost::program_options
 ) 
 
 #replace tests
