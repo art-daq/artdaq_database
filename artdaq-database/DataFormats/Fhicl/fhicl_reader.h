@@ -57,7 +57,8 @@ struct fhicl_comments_parser_grammar : qi::grammar<Iter, comments_t(), qi::blank
     double_quoted_string_rule = lit("\"") >> +(ascii::char_ - lit("\"")) >> lit("\"");
     single_quoted_string_rule = lit("\'") >> +(ascii::char_ - lit("\'")) >> lit("\'");
 
-    padded_quoted_string_rule = whitespace_b4quotedstring_rule >> *((double_quoted_string_rule|single_quoted_string_rule) >> whitespace_b4quotedstring_rule);
+    padded_quoted_string_rule =
+        whitespace_b4quotedstring_rule >> *((double_quoted_string_rule | single_quoted_string_rule) >> whitespace_b4quotedstring_rule);
 
     string_rule = +(ascii::char_ - (eol | eoi));
 
