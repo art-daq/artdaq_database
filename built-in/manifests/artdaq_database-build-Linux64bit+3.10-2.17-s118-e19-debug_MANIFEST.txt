@@ -7,6 +7,6 @@ python         v3_9_13      python-3.9.13-sl7-x86_64.tar.bz2             -f  Lin
 mongodb        v6_0_2      mongodb-6.0.2-sl7-x86_64-e19-debug.tar.bz2  -f  Linux64bit+3.10-2.17  -q  e19:debug
 sqlite         v3_39_02_00  sqlite-3.39.02.00-sl7-x86_64.tar.bz2         -f  Linux64bit+3.10-2.17
 swig           v4.0.2a       swig-4.0.2a-sl7-x86_64-e19-debug.tar.bz2      -f  Linux64bit+3.10-2.17  -q  e19:debug
-TRACE          v3_17_05     TRACE-3.17.05-noarch.tar.bz2             -f  Linux64bit+3.10-2.17
+TRACE          v3_17_07     TRACE-3.17.07-noarch.tar.bz2             -f  Linux64bit+3.10-2.17
 ups            v6_0_7       ups-6.0.7-Linux64bit+3.10-2.17.tar.bz2       -f  Linux64bit+3.10-2.17
 nodejs         v10_15_0     nodejs-10.15.0-noarch.tar.bz2                -f  Linux64bit+3.10-2.17

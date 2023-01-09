@@ -30,7 +30,7 @@ python          v3_9_13         -default-
 cetlib          v3_13_04        s112
 cetlib          v3_16_00        -default-
 mongodb         v6_0_2          -       only_for_build
-TRACE           v3_17_05        -       only_for_build
+TRACE           v3_17_07        -       only_for_build
 swig            v4_0_2a         -       only_for_build
 nodejs          v10_15_0        -       only_for_build
 cetmodules      v3_19_02        -       only_for_build
