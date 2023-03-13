@@ -27,7 +27,7 @@ std::vector<std::string> db::list_files(std::string const& path) {
   files.reserve(1024);
 
   for (auto& entry : boost::make_iterator_range(boost::filesystem::directory_iterator(path), {})) {
-    if (boost::filesystem::is_regular(entry)) {
+    if (boost::filesystem::is_regular_file(entry)) {
       files.push_back(entry.path().string());
     } else if (boost::filesystem::is_directory(entry.path())) {
       auto suddir_list = list_files(entry.path().string());
