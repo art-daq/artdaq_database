@@ -5,7 +5,18 @@
 #include "artdaq-database/DataFormats/Json/json_types.h"
 #include "artdaq-database/DataFormats/common.h"
 
-#include <boost/spirit/include/phoenix.hpp>
+#include <boost/phoenix/core.hpp>
+#include <boost/phoenix/debug.hpp>
+#include <boost/phoenix/function.hpp>
+#include <boost/phoenix/operator.hpp>
+#include <boost/phoenix/statement.hpp>
+#include <boost/phoenix/object.hpp>
+#include <boost/phoenix/scope.hpp>
+#include <boost/phoenix/bind.hpp>
+#include <boost/phoenix/stl/algorithm.hpp>
+#include <boost/phoenix/stl/container.hpp>
+#include <boost/phoenix/fusion.hpp>
+
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/support_line_pos_iterator.hpp>
 

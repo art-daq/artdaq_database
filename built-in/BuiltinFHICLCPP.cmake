@@ -19,7 +19,7 @@ endforeach()
 if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp )
     message("Downloading fhicl-cpp source")
 
-    execute_process(COMMAND git clone --branch v4_17_00 https://github.com/art-framework-suite/fhicl-cpp.git  WORKING_DIRECTORY  ${TOP_CMAKE_BINARY_DIR}/built-in
+    execute_process(COMMAND git clone --branch v4_18_00 https://github.com/art-framework-suite/fhicl-cpp.git  WORKING_DIRECTORY  ${TOP_CMAKE_BINARY_DIR}/built-in
   RESULT_VARIABLE STATUS
   OUTPUT_VARIABLE OUTPUT1 )
 if(STATUS AND NOT STATUS EQUAL 0)
@@ -28,7 +28,7 @@ else()
   message(STATUS "SUCCESS: ${OUTPUT1}")
 endif()
 
-    execute_process(COMMAND  git apply ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp-v4_17_00.patch
+    execute_process(COMMAND  git apply ${TOP_CMAKE_SOURCE_DIR}/built-in/fhicl-cpp-v4_18_00.patch
          WORKING_DIRECTORY  ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp
   RESULT_VARIABLE STATUS
   OUTPUT_VARIABLE OUTPUT2 )
