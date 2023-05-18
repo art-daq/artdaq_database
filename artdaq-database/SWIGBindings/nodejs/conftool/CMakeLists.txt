@@ -1,8 +1,6 @@
 create_nodejs_addon ( ADDON_NAME "conftoolg"
 					  LIBRARIES
-					  artdaq-database_ConfigurationDB
-					  INCLUDES
-					  ${CMAKE_SOURCE_DIR}/artdaq-database)
+					  artdaq_database::artdaq-database_ConfigurationDB)
 
 install_headers()
 install_source()
