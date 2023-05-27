@@ -1,0 +1,78 @@
+diff --git a/src/mongocxx/events/heartbeat_failed_event.hpp b/src/mongocxx/events/heartbeat_failed_event.hpp
+index 6ee9d51fd..0ff711399 100644
+--- a/src/mongocxx/events/heartbeat_failed_event.hpp
++++ b/src/mongocxx/events/heartbeat_failed_event.hpp
+@@ -18,6 +18,8 @@
+ 
+ #include <mongocxx/config/prelude.hpp>
+ 
++#include <cstdint>
++
+ namespace mongocxx {
+ MONGOCXX_INLINE_NAMESPACE_BEGIN
+ 
+diff --git a/src/mongocxx/events/heartbeat_started_event.hpp b/src/mongocxx/events/heartbeat_started_event.hpp
+index 0175a6113..501b3451d 100644
+--- a/src/mongocxx/events/heartbeat_started_event.hpp
++++ b/src/mongocxx/events/heartbeat_started_event.hpp
+@@ -18,6 +18,8 @@
+ 
+ #include <mongocxx/config/prelude.hpp>
+ 
++#include <cstdint>
++
+ namespace mongocxx {
+ MONGOCXX_INLINE_NAMESPACE_BEGIN
+ 
+diff --git a/src/mongocxx/events/server_closed_event.hpp b/src/mongocxx/events/server_closed_event.hpp
+index a0460835e..adafcd78a 100644
+--- a/src/mongocxx/events/server_closed_event.hpp
++++ b/src/mongocxx/events/server_closed_event.hpp
+@@ -19,6 +19,8 @@
+ 
+ #include <mongocxx/config/prelude.hpp>
+ 
++#include <cstdint>
++
+ namespace mongocxx {
+ MONGOCXX_INLINE_NAMESPACE_BEGIN
+ 
+diff --git a/src/mongocxx/events/server_opening_event.hpp b/src/mongocxx/events/server_opening_event.hpp
+index aa73fceab..48b0bafaf 100644
+--- a/src/mongocxx/events/server_opening_event.hpp
++++ b/src/mongocxx/events/server_opening_event.hpp
+@@ -18,6 +18,8 @@
+ 
+ #include <mongocxx/config/prelude.hpp>
+ 
++#include <cstdint>
++
+ namespace mongocxx {
+ MONGOCXX_INLINE_NAMESPACE_BEGIN
+ 
+diff --git a/src/mongocxx/exception/error_code.hpp b/src/mongocxx/exception/error_code.hpp
+index 961d65825..6edea5392 100644
+--- a/src/mongocxx/exception/error_code.hpp
++++ b/src/mongocxx/exception/error_code.hpp
+@@ -18,6 +18,8 @@
+ 
+ #include <mongocxx/config/prelude.hpp>
+ 
++#include <cstdint>
++
+ namespace mongocxx {
+ MONGOCXX_INLINE_NAMESPACE_BEGIN
+ 
+diff --git a/src/mongocxx/exception/server_error_code.hpp b/src/mongocxx/exception/server_error_code.hpp
+index 5a0082ba9..390e7893f 100644
+--- a/src/mongocxx/exception/server_error_code.hpp
++++ b/src/mongocxx/exception/server_error_code.hpp
+@@ -18,6 +18,8 @@
+ 
+ #include <mongocxx/config/prelude.hpp>
+ 
++#include <cstdint>
++
+ namespace mongocxx {
+ MONGOCXX_INLINE_NAMESPACE_BEGIN
+ 
