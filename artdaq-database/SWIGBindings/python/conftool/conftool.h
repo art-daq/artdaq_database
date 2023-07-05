@@ -47,6 +47,8 @@ result_t list_databases(std::string const& query_payload);    // metadata
 result_t read_dbinfo(std::string const& query_payload);       // metadata
 result_t list_collections(std::string const& query_payload);  // metadata
 
+#ifdef ADFHICLCPP
 result_t fhicl_to_json(std::string const& fcl, std::string const& filename);  // utility function
 result_t json_to_fhicl(std::string const& jsn, std::string& filename);        // utility function
+#endif
 void enable_trace();

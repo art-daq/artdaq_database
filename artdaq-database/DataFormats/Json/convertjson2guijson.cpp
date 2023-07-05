@@ -50,15 +50,15 @@ json_node_t metadata_node_t::child(std::string const& name) const {
   auto const& value_table = _node.value_as<object_t>();
 
   try {
-    object_t const& child = jcunwrap(value_table.at(name));
+    object_t child = jcunwrap(value_table.at(name));
     TLOG(22) << "json_db_to_gui() metadata node was found, name=<" << name << ">";
     return {child};
   } catch (...) {
   }
 
   try {
-    object_t const& children = jcunwrap(value_table.at(literal::children));
-    object_t const& child = jcunwrap(children.at(name));
+    object_t children = jcunwrap(value_table.at(literal::children));
+    object_t child = jcunwrap(children.at(name));
     TLOG(23) << "json_db_to_gui() metadata node was found, name=<" << name << ">";
 
     return {child};
@@ -341,7 +341,7 @@ void gui2db::operator()(json_node_t& data_node [[gnu::unused]], json_node_t& met
         TLOG(57) << "json_gui_to_db() operator() switch ARRAY child value=" << boost::apply_visitor(print_visitor(), value);
 
         if (value.type() == typeid(object_t)) {
-          object_t const& child = jcunwrap(value);
+          object_t child = jcunwrap(value);
 
           if (child.count(literal::type) == 0) {
             data_node.value_as<array_t>().push_back(value);

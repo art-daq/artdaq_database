@@ -245,7 +245,7 @@ bool JSONDocument::saveToFile(std::string const& fileName) try {
   }
 
   if (boost::filesystem::exists(fileName)) {
-    boost::filesystem::copy_file(fileName, std::string{fileName} + ".bak", boost::filesystem::copy_option::overwrite_if_exists);
+    boost::filesystem::copy_file(fileName, std::string{fileName} + ".bak", boost::filesystem::copy_options::overwrite_existing);
   }
 
   auto buffer = to_string();

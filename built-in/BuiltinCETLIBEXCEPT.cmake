@@ -19,7 +19,7 @@ endforeach()
 if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/cetlib_except )
     message("Downloading cetlib_except source")
 
-    execute_process(COMMAND git clone --branch v1_08_00 https://github.com/art-framework-suite/cetlib-except.git cetlib_except WORKING_DIRECTORY  ${TOP_CMAKE_BINARY_DIR}/built-in
+    execute_process(COMMAND git clone --branch v1_09_00 https://github.com/art-framework-suite/cetlib-except.git cetlib_except WORKING_DIRECTORY  ${TOP_CMAKE_BINARY_DIR}/built-in
   RESULT_VARIABLE STATUS
   OUTPUT_VARIABLE OUTPUT1 )
     

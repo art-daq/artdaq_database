@@ -35,7 +35,7 @@ if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/libmongo
     LOG_UPDATE ON
     DEPENDS mongo-c-driver
     BUILD_BYPRODUCTS "${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/libmongocxx.so" "${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/libbsoncxx.so"
-    #PATCH_COMMAND cd ${TOP_CMAKE_BINARY_DIR}/mongo-cxx-driver-prefix/src/mongo-cxx-driver && git apply ${TOP_CMAKE_SOURCE_DIR}/built-in/mongocxx-r366.patch
+    PATCH_COMMAND cd ${TOP_CMAKE_BINARY_DIR}/mongo-cxx-driver-prefix/src/mongo-cxx-driver && git apply ${TOP_CMAKE_SOURCE_DIR}/built-in/mongocxx-cstdint.patch
     UPDATE_COMMAND ""
     CMAKE_ARGS -DCMAKE_BUILD_TYPE=${MYCMAKE_BUILD_TYPE}
         -DCMAKE_BUILD_PARALLEL_LEVEL=${CMAKE_BUILD_PARALLEL_LEVEL}

@@ -28,6 +28,8 @@ class StorageProvider final {
    private:
     template <typename T, typename I>
     friend ProviderSPtr create(std::shared_ptr<I> const&);
+
+   public:
     PassKeyIdiom() = default;
   };
 
