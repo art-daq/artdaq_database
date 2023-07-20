@@ -1,7 +1,7 @@
 #ifndef _ots_DatabaseConfigurationInterface_h_
 #define _ots_DatabaseConfigurationInterface_h_
 
-//#include "otsdaq-core/ConfigurationInterface/ConfigurationInterface.h"
+// #include "otsdaq-core/ConfigurationInterface/ConfigurationInterface.h"
 
 #include "ConfigurationInterface.h"
 

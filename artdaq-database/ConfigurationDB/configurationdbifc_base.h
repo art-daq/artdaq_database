@@ -1,9 +1,9 @@
 #ifndef _ARTDAQ_DATABASE_CONFIGURATIONDBIFC_BASE_H_
 #define _ARTDAQ_DATABASE_CONFIGURATIONDBIFC_BASE_H_
 
-//#include <memory>
-//#include <string>
-//#include <type_traits>
+// #include <memory>
+// #include <string>
+// #include <type_traits>
 #include <utility>
 
 #include "artdaq-database/BasicTypes/basictypes.h"

@@ -23,6 +23,6 @@
 #include <boost/lexical_cast.hpp>
 
 #include "trace.h"
-//#define extra_traces 0
+// #define extra_traces 0
 
 #endif /* _ARTDAQ_DATABASE_COMMON_H_ */

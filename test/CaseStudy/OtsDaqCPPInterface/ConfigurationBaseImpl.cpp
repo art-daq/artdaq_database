@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <iterator>
 
-//#include "otsdaq-core/ConfigurationInterface/ConfigurationInterface.h"
+// #include "otsdaq-core/ConfigurationInterface/ConfigurationInterface.h"
 
 #include "ConfigurationInterface.h"
 #include "artdaq-database/ConfigurationDB/configurationdbifc.h"
