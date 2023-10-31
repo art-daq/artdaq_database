@@ -19,8 +19,7 @@ if(CAN_BUILD)
   FIND_PACKAGE(SWIG REQUIRED) 
   INCLUDE(${SWIG_USE_FILE})
   
-  FIND_PACKAGE(PythonLibs)  
-  INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
+  FIND_PACKAGE(Python3 COMPONENTS Development)
 endif(CAN_BUILD)
 
 macro (create_python_addon)
@@ -45,7 +44,7 @@ macro (create_python_addon)
 
     #swig_add_module (${PIA_ADDON_NAME} python ${PIA_SOURCES} ${LIB_SOURCES})
 	swig_add_library(${PIA_ADDON_NAME} LANGUAGE python SOURCES ${PIA_SOURCES} ${LIB_SOURCES})
-    swig_link_libraries (${PIA_ADDON_NAME} ${PIA_LIBRARIES} ${PYTHON_LIBRARIES})
+    swig_link_libraries (${PIA_ADDON_NAME} ${PIA_LIBRARIES} Python3::Python)
     
 		message("CMAKE_CXX_COMPILER is ${CMAKE_CXX_COMPILER}")
 		if(CMAKE_CXX_COMPILER MATCHES "clang\\+\\+$")
