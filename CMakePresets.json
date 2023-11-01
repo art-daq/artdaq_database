@@ -100,7 +100,7 @@
             },
             "artdaq_database_UPS_BUILD_ONLY_DEPENDENCIES_INIT" : {
                "type" : "STRING",
-               "value" : "TRACE;cetmodules;mongodb;nodejs;swig"
+               "value" : "TRACE;cetmodules;mongodb;swig"
             },
             "artdaq_database_UPS_PRODUCT_CHAINS_INIT" : {
                "type" : "STRING",
