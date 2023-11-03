@@ -3,7 +3,8 @@ printenv ; \
 ${mongod_bin}  \
 --dbpath ${CMAKE_BINARY_DIR}/databases/mongodb \
 --logpath ${CMAKE_BINARY_DIR}/databases/mongod.log \
---logappend \
+--logappend --tlsMode=disabled --noauth \
+--wiredTigerCacheSizeGB=1 \
 --pidfilepath=${CMAKE_BINARY_DIR}/databases/mongod.pid \
 --bind_ip=127.0.0.1 \
 --fork; sleep 5; \

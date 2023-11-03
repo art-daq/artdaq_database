@@ -27,14 +27,14 @@ if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64 )
     ExternalProject_Add(
     mongo-c-driver
     GIT_REPOSITORY https://github.com/mongodb/mongo-c-driver
-    GIT_TAG 1.23.1
+    GIT_TAG 1.24.4
     LOG_DOWNLOAD ON
     LOG_CONFIGURE ON
     LOG_BUILD ON
     LOG_INSTALL ON
     LOG_UPDATE ON
     
-    PATCH_COMMAND cd ${TOP_CMAKE_BINARY_DIR}/mongo-c-driver-prefix/src/mongo-c-driver && git apply ${TOP_CMAKE_SOURCE_DIR}/built-in/mongoc-1.23.1.patch
+    PATCH_COMMAND cd ${TOP_CMAKE_BINARY_DIR}/mongo-c-driver-prefix/src/mongo-c-driver && git apply ${TOP_CMAKE_SOURCE_DIR}/built-in/mongoc-1.24.4.patch
     UPDATE_COMMAND ""
     CMAKE_ARGS -DCMAKE_BUILD_TYPE=${MYCMAKE_BUILD_TYPE}
         -DCMAKE_BUILD_PARALLEL_LEVEL=${CMAKE_BUILD_PARALLEL_LEVEL}

@@ -1,0 +1,23 @@
+diff --git a/src/mongocxx/bulk_write.cpp b/src/mongocxx/bulk_write.cpp
+index 33d15d8..118b0d2 100644
+--- a/src/mongocxx/bulk_write.cpp
++++ b/src/mongocxx/bulk_write.cpp
+@@ -45,8 +45,16 @@ bulk_write& bulk_write::append(const model::write& operation) {
+         case write_type::k_insert_one: {
+             scoped_bson_t doc(operation.get_insert_one().document());
+             bson_error_t error;
+-            auto result = libmongoc::bulk_operation_insert_with_opts(
+-                _impl->operation_t, doc.bson(), nullptr, &error);
++//GAL:BEGIN Allow "." (dots) in keys
++            bsoncxx::builder::basic::document options_builder;
++            options_builder.append(kvp("validate",
++            (BSON_VALIDATE_UTF8 | BSON_VALIDATE_DOLLAR_KEYS |
++            BSON_VALIDATE_UTF8_ALLOW_NULL | BSON_VALIDATE_EMPTY_KEYS)));
++            scoped_bson_t options(options_builder.extract());
++
++             auto result = libmongoc::bulk_operation_insert_with_opts(
++                _impl->operation_t, doc.bson(), options.bson(), &error);
++//GAL: END Allow "." (dots) in keys
+             if (!result) {
+                 throw_exception<logic_error>(error);
+             }
