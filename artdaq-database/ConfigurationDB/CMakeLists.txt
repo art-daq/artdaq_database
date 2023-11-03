@@ -10,6 +10,7 @@ cet_make(
   artdaq-database_StorageProviders_UconDB
   Boost::program_options
   cetlib_except
+  -lpthread
   )
 
   if(USE_FHICLCPP)

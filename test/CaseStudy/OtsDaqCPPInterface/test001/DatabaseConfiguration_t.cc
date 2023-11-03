@@ -13,6 +13,7 @@
 #include "../DatabaseConfigurationInterface.h"
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 
+#include "artdaq-database/ConfigurationDB/Multitasker.h"
 #include "artdaq-database/ConfigurationDB/configuration_common.h"
 #include "artdaq-database/ConfigurationDB/dispatch_common.h"
 
@@ -27,37 +28,39 @@
 struct TestData {
   TestData() {
 #if 0
-  artdaq::database::configuration::debug::ExportImport();
-  artdaq::database::configuration::debug::ManageAliases();
-  artdaq::database::configuration::debug::ManageConfigs();
-  artdaq::database::configuration::debug::ManageDocuments();
-  artdaq::database::configuration::debug::Metadata();
+    artdaq::database::configuration::debug::ExportImport();
+    artdaq::database::configuration::debug::ManageAliases();
+    artdaq::database::configuration::debug::ManageConfigs();
+    artdaq::database::configuration::debug::ManageDocuments();
+    artdaq::database::configuration::debug::Metadata();
 
-  artdaq::database::configuration::debug::detail::ExportImport();
-  artdaq::database::configuration::debug::detail::ManageAliases();
-  artdaq::database::configuration::debug::detail::ManageConfigs();
-  artdaq::database::configuration::debug::detail::ManageDocuments();
-  artdaq::database::configuration::debug::detail::Metadata();
+    artdaq::database::configuration::debug::detail::ExportImport();
+    artdaq::database::configuration::debug::detail::ManageAliases();
+    artdaq::database::configuration::debug::detail::ManageConfigs();
+    artdaq::database::configuration::debug::detail::ManageDocuments();
+    artdaq::database::configuration::debug::detail::Metadata();
 
-  artdaq::database::configuration::debug::options::OperationBase();
-  artdaq::database::configuration::debug::options::BulkOperations();
-  artdaq::database::configuration::debug::options::ManageDocuments();
-  artdaq::database::configuration::debug::options::ManageConfigs();
-  artdaq::database::configuration::debug::options::ManageAliases();
+    artdaq::database::configuration::debug::options::OperationBase();
+    artdaq::database::configuration::debug::options::BulkOperations();
+    artdaq::database::configuration::debug::options::ManageDocuments();
+    artdaq::database::configuration::debug::options::ManageConfigs();
+    artdaq::database::configuration::debug::options::ManageAliases();
 
-  artdaq::database::configuration::debug::MongoDB();
-  artdaq::database::configuration::debug::UconDB();
-  artdaq::database::configuration::debug::FileSystemDB();
+    artdaq::database::configuration::debug::MongoDB();
+    artdaq::database::configuration::debug::UconDB();
+    artdaq::database::configuration::debug::FileSystemDB();
+    artdaq::database::configuration::debug::Multitasker();
 
-  artdaq::database::filesystem::debug::enable();
-  artdaq::database::mongo::debug::enable();
+    artdaq::database::filesystem::debug::enable();
+    artdaq::database::mongo::debug::enable();
 
- // artdaq::database::docrecord::debug::JSONDocumentBuilder();
- // artdaq::database::docrecord::debug::JSONDocument();
+    // artdaq::database::docrecord::debug::JSONDocumentBuilder();
+    // artdaq::database::docrecord::debug::JSONDocument();
 
-  debug::registerUngracefullExitHandlers();
-  artdaq::database::useFakeTime(true);
+    debug::registerUngracefullExitHandlers();
+    artdaq::database::useFakeTime(true);
 #endif
+    artdaq::database::configuration::debug::Multitasker();
     std::cout << "setup fixture\n";
   }
 
@@ -136,6 +139,42 @@ BOOST_AUTO_TEST_CASE(store_configuration) {
   std::cout << "\n";
 
   ifc.storeGlobalConfiguration(map, configName);
+}
+
+BOOST_AUTO_TEST_CASE(store_configuration_mt) {
+  std::shared_ptr<ConfigurationBase> cfg1 = std::make_shared<TestConfiguration001>();
+  std::shared_ptr<ConfigurationBase> cfg2 = std::make_shared<TestConfiguration002>();
+
+  auto ifc = DatabaseConfigurationInterface();
+
+  cfg1->getView().version = fixture.version() + 10;
+  cfg2->getView().version = fixture.version() + 20;
+
+  auto result1 = ifc.saveActiveVersion(cfg1.get());
+  BOOST_CHECK_EQUAL(result1, 0);
+
+  auto result2 = ifc.saveActiveVersion(cfg2.get());
+  BOOST_CHECK_EQUAL(result2, 0);
+
+  auto map = DatabaseConfigurationInterface::config_version_map_t{};
+  map[cfg1->getConfigurationName()] = cfg1->getView().version;
+  map[cfg2->getConfigurationName()] = cfg2->getView().version;
+
+  auto configName = std::string{"config_mt"} + std::to_string(fixture.version());
+
+  auto configs = ifc.findAllGlobalConfigurations();
+
+  fixture.updateConfigCount(configs.size());
+
+  std::cout << "Found configs (store_configuration_mt): ";
+  for (auto config : configs) std::cout << config << ",";
+  std::cout << "\n";
+
+  ifc.storeGlobalConfiguration_mt(map, configName);
+  configs = ifc.findAllGlobalConfigurations(configName);
+  BOOST_CHECK_EQUAL(configs.size(), 1);
+  auto map1 = ifc.loadGlobalConfiguration(configName);
+  BOOST_CHECK_EQUAL(map1.size(), 2);
 }
 
 BOOST_AUTO_TEST_CASE(load_configuration) {
