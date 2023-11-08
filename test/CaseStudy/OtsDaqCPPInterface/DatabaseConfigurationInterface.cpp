@@ -188,3 +188,32 @@ void DatabaseConfigurationInterface::storeGlobalConfiguration(config_version_map
   std::cout << "DBI Unknown exception.\n";
   throw std::runtime_error("DBI Unknown exception.");
 }
+
+// create a new global configuration from the contents map
+void DatabaseConfigurationInterface::storeGlobalConfiguration_mt(const config_version_map_t& configurationMap, const std::string& configuration) const
+    try {
+  auto ifc = db::ConfigurationInterface{default_dbprovider};
+
+  auto to_list = [](auto const& inputMap) {
+    auto resultList = VersionInfoList_t{};
+    std::transform(inputMap.begin(), inputMap.end(), std::back_inserter(resultList), [](auto const& mapEntry) {
+      return VersionInfoList_t::value_type{mapEntry.first, std::to_string(mapEntry.second), default_entity};
+    });
+
+    return resultList;
+  };
+
+  auto result = ifc.storeGlobalConfiguration_mt(to_list(configurationMap), configuration);
+
+  if (result.first) {
+    return;
+  }
+
+  throw std::runtime_error(result.second);
+} catch (std::exception const& e) {
+  std::cout << "DBI Exception:" << e.what() << "\n";
+  throw std::runtime_error(e.what());
+} catch (...) {
+  std::cout << "DBI Unknown exception.\n";
+  throw std::runtime_error("DBI Unknown exception.");
+}

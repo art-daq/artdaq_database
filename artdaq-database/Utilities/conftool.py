@@ -1051,7 +1051,7 @@ if __name__ == "__main__":
 
         sys.exit(0)
 
-    functions_list = [o[0] for o in inspect.getmembers(conftoolp) if inspect.isbuiltin(o[1])]
+    functions_list = [o[0] for o in inspect.getmembers(conftoolp) if inspect.isfunction(o[1]) and not o[1].__name__.startswith('_')]
     if sys.argv[1] not in functions_list:
         print ('Error: Unrecognised API function.')
         print ('Avaialble functions:')

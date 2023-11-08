@@ -1,6 +1,7 @@
 #ifndef _ARTDAQ_DATABASE_CONFIGURATIONDBIFC_H_
 #define _ARTDAQ_DATABASE_CONFIGURATIONDBIFC_H_
 
+#include "artdaq-database/ConfigurationDB/Multitasker.h"
 #include "artdaq-database/ConfigurationDB/configurationdbifc_base.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "options_operation_manageconfigs.h"
@@ -452,6 +453,36 @@ struct ConfigurationInterface final {
       throw artdaq::database::runtime_exception(apifunctname) << "JsonWriter failed, invalid payloadAST.";
 
     auto apiCallResult = cf::json::create_configuration(buffer);
+
+    if (!apiCallResult.first) throw artdaq::database::runtime_exception(apifunctname) << apiCallResult.second;
+
+    return apiCallResult;
+  } catch (std::exception const& e) {
+    return {false, make_error_msg(e.what())};
+  } catch (...) {
+    return {false, make_error_msg("Unknown exception")};
+  }
+
+  //==============================================================================
+  //
+  cf::result_t storeGlobalConfiguration_mt(VersionInfoList_t const& versionInfoList, std::string const& configuration) const try {
+    confirm(!configuration.empty());
+    confirm(!versionInfoList.empty());
+
+    constexpr auto apifunctname = "ConfigurationInterface::storeGlobalConfiguration_mt";
+
+    if (versionInfoList.empty()) throw artdaq::database::invalid_option_exception(apifunctname) << "Version info list is empty";
+
+    if (configuration.empty()) throw artdaq::database::invalid_option_exception(apifunctname) << "Global configuration name is empty";
+
+    auto threadCount = std::min<std::size_t>(versionInfoList.size(), std::thread::hardware_concurrency() / 2);
+    Multitasker multitasker(threadCount);
+    for (const auto& version : versionInfoList) {
+      multitasker.addTask([ifc = this, version, configuration] { return ifc->storeGlobalConfiguration(VersionInfoList_t{version}, configuration); });
+    }
+
+    multitasker.waitForResults();
+    auto apiCallResult = multitasker.getMergedResults();
 
     if (!apiCallResult.first) throw artdaq::database::runtime_exception(apifunctname) << apiCallResult.second;
 
