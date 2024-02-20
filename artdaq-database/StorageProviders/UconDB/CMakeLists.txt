@@ -4,9 +4,12 @@ IF(NOT CURL_FOUND)
   MESSAGE(FATAL_ERROR "Could not find the CURL library.")
 ENDIF()
 
-INCLUDE_DIRECTORIES(${CURL_INCLUDE_DIR})
-
-cet_make(
+cet_make_library(
+	SOURCE
+provider_connection.cpp
+provider_ucondb.cpp
+provider_ucondb_readwrite.cpp
+ucondb_api.cpp
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_BasicTypes

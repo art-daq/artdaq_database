@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.2)
+cmake_minimum_required (VERSION 3.20)
 
  string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC)
  set(MYCMAKE_BUILD_TYPE "Release")
