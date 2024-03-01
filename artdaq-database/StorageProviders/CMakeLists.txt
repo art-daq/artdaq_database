@@ -1,4 +1,6 @@
-cet_make(
+cet_make_library(
+  SOURCE
+  storage_providers.cpp
   LIBRARIES
   artdaq-database_SharedCommon
   cetlib_except

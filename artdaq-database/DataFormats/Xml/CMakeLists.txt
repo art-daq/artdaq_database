@@ -1,4 +1,9 @@
-cet_make(
+cet_make_library(
+  SOURCE
+  convertxml2json.cpp
+  xmljsondb.cpp
+  xml_reader.cpp
+  xml_writer.cpp
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_DataFormats_Json

@@ -1,8 +1,19 @@
-cet_make(
+cet_make_library(
+  SOURCE
+    ovlBookkeeping.cpp
+    ovlChangeLog.cpp
+    ovlComment.cpp
+    ovlDatabaseRecord.cpp
+    ovlDocument.cpp
+    ovlId.cpp
+    ovlKeyValue.cpp
+    ovlOrigin.cpp
+    ovlTimeStamp.cpp
+    ovlUpdate.cpp
   LIBRARIES
-  artdaq-database_SharedCommon
-  artdaq-database_DataFormats_Json
-  cetlib_except
+    artdaq-database_SharedCommon
+    artdaq-database_DataFormats_Json
+    cetlib_except
   )
 
 install_headers()
