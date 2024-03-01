@@ -1,4 +1,11 @@
-cet_make(
+cet_make_library(
+	SOURCE
+	convertfhicl2jsondb.cpp
+	fhicljsondb.cpp
+	fhicl_reader.cpp
+	fhicl_types.cpp
+	fhicl_writer.cpp
+	helper_functions.cpp
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_DataFormats_Json

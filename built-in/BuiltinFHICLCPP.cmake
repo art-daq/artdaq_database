@@ -70,21 +70,17 @@ IF(FHICLCPP_IS_STATIC)
   target_link_libraries(${FHICLCPP_TARGET} ${LIBRARIES})  
 
 else()
-  cet_make(
-    LIBRARY_NAME 
-    fhiclcpp
+  cet_make(fhiclcpp
+    SOURCE
+    ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp/fhiclcpp/exception.cc
+    ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp/fhiclcpp/extended_value.cc
+    ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp/fhiclcpp/intermediate_table.cc
+    ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp/fhiclcpp/parse.cc
+    ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp/fhiclcpp/parse_shims_opts.cc
+    ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp/fhiclcpp/Protection.cc
     LIBRARIES
     cetlib
     cetlib_except
     WITH_STATIC_LIBRARY
-    SUBDIRS
-    ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp/fhiclcpp
-    EXCLUDE
-    ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp/fhiclcpp/ParameterSet.cc
-    ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp/fhiclcpp/ParameterSetID.cc
-    ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp/fhiclcpp/ParameterSetRegistry.cc
-    ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp/fhiclcpp/DatabaseSupport.cc
-    ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp/fhiclcpp/coding.cc  
-    ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp/fhiclcpp/make_ParameterSet.cc  
   ) 
 ENDIF()

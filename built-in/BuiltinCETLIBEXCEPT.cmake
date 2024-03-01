@@ -51,15 +51,10 @@ IF(CETLIBEXCEPT_IS_STATIC)
   target_link_libraries(${CETLIB_EXCEPT_TARGET} ${LIBRARIES})  
 
 else()
-  cet_make(
-    LIBRARY_NAME 
-    cetlib_except
+  cet_make_library(    cetlib_except
+    SOURCE
+    ${TOP_CMAKE_BINARY_DIR}/built-in/cetlib_except/cetlib_except/exception.cc
     LIBRARIES
     WITH_STATIC_LIBRARY
-    SUBDIRS
-    ${TOP_CMAKE_BINARY_DIR}/built-in/cetlib_except/cetlib_except
-    EXCLUDE
-    ${TOP_CMAKE_BINARY_DIR}/built-in/cetlib_except/cetlib_except/demangle.cc
-    ${TOP_CMAKE_BINARY_DIR}/built-in/cetlib_except/cetlib_except/exception_collector.cc
   ) 
 ENDIF()

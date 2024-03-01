@@ -1,5 +1,7 @@
-cet_make(
-  LIBRARY_NAME artdaq-database_OtsDaqCPPInterface
+cet_make_library( artdaq-database_OtsDaqCPPInterface
+SOURCE
+ConfigurationBaseImpl.cpp
+DatabaseConfigurationInterface.cpp
   LIBRARIES
   artdaq-database_ConfigurationDB
   cetlib_except
