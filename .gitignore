@@ -17,3 +17,5 @@ obj/*
 *.vcxproj*
 *.orig
 .ycm_extra_conf.py
+spack-build-*
+spack-configure-*
