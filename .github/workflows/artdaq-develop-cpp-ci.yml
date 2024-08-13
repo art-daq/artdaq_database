@@ -20,6 +20,7 @@ on:
 
 jobs:
   build_against_dev_release:
+<<<<<<< Updated upstream
     name: build_against_dev
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -87,3 +88,7 @@ jobs:
     - name: change dir permission again
       run: |
         sudo chmod -R go+rwx /var/lib/cvmfs
+=======
+    name: Build against develop  
+    uses: art-daq/.github/.github/workflows/artdaq-develop-cpp-ci.yml@stable
+>>>>>>> Stashed changes

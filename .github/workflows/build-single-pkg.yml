@@ -15,6 +15,7 @@ jobs:
 
   build_single_pkg:
     name: build single pkg
+<<<<<<< Updated upstream
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -91,3 +92,6 @@ jobs:
     - name: change dir permission again
       run: |
         sudo chmod -R go+rwx /var/lib/cvmfs
+=======
+    uses: art-daq/.github/.github/workflows/artdaq-build-single-pkg.yml@stable
+>>>>>>> Stashed changes

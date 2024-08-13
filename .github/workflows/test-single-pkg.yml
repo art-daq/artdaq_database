@@ -1,7 +1,16 @@
 name: Test Single Pkg Workflow
 
 on:
+  push:
+    branches: 
+      - develop
+    paths-ignore:
+      - 'docs/**'
+      - '.github/**'
+  pull_request:
+    branches: [ develop ]
   workflow_dispatch:
+<<<<<<< Updated upstream
     inputs:
       build-type:
         description: 'build type, d or p'
@@ -9,10 +18,13 @@ on:
       quals:
         description: 'qualifiers'
         default: 's128:e20'
+=======
+>>>>>>> Stashed changes
 
 jobs:
 
   build_single_pkg:
+<<<<<<< Updated upstream
     name: build single pkg
     runs-on: ubuntu-latest
 
@@ -70,3 +82,7 @@ jobs:
     - name: change dir permission again
       run: |
         sudo chmod -R go+rwx /var/lib/cvmfs
+=======
+    name: test single pkg
+    uses: art-daq/.github/.github/workflows/artdaq-test-single-pkg.yml@stable
+>>>>>>> Stashed changes
