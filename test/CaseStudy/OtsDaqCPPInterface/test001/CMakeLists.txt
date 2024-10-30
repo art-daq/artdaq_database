@@ -2,7 +2,7 @@ include(CetTest)
 cet_enable_asserts()
 
 link_libraries(
-  artdaq-database_OtsDaqCPPInterface
+  test_CaseStudy_OtsDaqCPPInterface
 )
 
 

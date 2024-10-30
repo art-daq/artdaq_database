@@ -1,4 +1,4 @@
-cet_make_library( artdaq-database_OtsDaqCPPInterface
+cet_make_library( 
 SOURCE
 ConfigurationBaseImpl.cpp
 DatabaseConfigurationInterface.cpp
