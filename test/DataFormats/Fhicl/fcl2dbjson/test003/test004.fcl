@@ -176,7 +176,7 @@ uniquify: true
 }
 transfer_to_dispatcher: {
 
-transferPluginType: Shmem 
+transferPluginType: TCPSocket 
 
 source_rank: 4 
 
