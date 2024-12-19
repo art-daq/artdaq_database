@@ -1,4 +1,4 @@
-name: Build Single Pkg Workflow
+name: Test Single Pkg Workflow
 
 on:
   push:
@@ -14,5 +14,5 @@ on:
 jobs:
 
   build_single_pkg:
-    name: build single pkg
-    uses: art-daq/.github/.github/workflows/artdaq-build-single-pkg.yml@stable
+    name: test single pkg
+    uses: art-daq/.github/.github/workflows/artdaq-test-single-pkg.yml@stable
