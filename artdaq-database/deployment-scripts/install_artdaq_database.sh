@@ -1039,4 +1039,3 @@ printf "\t\tuser=${run_as_user}, group=${run_as_group}\n"
 
 main_program
 exit $?
-

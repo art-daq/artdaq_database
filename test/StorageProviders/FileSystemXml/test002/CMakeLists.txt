@@ -13,4 +13,3 @@ cet_test(FileSystemXml_${TEST_NAME}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC FileSy
     ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.cmp.${RAND_NAME}.xml
     ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.opts.${RAND_NAME}.json
   TEST_ARGS -s test${TEST_NUMBER}.src.${RAND_NAME}.xml -c test${TEST_NUMBER}.cmp.${RAND_NAME}.xml -t ${TEST_NAME} -o test${TEST_NUMBER}.opts.${RAND_NAME}.json)
-

@@ -34,7 +34,3 @@ add_subdirectory(ConfigurationDB)
 
 add_subdirectory(Utilities)
 add_subdirectory(SWIGBindings)
-
-
-
-

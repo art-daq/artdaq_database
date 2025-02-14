@@ -32,7 +32,7 @@ echo "building the artdaq_database distribution for ${version} ${dotver} ${qual_
 OS=$(uname)
 if [ "${OS}" = "Linux" ]
 then
-    flvr=slf$(lsb_release -r | sed -e 's/[[:space:]]//g' | cut -f2 -d":" | cut -f1 -d".")
+	flvr=slf$(lsb_release -r | sed -e 's/[[:space:]]//g' | cut -f2 -d":" | cut -f1 -d".")
 elif [ "${OS}" = "Darwin" ]
 then
   flvr=d$(uname -r | cut -f1 -d".")
@@ -72,25 +72,25 @@ function checkout_source() {
 
   local_src=/mnt/sde/mu2etrg/lukhanin-develop001/srcs/artdaq-utilities-database
 	if [[ -d ${local_src} ]]; then
-	 	mkdir -p ${srcdir}/artdaq-database
+		mkdir -p ${srcdir}/artdaq-database
 		cp -r  ${local_src}/* ${srcdir}/artdaq-database/
 	else
 	  git clone http://cdcvs.fnal.gov/projects/artdaq-utilities-database ${srcdir}/artdaq-database
-    cd ${srcdir}/artdaq-database
-    git checkout ${git_branch}
+	cd ${srcdir}/artdaq-database
+	git checkout ${git_branch}
 	fi
 }
 
 function pull_products() {
   if [ ! -d ${productsdir} ]; then
-    mkdir -p ${productsdir} || return 31
+	mkdir -p ${productsdir} || return 31
   fi
 
   cd ${productsdir} || return
 
   if [ ! -d ${srcdir}/artdaq-database/built-in/manifests/ ]; then
-    echo "Directory ${srcdir}/artdaq-database/built-in/manifests is missing"
-    return 32
+	echo "Directory ${srcdir}/artdaq-database/built-in/manifests is missing"
+	return 32
   fi
 
   cp ${srcdir}/artdaq-database/built-in/manifests/artdaq_database-build-*MANIFEST.txt  ${productsdir}/
@@ -106,8 +106,8 @@ function pull_products() {
 
   # Remove any artdaq_database that came with the bundle
   if [ -d ${productsdir}/artdaq_database ]; then
-    echo "Removing ${productsdir}/artdaq_database"
-    rm -rf ${productsdir}/artdaq_database
+	echo "Removing ${productsdir}/artdaq_database"
+	rm -rf ${productsdir}/artdaq_database
   fi
 
   set +x
@@ -125,9 +125,9 @@ function run_build() {
   cd ${blddir} || return 41
 
   if [[ "${build_type}" == "prof" ]]; then
-    build_flag="-p"
+	build_flag="-p"
   else
-    build_flag="-d"
+	build_flag="-d"
   fi
   set +x
 
@@ -150,24 +150,24 @@ function run_build() {
   CETPKG_J=$(nproc)
   buildtool -p -j$CETPKG_J 2>&1 |tee ${blddir}/build_artdaq-database.log || \
   { mv ${blddir}/*.log  ${working_dir}/copyBack/
-    return 43
+	return 43
   }
 
   export RUN_TESTS=true
   buildtool -p -j$CETPKG_J 2>&1 |tee ${blddir}/build_tests_artdaq-database.log || \
   { mv ${blddir}/*.log  ${working_dir}/copyBack/
-    return 44
+	return 44
   }
 
 
   echo "Checking whether to skip running tests: skip_tests=${skip_tests}"
   if [ "x$skip_tests" == "xtrue" ];then
-    return 0
+	return 0
   fi
 
   CETPKG_J=1
 
- 	export TRACE_NAME=$(echo ${qual_set} | sed -e 's/://g')${build_type}
+	export TRACE_NAME=$(echo ${qual_set} | sed -e 's/://g')${build_type}
   export TRACE_FILE=/tmp/trace_buffer_$TRACE_NAME
 	[[ -f $TRACE_FILE ]] &&  rm $TRACE_FILE
 
@@ -182,9 +182,9 @@ function run_build() {
 
   buildtool -t -j$CETPKG_J 2>&1 |tee ${blddir}/test_artdaq-database.log || \
   { mv ${blddir}/*.log  ${working_dir}/copyBack/
-    mv ${prodblddir}/{test,Testing}  ${working_dir}/copyBack/
+	mv ${prodblddir}/{test,Testing}  ${working_dir}/copyBack/
 		tshow > ${working_dir}/copyBack/trace-$TRACE_NAME.txt
-    return 45
+	return 45
   }
 
 	tshow > ${working_dir}/copyBack/trace-$TRACE_NAME.txt
@@ -259,7 +259,6 @@ if [ $RC -ne 0 ]; then
 fi
 
 [[ $(ls ${working_dir}/copyBack/artdaq_database*.tar.bz2 |wc -l ) -eq 1 ]] \
-      ||  { echo "Error: No artdaq_database*.tar.bz2 found in the copyBack directory."; exit 1; }
+	  ||  { echo "Error: No artdaq_database*.tar.bz2 found in the copyBack directory."; exit 1; }
 
 exit 0
-

@@ -49,4 +49,3 @@ cet_test(conftool_filesystem_store_${TEST_NUMBER}_04_t HANDBUILT  TEST_EXEC conf
   DATAFILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Aggregator_topol.fnal.gov_5266.fcl
   TEST_ARGS -p filesystem -o store -c artdaq_Aggregator -s Aggregator_topol.fnal.gov_5266.fcl -f fhicl -v version001 -e ${TEST_ENTITY_NAME})
-

@@ -13,4 +13,3 @@ cet_test(MongoFhicl_${TEST_NAME}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC MongoFhic
     ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.cmp.${RAND_NAME}.fcl
     ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.opts.${RAND_NAME}.json
   TEST_ARGS -s test${TEST_NUMBER}.src.${RAND_NAME}.fcl -c test${TEST_NUMBER}.cmp.${RAND_NAME}.fcl -t ${TEST_NAME} -o test${TEST_NUMBER}.opts.${RAND_NAME}.json)
-

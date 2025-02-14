@@ -75,4 +75,3 @@ index 5a0082ba9..390e7893f 100644
 +
  namespace mongocxx {
  MONGOCXX_INLINE_NAMESPACE_BEGIN
-

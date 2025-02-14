@@ -8,4 +8,3 @@ resume_after_timeout: true #Success 3 right of satom
 waiting_time: 900 //Success 2 right of satom
 
 }
-

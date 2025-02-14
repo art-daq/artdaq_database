@@ -21,4 +21,3 @@ conftool -p mongo -o store -c artdaq_EventBuilder -s EventBuilder_topol.fnal.gov
 
 conftool -p mongo -o store -c artdaq_Aggregator -s Aggregator_topol.fnal.gov_5266.fcl -f fhicl -v version001  -g configA001 -e DAQ_HOST_001
 conftool -p mongo -o store -c artdaq_Aggregator -s Aggregator_topol.fnal.gov_5266.fcl -f fhicl -v version001  -g configA001 -e DAQ_HOST_002
-

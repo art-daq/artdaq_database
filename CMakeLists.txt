@@ -151,4 +151,3 @@ add_dependencies(mongo-cxx-driver mongo-c-driver )
 add_dependencies(artdaq-database_StorageProviders_MongoDB mongo-cxx-driver)
 
 cet_cmake_config()
-

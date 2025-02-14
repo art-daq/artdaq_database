@@ -257,4 +257,3 @@ index ace640b..9eb40ea 100644
 +    while (it != last && (std::isalnum(*it) || *it == '_' || *it == ':' || *it == '.' || *it == '@')) ++it;
 
      if (it != last && !maximally_munched_ass(*it)) return false;
-

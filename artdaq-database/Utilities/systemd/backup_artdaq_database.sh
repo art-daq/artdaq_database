@@ -90,4 +90,3 @@ done
 rsync -av /data/artdaq_database/experiment_v4x_db/backup /software/backup/experiment_v4x_db/
 echo  "Backup ended: $(date)"
 echo
-

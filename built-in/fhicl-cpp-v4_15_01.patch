@@ -257,4 +257,3 @@ index d1f5dae..c70be82 100644
 
        if (it != last && !maximally_munched_ass(*it))
          return false;
-

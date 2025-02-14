@@ -161,5 +161,3 @@ rce15_standard.fragment_receiver.fragment_id: 115
 rce15_standard.fragment_receiver.board_id: 15
 rce15_standard.fragment_receiver.rce_client_host_addr: "10.0.1.188"
 rce15_standard.fragment_receiver.receive_port: 8998
-
-
