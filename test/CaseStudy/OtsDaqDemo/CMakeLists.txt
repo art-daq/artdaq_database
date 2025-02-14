@@ -1,6 +1,6 @@
 cet_make_exec(NAME OtsDaqDemo_t
   LIBRARIES
-    
+
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
@@ -8,13 +8,13 @@ cet_make_exec(NAME OtsDaqDemo_t
   artdaq-database_ConfigurationDB
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
-  artdaq-database_StorageProviders_UconDB  
+  artdaq-database_StorageProviders_UconDB
   fhiclcpp
   #${SQLITE3}
   cetlib
   cetlib_except
   Boost::program_options
-) 
+)
 
 SET (TEST_COLLECTION_NAME "testReadWrite" )
 string(RANDOM LENGTH 5 ALPHABET 0123456789 VERSION_NUMBER)

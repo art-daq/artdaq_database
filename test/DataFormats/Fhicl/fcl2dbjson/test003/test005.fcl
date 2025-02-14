@@ -2,7 +2,7 @@
 a1: "abc" //a1
 #comment a2 x"double quoted string"x
 a2: "a
-b\nc" 
+b\nc"
 #comment a3 x'single quoted string'x
 a3: "a	b\tc" //a3 #a3
 #comment a4 x\nnew linex
@@ -15,7 +15,7 @@ a6: "a'b\'c" //a6 'a6'
 b1: 'abc' //b1
 #comment b2 ->// \ // \ // \\ //<-
 b2: 'a
-b\nc' 
+b\nc'
 #comment b3 ->'' "" \"\" \'\'<-
 b3: 'a	b\tc' //b3 #b3
 #comment b4 ->\t\n\r\'\"<-

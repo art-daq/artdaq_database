@@ -35,7 +35,7 @@ daq: {
       uniquify: true
     }
   }
-} 
+}
 
 outputs: {
   rootMPIOutput: {
@@ -59,9 +59,9 @@ physics: {
 
   producers: {
 
-     
 
-     
+
+
   }
 
   filters: {
@@ -77,10 +77,10 @@ physics: {
     }
   }
 
-  p1: [  ] 
+  p1: [  ]
   pmod2: [ prescaleMod2 ]
   pmod3: [ prescaleMod3 ]
-   
+
 
   #a1: [ app, wf ]
 

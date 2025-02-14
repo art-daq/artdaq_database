@@ -10,7 +10,7 @@ export ARTDAQ_DATABASE_URI="mongodb://experiment:$password@192.168.1.1:28047,192
 
 export LD_LIBRARY_PATH=$MONGODB_FQ_DIR/lib64:$LD_LIBRARY_PATH
 
-if [ ! -d ${database_work_dir} ]; then 
+if [ ! -d ${database_work_dir} ]; then
   mkdir -p ${database_work_dir}
 fi
 
@@ -29,7 +29,7 @@ _complete_conftool(){
     elif [  ${COMP_WORDS[COMP_CWORD-1]} = "importConfiguration" ];then
        complete_list=$(conftool.py getListOfAvailableRunConfigurationPrefixes)
     fi
-                            
+
     COMPREPLY=($(compgen -W '${complete_list[@]}' -- "$current_string"))
     return 0
 }
@@ -41,8 +41,8 @@ echo
 echo
 echo "Listing RunConfigurations available in artdaq_database:"
 conftool.py getListOfAvailableRunConfigurations
-echo 
-echo 
+echo
+echo
 echo "Instructions: https://cdcvs.fnal.gov/redmine/projects/artdaq-utilities/wiki/Artdaq-config-conftool"
-echo 
-echo 
+echo
+echo

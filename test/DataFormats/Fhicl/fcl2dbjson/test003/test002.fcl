@@ -3,74 +3,74 @@ services: {
 
 scheduler: {
 
-fileMode: NOMERGE 
+fileMode: NOMERGE
 
-errorOnFailureToPut: false 
+errorOnFailureToPut: false
 
 }
 NetMonTransportServiceInterface: {
 
-service_provider: NetMonTransportService 
+service_provider: NetMonTransportService
 #broadcast_sends: true
 destinations: {
 
 d4: {
 
-transferPluginType: MPI 
+transferPluginType: MPI
 
-destination_rank: 4 
+destination_rank: 4
 
-max_fragment_size_words: 2097152 
+max_fragment_size_words: 2097152
 
 host_map: [{
 
-rank: 0 
+rank: 0
 
-host: "mu2edaq01.fnal.gov" 
+host: "mu2edaq01.fnal.gov"
 
-portOffset: 5300 
-
-}, {
-
-rank: 1 
-
-host: "mu2edaq01.fnal.gov" 
-
-portOffset: 5310 
+portOffset: 5300
 
 }, {
 
-rank: 2 
+rank: 1
 
-host: "mu2edaq01.fnal.gov" 
+host: "mu2edaq01.fnal.gov"
 
-portOffset: 5320 
-
-}, {
-
-rank: 3 
-
-host: "mu2edaq01.fnal.gov" 
-
-portOffset: 5330 
+portOffset: 5310
 
 }, {
 
-rank: 4 
+rank: 2
 
-host: "mu2edaq01.fnal.gov" 
+host: "mu2edaq01.fnal.gov"
 
-portOffset: 5340 
+portOffset: 5320
 
 }, {
 
-rank: 5 
+rank: 3
 
-host: "mu2edaq01.fnal.gov" 
+host: "mu2edaq01.fnal.gov"
 
-portOffset: 5350 
+portOffset: 5330
 
-}] 
+}, {
+
+rank: 4
+
+host: "mu2edaq01.fnal.gov"
+
+portOffset: 5340
+
+}, {
+
+rank: 5
+
+host: "mu2edaq01.fnal.gov"
+
+portOffset: 5350
+
+}]
 
 }
 }
@@ -80,136 +80,136 @@ daq: {
 
 event_builder: {
 
-expected_fragments_per_event: 2 
+expected_fragments_per_event: 2
 
-use_art: true 
+use_art: true
 
-print_event_store_stats: true 
+print_event_store_stats: true
 
 max_incomplete_events: 75 # Same as boardreader sync interval
 # Same as boardreader sync interval
-verbose: false 
+verbose: false
 
-send_requests: true 
+send_requests: true
 
 sources: {
 
 s0: {
 
-transferPluginType: MPI 
+transferPluginType: MPI
 
-source_rank: 0 
+source_rank: 0
 
-max_fragment_size_words: 2097152 
+max_fragment_size_words: 2097152
 
 host_map: [{
 
-rank: 0 
+rank: 0
 
-host: "mu2edaq01.fnal.gov" 
+host: "mu2edaq01.fnal.gov"
 
-portOffset: 5300 
-
-}, {
-
-rank: 1 
-
-host: "mu2edaq01.fnal.gov" 
-
-portOffset: 5310 
+portOffset: 5300
 
 }, {
 
-rank: 2 
+rank: 1
 
-host: "mu2edaq01.fnal.gov" 
+host: "mu2edaq01.fnal.gov"
 
-portOffset: 5320 
-
-}, {
-
-rank: 3 
-
-host: "mu2edaq01.fnal.gov" 
-
-portOffset: 5330 
+portOffset: 5310
 
 }, {
 
-rank: 4 
+rank: 2
 
-host: "mu2edaq01.fnal.gov" 
+host: "mu2edaq01.fnal.gov"
 
-portOffset: 5340 
+portOffset: 5320
 
 }, {
 
-rank: 5 
+rank: 3
 
-host: "mu2edaq01.fnal.gov" 
+host: "mu2edaq01.fnal.gov"
 
-portOffset: 5350 
+portOffset: 5330
 
-}] 
+}, {
+
+rank: 4
+
+host: "mu2edaq01.fnal.gov"
+
+portOffset: 5340
+
+}, {
+
+rank: 5
+
+host: "mu2edaq01.fnal.gov"
+
+portOffset: 5350
+
+}]
 
 }
 s1: {
 
-transferPluginType: MPI 
+transferPluginType: MPI
 
-source_rank: 1 
+source_rank: 1
 
-max_fragment_size_words: 2097152 
+max_fragment_size_words: 2097152
 
 host_map: [{
 
-rank: 0 
+rank: 0
 
-host: "mu2edaq01.fnal.gov" 
+host: "mu2edaq01.fnal.gov"
 
-portOffset: 5300 
-
-}, {
-
-rank: 1 
-
-host: "mu2edaq01.fnal.gov" 
-
-portOffset: 5310 
+portOffset: 5300
 
 }, {
 
-rank: 2 
+rank: 1
 
-host: "mu2edaq01.fnal.gov" 
+host: "mu2edaq01.fnal.gov"
 
-portOffset: 5320 
-
-}, {
-
-rank: 3 
-
-host: "mu2edaq01.fnal.gov" 
-
-portOffset: 5330 
+portOffset: 5310
 
 }, {
 
-rank: 4 
+rank: 2
 
-host: "mu2edaq01.fnal.gov" 
+host: "mu2edaq01.fnal.gov"
 
-portOffset: 5340 
+portOffset: 5320
 
 }, {
 
-rank: 5 
+rank: 3
 
-host: "mu2edaq01.fnal.gov" 
+host: "mu2edaq01.fnal.gov"
 
-portOffset: 5350 
+portOffset: 5330
 
-}] 
+}, {
+
+rank: 4
+
+host: "mu2edaq01.fnal.gov"
+
+portOffset: 5340
+
+}, {
+
+rank: 5
+
+host: "mu2edaq01.fnal.gov"
+
+portOffset: 5350
+
+}]
 
 }
 }
@@ -218,13 +218,13 @@ metrics: {
 
 evbFile: {
 
-metricPluginType: file 
+metricPluginType: file
 
-level: 3 
+level: 3
 
-fileName: "/tmp/eventbuilder/evb_%UID%_metrics.log" 
+fileName: "/tmp/eventbuilder/evb_%UID%_metrics.log"
 
-uniquify: true 
+uniquify: true
 
 }
 }
@@ -233,7 +233,7 @@ outputs: {
 
 rootMPIOutput: {
 
-module_type: RootMPIOutput 
+module_type: RootMPIOutput
 
 }
 }
@@ -249,33 +249,33 @@ filters: {
 
 prescaleMod2: {
 
-module_type: NthEvent 
+module_type: NthEvent
 
-nth: 2 
+nth: 2
 
 }
 prescaleMod3: {
 
-module_type: NthEvent 
+module_type: NthEvent
 
-nth: 3 
+nth: 3
 
 }
 }
-pmod2: [prescaleMod2] 
+pmod2: [prescaleMod2]
 
-pmod3: [prescaleMod3] 
+pmod3: [prescaleMod3]
 
-my_output_modules: [rootMPIOutput] 
+my_output_modules: [rootMPIOutput]
 
 }
 source: {
 
-module_type: DemoInput 
+module_type: DemoInput
 
-waiting_time: 2500000 
+waiting_time: 2500000
 
-resume_after_timeout: true 
+resume_after_timeout: true
 
 }
-process_name: DAQ 
+process_name: DAQ

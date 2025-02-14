@@ -21,7 +21,3 @@ conftool --searchquery=EventBuilder_DAQ_HOST_002.flt.filesystem.json -s EventBui
 
 conftool --searchquery=Aggregator_DAQ_HOST_001.flt.filesystem.json -s Aggregator_DAQ_HOST_001.gui.filesystem.json
 conftool --searchquery=Aggregator_DAQ_HOST_002.flt.filesystem.json -s Aggregator_DAQ_HOST_002.gui.filesystem.json
-
-
-
-

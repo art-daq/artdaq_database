@@ -1,6 +1,6 @@
 {
-    "document": {  
+    "document": {
             "data":{"tt":"aa"},
-            "bbb": [1,2,3] 
+            "bbb": [1,2,3]
         }
 }

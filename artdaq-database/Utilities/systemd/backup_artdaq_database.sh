@@ -10,7 +10,7 @@ this_experimentdaq_password="password"
 this_admin_password="prefix$this_experimentdaq_password"
 
 
-rc_success=0 
+rc_success=0
 rc_failure=1
 
 echo "Backup started: $(date)"
@@ -78,8 +78,8 @@ for dbname in ${DBBACKUP_LIST};
 do
   export ARTDAQ_DATABASE_URI="mongodb://admin:$this_admin_password@192.168.1.1:28047,192.168.1.2:28047/${dbname}?replicaSet=rs0&authSource=admin"
   #export ARTDAQ_DATABASE_URI="mongodb://127.0.0.1:${MONGOD_PORT}/${dbname}";
-  mkdir -p ${DBBACKUP_DIR}/${dbname}  
-  cd $DBBACKUP_DIR/$dbname  
+  mkdir -p ${DBBACKUP_DIR}/${dbname}
+  cd $DBBACKUP_DIR/$dbname
   echo "Backing up ${ARTDAQ_DATABASE_URI} to ${DBBACKUP_DIR}/${dbname}"
   conftool.py exportDatabase
   mongodump --uri=$ARTDAQ_DATABASE_URI --gzip
@@ -90,4 +90,3 @@ done
 rsync -av /data/artdaq_database/experiment_v4x_db/backup /software/backup/experiment_v4x_db/
 echo  "Backup ended: $(date)"
 echo
-

@@ -1,86 +1,86 @@
 {
-    "_id" : "5683230d1a72ba4f5176f731", 
+    "_id" : "5683230d1a72ba4f5176f731",
     "document" : {
         "metadata" : {
             "comments" : {
                 "a" : {
-                    "comment" : "//comment 1", 
+                    "comment" : "//comment 1",
                     "annotation" : "#annotation 1"
-                }, 
+                },
                 "b" : {
-                    "comment" : "//comment 2", 
+                    "comment" : "//comment 2",
                     "children" : {
                         "c" : {
                             "annotation" : "#annotation 2"
-                        }, 
+                        },
                         "d" : {
-                            "comment" : "//comment 3", 
+                            "comment" : "//comment 3",
                             "annotation" : "#annotation 3"
                         }
                     }
                 }
-            }, 
+            },
             "search" : [
                 {
-                    "name" : "find docs where b.c=2", 
+                    "name" : "find docs where b.c=2",
                     "query" : "find docs where b.c=2"
-                }, 
+                },
                 {
-                    "name" : "find docs where b.c=4", 
+                    "name" : "find docs where b.c=4",
                     "query" : "find docs where b.c=4"
                 }
             ]
-        }, 
+        },
         "origin" : {
-              
+
             "format" : "fhicl"
-        }, 
+        },
         "data" : {
-            "aa" : 3, 
+            "aa" : 3,
             "b" : {
-                "c" : "2", 
+                "c" : "2",
                 "dd" : [
-                    2, 
-                    5, 
-                    6, 
+                    2,
+                    5,
+                    6,
                     7
                 ]
             }
         }
-    }, 
-    "version" : "version1", 
+    },
+    "version" : "version1",
     "configurations" : [
-        "config1", 
+        "config1",
         "config2"
-    ], 
+    ],
     "aliases" : {
         "active" : [
             {
-                "name" : "version alias 1", 
+                "name" : "version alias 1",
                 "assigned" : "Tue Dec 29 18:19:25 2015"
-            }, 
+            },
             {
-                "name" : "version alias 2", 
+                "name" : "version alias 2",
                 "assigned" : "Tue Dec 29 18:19:25 2015"
             }
-        ], 
+        ],
         "history" : [
             {
-                "name" : "version alias 3", 
-                "assigned" : "Tue Dec 29 18:19:25 2015", 
+                "name" : "version alias 3",
+                "assigned" : "Tue Dec 29 18:19:25 2015",
                 "removed" : "Tue Dec 29 18:19:25 2015"
-            }, 
+            },
             {
-                "name" : "version alias 4", 
-                "assigned" : "Tue Dec 30 18:19:25 2015", 
+                "name" : "version alias 4",
+                "assigned" : "Tue Dec 30 18:19:25 2015",
                 "removed" : "Tue Dec 30 18:19:25 2015"
             }
         ]
-    }, 
+    },
     "bookkeeping" : {
-        "isdeleted" : false, 
-        "isreadonly" : true, 
-        "created" : "Tue Dec 29 18:19:25 2015", 
+        "isdeleted" : false,
+        "isreadonly" : true,
+        "created" : "Tue Dec 29 18:19:25 2015",
         "updates" : [
             "Tue Dec 29 18:19:25 2015"
         ]

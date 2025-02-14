@@ -12,7 +12,7 @@ cet_make_exec(NAME MongoFhicl_t
   cetlib_except
   Boost::program_options
 
-) 
+)
 
 add_subdirectory(test001)
 add_subdirectory(test002)
