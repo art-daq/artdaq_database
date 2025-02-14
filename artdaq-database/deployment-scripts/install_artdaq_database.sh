@@ -1,7 +1,7 @@
 #!/bin/bash
 #----------------------------------------------------------------
-# Current default configuration parameters, which can be 
-# overriden in $HOME/artdaq_database.env file if it exits. 
+# Current default configuration parameters, which can be
+# overriden in $HOME/artdaq_database.env file if it exits.
 # Main program starts at the bottom of this file.
 #----------------------------------------------------------------
 ARTDAQ_UPS_QUAL="e19:prof:s89"
@@ -12,8 +12,8 @@ WEBEDITOR_UPS_VER=v1_01_07
 ARTDAQ_BASE_DIR=/tmp/artdaq
 ARTDAQ_DB_NAME=artdaq_db
 #----------------------------------------------------------------
-# Optional configuration parameters, which can be 
-# overriden in $HOME/artdaq_database.env file if it exits. 
+# Optional configuration parameters, which can be
+# overriden in $HOME/artdaq_database.env file if it exits.
 # Main program starts at the bottom of this file.
 #----------------------------------------------------------------
 MONGOD_UPS_QUAL="e19:prof"
@@ -37,7 +37,7 @@ ARTDAQ_DB_ENV="$HOME/artdaq_database.env"
 required_tools_list=(wget tar bzip2 gunzip sed find id basename crontab cat cut uniq tee)
 
 #----------------------------------------------------------------
-rc_success=0 
+rc_success=0
 rc_failure=1
 user_prompts=true
 
@@ -59,7 +59,7 @@ function configure_artdaqdb_env() {
     echo "Info: Found ${ARTDAQ_DB_ENV} found! Sourcing it."
     printf "#-----------------------file contents begin----------------------\n"
     cat ${ARTDAQ_DB_ENV}
-    printf "#-----------------------file contents end------------------------\n"  
+    printf "#-----------------------file contents end------------------------\n"
     source <(sed -E -n 's/[^#]+/export &/ p' ${ARTDAQ_DB_ENV})
   fi
 
@@ -67,7 +67,7 @@ function configure_artdaqdb_env() {
   ARTDAQ_DB_UPS_QUAL=${ARTDAQ_UPS_QUAL}
   PRODUCTS_BASE_DIR=${ARTDAQ_BASE_DIR}/products
   source ${PRODUCTS_BASE_DIR}/setup
-  unsetup_all  >/dev/null 2>&1 
+  unsetup_all  >/dev/null 2>&1
 }
 
 function configure_pull_products() {
@@ -109,7 +109,7 @@ function have_artdaq_database() {
     printf "Info: ARTDAQ_DB_UPS_QUAL is set to '${ARTDAQ_DB_UPS_QUAL}'\n"
   fi
 
-  setup artdaq_database ${ARTDAQ_DB_UPS_VER} -q ${ARTDAQ_DB_UPS_QUAL} 
+  setup artdaq_database ${ARTDAQ_DB_UPS_VER} -q ${ARTDAQ_DB_UPS_QUAL}
   RC=$?
   if [ $RC -ne 0 ]; then
     printf "Error: Failed setting artdaq_database. Aborting.\n"; return $rc_failure;
@@ -135,7 +135,7 @@ function have_artdaq_node_server(){
     printf "Info: WEBEDITOR_UPS_VER is set to '${WEBEDITOR_UPS_VER}'\n"
   fi
 
-  setup artdaq_node_server ${WEBEDITOR_UPS_VER} 
+  setup artdaq_node_server ${WEBEDITOR_UPS_VER}
   RC=$?
   if [ $RC -ne 0 ]; then
     printf "Error: Failed setting artdaq_node_server. Aborting.\n"; return $rc_failure;
@@ -159,7 +159,7 @@ function disable_services(){
 
   echo "#!/bin/bash" > ${disable_services_file}
   for db in ${dblist[@]}
-  do for action in stop status disable 
+  do for action in stop status disable
   do for service in webconfigeditor mongodbserver
   do echo systemctl ${action} ${service}@${db}.service >> ${disable_services_file}
   done
@@ -293,7 +293,7 @@ cat <<EOF > ${filename}
 # 2. Run "systemctl daemon-reload"
 # 3. Run "systemctl enable webconfigeditor@${ARTDAQ_DB_NAME}.service"
 # 5. Run "systemctl start webconfigeditor@${ARTDAQ_DB_NAME}.service"
-# 
+#
 # 6. Check status "systemctl status webconfigeditor@${ARTDAQ_DB_NAME}.service"
 # 7. Stop "systemctl stop webconfigeditor@${ARTDAQ_DB_NAME}.service"
 
@@ -308,10 +308,10 @@ Group=${run_as_group}
 
 EnvironmentFile=${DATABASE_BASE_DIR}/%i/webconfigeditor.env
 #Environment=NODE_ENV=production
-#ExecStartPre=${DATABASE_BASE_DIR}/webconfigeditor-ctrl.sh clean 
-ExecStart=${DATABASE_BASE_DIR}/webconfigeditor-ctrl.sh start 
-ExecStop=${DATABASE_BASE_DIR}/webconfigeditor-ctrl.sh stop 
-#ExecStopPost=${DATABASE_BASE_DIR}/webconfigeditor-ctrl.sh clean 
+#ExecStartPre=${DATABASE_BASE_DIR}/webconfigeditor-ctrl.sh clean
+ExecStart=${DATABASE_BASE_DIR}/webconfigeditor-ctrl.sh start
+ExecStop=${DATABASE_BASE_DIR}/webconfigeditor-ctrl.sh stop
+#ExecStopPost=${DATABASE_BASE_DIR}/webconfigeditor-ctrl.sh clean
 PIDFile=${DATABASE_BASE_DIR}/%i/var/tmp/webconfigeditor.pid
 
 
@@ -349,7 +349,7 @@ cat <<EOF > ${filename}
 # 2. Run "systemctl daemon-reload"
 # 3. Run "systemctl enable mongodbserver@${ARTDAQ_DB_NAME}.service"
 # 5. Run "systemctl start mongodbserver@${ARTDAQ_DB_NAME}.service"
-# 
+#
 # 6. Check status "systemctl status mongodbserver@${ARTDAQ_DB_NAME}.service"
 # 7. Stop "systemctl stop mongodbserver@${ARTDAQ_DB_NAME}.service"
 
@@ -364,10 +364,10 @@ User=${run_as_user}
 Group=${run_as_group}
 
 EnvironmentFile=${DATABASE_BASE_DIR}/%i/mongod.env
-#ExecStartPre=${DATABASE_BASE_DIR}/mongod-ctrl.sh clean 
-ExecStart=${DATABASE_BASE_DIR}/mongod-ctrl.sh start 
-ExecStop=${DATABASE_BASE_DIR}/mongod-ctrl.sh stop 
-#ExecStopPost=${DATABASE_BASE_DIR}/mongod-ctrl.sh clean 
+#ExecStartPre=${DATABASE_BASE_DIR}/mongod-ctrl.sh clean
+ExecStart=${DATABASE_BASE_DIR}/mongod-ctrl.sh start
+ExecStop=${DATABASE_BASE_DIR}/mongod-ctrl.sh stop
+#ExecStopPost=${DATABASE_BASE_DIR}/mongod-ctrl.sh clean
 PIDFile=${DATABASE_BASE_DIR}/%i/var/tmp/mongod.pid
 
 
@@ -397,7 +397,7 @@ function copy_shell_scripts(){
   filenames=( ${ARTDAQ_DATABASE_DIR}/deployment-scripts/artdaq-database/{initd_functions,backup_artdaq_database.sh,webconfigeditor-ctrl.sh,mongod-ctrl.sh,setup_database.sh} )
       #----------------------------------------------------------------
       for filename in ${filenames[@]}
-      do 
+      do
         if [ ! -f ${filename} ]; then
           printf "Error: ${filename} is not found! Aborting.\n"; return $rc_failure ; else
           cp ${filename} ${DATABASE_BASE_DIR}
@@ -464,12 +464,12 @@ function copy_shell_scripts(){
 
         failed_test_count=0
         conftool_commands=(readDatabaseInfo listDatabases)
-        for conftool_command in ${conftool_commands[@]};do 
+        for conftool_command in ${conftool_commands[@]};do
           conftool_response=$(conftool.py ${conftool_command})
           RC=$?
           if [ $RC -ne 0 ]; then
             failed_test_count=$((failed_test_count+1))
-            printf "Error: Failed calling conftool.py ${conftool_command} "; 
+            printf "Error: Failed calling conftool.py ${conftool_command} ";
             printf "#-----------------------conftool.py ${conftool_command} begin---------------------\n"
             echo ${conftool_response}
             printf "#-----------------------conftool.py ${conftool_command} end-----------------------\n"
@@ -519,13 +519,13 @@ function copy_shell_scripts(){
     if [ -z ${INSTALL_TESTDATA_URI+x} ]; then
       printf "Info: Using ${ARTDAQ_DATABASE_DIR}/testdata/\n";return $rc_failure;  else
       printf "Info: Downloading ${INSTALL_TESTDATA_URI} into ${ARTDAQ_DATABASE_DIR}/testdata/\n"
-      wget ${INSTALL_TESTDATA_URI} 
+      wget ${INSTALL_TESTDATA_URI}
       cp $(basename ${INSTALL_TESTDATA_URI}) ${ARTDAQ_DATABASE_DIR}/testdata/
     fi
 
     tmpdir="/tmp/artdaqdb_test_data-${timestamp}"
 
-    for testfile in $(find ${ARTDAQ_DATABASE_DIR}/testdata -name  "np04_teststand*taz" -type f -print);do 
+    for testfile in $(find ${ARTDAQ_DATABASE_DIR}/testdata -name  "np04_teststand*taz" -type f -print);do
       tmpname=$(basename ${testfile})
       tmpname=${tmpname%.taz}
       mkdir -p ${tmpdir}/${tmpname}
@@ -561,8 +561,8 @@ function copy_shell_scripts(){
       printf "#----------------------- compare begin--------------------------------------------\n"
       diff -I "\s*#.*" -BZNb -W 80 -q  -r --suppress-common-lines ${tmpdir}/${tmpname} ${tmpdir}/${tmpname}-export
       printf "#----------------------- compare details-------------------------------------------\n"
-      diff -I "\s*#.*" -BZNb -W 80 -y -r --suppress-common-lines ${tmpdir}/${tmpname} ${tmpdir}/${tmpname}-export  
-      printf "#----------------------- compare end----------------------------------------------\n"  
+      diff -I "\s*#.*" -BZNb -W 80 -y -r --suppress-common-lines ${tmpdir}/${tmpname} ${tmpdir}/${tmpname}-export
+      printf "#----------------------- compare end----------------------------------------------\n"
     done
 
     printf "\nInfo: Running conftool.py tests\n"
@@ -602,7 +602,7 @@ function copy_shell_scripts(){
         echo "${conftool_response}\n"
         printf "#-----------------------conftool.py ${conftool_command} end-----------------------\n"
       fi
-    done  
+    done
 
     if [ $failed_test_count -ne 0 ]; then
       printf "Error: Deployment error, $failed_test_count test(s) failed.\n"
@@ -651,7 +651,7 @@ function enable_services(){
   echo "#!/bin/bash" > ${enable_services_file}
   for service in webconfigeditor mongodbserver; do
     echo "cp ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/systemd/${service}@${ARTDAQ_DB_NAME}.service /etc/systemd/system/" >> ${enable_services_file}
-    echo "systemctl daemon-reload" >> ${enable_services_file}  
+    echo "systemctl daemon-reload" >> ${enable_services_file}
     for action in enable start status; do
       echo systemctl ${action} ${service}@${ARTDAQ_DB_NAME}.service >> ${enable_services_file}
     done
@@ -677,7 +677,7 @@ function enable_services(){
 }
 
 function update_crontab(){
-  printf "\nInfo: Updating user's crontab\n"  
+  printf "\nInfo: Updating user's crontab\n"
   local crontab_file="/tmp/artdaq_database-${timestamp}.crontab"
 
   crontab_bin=$(command -v crontab)
@@ -708,7 +708,7 @@ function update_crontab(){
   ${DATABASE_BASE_DIR}/backup_artdaq_database.sh ${ARTDAQ_DB_NAME} >>${DATABASE_BASE_DIR}/database-backup-${ARTDAQ_DB_NAME}.log
   printf "Info: Backup size \n$(du -hs ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/backup/*)\n"
   printf "Info: Listing archive files\n"
-  ls -al $(find ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/backup ./ -name "*tar-bzip2-base64") 
+  ls -al $(find ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/backup ./ -name "*tar-bzip2-base64")
 
   local file_cout=$(find ${DATABASE_BASE_DIR}/${ARTDAQ_DB_NAME}/backup ./ -name "*tar-bzip2-base64" |wc -l)
 
@@ -740,7 +740,7 @@ function apply_patches(){
 End:
 EOF
 
-if [[ $? -ne $rc_success ]]; then 
+if [[ $? -ne $rc_success ]]; then
   echo -e "\e[31;7;5mError: Failed patching mongodb.table.\e[0m"; return $rc_failure
 fi
 }
@@ -749,37 +749,37 @@ function main_program(){
   printf "\nInfo: Running main_program\n"
 
   have_artdaq_database
-  if [[ $? -ne $rc_success ]]; then 
+  if [[ $? -ne $rc_success ]]; then
     echo -e "\e[31;7;5mError: artdaq_database product is not installed.\e[0m"; return $rc_failure
   fi
 
   have_artdaq_node_server
-  if [[ $? -ne $rc_success ]]; then 
+  if [[ $? -ne $rc_success ]]; then
     echo -e "\e[31;7;5mError: have_artdaq_node_server product is not installed.\e[0m"; return $rc_failure
   fi
 
   disable_services
-  if [[ $? -ne $rc_success ]]; then 
+  if [[ $? -ne $rc_success ]]; then
     echo -e "\e[31;7;5mError: failed disabling services.\e[0m"; return $rc_failure
   fi
 
   create_database_dirs
-  if [[ $? -ne $rc_success ]]; then 
+  if [[ $? -ne $rc_success ]]; then
     echo -e "\e[31;7;5mError: failed creating working database directories.\e[0m"; return $rc_failure
   fi
 
   create_database_configs
-  if [[ $? -ne $rc_success ]]; then 
+  if [[ $? -ne $rc_success ]]; then
     echo -e "\e[31;7;5mError: failed creating database config files.\e[0m"; return $rc_failure
   fi
 
   create_database_services
-  if [[  $? -ne $rc_success ]]; then 
+  if [[  $? -ne $rc_success ]]; then
     echo -e "\e[31;7;5mError: failed creating database service configuration files.\e[0m"; return $rc_failure
   fi
 
   copy_shell_scripts
-  if [[  $? -ne $rc_success ]]; then 
+  if [[  $? -ne $rc_success ]]; then
     echo -e "\e[31;7;5mError: failed copping database shell scripts.\e[0m"; return $rc_failure
   fi
 
@@ -790,23 +790,23 @@ function main_program(){
     return $rc_failure; else
 
     check_mongod_instance
-    if [[  $? -ne $rc_success ]]; then 
+    if [[  $? -ne $rc_success ]]; then
       echo -e "\e[31;7;5mError: failed accessing mongo database.\e[0m"
       #     read -p "Resume script ? " answer
       stop_mongod_instance
       return $rc_failure
-    fi 
+    fi
   fi
 
   run_conftool_tests
-  if [[  $? -ne $rc_success ]]; then 
+  if [[  $? -ne $rc_success ]]; then
     echo -e "\e[31;7;5mError: Deployment error.\e[0m"
     stop_mongod_instance
     return $rc_failure
   fi
 
   start_webeditor_instance
-  if [[  $? -ne $rc_success ]]; then 
+  if [[  $? -ne $rc_success ]]; then
     echo -e "\e[31;7;5mError: failed starting webconfigeditor.\e[0m"
     stop_webeditor_instance
     stop_mongod_instance
@@ -820,16 +820,16 @@ function main_program(){
     done
 
     check_webeditor_instance
-    if [[  $? -ne $rc_success ]]; then    
+    if [[  $? -ne $rc_success ]]; then
       echo -e "\e[31;7;5mError: failed accessing webconfigeditor.\e[0m"
       stop_webeditor_instance
       stop_mongod_instance
       return $rc_failure
-    fi 
+    fi
   fi
 
   update_crontab
-  if [[ $? -ne $rc_success ]]; then 
+  if [[ $? -ne $rc_success ]]; then
     echo -e "\e[31;7;5mError: failed updating crontab.\e[0m"; return $rc_failure
   fi
 
@@ -839,17 +839,17 @@ function main_program(){
 #read -p "Resume script ? " answer
 
 stop_webeditor_instance
-if [[  $? -ne $rc_success ]]; then 
+if [[  $? -ne $rc_success ]]; then
   echo -e "\e[31;7;5mError: failed stopping webconfigeditor.\e[0m"
   error_count=$((error_count+1))
 
-fi 
+fi
 
 stop_mongod_instance
-if [[  $? -ne $rc_success ]]; then 
+if [[  $? -ne $rc_success ]]; then
   echo -e "\e[31;7;5mError: failed stopping mongo database.\e[0m"
   error_count=$((error_count+1))
-fi 
+fi
 
 if [ $error_count -ne 0 ]; then
   echo -e "\e[31;7;5mError: Some of the services did not stop gracefully.\e[0m"
@@ -857,7 +857,7 @@ if [ $error_count -ne 0 ]; then
 fi
 
 enable_services
-if [[ $? -ne $rc_success ]]; then 
+if [[ $? -ne $rc_success ]]; then
   echo -e "\e[31;7;5mError: failed enabling services.\e[0m"; return $rc_failure
 fi
 
@@ -869,10 +869,10 @@ until check_webeditor_instance || [ $retry_counter -eq $max_retry_count ]; do
 done
 
 check_webeditor_instance
-if [[  $? -ne $rc_success ]]; then 
+if [[  $? -ne $rc_success ]]; then
   echo -e "\e[31;7;5mError: failed accessing webconfigeditor.\e[0m"
   return $rc_failure
-fi 
+fi
 
 echo -e "\e[0;7;5mInfo: Installation succeeded.\e[0m"
 
@@ -910,18 +910,18 @@ function pull_products(){
     printf "Info: ARTDAQ_DB_PULLPRODUCTS is set to '${ARTDAQ_DB_PULLPRODUCTS}'\n"
   fi
 
-  if [ ! -d ${products_dir} ]; then 
+  if [ ! -d ${products_dir} ]; then
     mkdir -p ${products_dir}
     if [ $? -ne 0 ]; then
       printf "Error: Failed creating ${products_dir}. Aborting.\n"; return $rc_failure
     fi
   fi
 
-  if [ ! -d ${download_dir} ]; then 
+  if [ ! -d ${download_dir} ]; then
     mkdir -p ${download_dir}
     if [ $? -ne 0 ]; then
       printf "Error: Failed creating ${download_dir}. Aborting.\n"; return $rc_failure
-    fi  
+    fi
   fi
 
   cd ${download_dir}
@@ -929,7 +929,7 @@ function pull_products(){
   if [ ! -f ${download_dir}/pullProducts ]; then
     echo "Info: ${download_dir}/pullProducts is not found! Downloading."
     wget http://scisoft.fnal.gov/scisoft/bundles/tools/pullProducts
-    chmod a+x pullProducts 
+    chmod a+x pullProducts
     if [ $? -ne 0 ]; then
       printf "Error: Failed creating ${download_dir}/pullProducts. Aborting.\n"; return $rc_failure
     fi
@@ -957,8 +957,8 @@ function pull_products(){
   printf "\n#-----------------------ARTDAQ DATABASE MANIFEST-------------------\n"
 
 
-  rm ${download_dir}/artdaq_database-*.tar.bz2   >/dev/null 2>&1 
-  rm ${download_dir}/artdaq_node_server-*.tar.bz2   >/dev/null 2>&1 
+  rm ${download_dir}/artdaq_database-*.tar.bz2   >/dev/null 2>&1
+  rm ${download_dir}/artdaq_node_server-*.tar.bz2   >/dev/null 2>&1
 
   ./pullProducts -l ../products ${ARTDAQ_DB_PULLPRODUCTS}
   if [ $? -ne 0 ]; then
@@ -968,16 +968,16 @@ function pull_products(){
   sed -i "s/8080/${WEBEDITOR_BASE_PORT}/g" ${products_dir}/artdaq_node_server/${WEBEDITOR_UPS_VER}/config.json
 
   source ${PRODUCTS_BASE_DIR}/setup
-  unsetup_all  >/dev/null 2>&1 
+  unsetup_all  >/dev/null 2>&1
 
 
   have_artdaq_database
-  if [[ $? -ne $rc_success ]]; then 
+  if [[ $? -ne $rc_success ]]; then
     echo -e "\e[31;7;5mError: artdaq_database product is not installed.\e[0m"; return $rc_failure
   fi
 
   have_artdaq_node_server
-  if [[ $? -ne $rc_success ]]; then 
+  if [[ $? -ne $rc_success ]]; then
     echo -e "\e[31;7;5mError: have_artdaq_node_server product is not installed.\e[0m"; return $rc_failure
   fi
 }
@@ -1017,12 +1017,12 @@ DATABASE_BASE_DIR=${ARTDAQ_BASE_DIR}/database
 PRODUCTS_BASE_DIR=${ARTDAQ_BASE_DIR}/products
 
 #configure_pull_products
-#if [[ $? -ne $rc_success ]]; then 
+#if [[ $? -ne $rc_success ]]; then
 #  exit $?
 #fi
 
 #pull_products
-#if [[ $? -ne $rc_success ]]; then 
+#if [[ $? -ne $rc_success ]]; then
 #  exit $?
 #fi
 
@@ -1032,11 +1032,10 @@ PRODUCTS_BASE_DIR=${ARTDAQ_BASE_DIR}/products
 #fi
 
 source ${PRODUCTS_BASE_DIR}/setup
-unsetup_all  >/dev/null 2>&1 
+unsetup_all  >/dev/null 2>&1
 
 printf "Info: Configuring artdaq_database services to run using the following credentials:\n"
 printf "\t\tuser=${run_as_user}, group=${run_as_group}\n"
 
 main_program
 exit $?
-

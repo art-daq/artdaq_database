@@ -3,10 +3,10 @@ setup artdaq_database v1_05_00 -q debug:e10:s41
 
 cd ~/artdaq-demo-base/artdaq-utilities-database/test/HOWTOS/NodeJSAddons/conftool/test004/
 
-#cet_test(OtsDaqDemo_mongo_${TEST_NAME}_${TEST_NUMBER}_02_t HANDBUILT  TEST_EXEC OtsDaqDemo_t 
-#  DATAFILES 
-#    ${CMAKE_CURRENT_SOURCE_DIR}/test002.src.json 
+#cet_test(OtsDaqDemo_mongo_${TEST_NAME}_${TEST_NUMBER}_02_t HANDBUILT  TEST_EXEC OtsDaqDemo_t
+#  DATAFILES
+#    ${CMAKE_CURRENT_SOURCE_DIR}/test002.src.json
 #  TEST_ARGS -p mongo -o store -t test_OtsDaqDemo${TEST_NAME}_${TEST_NUMBER} -c test002.src.json -f json -v version -g config2 )
 
-  
+
 conftool -o store -c test004.flt.filesystem.json -j test004.gui.filesystem.json

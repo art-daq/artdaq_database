@@ -1,6 +1,6 @@
 {
     "filter":{"version":"version002", "entities.name":"DAQ_HOST_001"},
-    "versionalias":"goodConfig",      
+    "versionalias":"goodConfig",
     "collection":"artdaq_Aggregator",
     "dbprovider":"filesystem",
     "operation":"removealias",

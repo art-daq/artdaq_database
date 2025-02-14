@@ -1,6 +1,6 @@
 cet_make_exec(NAME ValidateJson_t
   LIBRARIES
-    
+
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
@@ -8,7 +8,7 @@ cet_make_exec(NAME ValidateJson_t
   artdaq-database_ConfigurationDB
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
-  artdaq-database_StorageProviders_UconDB  
+  artdaq-database_StorageProviders_UconDB
   fhiclcpp
   #${SQLITE3}
   cetlib
@@ -17,6 +17,6 @@ cet_make_exec(NAME ValidateJson_t
 
 SET ( TEST_NAME "ValidateJson" )
 
-cet_test(${TEST_NAME}_t HANDBUILT  TEST_EXEC ValidateJson_t 
-  DATAFILES 
+cet_test(${TEST_NAME}_t HANDBUILT  TEST_EXEC ValidateJson_t
+  DATAFILES
   TEST_ARGS  )

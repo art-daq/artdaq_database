@@ -15,11 +15,11 @@ if(result.first==true) {
     var result =  mylib.tofhicl(out,result.second)
 
     if(result.first!=true)
-      console.log(result.second)  
-    else 
-      console.log("Wrote file " + out)  
-    } 
+      console.log(result.second)
+    else
+      console.log("Wrote file " + out)
+    }
 
 else {
-  console.log(result.second)  
+  console.log(result.second)
 }

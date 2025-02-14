@@ -1,5 +1,5 @@
 {
-"filter":{}, 
+"filter":{},
 "dbprovider":"filesystem",
 "operation":"findconfigs",
 "dataformat":"gui"

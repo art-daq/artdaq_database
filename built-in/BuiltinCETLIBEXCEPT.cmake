@@ -22,7 +22,7 @@ if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/cetlib_except )
     execute_process(COMMAND git clone --branch v1_09_00 https://github.com/art-framework-suite/cetlib-except.git cetlib_except WORKING_DIRECTORY  ${TOP_CMAKE_BINARY_DIR}/built-in
   RESULT_VARIABLE STATUS
   OUTPUT_VARIABLE OUTPUT1 )
-    
+
 if(STATUS AND NOT STATUS EQUAL 0)
   message(STATUS "FAILED: ${STATUS}")
 else()
@@ -38,17 +38,17 @@ include_directories(${TOP_CMAKE_BINARY_DIR}/built-in/cetlib_except)
 #cet_add_compiler_flags(-fvisibility=hidden)
 IF(CETLIBEXCEPT_IS_STATIC)
   MESSAGE (STATUS "Making cetlib_except static")
-  
+
   set(SOURCES
     ${TOP_CMAKE_BINARY_DIR}/built-in/cetlib_except/cetlib_except/exception.cc
     )
-    
-  set(LIBRARIES  
+
+  set(LIBRARIES
     )
-    
+
   add_library(${CETLIB_EXCEPT_TARGET} OBJECT ${SOURCES})
   set_property(TARGET ${CETLIB_EXCEPT_TARGET} PROPERTY POSITION_INDEPENDENT_CODE ON)
-  target_link_libraries(${CETLIB_EXCEPT_TARGET} ${LIBRARIES})  
+  target_link_libraries(${CETLIB_EXCEPT_TARGET} ${LIBRARIES})
 
 else()
   cet_make_library(    cetlib_except
@@ -56,5 +56,5 @@ else()
     ${TOP_CMAKE_BINARY_DIR}/built-in/cetlib_except/cetlib_except/exception.cc
     LIBRARIES
     WITH_STATIC_LIBRARY
-  ) 
+  )
 ENDIF()

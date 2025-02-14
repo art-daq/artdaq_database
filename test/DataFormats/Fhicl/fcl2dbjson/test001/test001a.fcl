@@ -1,22 +1,22 @@
-  a1:"abc" 
+  a1:"abc"
   a2:"a
 b\nc"
-  a3:"a	b\tc" 
-  a4:"a\tb	c" 
-  a5:"a\\a" 
+  a3:"a	b\tc"
+  a4:"a\tb	c"
+  a5:"a\\a"
   a6:"a'b\'c"
 
 evbFile:{
-  fileName:"/tmp/eventbuilder/evb_%UID%_metrics.log" 
-  level:3 
-  metricPluginType1:"file" 
-  metricPluginType2:"file 
+  fileName:"/tmp/eventbuilder/evb_%UID%_metrics.log"
+  level:3
+  metricPluginType1:"file"
+  metricPluginType2:"file
   2" #ss
-  metricPluginType3:"fi\"le" 
-  metricPluginType4:"fi\'le" 
-  metricPluginType5:"fi\"le" 
+  metricPluginType3:"fi\"le"
+  metricPluginType4:"fi\'le"
+  metricPluginType5:"fi\"le"
   metricPluginType6:"fi\\\"le" uniquify:true
-  
+
 }
 
 
@@ -80,12 +80,12 @@ daq: {
       uniquify: true
     }
   }
-} 
+}
 
 outputs: {
   netMonOutput: {
     module_type: NetMonOutput
-     #Failure 5 not a satom 
+     #Failure 5 not a satom
     SelectEvents: { SelectEvents: [ pmod2,pmod3 ] }
     #outputCommands: [ "keep *", "drop artdaq::Fragments_daq_V1720_*", "drop artdaq::Fragments_daq_V1724_*" ]
   }
@@ -101,15 +101,15 @@ outputs: {
 physics: {
 
   filters: {
-  
-      #Failure 4 not a satom 
+
+      #Failure 4 not a satom
     prescaleMod2: {
        module_type: NthEvent #//Success 5 right of satom
        nth: 2
     }
 
     prescaleMod3: {
-      #Failure 3 not directly above satom 
+      #Failure 3 not directly above satom
 
        module_type: NthEvent
        nth: 3 //#Success 4 right of satom
@@ -118,9 +118,9 @@ physics: {
 
   //Failure 1 not a comment
   pmod2: [ prescaleMod2 ]
-  #Failure 2 not a satom 
+  #Failure 2 not a satom
   pmod3: [ prescaleMod3 ]
-   
+
 
   #a1: [ app, wf ]
 
@@ -129,7 +129,7 @@ physics: {
 }
 source: {
 #Success 1  above satom
-  module_type: RawInput 
+  module_type: RawInput
   waiting_time: 900 //Success 2 right of satom
   resume_after_timeout: true #Success 3 right of satom
  // fragment_type_map: [[1, "missed"], [3, "V1720"], [4, "V1724"], [6, "TOY1"], [7, "TOY2"], [8, "ASCII"]]

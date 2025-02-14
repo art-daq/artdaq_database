@@ -18,5 +18,3 @@ conftool -p filesystem -o store -f otsdaq_ROCToFEConfiguration                 -
 conftool -p filesystem -o store -f otsdaq_VersionAliases                       -s VersionAliases_v0_pretty.json                       -f json -v version001 -g otsdaqC001 -e CMSROOT
 
 conftool -p filesystem -o store -f otsdaq_FSSRDACsConfiguration                -s FSSRDACsConfiguration_v0_pretty.json                -f json -v version001 -g otsdaqC001 -e CMSROOT
-
-

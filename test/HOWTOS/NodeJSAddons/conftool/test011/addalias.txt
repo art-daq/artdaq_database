@@ -7,4 +7,3 @@ conftool --searchquery=test0111.flt.json -x test0111.gui.json
 conftool --searchquery=test0112.flt.json -x test0112.gui.json
 
 #test011{1,2}.gui.json should be identical with test011{1,2}.cmp.json
-

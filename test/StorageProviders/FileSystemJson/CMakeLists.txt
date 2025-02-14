@@ -6,7 +6,7 @@ cet_make_exec(NAME FileSystemJson_t
   artdaq-database_JsonDocument
   artdaq-database_StorageProviders_FileSystemDB
   Boost::program_options
-) 
+)
 
 add_subdirectory(test001)
 add_subdirectory(test002)

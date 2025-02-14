@@ -7,13 +7,13 @@ index b242991..71fcd15 100644
  #include "fhiclcpp/fwd.h"
  #include "fhiclcpp/stdmap_shims.h"
 +#include "fhiclcpp/exception.h"
- 
+
  #include <any>
  #include <string>
 @@ -32,6 +33,68 @@ namespace fhicl {
    };
  }
- 
+
 +
 +namespace fhicl {
 +using raw_value_t = std::string;
@@ -77,7 +77,7 @@ index b242991..71fcd15 100644
 +} // namespace fhicl
 +
  // ----------------------------------------------------------------------
- 
+
  class fhicl::extended_value {
 @@ -52,6 +115,7 @@ public:
      : in_prolog{in_prolog}
@@ -126,7 +126,7 @@ index b242991..71fcd15 100644
 +    , raw_value{detail::rtrim_whitespace(std::move(raw_value))}
 +    , src_info{std::move(src)}
    {}
- 
+
    bool
 @@ -96,6 +190,7 @@ public:
    bool in_prolog{false};
@@ -134,7 +134,7 @@ index b242991..71fcd15 100644
    std::any value{};
 +  std::string raw_value{};
    std::string src_info{};
- 
+
    // Protection corresponds to the binding of a name to a value, and
 diff --git a/fhiclcpp/parse.cc b/fhiclcpp/parse.cc
 index 86d3b21..24c265b 100644
@@ -142,7 +142,7 @@ index 86d3b21..24c265b 100644
 +++ b/fhiclcpp/parse.cc
 @@ -422,15 +422,15 @@ namespace {
      }
- 
+
      extended_value
 -    xvalue_(value_tag const t, std::any const v, iter_t const pos)
 +    xvalue_(value_tag const t, std::any const v, iter_t const pos, iter_t const last)
@@ -150,14 +150,14 @@ index 86d3b21..24c265b 100644
 -      return extended_value{in_prolog, t, v, sref.src_whereis(pos)};
 +      return extended_value{in_prolog, t, v, raw_value_t(pos,last), sref.src_whereis(pos)};
      }
- 
+
      auto
      xvalue_for(value_tag const t)
      {
 -      return phx::bind(&document_parser::xvalue_, this, t, qi::_2, qi::_1);
 +      return phx::bind(&document_parser::xvalue_, this, t, qi::_2, qi::_1, qi::_3);
      }
- 
+
      void
 @@ -594,20 +594,20 @@ namespace {
  #pragma clang diagnostic ignored "-Wunsequenced"
@@ -194,11 +194,11 @@ index 4d3cab0..9accb11 100644
 --- a/fhiclcpp/parse_shims.h
 +++ b/fhiclcpp/parse_shims.h
 @@ -65,7 +65,7 @@ namespace shims {
- 
+
        Iterator it = first;
        while (it != last &&
 -             (std::isalnum(*it) || *it == '_' || *it == ':' || *it == '@'))
 +             (std::isalnum(*it) || *it == '_' || *it == ':' || *it == '.' || *it == '@'))
          ++it;
- 
+
        if (it != last && !maximally_munched_ass(*it))

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rc_success=0 
+rc_success=0
 rc_failure=1
 
 unset http_proxy
@@ -55,8 +55,8 @@ MONGOD_HOSTNAME=$(hostname -s)
 
 source /software/products/setup
 source /data/artdaq_database/initd_functions
-unsetup_all  >/dev/null 2>&1 
-setup mongodb ${MONGOD_UPS_VER} -q ${MONGOD_UPS_QUAL} 
+unsetup_all  >/dev/null 2>&1
+setup mongodb ${MONGOD_UPS_VER} -q ${MONGOD_UPS_QUAL}
 RC=$?
 if [ $RC -ne 0 ]; then
 	echo "Error: Failed setting mongodb. Aborting. "; exit $rc_failure;
@@ -125,7 +125,7 @@ start()
         --logappend                          \
         --fork                               \
         --replSet rs0                        \
-        --keyFile ${MONGOD_KEY}              
+        --keyFile ${MONGOD_KEY}
 
 
   RETVAL=$?
@@ -143,7 +143,7 @@ start_configure()
 #  ulimit -u 64000
 
   echo -n $"Configuring mongod: "
- 
+
   ${MONGOD_NUMA_CTRL} ${mongod_bin}          \
         --dbpath=${MONGOD_DATA_DIR}          \
         --pidfilepath=${MONGOD_PID}          \
@@ -152,7 +152,7 @@ start_configure()
         --bind_ip=127.0.0.1                  \
         --logpath=${MONGOD_LOG}              \
         --logappend                          \
-        --fork                               
+        --fork
 
   RETVAL=$?
   echo
@@ -170,7 +170,7 @@ start_arbiter()
 
   echo -n $"Starting mongo arbiter: "
 
-	
+
   if [ ! -d ${MONGOD_DATA_DIR}-arb ]; then
         mkdir -p ${MONGOD_DATA_DIR}-arb >/dev/null 2>&1
   fi
@@ -278,4 +278,3 @@ case "$1" in
 esac
 
 exit $RETVAL
-

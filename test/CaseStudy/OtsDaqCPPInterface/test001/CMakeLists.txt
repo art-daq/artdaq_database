@@ -8,7 +8,7 @@ link_libraries(
 
 cet_make_exec(NAME DatabaseConfiguration_t
   LIBRARIES
-    
+
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
@@ -16,14 +16,14 @@ cet_make_exec(NAME DatabaseConfiguration_t
   artdaq-database_ConfigurationDB
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
-  artdaq-database_StorageProviders_UconDB  
+  artdaq-database_StorageProviders_UconDB
   fhiclcpp
   #${SQLITE3}
   cetlib
   cetlib_except
   Boost::program_options
   Boost::unit_test_framework
-) 
+)
 
 MESSAGE("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}f")
 cet_test_env("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}f")
@@ -35,4 +35,3 @@ cet_test(OtsDaqCPPInterface_mongo_t USE_BOOST_UNIT HANDBUILT TEST_EXEC DatabaseC
 
 install_headers()
 install_source()
-
