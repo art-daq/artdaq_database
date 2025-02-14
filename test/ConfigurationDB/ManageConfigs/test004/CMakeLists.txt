@@ -35,4 +35,3 @@ configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_FILE_NUMBER}.cmp.json ${
 #  DATAFILES 
 #    ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json
 #  TEST_ARGS  -o findentities -p ${TEST_DBPROVIDER} -f gui -e "${TEST_COLLECTION_NAME_QUAL}-${CONFIG_NUMBER}*" -x test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json )
-  

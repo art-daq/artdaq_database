@@ -20,18 +20,18 @@
 "aliases": {
         "active" : [
             {
-                "name" : "alias012", 
+                "name" : "alias012",
                 "assigned" : "2017-02-18T12:48:10.123-0500"
-            }, 
+            },
             {
-                "name" : "alias02", 
+                "name" : "alias02",
                 "assigned" : "2017-02-18T12:48:10.123-0500"
             }
-        ], 
+        ],
         "history" : [
             {
-                "name" : "alias01", 
-                "assigned" : "2017-02-18T12:48:10.123-0500", 
+                "name" : "alias01",
+                "assigned" : "2017-02-18T12:48:10.123-0500",
                 "removed" : "2017-02-18T12:48:10.123-0500"
             }
         ]
@@ -67,11 +67,11 @@
 ,
 "entities": [
             {
-                "name" : "boardreader01", 
+                "name" : "boardreader01",
                 "assigned" : "2017-02-18T12:48:10.123-0500"
-            }, 
+            },
             {
-                "name" : "boardreader02", 
+                "name" : "boardreader02",
                 "assigned" : "2017-02-18T12:48:10.123-0500"
             }
 ],
@@ -81,7 +81,7 @@
 ],
 "configurations": [
         {
-            "name" : "test", 
+            "name" : "test",
             "assigned" : "2017-02-18T12:48:10.123-0500"
         }
 ],

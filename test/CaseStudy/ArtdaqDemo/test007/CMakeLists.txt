@@ -87,4 +87,3 @@ cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_16_t HANDBUILT  TEST_EXE
     ${CMAKE_CURRENT_SOURCE_DIR}/EventBuilder_topol.fnal.gov_5236.src.fcl
     ${CMAKE_CURRENT_SOURCE_DIR}/EventBuilder_topol.fnal.gov_5236.cmp.fcl     
   TEST_ARGS -p ${TEST_DBPROVIDER} -o store -c artdaq_EventBuilder2 -s EventBuilder_topol.fnal.gov_5236.src.fcl -x EventBuilder_topol.fnal.gov_5236.cmp.fcl -f fhicl -v ${TEST_VERSION_NAME} -g ${TEST_CONFIGURATION_NAME}-${TEST_NUMBER} )
-    

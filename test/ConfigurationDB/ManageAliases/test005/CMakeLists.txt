@@ -42,4 +42,4 @@ cet_test(conftool_mongo_${TEST_NAME}_${TEST_NUMBER}_01_t HANDBUILT  TEST_EXEC co
 cet_test(conftool_filesystem_${TEST_NAME}_${TEST_NUMBER}_01_t HANDBUILT  TEST_EXEC conftool 
   DATAFILES 
    ${CMAKE_CURRENT_BINARY_DIR}/test0052.flt.${RAND_NAME}.json 
-  TEST_ARGS  --searchquery=test0052.flt.${RAND_NAME}.json -x test0054.cmp.${RAND_NAME}.json)  
+  TEST_ARGS  --searchquery=test0052.flt.${RAND_NAME}.json -x test0054.cmp.${RAND_NAME}.json)

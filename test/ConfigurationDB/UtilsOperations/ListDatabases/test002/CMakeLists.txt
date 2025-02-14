@@ -21,4 +21,3 @@ configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_FILE_NUMBER}.cmp.json ${
 #  DATAFILES 
 #    ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json
 #  TEST_ARGS  -o listdatabases -p ${TEST_DBPROVIDER} -f csv -x test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json )
-  

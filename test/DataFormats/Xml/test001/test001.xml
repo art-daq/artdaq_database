@@ -8,7 +8,7 @@
             <sendDebugHeader>False</sendDebugHeader>
             <sendHitMask>False</sendHitMask>
             <debugFebEmu>True</debugFebEmu>
-            <TimeoutSize>63</TimeoutSize> 
+            <TimeoutSize>63</TimeoutSize>
             <EnableTimeout>False</EnableTimeout>
             <ConfigZeroSuppression>False</ConfigZeroSuppression>
             <ZeroSuppressionMode>False</ZeroSuppressionMode>
@@ -21,7 +21,7 @@
             <SwTrigPeriod>1000</SwTrigPeriod>
             <SwTrigEnable>False</SwTrigEnable>
        <RunMode>Trigger</RunMode>
-            <DaqHost>192.168.204.2</DaqHost> 
+            <DaqHost>192.168.204.2</DaqHost>
             <DaqPort>8991</DaqPort>
             <BlowOffDmaData>False</BlowOffDmaData>
             <BlowOffDmaEofe>False</BlowOffDmaEofe>
@@ -29,7 +29,7 @@
             <SendEmptyFrames>True</SendEmptyFrames>
          </DataBuffer>
             <LbneFrontEnd>
-            <AdcAsicDisable>0x0</AdcAsicDisable> 
+            <AdcAsicDisable>0x0</AdcAsicDisable>
             <AdcAsicSpi000>0xc0c0c0c</AdcAsicSpi000>
             <AdcAsicSpi001>0xc0c0c0c</AdcAsicSpi001>
             <AdcAsicSpi002>0xc0c0c0c</AdcAsicSpi002>
@@ -69,7 +69,7 @@
             <ChnSelect>0x0</ChnSelect>
             <ChpSelect>0x0</ChpSelect>
             <DataTestPattern>0x123</DataTestPattern>
-            <FeAsicSpi000>0x5C5C5C5C</FeAsicSpi000>  
+            <FeAsicSpi000>0x5C5C5C5C</FeAsicSpi000>
             <FeAsicSpi001>0x5C5C5C5C</FeAsicSpi001>
             <FeAsicSpi002>0x5C5C5C5C</FeAsicSpi002>
             <FeAsicSpi003>0x5C5C5C5C</FeAsicSpi003>
@@ -106,8 +106,8 @@
             <FpgaFAddr>0x0</FpgaFAddr>
             <FpgaFEnable>False</FpgaFEnable>
             <FpgaFOpCode>0x0</FpgaFOpCode>
-            <FpgaFStrtOp>0x0</FpgaFStrtOp> 
-            <HeaderPevent>0x1</HeaderPevent> 
+            <FpgaFStrtOp>0x0</FpgaFStrtOp>
+            <HeaderPevent>0x1</HeaderPevent>
             <ScratchPad>0x0</ScratchPad>
             <SendCnt>False</SendCnt>
             <SendPbrs>False</SendPbrs>
@@ -133,7 +133,7 @@
             <AdcLatchLoc7>0x6</AdcLatchLoc7>
             <AdcLatchLoc8>0x6</AdcLatchLoc8>
          </LbneFrontEnd>
-      </DataDpm> 
+      </DataDpm>
       <DataDpm index="1">
          <DataBuffer index="0">
             <DaqHost>192.168.204.2</DaqHost>
@@ -150,7 +150,7 @@
             <AdcLatchLoc7>0x6</AdcLatchLoc7>
             <AdcLatchLoc8>0x6</AdcLatchLoc8>
          </LbneFrontEnd>
-      </DataDpm> 
+      </DataDpm>
       <DataDpm index="2">
          <DataBuffer index="0">
             <DaqHost>192.168.204.2</DaqHost>
@@ -167,7 +167,7 @@
             <AdcLatchLoc7>0x6</AdcLatchLoc7>
             <AdcLatchLoc8>0x6</AdcLatchLoc8>
          </LbneFrontEnd>
-      </DataDpm> 
+      </DataDpm>
       <DataDpm index="3">
          <DataBuffer index="0">
             <DaqHost>192.168.204.2</DaqHost>
@@ -184,7 +184,7 @@
             <AdcLatchLoc7>0x4</AdcLatchLoc7>
             <AdcLatchLoc8>0x4</AdcLatchLoc8>
          </LbneFrontEnd>
-      </DataDpm> 
+      </DataDpm>
         <DataDpm index="4">
          <DataBuffer index="0">
             <DaqHost>192.168.204.2</DaqHost>
@@ -201,7 +201,7 @@
             <AdcLatchLoc7>0x6</AdcLatchLoc7>
             <AdcLatchLoc8>0x6</AdcLatchLoc8>
          </LbneFrontEnd>
-      </DataDpm> 
+      </DataDpm>
       <DataDpm index="5">
          <DataBuffer index="0">
             <DaqHost>192.168.204.2</DaqHost>
@@ -218,7 +218,7 @@
             <AdcLatchLoc7>0x6</AdcLatchLoc7>
             <AdcLatchLoc8>0x6</AdcLatchLoc8>
          </LbneFrontEnd>
-      </DataDpm> 
+      </DataDpm>
       <DataDpm index="6">
          <DataBuffer index="0">
             <DaqHost>192.168.204.2</DaqHost>
@@ -235,7 +235,7 @@
             <AdcLatchLoc7>0x6</AdcLatchLoc7>
             <AdcLatchLoc8>0x6</AdcLatchLoc8>
          </LbneFrontEnd>
-      </DataDpm> 
+      </DataDpm>
       <DataDpm index="7">
          <DataBuffer index="0">
             <DaqHost>192.168.204.2</DaqHost>
@@ -252,7 +252,7 @@
             <AdcLatchLoc7>0x6</AdcLatchLoc7>
             <AdcLatchLoc8>0x6</AdcLatchLoc8>
          </LbneFrontEnd>
-      </DataDpm> 
+      </DataDpm>
       <DataDpm index="8">
          <DataBuffer index="0">
             <DaqHost>192.168.204.2</DaqHost>
@@ -269,7 +269,7 @@
             <AdcLatchLoc7>0x6</AdcLatchLoc7>
             <AdcLatchLoc8>0x6</AdcLatchLoc8>
          </LbneFrontEnd>
-      </DataDpm> 
+      </DataDpm>
       <DataDpm index="9">
          <DataBuffer index="0">
             <DaqHost>192.168.204.2</DaqHost>
@@ -286,7 +286,7 @@
             <AdcLatchLoc7>0x6</AdcLatchLoc7>
             <AdcLatchLoc8>0x6</AdcLatchLoc8>
          </LbneFrontEnd>
-      </DataDpm> 
+      </DataDpm>
       <DataDpm index="10">
          <DataBuffer index="0">
             <DaqHost>192.168.204.2</DaqHost>
@@ -303,7 +303,7 @@
             <AdcLatchLoc7>0x6</AdcLatchLoc7>
             <AdcLatchLoc8>0x6</AdcLatchLoc8>
          </LbneFrontEnd>
-      </DataDpm> 
+      </DataDpm>
       <DataDpm index="11">
          <DataBuffer index="0">
             <DaqHost>192.168.204.2</DaqHost>
@@ -320,7 +320,7 @@
             <AdcLatchLoc7>0x6</AdcLatchLoc7>
             <AdcLatchLoc8>0x6</AdcLatchLoc8>
          </LbneFrontEnd>
-      </DataDpm> 
+      </DataDpm>
       <DataDpm index="12">
          <DataBuffer index="0">
             <DaqHost>192.168.204.2</DaqHost>
@@ -337,7 +337,7 @@
             <AdcLatchLoc7>0x6</AdcLatchLoc7>
             <AdcLatchLoc8>0x6</AdcLatchLoc8>
          </LbneFrontEnd>
-      </DataDpm> 
+      </DataDpm>
       <DataDpm index="13">
          <DataBuffer index="0">
             <DaqHost>192.168.204.2</DaqHost>
@@ -354,7 +354,7 @@
             <AdcLatchLoc7>0x6</AdcLatchLoc7>
             <AdcLatchLoc8>0x6</AdcLatchLoc8>
          </LbneFrontEnd>
-      </DataDpm> 
+      </DataDpm>
       <DataDpm index="14">
          <DataBuffer index="0">
             <DaqHost>192.168.204.2</DaqHost>
@@ -371,7 +371,7 @@
             <AdcLatchLoc7>0x6</AdcLatchLoc7>
             <AdcLatchLoc8>0x6</AdcLatchLoc8>
          </LbneFrontEnd>
-      </DataDpm> 
+      </DataDpm>
       <DataDpm index="15">
          <DataBuffer index="0">
             <DaqHost>192.168.204.2</DaqHost>
@@ -388,10 +388,10 @@
             <AdcLatchLoc7>0x6</AdcLatchLoc7>
             <AdcLatchLoc8>0x6</AdcLatchLoc8>
          </LbneFrontEnd>
-      </DataDpm> 
+      </DataDpm>
       <TimingDtm>
          <Enabled>True</Enabled>
-	  <EmuTrigCntSize>0x3D09000</EmuTrigCntSize> 
+	  <EmuTrigCntSize>0x3D09000</EmuTrigCntSize>
          <TimingRtm>
            <NovaDaisyChain>False</NovaDaisyChain>
             <EmulationEnable>True</EmulationEnable>

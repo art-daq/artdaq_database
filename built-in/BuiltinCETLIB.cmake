@@ -22,7 +22,7 @@ if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/cetlib )
        WORKING_DIRECTORY  ${TOP_CMAKE_BINARY_DIR}/built-in
   RESULT_VARIABLE STATUS
   OUTPUT_VARIABLE OUTPUT1 )
-  
+
 if(STATUS AND NOT STATUS EQUAL 0)
   message(STATUS "FAILED: ${STATUS}")
 else()
@@ -39,7 +39,7 @@ include_directories(${TOP_CMAKE_BINARY_DIR}/built-in/cetlib)
 
 IF(CETLIB_IS_STATIC)
   MESSAGE (STATUS "Making cetlib static")
-  
+
   set(SOURCES
     ${TOP_CMAKE_BINARY_DIR}/built-in/cetlib/cetlib/canonical_number.cc
     ${TOP_CMAKE_BINARY_DIR}/built-in/cetlib/cetlib/canonical_string.cc
@@ -53,17 +53,17 @@ IF(CETLIB_IS_STATIC)
     ${TOP_CMAKE_BINARY_DIR}/built-in/cetlib/cetlib/split_by_regex.cc
     )
 
-  set(LIBRARIES  
+  set(LIBRARIES
     cetlib_except
     Boost::filesystem
     Boost::system
     )
 
   include_directories( ${TOP_CMAKE_BINARY_DIR}/built-in/cetlib )
-    
+
   add_library(${CETLIB_TARGET} OBJECT ${SOURCES})
   set_property(TARGET ${CETLIB_TARGET} PROPERTY POSITION_INDEPENDENT_CODE ON)
-  target_link_libraries(${CETLIB_TARGET} ${LIBRARIES})  
+  target_link_libraries(${CETLIB_TARGET} ${LIBRARIES})
 
 else()
   cet_make_library(cetlib
@@ -83,5 +83,5 @@ else()
     Boost::filesystem
     Boost::system
     WITH_STATIC_LIBRARY
-  ) 
+  )
 ENDIF()

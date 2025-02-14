@@ -1,7 +1,7 @@
 
 artdaq_processes: [{
 
-collection: GPSs 
+collection: GPSs
 
 pattern: '(.*/)(gps(\d*|_standard))(\.fcl$)'
 
@@ -10,238 +10,238 @@ pattern: '(.*/)(gps(\d*|_standard))(\.fcl$)'
  pattern : '(.*/)(dummygenerator|pmt_oldstandard|crt_north_test_inner|v0pmt_standard)(\.fcl$)'
 },  {
 
-collection: Triggers 
+collection: Triggers
 
-pattern: '(.*/)(icarustrigger(|test))(\.fcl$)' 
-
-}, {
-
-collection: WRs 
-
-pattern: '(.*/)(wr(\d*|_pull|_standard))(\.fcl$)' 
+pattern: '(.*/)(icarustrigger(|test))(\.fcl$)'
 
 }, {
 
-collection: XARAs 
+collection: WRs
 
-pattern: '(.*/)(xara(\d+|_standard))(\.fcl$)' 
+pattern: '(.*/)(wr(\d*|_pull|_standard))(\.fcl$)'
 
 }, {
 
+collection: XARAs
 
-collection: MBBs 
-
-pattern: '(.*/)(mbb(\d+|_standard))(\.fcl$)' 
+pattern: '(.*/)(xara(\d+|_standard))(\.fcl$)'
 
 }, {
 
 
-collection: WIBs 
+collection: MBBs
 
-pattern: '(.*/)(wib(\d+|_standard))(\.fcl$)' 
+pattern: '(.*/)(mbb(\d+|_standard))(\.fcl$)'
+
+}, {
+
+
+collection: WIBs
+
+pattern: '(.*/)(wib(\d+|_standard))(\.fcl$)'
 
 }, {
 
 
-collection: PTBs 
+collection: PTBs
 
-pattern: '(.*/)(ptb(\d+|_standard))(\.fcl$)' 
-
-}, {
-
-collection: CRTs 
-
-pattern: '(.*/)((|icarus|icarus_)crt(|_feb)(\d+(|[a-zA-Z]{3})|_bitstream_\d+|_standard|_common|_noise))(\.fcl$)' 
-
-}, {
-collection: PMTs 
-
-pattern: '(.*/)((|icarus)pmt_standard_(even|odd|(|we|ww|ew|ee)(|top|bot)\d+))(\.fcl$)' 
+pattern: '(.*/)(ptb(\d+|_standard))(\.fcl$)'
 
 }, {
 
-collection: PMTs 
+collection: CRTs
 
-pattern: '(.*/)((|icarus)pmt((|we|ww|ew|ee)(|top|bot)\d+|x\d+|_standard(|_pmt\d+link\d+)))(\.fcl$)' 
+pattern: '(.*/)((|icarus|icarus_)crt(|_feb)(\d+(|[a-zA-Z]{3})|_bitstream_\d+|_standard|_common|_noise))(\.fcl$)'
+
+}, {
+collection: PMTs
+
+pattern: '(.*/)((|icarus)pmt_standard_(even|odd|(|we|ww|ew|ee)(|top|bot)\d+))(\.fcl$)'
 
 }, {
 
-collection: NevisTPCs 
+collection: PMTs
 
-pattern: '(.*/)((fake_|)NevisTPC(2|NU)Stream(CALIB|CTRL|EXT)_driver)(\.fcl$)' 
-
-}, {
-
-collection: TPCs 
-
-pattern: '(.*/)(((|icarus)tpc)((|we|ww|ew|ee)\d+(|b|t|m|n\d+)|_standard(|_n\d+)))(\.fcl$)' 
+pattern: '(.*/)((|icarus)pmt((|we|ww|ew|ee)(|top|bot)\d+|x\d+|_standard(|_pmt\d+link\d+)))(\.fcl$)'
 
 }, {
 
-collection: EventBuilders 
+collection: NevisTPCs
 
-pattern: '(.*/)(EventBuilder(\d+|_standard))(\.fcl$)' 
-
-}, {
-
-collection: DataLoggers 
-
-pattern: '(.*/)(DataLogger(\d+|_standard))(\.fcl$)' 
+pattern: '(.*/)((fake_|)NevisTPC(2|NU)Stream(CALIB|CTRL|EXT)_driver)(\.fcl$)'
 
 }, {
 
-collection: Dispatchers 
+collection: TPCs
 
-pattern: '(.*/)(Dispatcher(\d+|_standard))(\.fcl$)' 
+pattern: '(.*/)(((|icarus)tpc)((|we|ww|ew|ee)\d+(|b|t|m|n\d+)|_standard(|_n\d+)))(\.fcl$)'
 
 }, {
 
-collection: RoutingManager 
+collection: EventBuilders
 
-pattern: '(.*/)(RoutingManager(\d+|_standard))(\.fcl$)' 
+pattern: '(.*/)(EventBuilder(\d+|_standard))(\.fcl$)'
+
+}, {
+
+collection: DataLoggers
+
+pattern: '(.*/)(DataLogger(\d+|_standard))(\.fcl$)'
+
+}, {
+
+collection: Dispatchers
+
+pattern: '(.*/)(Dispatcher(\d+|_standard))(\.fcl$)'
+
+}, {
+
+collection: RoutingManager
+
+pattern: '(.*/)(RoutingManager(\d+|_standard))(\.fcl$)'
 
 }, {
 
 collection: UserSettings
 
-pattern: '(.*/)(user_setings)(\.fcl$)' 
+pattern: '(.*/)(user_setings)(\.fcl$)'
 
 }, {
 
 collection: Boot
 
-pattern: '(.*/)(boot)(\.fcl$)' 
+pattern: '(.*/)(boot)(\.fcl$)'
 
 }, {
 
 collection: KnownBoardreasers
 
-pattern: '(.*/)(known_boardreaders_list)(\.fcl$)' 
+pattern: '(.*/)(known_boardreaders_list)(\.fcl$)'
 
 }, {
 
 collection: CriticalProcesses
 
-pattern: '(.*/)(critical_process_list)(\.fcl$)' 
+pattern: '(.*/)(critical_process_list)(\.fcl$)'
 
 }, {
 
-collection: DataflowConfiguration 
+collection: DataflowConfiguration
 
-pattern: '(.*/)(DataflowConfiguration)(\.fcl$)' 
+pattern: '(.*/)(DataflowConfiguration)(\.fcl$)'
 
 }, {
 
-collection: Hashes 
+collection: Hashes
 
-pattern: '(.*/)(hashes)(\.fcl$)' 
+pattern: '(.*/)(hashes)(\.fcl$)'
 
-}] 
+}]
 
-artdaq_includes: [] 
+artdaq_includes: []
 
 run_history: [{
 
 collection: RunHistory
 
-pattern: '(.*/)(icarustrigger|icarustriggertest|dummygenerator|sbnToySimulator)(\.fcl$)' 
+pattern: '(.*/)(icarustrigger|icarustriggertest|dummygenerator|sbnToySimulator)(\.fcl$)'
 
 }, {
 
 collection: RunHistory
 
-pattern: '(.*/)(component(\d*|_standard))(\.fcl$)' 
+pattern: '(.*/)(component(\d*|_standard))(\.fcl$)'
 
 }, {
 
 collection: RunHistory
 
-pattern: '(.*/)(gps(\d*|_standard))(\.fcl$)' 
+pattern: '(.*/)(gps(\d*|_standard))(\.fcl$)'
 
 }, {
 
-collection: RunHistory 
+collection: RunHistory
 
-pattern: '(.*/)(wr(\d*|_pull|_standard))(\.fcl$)' 
-
-}, {
-
-collection: RunHistory 
-
-pattern: '(.*/)(xara(\d+|_standard))(\.fcl$)' 
+pattern: '(.*/)(wr(\d*|_pull|_standard))(\.fcl$)'
 
 }, {
 
+collection: RunHistory
 
-collection: RunHistory 
-
-pattern: '(.*/)(mbb(\d+|_standard))(\.fcl$)' 
+pattern: '(.*/)(xara(\d+|_standard))(\.fcl$)'
 
 }, {
 
 
-collection: RunHistory 
+collection: RunHistory
 
-pattern: '(.*/)(wib(\d+|_standard))(\.fcl$)' 
-
-}, {
-
-collection: RunHistory 
-
-pattern: '(.*/)(ptb(\d+|_standard))(\.fcl$)' 
+pattern: '(.*/)(mbb(\d+|_standard))(\.fcl$)'
 
 }, {
 
-collection: RunHistory 
 
-pattern: '(.*/)((|icarus|icarus_)crt(|_feb)(\d+(|[a-zA-Z]{3})|_bitstream_\d+|_standard|_common|_noise))(\.fcl$)' 
+collection: RunHistory
 
-}, {
-collection: RunHistory 
-
-pattern: '(.*/)((|icarus)pmt_standard_(even|odd|(|we|ww|ew|ee)(|top|bot)\d+))(\.fcl$)' 
-}, {
-
-
-collection: RunHistory 
-
-pattern: '(.*/)((|icarus)pmt((|we|ww|ew|ee)(|top|bot)\d+|x\d+|_standard))(\.fcl$)' 
-}, {
-
-collection: RunHistory 
-
-pattern: '(.*/)((fake_|)NevisTPC(2|NU)Stream(CALIB|CTRL|EXT)_driver)(\.fcl$)' 
+pattern: '(.*/)(wib(\d+|_standard))(\.fcl$)'
 
 }, {
 
-collection: RunHistory 
+collection: RunHistory
 
-pattern: '(.*/)(((|icarus)tpc)((|we|ww|ew|ee)\d+(|b|t|m|n\d+)|_standard(|_n\d+)))(\.fcl$)' 
-
-}, {
-
-collection: RunHistory 
-
-pattern: '(.*/)((EventBuilder|DataLogger|Dispatcher|RoutingManager)(\d+|_standard))(\.fcl$)' 
+pattern: '(.*/)(ptb(\d+|_standard))(\.fcl$)'
 
 }, {
 
-collection: RunHistory 
+collection: RunHistory
 
-pattern: '(.*/)(user_setings|metadata|boot|(known_boardreaders|critical_process)_list|DataflowConfiguration|RunHistory(|2))(\.fcl$)' 
+pattern: '(.*/)((|icarus|icarus_)crt(|_feb)(\d+(|[a-zA-Z]{3})|_bitstream_\d+|_standard|_common|_noise))(\.fcl$)'
 
-}] 
+}, {
+collection: RunHistory
+
+pattern: '(.*/)((|icarus)pmt_standard_(even|odd|(|we|ww|ew|ee)(|top|bot)\d+))(\.fcl$)'
+}, {
+
+
+collection: RunHistory
+
+pattern: '(.*/)((|icarus)pmt((|we|ww|ew|ee)(|top|bot)\d+|x\d+|_standard))(\.fcl$)'
+}, {
+
+collection: RunHistory
+
+pattern: '(.*/)((fake_|)NevisTPC(2|NU)Stream(CALIB|CTRL|EXT)_driver)(\.fcl$)'
+
+}, {
+
+collection: RunHistory
+
+pattern: '(.*/)(((|icarus)tpc)((|we|ww|ew|ee)\d+(|b|t|m|n\d+)|_standard(|_n\d+)))(\.fcl$)'
+
+}, {
+
+collection: RunHistory
+
+pattern: '(.*/)((EventBuilder|DataLogger|Dispatcher|RoutingManager)(\d+|_standard))(\.fcl$)'
+
+}, {
+
+collection: RunHistory
+
+pattern: '(.*/)(user_setings|metadata|boot|(known_boardreaders|critical_process)_list|DataflowConfiguration|RunHistory(|2))(\.fcl$)'
+
+}]
 
 system_layout: [{
 
-collection: SystemLayout 
+collection: SystemLayout
 
-pattern: '(.*)(schema)(\.fcl$)' 
+pattern: '(.*)(schema)(\.fcl$)'
 
 }, {
 
-collection: Flags 
+collection: Flags
 
-pattern: '(.*)(flags)(\.fcl$)' 
+pattern: '(.*)(flags)(\.fcl$)'
 
-}] 
+}]

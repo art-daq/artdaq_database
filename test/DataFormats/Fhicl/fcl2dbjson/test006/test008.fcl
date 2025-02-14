@@ -13,7 +13,7 @@ rce_standard: {
     mpi_sync_interval: 24000
 
     # These two variables will be calculated by DAQInterface...
-    first_event_builder_rank: -1  
+    first_event_builder_rank: -1
     event_builder_count: -1
 
     generator: TpcRceReceiver
@@ -22,7 +22,7 @@ rce_standard: {
     #    fragment_id: -1
     #    board_id: -1
     sleep_on_stop_us: 0
-    
+
     number_of_microslices_per_millislice: 10
 
     # rce_client_host_addr: "0.0.0.0"

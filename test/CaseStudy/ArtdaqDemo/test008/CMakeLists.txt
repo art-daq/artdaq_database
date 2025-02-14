@@ -75,4 +75,3 @@ cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_008_16_t HANDBUILT  TEST_EXEC ArtdaqDem
   DATAFILES 
     ${CMAKE_CURRENT_SOURCE_DIR}/EventBuilder_topol.fnal.gov_5236.cmp.fcl     
   TEST_ARGS -p ${TEST_DBPROVIDER} -o load -c artdaq_EventBuilder2  -x EventBuilder_topol.fnal.gov_5236.cmp.fcl -f fhicl -g ${TEST_CONFIGURATION_NAME}-007 )
-    

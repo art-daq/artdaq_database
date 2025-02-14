@@ -7,18 +7,18 @@ index 9689269..2c87411 100644
  #include "fhiclcpp/fwd.h"
  #include "stdmap_shims.h"
 +#include "fhiclcpp/exception.h"
- 
+
  #include <map>
  #include <string>
  #include <vector>
 +#include <utility>
- 
+
  // ----------------------------------------------------------------------
- 
+
 @@ -32,6 +34,68 @@ namespace fhicl {
    };
  }
- 
+
 +
 +namespace fhicl {
 +using raw_value_t = std::string;
@@ -82,7 +82,7 @@ index 9689269..2c87411 100644
 +} // namespace fhicl
 +
  // ----------------------------------------------------------------------
- 
+
  class fhicl::extended_value {
 @@ -50,7 +114,8 @@ public:
                   std::string const& src = {})
@@ -119,7 +119,7 @@ index 9689269..2c87411 100644
 +    , src_info{src}
 +    , protection{protection}
    {}
- 
+
 +  extended_value(bool const in_prolog,
 +                 value_tag const tag,
 +                 boost::any const value,
@@ -142,7 +142,7 @@ index 9689269..2c87411 100644
 +  std::string raw_value{};
    std::string src_info{};
    Protection protection{Protection::NONE};
- 
+
 diff --git a/fhiclcpp/parse.cc b/fhiclcpp/parse.cc
 index c7cb85f..e864ebe 100644
 --- a/fhiclcpp/parse.cc
@@ -154,7 +154,7 @@ index c7cb85f..e864ebe 100644
 -    return extended_value(b, t, v);
 +    return extended_value(b, t, std::move(v));
    }
- 
+
    template <typename FwdIter>
 @@ -191,10 +191,10 @@ namespace {
              value_tag t,
@@ -167,7 +167,7 @@ index c7cb85f..e864ebe 100644
 -    return extended_value(b, t, v, src_info);
 +    return extended_value(b, t,std::move(v),raw_value_t(pos,last),s.src_whereis(pos));
    }
- 
+
    complex_t
 @@ -673,66 +673,19 @@ namespace {
  #pragma clang diagnostic ignored "-Wunsequenced"
@@ -268,7 +268,7 @@ index c7cb85f..e864ebe 100644
 -  parse_document_(cet::includer(filename, maker), result);
 +  parse_document_(cet::includer{filename, maker}, result);
  } // parse_document()
- 
+
  void
 diff --git a/fhiclcpp/parse_shims.h b/fhiclcpp/parse_shims.h
 index 8a9116b..adb440d 100644
@@ -276,13 +276,13 @@ index 8a9116b..adb440d 100644
 +++ b/fhiclcpp/parse_shims.h
 @@ -68,9 +68,8 @@ namespace shims {
          return false;
- 
+
        Iterator it = first;
 -      while (it != last &&
 -             (std::isalnum(*it) || *it == '_' || *it == ':' || *it == '@'))
 -        ++it;
 +
 +      while (it != last && (std::isalnum(*it) || *it == '_' || *it == ':' || *it == '.' || *it == '@')) ++it;
- 
+
        if (it != last && !maximally_munched_ass(*it))
          return false;

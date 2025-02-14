@@ -1,4 +1,4 @@
-{ 
+{
   "operation":"replaceChild",
   "path":"document.data",
   "begin-state"   :"begin-state.json",

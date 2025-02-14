@@ -8,7 +8,7 @@ if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/paramiko )
     execute_process(COMMAND git clone https://github.com/paramiko/paramiko.git ${TOP_CMAKE_BINARY_DIR}/built-in/paramiko
         WORKING_DIRECTORY  ${TOP_CMAKE_BINARY_DIR}/built-in)
 
-    execute_process(COMMAND  git checkout tags/v1.18.1 
+    execute_process(COMMAND  git checkout tags/v1.18.1
         WORKING_DIRECTORY  ${TOP_CMAKE_BINARY_DIR}/built-in/paramiko)
 
     execute_process(COMMAND pip install --prefix ${TOP_CMAKE_BINARY_DIR}/built-in/paramiko/build/ paramiko

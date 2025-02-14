@@ -21,4 +21,3 @@ cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC C
   DATAFILES 
     ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json
   TEST_ARGS  -o listdatabases -p ${TEST_DBPROVIDER} -f gui -x test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json )
-  

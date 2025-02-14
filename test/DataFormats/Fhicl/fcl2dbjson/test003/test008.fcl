@@ -1,12 +1,12 @@
 #comment i
 i: 14 //14
-#comment t 
+#comment t
 t: .68 // .68
 #comment pi
 pi: 3.1415926 # 3.1415926
 #comment x
 x: 1.23e2 //1.23e2
-#comment y 
+#comment y
 y: -0.45600E+3 // -0.45600E+3
 #comment z
 z: -infinity # -infinity

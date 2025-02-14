@@ -42,4 +42,3 @@ cet_test(${TEST_NAME}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC readjson_t
   DATAFILES 
     ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json 
   TEST_ARGS -c test${TEST_NUMBER}.json )
-  

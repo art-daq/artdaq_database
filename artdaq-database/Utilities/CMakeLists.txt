@@ -8,8 +8,8 @@ cet_make_exec(NAME conftool
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
-  Boost::program_options  
-) 
+  Boost::program_options
+)
 
 cet_make_exec(NAME readjson
   LIBRARIES
@@ -59,7 +59,7 @@ cet_make_exec(NAME bulkloader
   LIBRARIES
   artdaq-database_SharedCommon
   artdaq-database_BasicTypes
-  
+
   artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
   artdaq-database_ConfigurationDB
@@ -92,29 +92,29 @@ cet_make_exec(NAME bulkdownloader
 
 cet_make_exec(NAME migrate_database
   LIBRARIES
-    
+
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
   artdaq-database_ConfigurationDB
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
-  artdaq-database_StorageProviders_UconDB  
-  Boost::program_options 
+  artdaq-database_StorageProviders_UconDB
+  Boost::program_options
   cetlib_except
 )
 
 cet_make_exec(NAME rebuild_database_index
   LIBRARIES
-    
+
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
   artdaq-database_ConfigurationDB
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
-  artdaq-database_StorageProviders_UconDB  
-  Boost::program_options 
+  artdaq-database_StorageProviders_UconDB
+  Boost::program_options
   cetlib_except
 )
 

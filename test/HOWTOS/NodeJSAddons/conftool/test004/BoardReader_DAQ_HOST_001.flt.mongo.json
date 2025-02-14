@@ -1,4 +1,4 @@
-{ 
+{
 "collection":"artdaq_BoardReader",
 "entity":"DAQ_HOST_001",
 "dbprovider":"mongo",

@@ -24,10 +24,10 @@
          }
       ]
    },
-   "version":"version1",   
+   "version":"version1",
    "origin":{
       "format":"json"
-   },   
+   },
    "configurations":[
       "config1"
    ],

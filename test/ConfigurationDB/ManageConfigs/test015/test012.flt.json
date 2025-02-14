@@ -1,6 +1,6 @@
 {
     "filter":{"version":"@TEST_VERSION_NAME@", "entities.name":"@TEST_COLLECTION_NAME_QUAL@-@CONFIG_NUMBER@-B"},
-    "configuration":"@TEST_COLLECTION_NAME_QUAL@-@TEST_CONFIGURATION_NAME@-A",      
+    "configuration":"@TEST_COLLECTION_NAME_QUAL@-@TEST_CONFIGURATION_NAME@-A",
     "collection":"@TEST_COLLECTION_NAME@_@TEST_COLLECTION_NAME_QUAL@_02",
     "dbprovider":"@TEST_DBPROVIDER@",
     "operation":"addconfig",

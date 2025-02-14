@@ -37,7 +37,7 @@ if(USE_FHICLCPP)
   include_directories(${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp)
   include_directories(${TOP_CMAKE_BINARY_DIR}/built-in/cetlib)
   include_directories(${TOP_CMAKE_BINARY_DIR}/built-in/cetlib_except)
- 
+
 endif()
 
 set(ARTDAQ_DATABASE_URI_FILESYSTEM "filesystemdb://${CMAKE_BINARY_DIR}/databases/filesystemdb/test_db")

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rc_success=0 
+rc_success=0
 rc_failure=1
 
 #source /grid/fermiapp/products/artdaq/setup
@@ -48,8 +48,8 @@ fi
 
 source /daq/artdaq/products/setup
 source /daq/database/initd_functions
-unsetup_all  >/dev/null 2>&1 
-setup mongodb ${MONGOD_UPS_VER} -q ${MONGOD_UPS_QUAL} 
+unsetup_all  >/dev/null 2>&1
+setup mongodb ${MONGOD_UPS_VER} -q ${MONGOD_UPS_QUAL}
 RC=$?
 if [ $RC -ne 0 ]; then
   echo "Error: Failed setting mongodb. Aborting. "; exit $rc_failure;

@@ -23,4 +23,3 @@ cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC C
   TEST_ARGS  -o findconfigs -p ${TEST_DBPROVIDER} -f gui -g ${TEST_CONFIGURATION_NAME}  -x test${TEST_FILE_NUMBER}.cmp.${RAND_NAME}.json )
 
   
-  

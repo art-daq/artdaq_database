@@ -2,7 +2,7 @@
 
 #source /data/artdaq_database/experiment_v4x_db/webconfigeditor.env
 
-rc_success=0 
+rc_success=0
 rc_failure=1
 
 unset http_proxy
@@ -53,8 +53,8 @@ ARTDAQ_DATABASE_URI_BAK=${ARTDAQ_DATABASE_URI}
 
 source /software/products/setup
 #source /data/artdaq_database/initd_functions
-unsetup_all  >/dev/null 2>&1 
-setup artdaq_node_server ${WEBEDITOR_UPS_VER} -q ${WEBEDITOR_UPS_QUAL} 
+unsetup_all  >/dev/null 2>&1
+setup artdaq_node_server ${WEBEDITOR_UPS_VER} -q ${WEBEDITOR_UPS_QUAL}
 RC=$?
 if [ $RC -ne 0 ]; then
 	echo "Error: Failed setting artdaq_node_server. Aborting. "; exit $rc_failure;
@@ -193,7 +193,7 @@ case "$1" in
   keeprunning)
      curl http://${WEBEDITOR_BINDIP}:${WEBEDITOR_BASE_PORT}/db/client.html -s -f -o /dev/null
      RETVAL=$?
-     if [ "$RETVAL" -ne 0 ];then 
+     if [ "$RETVAL" -ne 0 ];then
        echo "Web Config Editor is not responding $RETVAL"
        restart
      fi
@@ -203,15 +203,15 @@ case "$1" in
     RETVAL=$?
 
     if [ "$RETVAL" -eq 0 ]; then
-        echo Testing URL=http://${WEBEDITOR_BINDIP}:${WEBEDITOR_BASE_PORT}/db/client.html 
-#        curl http://${WEBEDITOR_BINDIP}:${WEBEDITOR_BASE_PORT}/db/client.html 
+        echo Testing URL=http://${WEBEDITOR_BINDIP}:${WEBEDITOR_BASE_PORT}/db/client.html
+#        curl http://${WEBEDITOR_BINDIP}:${WEBEDITOR_BASE_PORT}/db/client.html
         curl http://${WEBEDITOR_BINDIP}:${WEBEDITOR_BASE_PORT}/db/client.html -s -f -o /dev/null
         RETVAL=$?
-        if [ "$RETVAL" -eq 0 ]; then 
+        if [ "$RETVAL" -eq 0 ]; then
 		echo Web Config Editor is running
 		success "Web Config Editor is running"; else
                 echo Web Config Editor is  not running
-	        failure "Web Config Editor is not running" 
+	        failure "Web Config Editor is not running"
 	fi
     fi
     ;;

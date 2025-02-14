@@ -1,4 +1,4 @@
-{ 
+{
   "operation":"removeChild",
   "path":"aliases.active",
   "begin-state"   :"begin-state.json",

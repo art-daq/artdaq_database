@@ -1,6 +1,6 @@
 {"filter":{
  "entities.name":"DAQ_HOST_002"
-}, 
+},
 "collection":"artdaq_BoardReader",
 "entity":"DAQ_HOST_002",
 "configuration":"configA001",

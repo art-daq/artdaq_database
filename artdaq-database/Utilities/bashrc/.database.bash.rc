@@ -1,6 +1,6 @@
 export ARTDAQ_DATABASE_HOME=${HOME}/daqsw
 
-printf "\n$(whoami)@$(uname -a)\n\n"   
+printf "\n$(whoami)@$(uname -a)\n\n"
 
 source  /home/pduser/daqsw/products/setup
 unsetup_all > /dev/null 2>&1
@@ -40,7 +40,7 @@ killall -u sbnd -9 node
 }
 
 function statusWebGUIServer(){
-ps -ef |grep -v -E "(grep|grid)" |grep serverbase.js 
+ps -ef |grep -v -E "(grep|grid)" |grep serverbase.js
 }
 
 #unalias ssh

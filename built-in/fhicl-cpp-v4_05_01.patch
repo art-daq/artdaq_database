@@ -5,14 +5,14 @@ index bf2658a..69f4ff4 100644
 @@ -7,7 +7,9 @@
  //
  // ======================================================================
- 
+
 -#include "cetlib/coded_exception.h"
 +//#include "cetlib/coded_exception.h"
 +#include "cetlib_except/coded_exception.h"
 +
- 
+
  #include <string>
- 
+
 diff --git a/fhiclcpp/extended_value.h b/fhiclcpp/extended_value.h
 index 484038d..bee0847 100644
 --- a/fhiclcpp/extended_value.h
@@ -22,18 +22,18 @@ index 484038d..bee0847 100644
  #include "fhiclcpp/fwd.h"
  #include "stdmap_shims.h"
 +#include "fhiclcpp/exception.h"
- 
+
  #include <map>
  #include <string>
  #include <vector>
 +#include <utility>
- 
+
  // ----------------------------------------------------------------------
- 
+
 @@ -24,8 +26,86 @@ namespace fhicl {
    };
  }
- 
+
 -// ----------------------------------------------------------------------
 +namespace fhicl {
 +namespace detail {
@@ -81,13 +81,13 @@ index 484038d..bee0847 100644
 +    auto pos = str.find(double_quote, 1);
 +
 +    while (str[pos -1]==back_slash) pos = str.find(double_quote, pos+1);
-+       
++
 +    if (pos == std::string::npos)
 +      throw exception(cant_find, "missing a closing double quote in str=" + str);
-+    
++
 +    return str.substr(0, pos + 1);
 +  }
-+  
++
 +  auto pos = str.find(double_slashes);
 +
 +  if (pos == std::string::npos) {
@@ -113,7 +113,7 @@ index 484038d..bee0847 100644
 +};
 +} // namespace detail
 +} // namespace fhicl
- 
+
 +// ----------------------------------------------------------------------
  class fhicl::extended_value
  {
@@ -121,7 +121,7 @@ index 484038d..bee0847 100644
 @@ -34,35 +114,31 @@ public:
    typedef  std::vector<extended_value>            sequence_t;
    typedef  shims::map<std::string, extended_value>  table_t;
- 
+
 -  extended_value()
 -    : in_prolog( false )
 -    , tag      ( UNKNOWN )
@@ -130,7 +130,7 @@ index 484038d..bee0847 100644
 -    , protection (Protection::NONE)
 -  { }
 +  extended_value()=default;
- 
+
    extended_value(bool       in_prolog,
                   value_tag  tag,
                   boost::any value,
@@ -148,7 +148,7 @@ index 484038d..bee0847 100644
 +    , src_info {src}
 +    , protection {protection}
    { }
- 
+
    extended_value(bool       in_prolog,
                   value_tag  tag,
                   boost::any value,
@@ -165,12 +165,12 @@ index 484038d..bee0847 100644
 +    , src_info {src}
 +    , protection {Protection::NONE}
    { }
- 
+
    bool
 @@ -94,11 +170,12 @@ public:
    operator table_t() const
    { return boost::any_cast<table_t>(value); }
- 
+
 -  bool       in_prolog;
 -  value_tag  tag;
 -  boost::any value;
@@ -179,12 +179,12 @@ index 484038d..bee0847 100644
 +  bool       in_prolog{false};
 +  value_tag  tag{UNKNOWN};
 +  boost::any value{};
-+  std::string raw_value{};  
++  std::string raw_value{};
 +  std::string src_info{};
 +  Protection protection{Protection::NONE};
- 
+
  };  // extended_value
- 
+
 diff --git a/fhiclcpp/parse.cc b/fhiclcpp/parse.cc
 index 10a400e..618427b 100644
 --- a/fhiclcpp/parse.cc
@@ -201,7 +201,7 @@ index 10a400e..618427b 100644
 +    boost::any wv= fhicl::detail::wrap_value(v,std::string(pos,last));
 +    return extended_value(b, t,wv,src_info);
    }
- 
+
    complex_t
 @@ -731,24 +733,25 @@ fhicl::document_parser<FwdIter, Skip>::document_parser(cet::includer const & s)
  #pragma clang diagnostic ignored "-Wunsequenced"
@@ -251,10 +251,10 @@ index ace640b..9eb40ea 100644
 +++ b/fhiclcpp/parse_shims.h
 @@ -49,7 +49,7 @@ struct catchall_parser : ::boost::spirit::qi::primitive_parser<catchall_parser>
      if (!::shims::isSnippetMode()) return false;
- 
+
      Iterator it = first;
 -    while (it != last && (std::isalnum(*it) || *it == '_' || *it == ':' || *it == '@')) ++it;
 +    while (it != last && (std::isalnum(*it) || *it == '_' || *it == ':' || *it == '.' || *it == '@')) ++it;
- 
+
      if (it != last && !maximally_munched_ass(*it)) return false;
- 
+

@@ -36,7 +36,7 @@ then
 elif [ "${OS}" = "Darwin" ]
 then
   flvr=d$(uname -r | cut -f1 -d".")
-else 
+else
   echo "ERROR: unrecognized operating system ${OS}"
   exit 1
 fi
@@ -56,7 +56,7 @@ function cleanup() {
 # start with clean directories
 rm -rf ${blddir}
 rm -rf ${srcdir}
-rm -rf ${working_dir}/copyBack 
+rm -rf ${working_dir}/copyBack
 # now make the dfirectories
 mkdir -p ${srcdir} || return 11
 mkdir -p ${blddir} || return 12
@@ -72,9 +72,9 @@ function checkout_source() {
 
   local_src=/mnt/sde/mu2etrg/lukhanin-develop001/srcs/artdaq-utilities-database
 	if [[ -d ${local_src} ]]; then
-	 	mkdir -p ${srcdir}/artdaq-database 
+	 	mkdir -p ${srcdir}/artdaq-database
 		cp -r  ${local_src}/* ${srcdir}/artdaq-database/
-	else 
+	else
 	  git clone http://cdcvs.fnal.gov/projects/artdaq-utilities-database ${srcdir}/artdaq-database
     cd ${srcdir}/artdaq-database
     git checkout ${git_branch}
@@ -86,13 +86,13 @@ function pull_products() {
     mkdir -p ${productsdir} || return 31
   fi
 
-  cd ${productsdir} || return 
+  cd ${productsdir} || return
 
   if [ ! -d ${srcdir}/artdaq-database/built-in/manifests/ ]; then
     echo "Directory ${srcdir}/artdaq-database/built-in/manifests is missing"
     return 32
   fi
-   
+
   cp ${srcdir}/artdaq-database/built-in/manifests/artdaq_database-build-*MANIFEST.txt  ${productsdir}/
 
   curl --fail --silent --location --insecure -O http://scisoft.fnal.gov/scisoft/bundles/tools/pullProducts || exit 1
@@ -123,7 +123,7 @@ function run_build() {
   echo
 
   cd ${blddir} || return 41
-  
+
   if [[ "${build_type}" == "prof" ]]; then
     build_flag="-p"
   else
@@ -137,7 +137,7 @@ function run_build() {
   cd ${prodblddir}
 
   source ${srcdir}/artdaq-database/ups/setup_for_development ${build_flag} ${basequal} $(echo  ${squal} | sed -e 's/:/ /g')
-  setup git 
+  setup git
 
   ups active
   export MAKE_FHICLCPP_STATIC=TRUE
@@ -150,13 +150,13 @@ function run_build() {
   CETPKG_J=$(nproc)
   buildtool -p -j$CETPKG_J 2>&1 |tee ${blddir}/build_artdaq-database.log || \
   { mv ${blddir}/*.log  ${working_dir}/copyBack/
-    return 43 
+    return 43
   }
 
   export RUN_TESTS=true
   buildtool -p -j$CETPKG_J 2>&1 |tee ${blddir}/build_tests_artdaq-database.log || \
   { mv ${blddir}/*.log  ${working_dir}/copyBack/
-    return 44 
+    return 44
   }
 
 
@@ -166,7 +166,7 @@ function run_build() {
   fi
 
   CETPKG_J=1
-   
+
  	export TRACE_NAME=$(echo ${qual_set} | sed -e 's/://g')${build_type}
   export TRACE_FILE=/tmp/trace_buffer_$TRACE_NAME
 	[[ -f $TRACE_FILE ]] &&  rm $TRACE_FILE
@@ -183,11 +183,11 @@ function run_build() {
   buildtool -t -j$CETPKG_J 2>&1 |tee ${blddir}/test_artdaq-database.log || \
   { mv ${blddir}/*.log  ${working_dir}/copyBack/
     mv ${prodblddir}/{test,Testing}  ${working_dir}/copyBack/
-		tshow > ${working_dir}/copyBack/trace-$TRACE_NAME.txt 
-    return 45 
+		tshow > ${working_dir}/copyBack/trace-$TRACE_NAME.txt
+    return 45
   }
 
-	tshow > ${working_dir}/copyBack/trace-$TRACE_NAME.txt 
+	tshow > ${working_dir}/copyBack/trace-$TRACE_NAME.txt
 }
 
 function stash_artifacts() {
@@ -217,13 +217,13 @@ function patch_products() {
   find ./ -name  "mongodbConfigVersion.cmake" -type f -print | xargs -n 1 sed -i "s/3.4.6c/3.4.6d/g"
   find ./ -name  "mongodbConfigVersion.cmake" -type f -print | xargs -n 1 sed -i "s/v3_4_6c/v3_4_6d/g"
   cd ${productsdir}/mongodb/v4_0_8
-  find ./ -name  "libbson-1.0-config.cmake" -type f -print   | xargs -n 1 sed -i "s|}/include/libbson-1.0|}/../include/libbson-1.0|g" 
-  find ./ -name  "libmongoc-1.0-config.cmake" -type f -print | xargs -n 1 sed -i "s|}/include/libmongoc-1.0|}/../include/libmongoc-1.0|g"  
+  find ./ -name  "libbson-1.0-config.cmake" -type f -print   | xargs -n 1 sed -i "s|}/include/libbson-1.0|}/../include/libbson-1.0|g"
+  find ./ -name  "libmongoc-1.0-config.cmake" -type f -print | xargs -n 1 sed -i "s|}/include/libmongoc-1.0|}/../include/libmongoc-1.0|g"
   cd ${productsdir}/mongodb/v4_0_8a
-  find ./ -name  "libbson-1.0-config.cmake" -type f -print   | xargs -n 1 sed -i "s|}/include/libbson-1.0|}/../include/libbson-1.0|g" 
-  find ./ -name  "libmongoc-1.0-config.cmake" -type f -print | xargs -n 1 sed -i "s|}/include/libmongoc-1.0|}/../include/libmongoc-1.0|g"  
+  find ./ -name  "libbson-1.0-config.cmake" -type f -print   | xargs -n 1 sed -i "s|}/include/libbson-1.0|}/../include/libbson-1.0|g"
+  find ./ -name  "libmongoc-1.0-config.cmake" -type f -print | xargs -n 1 sed -i "s|}/include/libmongoc-1.0|}/../include/libmongoc-1.0|g"
 #  find ./ -name  "mongodb.table" -type f -print              | xargs -n 1 sed -i '/clang/{n;d}'
-}	
+}
 
 cleanup
 RC=$?

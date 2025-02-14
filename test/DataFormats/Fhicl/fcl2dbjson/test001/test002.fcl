@@ -7,7 +7,7 @@ services: {
   NetMonTransportServiceInterface: {
     service_provider: NetMonTransportService
     #broadcast_sends: true
-	destinations: {	
+	destinations: {
 	  d4: { transferPluginType: MPI destination_rank: 4 max_fragment_size_words: 2097152 host_map: [{rank: 0 host: "mu2edaq01.fnal.gov" portOffset: 5300},{rank: 1 host: "mu2edaq01.fnal.gov" portOffset: 5310},{rank: 2 host: "mu2edaq01.fnal.gov" portOffset: 5320},{rank: 3 host: "mu2edaq01.fnal.gov" portOffset: 5330},{rank: 4 host: "mu2edaq01.fnal.gov" portOffset: 5340},{rank: 5 host: "mu2edaq01.fnal.gov" portOffset: 5350}]}
 
     }
@@ -42,7 +42,7 @@ s1: { transferPluginType: MPI source_rank: 1 max_fragment_size_words: 2097152 ho
     #   metricPluginType: "ganglia"
     #   level: %{ganglia_level}
     #   reporting_interval: 15.0
-    # 
+    #
     #   configFile: "/etc/ganglia/gmond.conf"
     #   group: "ARTDAQ"
     # }
@@ -50,7 +50,7 @@ s1: { transferPluginType: MPI source_rank: 1 max_fragment_size_words: 2097152 ho
     #    level: %{mf_level}
     #    metricPluginType: "msgFacility"
     #    output_message_application_name: "ARTDAQ Metric"
-    #    output_message_severity: 0 
+    #    output_message_severity: 0
     # }
     # graphite: {
     #   level: %{graphite_level}
@@ -60,7 +60,7 @@ s1: { transferPluginType: MPI source_rank: 1 max_fragment_size_words: 2097152 ho
     #   namespace: "artdaq."
     # }
   }
-} 
+}
 
 outputs: {
   rootMPIOutput: {
@@ -99,7 +99,7 @@ physics: {
 
   pmod2: [ prescaleMod2 ]
   pmod3: [ prescaleMod3 ]
-   
+
 
   #a1: [ app, wf ]
 
