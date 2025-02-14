@@ -1,6 +1,6 @@
 cet_make_exec(NAME ArtdaqDemo_t
   LIBRARIES
-    
+
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
@@ -14,7 +14,7 @@ cet_make_exec(NAME ArtdaqDemo_t
   cetlib
   cetlib_except
   Boost::program_options
-) 
+)
 
 
 SET (TEST_COLLECTION_NAME "testArtdaqDemo" )

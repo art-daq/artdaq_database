@@ -1,13 +1,13 @@
 cet_make_exec(NAME JSONDocumentBuilder_t
   LIBRARIES
-  
+
   artdaq-database_JsonDocument
-  fhiclcpp 
+  fhiclcpp
   cetlib
   cetlib_except
   #${SQLITE3}
   Boost::program_options
-) 
+)
 
 #build document tests
 add_subdirectory(test001)

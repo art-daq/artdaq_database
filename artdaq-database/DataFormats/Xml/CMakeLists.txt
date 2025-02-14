@@ -9,6 +9,6 @@ cet_make_library(
   artdaq-database_DataFormats_Json
   cetlib_except
   )
-  
+
 install_headers()
 install_source()

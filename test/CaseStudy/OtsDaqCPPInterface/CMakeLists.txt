@@ -9,7 +9,7 @@ DatabaseConfigurationInterface.cpp
   )
 
 add_subdirectory(test001)
-  
+
 install_headers()
 install_source()
 
