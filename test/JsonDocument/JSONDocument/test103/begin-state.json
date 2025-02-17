@@ -1,7 +1,7 @@
 {
-    "document": {  
+    "document": {
 	    "data":"ss",
             "data1":"aa",
-            "bbb": [1,2,3] 
+            "bbb": [1,2,3]
         }
 }

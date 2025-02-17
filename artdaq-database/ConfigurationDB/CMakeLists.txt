@@ -28,10 +28,10 @@ shared_helper_functions.cpp
   LIBRARIES
   ${FHICLCPP_DATAFORMAT_LIB}
   artdaq-database_DataFormats_Json
-  artdaq-database_DataFormats_Xml  
+  artdaq-database_DataFormats_Xml
   artdaq-database_JsonDocument
   artdaq-database_BasicTypes
-  artdaq-database_StorageProviders_MongoDB  
+  artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
   Boost::program_options

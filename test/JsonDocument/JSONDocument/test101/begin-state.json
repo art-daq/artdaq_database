@@ -1,6 +1,6 @@
 {
     "_id": "5683230d1a72ba4f5176f731",
-    "document": {          
+    "document": {
 	"metadata": {
 	    "comments": {
 		"a": {
@@ -33,7 +33,7 @@
 	},
 	"origin": {
 	    "format": "fhicl"
-	}        
+	}
     },
     "version": "version1",
     "configurations": [

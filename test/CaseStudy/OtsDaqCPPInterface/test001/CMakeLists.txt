@@ -35,4 +35,3 @@ cet_test(OtsDaqCPPInterface_mongo_t USE_BOOST_UNIT HANDBUILT TEST_EXEC DatabaseC
 
 install_headers()
 install_source()
-

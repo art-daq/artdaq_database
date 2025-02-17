@@ -17,7 +17,7 @@ setup artdaq_database v1_04_48 -q e14:prof:s50
 export ARTDAQ_DATABASE_URI=${current_artdaq_database_uri}
 
 
-if [ ! -d ${database_work_dir} ]; then 
+if [ ! -d ${database_work_dir} ]; then
   mkdir -p ${database_work_dir}
 fi
 

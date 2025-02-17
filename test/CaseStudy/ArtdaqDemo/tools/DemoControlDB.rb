@@ -244,9 +244,9 @@ class CommandLineParser
         puts "Configuration File is " + configFile
         doc = REXML::Document.new(File.new(configFile)).root
         puts "This configuration brought to you by " + doc.elements["author"].text
-      
+
         portNumber = ENV['ARTDAQ_BASE_PORT'].to_i
- 
+
         if doc.elements["dataLogger/enabled"].text == "true"
           @options.writeData = "1"
         else
@@ -262,7 +262,7 @@ class CommandLineParser
         else
           @options.onmon_modules = "[wf]"
         end
-        
+
 
         dlConfig = OpenStruct.new
         dlConfig.host = doc.elements["dataLogger/hostname"].text
@@ -287,7 +287,7 @@ class CommandLineParser
         # Board Readers
         currentPort = portNumber + 3
         if doc.elements["boardReaders"] != nil
-          doc.elements["boardReaders"].each() { |element| 
+          doc.elements["boardReaders"].each() { |element|
             begin
               if element.elements["enabled"].text == "true"
                 puts "DEBUG: BR Enabled"
@@ -331,7 +331,7 @@ class CommandLineParser
         # Event Builders
         numEvbs = doc.elements["eventBuilders/count"].text
         compression = doc.elements["eventBuilders/compress"].text == "true" ? 1 : 0
-        *hosts = doc.elements["eventBuilders/hostnames/hostname"]     
+        *hosts = doc.elements["eventBuilders/hostnames/hostname"]
         it = 0
         while it < numEvbs.to_i do
           ebConfig = OpenStruct.new
@@ -408,8 +408,8 @@ class CommandLineParser
         agConfig.index = @options.aggregators.length
         @options.aggregators << agConfig
       end
-    
-      opts.on("--v1720 [host,port,board_id]", Array, 
+
+      opts.on("--v1720 [host,port,board_id]", Array,
               "Add a V1720 fragment receiver that runs on the specified host and port, ",
               "and has the specified board ID.") do |v1720|
         if v1720.length != 3
@@ -428,7 +428,7 @@ class CommandLineParser
         @options.v1720s << v1720Config
       end
 
-      opts.on("--v1724 [host,port,board_id]", Array, 
+      opts.on("--v1724 [host,port,board_id]", Array,
               "Add a V1724 fragment receiver that runs on the specified host, port, ",
               "and board ID.") do |v1724|
         if v1724.length != 3
@@ -448,7 +448,7 @@ class CommandLineParser
         @options.v1720s << v1724Config
       end
 
-      opts.on("--ascii [host,port,board_id,<string1>,<string2>]", Array, 
+      opts.on("--ascii [host,port,board_id,<string1>,<string2>]", Array,
               "Add a TOY1 fragment receiver that runs on the specified host, port, ",
               "and board ID. Generates alternating string1 and string2's.") do |ascii|
         if ascii.length < 3
@@ -471,9 +471,9 @@ class CommandLineParser
         @options.asciis << asciiConfig
       end
 
-      opts.on("--toy1 [host,port,board_id,<eventSize>,<generator_id>]", Array, 
+      opts.on("--toy1 [host,port,board_id,<eventSize>,<generator_id>]", Array,
               "Add a TOY1 fragment receiver that runs on the specified host, port, ",
-              "and board ID. Generates events of size eventSize bytes. ", 
+              "and board ID. Generates events of size eventSize bytes. ",
               "Generator ID must be one of: Uniform, Normal, or Pattern") do |toy1|
         if toy1.length < 3
           puts "You must specifiy a host, port, and board ID."
@@ -500,7 +500,7 @@ class CommandLineParser
       end
 
 
-      opts.on("--toy2 [host,port,board_id,<eventSize>,<generator_id>]", Array, 
+      opts.on("--toy2 [host,port,board_id,<eventSize>,<generator_id>]", Array,
               "Add a TOY2 fragment receiver that runs on the specified host, port, ",
               "and board ID. Generates events of size eventSize bytes. ",
               "Generator ID must be one of: Uniform, Normal, or Pattern") do |toy2|
@@ -529,7 +529,7 @@ class CommandLineParser
         @options.toys << toy2Config
       end
 
-      opts.on("--udp [host,port,board_id,udp_host,udp_port]", Array, 
+      opts.on("--udp [host,port,board_id,udp_host,udp_port]", Array,
               "Add a UDP fragment receiver that runs on the specified host, port, ",
               "and board ID. It will connect to a data source at udp_host:udp_port.") do |udp|
         if udp.length < 5
@@ -550,13 +550,13 @@ class CommandLineParser
         @options.udps << udpConfig
       end
 
-      opts.on("-d", "--data-dir [data dir]", 
+      opts.on("-d", "--data-dir [data dir]",
               "Directory that the event builders will", "write data to.") do |dataDir|
         @options.dataDir = dataDir
       end
 
       opts.on("-m", "--online-monitoring [enabled,file_enabled,file_path]", Array,
-              "Whether to run the online monitoring modules,", 
+              "Whether to run the online monitoring modules,",
               "also whether and whither to send file output from the online monitoring" ) do |runOnmon|
         @options.runOnmon = Integer(runOnmon[0])
         @options.onmonFileEnabled = Integer(runOnmon[1])
@@ -569,12 +569,12 @@ class CommandLineParser
         @options.onmonFile = onmonFile
       end
 
-      opts.on("-w", "--write-data [enable flag (0 or 1)]", 
+      opts.on("-w", "--write-data [enable flag (0 or 1)]",
               "Whether to write data to disk.") do |writeData|
         @options.writeData = writeData
       end
 
-      opts.on("-c", "--command [command]", 
+      opts.on("-c", "--command [command]",
               "Execute a command: start, stop, init, shutdown, pause, resume, status, get-legal-commands.") do |command|
         @options.command = command
       end
@@ -708,7 +708,7 @@ class CommandLineParser
           puts "    BoardReader, port %d, rank %d, board_id %d, generator %s" %
             [ item.port, item.index, item.board_id, item.fragType ]
         when "V1720", "V1724", "TOY1", "TOY2", "ASCII"
-          puts "    FragmentReceiver, Simulated %s, port %d, rank %d, board_id %d" % 
+          puts "    FragmentReceiver, Simulated %s, port %d, rank %d, board_id %d" %
             [item.kind.upcase,
              item.port,
              item.index,
@@ -744,44 +744,44 @@ class SystemControl
 
   def database_config(provider,config,datatype,fhicl_file)
     return_value=""
-    
+
     file = File.open(fhicl_file)
     fhicl_buffer = ""
     file.each {|line|fhicl_buffer << line}
-    
+
     #database configuration load/store
     database_provider="filesystem"
     database_config_id="config-"+Random.rand(1000...9999).to_s
     database_version_id="version-"+Random.rand(100...999).to_s
-    
+
     database_store_opts =" -d %s -o store -f fhicl -v %s -g %s -t %s -c %s" %[database_provider,database_version_id,database_config_id,datatype,fhicl_file]
-    
+
     stdout_str, stderr_str, status = Open3.capture3("conftool" + database_store_opts)
 
     if status.success?
       puts "DB store succeeded"
     else
         puts "stdout is:" + stdout_str
-        puts "stderr is:" + stderr_str	
-	return return_value	
-    end    
+        puts "stderr is:" + stderr_str
+	return return_value
+    end
 
     database_load_opts =" -d %s -o load -f fhicl -g %s -t %s -c %s" %[database_provider,database_config_id,datatype,fhicl_file+".database"]
-    
+
     stdout_str, stderr_str, status = Open3.capture3("conftool"+ database_load_opts)
     if status.success?
       puts "DB load succeeded"
     else
         puts "stdout is:" + stdout_str
-        puts "stderr is:" + stderr_str	
-	return return_value	
-    end    
-        
+        puts "stderr is:" + stderr_str
+	return return_value
+    end
+
     file = File.open(fhicl_file+".database")
     file.each {|line|return_value << line}
     return return_value
   end
-  
+
   def init()
     database_provider_name="filesystem"
     database_config_id="config-"+Random.rand(1000...9999).to_s
@@ -817,7 +817,7 @@ class SystemControl
     totalAGs = @options.aggregators.length
     inputBuffSizeWords = 2097152
 
-    
+
     #if Integer(totalv1720s) > 0
     #  inputBuffSizeWords = 8192 * @options.v1720s[0].gate_width
     #end
@@ -859,21 +859,21 @@ class SystemControl
                  puts "Invalid generator_id!"
                  exit
               end
-       
+
             end
             generatorCode += boardreaderOptions.typeConfig
 
           elsif kind == "ASCII"
-            generatorCode = generateAscii(boardreaderOptions.index, 
+            generatorCode = generateAscii(boardreaderOptions.index,
                                          boardreaderOptions.board_id, kind, 100000)
           elsif kind == "UDP"
             generatorCode = generateUDP(boardreaderOptions.index, boardreaderOptions.board_id,
                                         boardreaderOptions.udp_port, boardreaderOptions.udp_host )
           elsif kind == "TOY1" || kind == "TOY2"
-        
+
             # The third argument refers to the pause, in us, before
             # generating pseudodata in ToySimulator::getNext_()
-            
+
             case boardreaderOptions.generator_id
             when "Uniform"
                 generatorCode = generateToy(boardreaderOptions.index,
@@ -891,7 +891,7 @@ class SystemControl
           end
 
           cfg = generateBoardReaderMain(totalEBs, totalFRs,
-                                        Integer(inputBuffSizeWords/8), 
+                                        Integer(inputBuffSizeWords/8),
                                         generatorCode, br.host, br.port)
 
           br.cfgList[listIndex] = cfg
@@ -932,10 +932,10 @@ class SystemControl
           handle = File.open(fileName, "w")
           handle.write(cfg)
           handle.close()
-	  datatype= "artdaq_demo_BoardReader_%s"   % [proc.port]                                                                                          
+	  datatype= "artdaq_demo_BoardReader_%s"   % [proc.port]
 	  cfg=database_config(database_provider_name,database_config_id,datatype,fileName)
-#	  puts "Result fcl:" + cfg                                                                                             
-        end                                                                                             
+#	  puts "Result fcl:" + cfg
+        end
         result = xmlrpcClient.call("daq.init", cfg)
         currentTime = DateTime.now.strftime("%Y/%m/%d %H:%M:%S")
         puts "%s: %s FragmentReceiver on %s:%d result: %s" %
@@ -956,7 +956,7 @@ class SystemControl
       puts "%s: Sending the INIT command to %s:%d." %
         [currentTime, ebOptions.host, ebOptions.port]
       threads << Thread.new() do
-        xmlrpcClient = XMLRPC::Client.new(ebOptions.host, "/RPC2", 
+        xmlrpcClient = XMLRPC::Client.new(ebOptions.host, "/RPC2",
                                           ebOptions.port)
 
         fclWFViewer = generateWFViewer( (@options.v1720s + @options.toys + @options.asciis + @options.udps + @options.pbrs).map { |board| board.board_id },
@@ -970,7 +970,7 @@ class SystemControl
                                    totalv1720s, totalv1724s,
                                    @options.dataDir, @options.runOnmon,
                                    @options.writeData, inputBuffSizeWords,
-                                   totalBoards, 
+                                   totalBoards,
                                    fclWFViewer, ebOptions.host, ebOptions.port
                                    )
 
@@ -980,8 +980,8 @@ class SystemControl
           handle = File.open(fileName, "w")
           handle.write(cfg)
           handle.close()
-	  datatype= "artdaq_demo_EventBuilder_%s"   % [ebOptions.port]                                                                                          
-	  cfg=database_config(database_provider_name,database_config_id,datatype,fileName)                                                                                                                             
+	  datatype= "artdaq_demo_EventBuilder_%s"   % [ebOptions.port]
+	  cfg=database_config(database_provider_name,database_config_id,datatype,fileName)
         end
         result = xmlrpcClient.call("daq.init", cfg)
         currentTime = DateTime.now.strftime("%Y/%m/%d %H:%M:%S")
@@ -997,7 +997,7 @@ class SystemControl
       puts "%s: Sending the INIT command to %s:%d" %
         [currentTime, agOptions.host, agOptions.port, agIndex]
       threads << Thread.new( agIndex ) do |agIndexThread|
-        xmlrpcClient = XMLRPC::Client.new(agOptions.host, "/RPC2", 
+        xmlrpcClient = XMLRPC::Client.new(agOptions.host, "/RPC2",
                                           agOptions.port)
 
         fclWFViewer = generateWFViewer( (@options.v1720s + @options.toys + @options.asciis + @options.udps + @options.pbrs).map { |board| board.board_id },
@@ -1005,7 +1005,7 @@ class SystemControl
                                         )
 
         if @options.onmon_modules = "" || @options.onmon_modules = nil
-          @options.onmon_modules = ONMON_MODULES 
+          @options.onmon_modules = ONMON_MODULES
         end
         cfg = generateAggregatorMain(@options.dataDir, @options.runNumber,
                                  totalFRs, totalEBs, agOptions.bunch_size,
@@ -1025,8 +1025,8 @@ class SystemControl
           handle = File.open(fileName, "w")
           handle.write(cfg)
           handle.close()
-	  datatype= "artdaq_demo_Aggregator_%s"   % [agOptions.port]                                                                                          
-	  cfg=database_config(database_provider_name,database_config_id,datatype,fileName)                                                                                                                                                           
+	  datatype= "artdaq_demo_Aggregator_%s"   % [agOptions.port]
+	  cfg=database_config(database_provider_name,database_config_id,datatype,fileName)
         end
         result = xmlrpcClient.call("daq.init", cfg)
         currentTime = DateTime.now.strftime("%Y/%m/%d %H:%M:%S")
@@ -1037,7 +1037,7 @@ class SystemControl
 
       agIndex += 1
     }
-    
+
     STDOUT.flush
     threads.each { |aThread|
       aThread.join()
@@ -1224,7 +1224,7 @@ class SystemControl
           previousAGEventCount = aggregatorEventCount
         end
       else
-        puts "No Aggregator in use - Unable to determine the number of events in the current run."     
+        puts "No Aggregator in use - Unable to determine the number of events in the current run."
       end
     elsif @options.runDurationSeconds > 0
       if Integer(totalAGs) > 0

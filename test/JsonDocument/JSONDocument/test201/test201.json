@@ -1,4 +1,4 @@
-{ 
+{
   "operation":"deleteChild",
   "path":"document.data",
   "begin-state"   :"begin-state.json",

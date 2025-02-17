@@ -149,7 +149,7 @@ object_id_t StorageProvider<JSONDocument, UconDB>::writeDocument(JSONDocument co
 
   auto oid = object_id_t{ouid_invalid};
 
-#if 0  
+#if 0
   //auto isNew = bool{true};
 
   try {

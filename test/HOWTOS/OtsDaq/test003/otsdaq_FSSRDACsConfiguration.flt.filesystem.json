@@ -1,7 +1,7 @@
 {"filter":{
  "entities.name":"CMSROOT",
  "configurations.name":"otsdaqC001"
-}, 
+},
 "collection":"otsdaq_FSSRDACsConfiguration",
 "entity":"CMSROOT",
 "configuration":"otsdaqC001",

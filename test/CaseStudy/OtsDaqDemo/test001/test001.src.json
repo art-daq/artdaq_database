@@ -1,7 +1,7 @@
 {
   "NAME":"DetectorConfiguration",
   "EXTENSION_TABLE_NAME":"DETECTOR_CONFIGURATION",
-  
+
   "DATA_SET":[
   {
     "ROC_NAME":"FPix_BmI_D1_BLD1_PNL1_PLQ1_ROC0",
@@ -34,5 +34,4 @@
     "ROC_STATUS":"off"
   }
  ]
-} 
- 
+}

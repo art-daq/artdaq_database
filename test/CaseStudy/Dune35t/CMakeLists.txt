@@ -1,6 +1,6 @@
 cet_make_exec(NAME Dune35tDemo_t
   LIBRARIES
-    
+
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
@@ -13,7 +13,7 @@ cet_make_exec(NAME Dune35tDemo_t
   #${SQLITE3}
   cetlib
   Boost::program_options
-) 
+)
 
 
 SET (TEST_COLLECTION_NAME "testDune35tDemo" )

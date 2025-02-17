@@ -47,7 +47,7 @@ include_directories(${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp)
 
 IF(FHICLCPP_IS_STATIC)
   MESSAGE (STATUS "Making FHiCL static")
-  
+
   set(SOURCES
     ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp/fhiclcpp/exception.cc
     ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp/fhiclcpp/extended_value.cc
@@ -57,17 +57,17 @@ IF(FHICLCPP_IS_STATIC)
     ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp/fhiclcpp/Protection.cc
     )
 
-  set(LIBRARIES  
+  set(LIBRARIES
     cetlib
     cetlib_except
     Boost::headers
     )
-    
+
   include_directories( ${TOP_CMAKE_BINARY_DIR}/built-in/fhicl-cpp )
-    
+
   add_library(${FHICLCPP_TARGET} OBJECT ${SOURCES})
   set_property(TARGET ${FHICLCPP_TARGET} PROPERTY POSITION_INDEPENDENT_CODE ON)
-  target_link_libraries(${FHICLCPP_TARGET} ${LIBRARIES})  
+  target_link_libraries(${FHICLCPP_TARGET} ${LIBRARIES})
 
 else()
   cet_make(fhiclcpp
@@ -82,5 +82,5 @@ else()
     cetlib
     cetlib_except
     WITH_STATIC_LIBRARY
-  ) 
+  )
 ENDIF()

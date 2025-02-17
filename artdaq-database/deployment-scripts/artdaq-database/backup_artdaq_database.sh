@@ -9,7 +9,7 @@
 
 
 
-rc_success=0 
+rc_success=0
 rc_failure=1
 
 echo "Backup started: $(date)"
@@ -50,7 +50,7 @@ fi
 
 source /daq/artdaq/products/setup
 
-setup artdaq_node_server ${WEBEDITOR_UPS_VER} -q ${WEBEDITOR_UPS_QUAL} 
+setup artdaq_node_server ${WEBEDITOR_UPS_VER} -q ${WEBEDITOR_UPS_QUAL}
 RC=$?
 if [ $RC -ne 0 ]; then
         echo "Error: Failed setting artdaq_node_server. Aborting. "; exit $rc_failure;
@@ -76,11 +76,10 @@ echo "DATABASE_NAME is ${MONGOD_DATABASE_NAME}"
 for dbname in ${DBBACKUP_LIST};
 do
   export ARTDAQ_DATABASE_URI="mongodb://127.0.0.1:${MONGOD_PORT}/${dbname}";
-  mkdir -p ${DBBACKUP_DIR}/${dbname}  
+  mkdir -p ${DBBACKUP_DIR}/${dbname}
   cd $DBBACKUP_DIR/$dbname
   echo "Backing up ${ARTDAQ_DATABASE_URI} to ${DBBACKUP_DIR}/${dbname}"
   conftool.py exportDatabase
 done
 echo  "Backup ended: $(date)"
 echo
-
