@@ -7,19 +7,19 @@ index 1e8eed8..423f609 100644
  #include "fhiclcpp/fwd.h"
  #include "stdmap_shims.h"
 +#include "fhiclcpp/exception.h"
-
+ 
  #include <any>
  #include <map>
  #include <string>
  #include <vector>
 +#include <utility>
-
+ 
  // ----------------------------------------------------------------------
-
+ 
 @@ -32,6 +34,68 @@ namespace fhicl {
    };
  }
-
+ 
 +
 +namespace fhicl {
 +using raw_value_t = std::string;
@@ -83,7 +83,7 @@ index 1e8eed8..423f609 100644
 +} // namespace fhicl
 +
  // ----------------------------------------------------------------------
-
+ 
  class fhicl::extended_value {
 @@ -50,16 +114,47 @@ public:
                   std::string src = {})
@@ -95,7 +95,7 @@ index 1e8eed8..423f609 100644
      , src_info{move(src)}
      , protection{protection}
    {}
-
+ 
    extended_value(bool const in_prolog,
                   value_tag const tag,
 -                 std::any const value,
@@ -135,7 +135,7 @@ index 1e8eed8..423f609 100644
 +    , raw_value{detail::rtrim_whitespace(std::move(raw_value))}
 +    , src_info{move(src)}
    {}
-
+ 
    bool
 @@ -88,6 +183,7 @@ public:
    bool in_prolog{false};
@@ -144,7 +144,7 @@ index 1e8eed8..423f609 100644
 +  std::string raw_value{};
    std::string src_info{};
    Protection protection{Protection::NONE};
-
+ 
 diff --git a/fhiclcpp/parse.cc b/fhiclcpp/parse.cc
 index 951532e..b6e7f17 100644
 --- a/fhiclcpp/parse.cc
@@ -159,7 +159,7 @@ index 951532e..b6e7f17 100644
 -    return extended_value{b, t, v, s.src_whereis(pos)};
 +    return extended_value{b, t, v,raw_value_t(pos,last),s.src_whereis(pos)};
    }
-
+ 
    complex_t
 @@ -646,66 +647,19 @@ namespace {
  #pragma clang diagnostic ignored "-Wunsequenced"
@@ -247,13 +247,14 @@ index d1f5dae..c70be82 100644
 +++ b/fhiclcpp/parse_shims.h
 @@ -67,9 +67,8 @@ namespace shims {
          return false;
-
+ 
        Iterator it = first;
 -      while (it != last &&
 -             (std::isalnum(*it) || *it == '_' || *it == ':' || *it == '@'))
 -        ++it;
 +
 +      while (it != last && (std::isalnum(*it) || *it == '_' || *it == ':' || *it == '.' || *it == '@')) ++it;
-
+ 
        if (it != last && !maximally_munched_ass(*it))
          return false;
+

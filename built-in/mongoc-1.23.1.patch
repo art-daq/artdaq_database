@@ -9,7 +9,7 @@ index 9baff98d3..07187f5f6 100644
 +    'almalinux': 'rhel',
 +    'scientific': 'rhel',
  }
-
+ 
  DISTRO_VERSION_MAP = {
 @@ -61,6 +63,8 @@ DISTRO_ID_TO_TARGET = {
          '7.*': 'rhel70',
