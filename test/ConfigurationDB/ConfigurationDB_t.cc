@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) try {
   // artdaq::database::useFakeTime(true);
 #endif
 
-  std::unique_ptr<db::configuration::OperationBase> options;
+  std::unique_ptr<db::configuration::OperationBase> options = std::make_unique<db::configuration::OperationBase>("ConfigurationDB_t");
   // artdaq::database::filesystem::index::shouldAutoRebuildSearchIndex(true);
 
   auto make_opt_name = [](auto& long_name, auto& short_name) { return std::string{long_name}.append(",").append(short_name); };

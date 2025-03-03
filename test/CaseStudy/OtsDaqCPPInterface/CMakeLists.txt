@@ -1,4 +1,4 @@
-cet_make_library( artdaq-database_OtsDaqCPPInterface
+cet_make_library( 
 SOURCE
 ConfigurationBaseImpl.cpp
 DatabaseConfigurationInterface.cpp
@@ -9,6 +9,6 @@ DatabaseConfigurationInterface.cpp
   )
 
 add_subdirectory(test001)
-
+  
 install_headers()
 install_source()

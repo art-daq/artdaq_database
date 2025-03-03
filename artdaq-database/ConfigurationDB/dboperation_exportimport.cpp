@@ -55,7 +55,7 @@ result_t write_document_file(ManageDocumentOperation const& options, std::string
 }  // namespace database
 }  // namespace artdaq
 
-auto make_error_msg = [](auto msg) { return std::string(R"({"error":")").append(msg).append("\"}"); };
+inline auto make_error_msg = [](auto msg) { return std::string(R"({"error":")").append(msg).append("\"}"); };
 
 using namespace artdaq::database::result;
 using artdaq::database::result_t;
