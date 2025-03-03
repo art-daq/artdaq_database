@@ -32,7 +32,7 @@ using artdaq::database::basictypes::FhiclData;
 using artdaq::database::basictypes::JsonData;
 using cf::options::data_format_t;
 
-auto make_error_msg = [](const char* msg) { return std::string("{error:\"").append(msg).append("\"}"); };
+inline auto make_error_msg = [](const char* msg) { return std::string("{error:\"").append(msg).append("\"}"); };
 
 template <typename CONF>
 class MakeSerializable final {
