@@ -73,4 +73,4 @@ install(FILES ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/bson-1
               ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/mongoc-1.0/mongoc-1.0-config.cmake
               ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake/mongoc-1.0/mongoc-1.0-config-version.cmake
               ${TARGET_FILES}
-        DESTINATION ./${flavorqual_dir}/lib/artdaq_database/cmake/)
+        DESTINATION ./${flavorqual_dir}/lib/artdaq-database/cmake/)

@@ -12,7 +12,7 @@ ENDIF()
 include(CetTest)
 
 
-string(FIND "x${artdaq_database_EXEC_PREFIX}" "ots" OTS_FOUND)
+string(FIND "x${artdaq-database_EXEC_PREFIX}" "ots" OTS_FOUND)
 if(${OTS_FOUND} GREATER -1)
   MESSAGE(STATUS "DISABLE built-in FHICLCPP")
   set(USE_FHICLCPP FALSE)
