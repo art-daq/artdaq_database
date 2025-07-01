@@ -1,6 +1,7 @@
 #include "artdaq-database/DataFormats/common.h"
 
 #include "artdaq-database/DataFormats/Fhicl/fhiclcpplib_includes.h"
+#include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
 
 #include "artdaq-database/DataFormats/Fhicl/convertfhicl2jsondb.h"
 #include "artdaq-database/DataFormats/Fhicl/fhicl_types.h"
@@ -91,6 +92,7 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
     }
   }
 
+  rtrim_lines(buffer);
   buffer.reserve(buffer.size() + 512);
 
   auto regex = std::regex{"(#include\\s*:)([^\"]*)"};

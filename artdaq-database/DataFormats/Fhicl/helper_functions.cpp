@@ -147,6 +147,40 @@ std::string tag_as_string(::fhicl::value_tag tag) {
   throw ::fhicl::exception(::fhicl::parse_error, literal::data) << ("FHiCL atom type \"" + str + "\" is not implemented.");
 }
 
+void rtrim_lines(std::string& buffer) {
+  if (buffer.empty()) {
+    return;
+  }
+
+  std::string result;
+  result.reserve(buffer.size());
+
+  std::string_view view(buffer);
+  std::size_t start = 0;
+
+  while (start < view.size()) {
+    std::size_t end = view.find('\n', start);
+    if (end == std::string_view::npos) {
+      end = view.size();
+    }
+
+    std::string_view line = view.substr(start, end - start);
+    while (!line.empty() && std::isspace(static_cast<unsigned char>(line.back()))) {
+      line.remove_suffix(1);
+    }
+
+    result.append(line);
+
+    if (end < view.size()) {
+      result.push_back('\n');
+    }
+
+    start = end + 1;
+  }
+
+  buffer = std::move(result);
+}
+
 std::string protection_as_string(::fhicl::Protection protection) {
   switch (protection) {
     default:
