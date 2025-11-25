@@ -15,6 +15,22 @@ namespace bpo = boost::program_options;
 
 namespace db = artdaq::database;
 
+// Helper function to write content to a file
+bool write_to_file(const std::string& filename, const std::string& content) {
+  std::ofstream outfile(filename);
+
+  if (!outfile.is_open()) {
+    std::cerr << "ERROR: Failed to open file for writing: " << filename << "\n";
+    return false;
+  }
+
+  outfile << content;
+  outfile.close();
+
+  std::cout << "Debug file written: " << filename << "\n";
+  return true;
+}
+
 void test_001();
 void test_002();
 
@@ -98,6 +114,9 @@ void test_001() {
   JsonWriter{}.write(docAST, json);
 
   std::cout << "test001\n" << json << "\n";
+
+  // Write debug file
+  write_to_file("test001.output.json", json);
 }
 
 void test_002() {
@@ -144,4 +163,7 @@ void test_002() {
   JsonWriter{}.write(docAST, json);
 
   std::cout << "test002\n" << json << "\n";
+
+  // Write debug file
+  write_to_file("test002.output.json", json);
 }

@@ -3,23 +3,23 @@ SET ( TEST_NAME "ReadWrite_load" )
 SET ( TEST_NUMBER "014" )
 
 SET ( TEST_DBPROVIDER "filesystem" )
-cet_test_env("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}")
 string(RANDOM LENGTH 5 ALPHABET 0123456789 RAND_NAME)
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test011.cmp.fcl ${CMAKE_CURRENT_BINARY_DIR}/test011.cmp.${RAND_NAME}.fcl @ONLY )
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test011.flt.json ${CMAKE_CURRENT_BINARY_DIR}/test011.flt.${RAND_NAME}.json @ONLY )
-cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC ConfigurationDB_t
-  DATAFILES
-    ${CMAKE_CURRENT_BINARY_DIR}/test011.cmp.${RAND_NAME}.fcl
-    ${CMAKE_CURRENT_BINARY_DIR}/test011.flt.${RAND_NAME}.json
-  TEST_ARGS  --searchquery=test011.flt.${RAND_NAME}.json -o load -x test011.cmp.${RAND_NAME}.fcl )
+# Register test with CTest
+add_test(NAME ${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t
+         COMMAND ${CMAKE_BINARY_DIR}/bin/ConfigurationDB_t --searchquery=test011.flt.${RAND_NAME}.json -o load -x test011.cmp.${RAND_NAME}.fcl
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+set_tests_properties(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t PROPERTIES
+    ENVIRONMENT "ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}")
 
 SET ( TEST_DBPROVIDER "mongo" )
-cet_test_env("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_MONGO}")
 string(RANDOM LENGTH 5 ALPHABET 0123456789 RAND_NAME)
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test011.cmp.fcl ${CMAKE_CURRENT_BINARY_DIR}/test011.cmp.${RAND_NAME}.fcl @ONLY )
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test011.flt.json ${CMAKE_CURRENT_BINARY_DIR}/test011.flt.${RAND_NAME}.json @ONLY )
-cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC ConfigurationDB_t
-  DATAFILES
-    ${CMAKE_CURRENT_BINARY_DIR}/test011.cmp.${RAND_NAME}.fcl
-    ${CMAKE_CURRENT_BINARY_DIR}/test011.flt.${RAND_NAME}.json
-  TEST_ARGS  --searchquery=test011.flt.${RAND_NAME}.json -o load -x test011.cmp.${RAND_NAME}.fcl )
+# Register test with CTest
+add_test(NAME ${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t
+         COMMAND ${CMAKE_BINARY_DIR}/bin/ConfigurationDB_t --searchquery=test011.flt.${RAND_NAME}.json -o load -x test011.cmp.${RAND_NAME}.fcl
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+set_tests_properties(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t PROPERTIES
+    ENVIRONMENT "ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_MONGO}")

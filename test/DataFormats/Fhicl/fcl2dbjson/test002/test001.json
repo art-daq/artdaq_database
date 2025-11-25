@@ -244,21 +244,21 @@
 },
 "SelectEvents" : {
 "type" : "table",
-"comment" : "#Failure 5 not a satom ",
+"comment" : "#Failure 5 not a satom",
 "children" : {
 "SelectEvents" : {
 "type" : "sequence",
-"comment" : "#Failure 5 not a satom ",
+"comment" : "#Failure 5 not a satom",
 "annotation" : "",
 "children" : {
 "0" : {
 "type" : "string_unquoted",
-"comment" : "#Failure 5 not a satom ",
+"comment" : "#Failure 5 not a satom",
 "annotation" : ""
 },
 "1" : {
 "type" : "string_unquoted",
-"comment" : "#Failure 5 not a satom ",
+"comment" : "#Failure 5 not a satom",
 "annotation" : ""
 }
 }
@@ -279,7 +279,7 @@
 "children" : {
 "prescaleMod2" : {
 "type" : "table",
-"comment" : "#Failure 4 not a satom ",
+"comment" : "#Failure 4 not a satom",
 "children" : {
 "module_type" : {
 "type" : "string_unquoted",
@@ -325,12 +325,12 @@
 },
 "pmod3" : {
 "type" : "sequence",
-"comment" : "#Failure 2 not a satom ",
+"comment" : "#Failure 2 not a satom",
 "annotation" : "",
 "children" : {
 "0" : {
 "type" : "string_unquoted",
-"comment" : "#Failure 2 not a satom ",
+"comment" : "#Failure 2 not a satom",
 "annotation" : ""
 }
 }
@@ -381,104 +381,52 @@
 },
 "comments" : [
 {
-"linenum" : 12,
+"linenum" : 21,
 "value" : "# 2"
 },
 {
-"linenum" : 13,
-"value" : "#broadcast_sends: true"
-},
-{
-"linenum" : 17,
-"value" : "#SimpleMemoryCheck: { }"
-},
-{
-"linenum" : 35,
+"linenum" : 55,
 "value" : "//demoe"
 },
 {
-"linenum" : 44,
-"value" : "#Failure 5 not a satom "
+"linenum" : 67,
+"value" : "#Failure 5 not a satom"
 },
 {
-"linenum" : 46,
-"value" : "#outputCommands: [ \"keep *\", \"drop artdaq::Fragments_daq_V1720_*\", \"drop artdaq::Fragments_daq_V1724_*\" ]"
+"linenum" : 69,
+"value" : "#Failure 5 not a satom"
 },
 {
-"linenum" : 48,
-"value" : "#normalOutput: {"
-},
-{
-"linenum" : 49,
-"value" : "#  module_type: RootOutput"
-},
-{
-"linenum" : 50,
-"value" : "#  fileName: \"/tmp/artdaqdemo_eb04_r%06r_sr%02s_%to.root\""
-},
-{
-"linenum" : 51,
-"value" : "#  compressionLevel: 0"
-},
-{
-"linenum" : 52,
-"value" : "#  SelectEvents: { SelectEvents: [ pmod2,pmod3 ] }"
-},
-{
-"linenum" : 53,
-"value" : "#  #outputCommands: [ \"keep *\", \"drop artdaq::Fragments_daq_V1720_*\", \"drop artdaq::Fragments_daq_V1724_*\" ]"
-},
-{
-"linenum" : 54,
-"value" : "#}"
-},
-{
-"linenum" : 61,
-"value" : "#Failure 4 not a satom "
-},
-{
-"linenum" : 63,
-"value" : "#//Success 5 right of satom"
-},
-{
-"linenum" : 68,
-"value" : "#Failure 3 not directly above satom "
-},
-{
-"linenum" : 71,
-"value" : "//#Success 4 right of satom"
-},
-{
-"linenum" : 75,
-"value" : "//Failure 1 not a comment"
-},
-{
-"linenum" : 77,
-"value" : "#Failure 2 not a satom "
+"linenum" : 78,
+"value" : "#Failure 4 not a satom"
 },
 {
 "linenum" : 81,
-"value" : "#a1: [ app, wf ]"
+"value" : "#//Success 5 right of satom"
 },
 {
-"linenum" : 84,
-"value" : "#my_output_modules: [ normalOutput ]"
-},
-{
-"linenum" : 87,
-"value" : "#Success 1  above satom"
-},
-{
-"linenum" : 89,
-"value" : "//Success 2 right of satom"
+"linenum" : 82,
+"value" : "#//Success 5 right of satom"
 },
 {
 "linenum" : 90,
-"value" : "#Success 3 right of satom"
+"value" : "//#Success 4 right of satom"
 },
 {
-"linenum" : 91,
-"value" : "// fragment_type_map: [[1, \"missed\"], [3, \"V1720\"], [4, \"V1724\"], [6, \"TOY1\"], [7, \"TOY2\"], [8, \"ASCII\"]]"
+"linenum" : 95,
+"value" : "#Failure 2 not a satom"
+},
+{
+"linenum" : 102,
+"value" : "#Success 1  above satom"
+},
+{
+"linenum" : 105,
+"value" : "//Success 2 right of satom"
+},
+{
+"linenum" : 107,
+"value" : "#Success 3 right of satom"
 }
 ],
 "origin" : {

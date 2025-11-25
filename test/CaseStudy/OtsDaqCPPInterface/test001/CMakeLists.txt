@@ -26,11 +26,9 @@ cet_make_exec(NAME DatabaseConfiguration_t
 ) 
 
 MESSAGE("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}f")
-cet_test_env("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}f")
 cet_test(OtsDaqCPPInterface_filesystem_t USE_BOOST_UNIT HANDBUILT TEST_EXEC DatabaseConfiguration_t)
 
 MESSAGE("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_MONGO}f")
-cet_test_env("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_MONGO}f")
 cet_test(OtsDaqCPPInterface_mongo_t USE_BOOST_UNIT HANDBUILT TEST_EXEC DatabaseConfiguration_t)
 
 install_headers()

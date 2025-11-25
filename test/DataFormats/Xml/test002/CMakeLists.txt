@@ -1,8 +1,13 @@
 SET ( TEST_NUMBER "002" )
 SET ( TEST_NAME "json2xml" )
 
-cet_test(XMLConvert_${TEST_NAME}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC XMLConvert_t
-  DATAFILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.xml
-    ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
-  TEST_ARGS -s test${TEST_NUMBER}.json -c test${TEST_NUMBER}.xml -t ${TEST_NAME})
+# Copy test data files to build directory
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.xml
+               ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.xml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
+               ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.json COPYONLY)
+
+# Register test with CTest
+add_test(NAME XMLConvert_${TEST_NAME}_${TEST_NUMBER}_t
+         COMMAND ${CMAKE_BINARY_DIR}/bin/XMLConvert_t -s test${TEST_NUMBER}.json -c test${TEST_NUMBER}.xml -t ${TEST_NAME}
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

@@ -17,7 +17,7 @@ cet_make_exec(NAME MigrateDatabase_t
 
 SET ( TEST_NAME "MigrateDatabase" )
 
-set (ARTDAQ_DATABASE_URI "filesystemdb://${CMAKE_BINARY_DIR}/databases/filesystemdb/test_dbg")
+set (ARTDAQ_DATABASE_URI "filesystemdb:///${CMAKE_BINARY_DIR}/databases/filesystemdb/test_dbg")
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/databases/filesystemdb/test_dbg/)
 
@@ -26,8 +26,9 @@ WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/databases/filesystemdb/test_dbg/"
 COMMAND ${CMAKE_COMMAND} -E tar "xfz" "${CMAKE_CURRENT_SOURCE_DIR}/filesystemdb.taz")
 
 SET ( TEST_NUMBER "002" )
-cet_test(${TEST_NAME}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC MigrateDatabase_t
-  DATAFILES
-  TEST_ARGS --uri=${ARTDAQ_DATABASE_URI} )
+# Register test with CTest
+add_test(NAME ${TEST_NAME}_${TEST_NUMBER}_t
+         COMMAND ${CMAKE_BINARY_DIR}/bin/MigrateDatabase_t --uri=${ARTDAQ_DATABASE_URI}
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 add_dependencies(untar_MigrateDatabase MigrateDatabase_t)
