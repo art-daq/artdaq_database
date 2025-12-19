@@ -1,3 +1,46 @@
 { "search": [
- {"name" :"testReadWrite","query" :{"collection" : "testReadWrite","dbprovider" : "filesystem","dataformat" : "gui","operation" : "findversions","filter" : {}}}
-] }
+{
+"name" : "testJSON_V001",
+"query" : {
+"collection" : "testJSON_V001",
+"dbprovider" : "filesystem",
+"dataformat" : "gui",
+"operation" : "findversions",
+"filter" : {
+
+}
+}
+},{
+"name" : "testFHICL_V001",
+"query" : {
+"collection" : "testFHICL_V001",
+"dbprovider" : "filesystem",
+"dataformat" : "gui",
+"operation" : "findversions",
+"filter" : {
+
+}
+}
+},{
+"name" : "testXML_V001",
+"query" : {
+"collection" : "testXML_V001",
+"dbprovider" : "filesystem",
+"dataformat" : "gui",
+"operation" : "findversions",
+"filter" : {
+
+}
+}
+},{
+"name" : "testReadWrite",
+"query" : {
+"collection" : "testReadWrite",
+"dbprovider" : "filesystem",
+"dataformat" : "gui",
+"operation" : "findversions",
+"filter" : {
+
+}
+}
+}] }

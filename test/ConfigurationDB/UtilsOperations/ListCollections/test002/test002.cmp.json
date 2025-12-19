@@ -1,1 +1,13 @@
-testReadWrite
+{ "search": [
+{
+"name" : "testReadWrite",
+"query" : {
+"collection" : "testReadWrite",
+"dbprovider" : "mongo",
+"dataformat" : "gui",
+"operation" : "findversions",
+"filter" : {
+
+}
+}
+}] }

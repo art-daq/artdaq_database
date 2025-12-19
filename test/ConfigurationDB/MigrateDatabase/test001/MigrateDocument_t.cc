@@ -10,6 +10,9 @@
 
 #include "artdaq-database/DataFormats/Json/json_reader.h"
 
+#include <fstream>
+#include <regex>
+
 namespace db = artdaq::database;
 namespace bpo = boost::program_options;
 
@@ -17,9 +20,38 @@ using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocumentMigrator;
 
-using test_case = bool (*)(const std::string&, const std::string&);
+using test_case = bool (*)(const std::string&, const std::string&, const std::string&);
 
-bool test_migratev1v2(std::string const& /*source*/, std::string const& /*compare*/);
+bool test_migratev1v2(std::string const& /*source*/, std::string const& /*compare*/, std::string const& /*source_filename*/);
+
+// Helper function to extract test number from filename
+// e.g., "test001.src.json" -> "001"
+std::string extract_test_number(const std::string& filename) {
+  std::regex pattern(R"(test(\d{3}))");
+  std::smatch matches;
+
+  if (std::regex_search(filename, matches, pattern)) {
+    return matches[1].str();
+  }
+
+  return "unknown";
+}
+
+// Helper function to write content to a file
+bool write_to_file(const std::string& filename, const std::string& content) {
+  std::ofstream outfile(filename);
+
+  if (!outfile.is_open()) {
+    std::cerr << "ERROR: Failed to open file for writing: " << filename << "\n";
+    return false;
+  }
+
+  outfile << content;
+  outfile.close();
+
+  std::cout << "Debug file written: " << filename << "\n";
+  return true;
+}
 
 int main(int argc, char* argv[]) try {
 #if 0
@@ -99,7 +131,7 @@ int main(int argc, char* argv[]) try {
     return tests.at(name);
   };
 
-  auto testResult = runTest(test_name)(source_buffer, compare_buffer);
+  auto testResult = runTest(test_name)(source_buffer, compare_buffer, source_name);
 
   return static_cast<int>(!testResult);
 } catch (...) {
@@ -107,7 +139,7 @@ int main(int argc, char* argv[]) try {
   return process_exit_code::UNCAUGHT_EXCEPTION;
 }
 
-bool test_migratev1v2(std::string const& source, std::string const& compare) {
+bool test_migratev1v2(std::string const& source, std::string const& compare, std::string const& source_filename) {
   confirm(!source.empty());
   confirm(!compare.empty());
 
@@ -130,6 +162,14 @@ bool test_migratev1v2(std::string const& source, std::string const& compare) {
   std::cerr << "returned:\n" << returned << "\n";
   std::cerr << "expected:\n" << expected << "\n";
   std::cerr << "error:\n" << result.second << "\n";
+
+  // Write debug files
+  std::string test_number = extract_test_number(source_filename);
+  std::ostringstream returned_stream, expected_stream;
+  returned_stream << returned;
+  expected_stream << expected;
+  write_to_file("test" + test_number + ".output.json", returned_stream.str());
+  write_to_file("test" + test_number + ".expected.json", expected_stream.str());
 
   return false;
 }
