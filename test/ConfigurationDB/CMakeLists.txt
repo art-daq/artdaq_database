@@ -1,6 +1,6 @@
-cet_make_exec(NAME ConfigurationDB_t
-  LIBRARIES
+add_executable(ConfigurationDB_t ConfigurationDB_t.cc)
 
+target_link_libraries(ConfigurationDB_t PRIVATE
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json

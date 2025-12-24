@@ -69,7 +69,7 @@ class MakeSerializable final {
         << "Unable to to get configuration name" << demangle(typeid(CONF).name()) << ".";
   }
 
-  MakeSerializable(CONF conf) : _conf(conf){};
+  MakeSerializable(CONF conf) : _conf(conf) {};
 
   // defaults
   ~MakeSerializable() = default;
@@ -170,7 +170,7 @@ class ConfigurationSerializer final {
   ConfigurationSerializer& operator=(ConfigurationSerializer&&) = delete;
 
  private:
-  ConfigurationSerializer(CONF conf) : _conf(conf){};
+  ConfigurationSerializer(CONF conf) : _conf(conf) {};
 
  private:
   CONF _conf;

@@ -1,17 +1,13 @@
-cet_make_exec(NAME MongoFhicl_t
-  LIBRARIES
+add_executable(MongoFhicl_t MongoFhicl_t.cc)
+
+target_link_libraries(MongoFhicl_t PRIVATE
   artdaq-database_SharedCommon
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
   artdaq-database_StorageProviders_MongoDB
-  fhiclcpp
-  #${SQLITE3}
-  cetlib
-  cetlib_except
   Boost::program_options
-
 )
 
 add_subdirectory(test001)

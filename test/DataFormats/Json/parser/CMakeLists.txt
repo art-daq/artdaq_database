@@ -1,11 +1,7 @@
-cet_make_exec(NAME readjson_t
-  LIBRARIES
+add_executable(readjson_t readjson_t.cc)
 
+target_link_libraries(readjson_t PRIVATE
   artdaq-database_DataFormats_Json
-  fhiclcpp
-  cetlib
-  cetlib_except
-  #${SQLITE3}
   Boost::program_options
 )
 

@@ -1,11 +1,8 @@
-cet_make_exec(NAME JSONOverlay_t
-  LIBRARIES
+add_executable(JSONOverlay_t JSONOverlay_t.cc)
 
+target_link_libraries(JSONOverlay_t PRIVATE
   artdaq-database_DataFormats_Json
-
   artdaq-database_Overlay
-  cetlib
-  cetlib_except
   Boost::program_options
 )
 

@@ -209,8 +209,7 @@ void registerAbortHandler() {
 
 void registerTerminateHandler() { std::set_terminate(terminateHandler); }
 
-void registerUncaughtExceptionHandler() { /*std::set_unexpected(uncaughtExceptionHandler);*/
-}
+void registerUncaughtExceptionHandler() { /*std::set_unexpected(uncaughtExceptionHandler);*/ }
 
 void trace_enable() {
   TRACE_CNTL("name", TRACE_NAME);

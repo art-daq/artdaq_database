@@ -120,8 +120,7 @@ int main(int argc, char* argv[]) try {
           std::cout << " -> failed\n";
 
           // Write debug file for read failure
-          write_to_file(collection_name + "_" + oid + ".failed_read.txt",
-                        "Failed to read: " + dir_iter->path().string());
+          write_to_file(collection_name + "_" + oid + ".failed_read.txt", "Failed to read: " + dir_iter->path().string());
           continue;
         }
 
@@ -144,8 +143,7 @@ int main(int argc, char* argv[]) try {
 
         // Write debug files for migration/write failure
         write_to_file(collection_name + "_" + oid + ".failed_migration.json",
-                      "Collection: " + collection_name + "\nOID: " + oid +
-                      "\nError: " + ::debug::current_exception_diagnostic_information());
+                      "Collection: " + collection_name + "\nOID: " + oid + "\nError: " + ::debug::current_exception_diagnostic_information());
       }
     }
   }

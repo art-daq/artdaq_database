@@ -136,6 +136,45 @@ object_id_t StorageProvider<JSONDocument, MongoDB>::writeDocument(JSONDocument c
   }
 
   if (isNew) {
+    try {
+      auto version_value = user_document.findChild(jsonliteral::version).value();
+
+      auto entity_value = std::string{};
+      try {
+        auto entities_doc = user_document.findChildDocument(jsonliteral::entities);
+        auto entity_item = JSONDocument::value_at(entities_doc, 0);
+        auto entity_json = JSONDocument{entity_item};
+        entity_value = entity_json.findChild(jsonliteral::name).value();
+      } catch (...) {
+        TLOG(14) << "MongoDB::writeDocument() Could not extract entity name";
+      }
+
+      TLOG(14) << "MongoDB::writeDocument() Checking for duplicate: version=<" << version_value << ">, entity=<" << entity_value << ">";
+
+      std::ostringstream dup_filter_oss;
+      dup_filter_oss << "{\"" << apiliteral::filter::version << "\": \"" << version_value << "\"";
+      if (!entity_value.empty()) {
+        dup_filter_oss << ", \"" << apiliteral::filter::entities << ".name\": \"" << entity_value << "\"";
+      }
+      dup_filter_oss << "}";
+
+      auto dup_filter_bsondoc = compat::from_json(dup_filter_oss.str());
+      auto existing_count = collection.count_documents(dup_filter_bsondoc.view());
+
+      if (existing_count > 0) {
+        throw runtime_error("MongoDB") << "Document with same version and entity already exists; "
+                                       << "collection=<" << collection_name << ">, "
+                                       << "version=<" << version_value << ">, "
+                                       << "entity=<" << entity_value << ">";
+      }
+
+      TLOG(14) << "MongoDB::writeDocument() No duplicate found, proceeding with insert";
+    } catch (runtime_error const&) {
+      throw;
+    } catch (...) {
+      TLOG(14) << "MongoDB::writeDocument() Could not check for semantic duplicates, proceeding with insert";
+    }
+
     auto user_bsondoc = compat::from_json(builder.to_string());
     auto result = collection.insert_one(user_bsondoc.view());
     oid = extract_oid(compat::to_json(result->inserted_id()));

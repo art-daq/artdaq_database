@@ -1,6 +1,6 @@
-cet_make_exec(NAME MigrateDatabase_t
-  LIBRARIES
+add_executable(MigrateDatabase_t MigrateDatabase_t.cc)
 
+target_link_libraries(MigrateDatabase_t PRIVATE
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
@@ -9,9 +9,6 @@ cet_make_exec(NAME MigrateDatabase_t
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
-  fhiclcpp
-  #${SQLITE3}
-  cetlib
   Boost::program_options
 )
 

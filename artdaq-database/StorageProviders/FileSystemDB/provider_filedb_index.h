@@ -6,6 +6,9 @@
 #include "artdaq-database/StorageProviders/storage_providers.h"
 
 #include <boost/filesystem.hpp>
+#include <map>
+#include <memory>
+#include <mutex>
 
 namespace artdaq {
 namespace database {
@@ -24,6 +27,8 @@ class SearchIndex final {
  public:
   SearchIndex(boost::filesystem::path const&);
   ~SearchIndex();
+
+  static std::mutex& getMutexForPath(boost::filesystem::path const& path);
 
   std::vector<object_id_t> findDocumentIDs(JSONDocument const&);
   std::vector<std::pair<std::string, std::string>> findAllGlobalConfigurations(JSONDocument const&);
@@ -90,6 +95,10 @@ class SearchIndex final {
   boost::filesystem::path _path;
   bool _isDirty;
   bool _isOpen;
+
+  static std::map<std::string, std::unique_ptr<std::mutex>> _path_mutexes;
+  static std::mutex _path_mutexes_guard;
+  std::unique_lock<std::mutex> _path_lock;
 };
 
 bool shouldAutoRebuildSearchIndex(bool = false);

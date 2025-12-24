@@ -1,16 +1,5 @@
 { "search": [
 {
-"name" : "testJSON_V001",
-"query" : {
-"collection" : "testJSON_V001",
-"dbprovider" : "filesystem",
-"dataformat" : "gui",
-"operation" : "findversions",
-"filter" : {
-
-}
-}
-},{
 "name" : "testFHICL_V001",
 "query" : {
 "collection" : "testFHICL_V001",
@@ -22,9 +11,31 @@
 }
 }
 },{
-"name" : "testXML_V001",
+"name" : "testFHICL_V003",
 "query" : {
-"collection" : "testXML_V001",
+"collection" : "testFHICL_V003",
+"dbprovider" : "filesystem",
+"dataformat" : "gui",
+"operation" : "findversions",
+"filter" : {
+
+}
+}
+},{
+"name" : "testFHICL_V004",
+"query" : {
+"collection" : "testFHICL_V004",
+"dbprovider" : "filesystem",
+"dataformat" : "gui",
+"operation" : "findversions",
+"filter" : {
+
+}
+}
+},{
+"name" : "testJSON_V001",
+"query" : {
+"collection" : "testJSON_V001",
 "dbprovider" : "filesystem",
 "dataformat" : "gui",
 "operation" : "findversions",
@@ -36,6 +47,17 @@
 "name" : "testReadWrite",
 "query" : {
 "collection" : "testReadWrite",
+"dbprovider" : "filesystem",
+"dataformat" : "gui",
+"operation" : "findversions",
+"filter" : {
+
+}
+}
+},{
+"name" : "testXML_V001",
+"query" : {
+"collection" : "testXML_V001",
 "dbprovider" : "filesystem",
 "dataformat" : "gui",
 "operation" : "findversions",

@@ -288,7 +288,10 @@ std::list<std::string> JSONDocumentBuilder::extractTags() const {
 
 result_t JSONDocumentBuilder::comapreUsingOverlays(JSONDocumentBuilder const& other) const { return *_overlay == *other._overlay; }
 
-std::string JSONDocumentBuilder::to_string() const { return _document.to_string(); }
+std::string JSONDocumentBuilder::to_string() const {
+  _document._isDirty = true;
+  return _document.to_string();
+}
 
 std::ostream& utl::operator<<(std::ostream& os, JSONDocumentBuilder const& data) {
   os << data.to_string();

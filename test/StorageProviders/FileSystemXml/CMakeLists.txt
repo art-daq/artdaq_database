@@ -1,15 +1,11 @@
-cet_make_exec(NAME FileSystemXml_t
-  LIBRARIES
+add_executable(FileSystemXml_t FileSystemXml_t.cc)
 
+target_link_libraries(FileSystemXml_t PRIVATE
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Json
   artdaq-database_DataFormats_Xml
   artdaq-database_JsonDocument
   artdaq-database_StorageProviders_FileSystemDB
-  #fhiclcpp
-  #${SQLITE3}
-  cetlib
-  cetlib_except
   Boost::program_options
 )
 

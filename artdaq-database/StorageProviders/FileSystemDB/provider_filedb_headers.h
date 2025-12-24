@@ -9,8 +9,12 @@
 #include "artdaq-database/SharedCommon/sharedcommon_common.h"
 
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
+#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
+
+#include <sstream>
 
 namespace db = artdaq::database;
+namespace apiliteral = artdaq::database::configapi::literal;
 namespace dbfs = artdaq::database::filesystem;
 namespace dbfsl = dbfs::literal;
 

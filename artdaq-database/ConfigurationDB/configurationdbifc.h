@@ -1,9 +1,13 @@
 #ifndef _ARTDAQ_DATABASE_CONFIGURATIONDBIFC_H_
 #define _ARTDAQ_DATABASE_CONFIGURATIONDBIFC_H_
 
+#include <map>
+#include <set>
+
 #include "artdaq-database/ConfigurationDB/Multitasker.h"
 #include "artdaq-database/ConfigurationDB/configurationdbifc_base.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
+#include "dboperation_findcompositions.h"
 #include "options_operation_manageconfigs.h"
 
 using debug::demangle;
@@ -28,7 +32,7 @@ constexpr auto apiname = "ConfigurationInterface";
 struct ConfigurationInterface final {
   using VersionInfoList_t = std::list<VersionInfo>;
 
-  ConfigurationInterface(std::string const&){};
+  ConfigurationInterface(std::string const&) {};
 
   //==============================================================================
   // stores configuration version to database
@@ -328,7 +332,7 @@ struct ConfigurationInterface final {
     }
 
     return returnSet;  // RVO
-  }                    // namespace configuration
+  }  // namespace configuration
 
   //==============================================================================
   //
@@ -414,22 +418,127 @@ struct ConfigurationInterface final {
   }
 
   //==============================================================================
-  //
-  cf::result_t storeGlobalConfiguration(VersionInfoList_t const& versionInfoList, std::string const& configuration) const try {
-    confirm(!configuration.empty());
-    confirm(!versionInfoList.empty());
-
+  // storeGlobalConfiguration - stores a composition (global configuration)
+  // By default, rejects duplicate composition names. Use allowOverwrite=true to update existing.
+  // When allowOverwrite=true, performs a merge-based overwrite:
+  //   - Unassigns old members that are no longer in the composition
+  //   - Assigns only new members (skips unchanged ones)
+  cf::result_t storeGlobalConfiguration(VersionInfoList_t const& versionInfoList, std::string const& configuration, bool allowOverwrite = false) const
+      try {
     constexpr auto apifunctname = "ConfigurationInterface::storeGlobalConfiguration";
 
-    if (versionInfoList.empty()) throw artdaq::database::invalid_option_exception(apifunctname) << "Version info list is empty";
+    if (versionInfoList.empty()) {
+      throw artdaq::database::invalid_option_exception(apifunctname) << "Version info list is empty. Compositions must have at least one member.";
+    }
 
-    if (configuration.empty()) throw artdaq::database::invalid_option_exception(apifunctname) << "Global configuration name is empty";
+    if (configuration.empty()) {
+      throw artdaq::database::invalid_option_exception(apifunctname) << "Global configuration name is empty";
+    }
+
+    bool composition_exists = false;
+    try {
+      auto existingConfigs = findGlobalConfigurations(configuration);
+      composition_exists = (existingConfigs.find(configuration) != existingConfigs.end());
+
+      if (composition_exists && !allowOverwrite) {
+        throw artdaq::database::runtime_exception(apifunctname) << "Global configuration '" << configuration << "' already exists. "
+                                                                << "Use allowOverwrite=true to update an existing configuration.";
+      }
+    } catch (artdaq::database::runtime_exception const&) {
+      throw;
+    } catch (...) {
+    }
+
+    VersionInfoList_t old_members;
+    if (composition_exists && allowOverwrite) {
+      try {
+        old_members = loadGlobalConfiguration(configuration);
+        TLOG(TLVL_DEBUG) << apifunctname << ": Loaded " << old_members.size() << " existing members for merge";
+      } catch (std::exception const& e) {
+        TLOG(TLVL_WARNING) << apifunctname << ": Could not load existing composition for merge: " << e.what();
+        old_members.clear();
+      }
+    }
+
+    using MembershipKey = std::pair<std::string, std::string>;
+    auto make_key = [](VersionInfo const& vi) -> MembershipKey { return {vi.configuration, vi.entity}; };
+
+    std::map<MembershipKey, std::string> new_map;  // key → version
+    for (auto const& new_member : versionInfoList) {
+      new_map[make_key(new_member)] = new_member.version;
+    }
+
+    VersionInfoList_t to_unassign;
+    std::set<MembershipKey> unchanged;
+
+    for (auto const& old_member : old_members) {
+      auto key = make_key(old_member);
+      auto it = new_map.find(key);
+
+      if (it == new_map.end()) {
+        to_unassign.push_back(old_member);
+        TLOG(TLVL_DEBUG) << apifunctname << ": Will unassign (removed): " << old_member.configuration << "/" << old_member.version << "/"
+                         << old_member.entity;
+      } else if (it->second != old_member.version) {
+        to_unassign.push_back(old_member);
+        TLOG(TLVL_DEBUG) << apifunctname << ": Will unassign (replaced): " << old_member.configuration << "/" << old_member.version << "/"
+                         << old_member.entity;
+      } else {
+        unchanged.insert(key);
+        TLOG(TLVL_DEBUG) << apifunctname << ": Unchanged: " << old_member.configuration << "/" << old_member.version << "/" << old_member.entity;
+      }
+    }
+
+    VersionInfoList_t to_assign;
+    for (auto const& new_member : versionInfoList) {
+      if (unchanged.find(make_key(new_member)) == unchanged.end()) {
+        to_assign.push_back(new_member);
+        TLOG(TLVL_DEBUG) << apifunctname << ": Will assign: " << new_member.configuration << "/" << new_member.version << "/" << new_member.entity;
+      }
+    }
+
+    TLOG(TLVL_DEBUG) << apifunctname << ": Executing " << to_unassign.size() << " unassignments";
+    for (auto const& old_member : to_unassign) {
+      try {
+        auto removeOp = jsn::object_t{};
+        removeOp[apiliteral::option::configuration] = configuration;
+        removeOp[apiliteral::option::collection] = old_member.configuration;
+        removeOp[apiliteral::option::format] = to_string(data_format_t::gui);
+        removeOp[apiliteral::option::operation] = std::string{apiliteral::operation::removeconfig};
+        removeOp[apiliteral::option::searchfilter] = jsn::object_t{};
+
+        auto& filter = unwrap(removeOp).value_as<jsn::object_t>(apiliteral::option::searchfilter);
+        filter[apiliteral::filter::version] = old_member.version;
+        filter[apiliteral::filter::entities] = old_member.entity;
+
+        auto buffer = std::string{};
+        if (jsn::JsonWriter().write(removeOp, buffer)) {
+          TLOG(TLVL_DEBUG) << apifunctname << ": Calling remove_configuration with: " << buffer;
+          auto result = cf::json::remove_configuration(buffer);
+          if (!result.first) {
+            TLOG(TLVL_WARNING) << apifunctname << ": Failed to unassign " << old_member.configuration << "/" << old_member.version << ": "
+                               << result.second;
+          } else {
+            TLOG(TLVL_DEBUG) << apifunctname << ": Successfully unassigned " << old_member.configuration << "/" << old_member.version;
+          }
+        }
+      } catch (std::exception const& e) {
+        TLOG(TLVL_WARNING) << apifunctname << ": Exception unassigning " << old_member.configuration << "/" << old_member.version << ": " << e.what();
+      }
+    }
+
+    VersionInfoList_t const& members_to_process = (composition_exists && allowOverwrite) ? to_assign : versionInfoList;
+
+    if (members_to_process.empty()) {
+      TLOG(TLVL_DEBUG) << apifunctname << ": No changes needed, all members unchanged";
+      return {true, "Success"};
+    }
 
     auto payloadAST = jsn::object_t{};
     payloadAST[apiliteral::operations] = jsn::array_t{};
     auto& operations = unwrap(payloadAST).value_as<jsn::array_t>(apiliteral::operations);
 
-    for (auto const& versionInfo : versionInfoList) {
+    for (auto const& versionInfo : members_to_process) {
       versionInfo.validate();
 
       auto op = jsn::object_t{};
@@ -464,21 +573,134 @@ struct ConfigurationInterface final {
   }
 
   //==============================================================================
+  // storeGlobalConfiguration_mt - multi-threaded version of storeGlobalConfiguration
   //
-  cf::result_t storeGlobalConfiguration_mt(VersionInfoList_t const& versionInfoList, std::string const& configuration) const try {
-    confirm(!configuration.empty());
-    confirm(!versionInfoList.empty());
-
+  cf::result_t storeGlobalConfiguration_mt(VersionInfoList_t const& versionInfoList, std::string const& configuration, bool overwrite = false) const
+      try {
     constexpr auto apifunctname = "ConfigurationInterface::storeGlobalConfiguration_mt";
 
-    if (versionInfoList.empty()) throw artdaq::database::invalid_option_exception(apifunctname) << "Version info list is empty";
+    if (versionInfoList.empty()) {
+      throw artdaq::database::invalid_option_exception(apifunctname) << "Version info list is empty. Compositions must have at least one member.";
+    }
 
-    if (configuration.empty()) throw artdaq::database::invalid_option_exception(apifunctname) << "Global configuration name is empty";
+    if (configuration.empty()) {
+      throw artdaq::database::invalid_option_exception(apifunctname) << "Global configuration name is empty";
+    }
 
-    auto threadCount = std::min<std::size_t>(versionInfoList.size(), std::thread::hardware_concurrency() / 2);
+    bool composition_exists = false;
+    VersionInfoList_t old_members;
+    try {
+      auto existingConfigs = findGlobalConfigurations(configuration);
+      composition_exists = (existingConfigs.find(configuration) != existingConfigs.end());
+      if (composition_exists) {
+        old_members = loadGlobalConfiguration(configuration);
+        TLOG(TLVL_DEBUG) << apifunctname << ": Composition exists with " << old_members.size() << " members";
+      }
+    } catch (...) {
+    }
+
+    if (composition_exists && !overwrite) {
+      throw artdaq::database::runtime_exception(apifunctname) << "Global configuration '" << configuration << "' already exists. "
+                                                              << "Use allowOverwrite=true to update an existing configuration.";
+    }
+
+    VersionInfoList_t members_to_assign;
+
+    if (composition_exists && overwrite) {
+      using MembershipKey = std::pair<std::string, std::string>;
+      auto make_key = [](VersionInfo const& vi) -> MembershipKey { return {vi.configuration, vi.entity}; };
+
+      std::map<MembershipKey, std::string> new_map;
+      for (auto const& new_member : versionInfoList) {
+        new_map[make_key(new_member)] = new_member.version;
+      }
+
+      VersionInfoList_t to_unassign;
+      std::set<MembershipKey> unchanged;
+
+      for (auto const& old_member : old_members) {
+        auto key = make_key(old_member);
+        auto it = new_map.find(key);
+
+        if (it == new_map.end()) {
+          to_unassign.push_back(old_member);
+          TLOG(TLVL_DEBUG) << apifunctname << ": Will unassign (removed): " << old_member.configuration << "/" << old_member.version;
+        } else if (it->second != old_member.version) {
+          to_unassign.push_back(old_member);
+          TLOG(TLVL_DEBUG) << apifunctname << ": Will unassign (replaced): " << old_member.configuration << "/" << old_member.version;
+        } else {
+          unchanged.insert(key);
+          TLOG(TLVL_DEBUG) << apifunctname << ": Unchanged: " << old_member.configuration << "/" << old_member.version;
+        }
+      }
+
+      TLOG(TLVL_DEBUG) << apifunctname << ": Executing " << to_unassign.size() << " unassignments";
+      for (auto const& old_member : to_unassign) {
+        try {
+          auto removeOp = jsn::object_t{};
+          removeOp[apiliteral::option::configuration] = configuration;
+          removeOp[apiliteral::option::collection] = old_member.configuration;
+          removeOp[apiliteral::option::format] = to_string(data_format_t::gui);
+          removeOp[apiliteral::option::operation] = std::string{apiliteral::operation::removeconfig};
+          removeOp[apiliteral::option::searchfilter] = jsn::object_t{};
+
+          auto& filter = unwrap(removeOp).value_as<jsn::object_t>(apiliteral::option::searchfilter);
+          filter[apiliteral::filter::version] = old_member.version;
+          filter[apiliteral::filter::entities] = old_member.entity;
+
+          auto buffer = std::string{};
+          if (jsn::JsonWriter().write(removeOp, buffer)) {
+            auto result = cf::json::remove_configuration(buffer);
+            if (!result.first) {
+              TLOG(TLVL_WARNING) << apifunctname << ": Failed to unassign " << old_member.configuration << "/" << old_member.version << ": "
+                                 << result.second;
+            }
+          }
+        } catch (std::exception const& e) {
+          TLOG(TLVL_WARNING) << apifunctname << ": Exception unassigning " << old_member.configuration << "/" << old_member.version << ": "
+                             << e.what();
+        }
+      }
+
+      for (auto const& new_member : versionInfoList) {
+        if (unchanged.find(make_key(new_member)) == unchanged.end()) {
+          members_to_assign.push_back(new_member);
+        }
+      }
+    } else {
+      members_to_assign = versionInfoList;
+    }
+
+    if (members_to_assign.empty()) {
+      TLOG(TLVL_DEBUG) << apifunctname << ": No changes needed, all members unchanged";
+      return {true, "Success"};
+    }
+
+    TLOG(TLVL_DEBUG) << apifunctname << ": Assigning " << members_to_assign.size() << " members in parallel";
+
+    auto threadCount = std::min<std::size_t>(members_to_assign.size(), std::thread::hardware_concurrency() / 2);
     Multitasker multitasker(threadCount);
-    for (const auto& version : versionInfoList) {
-      multitasker.addTask([ifc = this, version, configuration] { return ifc->storeGlobalConfiguration(VersionInfoList_t{version}, configuration); });
+
+    for (const auto& versionInfo : members_to_assign) {
+      multitasker.addTask([configuration, versionInfo] {
+        auto op = jsn::object_t{};
+        op[apiliteral::option::configuration] = configuration;
+        op[apiliteral::option::collection] = versionInfo.configuration;
+        op[apiliteral::option::format] = to_string(data_format_t::gui);
+        op[apiliteral::option::operation] = std::string{apiliteral::operation::assignconfig};
+        op[jsonliteral::filter] = jsn::object_t{};
+
+        auto& filter = unwrap(op).value_as<jsn::object_t>(jsonliteral::filter);
+        filter[apiliteral::filter::version] = versionInfo.version;
+        filter[apiliteral::filter::entities] = versionInfo.entity;
+
+        auto buffer = std::string{};
+        if (!jsn::JsonWriter().write(op, buffer)) {
+          return cf::result_t{false, "JsonWriter failed for assign operation"};
+        }
+
+        return cf::json::assign_configuration(buffer);
+      });
     }
 
     multitasker.waitForResults();
@@ -524,6 +746,85 @@ struct ConfigurationInterface final {
     }
 
     return returnSet;
+  }
+
+  std::set<std::string> findGlobalConfigurationsContaining(std::string const& configurationType, std::string const& version,
+                                                           std::string const& entity = "") const {
+    constexpr auto apifunctname = "ConfigurationInterface::findGlobalConfigurationsContaining";
+
+    auto returnSet = std::set<std::string>{};  // RVO
+
+    try {
+      if (configurationType.empty()) {
+        throw artdaq::database::invalid_option_exception(apifunctname) << "Configuration type is empty";
+      }
+
+      if (version.empty()) {
+        throw artdaq::database::invalid_option_exception(apifunctname) << "Version is empty";
+      }
+
+      try {
+        auto opts = ManageDocumentOperation{apiname};
+        opts.operation(apiliteral::operation::findcompositionscontaining);
+        opts.collection(configurationType);
+        opts.version(version);
+        if (!entity.empty()) opts.entity(entity);
+        opts.format(data_format_t::gui);
+
+        std::string optimizedResults;
+        auto apiResult = impl::find_compositions_containing(opts, optimizedResults);
+
+        if (apiResult.first && !optimizedResults.empty()) {
+          auto resultAST = jsn::object_t{};
+          if (jsn::JsonReader().read(optimizedResults, resultAST)) {
+            try {
+              auto const& searches = unwrap(resultAST).value_as<jsn::array_t>(jsonliteral::search);
+              if (!searches.empty()) {
+                for (auto const& search : searches) {
+                  auto const& name_value = unwrap(search).value_as<const jsn::object_t>(jsonliteral::name);
+                  if (!name_value.empty()) {
+                    auto const& compositionName = unwrap(search).value_as<const std::string>(apiliteral::name);
+                    returnSet.insert(compositionName);
+                  }
+                }
+                return returnSet;
+              }
+            } catch (...) {
+            }
+          }
+        }
+      } catch (...) {
+      }
+
+      auto allCompositions = findGlobalConfigurations("");
+
+      for (auto const& compositionName : allCompositions) {
+        try {
+          auto members = loadGlobalConfiguration(compositionName);
+
+          for (auto const& member : members) {
+            bool typeMatches = (member.configuration == configurationType);
+            bool versionMatches = (member.version == version);
+            bool entityMatches = (entity.empty() || member.entity == entity);
+
+            if (typeMatches && versionMatches && entityMatches) {
+              returnSet.insert(compositionName);
+              break;
+            }
+          }
+        } catch (std::exception const& e) {
+          continue;
+        }
+      }
+    } catch (std::exception const& e) {
+      returnSet.clear();
+      throw artdaq::database::runtime_exception(apifunctname) << "Exception: " << e.what();
+    } catch (...) {
+      returnSet.clear();
+      throw artdaq::database::runtime_exception(apifunctname) << "Unknown exception";
+    }
+
+    return returnSet;  // RVO
   }
 
   // defaults

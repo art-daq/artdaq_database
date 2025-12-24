@@ -1,6 +1,7 @@
 # ValidateJson test - reads JSON file, parses to AST, serializes, parses again, compares ASTs
-cet_make_exec(NAME ValidateJson_t
-  LIBRARIES
+add_executable(ValidateJson_t ValidateJson_t.cc)
+
+target_link_libraries(ValidateJson_t PRIVATE
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
@@ -9,8 +10,6 @@ cet_make_exec(NAME ValidateJson_t
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
-  fhiclcpp
-  cetlib
   Boost::program_options
 )
 

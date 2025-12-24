@@ -96,7 +96,7 @@ add_test(NAME ${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_11_t
          COMMAND ${CMAKE_BINARY_DIR}/bin/ArtdaqDemo_t -p ${TEST_DBPROVIDER} -o store -c artdaq_Aggregator1 -s Aggregator_topol.fnal.gov_5265.src.fcl -x Aggregator_topol.fnal.gov_5265.cmp.fcl -f fhicl -v ${TEST_VERSION_NAME} -g ${TEST_CONFIGURATION_NAME}-${TEST_NUMBER}
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 set_tests_properties(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_11_t PROPERTIES
-    ENVIRONMENT "ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}")
+    ENVIRONMENT "ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_MONGO}")
 
 
 # Copy test data files to build directory

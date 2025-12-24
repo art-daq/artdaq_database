@@ -142,7 +142,9 @@ std::string db::debrace(std::string s) {
   if (s[0] == '{' && s[s.length() - 1] == '}') {
     return s.substr(1, s.length() - 2);
   }
-  { return s; }
+  {
+    return s;
+  }
 }
 
 db::quotation_type_t db::quotation_type(std::string s) {
@@ -159,14 +161,18 @@ std::string db::dequote(std::string s) {
   if ((s[0] == '\"' && s[s.length() - 1] == '\"') || (s[0] == '\'' && s[s.length() - 1] == '\'')) {
     return s.substr(1, s.length() - 2);
   }
-  { return s; }
+  {
+    return s;
+  }
 }
 
 std::string db::debracket(std::string s) {
   if (s[0] == '[' && s[s.length() - 1] == ']') {
     return s.substr(1, s.length() - 2);
   }
-  { return s; }
+  {
+    return s;
+  }
 }
 
 std::string db::annotate(std::string const& s) {
@@ -282,7 +288,9 @@ db::object_id_t db::extract_oid(std::string const& filter) {
     if (s[0] == '"' && s[s.length() - 1] == '"') {
       return s.substr(1, s.length() - 2);
     }
-    { return s; }
+    {
+      return s;
+    }
   };
 
   match = dequote(match);

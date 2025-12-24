@@ -35,11 +35,28 @@ namespace apiliteral = db::configapi::literal;
 
 using matching_function_t = std::vector<object_id_t> (SearchIndex::*)(const std::string&) const;
 
-SearchIndex::SearchIndex(boost::filesystem::path const& path) : _index{}, _path{path}, _isDirty{false}, _isOpen{_open(path)} {}
+std::map<std::string, std::unique_ptr<std::mutex>> SearchIndex::_path_mutexes;
+std::mutex SearchIndex::_path_mutexes_guard;
+
+std::mutex& SearchIndex::getMutexForPath(boost::filesystem::path const& path) {
+  std::lock_guard<std::mutex> guard(_path_mutexes_guard);
+  auto key = path.string();
+  if (_path_mutexes.find(key) == _path_mutexes.end()) {
+    _path_mutexes[key] = std::make_unique<std::mutex>();
+  }
+  return *_path_mutexes[key];
+}
+
+SearchIndex::SearchIndex(boost::filesystem::path const& path)
+    : _index{}, _path{path}, _isDirty{false}, _isOpen{false}, _path_lock{getMutexForPath(path)} {
+  TLOG(13) << "SearchIndex::SearchIndex() Acquired lock for path=<" << path.c_str() << ">";
+  _isOpen = _open(path);
+}
 
 SearchIndex::~SearchIndex() {
   try {
     _close();
+    TLOG(13) << "SearchIndex::~SearchIndex() Releasing lock for path=<" << _path.c_str() << ">";
   } catch (...) {
     TLOG(20) << "Exception in StorageProvider::FileSystemDB::~SearchIndex() " << ::debug::current_exception_diagnostic_information();
   }

@@ -1,8 +1,7 @@
-cet_make_exec(NAME BulkOperations_t
-  LIBRARIES
+add_executable(BulkOperations_t BulkOperations_t.cc)
 
+target_link_libraries(BulkOperations_t PRIVATE
   artdaq-database_BasicTypes
-
   artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
@@ -10,9 +9,6 @@ cet_make_exec(NAME BulkOperations_t
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
-  fhiclcpp
-  #${SQLITE3}
-  cetlib
   Boost::program_options
 )
 
