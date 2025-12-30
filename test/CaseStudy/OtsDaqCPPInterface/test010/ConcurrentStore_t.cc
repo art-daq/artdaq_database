@@ -336,10 +336,17 @@ BOOST_AUTO_TEST_CASE(concurrent_composition_creation) {
 
   auto ifc = DatabaseConfigurationInterface();
 
-  int sharedVersion = fixture.baseVersion + 60;
-  BOOST_REQUIRE_EQUAL(fixture.createConfig001(ifc, sharedVersion), 0);
-
   const int NUM_THREADS = 5;
+
+  std::vector<int> uniqueVersions;
+  for (int i = 0; i < NUM_THREADS; ++i) {
+    int version = fixture.baseVersion + 60 + i;
+    uniqueVersions.push_back(version);
+    BOOST_REQUIRE_EQUAL(fixture.createConfig001(ifc, version), 0);
+  }
+
+  std::cout << "Setup: Created " << NUM_THREADS << " unique versions for compositions\n";
+
   std::vector<std::thread> threads;
   std::atomic<int> successCount{0};
   std::atomic<int> failCount{0};
@@ -358,7 +365,7 @@ BOOST_AUTO_TEST_CASE(concurrent_composition_creation) {
         auto localIfc = DatabaseConfigurationInterface();
 
         auto map = DatabaseConfigurationInterface::config_version_map_t{};
-        map[fixture.config001Name()] = sharedVersion;
+        map[fixture.config001Name()] = uniqueVersions[i];
 
         localIfc.storeGlobalConfiguration(map, compNames[i]);
         successCount++;
@@ -390,6 +397,13 @@ BOOST_AUTO_TEST_CASE(concurrent_composition_creation) {
 
   BOOST_CHECK_EQUAL(foundCount, NUM_THREADS);
   std::cout << "  Verified: All " << NUM_THREADS << " compositions exist\n";
+
+  for (int i = 0; i < NUM_THREADS; ++i) {
+    auto loaded = ifc.loadGlobalConfiguration(compNames[i]);
+    BOOST_CHECK_EQUAL(loaded.size(), 1);
+    BOOST_CHECK_EQUAL(loaded[fixture.config001Name()], uniqueVersions[i]);
+  }
+  std::cout << "  Verified: Each composition has its unique version\n";
 }
 
 BOOST_AUTO_TEST_CASE(concurrent_reverse_lookups) {

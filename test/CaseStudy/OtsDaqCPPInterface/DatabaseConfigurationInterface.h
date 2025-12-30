@@ -40,6 +40,18 @@ class DatabaseConfigurationInterface : public ConfigurationInterface {
 
   std::set<std::string> findCompositionsContaining(std::string const&, std::string const&) const;
 
+  using result_t = std::pair<bool, std::string>;
+
+  result_t getVersions_safe(const ConfigurationBase*, std::set<int>&) const noexcept;
+
+  result_t listConfigurationsTypes_safe(std::set<std::string>&) const noexcept;
+
+  result_t findAllGlobalConfigurations_safe(std::string const&, std::set<std::string>&) const noexcept;
+
+  result_t loadGlobalConfiguration_safe(std::string const&, config_version_map_t&) const noexcept;
+
+  result_t findCompositionsContaining_safe(std::string const&, std::string const&, std::set<std::string>&) const noexcept;
+
  private:
 };
 }  // namespace ots

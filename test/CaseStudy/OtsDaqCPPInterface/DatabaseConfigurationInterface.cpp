@@ -205,3 +205,97 @@ std::set<std::string> DatabaseConfigurationInterface::findCompositionsContaining
   std::cout << "DBI Unknown exception.\n";
   throw std::runtime_error("DBI Unknown exception.");
 }
+
+DatabaseConfigurationInterface::result_t DatabaseConfigurationInterface::getVersions_safe(const ConfigurationBase* configuration,
+                                                                                          std::set<int>& versions) const noexcept try {
+  auto ifc = db::ConfigurationInterface{default_dbprovider};
+
+  std::list<std::string> versionStrings;
+  auto result = ifc.template getVersions_safe<decltype(configuration)>(configuration, default_entity, versionStrings);
+
+  if (!result.first) {
+    versions.clear();
+    return result;
+  }
+
+  versions.clear();
+  for (auto const& v : versionStrings) {
+    versions.insert(std::stol(v, nullptr, 10));
+  }
+
+  return {true, "Success"};
+} catch (std::exception const& e) {
+  versions.clear();
+  return {false, std::string("Exception: ") + e.what()};
+} catch (...) {
+  versions.clear();
+  return {false, "Unknown exception"};
+}
+
+DatabaseConfigurationInterface::result_t DatabaseConfigurationInterface::listConfigurationsTypes_safe(
+    std::set<std::string>& collections) const noexcept try {
+  auto ifc = db::ConfigurationInterface{default_dbprovider};
+
+  auto collection_name_prefix = std::string{};
+
+  return ifc.listCollections_safe(collection_name_prefix, collections);
+} catch (std::exception const& e) {
+  collections.clear();
+  return {false, std::string("Exception: ") + e.what()};
+} catch (...) {
+  collections.clear();
+  return {false, "Unknown exception"};
+}
+
+DatabaseConfigurationInterface::result_t DatabaseConfigurationInterface::findAllGlobalConfigurations_safe(
+    std::string const& search, std::set<std::string>& configurations) const noexcept try {
+  auto ifc = db::ConfigurationInterface{default_dbprovider};
+
+  return ifc.findGlobalConfigurations_safe(search, configurations);
+} catch (std::exception const& e) {
+  configurations.clear();
+  return {false, std::string("Exception: ") + e.what()};
+} catch (...) {
+  configurations.clear();
+  return {false, "Unknown exception"};
+}
+
+DatabaseConfigurationInterface::result_t DatabaseConfigurationInterface::loadGlobalConfiguration_safe(std::string const& configuration,
+                                                                                                      config_version_map_t& configMap) const noexcept
+    try {
+  auto ifc = db::ConfigurationInterface{default_dbprovider};
+
+  VersionInfoList_t members;
+  auto result = ifc.loadGlobalConfiguration_safe(configuration, members);
+
+  if (!result.first) {
+    configMap.clear();
+    return result;
+  }
+
+  configMap.clear();
+  for (auto const& info : members) {
+    configMap[info.configuration] = std::stol(info.version, nullptr, 10);
+  }
+
+  return {true, "Success"};
+} catch (std::exception const& e) {
+  configMap.clear();
+  return {false, std::string("Exception: ") + e.what()};
+} catch (...) {
+  configMap.clear();
+  return {false, "Unknown exception"};
+}
+
+DatabaseConfigurationInterface::result_t DatabaseConfigurationInterface::findCompositionsContaining_safe(
+    std::string const& configurationType, std::string const& version, std::set<std::string>& compositions) const noexcept try {
+  auto ifc = db::ConfigurationInterface{default_dbprovider};
+
+  return ifc.findGlobalConfigurationsContaining_safe(configurationType, version, "", compositions);
+} catch (std::exception const& e) {
+  compositions.clear();
+  return {false, std::string("Exception: ") + e.what()};
+} catch (...) {
+  compositions.clear();
+  return {false, "Unknown exception"};
+}
