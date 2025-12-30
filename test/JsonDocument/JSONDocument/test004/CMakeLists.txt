@@ -16,5 +16,5 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/returned-value.json
 
 # Register test with CTest
 add_test(NAME JSONDocument_${TEST_NAME}_${TEST_NUMBER}_t
-         COMMAND ${CMAKE_BINARY_DIR}/bin/JSONDocument_t -c test${TEST_NUMBER}.json
+         COMMAND ${TOP_CMAKE_BINARY_DIR}/bin/JSONDocument_t -c test${TEST_NUMBER}.json
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

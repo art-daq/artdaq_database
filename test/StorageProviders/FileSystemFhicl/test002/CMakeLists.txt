@@ -9,7 +9,7 @@ configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.cmp.fcl ${CMAKE_
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.opts.json ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.opts.${RAND_NAME}.json @ONLY )
 # Register test with CTest
 add_test(NAME FileSystemFhicl_${TEST_NAME}_${TEST_NUMBER}_t
-         COMMAND ${CMAKE_BINARY_DIR}/bin/FileSystemFhicl_t -s test${TEST_NUMBER}.src.${RAND_NAME}.fcl -c test${TEST_NUMBER}.cmp.${RAND_NAME}.fcl -t ${TEST_NAME} -o test${TEST_NUMBER}.opts.${RAND_NAME}.json -n testFHICL_${RAND_NAME}
+         COMMAND ${TOP_CMAKE_BINARY_DIR}/bin/FileSystemFhicl_t -s test${TEST_NUMBER}.src.${RAND_NAME}.fcl -c test${TEST_NUMBER}.cmp.${RAND_NAME}.fcl -t ${TEST_NAME} -o test${TEST_NUMBER}.opts.${RAND_NAME}.json -n testFHICL_${RAND_NAME}
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 set_tests_properties(FileSystemFhicl_${TEST_NAME}_${TEST_NUMBER}_t PROPERTIES
     ENVIRONMENT "ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}")

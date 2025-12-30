@@ -8,7 +8,7 @@ configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test001.src.json ${CMAKE_CURRENT_BI
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test001.cmp.json ${CMAKE_CURRENT_BINARY_DIR}/test001.cmp.${RAND_NAME}.json @ONLY )
 # Register test with CTest
 add_test(NAME ${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t
-         COMMAND ${CMAKE_BINARY_DIR}/bin/ArtdaqDemo_t -o store -p ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f json -v ${TEST_VERSION_NAME}-${TEST_NUMBER}  -s test001.src.${RAND_NAME}.json -x test001.cmp.${RAND_NAME}.json
+         COMMAND ${TOP_CMAKE_BINARY_DIR}/bin/ArtdaqDemo_t -o store -p ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f json -v ${TEST_VERSION_NAME}-${TEST_NUMBER}  -s test001.src.${RAND_NAME}.json -x test001.cmp.${RAND_NAME}.json
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 set_tests_properties(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t PROPERTIES
     ENVIRONMENT "ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}")
@@ -19,7 +19,7 @@ configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test001.src.json ${CMAKE_CURRENT_BI
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test001.cmp.json ${CMAKE_CURRENT_BINARY_DIR}/test001.cmp.${RAND_NAME}.json @ONLY )
 # Register test with CTest
 add_test(NAME ${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t
-         COMMAND ${CMAKE_BINARY_DIR}/bin/ArtdaqDemo_t -o store -p ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f json -v ${TEST_VERSION_NAME}${TEST_NUMBER} -s test001.src.${RAND_NAME}.json -x test001.cmp.${RAND_NAME}.json
+         COMMAND ${TOP_CMAKE_BINARY_DIR}/bin/ArtdaqDemo_t -o store -p ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f json -v ${TEST_VERSION_NAME}${TEST_NUMBER} -s test001.src.${RAND_NAME}.json -x test001.cmp.${RAND_NAME}.json
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 set_tests_properties(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t PROPERTIES
     ENVIRONMENT "ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_MONGO}")

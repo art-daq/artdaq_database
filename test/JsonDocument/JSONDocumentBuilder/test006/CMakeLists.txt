@@ -14,5 +14,5 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/end-state.json
 
 # Register test with CTest
 add_test(NAME JSONDocumentBuilder_${TEST_NAME}_${TEST_NUMBER}_t
-         COMMAND ${CMAKE_BINARY_DIR}/bin/JSONDocumentBuilder_t -c test${TEST_NUMBER}.json
+         COMMAND ${TOP_CMAKE_BINARY_DIR}/bin/JSONDocumentBuilder_t -c test${TEST_NUMBER}.json
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

@@ -25,7 +25,7 @@ COMMAND ${CMAKE_COMMAND} -E tar "xfz" "${CMAKE_CURRENT_SOURCE_DIR}/filesystemdb.
 SET ( TEST_NUMBER "002" )
 # Register test with CTest
 add_test(NAME ${TEST_NAME}_${TEST_NUMBER}_t
-         COMMAND ${CMAKE_BINARY_DIR}/bin/MigrateDatabase_t --uri=${ARTDAQ_DATABASE_URI}
+         COMMAND ${TOP_CMAKE_BINARY_DIR}/bin/MigrateDatabase_t --uri=${ARTDAQ_DATABASE_URI}
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 add_dependencies(untar_MigrateDatabase MigrateDatabase_t)

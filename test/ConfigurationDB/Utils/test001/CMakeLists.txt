@@ -17,13 +17,13 @@ SET ( TEST_NAME "ValidateJson" )
 
 # Register ValidateJson tests with CTest
 add_test(NAME ${TEST_NAME}_simple_t
-         COMMAND ${CMAKE_BINARY_DIR}/bin/ValidateJson_t ${CMAKE_CURRENT_SOURCE_DIR}/test_simple.json
+         COMMAND ${TOP_CMAKE_BINARY_DIR}/bin/ValidateJson_t ${CMAKE_CURRENT_SOURCE_DIR}/test_simple.json
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 add_test(NAME ${TEST_NAME}_nested_t
-         COMMAND ${CMAKE_BINARY_DIR}/bin/ValidateJson_t ${CMAKE_CURRENT_SOURCE_DIR}/test_nested.json
+         COMMAND ${TOP_CMAKE_BINARY_DIR}/bin/ValidateJson_t ${CMAKE_CURRENT_SOURCE_DIR}/test_nested.json
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 add_test(NAME ${TEST_NAME}_arrays_t
-         COMMAND ${CMAKE_BINARY_DIR}/bin/ValidateJson_t ${CMAKE_CURRENT_SOURCE_DIR}/test_arrays.json
+         COMMAND ${TOP_CMAKE_BINARY_DIR}/bin/ValidateJson_t ${CMAKE_CURRENT_SOURCE_DIR}/test_arrays.json
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
