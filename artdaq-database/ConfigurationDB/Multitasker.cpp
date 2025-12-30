@@ -1,6 +1,8 @@
 #include "artdaq-database/ConfigurationDB/Multitasker.h"
 #include "artdaq-database/ConfigurationDB/common.h"
 
+#include <cassert>
+
 #ifdef TRACE_NAME
 #undef TRACE_NAME
 #endif
@@ -35,7 +37,10 @@ void Multitasker::checkSameThreadOrThrow() const {
 }
 
 Multitasker::~Multitasker() {
-  checkSameThreadOrThrow();
+  if (std::this_thread::get_id() != _threadid) {
+    TLOG(TLVL_ERROR) << "Multitasker destructor called from wrong thread! This is a programming error.";
+    assert(false && "Multitasker destructor called from wrong thread");
+  }
   {
     std::unique_lock lock(_one4all_mutex);
     auto isbusy = !_tasks.empty() || _results.size() < _totalTasks;
@@ -123,17 +128,22 @@ void Multitasker::waitForResults() const {
 
   auto startTime = std::chrono::high_resolution_clock::now();
   bool logWarnPrinted = false;
-  int reportAfterSecs = 15;
+  constexpr int reportAfterSecs = 15;
+  constexpr auto waitTimeout = std::chrono::seconds(5);
 
-  while (isBusy()) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    auto currentTime = std::chrono::high_resolution_clock::now();
-    auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
-    if (elapsedSeconds >= reportAfterSecs && !logWarnPrinted) {
-      TLOG(TLVL_WARNING) << "WaitForResults() has been running for" << elapsedSeconds << " seconds.";
-      logWarnPrinted = true;
-    } else if (elapsedSeconds % reportAfterSecs == 0 && logWarnPrinted) {
-      TLOG(TLVL_ERROR) << "WaitForResults() has been running for " << elapsedSeconds << " seconds.";
+  std::unique_lock lock(_one4all_mutex);
+  while (_tasks.size() > 0 || _results.size() < _totalTasks) {
+    auto status = _condition.wait_for(lock, waitTimeout);
+
+    if (status == std::cv_status::timeout) {
+      auto currentTime = std::chrono::high_resolution_clock::now();
+      auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
+      if (elapsedSeconds >= reportAfterSecs && !logWarnPrinted) {
+        TLOG(TLVL_WARNING) << "WaitForResults() has been running for " << elapsedSeconds << " seconds.";
+        logWarnPrinted = true;
+      } else if (elapsedSeconds >= reportAfterSecs && elapsedSeconds % reportAfterSecs == 0) {
+        TLOG(TLVL_ERROR) << "WaitForResults() has been running for " << elapsedSeconds << " seconds.";
+      }
     }
   }
 }
@@ -185,16 +195,27 @@ void Multitasker::workerThread() {
       }
       TLOG(31) << "Completed task=" << taskid << ", thread=" << this_thread_id << " in " << duration.count() << " ms.";
 
-      std::unique_lock lock(_one4all_mutex);
-      _results.push_back(result);
+      {
+        std::unique_lock lock(_one4all_mutex);
+        _results.push_back(result);
+      }
+      _condition.notify_all();
     } catch (std::exception const& e) {
       auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - startTime);
       TLOG(TLVL_ERROR) << "Exception: " << e.what() << " ; thread=" << this_thread_id << ", elapsed time " << duration.count() << " ms.";
-      _results.emplace_back(false, e.what());
+      {
+        std::unique_lock lock(_one4all_mutex);
+        _results.emplace_back(false, e.what());
+      }
+      _condition.notify_all();
     } catch (...) {
       auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - startTime);
       TLOG(TLVL_ERROR) << "Unknown exception; thread=" << this_thread_id << ", elapsed time " << duration.count() << " ms.";
-      _results.emplace_back(false, "DB operation threw an unknown exception.");
+      {
+        std::unique_lock lock(_one4all_mutex);
+        _results.emplace_back(false, "DB operation threw an unknown exception.");
+      }
+      _condition.notify_all();
     }
   }
 

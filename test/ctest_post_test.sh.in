@@ -1,0 +1,16 @@
+#!/bin/sh
+# CTest post-test script - stops MongoDB if running
+
+# Check if TEST_WITHOUT_MONGO is set
+if [ -n "$TEST_WITHOUT_MONGO" ]; then
+  echo 'TEST_WITHOUT_MONGO is set - skipping MongoDB shutdown'
+  exit 0
+fi
+
+if [ -f '@CMAKE_BINARY_DIR@/databases/mongod.pid' ]; then
+  pkill -F @CMAKE_BINARY_DIR@/databases/mongod.pid || echo 'MongoDB already stopped'
+  sleep 2
+  tail -10 @CMAKE_BINARY_DIR@/databases/mongod.log
+else
+  echo 'No MongoDB was running'
+fi

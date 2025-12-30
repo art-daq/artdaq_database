@@ -1,44 +1,72 @@
 SET ( TEST_NAME "Readjson" )
 
 SET ( TEST_NUMBER "001" )
-cet_test(${TEST_NAME}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC readjson_t
-  DATAFILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
-  TEST_ARGS -c test${TEST_NUMBER}.json )
+# Copy test data files to build directory
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
+               ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.json COPYONLY)
+
+# Register test with CTest
+add_test(NAME ${TEST_NAME}_${TEST_NUMBER}_t
+         COMMAND ${CMAKE_BINARY_DIR}/bin/readjson_t -c test${TEST_NUMBER}.json
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 SET ( TEST_NUMBER "002" )
-cet_test(${TEST_NAME}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC readjson_t
-  DATAFILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
-  TEST_ARGS -c test${TEST_NUMBER}.json )
+# Copy test data files to build directory
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
+               ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.json COPYONLY)
+
+# Register test with CTest
+add_test(NAME ${TEST_NAME}_${TEST_NUMBER}_t
+         COMMAND ${CMAKE_BINARY_DIR}/bin/readjson_t -c test${TEST_NUMBER}.json
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 SET ( TEST_NUMBER "003" )
-cet_test(${TEST_NAME}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC readjson_t
-  DATAFILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
-  TEST_ARGS -c test${TEST_NUMBER}.json )
+# Copy test data files to build directory
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
+               ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.json COPYONLY)
+
+# Register test with CTest
+add_test(NAME ${TEST_NAME}_${TEST_NUMBER}_t
+         COMMAND ${CMAKE_BINARY_DIR}/bin/readjson_t -c test${TEST_NUMBER}.json
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 SET ( TEST_NUMBER "004" )
-cet_test(${TEST_NAME}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC readjson_t
-  DATAFILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
-  TEST_ARGS -c test${TEST_NUMBER}.json )
+# Copy test data files to build directory
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
+               ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.json COPYONLY)
+
+# Register test with CTest
+add_test(NAME ${TEST_NAME}_${TEST_NUMBER}_t
+         COMMAND ${CMAKE_BINARY_DIR}/bin/readjson_t -c test${TEST_NUMBER}.json
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 SET ( TEST_NUMBER "005" )
-cet_test(${TEST_NAME}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC readjson_t
-  DATAFILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
-  TEST_ARGS -c test${TEST_NUMBER}.json )
+# Copy test data files to build directory
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
+               ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.json COPYONLY)
+
+# Register test with CTest
+add_test(NAME ${TEST_NAME}_${TEST_NUMBER}_t
+         COMMAND ${CMAKE_BINARY_DIR}/bin/readjson_t -c test${TEST_NUMBER}.json
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 
 SET ( TEST_NUMBER "006" )
-cet_test(${TEST_NAME}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC readjson_t
-  DATAFILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
-  TEST_ARGS -c test${TEST_NUMBER}.json )
+# Copy test data files to build directory
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
+               ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.json COPYONLY)
+
+# Register test with CTest
+add_test(NAME ${TEST_NAME}_${TEST_NUMBER}_t
+         COMMAND ${CMAKE_BINARY_DIR}/bin/readjson_t -c test${TEST_NUMBER}.json
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 SET ( TEST_NUMBER "007" )
-cet_test(${TEST_NAME}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC readjson_t
-  DATAFILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
-  TEST_ARGS -c test${TEST_NUMBER}.json )
+# Copy test data files to build directory
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
+               ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.json COPYONLY)
+
+# Register test with CTest
+add_test(NAME ${TEST_NAME}_${TEST_NUMBER}_t
+         COMMAND ${CMAKE_BINARY_DIR}/bin/readjson_t -c test${TEST_NUMBER}.json
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

@@ -952,7 +952,7 @@
 },
 {
 "linenum" : 45,
-"value" : "# "
+"value" : "#"
 },
 {
 "linenum" : 46,
@@ -984,7 +984,7 @@
 },
 {
 "linenum" : 53,
-"value" : "#    output_message_severity: 0 "
+"value" : "#    output_message_severity: 0"
 },
 {
 "linenum" : 54,

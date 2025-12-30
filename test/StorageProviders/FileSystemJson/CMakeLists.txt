@@ -1,5 +1,6 @@
-cet_make_exec(NAME FileSystemJson_t
-  LIBRARIES
+add_executable(FileSystemJson_t FileSystemJson_t.cc)
+
+target_link_libraries(FileSystemJson_t PRIVATE
   artdaq-database_SharedCommon
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Json

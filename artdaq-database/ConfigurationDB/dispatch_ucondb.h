@@ -33,6 +33,7 @@ std::vector<JSONDocument> findVersionAliases(cf::ManageAliasesOperation const& /
 JSONDocument addConfigurationAlias(cf::ManageAliasesOperation const& /*options*/, JSONDocument const& /*query_payload*/);
 JSONDocument removeConfigurationAlias(cf::ManageAliasesOperation const& /*options*/, JSONDocument const& /*query_payload*/);
 std::vector<JSONDocument> findConfigurations(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
+std::vector<JSONDocument> findCompositionsContaining(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
 JSONDocument configurationComposition(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
 JSONDocument assignConfiguration(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);
 JSONDocument removeConfiguration(cf::ManageDocumentOperation const& /*options*/, JSONDocument const& /*query_payload*/);

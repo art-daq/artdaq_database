@@ -5,8 +5,11 @@
 
 #include "artdaq-database/BasicTypes/basictypes.h"
 #include "artdaq-database/DataFormats/Json/json_reader.h"
+#include "artdaq-database/DataFormats/Json/presort_json.h"
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
+
+#include <fstream>
 
 namespace db = artdaq::database;
 namespace bpo = boost::program_options;
@@ -17,6 +20,22 @@ using artdaq::database::docrecord::JSONDocumentBuilder;
 namespace ovl = artdaq::database::overlay;
 
 namespace apiliteral = db::configapi::literal;
+
+// Helper function to write content to a file
+bool write_to_file(const std::string& filename, const std::string& content) {
+  std::ofstream outfile(filename);
+
+  if (!outfile.is_open()) {
+    std::cerr << "ERROR: Failed to open file for writing: " << filename << "\n";
+    return false;
+  }
+
+  outfile << content;
+  outfile.close();
+
+  std::cout << "Debug file written: " << filename << "\n";
+  return true;
+}
 
 int main(int argc, char* argv[]) try {
 #if 1
@@ -116,8 +135,31 @@ int main(int argc, char* argv[]) try {
     std::cerr << "expected:\n" << expected << "\n";
     std::cerr << "error:\n" << result.second << "\n";
 
+    // Write debug files
+    std::ostringstream returned_stream, expected_stream;
+    returned_stream << returned;
+    expected_stream << expected;
+    write_to_file(options->operation() + ".output.json", returned_stream.str());
+    write_to_file(options->operation() + ".expected.json", expected_stream.str());
+
     return process_exit_code::FAILURE;
-  } else if (options->format() == data_format_t::gui || options->format() == data_format_t::json) {
+  } else if (options->format() == data_format_t::gui) {
+    // Presort GUI JSON documents by "name" field before comparison
+    auto sorted_retdoc = artdaq::database::json::presort_gui_json_by_name(retdoc);
+    auto sorted_cmpdoc = artdaq::database::json::presort_gui_json_by_name(cmpdoc);
+
+    auto compare_result = artdaq::database::json::compare_json_objects(sorted_retdoc, sorted_cmpdoc);
+    if (compare_result.first) {
+      std::cout << "returned:\n" << retdoc << "\n";
+
+      return process_exit_code::SUCCESS;
+    }
+    std::cout << "Test failed (expected!=returned); error message: " << compare_result.second << "\n";
+
+    // Write debug files
+    write_to_file(options->operation() + ".output.json", sorted_retdoc);
+    write_to_file(options->operation() + ".expected.json", sorted_cmpdoc);
+  } else if (options->format() == data_format_t::json) {
     auto compare_result = artdaq::database::json::compare_json_objects(retdoc, cmpdoc);
     if (compare_result.first) {
       std::cout << "returned:\n" << retdoc << "\n";
@@ -125,6 +167,10 @@ int main(int argc, char* argv[]) try {
       return process_exit_code::SUCCESS;
     }
     std::cout << "Test failed (expected!=returned); error message: " << compare_result.second << "\n";
+
+    // Write debug files
+    write_to_file(options->operation() + ".output.json", retdoc);
+    write_to_file(options->operation() + ".expected.json", cmpdoc);
   } else if (cmpdoc == retdoc) {
     std::cout << "returned:\n" << retdoc << "\n";
 
@@ -146,6 +192,11 @@ int main(int argc, char* argv[]) try {
   std::cout << "First mismatch at position " << std::distance(cmpdoc.begin(), mismatch.first) << ", (exp,ret)=(0x" << std::hex
             << static_cast<unsigned int>(*mismatch.first) << ",0x" << static_cast<unsigned int>(*mismatch.second) << ")\n";
 
+  // Write simple debug files in current directory
+  write_to_file(options->operation() + ".output.txt", retdoc);
+  write_to_file(options->operation() + ".expected.txt", cmpdoc);
+
+  // Also write to temp directory for compatibility with existing workflows
   auto file_out_name = std::string(db::make_temp_dir())
                            .append("/")
                            .append(argv[0])

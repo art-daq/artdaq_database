@@ -5,6 +5,7 @@
 #include "artdaq-database/DataFormats/Fhicl/convertfhicl2jsondb.h"
 #include "artdaq-database/DataFormats/Fhicl/fhicl_types.h"
 #include "artdaq-database/DataFormats/Fhicl/fhicl_writer.h"
+#include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
 #include "artdaq-database/DataFormats/Json/json_types.h"
 
 #ifdef TRACE_NAME
@@ -97,6 +98,8 @@ bool FhiclWriter::write_data(jsn::object_t const& json_object, std::string& out)
 
   std::for_each(std::sregex_iterator(buffer.begin(), buffer.end(), regex), std::sregex_iterator(),
                 [&buffer](auto& m) { buffer.replace(m.position(), m.length(), "#include "); });
+
+  buffer_rtrim_lines(buffer);
 
   out.swap(buffer);
 

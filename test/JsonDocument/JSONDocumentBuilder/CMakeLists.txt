@@ -1,11 +1,7 @@
-cet_make_exec(NAME JSONDocumentBuilder_t
-  LIBRARIES
+add_executable(JSONDocumentBuilder_t JSONDocumentBuilder_t.cc)
 
+target_link_libraries(JSONDocumentBuilder_t PRIVATE
   artdaq-database_JsonDocument
-  fhiclcpp
-  cetlib
-  cetlib_except
-  #${SQLITE3}
   Boost::program_options
 )
 

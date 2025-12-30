@@ -141,7 +141,8 @@ object_id_t StorageProvider<JSONDocument, FileSystemDB>::writeDocument(JSONDocum
 
   TLOG(14) << "FileSystemDB::writeDocument() collection_path=<" << collection << ">";
 
-  auto filename = dbfs::mkdir(collection) + "/" + oid + ".json";
+  auto dir_name = dbfs::mkdir(collection);
+  auto filename = dir_name + "/" + oid + ".json";
 
   TLOG(14) << "FileSystemDB::writeDocument() filename=<" << filename << ">.";
 
@@ -150,17 +151,69 @@ object_id_t StorageProvider<JSONDocument, FileSystemDB>::writeDocument(JSONDocum
       throw runtime_error("FileSystemDB") << "FileSystemDB failed inserting data, document already exist; filename= <" << filename << ">, filter= <"
                                           << filter_document << ">";
     }
+
+    try {
+      auto version_value = user_document.findChild(jsonliteral::version).value();
+
+      auto entity_value = std::string{};
+      try {
+        auto entities_doc = user_document.findChildDocument(jsonliteral::entities);
+        auto entity_item = JSONDocument::value_at(entities_doc, 0);
+        auto entity_json = JSONDocument{entity_item};
+        entity_value = entity_json.findChild(jsonliteral::name).value();
+      } catch (...) {
+        TLOG(14) << "FileSystemDB::writeDocument() Could not extract entity name";
+      }
+
+      TLOG(14) << "FileSystemDB::writeDocument() Checking for duplicate: version=<" << version_value << ">, entity=<" << entity_value << ">";
+
+      std::ostringstream filter_oss;
+      filter_oss << "{\"" << apiliteral::filter::version << "\": \"" << version_value << "\"";
+      if (!entity_value.empty()) {
+        filter_oss << ", \"" << apiliteral::filter::entities << "\": \"" << entity_value << "\"";
+      }
+      filter_oss << "}";
+
+      auto index_path = boost::filesystem::path(dir_name.c_str()).append(dbfsl::search_index);
+      SearchIndex search_index(index_path);
+
+      auto existing_oids = search_index.findDocumentIDs(JSONDocument{filter_oss.str()});
+
+      if (!existing_oids.empty()) {
+        throw runtime_error("FileSystemDB") << "Document with same version and entity already exists; "
+                                            << "collection=<" << collection_name << ">, "
+                                            << "version=<" << version_value << ">, "
+                                            << "entity=<" << entity_value << ">";
+      }
+
+      TLOG(14) << "FileSystemDB::writeDocument() No duplicate found, proceeding with write";
+    } catch (runtime_error const&) {
+      throw;
+    } catch (...) {
+      TLOG(14) << "FileSystemDB::writeDocument() Could not check for semantic duplicates, proceeding with write";
+    }
   }
 
   auto json = builder.to_string();
 
   TLOG(14) << "FileSystemDB::writeDocument() json=<" << json << ">.";
 
-  db::write_buffer_to_file(json, filename);
-
   auto index_path = boost::filesystem::path(filename.c_str()).parent_path().append(dbfsl::search_index);
 
   SearchIndex search_index(index_path);
+
+  if (!isNew) {
+    auto old_json = std::string{};
+    if (dbfs::check_if_file_exists(filename)) {
+      db::read_buffer_from_file(old_json, {filename});
+      if (!old_json.empty()) {
+        TLOG(14) << "FileSystemDB::writeDocument() Removing old document from index.";
+        search_index.removeDocument(JSONDocument{old_json}, oid);
+      }
+    }
+  }
+
+  db::write_buffer_to_file(json, filename);
 
   if (!search_index.addDocument(json, oid)) {
     TLOG(14) << "FileSystemDB::writeDocument() Failed updating SearchIndex.";

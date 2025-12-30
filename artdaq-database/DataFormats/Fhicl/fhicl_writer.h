@@ -5,6 +5,7 @@
 #include "artdaq-database/DataFormats/Json/json_types.h"
 #include "artdaq-database/DataFormats/common.h"
 
+#include <boost/spirit/home/karma/char/char.hpp>
 #include <boost/spirit/include/karma.hpp>
 
 namespace artdaq {
@@ -30,11 +31,11 @@ struct fhicl_generator_grammar : karma::grammar<Iter, table_t()> {
 
     annotated_atom_rule = commented_key_rule << ": " << annotated_value_rule;
 
-    table_rule = "{" << karma::eol << *(annotated_atom_rule) << karma::eol << "}";
+    table_rule = karma::lit('{') << karma::eol << *(annotated_atom_rule) << karma::eol << karma::lit('}');
 
     toplevel_table = *(annotated_atom_rule);
 
-    sequence_rule = "[" << -(annotated_value_rule % ", ") << "]";
+    sequence_rule = karma::lit('[') << -(annotated_value_rule % ", ") << karma::lit(']');
 
     start = toplevel_table;
   }

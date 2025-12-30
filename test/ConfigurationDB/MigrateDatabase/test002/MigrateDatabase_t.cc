@@ -8,6 +8,9 @@
 
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
 
+#include <fstream>
+#include <sstream>
+
 namespace bpo = boost::program_options;
 using namespace artdaq::database;
 
@@ -19,6 +22,22 @@ using artdaq::database::basictypes::JsonData;
 using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 using artdaq::database::docrecord::JSONDocumentMigrator;
+
+// Helper function to write content to a file
+bool write_to_file(const std::string& filename, const std::string& content) {
+  std::ofstream outfile(filename);
+
+  if (!outfile.is_open()) {
+    std::cerr << "ERROR: Failed to open file for writing: " << filename << "\n";
+    return false;
+  }
+
+  outfile << content;
+  outfile.close();
+
+  std::cout << "Debug file written: " << filename << "\n";
+  return true;
+}
 
 int main(int argc, char* argv[]) try {
   std::ostringstream descstr;
@@ -99,6 +118,9 @@ int main(int argc, char* argv[]) try {
         if (!db::read_buffer_from_file(source, dir_iter->path().string())) {
           std::cerr << " Unable to read a file " << dir_iter->path();
           std::cout << " -> failed\n";
+
+          // Write debug file for read failure
+          write_to_file(collection_name + "_" + oid + ".failed_read.txt", "Failed to read: " + dir_iter->path().string());
           continue;
         }
 
@@ -118,6 +140,10 @@ int main(int argc, char* argv[]) try {
 
       } catch (...) {
         std::cerr << "Failed to import a document: " << ::debug::current_exception_diagnostic_information() << "\n";
+
+        // Write debug files for migration/write failure
+        write_to_file(collection_name + "_" + oid + ".failed_migration.json",
+                      "Collection: " + collection_name + "\nOID: " + oid + "\nError: " + ::debug::current_exception_diagnostic_information());
       }
     }
   }

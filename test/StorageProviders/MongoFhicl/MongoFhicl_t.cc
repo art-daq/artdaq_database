@@ -15,12 +15,16 @@ using artdaq::database::docrecord::JSONDocument;
 using artdaq::database::docrecord::JSONDocumentBuilder;
 namespace ovl = artdaq::database::overlay;
 
-using test_case = bool (*)(const std::string&, const std::string&, const std::string&);
+using test_case = bool (*)(const std::string&, const std::string&, const std::string&, const std::string&);
 
-bool test_insert(std::string const& /*source_fcl*/, std::string const& /*compare_fcl*/, std::string const& /*filter*/);
-bool test_search1(std::string const& /*source_fcl*/, std::string const& /*compare_fcl*/, std::string const& /*filter*/);
-bool test_search2(std::string const& /*source_fcl*/, std::string const& /*compare_fcl*/, std::string const& /*options*/);
-bool test_update(std::string const& /*source_fcl*/, std::string const& /*compare_fcl*/, std::string const& /*update_fcl*/);
+bool test_insert(std::string const& /*source_fcl*/, std::string const& /*compare_fcl*/, std::string const& /*filter*/,
+                 std::string const& /*collection*/);
+bool test_search1(std::string const& /*source_fcl*/, std::string const& /*compare_fcl*/, std::string const& /*filter*/,
+                  std::string const& /*collection*/);
+bool test_search2(std::string const& /*source_fcl*/, std::string const& /*compare_fcl*/, std::string const& /*options*/,
+                  std::string const& /*collection*/);
+bool test_update(std::string const& /*source_fcl*/, std::string const& /*compare_fcl*/, std::string const& /*update_fcl*/,
+                 std::string const& /*collection*/);
 
 int main(int argc, char* argv[]) try {
   artdaq::database::mongo::debug::enable();
@@ -31,13 +35,14 @@ int main(int argc, char* argv[]) try {
 
   std::ostringstream descstr;
   descstr << argv[0]
-          << " <-s <source-file>> <-c <compare-with-file>> <-t <test-name>> [<-o <options file>>] "
+          << " <-s <source-file>> <-c <compare-with-file>> <-t <test-name>> [<-o <options file>>] [<-n <collection-name>>] "
              "(available test names: insert,search1,search1,update)";
 
   bpo::options_description desc = descstr.str();
 
   desc.add_options()("source,s", bpo::value<std::string>(), "Input source file.")("compare,c", bpo::value<std::string>(), "Expected result.")(
-      "testname,t", bpo::value<std::string>(), "Test name.")("options,o", bpo::value<std::string>(), "Test options file.")
+      "testname,t", bpo::value<std::string>(), "Test name.")("options,o", bpo::value<std::string>(), "Test options file.")(
+      "collection,n", bpo::value<std::string>()->default_value("testFHICL_V001"), "Collection name.")
 
       ("help,h", "produce help message");
 
@@ -95,6 +100,8 @@ int main(int argc, char* argv[]) try {
     db::read_buffer_from_file(options, opts_name);
   }
 
+  auto collection_name = vm["collection"].as<std::string>();
+
   auto runTest = [](std::string const& name) {
     auto tests =
         std::map<std::string, test_case>{{"insert", test_insert}, {"update", test_update}, {"search1", test_search1}, {"search2", test_search2}};
@@ -104,7 +111,7 @@ int main(int argc, char* argv[]) try {
     return tests.at(name);
   };
 
-  auto testResult = runTest(test_name)(input, compare, options);
+  auto testResult = runTest(test_name)(input, compare, options, collection_name);
 
   if (testResult) {
     return process_exit_code::SUCCESS;
@@ -116,7 +123,7 @@ int main(int argc, char* argv[]) try {
   return process_exit_code::UNCAUGHT_EXCEPTION;
 }
 
-bool test_insert(std::string const& source_fcl, std::string const& compare_fcl, std::string const& filter) {
+bool test_insert(std::string const& source_fcl, std::string const& compare_fcl, std::string const& filter, std::string const& collection) {
   confirm(!source_fcl.empty());
   confirm(!compare_fcl.empty());
 
@@ -134,8 +141,6 @@ bool test_insert(std::string const& source_fcl, std::string const& compare_fcl, 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JSONDocument>::create(database);
-
-  auto collection = std::string("testFHICL_V001");
 
   auto json = JSONDocument{"{\"document\":" + insert.to_string() + ", \"collection\":\"" + collection + "\"}"};
 
@@ -179,7 +184,7 @@ bool test_insert(std::string const& source_fcl, std::string const& compare_fcl, 
   return false;
 }
 
-bool test_search1(std::string const& source_fcl, std::string const& compare_fcl, std::string const& filter) {
+bool test_search1(std::string const& source_fcl, std::string const& compare_fcl, std::string const& filter, std::string const& collection) {
   confirm(!source_fcl.empty());
   confirm(!compare_fcl.empty());
 
@@ -200,8 +205,6 @@ bool test_search1(std::string const& source_fcl, std::string const& compare_fcl,
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JSONDocument>::create(database);
-
-  auto collection = std::string("testFHICL_V001");
 
   auto json = JSONDocument{"{\"document\":" + insert.to_string() + ", \"collection\":\"" + collection + "\"}"};
 
@@ -243,7 +246,8 @@ bool test_search1(std::string const& source_fcl, std::string const& compare_fcl,
   return false;
 }
 
-bool test_search2(std::string const& source_fcl, std::string const& compare_fcl, std::string const& options [[gnu::unused]]) {
+bool test_search2(std::string const& source_fcl, std::string const& compare_fcl, std::string const& options [[gnu::unused]],
+                  std::string const& collection) {
   confirm(!source_fcl.empty());
   confirm(!compare_fcl.empty());
 
@@ -256,10 +260,6 @@ bool test_search2(std::string const& source_fcl, std::string const& compare_fcl,
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JSONDocument>::create(database);
 
-  auto collection = std::string("testFHICL_V001");
-
-  auto json = JSONDocument{"{\"document\":" + source.json_buffer + ", \"collection\":\"" + collection + "\"}"};
-
   auto repeatCount = std::size_t{10};
 
   auto object_ids = std::vector<std::string>();
@@ -270,6 +270,25 @@ bool test_search2(std::string const& source_fcl, std::string const& compare_fcl,
   auto nodata_pos = oss.tellp();
 
   for (int i = repeatCount; i != 0; i--) {
+    auto version_str = "version_search2_" + std::to_string(i);
+
+    auto source_with_version = source.json_buffer;
+    auto version_pattern = std::string{"\"version\" : \"notprovided\""};
+    auto pos = source_with_version.find(version_pattern);
+    if (pos == std::string::npos) {
+      version_pattern = "\"version\":\"notprovided\"";
+      pos = source_with_version.find(version_pattern);
+    }
+    if (pos == std::string::npos) {
+      version_pattern = "\"version\": \"notprovided\"";
+      pos = source_with_version.find(version_pattern);
+    }
+    if (pos != std::string::npos) {
+      source_with_version.replace(pos, version_pattern.length(), "\"version\" : \"" + version_str + "\"");
+    }
+
+    auto json =
+        JSONDocument{"{\"document\":" + source_with_version + ", \"version\":\"" + version_str + "\", \"collection\":\"" + collection + "\"}"};
     auto object_id = provider->writeDocument(json);
     object_ids.push_back(object_id);
     oss << JSONDocument(object_id).findChildDocument("_id").to_string() << ",";
@@ -301,7 +320,7 @@ bool test_search2(std::string const& source_fcl, std::string const& compare_fcl,
   return true;
 }
 
-bool test_update(std::string const& source_fcl, std::string const& compare_fcl, std::string const& update_fcl) {
+bool test_update(std::string const& source_fcl, std::string const& compare_fcl, std::string const& update_fcl, std::string const& collection) {
   confirm(!source_fcl.empty());
   confirm(!compare_fcl.empty());
 
@@ -325,8 +344,6 @@ bool test_update(std::string const& source_fcl, std::string const& compare_fcl, 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
   auto provider = DBI::DBProvider<JSONDocument>::create(database);
-
-  auto collection = std::string("testFHICL_V001");
 
   auto json = JSONDocument{"{\"document\":" + insert.to_string() + ", \"collection\":\"" + collection + "\"}"};
 

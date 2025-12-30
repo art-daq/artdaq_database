@@ -1,0 +1,50 @@
+#include "DatabaseConfigurationInterface.h"
+
+#include <algorithm>
+#include <iterator>
+
+#include "ConfigurationInterface.h"
+#include "artdaq-database/ConfigurationDB/configurationdbifc.h"
+
+#include "artdaq-database/BasicTypes/basictypes.h"
+using artdaq::database::basictypes::JsonData;
+
+namespace artdaq {
+namespace database {
+namespace configuration {
+
+using ots::ConfigurationBase;
+
+template <>
+template <>
+bool MakeSerializable<ConfigurationBase const*>::writeDocumentImpl<JsonData>(JsonData& data) const {
+  std::stringstream ss;
+
+  _conf->getView().printJSON(ss);
+
+  data.json_buffer = ss.str();
+
+  return true;
+}
+
+template <>
+std::string MakeSerializable<ConfigurationBase const*>::configurationNameImpl() const {
+  return _conf->getConfigurationName();
+}
+
+template <>
+template <>
+bool MakeSerializable<ConfigurationBase*>::readDocumentImpl<JsonData>(JsonData const& data) {
+  int retVal = _conf->getViewP()->fillFromJSON(data);
+
+  return (retVal >= 0);
+}
+
+template <>
+std::string MakeSerializable<ConfigurationBase*>::configurationNameImpl() const {
+  return _conf->getConfigurationName();
+}
+
+}  // namespace configuration
+}  // namespace database
+}  // namespace artdaq

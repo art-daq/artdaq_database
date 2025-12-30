@@ -313,8 +313,6 @@ bool test_search_collection(std::string const& source, std::string const& compar
 
   auto collection = std::string("testJSON_V002");
 
-  auto json = JSONDocument{"{\"document\":" + source + ", \"collection\":\"" + collection + "\"}"};
-
   auto repeatCount = std::size_t{5};
 
   auto object_ids = std::vector<std::string>();
@@ -325,6 +323,8 @@ bool test_search_collection(std::string const& source, std::string const& compar
   auto nodata_pos = oss.tellp();
 
   for (int i = repeatCount; i != 0; i--) {
+    auto version_str = "version_search_" + std::to_string(i);
+    auto json = JSONDocument{"{\"document\":" + source + ", \"version\":\"" + version_str + "\", \"collection\":\"" + collection + "\"}"};
     auto object_id = provider->writeDocument(json);
     object_ids.push_back(object_id);
     oss << JSONDocument(object_id).findChildDocument("_id").to_string() << ",";

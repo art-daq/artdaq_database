@@ -1,8 +1,7 @@
-cet_make_exec(NAME ExportDune35tData_t
-  LIBRARIES
+add_executable(ExportDune35tData_t ExportDune35tData_t.cc)
 
+target_link_libraries(ExportDune35tData_t PRIVATE
   artdaq-database_BasicTypes
-
   artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
   artdaq-database_JsonDocument
@@ -10,8 +9,6 @@ cet_make_exec(NAME ExportDune35tData_t
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
-  fhiclcpp
-  cetlib
   Boost::program_options
 )
 
@@ -39,15 +36,17 @@ SET ( TEST_NUMBER "001" )
 SET ( TEST_NAME "Dune35t_bulkexport" )
 
 SET ( TEST_DBPROVIDER "filesystem" )
-cet_test_env("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}")
-cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC ExportDune35tData_t
-  DATAFILES
-  TEST_ARGS -o store -p ${TEST_DBPROVIDER} -f fhicl -v ${TEST_VERSION_NAME}-${TEST_NUMBER} -g ${TEST_CONFIGURATION_NAME}-${TEST_NUMBER} -s "${CMAKE_CURRENT_SOURCE_DIR}/../seeddata" )
+# Register test with CTest
+add_test(NAME ${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t
+         COMMAND ${CMAKE_BINARY_DIR}/bin/ExportDune35tData_t -o store -p ${TEST_DBPROVIDER} -f fhicl -v ${TEST_VERSION_NAME}-${TEST_NUMBER} -g ${TEST_CONFIGURATION_NAME}-${TEST_NUMBER} -s "${CMAKE_CURRENT_SOURCE_DIR}/../seeddata"
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 SET ( TEST_DBPROVIDER "mongo" )
-cet_test_env("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_MONGO}")
-cet_test(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC ExportDune35tData_t
-  DATAFILES
-  TEST_ARGS -o store -p ${TEST_DBPROVIDER} -f fhicl -v ${TEST_VERSION_NAME}-${TEST_NUMBER} -g ${TEST_CONFIGURATION_NAME}-${TEST_NUMBER} -s "${CMAKE_CURRENT_SOURCE_DIR}/../seeddata" )
+# Register test with CTest
+add_test(NAME ${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t
+         COMMAND ${CMAKE_BINARY_DIR}/bin/ExportDune35tData_t -o store -p ${TEST_DBPROVIDER} -f fhicl -v ${TEST_VERSION_NAME}-${TEST_NUMBER} -g ${TEST_CONFIGURATION_NAME}-${TEST_NUMBER} -s "${CMAKE_CURRENT_SOURCE_DIR}/../seeddata"
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+set_tests_properties(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t PROPERTIES
+    ENVIRONMENT "ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}")
 
 install_source()

@@ -413,7 +413,7 @@ JSONDocument prov::removeConfiguration(ManageDocumentOperation const& options, J
 
   new_options.operation(apiliteral::operation::writedocument);
 
-  auto update_str = std::string{"({\"filter\": )"} + builder.getObjectID().to_string() + ",  \"document\":" + builder.to_string() + "}";
+  auto update_str = std::string{"{\"filter\": "} + builder.getObjectID().to_string() + ",  \"document\":" + builder.to_string() + "}";
   auto update = JSONDocument(update_str);
 
   mongo::writeDocument(new_options, update);
@@ -571,6 +571,98 @@ std::vector<JSONDocument> prov::findVersionAliases(cf::ManageAliasesOperation co
   auto returnValue = std::vector<JSONDocument>{};
 
   throw runtime_error("findVersionAliases") << "findVersionAliases: is not implemented";
+
+  return returnValue;
+}
+
+std::vector<JSONDocument> prov::findCompositionsContaining(ManageDocumentOperation const& options,
+                                                           [[maybe_unused]] JSONDocument const& search_payload) {
+  auto returnValue = std::vector<JSONDocument>{};
+
+  if (options.operation() != apiliteral::operation::findcompositionscontaining) {
+    throw runtime_error("operation_findcompositionscontaining") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  }
+
+  if (options.provider() != apiliteral::provider::mongo) {
+    throw runtime_error("operation_findcompositionscontaining") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  }
+
+  TLOG(27) << "operation_findcompositionscontaining: begin (MongoDB)";
+
+  auto configurationType = options.collection();  // e.g., "ComponentConfig"
+  auto version = options.version();               // e.g., "v1.0"
+  auto entity = options.entity();                 // optional, e.g., "subsystem01"
+
+  if (configurationType.empty() || configurationType == apiliteral::notprovided) {
+    throw runtime_error("operation_findcompositionscontaining") << "Configuration type (collection) is empty or not provided.";
+  }
+
+  if (version.empty() || version == apiliteral::notprovided) {
+    throw runtime_error("operation_findcompositionscontaining") << "Version is empty or not provided.";
+  }
+
+  TLOG(27) << "Searching SystemConfiguration for configurationType=<" << configurationType << ">, version=<" << version << ">, entity=<" << entity
+           << ">";
+
+  std::ostringstream matchQuery;
+  matchQuery << "{";
+  matchQuery << "\"configurations." << configurationType << ".version\": " << quoted_(version);
+
+  if (!entity.empty() && entity != apiliteral::notprovided) {
+    matchQuery << ", \"configurations." << configurationType << ".entity\": " << quoted_(entity);
+  }
+
+  matchQuery << "}";
+
+  std::ostringstream pipeline;
+  pipeline << "[";
+  pipeline << "{ \"$match\": " << matchQuery.str() << " },";
+  pipeline << "{ \"$project\": { \"_id\": 0, \"name\": 1 } }";
+  pipeline << "]";
+
+  TLOG(27) << "MongoDB aggregation pipeline: " << pipeline.str();
+
+  std::ostringstream queryPayload;
+  queryPayload << "{";
+  queryPayload << quoted_(apiliteral::option::collection) << ": " << quoted_("SystemConfiguration") << ",";
+  queryPayload << quoted_(apiliteral::option::searchfilter) << ": " << pipeline.str();
+  queryPayload << "}";
+
+  TLOG(27) << "Query payload: " << queryPayload.str();
+
+  auto config = DBI::DBConfig{};
+  auto database = DBI::DB::create(config);
+  auto provider = DBI::DBProvider<JSONDocument>::create(database);
+
+  auto search_results = provider->searchCollection(JSONDocument{queryPayload.str()});
+
+  TLOG(27) << "Search returned " << search_results.size() << " results.";
+
+  for (auto const& search_result : search_results) {
+    try {
+      auto result_node = search_result.findChild(apiliteral::option::result);
+      auto result_doc_str = JSONDocument::value(result_node.value());
+
+      TLOG(28) << "Processing result document: " << result_doc_str;
+
+      auto result_doc = JSONDocument{result_doc_str};
+      auto name_node = result_doc.findChild(apiliteral::name);
+      auto composition_name = JSONDocument::value(name_node.value());
+
+      TLOG(28) << "Found composition: " << composition_name;
+
+      std::ostringstream oss;
+      oss << "{";
+      oss << quoted_(apiliteral::name) << ": " << quoted_(composition_name);
+      oss << "}";
+
+      returnValue.emplace_back(oss.str());
+    } catch (std::exception const& e) {
+      TLOG(29) << "Error processing search result: " << e.what();
+    }
+  }
+
+  TLOG(27) << "operation_findcompositionscontaining: end (found " << returnValue.size() << " compositions)";
 
   return returnValue;
 }

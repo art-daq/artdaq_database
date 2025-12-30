@@ -1,6 +1,6 @@
-cet_make_exec(NAME ConfToolTest_t
-  LIBRARIES
+add_executable(ConfToolTest_t ConfToolTest_t.cc)
 
+target_link_libraries(ConfToolTest_t PRIVATE
   artdaq-database_BasicTypes
   artdaq-database_FhiclJson
   artdaq-database_JsonDocument
@@ -8,9 +8,6 @@ cet_make_exec(NAME ConfToolTest_t
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
-  fhiclcpp
-  #${SQLITE3}
-  cetlib
   Boost::program_options
 )
 

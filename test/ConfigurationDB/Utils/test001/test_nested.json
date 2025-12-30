@@ -1,0 +1,1 @@
+{"config": {"database": {"host": "localhost", "port": 27017, "enabled": true}, "logging": {"level": "debug", "max_size": 1024}}, "version": 1}
