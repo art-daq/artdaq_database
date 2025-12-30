@@ -8,6 +8,9 @@
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
 
+#include <cstdio>
+#include <sstream>
+
 #ifdef TRACE_NAME
 #undef TRACE_NAME
 #endif
@@ -366,9 +369,7 @@ JSONDocument prov::assignConfiguration(ManageDocumentOperation const& options, J
 
   auto update = JSONDocument{"{\"filter\": " + builder.getObjectID().to_string() + ",  \"document\":" + builder.to_string() + "\n}"};
 
-  // TLOG(30)<< "operation_addconfig: writeDocument() begin";
   filesystem::writeDocument(new_options, update);
-  // TLOG(30)<< "operation_addconfig: writeDocument() done";
 
   new_options.operation(apiliteral::operation::confcomposition);
 
@@ -408,7 +409,6 @@ JSONDocument prov::removeConfiguration(ManageDocumentOperation const& options, J
 
   auto update = JSONDocument{"{\"filter\": " + builder.getObjectID().to_string() + ",  \"document\":" + builder.to_string() + "\n}"};
 
-  // TLOG(30)<< "operation_addconfig: writeDocument() begin";
   filesystem::writeDocument(new_options, update);
   // TLOG(30)<< "operation_addconfig: writeDocument() done";
 
@@ -544,6 +544,113 @@ std::vector<JSONDocument> prov::searchCollection(ManageDocumentOperation const& 
   auto returnValue = std::vector<JSONDocument>{};
 
   throw runtime_error("findVersionAliases") << "findVersionAliases: is not implemented";
+
+  return returnValue;
+}
+
+std::vector<JSONDocument> prov::findCompositionsContaining(ManageDocumentOperation const& options,
+                                                           [[maybe_unused]] JSONDocument const& search_payload) {
+  auto returnValue = std::vector<JSONDocument>{};
+
+  if (options.operation() != apiliteral::operation::findcompositionscontaining) {
+    throw runtime_error("operation_findcompositionscontaining") << "Wrong operation option; operation=<" << options.operation() << ">.";
+  }
+
+  if (options.provider() != apiliteral::provider::filesystem) {
+    throw runtime_error("operation_findcompositionscontaining") << "Wrong provider option; provider=<" << options.provider() << ">.";
+  }
+
+  TLOG(27) << "operation_findcompositionscontaining: begin (Filesystem)";
+
+  auto configurationType = options.collection();
+  auto version = options.version();
+  auto entity = options.entity();
+
+  if (configurationType.empty() || configurationType == apiliteral::notprovided) {
+    throw runtime_error("operation_findcompositionscontaining") << "Configuration type (collection) is empty or not provided.";
+  }
+
+  if (version.empty() || version == apiliteral::notprovided) {
+    throw runtime_error("operation_findcompositionscontaining") << "Version is empty or not provided.";
+  }
+
+  TLOG(27) << "Searching filesystem for configurationType=<" << configurationType << ">, version=<" << version << ">, entity=<" << entity << ">";
+
+  auto config = DBI::DBConfig{};
+  auto database = DBI::DB::create(config);
+  auto db_path = database->connection();
+
+  std::string search_dir = db_path + "/SystemConfiguration";
+
+  TLOG(27) << "Searching in directory: " << search_dir;
+
+  if (!DBI::check_if_file_exists(search_dir)) {
+    TLOG(27) << "SystemConfiguration directory does not exist: " << search_dir;
+    TLOG(27) << "operation_findcompositionscontaining: end (0 compositions found)";
+    return returnValue;
+  }
+
+  std::ostringstream grep_cmd;
+  grep_cmd << "grep -l '\"" << configurationType << "\"' " << search_dir << "/*.json 2>/dev/null";
+  grep_cmd << " | xargs grep -l '\"" << version << "\"' 2>/dev/null";
+
+  if (!entity.empty() && entity != apiliteral::notprovided) {
+    grep_cmd << " | xargs grep -l '\"" << entity << "\"' 2>/dev/null";
+  }
+
+  TLOG(27) << "Executing grep command: " << grep_cmd.str();
+
+  FILE* pipe = popen(grep_cmd.str().c_str(), "r");
+  if (!pipe) {
+    TLOG(29) << "Failed to execute grep command";
+    throw runtime_error("operation_findcompositionscontaining") << "Failed to execute grep command.";
+  }
+
+  char buffer[1024];
+  std::ostringstream grep_output;
+
+  while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+    grep_output << buffer;
+  }
+
+  int return_code = pclose(pipe);
+
+  TLOG(27) << "Grep return code: " << return_code;
+  TLOG(27) << "Grep output: " << grep_output.str();
+
+  std::string output = grep_output.str();
+  if (output.empty()) {
+    TLOG(27) << "No matching files found";
+    TLOG(27) << "operation_findcompositionscontaining: end (0 compositions found)";
+    return returnValue;
+  }
+
+  std::istringstream iss(output);
+  std::string filename;
+
+  while (std::getline(iss, filename)) {
+    filename.erase(filename.find_last_not_of(" \n\r\t") + 1);
+
+    if (filename.empty()) continue;
+
+    size_t last_slash = filename.find_last_of('/');
+    size_t last_dot = filename.find_last_of('.');
+
+    if (last_slash != std::string::npos && last_dot != std::string::npos && last_dot > last_slash) {
+      std::string composition_name = filename.substr(last_slash + 1, last_dot - last_slash - 1);
+
+      TLOG(28) << "Found composition: " << composition_name << " (from file: " << filename << ")";
+
+      std::ostringstream oss;
+      oss << "{";
+      oss << quoted_(apiliteral::name) << ": " << quoted_(composition_name);
+      oss << "}";
+
+      returnValue.emplace_back(oss.str());
+    }
+  }
+
+  TLOG(27) << "operation_findcompositionscontaining: end (found " << returnValue.size() << " compositions)";
 
   return returnValue;
 }

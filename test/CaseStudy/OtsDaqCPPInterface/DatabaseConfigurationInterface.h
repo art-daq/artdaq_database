@@ -1,8 +1,6 @@
 #ifndef _ots_DatabaseConfigurationInterface_h_
 #define _ots_DatabaseConfigurationInterface_h_
 
-// #include "otsdaq-core/ConfigurationInterface/ConfigurationInterface.h"
-
 #include "ConfigurationInterface.h"
 
 #include <list>
@@ -16,39 +14,43 @@ struct ConfigurationBase;
 
 class DatabaseConfigurationInterface : public ConfigurationInterface {
  public:
-  using config_version_map_t = std::map<std::string /*name*/, int /*version*/>;
+  using config_version_map_t = std::map<std::string, int>;
   DatabaseConfigurationInterface() { ; }
   ~DatabaseConfigurationInterface() { ; }
 
-  // read configuration from database
-  int fill(ConfigurationBase* /*configuration*/, int /*version*/) const noexcept;
+  int fill(ConfigurationBase*, int) const noexcept;
 
-  // write configuration to database
-  int saveActiveVersion(const ConfigurationBase* /*configuration*/, bool /*overwrite*/ = false) const noexcept;
+  int saveActiveVersion(const ConfigurationBase*, bool = false) const noexcept;
 
-  // mark configuration as read-only in database
-  int markActiveVersionReadonly(const ConfigurationBase* /*configuration*/) const noexcept;
+  int markActiveVersionReadonly(const ConfigurationBase*) const noexcept;
 
-  // find the latest configuration version by configuration type
-  int findLatestVersion(const ConfigurationBase* /*configuration*/) const noexcept;
+  int findLatestVersion(const ConfigurationBase*) const noexcept;
 
-  // find all configuration versions by configuration type
-  std::set<int> getVersions(const ConfigurationBase* /*configuration*/) const noexcept;
+  std::set<int> getVersions(const ConfigurationBase*) const noexcept;
 
-  // returns a set of all configuration data types
-  std::set<std::string /*name*/> listConfigurationsTypes() const;
+  std::set<std::string> listConfigurationsTypes() const;
 
-  // find all global configurations in database
-  std::set<std::string /*name*/> findAllGlobalConfigurations(std::string const& /*search*/ = "") const;
+  std::set<std::string> findAllGlobalConfigurations(std::string const& = "") const;
 
-  // return the contents of a global configuration
-  config_version_map_t loadGlobalConfiguration(std::string const& /*configuration*/) const;
+  config_version_map_t loadGlobalConfiguration(std::string const&) const;
 
-  // create a new global configuration from the contents map
-  void storeGlobalConfiguration(config_version_map_t const& /*configurationMap*/, std::string const& /*configuration*/) const;
+  void storeGlobalConfiguration(config_version_map_t const&, std::string const&, bool = false) const;
 
-  // create a new global configuration from the contents map
-  void storeGlobalConfiguration_mt(config_version_map_t const& /*configurationMap*/, std::string const& /*configuration*/) const;
+  void storeGlobalConfiguration_mt(config_version_map_t const&, std::string const&, bool = false) const;
+
+  std::set<std::string> findCompositionsContaining(std::string const&, std::string const&) const;
+
+  using result_t = std::pair<bool, std::string>;
+
+  result_t getVersions_safe(const ConfigurationBase*, std::set<int>&) const noexcept;
+
+  result_t listConfigurationsTypes_safe(std::set<std::string>&) const noexcept;
+
+  result_t findAllGlobalConfigurations_safe(std::string const&, std::set<std::string>&) const noexcept;
+
+  result_t loadGlobalConfiguration_safe(std::string const&, config_version_map_t&) const noexcept;
+
+  result_t findCompositionsContaining_safe(std::string const&, std::string const&, std::set<std::string>&) const noexcept;
 
  private:
 };

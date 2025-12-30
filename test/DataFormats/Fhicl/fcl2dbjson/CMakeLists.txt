@@ -1,12 +1,8 @@
-cet_make_exec(NAME ConvertFhicl_t
-  LIBRARIES
+add_executable(ConvertFhicl_t ConvertFhicl_t.cc)
 
+target_link_libraries(ConvertFhicl_t PRIVATE
   artdaq-database_DataFormats_Json
   artdaq-database_DataFormats_Fhicl
-  fhiclcpp
-  cetlib
-  cetlib_except
-  #${SQLITE3}
   Boost::program_options
 )
 

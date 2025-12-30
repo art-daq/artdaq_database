@@ -1,14 +1,10 @@
-include(CetTest)
-cet_enable_asserts()
+SET ( TEST_NAME "OtsDaqCPPInterface" )
+SET ( TEST_NUMBER "001" )
 
-link_libraries(
+add_executable(DatabaseConfiguration_t DatabaseConfiguration_t.cc)
+
+target_link_libraries(DatabaseConfiguration_t PRIVATE
   test_CaseStudy_OtsDaqCPPInterface
-)
-
-
-cet_make_exec(NAME DatabaseConfiguration_t
-  LIBRARIES
-    
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
@@ -16,22 +12,26 @@ cet_make_exec(NAME DatabaseConfiguration_t
   artdaq-database_ConfigurationDB
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
-  artdaq-database_StorageProviders_UconDB  
-  fhiclcpp
-  #${SQLITE3}
-  cetlib
-  cetlib_except
+  artdaq-database_StorageProviders_UconDB
   Boost::program_options
   Boost::unit_test_framework
-) 
+)
 
-MESSAGE("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}f")
-cet_test_env("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}f")
-cet_test(OtsDaqCPPInterface_filesystem_t USE_BOOST_UNIT HANDBUILT TEST_EXEC DatabaseConfiguration_t)
+SET ( TEST_DBPROVIDER "filesystem" )
+# Register test with CTest - use unique database path for isolation
+add_test(NAME ${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t
+         COMMAND DatabaseConfiguration_t
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+set_tests_properties(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t PROPERTIES
+    ENVIRONMENT "ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}_otsdb001")
 
-MESSAGE("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_MONGO}f")
-cet_test_env("ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_MONGO}f")
-cet_test(OtsDaqCPPInterface_mongo_t USE_BOOST_UNIT HANDBUILT TEST_EXEC DatabaseConfiguration_t)
+SET ( TEST_DBPROVIDER "mongo" )
+# Register test with CTest - use unique database path for isolation
+add_test(NAME ${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t
+         COMMAND DatabaseConfiguration_t
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+set_tests_properties(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t PROPERTIES
+    ENVIRONMENT "ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_MONGO}_otsdb001")
 
 install_headers()
 install_source()

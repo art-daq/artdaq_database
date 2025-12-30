@@ -1,6 +1,6 @@
-cet_make_exec(NAME ArtdaqDemo_t
-  LIBRARIES
+add_executable(ArtdaqDemo_t ArtdaqDemo_t.cc)
 
+target_link_libraries(ArtdaqDemo_t PRIVATE
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
@@ -9,10 +9,6 @@ cet_make_exec(NAME ArtdaqDemo_t
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
-  fhiclcpp
-  #${SQLITE3}
-  cetlib
-  cetlib_except
   Boost::program_options
 )
 

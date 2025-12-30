@@ -1,5 +1,6 @@
-cet_make_exec(NAME MongoJson_t
-  LIBRARIES
+add_executable(MongoJson_t MongoJson_t.cc)
+
+target_link_libraries(MongoJson_t PRIVATE
   artdaq-database_SharedCommon
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Json

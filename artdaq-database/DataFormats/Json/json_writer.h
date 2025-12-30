@@ -17,15 +17,15 @@ struct json_generator_grammar : karma::grammar<Iter, object_t()> {
   json_generator_grammar() : json_generator_grammar::base_type(start) {
     value_rule = quoted_string | karma::long_ | karma::double_ | karma::bool_ | object_rule | array_rule;
 
-    quoted_string = '"' << karma::string << '"';
+    quoted_string = karma::lit('"') << karma::string << karma::lit('"');
 
     key_rule = quoted_string;
 
     data_rule = key_rule << " : " << value_rule;
 
-    object_rule = "{\n" << -(data_rule % ",\n") << "\n}";
+    object_rule = karma::lit('{') << karma::eol << -(data_rule % (karma::lit(',') << karma::eol)) << karma::eol << karma::lit('}');
 
-    array_rule = "[\n" << -(value_rule % ",\n") << "\n]";
+    array_rule = karma::lit('[') << karma::eol << -(value_rule % (karma::lit(',') << karma::eol)) << karma::eol << karma::lit(']');
 
     start = object_rule;
 

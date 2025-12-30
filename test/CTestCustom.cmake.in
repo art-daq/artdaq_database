@@ -1,14 +1,4 @@
-set(CTEST_CUSTOM_PRE_TEST "mkdir -p ${CMAKE_BINARY_DIR}/databases/mongodb; \
-printenv ; \
-${mongod_bin}  \
---dbpath ${CMAKE_BINARY_DIR}/databases/mongodb \
---logpath ${CMAKE_BINARY_DIR}/databases/mongod.log \
---logappend --tlsMode=disabled --noauth \
---wiredTigerCacheSizeGB=1 \
---pidfilepath=${CMAKE_BINARY_DIR}/databases/mongod.pid \
---bind_ip=127.0.0.1 \
---fork; sleep 5; \
-tail -10 ${CMAKE_BINARY_DIR}/databases/mongod.log")
-
-set(CTEST_CUSTOM_POST_TEST "bash -c \"pkill -F  ${CMAKE_BINARY_DIR}/databases/mongod.pid || echo 'MongoDB already stopped'\"; \
-sleep 2; tail -10 ${CMAKE_BINARY_DIR}/databases/mongod.log")
+# Check if mongod binary was found and conditionally start MongoDB
+# Use shell scripts so CTest can execute complex shell logic
+set(CTEST_CUSTOM_PRE_TEST "${CMAKE_BINARY_DIR}/ctest_pre_test.sh")
+set(CTEST_CUSTOM_POST_TEST "${CMAKE_BINARY_DIR}/ctest_post_test.sh")

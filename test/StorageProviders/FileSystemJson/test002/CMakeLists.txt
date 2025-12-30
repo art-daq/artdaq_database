@@ -7,9 +7,9 @@ string(RANDOM LENGTH 5 ALPHABET 0123456789 RAND_NAME)
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.src.json ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.src.${RAND_NAME}.json @ONLY )
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.cmp.json ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.cmp.${RAND_NAME}.json @ONLY )
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.opts.json ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.opts.${RAND_NAME}.json @ONLY )
-cet_test(FileSystemJson_${TEST_NAME}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC FileSystemJson_t
-  DATAFILES
-    ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.src.${RAND_NAME}.json
-    ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.cmp.${RAND_NAME}.json
-    ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.opts.${RAND_NAME}.json
-  TEST_ARGS -s test${TEST_NUMBER}.src.${RAND_NAME}.json -c test${TEST_NUMBER}.cmp.${RAND_NAME}.json -t ${TEST_NAME} -o test${TEST_NUMBER}.opts.${RAND_NAME}.json)
+# Register test with CTest
+add_test(NAME FileSystemJson_${TEST_NAME}_${TEST_NUMBER}_t
+         COMMAND ${CMAKE_BINARY_DIR}/bin/FileSystemJson_t -s test${TEST_NUMBER}.src.${RAND_NAME}.json -c test${TEST_NUMBER}.cmp.${RAND_NAME}.json -t ${TEST_NAME} -o test${TEST_NUMBER}.opts.${RAND_NAME}.json)
+set_tests_properties(FileSystemJson_${TEST_NAME}_${TEST_NUMBER}_t PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    ENVIRONMENT "ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}")

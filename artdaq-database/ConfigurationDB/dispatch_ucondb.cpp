@@ -553,6 +553,15 @@ std::vector<JSONDocument> prov::searchCollection(ManageDocumentOperation const& 
   return returnValue;
 }
 
+std::vector<JSONDocument> prov::findCompositionsContaining([[maybe_unused]] ManageDocumentOperation const& options,
+                                                           [[maybe_unused]] JSONDocument const& search_payload) {
+  auto returnValue = std::vector<JSONDocument>{};
+
+  throw runtime_error("findCompositionsContaining") << "findCompositionsContaining: is not implemented for UconDB";
+
+  return returnValue;
+}
+
 void cf::debug::UconDB() {
   TRACE_CNTL("name", TRACE_NAME);
   TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);

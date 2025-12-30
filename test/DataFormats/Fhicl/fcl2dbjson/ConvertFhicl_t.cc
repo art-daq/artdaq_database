@@ -7,15 +7,47 @@
 #include "artdaq-database/DataFormats/Json/convertjson2guijson.h"
 #include "artdaq-database/DataFormats/Json/json_common.h"
 
+#include <fstream>
+#include <regex>
+
 namespace bpo = boost::program_options;
 using namespace artdaq::database;
 
-using test_case = bool (*)(const std::string&, const std::string&);
+using test_case = bool (*)(const std::string&, const std::string&, const std::string&);
 
-bool test_convert2fcl(std::string const& /*input*/, std::string const& /*compare*/);
-bool test_convert2json(std::string const& /*input*/, std::string const& /*compare*/);
-bool test_roundconvertfcl(std::string const& /*input*/, std::string const& /*compare*/);
-bool test_roundconvertjson(std::string const& /*input*/, std::string const& /*compare*/);
+bool test_convert2fcl(std::string const& /*input*/, std::string const& /*compare*/, std::string const& /*source_filename*/);
+bool test_convert2json(std::string const& /*input*/, std::string const& /*compare*/, std::string const& /*source_filename*/);
+bool test_roundconvertfcl(std::string const& /*input*/, std::string const& /*compare*/, std::string const& /*source_filename*/);
+bool test_roundconvertjson(std::string const& /*input*/, std::string const& /*compare*/, std::string const& /*source_filename*/);
+
+// Helper function to extract test number from filename
+// e.g., "test001.src.fcl" -> "001"
+std::string extract_test_number(const std::string& filename) {
+  std::regex pattern(R"(test(\d{3}))");
+  std::smatch matches;
+
+  if (std::regex_search(filename, matches, pattern)) {
+    return matches[1].str();
+  }
+
+  return "unknown";
+}
+
+// Helper function to write content to a file
+bool write_to_file(const std::string& filename, const std::string& content) {
+  std::ofstream outfile(filename);
+
+  if (!outfile.is_open()) {
+    std::cerr << "ERROR: Failed to open file for writing: " << filename << "\n";
+    return false;
+  }
+
+  outfile << content;
+  outfile.close();
+
+  std::cout << "Debug file written: " << filename << "\n";
+  return true;
+}
 
 int main(int argc, char* argv[]) try {
   artdaq::database::fhicl::debug::FhiclReader();
@@ -98,7 +130,7 @@ int main(int argc, char* argv[]) try {
     return tests.at(name);
   };
 
-  auto testResult = runTest(test_name)(input, compare);
+  auto testResult = runTest(test_name)(input, compare, input_name);
 
   if (testResult) {
     return process_exit_code::SUCCESS;
@@ -110,7 +142,7 @@ int main(int argc, char* argv[]) try {
   return process_exit_code::UNCAUGHT_EXCEPTION;
 }
 
-bool test_convert2fcl(std::string const& input, std::string const& compare) {
+bool test_convert2fcl(std::string const& input, std::string const& compare, std::string const& source_filename) {
   confirm(!input.empty());
   confirm(!compare.empty());
 
@@ -137,12 +169,17 @@ bool test_convert2fcl(std::string const& input, std::string const& compare) {
 
     std::cerr << "First mismatch at position " << std::distance(compare.begin(), mismatch.first) << ", (exp,ret)=(0x" << std::hex
               << static_cast<unsigned int>(*mismatch.first) << ",0x" << static_cast<unsigned int>(*mismatch.second) << ")\n";
+
+    // Write debug files
+    std::string test_number = extract_test_number(source_filename);
+    write_to_file("test" + test_number + ".output.json", output);
+    write_to_file("test" + test_number + ".expected.json", compare);
   }
 
   return false;
 }
 
-bool test_convert2json(std::string const& input, std::string const& compare) {
+bool test_convert2json(std::string const& input, std::string const& compare, std::string const& source_filename) {
   confirm(!input.empty());
   confirm(!compare.empty());
 
@@ -165,12 +202,17 @@ bool test_convert2json(std::string const& input, std::string const& compare) {
     std::cout << "Convertion failed; error: " << compare_result.second << "\n";
     std::cerr << "output:\n" << output << "\n";
     std::cerr << "expected:\n" << compare << "\n";
+
+    // Write debug files
+    std::string test_number = extract_test_number(source_filename);
+    write_to_file("test" + test_number + ".output.json", output);
+    write_to_file("test" + test_number + ".expected.json", compare);
   }
 
   return false;
 }
 
-bool test_roundconvertfcl(std::string const& input, std::string const& compare) {
+bool test_roundconvertfcl(std::string const& input, std::string const& compare, std::string const& source_filename) {
   confirm(!input.empty());
   confirm(!compare.empty());
 
@@ -202,6 +244,13 @@ bool test_roundconvertfcl(std::string const& input, std::string const& compare) 
     std::cerr << "output:\n" << output << "\n";
     std::cerr << "expected:\n" << compare << "\n";
     std::cerr << "tmp:\n" << tmp << "\n";
+
+    // Write debug files
+    std::string test_number = extract_test_number(source_filename);
+    write_to_file("test" + test_number + ".output.json", output);
+    write_to_file("test" + test_number + ".expected.json", compare);
+    write_to_file("test" + test_number + ".tmp.json", tmp);
+
     throw;
   }
 
@@ -219,12 +268,18 @@ bool test_roundconvertfcl(std::string const& input, std::string const& compare) 
 
     std::cerr << "First mismatch at position " << std::distance(compare.begin(), mismatch.first) << ", (exp,ret)=(0x" << std::hex
               << static_cast<unsigned int>(*mismatch.first) << ",0x" << static_cast<unsigned int>(*mismatch.second) << ")\n";
+
+    // Write debug files
+    std::string test_number = extract_test_number(source_filename);
+    write_to_file("test" + test_number + ".output.json", output);
+    write_to_file("test" + test_number + ".expected.json", compare);
+    write_to_file("test" + test_number + ".tmp.json", tmp);
   }
 
   return false;
 }
 
-bool test_roundconvertjson(std::string const& input, std::string const& compare) {
+bool test_roundconvertjson(std::string const& input, std::string const& compare, std::string const& source_filename) {
   confirm(!input.empty());
   confirm(!compare.empty());
 
@@ -256,6 +311,13 @@ bool test_roundconvertjson(std::string const& input, std::string const& compare)
     std::cerr << "output:\n" << output << "\n";
     std::cerr << "expected:\n" << compare << "\n";
     std::cerr << "tmp:\n" << tmp << "\n";
+
+    // Write debug files
+    std::string test_number = extract_test_number(source_filename);
+    write_to_file("test" + test_number + ".output.json", output);
+    write_to_file("test" + test_number + ".expected.json", compare);
+    write_to_file("test" + test_number + ".tmp.json", tmp);
+
     throw;
   }
 
@@ -268,8 +330,11 @@ bool test_roundconvertjson(std::string const& input, std::string const& compare)
     std::cerr << "expected:\n" << compare << "\n";
     std::cerr << "tmp:\n" << tmp << "\n";
 
-    auto filename = std::string{"/tmp/test.json"};
-    db::write_buffer_to_file(output, filename);
+    // Write debug files
+    std::string test_number = extract_test_number(source_filename);
+    write_to_file("test" + test_number + ".output.json", output);
+    write_to_file("test" + test_number + ".expected.json", compare);
+    write_to_file("test" + test_number + ".tmp.json", tmp);
   }
 
   return false;

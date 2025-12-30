@@ -107,7 +107,7 @@ template <typename T, std::uint32_t mask>
 result_t ovlFixedList<T, mask>::remove(std::unique_ptr<T>& oldEntry) {
   confirm(oldEntry);
 
-  if (_list.empty()) Success(msg_Ignored);
+  if (_list.empty()) return Success(msg_Ignored);
 
   auto& entries = ovlKeyValue::array_value();
 
