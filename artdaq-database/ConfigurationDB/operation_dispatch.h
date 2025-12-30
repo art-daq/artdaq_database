@@ -8,7 +8,7 @@ namespace dispatch {
 template <typename R>
 struct Functor {
   virtual R invoke() = 0;
-  virtual ~Functor() {};
+  virtual ~Functor(){};
 };
 
 template <typename R>

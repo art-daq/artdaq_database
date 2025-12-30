@@ -386,9 +386,7 @@ std::string JSONDocument::value(JSONDocument const& document) {
   if (type(docValue) == type_t::OBJECT) {
     return JSONDocument{docValue}.to_string();
   }
-  {
-    return tostring_visitor(docValue);
-  }
+  { return tostring_visitor(docValue); }
 }
 
 std::string JSONDocument::value_at(JSONDocument const& document, std::size_t index) try {
@@ -414,9 +412,7 @@ std::string JSONDocument::value_at(JSONDocument const& document, std::size_t ind
   if (type(*pos) == type_t::OBJECT) {
     return JSONDocument{*pos}.to_string();
   }
-  {
-    return tostring_visitor(*pos);
-  }
+  { return tostring_visitor(*pos); }
 } catch (std::exception& ex) {
   throw runtime_error("JSONDocument") << "Failed calling value_at(): Caught exception:" << ex.what();
 }

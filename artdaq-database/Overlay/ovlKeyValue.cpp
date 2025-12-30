@@ -27,9 +27,7 @@ std::string ovlKeyValue::to_string() const {
   if (JsonWriter().write(tmpAST, retValue)) {
     return retValue;
   }
-  {
-    return msg_ConvertionError;
-  }
+  { return msg_ConvertionError; }
 }
 
 value_t& ovlKeyValue::value(object_t::key_type const& key) { return objectValue(key); }

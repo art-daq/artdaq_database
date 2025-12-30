@@ -32,7 +32,7 @@ constexpr auto apiname = "ConfigurationInterface";
 struct ConfigurationInterface final {
   using VersionInfoList_t = std::list<VersionInfo>;
 
-  ConfigurationInterface(std::string const&) {};
+  ConfigurationInterface(std::string const&){};
 
   //==============================================================================
   // stores configuration version to database
@@ -303,7 +303,7 @@ struct ConfigurationInterface final {
     }
 
     return returnSet;  // RVO
-  }  // namespace configuration
+  }                    // namespace configuration
 
   //==============================================================================
   // Loads a composition (global configuration) and returns its members.

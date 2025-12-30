@@ -391,9 +391,7 @@ result_t dbuc::create_folder(const UconDBSPtr_t& provider, std::string const& fo
   if (found) {
     return Success(db::result::msg_Added);
   }
-  {
-    return Failure(db::result::msg_Failure);
-  }
+  { return Failure(db::result::msg_Failure); }
 }
 
 void dbuc::debug::UconDBAPI() {
