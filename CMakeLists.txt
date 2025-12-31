@@ -98,9 +98,7 @@ endif()
 find_package(Boost QUIET COMPONENTS filesystem program_options system unit_test_framework REQUIRED)
 find_package(TRACE REQUIRED)
 
-# buil-in libraries
-include(BuiltinMONGOC)
-include(BuiltinMONGOCXX)
+# built-in libraries
 if(USE_FHICLCPP)
   add_compile_definitions(ADFHICLCPP)
   add_subdirectory(built-in)
@@ -117,11 +115,23 @@ endif()
 # Build Node Addons
 #include(NodeJSAddon)
 
-# MongoDB Libraries
-set(BSONCLIB bsonc)
-set(MONGOCLIB mongoc)
-set(BSONCXXLIB bsoncxx)
-set(MONGOCXXLIB mongocxx)
+if(USE_MONGOCXX)
+  # MongoDB Libraries
+  include(BuiltinMONGOC)
+  include(BuiltinMONGOCXX)
+  set(BSONCLIB bsonc)
+  set(MONGOCLIB mongoc)
+  set(BSONCXXLIB bsoncxx)
+  set(MONGOCXXLIB mongocxx)
+  add_dependencies(mongo-cxx-driver mongo-c-driver )
+else()
+  find_package(mongocxx REQUIRED)
+  find_package(bsoncxx REQUIRED)
+  set(BSONCXXLIB mongo::bsoncxx_shared)
+  set(MONGOCXXLIB mongo::mongocxx_shared)
+  set(BSONCLIB bsonc::bsonc)
+  set(MONGOCLIB mongoc::mongoc)
+endif()
 
 #find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_LIB} )
 #find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_LIB} )
@@ -148,7 +158,6 @@ add_subdirectory(artdaq-database)
 # doc- Documentation
 #add_subdirectory(doc)
 
-add_dependencies(mongo-cxx-driver mongo-c-driver )
-add_dependencies(artdaq-database_StorageProviders_MongoDB mongo-cxx-driver)
+add_dependencies(artdaq-database_StorageProviders_MongoDB ${MONGOCXXLIB})
 
 cet_cmake_config()

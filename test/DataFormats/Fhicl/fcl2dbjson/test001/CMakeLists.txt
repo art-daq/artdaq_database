@@ -9,7 +9,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
 
 # Register test with CTest
 add_test(NAME ${TEST_NAME}_${TEST_NUMBER}_t
-         COMMAND ${CMAKE_BINARY_DIR}/bin/ConvertFhicl_t -s test${TEST_NUMBER}.fcl -c test${TEST_NUMBER}.json -t ${TEST_NAME}
+         COMMAND ${TOP_CMAKE_BINARY_DIR}/bin/ConvertFhicl_t -s test${TEST_NUMBER}.fcl -c test${TEST_NUMBER}.json -t ${TEST_NAME}
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 
@@ -22,7 +22,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
 
 # Register test with CTest
 add_test(NAME ${TEST_NAME}_${TEST_NUMBER}_t
-         COMMAND ${CMAKE_BINARY_DIR}/bin/ConvertFhicl_t -s test${TEST_NUMBER}.fcl -c test${TEST_NUMBER}.json -t ${TEST_NAME}
+         COMMAND ${TOP_CMAKE_BINARY_DIR}/bin/ConvertFhicl_t -s test${TEST_NUMBER}.fcl -c test${TEST_NUMBER}.json -t ${TEST_NAME}
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 SET ( TEST_NUMBER "003" )
@@ -34,7 +34,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
 
 # Register test with CTest
 add_test(NAME ${TEST_NAME}_${TEST_NUMBER}_t
-         COMMAND ${CMAKE_BINARY_DIR}/bin/ConvertFhicl_t -s test${TEST_NUMBER}.fcl -c test${TEST_NUMBER}.json -t ${TEST_NAME}
+         COMMAND ${TOP_CMAKE_BINARY_DIR}/bin/ConvertFhicl_t -s test${TEST_NUMBER}.fcl -c test${TEST_NUMBER}.json -t ${TEST_NAME}
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 SET ( TEST_NUMBER "004" )
@@ -46,7 +46,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
 
 # Register test with CTest
 add_test(NAME ${TEST_NAME}_${TEST_NUMBER}_t
-         COMMAND ${CMAKE_BINARY_DIR}/bin/ConvertFhicl_t -s test${TEST_NUMBER}.fcl -c test${TEST_NUMBER}.json -t ${TEST_NAME}
+         COMMAND ${TOP_CMAKE_BINARY_DIR}/bin/ConvertFhicl_t -s test${TEST_NUMBER}.fcl -c test${TEST_NUMBER}.json -t ${TEST_NAME}
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 SET ( TEST_NUMBER "005" )
@@ -58,5 +58,5 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.json
 
 # Register test with CTest
 add_test(NAME ${TEST_NAME}_${TEST_NUMBER}_t
-         COMMAND ${CMAKE_BINARY_DIR}/bin/ConvertFhicl_t -s test${TEST_NUMBER}.fcl -c test${TEST_NUMBER}.json -t ${TEST_NAME}
+         COMMAND ${TOP_CMAKE_BINARY_DIR}/bin/ConvertFhicl_t -s test${TEST_NUMBER}.fcl -c test${TEST_NUMBER}.json -t ${TEST_NAME}
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

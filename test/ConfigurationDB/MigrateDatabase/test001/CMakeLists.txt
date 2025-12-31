@@ -20,5 +20,5 @@ configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test001.src.json ${CMAKE_CURRENT_BI
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test001.cmp.json ${CMAKE_CURRENT_BINARY_DIR}/test001.cmp.${RAND_NAME}.json @ONLY )
 # Register test with CTest
 add_test(NAME ${TEST_NAME}_${TEST_NUMBER}_t
-         COMMAND ${CMAKE_BINARY_DIR}/bin/MigrateDocument_t -s test001.src.${RAND_NAME}.json -x test001.cmp.${RAND_NAME}.json
+         COMMAND ${TOP_CMAKE_BINARY_DIR}/bin/MigrateDocument_t -s test001.src.${RAND_NAME}.json -x test001.cmp.${RAND_NAME}.json
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
