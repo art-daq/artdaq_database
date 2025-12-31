@@ -48,6 +48,7 @@ if ( NOT EXISTS ${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver/lib64/libmongo
         -DCMAKE_CXX_FLAGS=${MYCMAKE_CXX_FLAGS}
         -DCMAKE_C_FLAGS=${MYCMAKE_C_FLAGS}
         -DCMAKE_CXX_STANDARD=${MYCMAKE_CXX_STANDARD}
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5
         -DCMAKE_PREFIX_PATH=${TOP_CMAKE_BINARY_DIR}/built-in/mongo-c-driver/lib64/cmake
         -DCMAKE_INSTALL_PREFIX:PATH=${TOP_CMAKE_BINARY_DIR}/built-in/mongo-cxx-driver
     )
