@@ -2,9 +2,19 @@ SET ( TEST_NUMBER "003" )
 
 SET ( TEST_NAME "update" )
 
-cet_test(FileSystemFhicl_${TEST_NAME}_${TEST_NUMBER}_t HANDBUILT  TEST_EXEC FileSystemFhicl_t
-  DATAFILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.src.fcl
-    ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.cmp.fcl
-    ${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.update.fcl
-  TEST_ARGS -s test${TEST_NUMBER}.src.fcl -c test${TEST_NUMBER}.cmp.fcl -t ${TEST_NAME}  -o test${TEST_NUMBER}.update.fcl)
+string(RANDOM LENGTH 5 ALPHABET 0123456789 RAND_NAME)
+
+# Copy test data files to build directory
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.src.fcl
+               ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.src.fcl COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.cmp.fcl
+               ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.cmp.fcl COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test${TEST_NUMBER}.update.fcl
+               ${CMAKE_CURRENT_BINARY_DIR}/test${TEST_NUMBER}.update.fcl COPYONLY)
+
+# Register test with CTest
+add_test(NAME FileSystemFhicl_${TEST_NAME}_${TEST_NUMBER}_t
+         COMMAND ${CMAKE_BINARY_DIR}/bin/FileSystemFhicl_t -s test${TEST_NUMBER}.src.fcl -c test${TEST_NUMBER}.cmp.fcl -t ${TEST_NAME} -o test${TEST_NUMBER}.update.fcl -n testFHICL_V003)
+set_tests_properties(FileSystemFhicl_${TEST_NAME}_${TEST_NUMBER}_t PROPERTIES
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    ENVIRONMENT "ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}")

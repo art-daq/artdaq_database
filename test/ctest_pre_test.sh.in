@@ -1,0 +1,34 @@
+#!/bin/sh
+# CTest pre-test script - starts MongoDB if available
+
+# Check if TEST_WITHOUT_MONGO is set
+if [ -n "$TEST_WITHOUT_MONGO" ]; then
+  echo '================================================================'
+  echo 'TEST_WITHOUT_MONGO is set - skipping MongoDB startup (faster tests)'
+  echo 'MongoDB tests will be skipped, FileSystemDB tests will run'
+  echo '================================================================'
+  exit 0
+fi
+
+mkdir -p @CMAKE_BINARY_DIR@/databases/mongodb
+
+if [ -f '@mongod_bin@' ] && [ -x '@mongod_bin@' ]; then
+  echo 'Starting MongoDB...'
+  #printenv
+  @mongod_bin@ --dbpath @CMAKE_BINARY_DIR@/databases/mongodb \
+                --logpath @CMAKE_BINARY_DIR@/databases/mongod.log \
+                --logappend \
+                --tlsMode=disabled \
+                --noauth \
+                --wiredTigerCacheSizeGB=1 \
+                --pidfilepath=@CMAKE_BINARY_DIR@/databases/mongod.pid \
+                --bind_ip=127.0.0.1 \
+                --fork
+  sleep 5
+  tail -10 @CMAKE_BINARY_DIR@/databases/mongod.log
+else
+  echo '================================================================'
+  echo 'MongoDB not found - MongoDB tests will fail but FileSystemDB tests will run'
+  echo 'mongod binary: @mongod_bin@'
+  echo '================================================================'
+fi

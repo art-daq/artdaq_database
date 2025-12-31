@@ -244,21 +244,21 @@
 },
 "SelectEvents" : {
 "type" : "table",
-"comment" : "#Failure 5 not a satom ",
+"comment" : "#Failure 5 not a satom",
 "children" : {
 "SelectEvents" : {
 "type" : "sequence",
-"comment" : "#Failure 5 not a satom ",
+"comment" : "#Failure 5 not a satom",
 "annotation" : "",
 "children" : {
 "0" : {
 "type" : "string_unquoted",
-"comment" : "#Failure 5 not a satom ",
+"comment" : "#Failure 5 not a satom",
 "annotation" : ""
 },
 "1" : {
 "type" : "string_unquoted",
-"comment" : "#Failure 5 not a satom ",
+"comment" : "#Failure 5 not a satom",
 "annotation" : ""
 }
 }
@@ -279,7 +279,7 @@
 "children" : {
 "prescaleMod2" : {
 "type" : "table",
-"comment" : "#Failure 4 not a satom ",
+"comment" : "#Failure 4 not a satom",
 "children" : {
 "module_type" : {
 "type" : "string_unquoted",
@@ -325,12 +325,12 @@
 },
 "pmod3" : {
 "type" : "sequence",
-"comment" : "#Failure 2 not a satom ",
+"comment" : "#Failure 2 not a satom",
 "annotation" : "",
 "children" : {
 "0" : {
 "type" : "string_unquoted",
-"comment" : "#Failure 2 not a satom ",
+"comment" : "#Failure 2 not a satom",
 "annotation" : ""
 }
 }
@@ -390,15 +390,15 @@
 },
 {
 "linenum" : 67,
-"value" : "#Failure 5 not a satom "
+"value" : "#Failure 5 not a satom"
 },
 {
 "linenum" : 69,
-"value" : "#Failure 5 not a satom "
+"value" : "#Failure 5 not a satom"
 },
 {
 "linenum" : 78,
-"value" : "#Failure 4 not a satom "
+"value" : "#Failure 4 not a satom"
 },
 {
 "linenum" : 81,
@@ -414,7 +414,7 @@
 },
 {
 "linenum" : 95,
-"value" : "#Failure 2 not a satom "
+"value" : "#Failure 2 not a satom"
 },
 {
 "linenum" : 102,

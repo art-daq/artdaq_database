@@ -19,6 +19,7 @@ std::string protection_as_string(::fhicl::Protection);
 std::string to_json_string(std::string const& str);
 std::string from_json_string(std::string const& str);
 
+void buffer_rtrim_lines(std::string& buffer) noexcept;
 }  // namespace fhicl
 }  // namespace database
 }  // namespace artdaq

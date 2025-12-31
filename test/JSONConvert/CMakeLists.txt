@@ -1,6 +1,6 @@
-cet_make_exec(NAME JSONConvert_t
-  LIBRARIES
+add_executable(JSONConvert_t JSONConvert_t.cc)
 
+target_link_libraries(JSONConvert_t PRIVATE
   artdaq-database_BasicTypes
   artdaq-database_FhiclJson
   artdaq-database_JsonDocument
@@ -8,9 +8,6 @@ cet_make_exec(NAME JSONConvert_t
   artdaq-database_StorageProviders_MongoDB
   artdaq-database_StorageProviders_FileSystemDB
   artdaq-database_StorageProviders_UconDB
-  fhiclcpp
-  cetlib
-  cetlib_except
   Boost::program_options
 )
 

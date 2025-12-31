@@ -7,7 +7,10 @@
 #include "artdaq-database/StorageProviders/common.h"
 
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
+#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 #include "artdaq-database/SharedCommon/sharedcommon_common.h"
+
+#include <sstream>
 
 #include <bsoncxx/builder/basic/helpers.hpp>
 #include <bsoncxx/builder/stream/array.hpp>
@@ -45,5 +48,6 @@ using artdaq::database::mongo::DBConfig;
 using artdaq::database::mongo::MongoDB;
 
 namespace jsonliteral = artdaq::database::dataformats::literal;
+namespace apiliteral = artdaq::database::configapi::literal;
 
 #endif /* _ARTDAQ_DATABASE_PROVIDER_MONGO_HEADERS_H_ */

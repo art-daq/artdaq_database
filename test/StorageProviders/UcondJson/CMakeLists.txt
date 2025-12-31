@@ -1,5 +1,6 @@
-cet_make_exec(NAME UcondJson_t
-  LIBRARIES
+add_executable(UcondJson_t UcondJson_t.cc)
+
+target_link_libraries(UcondJson_t PRIVATE
   artdaq-database_SharedCommon
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Json

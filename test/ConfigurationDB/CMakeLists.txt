@@ -1,6 +1,6 @@
-cet_make_exec(NAME ConfigurationDB_t
-  LIBRARIES
+add_executable(ConfigurationDB_t ConfigurationDB_t.cc)
 
+target_link_libraries(ConfigurationDB_t PRIVATE
   artdaq-database_BasicTypes
   artdaq-database_DataFormats_Fhicl
   artdaq-database_DataFormats_Json
@@ -13,14 +13,14 @@ cet_make_exec(NAME ConfigurationDB_t
 
 
 add_subdirectory(ReadWrite)
-#add_subdirectory(UtilsOperations)
-#add_subdirectory(ManageConfigs)
-#add_subdirectory(BulkOperations)
-#add_subdirectory(ManageDocuments)
-#add_subdirectory(ManageAliases)
+add_subdirectory(UtilsOperations)
+add_subdirectory(ManageConfigs)
+add_subdirectory(BulkOperations)
+add_subdirectory(ManageDocuments)
+add_subdirectory(ManageAliases)
 
 
-#add_subdirectory(ExportImport)
-#add_subdirectory(MigrateDatabase)
+add_subdirectory(ExportImport)
+add_subdirectory(MigrateDatabase)
 
-##add_subdirectory(Utils)
+add_subdirectory(Utils)

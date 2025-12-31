@@ -1,6 +1,7 @@
 SET ( TEST_NUMBER "001" )
 SET ( TEST_NAME "jsonconvert" )
 
-cet_test(JSONConvert_01_t HANDBUILT  TEST_EXEC JSONConvert_t.cc
-  DATAFILES
-  TEST_ARGS )
+# Register test with CTest
+add_test(NAME JSONConvert_01_t
+         COMMAND ${CMAKE_BINARY_DIR}/bin/JSONConvert_t.cc 
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

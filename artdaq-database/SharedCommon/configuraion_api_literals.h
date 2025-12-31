@@ -63,6 +63,8 @@ constexpr auto importcollection = "importcollection";
 
 constexpr auto searchcollection = "searchcollection";
 
+constexpr auto findcompositionscontaining = "findcompositionscontaining";
+
 }  // namespace operation
 
 namespace provider {

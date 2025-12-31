@@ -1,10 +1,8 @@
-cet_make_exec(NAME XMLConvert_t
-  LIBRARIES
+add_executable(XMLConvert_t XMLConvert_t.cc)
 
+target_link_libraries(XMLConvert_t PRIVATE
   artdaq-database_DataFormats_Json
   artdaq-database_DataFormats_Xml
-  cetlib
-  cetlib_except
   Boost::program_options
 )
 

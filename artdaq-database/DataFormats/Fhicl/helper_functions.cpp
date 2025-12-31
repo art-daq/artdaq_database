@@ -1,6 +1,7 @@
 #include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
 #include "artdaq-database/DataFormats/common.h"
 #include "artdaq-database/DataFormats/shared_literals.h"
+#include "helper_functions.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
@@ -192,6 +193,60 @@ std::string protection_as_string(::fhicl::Protection protection) {
   */
 
   throw ::fhicl::exception(::fhicl::parse_error, literal::data) << ("FHiCL protection option \"" + str + "\" is not implemented.");
+}
+
+void buffer_rtrim_lines(std::string& buffer) noexcept {
+  if (buffer.empty()) return;
+
+  struct WsTable {
+    alignas(64) bool data[256]{};
+    constexpr WsTable() noexcept {
+      data[static_cast<unsigned char>(' ')] = true;
+      data[static_cast<unsigned char>('\t')] = true;
+      data[static_cast<unsigned char>('\r')] = true;
+    }
+    [[nodiscard]] constexpr bool operator[](char c) const noexcept { return data[static_cast<unsigned char>(c)]; }
+  };
+  static constexpr WsTable isWs{};
+
+  char* const base = buffer.data();
+  char* write = base;
+  const char* read = base;
+  const char* const end = base + buffer.size();
+
+  while (read < end) {
+    const char* nl = static_cast<const char*>(std::memchr(read, '\n', static_cast<size_t>(end - read)));
+
+    const char* lineEnd = nl ? nl : end;
+
+    while (lineEnd > read && isWs[lineEnd[-1]]) {
+      --lineEnd;
+    }
+
+    const auto len = static_cast<size_t>(lineEnd - read);
+
+    if (write != read) {
+      std::memmove(write, read, len);
+    }
+
+    write += len;
+
+    if (nl) {
+      *write++ = '\n';
+      read = nl + 1;
+    } else {
+      break;
+    }
+  }
+
+  const auto newSize = static_cast<size_t>(write - base);
+
+  if (newSize == 0 || buffer[newSize - 1] != '\n') {
+    buffer.resize(newSize + 1);
+    buffer[newSize] = '\n';
+  } else {
+    buffer.resize(newSize);
+  }
 }
 
 }  // namespace fhicl

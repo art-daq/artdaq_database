@@ -1,9 +1,8 @@
-cet_make_exec(NAME CONFConvert_t
-  LIBRARIES
+add_executable(CONFConvert_t CONFConvert_t.cc)
 
+target_link_libraries(CONFConvert_t PRIVATE
   artdaq-database_DataFormats_Json
   artdaq-database_DataFormats_Conf
-  cetlib
 )
 
 add_subdirectory(test001)

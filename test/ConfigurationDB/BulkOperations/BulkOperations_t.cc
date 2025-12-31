@@ -11,6 +11,7 @@
 #include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
 
 #include "artdaq-database/DataFormats/Json/json_reader.h"
+#include "artdaq-database/DataFormats/Json/presort_json.h"
 
 namespace db = artdaq::database;
 namespace cf = db::configuration;
@@ -111,7 +112,19 @@ int main(int argc, char* argv[]) try {
 
   using cfo::data_format_t;
 
-  if (options.format() == data_format_t::gui || options.format() == data_format_t::db || options.format() == data_format_t::json) {
+  if (options.format() == data_format_t::gui) {
+    // Presort GUI JSON documents by "name" field before comparison
+    auto sorted_returned = artdaq::database::json::presort_gui_json_by_name(returned);
+    auto sorted_expected = artdaq::database::json::presort_gui_json_by_name(expected);
+
+    auto compare_result = artdaq::database::json::compare_json_objects(sorted_returned, sorted_expected);
+    if (compare_result.first) {
+      std::cout << "returned:\n" << returned << "\n";
+
+      return process_exit_code::SUCCESS;
+    }
+    std::cout << "Test failed (expected!=returned); error message: " << compare_result.second << "\n";
+  } else if (options.format() == data_format_t::db || options.format() == data_format_t::json) {
     auto compare_result = artdaq::database::json::compare_json_objects(returned, expected);
     if (compare_result.first) {
       std::cout << "returned:\n" << returned << "\n";

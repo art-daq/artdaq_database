@@ -36,7 +36,7 @@ class Multitasker {
 
  private:
   std::vector<std::thread> _threads;
-  std::condition_variable _condition;
+  mutable std::condition_variable _condition;
   mutable std::mutex _one4all_mutex;
   std::queue<std::function<result_t()>> _tasks;
   std::list<result_t> _results;

@@ -2,12 +2,14 @@ cet_make_library(
 	SOURCE
 configuration_dbproviders.cpp
 dboperation_exportimport.cpp
+dboperation_findcompositions.cpp
 dboperation_managealiases.cpp
 dboperation_manageconfigs.cpp
 dboperation_managedocument.cpp
 dboperation_metadata.cpp
 dboperation_searchcollection.cpp
 detail_exportimport.cpp
+detail_findcompositions.cpp
 detail_managealiases.cpp
 detail_manageconfigs.cpp
 detail_managedocument.cpp

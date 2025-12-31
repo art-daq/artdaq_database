@@ -1,0 +1,14 @@
+-Wall
+-Wextra
+-Werror
+-std=c++17
+-pthread
+-pedantic
+-Wno-unused-parameter
+-Wno-unused-variable
+-Wno-unused-value
+-I/home/artdaq/DAQ_SPACK_ProjAreas/DAQ_2025-06-25_GAL_artdaq-database_v2_00_00/almalinux9-gcc13.1.0-c++20/.spack-env/view/include
+-I/home/artdaq/DAQ_SPACK_ProjAreas/DAQ_2025-06-25_GAL_artdaq-database_v2_00_00/almalinux9-gcc13.1.0-c++20/.spack-env/view/include/mongocxx/v_noabi
+-I/home/artdaq/DAQ_SPACK_ProjAreas/DAQ_2025-06-25_GAL_artdaq-database_v2_00_00/almalinux9-gcc13.1.0-c++20/.spack-env/view/include/bsoncxx/v_noabi
+-I/home/artdaq/DAQ_SPACK_ProjAreas/DAQ_2025-06-25_GAL_artdaq-database_v2_00_00/srcs/artdaq-database
+
