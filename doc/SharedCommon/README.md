@@ -259,7 +259,7 @@ sharedcommon_common.h (aggregator)
 
 ## Key Features Documented
 
-### For Junior Developers
+### For Developers
 
 Each documentation file includes:
 
@@ -375,5 +375,5 @@ Documentation uses the actual filenames for accuracy, but notes the typos.
 ---
 
 **Documentation generated for artdaq-database SharedCommon module**
-**Target audience**: Junior to intermediate C++ developers
+**Target audience**: C++ developers
 **Last updated**: December 30, 2025

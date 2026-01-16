@@ -527,7 +527,7 @@ These are cosmetic issues that don't affect functionality.
 7. ✅ **Include Fusion headers** only when needed for generic programming
 8. ✅ **Validate data** before creating BasicTypes objects
 
-## For Junior Developers
+## For Developers
 
 ### Quick Start
 

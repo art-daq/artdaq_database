@@ -1,4 +1,4 @@
-# ConfigurationInterface Tutorial for Junior Developers
+# ConfigurationInterface Tutorial
 
 ## Complete Guide to Using the artdaq-database Configuration API
 
