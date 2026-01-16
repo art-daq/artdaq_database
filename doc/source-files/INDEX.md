@@ -1,6 +1,6 @@
 # artdaq-database Documentation Index
 
-**Version:** 2.00.00
+**Version:** 3.00.00
 **Last Updated:** 2026-01-14
 
 This is the master documentation index for the artdaq-database project, a configuration database implementation for the ARTDAQ data acquisition toolkit used in high-energy physics experiments.
@@ -539,4 +539,4 @@ TLOG(TLVL_ERROR) << "Error message";
 
 ---
 
-*Documentation generated for artdaq-database v2.00.00*
+*Documentation generated for artdaq-database v3.00.00*

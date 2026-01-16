@@ -1,6 +1,6 @@
 # artdaq-database Architecture
 
-**Version:** 2.00.00
+**Version:** 3.00.00
 **Last Updated:** 2026-01-14
 
 This document provides a comprehensive overview of the artdaq-database system architecture, designed for developers who need to understand how the system works internally.
@@ -811,4 +811,4 @@ Key transformations:
 
 ---
 
-*Architecture documentation for artdaq-database v2.00.00*
+*Architecture documentation for artdaq-database v3.00.00*
