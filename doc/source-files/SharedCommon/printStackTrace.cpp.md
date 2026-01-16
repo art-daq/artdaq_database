@@ -1,610 +1,421 @@
 # printStackTrace.cpp
 
-## File Overview
+**Path:** `artdaq-database/SharedCommon/printStackTrace.cpp`
 
-This implementation file provides the actual implementation of stack trace capture, exception diagnostics, signal handling, and C++ ABI exception interception declared in `printStackTrace.h`. It's a critical debugging infrastructure component that helps diagnose crashes and exceptions in production environments.
+**Implements:** [printStackTrace.h](./printStackTrace.h.md)
 
-**Location**: `/home/user/artdaq-database/artdaq-database/SharedCommon/printStackTrace.cpp`
+**Purpose:** Implements stack trace capture, exception interception, and signal handling for debugging. The key feature is `__cxa_throw` interception, which captures stack traces at exception throw points rather than catch points, providing invaluable diagnostic information.
 
-## Dependencies
+## Implementation Overview
 
-### System Headers
-- `<cxxabi.h>` - C++ ABI for name demangling
-- `<dlfcn.h>` - Dynamic linking (dlsym for finding __cxa_throw)
-- `<execinfo.h>` - Stack trace support (backtrace functions)
-- `<libgen.h>` - Path manipulation (basename)
-- `<cerrno>` - Error numbers
-- `<csignal>` - Signal handling
-- `<cstdio>` - C I/O
-- `<cstdlib>` - C standard library
-- `<iostream>` - C++ I/O
-- `<memory>` - Smart pointers
-- `<ostream>` - Output streams
-- `<regex>` - Regular expressions
-- `<string>` - String class
-- `<typeinfo>` - Type information
+This file provides the core debugging infrastructure for the artdaq-database library. It intercepts the C++ ABI's exception throwing mechanism to capture stack traces at throw points, installs signal handlers for fatal signals, and provides utility functions for name demangling and stack trace formatting. The implementation uses platform-specific features (glibc `backtrace()`, GCC/Clang ABI functions) to achieve this functionality.
 
-### Project Headers
-- `"artdaq-database/SharedCommon/common.h"` - Common includes
-- `"artdaq-database/SharedCommon/printStackTrace.h"` - Function declarations
-- `"artdaq-database/SharedCommon/process_exit_codes.h"` - Exit codes
+## Key Algorithms
 
-### Third-Party Libraries
-- `<boost/exception/diagnostic_information.hpp>` - Exception diagnostics
+### __cxa_throw Interception
 
-## TRACE Configuration
+The C++ runtime calls `__cxa_throw` when throwing exceptions. Our implementation:
+
+**Steps:**
+1. Capture the current stack trace using `backtrace()` into global storage
+2. Find the real `__cxa_throw` implementation using `dlsym(RTLD_NEXT, "__cxa_throw")`
+3. Forward the call to the real implementation
 
 ```cpp
-#ifndef TRACE_LVL
-#define TRACE_LVL 11
-#endif
-
-#define TRACE_NAME "printStackTrace.cpp"
+void __cxa_throw(void* ex, void* info, void (*dest)(void*)) {
+    debug::stack::last_size = backtrace(debug::stack::last_frames, 1024);
+    auto* rethrow = (__cxa_throw_t*)dlsym(RTLD_NEXT, "__cxa_throw");
+    rethrow(ex, info, dest);
+}
 ```
 
-Sets default TRACE level to 11 and identifies this module for logging.
+### Stack Trace Demangling (`demangleStackTrace`)
 
-## Global State
+**Steps:**
+1. Convert raw addresses to symbol strings using `backtrace_symbols()`
+2. For each symbol, use regex to extract the mangled function name
+3. Demangle each function name using `abi::__cxa_demangle()`
+4. Format with frame numbers (highest first) for readability
+5. Free the symbol memory
 
-### Stack Trace Storage
+**Regex Pattern:** `[(](.*)[+]` - Extracts the function name between `(` and `+` in the backtrace symbol format.
+
+### Signal Handler Flow
+
+**Steps:**
+1. Map signal number to human-readable name
+2. Log the signal information via TRACE
+3. Capture and log the current stack trace
+4. Exit with the signal number as exit code
+
+### Terminate Handler Flow
+
+**Steps:**
+1. Check if there's a current exception (`std::current_exception()`)
+2. If so, retrieve the stack trace captured at throw time
+3. Rethrow and catch to get exception type and message
+4. Demangle the exception type name
+5. Log all diagnostic information via TRACE
+6. Capture and log the current stack trace
+7. Exit with SIGTERM
+
+## Internal Data Structures
+
+### Global Stack Storage
 
 ```cpp
 namespace debug {
 namespace stack {
-void* last_frames[1024];
-size_t last_size;
+void* last_frames[1024];  // Array of return addresses
+size_t last_size;         // Number of captured frames
 }  // namespace stack
 }  // namespace debug
 ```
 
-**Purpose**: Global storage for the most recent stack trace captured at exception throw.
+Stores the most recent exception's stack trace. Not thread-safe - concurrent exceptions from multiple threads may overwrite each other's stack traces.
 
-**Structure**:
-- `last_frames`: Array of 1024 void pointers (return addresses)
-- `last_size`: Number of valid frames in array
+## Function Implementations
 
-**Thread Safety**: Not thread-safe. In multithreaded programs, traces from different threads could overwrite each other.
+### `__cxa_throw(ex, info, dest) -> void`
 
----
+**Brief:** Intercepts exception throws to capture stack traces before the real throw occurs.
 
-## C++ ABI Exception Interception
+**Implementation:**
+- Captures stack with `backtrace()` into global storage
+- Uses `dlsym(RTLD_NEXT, ...)` to find the real `__cxa_throw`
+- Forwards all parameters to the real implementation
+- Compiler-specific handling for GCC vs Clang ABI differences
 
-### __cxa_throw Implementation
-
-```cpp
-extern "C" {
-#ifndef __clang__
-void __cxa_throw(void* ex, void* info, void (*dest)(void*)) {
-    debug::stack::last_size = backtrace(debug::stack::last_frames,
-                                        sizeof debug::stack::last_frames / sizeof(void*));
-
-    __cxa_throw_t* rethrow __attribute__((noreturn)) = (__cxa_throw_t*)dlsym(RTLD_NEXT, "__cxa_throw");
-
-    rethrow(ex, info, dest);
-}
-#else
-__attribute__((noreturn)) void __cxa_throw(void* ex, std::type_info* info, void (*dest)(void*)) {
-    debug::stack::last_size = backtrace(debug::stack::last_frames,
-                                        sizeof debug::stack::last_frames / sizeof(void*));
-
-    auto* rethrow = (__cxa_throw_t*)dlsym(RTLD_NEXT, "__cxa_throw");
-
-    rethrow(ex, info, dest);
-}
-#endif
-}
-```
-
-**Purpose**: Intercept all C++ exception throws to capture stack trace.
-
-**How It Works**:
-1. **Capture Stack**: Uses `backtrace()` to capture current call stack
-2. **Find Real __cxa_throw**: Uses `dlsym(RTLD_NEXT, "__cxa_throw")` to find the actual C++ runtime implementation
-3. **Forward Call**: Calls the real __cxa_throw to continue normal exception handling
-
-**Compiler Differences**:
-- **GCC**: Uses `void*` for type_info parameter
-- **Clang**: Uses `std::type_info*` and requires `noreturn` attribute
-
-**Technical Details**:
-- This relies on dynamic linking to interpose the C++ ABI function
-- `RTLD_NEXT` finds the next occurrence of the symbol in the library search order
-- Must be compiled with `-rdynamic` or similar to export symbols
-
-**Limitations**:
-- Only works with dynamic linking
-- Stack trace storage is not thread-safe
-- Adds small overhead to every exception throw
+**Thread Safety:** Not thread-safe (writes to global storage)
 
 ---
 
-## Stack Trace Functions
+### `getStackTrace() -> std::string`
 
-### getStackTrace
+**Brief:** Captures the current call stack and formats it as a human-readable string.
 
+**Implementation:**
 ```cpp
 std::string getStackTrace() {
-    debug::stack::last_size = backtrace(debug::stack::last_frames,
-                                        sizeof debug::stack::last_frames / sizeof(void*));
-
-    std::ostringstream os;
-    os << "Stack trace [" << debug::stack::last_size << " frames]:\n";
-    if (debug::stack::last_size != 0) {
-        os << demangleStackTrace(debug::stack::last_frames, debug::stack::last_size);
-    }
-
-    return os.str();
+  debug::stack::last_size = backtrace(debug::stack::last_frames, 1024);
+  std::ostringstream os;
+  os << "Stack trace [" << debug::stack::last_size << " frames]:\n";
+  if (debug::stack::last_size != 0) {
+    os << demangleStackTrace(debug::stack::last_frames, debug::stack::last_size);
+  }
+  return os.str();
 }
 ```
 
-**Implementation Details**:
-- Captures current stack using `backtrace()`
-- Stores in global `last_frames` array
-- Formats with frame count header
-- Calls `demangleStackTrace()` for human-readable output
-
-**Output Example**:
-```
-Stack trace [15 frames]:
- 15 main (artdaq_database_tool.cpp:123)
- 14 process_command (command_processor.cpp:456)
- 13 execute_operation (operations.cpp:789)
-  ...
-```
+**Thread Safety:** Not thread-safe (writes to global storage)
 
 ---
 
-### getCxaThrowStack
+### `getCxaThrowStack() -> std::string`
 
-```cpp
-std::string getCxaThrowStack() {
-    if (debug::stack::last_size == 0) {
-        return "None";
-    }
+**Brief:** Returns the stack trace that was captured at the most recent exception throw point.
 
-    std::ostringstream os;
-    os << "Stack trace [" << debug::stack::last_size << " frames] @ __cxa_throw():\n";
-    os << demangleStackTrace(debug::stack::last_frames, debug::stack::last_size) << "\n";
+**Implementation:**
+- Returns `"None"` if `last_size == 0` (no exception thrown yet)
+- Otherwise formats the stored stack frames using `demangleStackTrace()`
 
-    return os.str();
-}
-```
-
-**Implementation Details**:
-- Returns stack captured by __cxa_throw interception
-- Returns "None" if no exception has been thrown
-- Includes special marker "@ __cxa_throw()" in header
-
-**Use Case**: Shows where an exception was originally thrown, not just where it was caught.
+**Thread Safety:** Not thread-safe (reads global storage)
 
 ---
 
-### demangle (const char*)
+### `demangle(const char* name) -> std::string`
 
+**Brief:** Converts a mangled C++ symbol name to human-readable form.
+
+**Implementation:**
 ```cpp
 std::string demangle(const char* name) {
-    int status;
-    std::unique_ptr<char, void (*)(void*)> realname(
-        abi::__cxa_demangle(name, nullptr, nullptr, &status),
-        &std::free);
-    return status != 0 ? name : &*realname;
+  int status;
+  std::unique_ptr<char, void (*)(void*)> realname(
+      abi::__cxa_demangle(name, nullptr, nullptr, &status), &std::free);
+  return status != 0 ? name : &*realname;
 }
 ```
 
-**Implementation Details**:
-- Uses C++ ABI `__cxa_demangle()` function
-- Wraps result in unique_ptr with custom deleter (std::free)
-- Returns original name if demangling fails
+**Note:** Uses `unique_ptr` with custom deleter to ensure memory is freed.
 
-**Parameters**:
-- `name` - Mangled C++ symbol name
-
-**Status Codes**:
-- 0: Success
-- -1: Memory allocation failure
-- -2: Invalid mangled name
-- -3: Invalid arguments
-
-**Example Transformation**:
-```
-Input:  "_ZNSt6vectorIiSaIiEE9push_backERKi"
-Output: "std::vector<int, std::allocator<int> >::push_back(int const&)"
-```
+**Thread Safety:** Safe
 
 ---
 
-### demangle (std::string)
+### `demangle(std::string const& name) -> std::string`
 
-```cpp
-std::string demangle(std::string const& name) {
-    return debug::demangle(name.c_str());
-}
-```
+**Brief:** Convenience overload that delegates to the `const char*` version.
 
-**Purpose**: String overload that forwards to const char* version.
+**Thread Safety:** Safe
 
 ---
 
-### demangleStackTrace
+### `demangleStackTrace(trace, size) -> std::string`
 
-```cpp
-std::string demangleStackTrace(void* const* trace, int size) {
-    char** symbols = backtrace_symbols(trace, size);
-    std::ostringstream os;
+**Brief:** Converts raw backtrace addresses to a formatted, readable stack trace.
 
-    auto ex = std::regex{"[(](.*)[+]"};
+**Implementation:**
+- Uses `backtrace_symbols()` to convert addresses to symbol strings
+- Applies regex to extract function names
+- Demangles each function name
+- Formats with frame numbers (reverse order - highest frame number first)
+- Frees symbol memory with `free()`
 
-    auto make_readable = [&ex](char* sym) {
-        auto val = std::string{basename(sym)};
-        auto m = std::smatch();
-
-        if (std::regex_search(val, m, ex)) {
-            if (m.size() > 1) {
-                val.replace(m.position(1), m.length(1), demangle(m[1]));
-            }
-        }
-
-        return val;
-    };
-
-    for (int i = size; i > 0; i--) {
-        os << std::setw(3) << i << " " << make_readable(symbols[i - 1]) << "\n";
-    }
-
-    free(symbols);
-
-    return os.str();
-}
-```
-
-**Implementation Details**:
-
-1. **Get Symbols**: `backtrace_symbols()` converts addresses to symbol information
-2. **Parse Format**: Symbol format is typically: `path/to/binary(symbol+offset) [address]`
-3. **Extract Function**: Regex `[(](.*)[+]` extracts function name between '(' and '+'
-4. **Demangle**: Converts mangled name to readable form
-5. **Format Output**: Numbers frames in reverse order (innermost last)
-6. **Cleanup**: Frees memory allocated by backtrace_symbols
-
-**Regex Pattern**: `[(](.*)[+]`
-- `[(]` - Literal opening parenthesis
-- `(.*)` - Capture group: any characters (function name)
-- `[+]` - Literal plus sign
-
-**Output Format**:
-```
-  5 artdaq_database_tool(main+0x123) [0x400abc]
-  4 libdatabase.so(artdaq::database::operation::execute()+0x45) [0x7f1234]
-  3 libdatabase.so(_ZN6artdaq8database9operation7executeEv+0x45) [0x7f1234]
-```
-After processing:
-```
-  5 main
-  4 artdaq::database::operation::execute()
-  3 artdaq::database::operation::execute()
-```
+**Thread Safety:** Safe
 
 ---
 
-## Signal Handler
+### `signalHandler(signum) -> void`
 
-### signalHandler
+**Brief:** Signal handler that logs diagnostic information before terminating.
 
+**Implementation:**
 ```cpp
 void signalHandler(int signum) {
-    const char* name = nullptr;
-    switch (signum) {
-        case SIGABRT:   name = "SIGABRT"; break;
-        case SIGSEGV:   name = "SIGSEGV"; break;
-        case SIGBUS:    name = "SIGBUS"; break;
-        case SIGILL:    name = "SIGILL"; break;
-        case SIGFPE:    name = "SIGFPE"; break;
-        case SIGTERM:   name = "SIGTERM"; break;
-        case SIGQUIT:   name = "SIGQUIT"; break;
-        case SIGSTKFLT: name = "SIGSTKFLT"; break;
-    }
+  const char* name = nullptr;
+  switch (signum) {
+    case SIGABRT: name = "SIGABRT"; break;
+    case SIGSEGV: name = "SIGSEGV"; break;
+    case SIGBUS:  name = "SIGBUS";  break;
+    case SIGILL:  name = "SIGILL";  break;
+    case SIGFPE:  name = "SIGFPE";  break;
+    case SIGTERM: name = "SIGTERM"; break;
+    case SIGQUIT: name = "SIGQUIT"; break;
+    case SIGSTKFLT: name = "SIGSTKFLT"; break;
+  }
 
-    if (name != nullptr) {
-        TLOG(TRACE_LVL) << __func__ << ": Caught signal " << signum << " (" << name << ")";
-    } else {
-        TLOG(TRACE_LVL) << __func__ << ": Caught signal " << signum;
-    }
-
-    TLOG(TRACE_LVL) << __func__ << ": " << getStackTrace();
-
-    exit(signum);
+  TLOG(TRACE_LVL) << "Caught signal " << signum << " (" << name << ")";
+  TLOG(TRACE_LVL) << getStackTrace();
+  exit(signum);
 }
 ```
 
-**Purpose**: Handle fatal signals by logging stack trace before terminating.
-
-**Signals Handled**:
-- `SIGABRT` (6) - Abort signal from abort()
-- `SIGSEGV` (11) - Segmentation fault
-- `SIGBUS` (7) - Bus error (alignment, non-existent memory)
-- `SIGILL` (4) - Illegal instruction
-- `SIGFPE` (8) - Floating-point exception
-- `SIGTERM` (15) - Termination signal
-- `SIGQUIT` (3) - Quit from keyboard (Ctrl-\)
-- `SIGSTKFLT` (16) - Stack fault on coprocessor
-
-**Behavior**:
-1. Map signal number to name
-2. Log signal number and name
-3. Capture and log stack trace
-4. Exit with signal number as exit code
-
-**Usage Context**: Installed by `registerAbortHandler()`.
+**Thread Safety:** Not thread-safe (signal handlers are inherently not thread-safe)
 
 ---
 
-## Terminate Handler
+### `terminateHandler() -> void`
 
-### terminateHandler
+**Brief:** Custom terminate handler that provides detailed exception diagnostics.
 
-```cpp
-void terminateHandler() {
-    std::exception_ptr exptr = std::current_exception();
-    if (exptr != nullptr) {
-        auto pending = getCxaThrowStack();
-        try {
-            std::rethrow_exception(exptr);
-        } catch (std::exception const& ex) {
-            size_t funcnamesize = 1024;
-            char funcname[1024];
-            int status = 0;
+**Implementation:**
+1. Checks for current exception using `std::current_exception()`
+2. If exception exists:
+   - Retrieves the throw stack trace
+   - Rethrows and catches to get type and message
+   - Demangles the exception type name
+   - Logs all information via TRACE
+3. Logs the current stack trace
+4. Exits with SIGTERM
 
-            TLOG(TRACE_LVL) << __func__ << ": Terminate called after throwing an instance of \'"
-                            << abi::__cxa_demangle(typeid(ex).name(), funcname, &funcnamesize, &status) << "\'";
-
-            TLOG(TRACE_LVL) << __func__ << ": what(): " << ex.what();
-            TLOG(TRACE_LVL) << __func__ << ": details: " << pending;
-
-        } catch (...) {
-            TLOG(TRACE_LVL) << __func__ << ": Terminate called after throwing an instance of unknown exception";
-        }
-    } else {
-        TLOG(TRACE_LVL) << __func__ << ": Terminate called";
-    }
-
-    TLOG(TRACE_LVL) << __func__ << ": " << getStackTrace();
-
-    exit(SIGTERM);
-}
-```
-
-**Purpose**: Handle std::terminate() calls with detailed diagnostics.
-
-**Implementation Details**:
-
-1. **Check for Active Exception**: `std::current_exception()` returns exception_ptr if called during exception handling
-2. **Get Throw Stack**: Retrieve stack from __cxa_throw interception
-3. **Rethrow and Catch**: Rethrow to access exception object
-4. **Demangle Type**: Show human-readable exception type
-5. **Log Details**: Show what() message and throw stack
-6. **Current Stack**: Show stack at terminate point
-7. **Exit**: Terminate with SIGTERM code
-
-**Scenarios Handled**:
-- Known exception types (std::exception)
-- Unknown exception types (catch(...))
-- No exception (terminate called directly)
-
-**Output Example**:
-```
-terminateHandler: Terminate called after throwing an instance of 'artdaq::database::invalid_argument'
-terminateHandler: what(): Invalid collection name
-terminateHandler: details: Stack trace [12 frames] @ __cxa_throw():
-  12 artdaq::database::validate_name (validator.cpp:45)
-  ...
-terminateHandler: Stack trace [8 frames]:
-  8 terminate (terminate.cpp:123)
-  ...
-```
+**Thread Safety:** Not thread-safe
 
 ---
 
-## Uncaught Exception Handler
+### `uncaughtExceptionHandler() -> void`
 
-### uncaughtExceptionHandler
+**Brief:** Handler for unexpected exceptions (largely unused due to C++17 deprecation of `std::set_unexpected`).
 
-```cpp
-void uncaughtExceptionHandler() {
-    TLOG(TRACE_LVL) << __func__ << ": Unexpected handler function called.";
-    TLOG(TRACE_LVL) << __func__ << ": " << getCxaThrowStack();
-    terminateHandler();
-}
-```
+**Implementation:**
+- Logs a message indicating unexpected handler was called
+- Logs the throw stack trace
+- Delegates to `terminateHandler()`
 
-**Purpose**: Handle unexpected exceptions (deprecated mechanism).
-
-**Note**: This is rarely called in modern C++ as std::set_unexpected is deprecated.
+**Thread Safety:** Not thread-safe
 
 ---
 
-## Handler Registration Functions
+### `registerAbortHandler() -> void`
 
-### registerAbortHandler
+**Brief:** Installs signal handlers for fatal signals.
 
+**Implementation:**
 ```cpp
 void registerAbortHandler() {
-    signal(SIGABRT, signalHandler);
-    signal(SIGSEGV, signalHandler);
-    signal(SIGBUS, signalHandler);
-    signal(SIGILL, signalHandler);
-    signal(SIGFPE, signalHandler);
-    signal(SIGQUIT, signalHandler);
-    signal(SIGSTKFLT, signalHandler);
+  signal(SIGABRT, signalHandler);
+  signal(SIGSEGV, signalHandler);
+  signal(SIGBUS, signalHandler);
+  signal(SIGILL, signalHandler);
+  signal(SIGFPE, signalHandler);
+  signal(SIGQUIT, signalHandler);
+  signal(SIGSTKFLT, signalHandler);
 
-    std::set_terminate(terminateHandler);
+  std::set_terminate(terminateHandler);
 }
 ```
 
-**Purpose**: Register handlers for fatal signals and terminate condition.
-
-**Behavior**: Installs `signalHandler` for 7 different fatal signals and sets terminate handler.
+**Thread Safety:** Not thread-safe (modifies global handlers)
 
 ---
 
-### registerTerminateHandler
+### `registerTerminateHandler() -> void`
 
+**Brief:** Installs the custom terminate handler.
+
+**Implementation:**
 ```cpp
 void registerTerminateHandler() {
-    std::set_terminate(terminateHandler);
+  std::set_terminate(terminateHandler);
 }
 ```
 
-**Purpose**: Only register terminate handler without signal handlers.
+**Thread Safety:** Not thread-safe
 
 ---
 
-### registerUncaughtExceptionHandler
+### `registerUncaughtExceptionHandler() -> void`
 
-```cpp
-void registerUncaughtExceptionHandler() {
-    /*std::set_unexpected(uncaughtExceptionHandler);*/
-}
-```
+**Brief:** Placeholder for unexpected exception handler (deprecated in C++17).
 
-**Purpose**: Would register unexpected handler, but is commented out due to deprecation.
+**Implementation:** Currently empty (commented-out `std::set_unexpected` call).
+
+**Thread Safety:** Not thread-safe
 
 ---
 
-### trace_enable
+### `trace_enable() -> void`
 
+**Brief:** Enables and configures the TRACE logging system.
+
+**Implementation:**
 ```cpp
 void trace_enable() {
-    TRACE_CNTL("name", TRACE_NAME);
-    TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-    TRACE_CNTL("modeM", trace_mode::modeM);
-    TRACE_CNTL("modeS", trace_mode::modeS);
+  TRACE_CNTL("name", TRACE_NAME);
+  TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
+  TRACE_CNTL("modeM", trace_mode::modeM);
+  TRACE_CNTL("modeS", trace_mode::modeS);
 }
 ```
 
-**Purpose**: Configure TRACE logging system.
-
-**Settings**:
-- Set module name to "printStackTrace.cpp"
-- Enable all trace levels (all bits set)
-- Configure memory mode
-- Configure slow-path mode
+**Thread Safety:** Not thread-safe (modifies global TRACE state)
 
 ---
 
-### registerUngracefullExitHandlers
+### `registerUngracefullExitHandlers() -> void`
 
+**Brief:** One-call registration of all debugging handlers.
+
+**Implementation:**
 ```cpp
 void registerUngracefullExitHandlers() {
-    trace_enable();
-    registerAbortHandler();
-    registerTerminateHandler();
-    registerUncaughtExceptionHandler();
+  trace_enable();
+  registerAbortHandler();
+  registerTerminateHandler();
+  registerUncaughtExceptionHandler();
 }
 ```
 
-**Purpose**: One-call registration of all debugging infrastructure.
-
-**Order of Operations**:
-1. Enable TRACE (so handlers can log)
-2. Register abort/signal handlers
-3. Register terminate handler
-4. Register uncaught exception handler (no-op)
+**Thread Safety:** Not thread-safe (should be called once at startup)
 
 ---
 
-## Exception Diagnostics
+### `current_exception_diagnostic_information() -> std::string`
 
-### current_exception_diagnostic_information
+**Brief:** Combines throw stack trace with Boost exception diagnostic information.
 
+**Implementation:**
 ```cpp
 std::string current_exception_diagnostic_information() {
-    std::ostringstream os;
-
-    os << "Process exited";
-    os << getCxaThrowStack();
-    os << "Error: " << boost::current_exception_diagnostic_information();
-
-    return os.str();
+  std::ostringstream os;
+  os << "Process exited";
+  os << getCxaThrowStack();
+  os << "Error: " << boost::current_exception_diagnostic_information();
+  return os.str();
 }
 ```
 
-**Purpose**: Gather comprehensive exception diagnostic information.
+**Thread Safety:** Not thread-safe (reads global stack state)
 
-**Includes**:
-1. Generic header
-2. Stack trace from throw point
-3. Boost diagnostic information (includes type, message, nested exceptions)
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/printStackTrace.h"
+#include <iostream>
 
-**Usage Context**: Called from catch blocks and exception handlers.
+void safeWrapper() {
+    try {
+        riskyOperation();
+    } catch (...) {
+        std::cerr << debug::current_exception_diagnostic_information();
+        throw;
+    }
+}
+```
 
 ---
-
-## Design Patterns and Techniques
-
-### RAII for Symbol Names
-```cpp
-std::unique_ptr<char, void (*)(void*)> realname(
-    abi::__cxa_demangle(...),
-    &std::free);
-```
-Uses unique_ptr with custom deleter to ensure demangled string is freed.
-
-### Lambda for Local Processing
-```cpp
-auto make_readable = [&ex](char* sym) {
-    // ... processing logic ...
-};
-```
-Encapsulates symbol processing logic in demangleStackTrace.
-
-### Dynamic Symbol Resolution
-```cpp
-auto* rethrow = (__cxa_throw_t*)dlsym(RTLD_NEXT, "__cxa_throw");
-```
-Finds next symbol in library chain to avoid infinite recursion.
 
 ## Performance Considerations
 
-1. **Stack Capture**: `backtrace()` is relatively expensive (~100 microseconds)
-2. **Symbol Resolution**: `backtrace_symbols()` does filesystem I/O
-3. **Demangling**: Can be slow for complex template names
-4. **Global State**: Non-thread-safe last_frames storage
+| Operation | Approximate Cost |
+|-----------|-----------------|
+| Handler registration | ~1 microsecond (done once) |
+| `__cxa_throw` interception | ~10 microseconds per throw |
+| Stack trace capture (`backtrace()`) | ~100 microseconds |
+| Stack trace formatting | ~1 millisecond (depends on depth) |
 
-**Mitigation**: These costs are only incurred during errors/crashes, so acceptable for debugging.
+Stack capture is expensive but only occurs during errors, so the debugging benefit outweighs the cost.
+
+## Error Handling Strategy
+
+- Signal handlers log diagnostics via TRACE before exiting
+- Terminate handler catches and logs exception information
+- All handlers capture stack traces for post-mortem analysis
+
+## Dependencies
+
+| Include | Purpose |
+|---------|---------|
+| `<cxxabi.h>` | Name demangling (`abi::__cxa_demangle`) |
+| `<dlfcn.h>` | Dynamic linking (`dlsym`) |
+| `<execinfo.h>` | Stack traces (`backtrace`, `backtrace_symbols`) |
+| `<libgen.h>` | Path manipulation (`basename`) |
+| `<cerrno>` | Error numbers |
+| `<csignal>` | Signal handling |
+| `<cstdio>` | Standard I/O |
+| `<cstdlib>` | `exit()`, `free()` |
+| `<iostream>` | Output streams |
+| `<memory>` | `unique_ptr` |
+| `<ostream>` | Stream operations |
+| `<regex>` | Function name extraction |
+| `<string>` | String class |
+| `<typeinfo>` | Type information |
+| `common.h` | TRACE macros |
+| `printStackTrace.h` | Header declarations |
+| `process_exit_codes.h` | Exit codes, trace modes |
+| `<boost/exception/diagnostic_information.hpp>` | Exception diagnostics |
+
+## TRACE Configuration
+
+- `TRACE_NAME`: `"printStackTrace.cpp"`
+- `TRACE_LVL`: 11 (default, can be overridden)
+
+Used for logging signal and terminate handler diagnostics.
 
 ## Thread Safety
 
-**Not Thread-Safe**:
-- `last_frames` and `last_size` are global
-- Multiple threads throwing exceptions simultaneously will race
-- Signal handlers are process-wide
+- Global `last_frames` and `last_size` are not thread-safe
+- Concurrent exceptions from multiple threads may overwrite each other's stack traces
+- Signal handlers are inherently not thread-safe
+- Handler registration should be done once at startup before spawning threads
 
-**Recommendation**: In multithreaded code, consider thread-local storage for stack traces.
+## Platform Requirements
 
-## Limitations
+- **Operating System:** Unix/Linux only
+- **Compiler:** GCC or Clang (C++ ABI specific)
+- **Library:** glibc (for `backtrace()`)
+- **Compilation flags:**
+  - `-rdynamic` for symbol export in executables
+  - `-g` for meaningful stack traces
+  - Note: High optimization (`-O2`, `-O3`) may affect accuracy due to inlining
 
-1. **Dynamic Linking Required**: Symbol interposition needs dynamic linking
-2. **Unix/Linux Only**: Uses POSIX-specific APIs
-3. **Debug Symbols**: Stack traces are most useful with -g flag
-4. **Optimization**: Inlining from -O2/-O3 can obscure call chains
-5. **Single Trace**: Only stores most recent exception throw stack
+## Testing Notes
 
-## Related Files
+- **Unit tests:** Debugging infrastructure is tested indirectly through exception handling
+- **Key test cases:** Stack trace capture, exception interception, signal handling
 
-- **printStackTrace.h** - Function declarations
-- **process_exit_codes.h** - Exit codes and trace modes
-- **helper_functions.h** - Uses getStackTrace() in confirm()
-- **shared_exceptions.h** - Exception types that trigger these handlers
+## See Also
 
-## Best Practices
-
-1. **Initialize Early**: Call registerUngracefullExitHandlers() at program start
-2. **Compile with Symbols**: Use -g flag for meaningful stack traces
-3. **Link Dynamically**: Use -rdynamic for symbol interposition
-4. **Check Logs**: Always check TRACE logs after crashes
-
-## Notes
-
-- Comment typo on line 122: "aosociate" should be "associate"
-- The implementation is production-ready and battle-tested in artdaq projects
-- Stack trace depth limited to 1024 frames (sufficient for most use cases)
+- [printStackTrace.h](./printStackTrace.h.md) - Function declarations
+- [process_exit_codes.h](./process_exit_codes.h.md) - Exit codes and trace mode constants
+- [helper_functions.h](./helper_functions.h.md) - `confirm()` assertion that uses `getStackTrace()`
+- [common.h](./common.h.md) - TRACE logging macros

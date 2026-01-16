@@ -21,8 +21,9 @@ JSON (JavaScript Object Notation) format support with Boost.Spirit parsers and g
 - `json_types.h` - JSON AST type definitions (object, array, value)
 - `json_reader.h/cpp` - Boost.Spirit Qi parser
 - `json_writer.h/cpp` - Boost.Spirit Karma generator
-- `convertjson2guijson.h/cpp` - Database ↔ GUI format conversion
+- `convertjson2guijson.h/cpp` - Database to/from GUI format conversion
 - `json_types_impl.h` - Template implementations
+- `presort_json.h/cpp` - GUI JSON sorting utility
 
 #### [Xml/](Xml/)
 XML format support using Boost.PropertyTree for parsing/generation.
@@ -279,3 +280,16 @@ When adding support for a new format:
 - XML and CONF are simpler, reuse JSON AST for efficiency
 - Database JSON format is the canonical storage representation
 - Boost.Spirit grammars are declarative and self-documenting
+
+## Thread Safety
+
+All Reader and Writer classes in this module are thread-safe:
+- **Stateless design**: No shared mutable state
+- **Concurrent usage**: Multiple instances can parse/generate concurrently
+- **No locking required**: Each operation is independent
+
+The AST types (object_t, table_t, etc.) are value types that must be protected by the caller if shared across threads.
+
+---
+
+**Last Updated:** 2026-01-14

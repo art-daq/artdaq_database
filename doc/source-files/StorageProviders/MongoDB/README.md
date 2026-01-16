@@ -1,148 +1,137 @@
-# MongoDB Provider Documentation
+# MongoDB Provider
+
+**Path:** `artdaq-database/StorageProviders/MongoDB/`
+
+**Purpose:** Implements a production-grade MongoDB storage provider for artdaq-database using the official mongocxx C++ driver. This provider offers scalable document storage with full MongoDB query capabilities, connection pooling, replica set support, and enterprise features for mission-critical deployments.
 
 ## Overview
 
-This directory contains comprehensive documentation for all source files in the MongoDB storage provider. The MongoDB provider interfaces with MongoDB database servers using the official mongocxx C++ driver, providing production-grade, scalable document storage.
-
-**Module Location**: `/home/user/artdaq-database/artdaq-database/StorageProviders/MongoDB/`
-
-**Documentation Created**: November 13, 2025
-
----
+The MongoDB provider interfaces with MongoDB database servers to provide:
+- Scalable storage for millions of documents
+- Full MongoDB query language support including aggregation pipelines
+- Indexed queries with O(log n) performance
+- Automatic connection pooling and caching
+- Replica set and sharded cluster support
+- TLS/X.509 authentication for secure deployments
 
 ## Architecture
 
-### MongoDB C++ Driver
+```
++-------------------+
+|  ConfigurationDB  |  (dispatch_mongodb.cpp selects this provider)
++--------+----------+
+         |
++--------v----------+
+|   MongoDB Class   |  (provider_mongodb.h)
+|  - create()       |  Factory with connection caching
+|  - connection()   |  Returns mongocxx::database&
++--------+----------+
+         |
++--------v----------+
+| StorageProvider<> |  Template specializations:
+|  - readDocument   |  (provider_mongodb_readwrite.cpp)
+|  - writeDocument  |  (provider_mongodb_readwrite.cpp)
+|  - findConfigs    |  (provider_mongodb.cpp)
+|  - findEntities   |  (provider_mongodb.cpp)
+|  - listCollections|  (provider_mongodb.cpp)
++--------+----------+
+         |
++--------v----------+
+|    mongocxx       |  Official MongoDB C++ driver
+|    bsoncxx        |  BSON serialization
++-------------------+
+```
 
-Uses the official **mongocxx/bsoncxx** drivers for MongoDB communication:
-- **mongocxx**: MongoDB client library
-- **bsoncxx**: BSON (Binary JSON) document format library
+## Files in This Module
 
-### Communication Model
+| File | Purpose |
+|------|---------|
+| [provider_mongodb.h](./provider_mongodb.h.md) | Main provider class (`MongoDB`), `DBConfig`, type aliases, debug functions |
+| [provider_mongodb.cpp](./provider_mongodb.cpp.md) | Query operation implementations: find configurations, entities, versions, collections, databases |
+| [provider_mongodb_headers.h](./provider_mongodb_headers.h.md) | Aggregated includes for implementation files, namespace aliases |
+| [provider_mongodb_readwrite.cpp](./provider_mongodb_readwrite.cpp.md) | Core document I/O: `readDocument()` and `writeDocument()` |
+| [provider_connection.cpp](./provider_connection.cpp.md) | Connection management, singleton instance, TLS configuration |
+| [mongo_json.h](./mongo_json.h.md) | BSON/JSON conversion function declarations |
+| [mongo_json.cpp](./mongo_json.cpp.md) | BSON/JSON conversion implementations |
+| [helper_functions.cpp](./helper_functions.cpp.md) | Query utilities including wildcard-to-regex transformation |
 
-- **Protocol**: MongoDB wire protocol over TCP
-- **Format**: BSON documents (binary JSON)
-- **Queries**: MongoDB query language with full indexing support
-- **Operations**: Find, insert, update, aggregation pipeline
+## Key Classes
 
----
+### MongoDB
 
-## Documentation Files
+Main provider class that manages the connection to a MongoDB database server. Uses the mongocxx driver for all database operations.
 
-### Core Provider Files
+**Key Methods:**
+- `create(DBConfig const&)` - Factory method with connection caching
+- `connection()` - Returns reference to the mongocxx database
+- `list_databases()` - Enumerates databases on the server
 
-#### [provider_mongodb.h.md](./provider_mongodb.h.md)
-MongoDB provider class and configuration.
+### DBConfig
 
-**Key Contents**:
-- `MongoDB` class - Database connection manager
-- `DBConfig` struct - Connection configuration
-- Type aliases for provider usage
-- Debug functions
+Configuration structure holding the MongoDB connection URI with support for:
+- Username/password authentication
+- X.509 certificate authentication
+- Replica set connections
+- TLS encryption
 
-#### [provider_mongodb.cpp.md](./provider_mongodb.cpp.md)
-Implementation of query operations.
+## Usage Example
 
-**Operations**:
-- `findConfigurations()` - Query configurations
-- `configurationComposition()` - Get configuration entities
-- `findVersions()` - Find document versions
-- `findEntities()` - Discover entities
-- `listCollections()` / `listDatabases()` - Database discovery
-- `databaseMetadata()` - Retrieve metadata
+```cpp
+#include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
+#include "artdaq-database/JsonDocument/JSONDocument.h"
 
----
+using namespace artdaq::database;
+using namespace artdaq::database::mongo;
 
-### BSON/JSON Conversion
+void example() {
+  // Configure MongoDB connection
+  DBConfig config("mongodb://localhost:27017/artdaq_db");
 
-#### [mongo_json.h.md](./mongo_json.h.md) / [mongo_json.cpp.md](./mongo_json.cpp.md)
-BSON ↔ JSON conversion utilities.
+  // Create provider (connection is cached per thread)
+  auto db = MongoDB::create(config);
 
-**Key Functions**:
-- `to_json()` - Convert BSON to JSON
-- `from_json()` - Convert JSON to BSON
-- `to_json_unescaped()` - Human-readable JSON output
-- Special handling for MongoDB types (ObjectId, Date, Binary)
+  // Create a StorageProvider for JSONDocument operations
+  auto provider = StorageProvider<JSONDocument, MongoDB>::create(db);
 
----
+  // Write a document
+  JSONDocument writeDoc(R"({
+    "document": {
+      "collection": "Configurations",
+      "version": "1.0.0",
+      "entities": [{"name": "detector_front_end"}],
+      "data": {"threshold": 100, "enabled": true}
+    }
+  })");
 
-### Read/Write Operations
+  try {
+    object_id_t id = provider->writeDocument(writeDoc);
+    std::cout << "Stored with ID: " << id << std::endl;
 
-#### [provider_mongodb_readwrite.cpp.md](./provider_mongodb_readwrite.cpp.md)
-Document I/O operations.
+    // Read it back
+    JSONDocument readQuery(R"({
+      "collection": "Configurations",
+      "filter": {"version": "1.0.0"}
+    })");
 
-**Functions**:
-- `readDocument()` - Query and retrieve documents
-- `writeDocument()` - Insert/update documents
-
-**Features**:
-- Full MongoDB query language
-- Efficient indexed queries
-- Automatic ObjectId generation
-- Upsert support
-
----
-
-### Supporting Files
-
-#### [provider_mongodb_headers.h.md](./provider_mongodb_headers.h.md)
-Aggregator header with mongocxx/bsoncxx includes.
-
-#### [provider_connection.cpp.md](./provider_connection.cpp.md)
-Connection management and initialization.
-
-**Features**:
-- Singleton mongocxx::instance
-- Connection string parsing
-- Auto-metadata creation
-
-#### [mongo_functions.cpp.md](./mongo_functions.cpp.md)
-MongoDB-specific utility functions.
-
-#### [helper_functions.cpp.md](./helper_functions.cpp.md)
-MongoDB provider helper utilities.
-
----
-
-## Key Features
-
-### Advantages
-
-1. **Scalability**: Handles millions of documents
-2. **Performance**:
-   - Indexed queries (B-tree indexes)
-   - Aggregation pipeline
-   - Query optimization
-3. **Reliability**:
-   - Replication and high availability
-   - Automatic failover
-   - Data persistence
-4. **Query Power**:
-   - Rich query language
-   - Aggregation framework
-   - Geospatial queries
-5. **Transactions**: ACID transactions (MongoDB 4.0+)
-6. **Schema Flexibility**: Dynamic schema
-
-### Production Features
-
-- **Authentication**: Username/password, Kerberos, LDAP
-- **Encryption**: TLS/SSL, encryption at rest
-- **Monitoring**: Built-in monitoring and profiling
-- **Backup**: Point-in-time recovery
-- **Sharding**: Horizontal scaling
-
----
+    auto results = provider->readDocument(readQuery);
+    for (const auto& doc : results) {
+      std::cout << "Found: " << doc << std::endl;
+    }
+  } catch (const std::exception& e) {
+    std::cerr << "Error: " << e.what() << std::endl;
+  }
+}
+```
 
 ## Configuration
 
-### Connection URI
+### URI Format
 
 ```
 mongodb://[username:password@]host[:port][/database][?options]
 ```
 
-**Examples**:
+**Examples:**
 ```
 mongodb://localhost:27017/artdaq_db
 mongodb://user:pass@mongodb.fnal.gov:27017/production_db?authSource=admin
@@ -151,48 +140,27 @@ mongodb://host1:27017,host2:27017,host3:27017/artdaq_db?replicaSet=rs0
 
 ### Environment Variables
 
-```bash
-export ARTDAQ_DATABASE_URI="mongodb://prodserver:27017/artdaq_production"
-```
-
----
-
-## Usage Example
-
-```cpp
-#include "artdaq-database/StorageProviders/MongoDB/provider_mongodb.h"
-
-using namespace artdaq::database::mongo;
-
-// Configure
-DBConfig config("mongodb://localhost:27017/artdaq_db");
-
-// Create provider
-auto db = MongoDB::create(config);
-auto provider = MongoDBProvider<JSONDocument>::create(db);
-
-// Write document
-JSONDocument doc;
-doc.setCollection("Configurations");
-doc.setData("{\"run\": 12345, \"config\": \"production\"}");
-object_id_t id = provider->writeDocument(doc);
-
-// Query documents
-JSONDocument query;
-query.setCollection("Configurations");
-query.setFilter("{\"run\": {\"$gte\": 12000}}");
-auto results = provider->readDocument(query);
-```
-
----
+| Variable | Purpose |
+|----------|---------|
+| `ARTDAQ_DATABASE_URI` | Set MongoDB connection URI (overrides defaults) |
+| `ARTDAQ_DATABASE_CLIENT_CERT` | Path to X.509 client certificate for TLS |
+| `ARTDAQ_DATABASE_CA_CERT` | Path to CA certificate for TLS verification |
 
 ## MongoDB Query Language
 
 ### Simple Queries
 ```javascript
-{"run": 12345}                    // Exact match
-{"run": {"$gte": 12000}}         // Greater than or equal
+{"run": 12345}                              // Exact match
+{"run": {"$gte": 12000}}                    // Greater than or equal
 {"status": {"$in": ["active", "pending"]}}  // In list
+```
+
+### Wildcard Searches
+The provider supports `*` wildcards that are converted to MongoDB regex:
+```cpp
+// Search for all configurations starting with "production_"
+JSONDocument query(R"({"configurations": "production_*"})");
+auto results = provider->findConfigurations(query);
 ```
 
 ### Complex Queries
@@ -203,47 +171,44 @@ auto results = provider->readDocument(query);
 ]}
 ```
 
-### Aggregation
-```javascript
-[
-    {"$match": {"status": "active"}},
-    {"$group": {"_id": "$run", "count": {"$sum": 1}}},
-    {"$sort": {"count": -1}}
-]
-```
+## Thread Safety
 
----
+**Thread-safe:** The mongocxx driver handles all thread safety concerns.
+- Automatic connection pooling per thread
+- Multiple threads can share a `MongoDB` instance
+- Each thread gets its own connection from the cache
 
 ## Performance Characteristics
 
-### Time Complexity
+| Operation | Complexity |
+|-----------|------------|
+| Indexed query | O(log n) |
+| Full scan | O(n) |
+| Insert | O(log n) with indexes |
+| Update | O(log n) with indexes |
 
-- **Indexed Query**: O(log n)
-- **Full Scan**: O(n)
-- **Insert**: O(log n) with indexes
-- **Update**: O(log n) with indexes
+### Scalability Limits
 
-### Scalability
+| Resource | Capacity |
+|----------|----------|
+| Documents per collection | Billions |
+| Collections per database | Thousands |
+| Document size | Up to 16 MB |
+| Database size | Petabytes (with sharding) |
 
-- **Documents per Collection**: Billions
-- **Collections per Database**: Thousands
-- **Document Size**: Up to 16 MB
-- **Database Size**: Petabytes (with sharding)
+## Debugging
 
-### Recommended Use Cases
-
-- **Large Datasets**: > 10,000 documents
-- **High Performance**: Need fast indexed queries
-- **Production**: Mission-critical applications
-- **Scalability**: Need to grow beyond single server
-- **Complex Queries**: Need aggregation and analytics
-
----
+Enable TRACE debugging:
+```cpp
+artdaq::database::mongo::debug::enable();       // All debugging
+artdaq::database::mongo::debug::connection();   // Connection only
+artdaq::database::mongo::debug::ReadWrite();    // I/O only
+```
 
 ## Deployment Topologies
 
 ### Standalone
-Single MongoDB server for development/testing.
+Single MongoDB server for development and testing.
 
 ### Replica Set
 Multiple servers with automatic failover for high availability.
@@ -251,53 +216,30 @@ Multiple servers with automatic failover for high availability.
 ### Sharded Cluster
 Horizontally scaled across multiple servers for massive datasets.
 
----
+## When to Use MongoDB
 
-## Debugging
+- Large datasets (> 10,000 documents)
+- Need fast indexed queries
+- Production/mission-critical applications
+- Need to scale beyond single server
+- Complex queries with aggregation
+- Need enterprise features (auth, encryption)
 
-Enable TRACE debugging:
+## Dependencies
 
-```cpp
-artdaq::database::mongo::debug::enable();       // All debugging
-artdaq::database::mongo::debug::connection();   // Connection only
-artdaq::database::mongo::debug::ReadWrite();    // I/O only
-```
+### External
+- **mongocxx** - MongoDB C++ driver (included in build)
+- **bsoncxx** - BSON serialization library (included in build)
 
----
+### Internal
+- `StorageProviders/storage_providers.h` - Base template
+- `StorageProviders/common.h` - Common utilities
+- `JsonDocument/` - Document model
+- `SharedCommon/` - Helper functions
 
-## Thread Safety
+## See Also
 
-**MongoDB Driver**: Thread-safe
-**Concurrent Operations**: Supported
-**Connection Pooling**: Automatic
-
----
-
-## File List
-
-All documented MongoDB provider files:
-
-1. **provider_mongodb.h** - Provider declarations
-2. **provider_mongodb.cpp** - Query operations
-3. **provider_mongodb_headers.h** - Header aggregator
-4. **provider_mongodb_readwrite.cpp** - I/O operations
-5. **provider_connection.cpp** - Connection management
-6. **mongo_json.h** - BSON/JSON conversion headers
-7. **mongo_json.cpp** - Conversion implementations
-8. **mongo_functions.cpp** - Utility functions
-9. **helper_functions.cpp** - Helper utilities
-
----
-
-## Related Documentation
-
-- **FileSystemDB Provider**: [../FileSystemDB/README.md](../FileSystemDB/README.md)
-- **UconDB Provider**: [../UconDB/README.md](../UconDB/README.md)
-- **Storage Provider Interface**: [../storage_providers.h.md](../storage_providers.h.md)
-- **MongoDB Documentation**: https://docs.mongodb.com/
-
----
-
-**Documentation generated for artdaq-database MongoDB provider**
-**Target audience**: Junior to intermediate C++ developers
-**Last updated**: November 13, 2025
+- [StorageProviders README](../README.md) - Overview of all providers
+- [FileSystemDB](../FileSystemDB/README.md) - Alternative file-based provider
+- [External: MongoDB C++ Driver](https://mongocxx.org/) - Official driver documentation
+- [External: MongoDB Manual](https://www.mongodb.com/docs/manual/) - MongoDB reference

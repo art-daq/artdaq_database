@@ -1,448 +1,462 @@
 # shared_datatypes.h
 
-## File Overview
+**Path:** `artdaq-database/SharedCommon/shared_datatypes.h`
 
-This header file defines common type aliases used throughout the artdaq-database project. It establishes consistent naming for fundamental data types, improving code readability and providing a single point to change underlying type implementations if needed.
+**Purpose:** Defines semantic type aliases used throughout the artdaq-database project. Instead of using raw `std::string` everywhere, this file provides meaningful type names like `object_id_t` and `timestamp_t` that make code self-documenting. When you see `object_id_t`, you immediately know it represents a unique identifier, not just any string.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/SharedCommon/shared_datatypes.h`
+
+## Key Concepts
+
+### Type Aliases
+
+A *type alias* creates a new name for an existing type using the `using` keyword. This does not create a new type at the language level (the compiler still sees `std::string`), but makes code more readable and maintainable:
+
+```cpp
+// Without type aliases - unclear what each string represents
+void saveDocument(std::string id, std::string time, std::string location);
+
+// With type aliases - intent is clear
+void saveDocument(object_id_t id, timestamp_t time, path_t location);
+```
+
+### Why Use Semantic Types?
+
+1. **Self-documentation**: Code reads like documentation; function signatures clearly indicate intent
+2. **Refactoring safety**: Change the underlying type in one place if needed in the future
+3. **IDE support**: Better autocomplete suggestions and type hints
+4. **Code review**: Easier to spot type mismatches and logic errors
+
+### Important Limitation
+
+These are *aliases*, not distinct types. The compiler will not prevent mixing them:
+
+```cpp
+object_id_t id = "507f1f77bcf86cd799439011";
+timestamp_t time = id;  // Compiles! Semantically wrong but no compiler error
+```
+
+The type names are for human readers, not compiler enforcement. Be careful to use the correct type in the correct context.
+
+## Thread Safety
+
+- **Thread-safe:** Yes (for reads)
+- **Concurrent access:** All types inherit `std::string`'s thread-safety guarantees: safe for concurrent reads, but concurrent writes to the same object require external synchronization
+- **Locking:** No internal locking; use external synchronization for concurrent modifications
 
 ## Dependencies
 
-### Standard Library
-- `<string>` - String class
-- `<utility>` - std::pair
-
-## Header Guard
-
-```cpp
-#ifndef _ARTDAQ_DATABASE_SHARED_DATATYPES_H_
-#define _ARTDAQ_DATABASE_SHARED_DATATYPES_H_
-```
-
-## Namespace: artdaq::database
-
-All type aliases are defined in the `artdaq::database` namespace.
+| Include | Purpose |
+|---------|---------|
+| `<string>` | Provides `std::string` base type for most aliases |
+| `<utility>` | Provides `std::pair` for `string_pair_t` |
 
 ## Type Aliases
 
-### path_t
+### Summary Table
+
+| Alias | Underlying Type | Purpose |
+|-------|-----------------|---------|
+| `path_t` | `std::string` | Filesystem paths, directory names, URIs |
+| `string_pair_t` | `std::pair<std::string, std::string>` | Key-value pairs, mappings |
+| `object_id_t` | `std::string` | Document IDs, unique identifiers (typically 24-char hex) |
+| `timestamp_t` | `std::string` | ISO 8601 formatted timestamps |
+
+---
+
+### `path_t`
 
 ```cpp
 using path_t = std::string;
 ```
 
-**Purpose**: Represents a filesystem path or URL path.
+**Brief:** Represents filesystem paths, directory names, and URI paths. Use this type for any string that refers to a location in the filesystem or a network resource.
 
-**Underlying Type**: std::string
+**Thread Safety:** Thread-safe for concurrent reads; concurrent writes require external synchronization
 
-**Usage Context**:
-- File paths: `/path/to/config.json`
-- Directory paths: `/data/configurations/`
-- URL paths: May be used for URI paths in some contexts
+**Common Uses:**
+- File locations on disk
+- Directory paths
+- MongoDB connection URIs
+- Configuration file paths
 
-**Usage Example**:
+**Example:**
 ```cpp
-path_t config_path = "/etc/artdaq/database/config.json";
-path_t data_dir = "/var/lib/artdaq/database/";
+#include "artdaq-database/SharedCommon/shared_datatypes.h"
+#include "artdaq-database/SharedCommon/shared_exceptions.h"
+#include <iostream>
+#include <fstream>
 
-bool file_exists(path_t const& path) {
-    // ... implementation ...
+namespace db = artdaq::database;
+
+bool loadConfiguration(db::path_t const& config_path) {
+    if (config_path.empty()) {
+        throw db::invalid_argument("loadConfiguration")
+            << "Configuration path cannot be empty";
+    }
+
+    std::ifstream file(config_path);
+    if (!file) {
+        throw db::runtime_error("loadConfiguration")
+            << "Failed to open file: " << config_path;
+    }
+
+    std::cout << "Loading configuration from: " << config_path << std::endl;
+    // ... load logic
+    return true;
+}
+
+int main() {
+    try {
+        db::path_t config_file = "/etc/artdaq/config.json";
+        db::path_t database_uri = "mongodb://localhost:27017/test_db";
+        db::path_t export_dir = "/tmp/exports/";
+
+        loadConfiguration(config_file);
+        return 0;
+    } catch (db::exception const& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
 }
 ```
 
-**Design Rationale**:
-- Semantic clarity: path_t clearly indicates "this string is a path"
-- Future flexibility: Could change to std::filesystem::path without changing signatures
-- Type safety: Functions expecting paths are self-documenting
-
 ---
 
-### string_pair_t
+### `string_pair_t`
 
 ```cpp
 using string_pair_t = std::pair<std::string, std::string>;
 ```
 
-**Purpose**: Represents a pair of related strings (key-value, name-value, etc.).
+**Brief:** Represents a pair of related strings, typically key-value pairs or mappings. Use this type when you need to associate two string values together.
 
-**Underlying Type**: std::pair<std::string, std::string>
+**Thread Safety:** Thread-safe for concurrent reads; concurrent writes require external synchronization
 
-**Common Uses**:
-- Key-value pairs
-- Name-value associations
-- Attribute-value pairs
-- Before-after comparisons
+**Common Uses:**
+- Configuration key-value pairs
+- Environment variables
+- HTTP headers
+- Query parameters
 
-**Usage Example**:
+**Example:**
 ```cpp
-// Configuration option
-string_pair_t option{"database_provider", "mongodb"};
+#include "artdaq-database/SharedCommon/shared_datatypes.h"
+#include <vector>
+#include <iostream>
 
-// Using in a function
-string_pair_t parse_assignment(std::string const& input) {
-    // Parse "key=value" format
-    auto pos = input.find('=');
-    return {input.substr(0, pos), input.substr(pos + 1)};
+namespace db = artdaq::database;
+
+void processOptions(std::vector<db::string_pair_t> const& options) {
+    if (options.empty()) {
+        std::cout << "No options provided" << std::endl;
+        return;
+    }
+
+    for (auto const& [key, value] : options) {  // C++17 structured binding
+        std::cout << key << " = " << value << std::endl;
+    }
 }
 
-// Accessing elements
-std::cout << "Key: " << option.first << std::endl;
-std::cout << "Value: " << option.second << std::endl;
-```
+int main() {
+    // Single pair
+    db::string_pair_t config_entry = {"hostname", "localhost"};
+    std::cout << "Key: " << config_entry.first
+              << ", Value: " << config_entry.second << std::endl;
 
-**Design Rationale**:
-- Common pattern deserves a named type
-- More readable than bare std::pair
-- Could be replaced with custom struct without changing much code
-- Interoperable with std::map, std::unordered_map
+    // Collection of pairs
+    std::vector<db::string_pair_t> options;
+    options.push_back({"port", "27017"});
+    options.push_back({"database", "test_db"});
+    options.push_back({"authSource", "admin"});
+
+    processOptions(options);
+
+    return 0;
+}
+```
 
 ---
 
-### object_id_t
+### `object_id_t`
 
 ```cpp
 using object_id_t = std::string;
 ```
 
-**Purpose**: Represents a unique object identifier (typically MongoDB ObjectId or UUID).
+**Brief:** Represents unique object identifiers, similar to MongoDB's ObjectId. Typically 24-character hexadecimal strings generated by `generate_oid()`. Use this type for any string that uniquely identifies a document in the database.
 
-**Underlying Type**: std::string
+**Thread Safety:** Thread-safe for concurrent reads; concurrent writes require external synchronization
 
-**Format Examples**:
-- MongoDB ObjectId: `"507f1f77bcf86cd799439011"` (24 hex characters)
-- UUID: `"550e8400-e29b-41d4-a716-446655440000"` (with or without hyphens)
+**Format:** 24-character hexadecimal string (e.g., `"507f1f77bcf86cd799439011"`)
 
-**Usage Context**:
-- Document IDs in database operations
-- Unique identifiers for configurations
-- Version identifiers
-- Entity identifiers
+**Common Uses:**
+- Document unique identifiers in the database
+- Cross-reference IDs between related documents
+- Tracking document lineage
 
-**Usage Example**:
+**Example:**
 ```cpp
-object_id_t generate_new_id() {
-    // ... generate unique ID ...
-    return "507f1f77bcf86cd799439011";
+#include "artdaq-database/SharedCommon/shared_datatypes.h"
+#include "artdaq-database/SharedCommon/shared_exceptions.h"
+#include <iostream>
+#include <map>
+
+namespace db = artdaq::database;
+
+// Forward declaration - actual implementation in helper_functions.h
+db::object_id_t generate_oid();
+
+struct Document {
+    db::object_id_t id;
+    std::string name;
+    std::string content;
+};
+
+void processDocument(db::object_id_t const& id) {
+    if (id.empty()) {
+        throw db::invalid_argument("processDocument")
+            << "Document ID cannot be empty";
+    }
+    if (id.size() != 24) {
+        throw db::invalid_argument("processDocument")
+            << "Invalid document ID format: expected 24 characters, got "
+            << id.size();
+    }
+    // ... process document
 }
 
-object_id_t doc_id = generate_new_id();
+int main() {
+    try {
+        // Create a document with an ID
+        Document doc;
+        doc.id = "507f1f77bcf86cd799439011";
+        doc.name = "detector_config";
+        doc.content = R"({"threshold": 100})";
 
-bool delete_document(object_id_t const& id) {
-    // ... delete document with given ID ...
-}
+        // Validate and process
+        processDocument(doc.id);
 
-// Extracting from JSON
-object_id_t extract_id(std::string const& json) {
-    // Parse JSON and extract ID field
+        // Store documents by ID
+        std::map<db::object_id_t, Document> documents;
+        documents[doc.id] = doc;
+
+        // Retrieve by ID
+        if (documents.count(doc.id) > 0) {
+            std::cout << "Found document: " << documents[doc.id].name << std::endl;
+        }
+
+        return 0;
+    } catch (db::exception const& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
 }
 ```
 
-**Design Rationale**:
-- String representation is universal and serializable
-- Compatible with multiple ID formats (MongoDB, UUID, custom)
-- Easy to log and debug
-- Could be replaced with custom ID class if needed
-
 ---
 
-### timestamp_t
+### `timestamp_t`
 
 ```cpp
 using timestamp_t = std::string;
 ```
 
-**Purpose**: Represents a timestamp as a string (typically ISO 8601 format).
+**Brief:** Represents ISO 8601 formatted timestamps with timezone information. Use this type for any string that represents a point in time.
 
-**Underlying Type**: std::string
+**Thread Safety:** Thread-safe for concurrent reads; concurrent writes require external synchronization
 
-**Format**: ISO 8601 with milliseconds: `"2017-07-18T12:48:10.123-0500"`
+**Format:** `YYYY-MM-DDTHH:MM:SS.sss+HHMM` (e.g., `"2024-01-15T14:30:25.123-0500"`)
 
-**Components**:
-- Date: `YYYY-MM-DD`
-- Time: `HH:MM:SS.mmm`
-- Timezone: `±HHMM`
+**Common Uses:**
+- Document creation timestamps
+- Modification timestamps
+- Audit trails
+- Version history
 
-**Usage Context**:
-- Document creation/modification times
-- Operation timestamps
-- Version timestamps
-- Log entry timestamps
-
-**Usage Example**:
+**Example:**
 ```cpp
-timestamp_t current_time() {
-    // Returns current time in ISO 8601 format
-    return "2025-11-13T10:30:45.123-0600";
+#include "artdaq-database/SharedCommon/shared_datatypes.h"
+#include "artdaq-database/SharedCommon/shared_exceptions.h"
+#include <iostream>
+
+namespace db = artdaq::database;
+
+// Forward declaration - actual implementation in helper_functions.h
+db::timestamp_t timestamp();
+
+struct AuditRecord {
+    db::object_id_t document_id;
+    std::string action;           // "created", "modified", "deleted"
+    std::string user;
+    db::timestamp_t when;
+};
+
+struct VersionedDocument {
+    db::object_id_t id;
+    std::string name;
+    std::string version;
+    db::timestamp_t created;
+    db::timestamp_t modified;
+};
+
+void validateTimestamp(db::timestamp_t const& ts) {
+    if (ts.empty()) {
+        throw db::invalid_argument("validateTimestamp")
+            << "Timestamp cannot be empty";
+    }
+    // Basic format validation (ISO 8601)
+    if (ts.size() < 19) {
+        throw db::invalid_argument("validateTimestamp")
+            << "Invalid timestamp format: " << ts;
+    }
 }
 
-timestamp_t created_at = current_time();
-timestamp_t modified_at = current_time();
+int main() {
+    try {
+        VersionedDocument doc;
+        doc.id = "507f1f77bcf86cd799439011";
+        doc.name = "detector_config";
+        doc.version = "v1.0";
+        doc.created = "2024-01-15T14:30:25.123-0500";
+        doc.modified = "2024-01-16T09:15:00.000-0500";
 
-struct Document {
-    object_id_t id;
-    timestamp_t created;
-    timestamp_t modified;
-    std::string content;
-};
+        validateTimestamp(doc.created);
+        validateTimestamp(doc.modified);
+
+        std::cout << "Document: " << doc.name << std::endl;
+        std::cout << "Created: " << doc.created << std::endl;
+        std::cout << "Modified: " << doc.modified << std::endl;
+
+        return 0;
+    } catch (db::exception const& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
+}
 ```
 
-**Design Rationale**:
-- String format is portable and human-readable
-- ISO 8601 is standard and sortable
-- Easy to serialize to JSON/XML
-- Compatible with database timestamp formats
-- Could be replaced with std::chrono::time_point if needed
+## Relationship to Other Components
 
----
+This file is a foundational header included by many SharedCommon files and throughout the project:
 
-## Usage Patterns
+- **helper_functions.h** - Uses `object_id_t` and `timestamp_t` in function signatures for `generate_oid()` and `timestamp()`
+- **fileststem_functions.h** - Uses `path_t` for file and directory operations
+- **returned_result.h** - Uses these types in result messages
+- **ConfigurationDB** - Uses all types extensively for document management
+- **StorageProviders** - Uses `path_t` for connection URIs and `object_id_t` for document IDs
 
-### Function Signatures
-
-These type aliases make function signatures more self-documenting:
+## Example
 
 ```cpp
-// Clear intent - expects a path
-bool load_config(path_t const& config_path);
+#include "artdaq-database/SharedCommon/shared_datatypes.h"
+#include "artdaq-database/SharedCommon/shared_exceptions.h"
+#include <iostream>
 
-// Clear intent - returns an object ID
-object_id_t create_document(std::string const& content);
+namespace db = artdaq::database;
 
-// Clear intent - expects timestamp
-bool is_expired(timestamp_t const& expiry_time);
-
-// Clear intent - returns key-value pair
-string_pair_t parse_option(std::string const& option_string);
-```
-
-Compare with using raw types:
-```cpp
-// Less clear - what kind of string?
-bool load_config(std::string const& config_path);
-
-// Less clear - what is the returned string?
-std::string create_document(std::string const& content);
-```
-
-### Structured Data
-
-```cpp
-struct ConfigurationMetadata {
-    object_id_t id;
-    std::string name;
-    timestamp_t created;
-    timestamp_t modified;
-    path_t storage_path;
-    std::vector<string_pair_t> attributes;
-};
-```
-
-### Collections
-
-```cpp
-std::vector<object_id_t> document_ids;
-std::map<object_id_t, timestamp_t> document_timestamps;
-std::vector<string_pair_t> configuration_options;
-std::set<path_t> search_paths;
-```
-
-### Parameter Objects
-
-```cpp
-struct DatabaseQuery {
-    object_id_t collection_id;
-    timestamp_t start_time;
-    timestamp_t end_time;
-    std::vector<string_pair_t> filters;
-};
-```
-
-## Design Philosophy
-
-### Semantic Types
-
-These aliases create **semantic types** - the underlying type is less important than the semantic meaning:
-
-- `path_t` means "this is a path" (not just any string)
-- `object_id_t` means "this is an identifier" (not just any string)
-- `timestamp_t` means "this is a timestamp" (not just any string)
-- `string_pair_t` means "these strings are related" (not just any pair)
-
-### Benefits
-
-1. **Self-Documentation**: Code is more readable
-   ```cpp
-   void process(path_t path);           // Clear: expects a path
-   void process(std::string path);      // Unclear: what kind of string?
-   ```
-
-2. **Refactoring**: Can change underlying type in one place
-   ```cpp
-   // Today: using path_t = std::string;
-   // Tomorrow: using path_t = std::filesystem::path;
-   // All code using path_t automatically updated
-   ```
-
-3. **Type Safety**: Catch errors at compile time (with careful design)
-   ```cpp
-   void process_id(object_id_t id);
-   void process_timestamp(timestamp_t ts);
-
-   object_id_t id = "507f1f77bcf86cd799439011";
-   timestamp_t ts = "2025-11-13T10:30:45.123-0600";
-
-   // These work
-   process_id(id);
-   process_timestamp(ts);
-
-   // These would work too (same underlying type) but semantically wrong
-   // Strong typing would prevent this
-   process_id(ts);  // Compiles but semantically wrong
-   ```
-
-4. **Consistency**: Ensures same type used everywhere for same purpose
-   ```cpp
-   // All functions use same type for paths
-   path_t get_config_path();
-   bool validate_path(path_t const&);
-   void set_path(path_t const&);
-   ```
-
-### Limitations
-
-Since these are type aliases (not strong types), they don't provide actual type safety:
-
-```cpp
-object_id_t id = "123";
-path_t path = "123";
-// These are interchangeable (both std::string)
-id = path;  // Compiles, but semantically wrong
-```
-
-To get true type safety, would need strong typedef or custom classes:
-```cpp
-struct object_id_t {
-    std::string value;
-    explicit object_id_t(std::string s) : value(std::move(s)) {}
-};
-// Now id = path; would be a compile error
-```
-
-## Migration Path
-
-If stronger typing is needed in the future:
-
-### Step 1: Define Strong Types
-```cpp
-class ObjectId {
-    std::string value_;
-public:
-    explicit ObjectId(std::string s) : value_(std::move(s)) {}
-    std::string const& str() const { return value_; }
-    // ... validation, comparison operators, etc. ...
+// A complete document structure using semantic types
+struct ConfigurationDocument {
+    db::object_id_t   id;           // Unique document identifier
+    std::string       name;         // Human-readable name
+    std::string       version;      // Semantic version string
+    db::path_t        source_file;  // Where this configuration came from
+    db::timestamp_t   created;      // When document was created
+    db::timestamp_t   modified;     // Last modification time
 };
 
-using object_id_t = ObjectId;  // Update alias
+// Function demonstrating type usage
+void displayDocument(ConfigurationDocument const& doc) {
+    std::cout << "Document ID: " << doc.id << std::endl;
+    std::cout << "Name: " << doc.name << std::endl;
+    std::cout << "Version: " << doc.version << std::endl;
+    std::cout << "Source: " << doc.source_file << std::endl;
+    std::cout << "Created: " << doc.created << std::endl;
+    std::cout << "Modified: " << doc.modified << std::endl;
+}
+
+int main() {
+    ConfigurationDocument doc;
+    doc.id = "507f1f77bcf86cd799439011";
+    doc.name = "detector_config";
+    doc.version = "v1.0.0";
+    doc.source_file = "/etc/artdaq/detector.fcl";
+    doc.created = "2024-01-15T14:30:25.123-0500";
+    doc.modified = "2024-01-15T14:30:25.123-0500";
+
+    displayDocument(doc);
+    return 0;
+}
 ```
 
-### Step 2: Update Code Gradually
+## Notes for Developers
+
+### When to Use Each Type
+
+| Type | Use For |
+|------|---------|
+| `path_t` | File paths, directory names, URIs, connection strings |
+| `string_pair_t` | Key-value pairs, mappings, two related strings |
+| `object_id_t` | Document IDs, unique identifiers, foreign keys |
+| `timestamp_t` | Dates, times, audit trails, version timestamps |
+
+### Common Pitfalls
+
+- **Pitfall 1:** Mixing up type aliases since the compiler does not enforce type safety:
+  ```cpp
+  // BAD: Compiler will not catch this mistake
+  db::object_id_t id = "2024-01-15T14:30:25.123-0500";  // Actually a timestamp!
+  db::timestamp_t time = "507f1f77bcf86cd799439011";   // Actually an ID!
+
+  // GOOD: Use the correct type for the correct purpose
+  db::object_id_t id = "507f1f77bcf86cd799439011";
+  db::timestamp_t time = "2024-01-15T14:30:25.123-0500";
+  ```
+
+- **Pitfall 2:** Forgetting that these are still strings and can be empty:
+  ```cpp
+  // GOOD: Always validate before use
+  void processDocument(db::object_id_t const& id) {
+      if (id.empty()) {
+          throw db::invalid_argument("processDocument")
+              << "Document ID cannot be empty";
+      }
+      // ... proceed
+  }
+  ```
+
+- **Pitfall 3:** Assuming format validation is automatic:
+  ```cpp
+  // BAD: Assuming any string is a valid ID
+  db::object_id_t id = "invalid";  // Compiles but not a valid ID
+
+  // GOOD: Validate format when receiving external input
+  void setDocumentId(db::object_id_t const& id) {
+      if (id.size() != 24) {
+          throw db::invalid_argument("setDocumentId")
+              << "Invalid ID format: expected 24 hex characters";
+      }
+      // ... use id
+  }
+  ```
+
+### Anti-patterns
+
 ```cpp
-// Old code (still works with string)
-object_id_t id = "123";  // Now requires explicit ObjectId("123")
+// DON'T use raw std::string when semantic types are available
+void saveDocument(std::string id, std::string path);  // Unclear!
 
-// New code
-object_id_t id = ObjectId("123");
-std::string str = id.str();
+// DO use semantic types for clarity
+void saveDocument(db::object_id_t id, db::path_t path);  // Clear intent
+
+// DON'T mix up types even though compiler allows it
+db::path_t p = doc.id;  // BAD: ID is not a path!
+
+// DO use types consistently
+db::path_t p = doc.source_file;  // GOOD: path to path
 ```
 
-The type alias provides the flexibility for this migration.
+## See Also
 
-## Comparison with Alternatives
-
-### Raw Types
-```cpp
-std::string path;           // What kind of string?
-std::string id;             // What kind of string?
-std::pair<std::string, std::string> kv;  // What's the relationship?
-```
-**Pros**: Simple, no learning curve
-**Cons**: No semantic meaning, harder to refactor
-
-### Strong Typedefs (C++11)
-```cpp
-enum class path_tag {};
-using path_t = strong_typedef<std::string, path_tag>;
-```
-**Pros**: Type safety, prevents mixing
-**Cons**: More complex, harder to use with existing APIs
-
-### Custom Classes
-```cpp
-class Path {
-    std::string value_;
-public:
-    explicit Path(std::string s);
-    // ... methods ...
-};
-```
-**Pros**: Maximum control, validation
-**Cons**: Most complex, requires lots of boilerplate
-
-### Type Aliases (Current Approach)
-```cpp
-using path_t = std::string;
-```
-**Pros**: Simple, flexible, good documentation
-**Cons**: No actual type safety
-
-**Decision**: Type aliases strike the best balance for artdaq-database needs.
-
-## Related Files
-
-- **helper_functions.h** - Uses object_id_t and timestamp_t extensively
-- **fileststem_functions.h** - Uses path_t for file operations
-- **returned_result.h** - Could use string_pair_t for key-value results
-- All database operation files - Use these types in their interfaces
-
-## Best Practices
-
-1. **Use Semantic Types in Signatures**: Makes intent clear
-   ```cpp
-   void store(object_id_t id, path_t path, timestamp_t time);
-   ```
-
-2. **Use Appropriate Conversions**: Be explicit when converting
-   ```cpp
-   path_t path = get_path();
-   std::string str = path;  // Implicit conversion OK
-   ```
-
-3. **Document Formats**: Especially for string-based types
-   ```cpp
-   /// @brief Get document creation time
-   /// @return ISO 8601 timestamp: "YYYY-MM-DDTHH:MM:SS.mmm±ZZZZ"
-   timestamp_t get_created_time();
-   ```
-
-4. **Validate Input**: Even though types are aliases, validate values
-   ```cpp
-   bool is_valid_object_id(object_id_t const& id) {
-       return id.length() == 24 && std::all_of(id.begin(), id.end(), ::isxdigit);
-   }
-   ```
-
-5. **Consider Strong Types**: For critical code paths or when type safety is paramount
-   ```cpp
-   // If needed in future:
-   class ObjectId { /* ... */ };
-   using object_id_t = ObjectId;
-   ```
-
-## Notes
-
-- All types are string-based for simplicity and serialization compatibility
-- ISO 8601 timestamp format is assumed throughout the codebase
-- Object IDs are typically 24-character hex strings (MongoDB format)
-- The aliases provide flexibility for future refactoring without breaking existing code
-- Consider adding validation functions for each type
-- string_pair_t is particularly useful with std::map and configuration parsing
+- [helper_functions.h](./helper_functions.h.md) - Functions that generate and manipulate these types (`generate_oid()`, `timestamp()`)
+- [returned_result.h](./returned_result.h.md) - Result type using string messages
+- [configuraion_api_literals.h](./configuraion_api_literals.h.md) - String constants used with these types

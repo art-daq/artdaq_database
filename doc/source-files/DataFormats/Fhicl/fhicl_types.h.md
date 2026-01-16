@@ -1,79 +1,105 @@
 # fhicl_types.h
 
-## File Overview
+**Path:** `artdaq-database/DataFormats/Fhicl/fhicl_types.h`
 
-Defines the type system for FHiCL (Fermilab Hierarchical Configuration Language) documents. Unlike JSON/XML/CONF, FHiCL has its own rich type system supporting comments, annotations, tables, and sequences.
+**Purpose:** Defines the type system for FHiCL (Fermilab Hierarchical Configuration Language) documents. Unlike JSON/XML/CONF, FHiCL has its own rich type system supporting comments, annotations, tables, and sequences with full metadata preservation.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/DataFormats/Fhicl/fhicl_types.h`
+## Key Concepts
+
+### Why FHiCL Has Its Own Types
+
+FHiCL configurations in high-energy physics experiments often contain extensive documentation:
+- **Comments**: Describe the purpose of parameters
+- **Annotations**: Specify units, constraints, or default values
+
+Preserving this metadata requires types that go beyond simple JSON structures.
+
+### Type Hierarchy
+
+```
+table_t (root container)
+    |
+    +-- atom_t (key-value pair)
+            |
+            +-- key_t (with optional comment)
+            |       |
+            |       +-- basic_key_t (std::string)
+            |       +-- optional_comment_t
+            |
+            +-- value_t (with optional annotation)
+                    |
+                    +-- variant_value_t (table, sequence, string, number, bool)
+                    +-- optional_annotation_t
+```
+
+## Thread Safety
+
+- **Thread-safe:** Yes (header-only, types are value types)
+- **Concurrent access:** Types can be used in multiple threads
+- **Locking:** None (users must protect shared instances)
 
 ## Dependencies
 
-### Third-Party Libraries
-- `<boost/fusion/adapted/struct/adapt_struct.hpp>` - Boost.Fusion adaptation
-- `<boost/fusion/include/adapt_struct.hpp>` - Boost.Fusion includes
+| Include | Purpose |
+|---------|---------|
+| `<boost/fusion/adapted/struct/adapt_struct.hpp>` | Boost.Fusion struct adaptation |
+| `<boost/fusion/include/adapt_struct.hpp>` | Boost.Fusion includes |
+| `artdaq-database/DataFormats/common.h` | Common infrastructure |
+| `artdaq-database/DataFormats/shared_types.h` | Base template types |
 
-### Project Headers
-- `"artdaq-database/DataFormats/common.h"` - Common infrastructure
-- `"artdaq-database/DataFormats/shared_types.h"` - Base templates
-
-## Namespace
-
-```cpp
-artdaq::database::fhicl
-```
-
-**Alias**: `namespace fcl = artdaq::database::fhicl;`
-
-## Type Definitions
-
-### Forward Declarations
-
-```cpp
-struct table_t;
-struct sequence_t;
-```
-
-### Variant Value Type
-
-```cpp
-using variant_value_t = sharedtypes::variant_value_of<table_t, sequence_t>;
-```
-
-Holds: table, sequence, string, decimal, integer, or bool.
+## Type Aliases
 
 ### Basic Types
 
-```cpp
-using basic_key_t = sharedtypes::basic_key_t;                    // std::string
-using optional_comment_t = sharedtypes::optional_comment_t;      // boost::optional<std::string>
-using optional_annotation_t = sharedtypes::optional_annotation_t; // boost::optional<std::string>
-```
+| Type | Definition | Description |
+|------|------------|-------------|
+| `basic_key_t` | `std::string` | Simple string key |
+| `optional_comment_t` | `boost::optional<std::string>` | Optional comment text |
+| `optional_annotation_t` | `boost::optional<std::string>` | Optional annotation text |
 
 ### FHiCL-Specific Types
 
-```cpp
-using key_t = sharedtypes::key_of<basic_key_t, optional_comment_t>;
-using value_t = sharedtypes::value_of<variant_value_t, optional_annotation_t>;
-using atom_t = sharedtypes::kv_pair_of<key_t, value_t>;
-```
+| Type | Definition | Description |
+|------|------------|-------------|
+| `key_t` | `key_of<basic_key_t, optional_comment_t>` | Key with optional comment |
+| `value_t` | `value_of<variant_value_t, optional_annotation_t>` | Value with optional annotation |
+| `atom_t` | `kv_pair_of<key_t, value_t>` | Complete key-value pair |
+| `variant_value_t` | `variant_value_of<table_t, sequence_t>` | Union of all value types |
 
-| Type | Description |
-|------|-------------|
-| `key_t` | Key with optional comment |
-| `value_t` | Value with optional annotation |
-| `atom_t` | Key-value pair (FHiCL parameter) |
+## Classes/Structures
 
-### Composite Types
+### `table_t`
+
+**Brief:** FHiCL table structure (analogous to JSON object but with metadata).
 
 ```cpp
 struct table_t : sharedtypes::table_of<atom_t> {};
+```
+
+**Inherits from:** `sharedtypes::table_of<atom_t>`
+
+**Features:**
+- Maintains insertion order
+- Allows duplicate keys (FHiCL requirement)
+- Contains `atom_t` elements (key-value pairs with metadata)
+
+### `sequence_t`
+
+**Brief:** FHiCL sequence structure (analogous to JSON array but with metadata).
+
+```cpp
 struct sequence_t : sharedtypes::vector_of<value_t> {};
 ```
 
-**table_t**: FHiCL table (like JSON object but with metadata)
-**sequence_t**: FHiCL sequence (like JSON array but with metadata)
+**Inherits from:** `sharedtypes::vector_of<value_t>`
+
+**Features:**
+- Maintains insertion order
+- Contains `value_t` elements (values with annotations)
 
 ## Boost.Fusion Adaptation
+
+The types are adapted for Boost.Spirit parsing/generation:
 
 ```cpp
 BOOST_FUSION_ADAPT_STRUCT(fcl::atom_t,
@@ -89,46 +115,84 @@ BOOST_FUSION_ADAPT_STRUCT(fcl::value_t,
     (fcl::optional_annotation_t, annotation))
 ```
 
-**Purpose**: Enables Boost.Spirit parsers/generators to work with these structures.
-
-## Design Features
-
-**Metadata Support**:
-- Keys can have comments
-- Values can have annotations
-- Preserves FHiCL documentation in data structure
-
-**Hierarchical**:
-- Tables contain atoms (parameters)
-- Sequences contain values
-- Supports arbitrary nesting
-
-**FHiCL Compatibility**:
-- Duplicate keys allowed
-- Order preserved
-- Comments/annotations maintained
+**Purpose:** Enables Boost.Spirit parsers and generators to directly populate and read these structures.
 
 ## Usage Example
 
 ```cpp
+#include "artdaq-database/DataFormats/Fhicl/fhicl_types.h"
+
 using namespace artdaq::database::fhicl;
 
-// Create table with commented key
-table_t config;
-key_t key("timeout", "Connection timeout in seconds");
-value_t value(static_cast<integer>(30), "default value");
-config.push_back(atom_t{key, value});
+void buildFhiclAST() {
+  // Create table with commented key
+  table_t config;
 
-// Create sequence
-sequence_t items;
-items.push_back(value_t{std::string("item1")});
-items.push_back(value_t{std::string("item2")});
+  // Create a key with comment
+  key_t key;
+  key.key = "timeout";
+  key.comment = "Connection timeout in seconds";
+
+  // Create a value with annotation
+  value_t value;
+  value.value = static_cast<integer>(30);
+  value.annotation = "default value";
+
+  // Add to table
+  atom_t atom;
+  atom.key = key;
+  atom.value = value;
+  config.push_back(atom);
+
+  // Create a sequence
+  sequence_t items;
+  value_t item1;
+  item1.value = std::string("item1");
+  items.push_back(item1);
+}
 ```
 
-## Related Files
+## Relationship to Other Components
 
-- **fhicl_types.cpp** - Type implementations
-- **fhicl_reader.h** - FHiCL parser
-- **fhicl_writer.h** - FHiCL generator
-- **shared_types.h** - Base templates
-- **fhiclcpplib_includes.h** - FHiCL-CPP library integration
+```
+fhicl_types.h
+    |
+    +-- shared_types.h (base templates)
+    |       +-- key_of, value_of, kv_pair_of
+    |       +-- table_of, vector_of
+    |       +-- variant_value_of
+    |
+    +-- Used by:
+            +-- fhicl_reader.h (parser output)
+            +-- fhicl_writer.h (generator input)
+            +-- convertfhicl2jsondb.h (conversion)
+```
+
+### Comparison with Other Format Types
+
+| Feature | FHiCL | JSON | CONF/XML |
+|---------|-------|------|----------|
+| Own type system | Yes (`table_t`) | Yes (`object_t`) | No (uses JSON) |
+| Comment support | Yes | No | No |
+| Annotation support | Yes | No | No |
+| Duplicate keys | Yes | Yes | Yes |
+
+## Notes for Developers
+
+- All types are header-only with no separate implementation file except `fhicl_types.cpp` for utility functions
+- The namespace alias `namespace fcl = artdaq::database::fhicl;` is provided for convenience
+- Boost.Fusion adaptation enables direct use with Boost.Spirit parsers
+- The `variant_value_t` uses `boost::recursive_wrapper` for nested structures
+
+### Common Pitfalls
+
+- **Wrong namespace:** Use `fhicl::` or `fcl::`, not `json::`
+- **Missing Fusion adaptation:** Custom types won't work with Spirit parsers without adaptation
+- **Forgetting metadata:** Comments/annotations are optional but should be preserved when present
+
+## See Also
+
+- [fhicl_types.cpp](./fhicl_types.cpp.md) - Type implementations
+- [fhicl_reader.h](./fhicl_reader.h.md) - FHiCL parser using these types
+- [fhicl_writer.h](./fhicl_writer.h.md) - FHiCL generator using these types
+- [../shared_types.h](../shared_types.h.md) - Base template definitions

@@ -1,10 +1,27 @@
 # JsonDocument Module
 
+**Last Updated:** 2026-01-14
+
 ## Module Overview
 
 The JsonDocument module provides a comprehensive framework for working with JSON documents in the artdaq-database system. It offers a high-level, type-safe API for creating, manipulating, querying, and migrating JSON document structures with proper metadata, versioning, and database compliance.
 
-**Module Location**: `/home/user/artdaq-database/artdaq-database/JsonDocument/`
+**Module Location**: `artdaq-database/JsonDocument/`
+
+## File Index
+
+| File | Description |
+|------|-------------|
+| [JSONDocument.h.md](JSONDocument.h.md) | Core document class declaration - path-based JSON manipulation API |
+| [JSONDocument.cpp.md](JSONDocument.cpp.md) | Tree manipulation implementation - find, insert, replace, delete |
+| [JSONDocumentBuilder.h.md](JSONDocumentBuilder.h.md) | Builder class declaration - fluent API for structured documents |
+| [JSONDocumentBuilder.cpp.md](JSONDocumentBuilder.cpp.md) | Builder implementation - metadata, versioning, bookkeeping |
+| [JSONDocumentMigrator.h.md](JSONDocumentMigrator.h.md) | Migrator class declaration - legacy format conversion |
+| [JSONDocumentMigrator.cpp.md](JSONDocumentMigrator.cpp.md) | Migration implementation - field transformation |
+| [JSONDocument_utils.cpp.md](JSONDocument_utils.cpp.md) | Utility functions - serialization, file I/O, matching |
+| [common.h.md](common.h.md) | Aggregator header - module-wide dependencies |
+| [docrecord_exceptions.h.md](docrecord_exceptions.h.md) | Exception definitions - notfound_exception, readonly_exception |
+| [docrecord_literals.h.md](docrecord_literals.h.md) | String constants - action names, templates |
 
 ## Module Purpose
 
@@ -581,6 +598,12 @@ Refer to individual file documentation for detailed API information:
 - [JSONDocument.h.md](JSONDocument.h.md) - Core document API
 - [JSONDocumentBuilder.h.md](JSONDocumentBuilder.h.md) - Builder API
 - [JSONDocumentMigrator.h.md](JSONDocumentMigrator.h.md) - Migration API
+
+## Documentation Status
+
+See [WORKLIST.md](./WORKLIST.md) for complete documentation tracking.
+
+All 10 source files in this module are fully documented.
 
 ## Summary
 

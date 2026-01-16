@@ -1,116 +1,230 @@
 # ovlUpdate.h
 
-## File Overview
+**Path:** `artdaq-database/Overlay/ovlUpdate.h`
 
-Overlay class representing a single update event in a record's update history. Tracks what changed, when it changed, and the event name describing the change.
+**Purpose:** Defines the `ovlUpdate` overlay class that represents a single update event in a record's audit trail. Each update tracks three components: the event name (type of change), when it occurred (timestamp), and what was changed (value). These updates are stored in `ovlBookkeeping` to provide a complete history of record modifications.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/Overlay/ovlUpdate.h`
+## Key Concepts
 
-## Class Definition
+### Audit Trail Entry
 
-```cpp
-class ovlUpdate final : public ovlKeyValue {
- public:
-  ovlUpdate(object_t::key_type const& key, value_t& update);
+Each `ovlUpdate` represents one modification event in the record's history:
+- **Event** - Name describing the type of change (e.g., "addConfiguration", "setVersion")
+- **Timestamp** - When the change occurred (ISO8601 format)
+- **Value** - The data that was changed (typically contains a name and assigned timestamp)
 
-  // accessors
-  std::string& name();
-  std::string const& name() const;
-  std::string& timestamp();
-  std::string const& timestamp() const;
+### Event Types
 
-  ovlUpdateEntry& what();
-  ovlUpdateEntry const& what() const;
+Common event names that appear in update history:
 
-  // overrides
-  std::string to_string() const override;
+| Event Name | Description |
+|------------|-------------|
+| `addConfiguration` | Configuration added to record |
+| `removeConfiguration` | Configuration removed from record |
+| `addEntity` | Entity added to the system |
+| `removeEntity` | Entity removed from the system |
+| `addAlias` | Alias assigned to a version |
+| `removeAlias` | Alias removed (moved to history) |
+| `setVersion` | Version number changed |
+| `setCollection` | Collection assignment changed |
+| `addRun` | Run number added |
 
-  // ops
-  result_t operator==(ovlUpdate const&) const;
+### Update Entry Structure
 
- private:
-  ovlUpdateEntry map_what(value_t& value);
-  ovlTimeStamp map_timestamp(value_t& value);
+The `ovlUpdateEntry` type alias wraps the "value" field of an update, which contains:
+- **name** - Identifier of what was changed
+- **assigned** - Timestamp when the change was assigned
 
- private:
-  ovlTimeStamp _timestamp;
-  ovlUpdateEntry _what;
-};
-```
+## Thread Safety
 
-## Component Types
+- **Thread-safe:** No
+- **Concurrent access:** Not safe for concurrent access; external synchronization required
+- **Locking:** No internal locking
+
+## Dependencies
+
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/Overlay/common.h` | Module foundation types and comparison constants |
+| `artdaq-database/Overlay/ovlKeyValue.h` | Base class for key-value overlay pattern |
+| `artdaq-database/Overlay/ovlTimeStamp.h` | Timestamp overlay for event timing |
+| `artdaq-database/Overlay/ovlKeyValueTimeStamp.h` | Named entry with timestamp for update value |
+
+## Type Aliases
+
+### `ovlUpdateEntry`
 
 ```cpp
 using ovlUpdateEntry = ovlKeyValueTimeStamp<DOCUMENT_COMPARE_MUTE_UPDATE_VALUES>;
 ```
 
-An update entry is a named value with timestamp tracking.
+**Brief:** Type alias for the update entry value, which is a named value with timestamp and comparison masking capability. When `DOCUMENT_COMPARE_MUTE_UPDATE_VALUES` is set, update value comparisons are masked.
 
-## Implementation
+### `ovlUpdateEntryUPtr_t`
 
-### Constructor
 ```cpp
-ovlUpdate::ovlUpdate(object_t::key_type const& key, value_t& update)
-    : ovlKeyValue(key, update),
-      _timestamp(map_timestamp(update)),
-      _what(map_what(update)) {}
+using ovlUpdateEntryUPtr_t = std::unique_ptr<ovlUpdateEntry>;
 ```
 
-### Mapping Methods
-```cpp
-ovlTimeStamp map_timestamp(value_t& value) {
-  confirm(type(value) == type_t::OBJECT);
-  auto& obj = object_value();
-  confirm(obj.count(jsonliteral::timestamp) == 1);
-  return ovlTimeStamp(jsonliteral::timestamp, obj.at(jsonliteral::timestamp));
-}
+**Brief:** Unique pointer type for update entry ownership.
 
-ovlUpdateEntry map_what(value_t& value) {
-  confirm(type(value) == type_t::OBJECT);
-  auto& obj = object_value();
-  confirm(obj.count(jsonliteral::value) == 1);
-  return ovlUpdateEntry(jsonliteral::value, obj.at(jsonliteral::value));
-}
+### `ovlUpdateUPtr_t`
+
+```cpp
+using ovlUpdateUPtr_t = std::unique_ptr<ovlUpdate>;
 ```
 
-### Accessor Methods
-```cpp
-std::string& name() { return value_as<std::string>(jsonliteral::event); }
-std::string& timestamp() { return _timestamp.timestamp(); }
-ovlUpdateEntry& what() { return _what; }
-```
+**Brief:** Unique pointer type for update overlay ownership.
 
-### Serialization
-```cpp
-std::string to_string() const {
-  std::ostringstream oss;
-  oss << "{";
-  oss << quoted_(jsonliteral::event) << ":" << quoted_(name()) << ",";
-  oss << debrace(_timestamp.to_string()) << ",";
-  oss << debrace(_what.to_string());
-  oss << "}";
-  return oss.str();
-}
-```
+## Classes/Structures
 
-**Example Output**:
+### `ovlUpdate`
+
+A final overlay class that wraps an update event JSON object, providing type-safe access to the event name, timestamp, and changed value. Inherits from `ovlKeyValue` to participate in the overlay pattern.
+
+**Thread Safety:** Not thread-safe; external synchronization required for concurrent access.
+
+#### Constructor
+
+##### `ovlUpdate(object_t::key_type const& key, value_t& update)`
+
+**Brief:** Constructs an update overlay by wrapping an existing JSON object and creating sub-overlays for timestamp and value components.
+
+**Parameters:**
+- `key` - The JSON key for this update (typically an array index when in updates array)
+- `update` - Reference to the JSON object containing event, timestamp, and value fields
+
+**Preconditions:**
+- `update` must be a valid JSON object
+- `update` must contain "event", "timestamp", and "value" fields
+
+**Postconditions:**
+- Update overlay is initialized with sub-overlays for timestamp and value
+- Modifications through the overlay affect the underlying JSON
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| Assertion failure | If `update` is not an object or required fields are missing |
+
+**Thread Safety:** Not thread-safe
+
+#### Move Constructor and Destructor
+
+##### `ovlUpdate(ovlUpdate&&) = default`
+
+**Brief:** Default move constructor for transferring update overlay ownership.
+
+##### `~ovlUpdate() = default`
+
+**Brief:** Default destructor that releases resources.
+
+#### Methods
+
+##### `name() -> std::string&`
+
+**Brief:** Returns a mutable reference to the event name, allowing modification of the event type.
+
+**Returns:** Mutable reference to the event name string (from "event" field)
+
+**Thread Safety:** Not thread-safe
+
+##### `name() const -> std::string const&`
+
+**Brief:** Returns a const reference to the event name for read-only access.
+
+**Returns:** Const reference to the event name string
+
+**Thread Safety:** Not thread-safe
+
+##### `timestamp() -> std::string&`
+
+**Brief:** Returns a mutable reference to the event timestamp, allowing modification of when the event occurred.
+
+**Returns:** Mutable reference to the timestamp string
+
+**Thread Safety:** Not thread-safe
+
+##### `timestamp() const -> std::string const&`
+
+**Brief:** Returns a const reference to the event timestamp for read-only access.
+
+**Returns:** Const reference to the timestamp string
+
+**Thread Safety:** Not thread-safe
+
+##### `what() -> ovlUpdateEntry&`
+
+**Brief:** Returns a mutable reference to the update entry value, allowing modification of what was changed.
+
+**Returns:** Mutable reference to the update entry overlay
+
+**Thread Safety:** Not thread-safe
+
+##### `what() const -> ovlUpdateEntry const&`
+
+**Brief:** Returns a const reference to the update entry value for read-only access to what was changed.
+
+**Returns:** Const reference to the update entry overlay
+
+**Thread Safety:** Not thread-safe
+
+##### `to_string() const -> std::string` [override]
+
+**Brief:** Serializes the update to a JSON string representation including event name, timestamp, and value.
+
+**Returns:** JSON string representation of the update
+
+**Thread Safety:** Not thread-safe
+
+**Example Output:**
 ```json
-{
-  "event": "addConfiguration",
-  "timestamp": "2025-01-15T10:30:00Z",
-  "value": {"name": "DAQConfig", "assigned": "2025-01-15T10:30:00Z"}
-}
+{"event": "addConfiguration", "timestamp": "2025-01-15T10:30:00Z", "value": {"name": "DAQConfig", "assigned": "2025-01-15T10:30:00Z"}}
 ```
 
-### Comparison
-```cpp
-result_t operator==(ovlUpdate const& other) const {
-  // Compares timestamp, event name, and event data
-  // Respects DOCUMENT_COMPARE_MUTE_TIMESTAMPS mask
-}
+##### `operator==(ovlUpdate const& other) const -> result_t`
+
+**Brief:** Compares this update with another for equality, checking timestamp, event name, and value while respecting comparison masks.
+
+**Parameters:**
+- `other` - The update to compare against
+
+**Returns:** `Success()` if updates are equal (considering masks), `Failure(message)` with details if different
+
+**Postconditions:**
+- Returns detailed error message describing which components differ
+
+**Thread Safety:** Not thread-safe
+
+#### Private Methods
+
+##### `map_timestamp(value_t& value) -> ovlTimeStamp`
+
+**Brief:** Creates an `ovlTimeStamp` overlay for the timestamp field within the update object.
+
+##### `map_what(value_t& value) -> ovlUpdateEntry`
+
+**Brief:** Creates an `ovlUpdateEntry` overlay for the value field within the update object.
+
+## Relationship to Other Components
+
+### In the Overlay Hierarchy
+
+```
+ovlKeyValue (base)
+     ^
+     |
+ovlUpdate (this class)
+     |
+     +-- ovlTimeStamp _timestamp (when the event occurred)
+     +-- ovlUpdateEntry _what (what was changed)
 ```
 
-## JSON Structure
+### Used By
+
+- **ovlBookkeeping** - Stores updates in the `updates` movable list
+
+### JSON Structure
 
 ```json
 {
@@ -135,46 +249,92 @@ result_t operator==(ovlUpdate const& other) const {
 }
 ```
 
-## Usage
+## See Also
+
+- [ovlUpdate.cpp](./ovlUpdate.cpp.md) - Implementation details
+- [ovlKeyValue.h](./ovlKeyValue.h.md) - Base class for overlay pattern
+- [ovlTimeStamp.h](./ovlTimeStamp.h.md) - Timestamp overlay used for event timing
+- [ovlKeyValueTimeStamp.h](./ovlKeyValueTimeStamp.h.md) - Update entry template
+- [ovlBookkeeping.h](./ovlBookkeeping.h.md) - Contains update arrays
+
+## Notes for Developers
+
+### Usage Examples
 
 ```cpp
-value_t updateJson;
-updateJson["event"] = "addEntity";
-updateJson["timestamp"] = timestamp();
-updateJson["value"]["name"] = "BoardReader01";
+#include "artdaq-database/Overlay/ovlUpdate.h"
+#include "artdaq-database/SharedCommon/helper_functions.h"
 
-ovlUpdate update("update", updateJson);
+using namespace artdaq::database::overlay;
 
-std::cout << "Event: " << update.name() << std::endl;
-std::cout << "When: " << update.timestamp() << std::endl;
-std::cout << "What: " << update.what().name() << std::endl;
+void createUpdate() {
+  // Create JSON for an update event
+  value_t updateJson = object_t{};
+  updateJson["event"] = "addEntity";
+  updateJson["timestamp"] = artdaq::database::timestamp();
+  updateJson["value"] = object_t{};
+  updateJson["value"]["name"] = "BoardReader01";
+  updateJson["value"]["assigned"] = artdaq::database::timestamp();
+
+  // Create overlay
+  ovlUpdate update("update", updateJson);
+
+  // Access components
+  std::cout << "Event: " << update.name() << std::endl;
+  std::cout << "When: " << update.timestamp() << std::endl;
+  std::cout << "What: " << update.what().name() << std::endl;
+}
+
+void modifyUpdate() {
+  value_t updateJson = /* existing update */;
+  ovlUpdate update("update", updateJson);
+
+  // Modify event type
+  update.name() = "removeEntity";
+
+  // Update timestamp
+  update.timestamp() = artdaq::database::timestamp();
+}
+
+void compareUpdates() {
+  value_t json1 = /* first update */;
+  value_t json2 = /* second update */;
+
+  ovlUpdate update1("update", json1);
+  ovlUpdate update2("update", json2);
+
+  // Compare with timestamp masking
+  useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS);
+  auto result = update1 == update2;
+
+  if (!result.first) {
+    std::cerr << "Updates differ: " << result.second << std::endl;
+  }
+}
 ```
 
-## Update Event Types
+### Common Pitfalls
 
-Common event names:
-- `"addConfiguration"` - Configuration added
-- `"removeConfiguration"` - Configuration removed
-- `"addEntity"` - Entity added
-- `"removeEntity"` - Entity removed
-- `"addAlias"` - Alias added
-- `"removeAlias"` - Alias removed
-- `"setVersion"` - Version changed
-- `"setCollection"` - Collection changed
-- `"addRun"` - Run added
+- **Event names are free-form:** Event names are strings with no validation. Use consistent naming conventions.
+- **Timestamp masking affects comparison:** When `DOCUMENT_COMPARE_MUTE_TIMESTAMPS` is set, only event names are compared, not the full value.
 
-## Related Files
+### Anti-patterns
 
-- **ovlKeyValue.h** - Base class
-- **ovlTimeStamp.h** - For timestamp tracking
-- **ovlKeyValueTimeStamp.h** - For update entry
-- **ovlBookkeeping.h** - Uses ovlUpdate in update history
-- **common.h** - Mask constants
+```cpp
+// DON'T do this: Inconsistent event naming
+update1.name() = "add_entity";  // snake_case
+update2.name() = "addEntity";   // camelCase
+// These will not compare as equal!
 
-## Notes
+// DO this instead: Use consistent naming convention
+update1.name() = "addEntity";
+update2.name() = "addEntity";
+```
 
-- Final class
-- Used in ovlBookkeeping update arrays
-- Tracks complete audit trail of record changes
-- Comparison can mask timestamp differences
-- Event names are free-form strings
+### Comparison Behavior
+
+The comparison operator has special behavior based on the timestamp mask:
+- **Without mask:** Compares timestamp, event name, and full value
+- **With `DOCUMENT_COMPARE_MUTE_TIMESTAMPS`:** Compares only event names within the value (not timestamps)
+
+This allows flexible comparison where timing information can be ignored when testing or comparing semantically equivalent updates.

@@ -1,610 +1,677 @@
 # JSONDocumentBuilder.h
 
-## File Overview
+**Path:** `artdaq-database/JsonDocument/JSONDocumentBuilder.h`
 
-This header file defines the `JSONDocumentBuilder` class, which provides a high-level builder pattern API for creating and modifying JSON documents with proper metadata, versioning, and bookkeeping. It wraps the lower-level `JSONDocument` API and integrates with the overlay system to ensure documents have correct structure and maintain database integrity.
+**Purpose:** This header file defines the `JSONDocumentBuilder` class, which provides a high-level builder pattern API for creating and modifying JSON documents with proper metadata, versioning, aliases, and bookkeeping. It wraps the lower-level `JSONDocument` API and integrates with the overlay system to ensure documents have correct structure for database storage.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/JsonDocument/JSONDocumentBuilder.h`
+
+## Key Concepts
+
+### Builder Pattern
+The `JSONDocumentBuilder` implements the classic builder pattern:
+- **Fluent interface** - Methods return `JSONDocumentBuilder&` allowing method chaining
+- **Step-by-step construction** - Add metadata, versions, aliases incrementally
+- **Final extraction** - Use `extract()` to get the completed document
+- **Non-copyable** - Ensures clear ownership of the document being built
+
+### Database Document Structure
+The builder creates documents with proper database structure including:
+- **Version** - Document version identifier
+- **Object ID** - Unique database identifier (MongoDB ObjectId format)
+- **Collection** - Database collection assignment
+- **Entities** - Configurable components/subsystems
+- **Configurations** - Configuration set associations
+- **Aliases** - Alternate names/identifiers for version lookup
+- **Bookkeeping** - Readonly/deleted flags, update tracking
+
+### Overlay Integration
+The builder uses overlay classes (`ovlDatabaseRecord`) to provide:
+- Type-safe field access to document metadata
+- Validation of document structure
+- Abstraction over raw JSON details
+- Consistent bookkeeping management
+
+### Undo Mechanism
+The builder includes `SaveUndo()` and `CallUndo()` methods that form a placeholder for transaction-like rollback. Current implementation always returns `Success()` but the pattern allows for future state preservation.
+
+## Thread Safety
+
+- **Thread-safe:** No
+- **Concurrent access:** Not safe for concurrent read/write operations
+- **Locking:** No internal locks; external synchronization required for multi-threaded use
 
 ## Dependencies
 
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/JsonDocument/JSONDocument.h` | Core document manipulation class |
+| `artdaq-database/JsonDocument/common.h` | Module-wide types and utilities |
+| `artdaq-database/Overlay/JSONDocumentOverlay.h` | Overlay classes for structured access to document fields |
+
+## Classes/Structures
+
+### `JSONDocumentBuilder`
+
+A final, non-copyable class that provides a builder API for creating database-compliant JSON documents with proper metadata structure.
+
+**Thread Safety:** Not thread-safe. Maintains mutable internal state including `_document`, `_overlay`, and `_initOK`.
+
+#### Constructors
+
+##### `JSONDocumentBuilder()`
+
+**Brief:** Default constructor that creates a new builder with an empty document template and initializes the overlay.
+
+**Parameters:** None
+
+**Preconditions:** None
+
+**Postconditions:**
+- Document contains empty template from `template__empty_document`
+- Overlay is initialized for structured access
+- `_initOK` is set to true
+
+**Throws:** None
+
+**Thread Safety:** safe (construction)
+
+**Example:**
 ```cpp
-#include "artdaq-database/JsonDocument/JSONDocument.h"
-#include "artdaq-database/JsonDocument/common.h"
-#include "artdaq-database/Overlay/JSONDocumentOverlay.h"
-```
+#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 
-**Key Dependencies**:
-- **JSONDocument.h** - Core document manipulation class
-- **common.h** - Module-wide types and utilities
-- **JSONDocumentOverlay.h** - Overlay classes for structured access to document fields
+using namespace artdaq::database::docrecord;
 
-## Namespace Structure
-
-```cpp
-namespace artdaq {
-namespace database {
-namespace docrecord {
-  // JSONDocumentBuilder class
+void example() {
+  JSONDocumentBuilder builder;
+  builder.createFromData(userData)
+         .setVersion(version);
 }
-}
-}
 ```
 
-## Type Aliases
+##### `JSONDocumentBuilder(JSONDocument doc)`
 
+**Brief:** Constructor that initializes builder with an existing document for modification by moving the document and creating an overlay.
+
+**Parameters:**
+- `doc` - Existing JSONDocument to build upon (moved)
+
+**Preconditions:**
+- Document should contain valid JSON structure
+
+**Postconditions:**
+- Builder wraps the provided document (moved)
+- Overlay is initialized for the document structure
+- `_initOK` is set to true
+
+**Throws:** None
+
+**Thread Safety:** safe (construction)
+
+**Example:**
 ```cpp
-using artdaq::database::json::array_t;
-using artdaq::database::json::object_t;
-using artdaq::database::json::type_t;
-using artdaq::database::json::value_t;
-
-using artdaq::database::overlay::ovlDatabaseRecord;
-using artdaq::database::overlay::ovlDatabaseRecordUPtr_t;
+JSONDocument existing = JSONDocument::loadFromFile("config.json");
+JSONDocumentBuilder builder(existing);
+builder.addAlias(newAlias);
 ```
 
-Makes JSON types and overlay types available without full qualification.
+#### Data Import Methods
 
-## JSONDocumentBuilder Class
+##### `createFromData(JSONDocument userDoc) -> JSONDocumentBuilder&`
 
-### Class Declaration
+**Brief:** Creates a new database document from user data, wrapping it in proper database structure with metadata scaffolding.
 
+**Parameters:**
+- `userDoc` - User-provided document containing configuration data (moved internally)
+
+**Preconditions:**
+- None
+
+**Returns:** Reference to this builder for method chaining
+
+**Postconditions:**
+- Document contains user data wrapped in database structure
+- Overlay is refreshed to reflect new structure
+- Metadata fields (metadata, changelog, origin, collection, attachments, data) are imported if present in source
+
+**Throws:** None directly, but overlay operations may throw
+
+**Thread Safety:** unsafe
+
+**Example:**
 ```cpp
-class JSONDocumentBuilder final {
-public:
-  // ... methods ...
-private:
-  // ... implementation ...
-};
+JSONDocument userData(R"({"detector": "ICARUS", "channels": 1024})");
+JSONDocumentBuilder builder;
+builder.createFromData(userData);
 ```
 
-**Key Characteristic**: Marked `final` - cannot be inherited from.
+#### Alias Methods
 
-### Constructors
+##### `addAlias(JSONDocument const& alias) -> JSONDocumentBuilder&`
 
+**Brief:** Adds an alternate name/identifier for the document to the active aliases list.
+
+**Parameters:**
+- `alias` - Document containing alias in format `{"alias": "alias_name"}`
+
+**Preconditions:**
+- Alias name should be unique within the document
+
+**Returns:** Reference to this builder for method chaining
+
+**Postconditions:**
+- Alias is added to document's active aliases via overlay
+- On failure: undo is called, builder remains usable
+
+**Throws:** None (exceptions are caught internally and logged)
+
+**Thread Safety:** unsafe
+
+**Example:**
 ```cpp
-JSONDocumentBuilder();
-JSONDocumentBuilder(JSONDocument);
+builder.addAlias(JSONDocument(R"({"alias":"latest_stable"})"))
+       .addAlias(JSONDocument(R"({"alias":"production"})"));
 ```
 
-**Default Constructor**: Creates a new document from the empty template.
+##### `removeAlias(JSONDocument const& alias) -> JSONDocumentBuilder&`
 
-**Document Constructor**: Initializes builder with an existing document.
+**Brief:** Removes an alias from the document's active aliases list.
 
-**Both constructors**:
-- Create an overlay for structured access
-- Call `init()` for initialization
-- Store initialization status in `_initOK`
+**Parameters:**
+- `alias` - Document containing alias to remove in format `{"alias": "alias_name"}`
 
-### Document Creation
+**Returns:** Reference to this builder for method chaining
 
+**Postconditions:**
+- Alias is removed from document's active aliases
+- On failure: undo is called, builder remains usable
+
+**Throws:** None (exceptions are caught internally)
+
+**Thread Safety:** unsafe
+
+#### Configuration Methods
+
+##### `addConfiguration(JSONDocument const& config) -> JSONDocumentBuilder&`
+
+**Brief:** Adds a configuration set association to the document.
+
+**Parameters:**
+- `config` - Document containing configuration in format `{"configuration": "config_name"}`
+
+**Returns:** Reference to this builder for method chaining
+
+**Postconditions:**
+- Configuration is added to document's configurations list via overlay
+
+**Throws:** None (exceptions are caught internally)
+
+**Thread Safety:** unsafe
+
+**Example:**
 ```cpp
-JSONDocumentBuilder& createFromData(JSONDocument);
+builder.addConfiguration(JSONDocument(R"({"configuration":"nominal"})"))
+       .addConfiguration(JSONDocument(R"({"configuration":"high_rate"})"));
 ```
 
-**Purpose**: Creates a new database document from user data, wrapping it in proper database structure.
+##### `removeConfiguration(JSONDocument const& config) -> JSONDocumentBuilder&`
 
-**Process**:
-1. Resets overlay
-2. Creates empty template document
-3. Creates new overlay
-4. Imports user data into template structure
-5. Refreshes overlay
+**Brief:** Removes a configuration association from the document.
 
-**Use Case**: Converting raw configuration data into a proper database document with metadata.
+**Parameters:**
+- `config` - Document containing configuration to remove
 
-**Returns**: Reference to self (builder pattern)
+**Returns:** Reference to this builder for method chaining
 
-### Alias Management
+**Thread Safety:** unsafe
 
+##### `removeAllConfigurations() -> JSONDocumentBuilder&`
+
+**Brief:** Removes all configuration associations from the document by calling wipe() on the overlay's configurations list.
+
+**Parameters:** None
+
+**Returns:** Reference to this builder for method chaining
+
+**Postconditions:**
+- Document's configurations list is empty
+
+**Thread Safety:** unsafe
+
+#### Entity Methods
+
+##### `addEntity(JSONDocument const& entity) -> JSONDocumentBuilder&`
+
+**Brief:** Adds a configurable component/subsystem entity to the document.
+
+**Parameters:**
+- `entity` - Document containing entity in format `{"entity": "entity_name"}`
+
+**Returns:** Reference to this builder for method chaining
+
+**Postconditions:**
+- Entity is added to document's entities list via overlay
+
+**Throws:** None (exceptions are caught internally)
+
+**Thread Safety:** unsafe
+
+**Example:**
 ```cpp
-JSONDocumentBuilder& addAlias(JSONDocument const&);
-JSONDocumentBuilder& removeAlias(JSONDocument const&);
+builder.addEntity(JSONDocument(R"({"entity":"TPC_West"})"))
+       .addEntity(JSONDocument(R"({"entity":"TPC_East"})"));
 ```
 
-**addAlias**:
-- Adds an alternate name/identifier to the document
-- Uses overlay system to manage alias arrays
-- Throws on failure, calls undo
+##### `removeEntity(JSONDocument const& entity) -> JSONDocumentBuilder&`
 
-**removeAlias**:
-- Removes an alias from the document
-- Maintains alias history
-- Throws on failure, calls undo
+**Brief:** Removes an entity association from the document.
 
-**Alias Use Cases**:
-- "latest_stable" pointing to specific version
-- "production" pointing to current production config
-- Multiple names for the same configuration
+**Parameters:**
+- `entity` - Document containing entity to remove
 
-### Configuration Management
+**Returns:** Reference to this builder for method chaining
 
+**Thread Safety:** unsafe
+
+##### `removeAllEntities() -> JSONDocumentBuilder&`
+
+**Brief:** Removes all entity associations from the document by calling wipe() on the overlay's entities list.
+
+**Parameters:** None
+
+**Returns:** Reference to this builder for method chaining
+
+**Postconditions:**
+- Document's entities list is empty
+
+**Thread Safety:** unsafe
+
+#### Run Methods
+
+##### `addRun(JSONDocument const& run) -> JSONDocumentBuilder&`
+
+**Brief:** Associates a run number/identifier with the document.
+
+**Parameters:**
+- `run` - Document containing run information
+
+**Returns:** Reference to this builder for method chaining
+
+**Thread Safety:** unsafe
+
+#### Metadata Methods
+
+##### `setVersion(JSONDocument const& version) -> JSONDocumentBuilder&`
+
+**Brief:** Sets the version identifier for the document by extracting the "name" field from the provided document.
+
+**Parameters:**
+- `version` - Document containing version in format `{"name": "version_string"}`
+
+**Returns:** Reference to this builder for method chaining
+
+**Postconditions:**
+- Document's version field is updated via overlay
+
+**Throws:** None (exceptions are caught internally)
+
+**Thread Safety:** unsafe
+
+**Example:**
 ```cpp
-JSONDocumentBuilder& addConfiguration(JSONDocument const&);
-JSONDocumentBuilder& removeConfiguration(JSONDocument const&);
-JSONDocumentBuilder& removeAllConfigurations();
+builder.setVersion(JSONDocument(R"({"name":"v1.0.0"})"));
 ```
 
-**addConfiguration**:
-- Adds a configuration to the document's configuration array
-- Configurations represent different settings/variants
+##### `setCollection(JSONDocument const& collection) -> JSONDocumentBuilder&`
 
-**removeConfiguration**:
-- Removes specific configuration
-- Uses overlay for safe removal
+**Brief:** Sets the database collection for the document.
 
-**removeAllConfigurations**:
-- Clears all configurations using `wipe()`
-- Useful for rebuilding configuration list
+**Parameters:**
+- `collection` - Document containing collection in format `{"collection": "collection_name"}`
 
-### Entity Management
+**Returns:** Reference to this builder for method chaining
 
+**Thread Safety:** unsafe
+
+**Example:**
 ```cpp
-JSONDocumentBuilder& addEntity(JSONDocument const&);
-JSONDocumentBuilder& removeEntity(JSONDocument const&);
-JSONDocumentBuilder& removeAllEntities();
+builder.setCollection(JSONDocument(R"({"collection":"detector_configs"})"));
 ```
 
-**addEntity**:
-- Adds an entity (component/subsystem) to the document
-- Entities represent configurable components
+##### `setObjectID(JSONDocument const& objectId) -> JSONDocumentBuilder&`
 
-**removeEntity**:
-- Removes specific entity
+**Brief:** Sets the unique database identifier for the document by extracting "id" field and using swap via overlay.
 
-**removeAllEntities**:
-- Clears all entities using `wipe()`
+**Parameters:**
+- `objectId` - Document containing object ID
 
-### Run Management
+**Returns:** Reference to this builder for method chaining
 
+**Thread Safety:** unsafe
+
+##### `getObjectID() const -> JSONDocument`
+
+**Brief:** Returns the document's object ID as a JSONDocument by extracting from the overlay.
+
+**Parameters:** None
+
+**Returns:** JSONDocument containing the object ID
+
+**Thread Safety:** safe (const method)
+
+##### `getObjectOUID() const -> std::string`
+
+**Brief:** Returns the document's object ID as a string (OID format) by extracting from the overlay.
+
+**Parameters:** None
+
+**Returns:** String representation of the object ID
+
+**Thread Safety:** safe (const method)
+
+##### `newObjectID() -> bool`
+
+**Brief:** Generates a new unique object ID for the document by calling the overlay's newId() method.
+
+**Parameters:** None
+
+**Returns:** `true` if ID was successfully generated
+
+**Postconditions:**
+- Document has a new unique object ID
+
+**Thread Safety:** unsafe
+
+**Example:**
 ```cpp
-JSONDocumentBuilder& addRun(JSONDocument const&);
+builder.newObjectID();
+std::string oid = builder.getObjectOUID();
 ```
 
-**Purpose**: Associates a run number/identifier with the document.
+#### Bookkeeping Methods
 
-**Use Case**: Tracking which experimental runs used this configuration.
+##### `markReadonly() -> JSONDocumentBuilder&`
 
-### Versioning
+**Brief:** Marks the document as read-only, preventing future modifications by setting bookkeeping flag via overlay.
 
+**Parameters:** None
+
+**Returns:** Reference to this builder for method chaining
+
+**Postconditions:**
+- Document's bookkeeping.isreadonly flag is set to true
+
+**Thread Safety:** unsafe
+
+**Example:**
 ```cpp
-JSONDocumentBuilder& setVersion(JSONDocument const&);
+// Lock production configuration
+builder.markReadonly();
 ```
 
-**Purpose**: Sets the version identifier for the document.
+##### `markDeleted() -> JSONDocumentBuilder&`
 
-**Version Format**: Typically string like "v1.0.0" or "2023-01-15"
+**Brief:** Marks the document as soft-deleted without physical removal by setting bookkeeping flag via overlay.
 
-**Importance**: Critical for tracking document evolution and compatibility.
+**Parameters:** None
 
-### Collection Assignment
+**Returns:** Reference to this builder for method chaining
 
+**Postconditions:**
+- Document's bookkeeping.isdeleted flag is set to true
+
+**Thread Safety:** unsafe
+
+##### `isReadonlyOrDeleted() const -> bool`
+
+**Brief:** Checks if the document is marked as read-only or deleted by querying the overlay's bookkeeping flags.
+
+**Parameters:** None
+
+**Returns:** `true` if document is readonly or deleted, `false` otherwise
+
+**Thread Safety:** safe (const method)
+
+#### Extraction and Comparison Methods
+
+##### `extractTags() const -> std::list<std::string>`
+
+**Brief:** Extracts searchable tags from the document by collecting version, configuration, and entity information from the overlay.
+
+**Parameters:** None
+
+**Returns:** List of tags in format `"type:value"` (e.g., `"version:v1.0.0"`, `"configuration:nominal"`, `"entity:TPC_West"`)
+
+**Thread Safety:** safe (const method)
+
+**Example:**
 ```cpp
-JSONDocumentBuilder& setCollection(JSONDocument const&);
+auto tags = builder.extractTags();
+// tags = ["version:v1.0.0", "configuration:nominal", "entity:TPC_West"]
 ```
 
-**Purpose**: Assigns the document to a specific database collection.
+##### `extract() -> JSONDocument`
 
-**Collections**: Group related documents (e.g., "run_configurations", "detector_configs")
+**Brief:** Extracts the final document from the builder using move semantics.
 
-### Bookkeeping Operations
+**Parameters:** None
 
+**Returns:** The completed JSONDocument (moved)
+
+**Postconditions:**
+- Builder's internal document is moved out
+- Builder should not be used after this call
+
+**Thread Safety:** unsafe
+
+**Example:**
 ```cpp
-JSONDocumentBuilder& markReadonly();
-JSONDocumentBuilder& markDeleted();
+auto finalDoc = builder.extract();
+finalDoc.saveToFile("config.json");
+// builder should not be used after this
 ```
 
-**markReadonly**:
-- Sets bookkeeping flag indicating document is immutable
-- Future modification attempts will throw `readonly_exception`
-- Used for archiving production configurations
+##### `comapreUsingOverlays(JSONDocumentBuilder const& other) const -> result_t`
 
-**markDeleted**:
-- Soft-delete: marks document as deleted without removing it
-- Document remains in database for audit trail
-- Queries typically filter out deleted documents
+**Brief:** Compares this builder's document with another using overlay comparison by delegating to the overlay's equality operator.
 
-### Object ID Management
+**Parameters:**
+- `other` - Builder to compare with
 
+**Returns:** result_t indicating success/failure of comparison
+
+**Thread Safety:** safe (const method)
+
+**Note:** Method name has typo (should be "compareUsingOverlays")
+
+##### `operator==(JSONDocumentBuilder const& other) const -> result_t`
+
+**Brief:** Equality comparison operator using overlay comparison, delegates to comapreUsingOverlays().
+
+**Parameters:**
+- `other` - Builder to compare with
+
+**Returns:** result_t from overlay comparison
+
+**Thread Safety:** safe (const method)
+
+##### `to_string() const -> std::string`
+
+**Brief:** Converts the document to its JSON string representation by calling the document's to_string() method.
+
+**Parameters:** None
+
+**Returns:** JSON string of the document
+
+**Thread Safety:** conditional (modifies document's _isDirty flag)
+
+## Template Methods
+
+### `overlay<OVL>(JSONDocument& document, object_t::key_type const& self_key) -> std::unique_ptr<OVL>`
+
+**Brief:** Template method that creates an overlay of specific type for a document field.
+
+**Parameters:**
+- `document` - Document to create overlay for (non-const reference)
+- `self_key` - Key name for the overlay
+
+**Preconditions:**
+- `self_key` must not be empty
+- Document's value must be an object type
+
+**Returns:** Unique pointer to the created overlay of type OVL
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `std::runtime_error` | When self_key is empty |
+| `std::runtime_error` | When document value is not an object type |
+
+**Thread Safety:** unsafe
+
+## Functions
+
+### `toJSONDocument<T>(T const& value) -> JSONDocument`
+
+**Brief:** Template function that converts various types to JSONDocument.
+
+**Parameters:**
+- `value` - Value to convert
+
+**Returns:** JSONDocument containing the converted value
+
+**Thread Safety:** safe
+
+**Note:** Specialization for `string_pair_t` is provided in JSONDocument_utils.cpp.
+
+### `debug::JSONDocumentBuilder()`
+
+**Brief:** Enables detailed TRACE logging for builder operations at maximum verbosity.
+
+**Parameters:** None
+
+**Returns:** None
+
+**Side Effects:**
+- Configures TRACE logging for JSONDocumentBuilder debugging
+
+**Thread Safety:** safe
+
+### `operator<<(std::ostream& os, JSONDocumentBuilder const& builder) -> std::ostream&`
+
+**Brief:** Stream output operator for JSONDocumentBuilder that writes JSON string to output stream.
+
+**Parameters:**
+- `os` - Output stream
+- `builder` - Builder to output
+
+**Returns:** Reference to the output stream
+
+**Thread Safety:** conditional
+
+## Copy/Move Semantics
+
+The class is non-copyable and non-movable by design:
 ```cpp
-JSONDocumentBuilder& setObjectID(JSONDocument const&);
-JSONDocument getObjectID() const;
-std::string getObjectOUID() const;
-bool newObjectID();
-```
-
-**setObjectID**:
-- Sets the database object ID (typically MongoDB-style _id)
-
-**getObjectID**:
-- Returns the object ID as a document
-
-**getObjectOUID**:
-- Returns the object ID as a string (OID format)
-
-**newObjectID**:
-- Generates a new unique object ID
-- Returns true if successful
-
-### State Queries
-
-```cpp
-bool isReadonlyOrDeleted() const;
-```
-
-**Purpose**: Checks if document is in a protected state (readonly or deleted).
-
-**Use Case**: Validating whether modifications are allowed before attempting them.
-
-### Tag Extraction
-
-```cpp
-std::list<std::string> extractTags() const;
-```
-
-**Purpose**: Extracts searchable tags from the document.
-
-**Tags Include**:
-- Version: "version:v1.0.0"
-- Configurations: "configuration:detector_A"
-- Entities: "entity:daq_component_1"
-
-**Use Case**: Building search indexes, filtering documents.
-
-### Document Extraction
-
-```cpp
-JSONDocument extract();
-```
-
-**Purpose**: Extracts the final document from the builder (move semantics).
-
-**Characteristics**:
-- Transfers ownership
-- Builder should not be used after extraction
-- Efficient (no copying)
-
-### Comparison
-
-```cpp
-result_t comapreUsingOverlays(JSONDocumentBuilder const&) const;
-result_t operator==(JSONDocumentBuilder const& other) const;
-```
-
-**Note**: Method name has typo: "comapreUsingOverlays" (should be "compare").
-
-**Purpose**: Compares two builders by comparing their overlay structures.
-
-**Returns**: `result_t` indicating success/failure with details.
-
-### String Conversion
-
-```cpp
-std::string to_string() const;
-```
-
-**Purpose**: Converts the document to JSON string representation.
-
-**Use Case**: Logging, debugging, serialization.
-
-### Special Member Functions
-
-```cpp
-// Defaults
-~JSONDocumentBuilder() = default;
-
-// Deleted
 JSONDocumentBuilder(JSONDocumentBuilder const&) = delete;
 JSONDocumentBuilder& operator=(JSONDocumentBuilder const&) = delete;
 JSONDocumentBuilder& operator=(JSONDocumentBuilder&&) = delete;
 JSONDocumentBuilder(JSONDocumentBuilder&&) = delete;
 ```
 
-**Design**: Non-copyable, non-movable.
-
-**Rationale**:
-- Builder maintains state through overlay
-- Copying/moving would complicate overlay management
-- Use `extract()` to transfer ownership of document
+**Rationale:**
+- Builder maintains state through overlay pointer
+- Copying/moving would complicate overlay management and ownership
+- Use `extract()` to transfer ownership of the completed document
 - Intended for single-use, stack-allocated builders
 
-## Private Methods
+## Relationship to Other Components
 
-### Template Method
+### Within the JsonDocument Module
+- **JSONDocument** - The builder wraps and manipulates `JSONDocument` internally
+- **JSONDocumentMigrator** - Uses builder for constructing migrated documents
+- **docrecord_literals.h** - Provides template strings and field name constants
 
-```cpp
-template <typename OVL>
-std::unique_ptr<OVL> overlay(JSONDocument&, object_t::key_type const&);
-```
+### Dependencies
+- **Overlay Module** - Provides `ovlDatabaseRecord` and specialized overlays (`ovlAlias`, `ovlConfiguration`, `ovlEntity`, `ovlVersion`, `ovlCollection`, `ovlId`) for structured field access
+- **DataFormats/Json** - Provides JSON types used by overlays
 
-**Purpose**: Creates an overlay of specific type for a document field.
+### Used By
+- **StorageProviders** - Use builder to create properly structured documents for storage
+- **ConfigurationDB** - Uses builder for document creation workflows
+- **Migration Utilities** - Uses builder to construct modern format documents
 
-**Template Parameter**: Overlay type (e.g., `ovlAlias`, `ovlConfiguration`, `ovlEntity`)
+## See Also
 
-**Implementation**:
-```cpp
-template <typename OVL>
-std::unique_ptr<OVL> JSONDocumentBuilder::overlay(
-    JSONDocument& document, object_t::key_type const& self_key) {
-  confirm(!self_key.empty());
-  confirm(type(document._value) == type_t::OBJECT);
+- [JSONDocumentBuilder.cpp.md](./JSONDocumentBuilder.cpp.md) - Implementation details
+- [JSONDocument.h.md](./JSONDocument.h.md) - Core document class
+- [JSONDocumentMigrator.h.md](./JSONDocumentMigrator.h.md) - Document migration
+- [JSONDocument_utils.cpp.md](./JSONDocument_utils.cpp.md) - Contains `createFromData` and `_importUserData` implementations
+- [Overlay Module](../Overlay/README.md) - Overlay classes used by builder
+- [docrecord_literals.h.md](./docrecord_literals.h.md) - Template constants
 
-  if (self_key.empty())
-    throw std::runtime_error("Errror: self_key is empty");
+## Notes for Developers
 
-  if (type(document._value) != type_t::OBJECT)
-    throw std::runtime_error("Errror: document._value is not a type_t::OBJECT type");
+### Common Pitfalls
 
-  using artdaq::database::sharedtypes::unwrap;
-  return std::make_unique<OVL>(self_key, document._value);
-}
-```
+- **Using builder after extract():** The builder's document is moved out; do not reuse the builder.
+- **Forgetting to set version:** Many database operations require a version.
+- **Not generating new ID:** Call `newObjectID()` for new documents before storing.
+- **Modifying readonly documents:** Check `isReadonlyOrDeleted()` first.
 
-**Usage**:
-```cpp
-auto ovl = overlay<ovl::ovlConfiguration>(copy, jsonliteral::configuration);
-```
-
-### Internal Helpers
+### Anti-patterns
 
 ```cpp
-void _createFromTemplate(JSONDocument document);
-JSONDocumentBuilder& self();
-JSONDocumentBuilder const& self() const;
-bool init();
-void _importUserData(JSONDocument const& document);
-```
-
-**_createFromTemplate**: Sets internal document from template
-
-**self()**: Returns reference to this (builder pattern)
-
-**init()**: Initialization logic
-
-**_importUserData**: Imports user-provided data into document structure
-
-### Undo Mechanism
-
-```cpp
-result_t SaveUndo();
-result_t CallUndo() noexcept;
-```
-
-**Purpose**: Transaction-like rollback for failed operations.
-
-**SaveUndo**: Saves document state before modification
-
-**CallUndo**: Restores document state if operation fails
-
-**Pattern Used In**:
-```cpp
-try {
-  ThrowOnFailure(SaveUndo());
-  ThrowOnFailure(_overlay->addAlias(ovl));
-  return self();
-} catch (std::exception const& ex) {
-  ThrowOnFailure(CallUndo());
-  return self();
-}
-```
-
-## Private Member Variables
-
-```cpp
-private:
-  JSONDocument _document;
-  ovlDatabaseRecordUPtr_t _overlay;
-  bool _initOK;
-```
-
-**_document**: The JSON document being built
-
-**_overlay**: Smart pointer to overlay providing structured access
-
-**_initOK**: Initialization status flag
-
-## Free Functions
-
-### Template Function
-
-```cpp
-template <typename T>
-JSONDocument toJSONDocument(T const&);
-```
-
-**Purpose**: Converts various types to `JSONDocument`.
-
-**Use Case**: Creating documents from different data types (pairs, structs, etc.)
-
-### Debug Function
-
-```cpp
-namespace debug {
-  void JSONDocumentBuilder();
-}
-```
-
-**Purpose**: Enables detailed TRACE logging for builder operations.
-
-### Stream Output
-
-```cpp
-std::ostream& operator<<(std::ostream&, JSONDocumentBuilder const&);
-```
-
-**Purpose**: Allows streaming builder to output streams.
-
-**Usage**:
-```cpp
-std::cout << builder << std::endl;
-TLOG(10) << "Builder state: " << builder;
-```
-
-## Usage Patterns
-
-### Building a New Document
-
-```cpp
-JSONDocumentBuilder builder;
-
-// Set metadata
-builder.setVersion(JSONDocument(R"({"name":"v1.0.0"})"));
-builder.setCollection(JSONDocument(R"({"collection":"configurations"})"));
-
-// Add content
-builder.addEntity(JSONDocument(R"({"entity":"detector_A"})"));
-builder.addConfiguration(JSONDocument(R"({"configuration":"default"})"));
-
-// Add aliases
-builder.addAlias(JSONDocument(R"({"alias":"latest"})"));
-
-// Extract final document
+// DON'T do this - builder is invalid after extract():
 auto doc = builder.extract();
+builder.addAlias(alias);  // Builder is in invalid state!
+
+// DO this instead - extract() last:
+builder.addAlias(alias);
+auto doc = builder.extract();
+
+// DON'T try to copy a builder:
+auto builder2 = builder;  // Compilation error - deleted
+
+// DO create separate builders:
+JSONDocumentBuilder builder1;
+JSONDocumentBuilder builder2;
 ```
 
-### Importing User Data
+### Complete Example
 
 ```cpp
-// User provides raw configuration
-JSONDocument userData = loadUserConfig();
+#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
 
-// Wrap in database structure
-JSONDocumentBuilder builder;
-builder.createFromData(userData);
-builder.setVersion(version);
-builder.newObjectID();
+using namespace artdaq::database::docrecord;
 
-// Extract database-ready document
-auto dbDoc = builder.extract();
-```
+void createDatabaseDocument() {
+  // User provides configuration data
+  JSONDocument userData(R"({
+    "detector": "ICARUS",
+    "channels": 1024,
+    "settings": {"gain": 2.5}
+  })");
 
-### Modifying Existing Document
+  // Create builder and wrap data
+  JSONDocumentBuilder builder;
+  builder.createFromData(userData);
 
-```cpp
-JSONDocument existing = loadFromDatabase();
+  // Set metadata
+  builder.setVersion(JSONDocument(R"({"name":"v1.0.0"})"));
+  builder.setCollection(JSONDocument(R"({"collection":"detector_configs"})"));
+  builder.newObjectID();
 
-JSONDocumentBuilder builder(existing);
+  // Add organizational metadata
+  builder.addEntity(JSONDocument(R"({"entity":"ICARUS_TPC"})"));
+  builder.addConfiguration(JSONDocument(R"({"configuration":"nominal"})"));
+  builder.addAlias(JSONDocument(R"({"alias":"latest"})"));
 
-// Make modifications
-builder.addConfiguration(newConfig);
-builder.removeAlias(oldAlias);
-
-// Mark as updated
-builder.setVersion(newVersion);
-
-// Extract modified document
-auto updated = builder.extract();
-```
-
-### Protecting Documents
-
-```cpp
-JSONDocumentBuilder builder(productionDoc);
-
-// Lock down production configuration
-builder.markReadonly();
-
-auto protected_doc = builder.extract();
-// Future modification attempts will fail
-```
-
-## Design Patterns
-
-### Builder Pattern
-
-The class follows the classic builder pattern:
-- Fluent interface (methods return `*this`)
-- Step-by-step construction
-- Final extraction via `extract()`
-- Validates and structures data
-
-### Overlay Pattern
-
-Uses overlay classes for structured access:
-- Type-safe field access
-- Validation of document structure
-- Abstraction over JSON details
-- Consistent field naming
-
-### Transaction Pattern
-
-Undo mechanism provides transaction-like behavior:
-- Save state before operation
-- Perform operation
-- On failure, restore state
-- Ensures consistency
-
-## Integration with Overlay System
-
-The builder heavily relies on overlays:
-
-**ovlDatabaseRecord**: Top-level overlay providing access to:
-- Version
-- ID
-- Collection
-- Configurations
-- Entities
-- Aliases
-- Bookkeeping
-
-**Specialized Overlays**:
-- `ovlAlias`: Alias management
-- `ovlConfiguration`: Configuration management
-- `ovlEntity`: Entity management
-- `ovlRun`: Run association
-- `ovlVersion`: Version management
-- `ovlCollection`: Collection assignment
-- `ovlId`: Object ID management
-
-## Error Handling
-
-All modification methods use try-catch with undo:
-```cpp
-try {
-  ThrowOnFailure(SaveUndo());
-  ThrowOnFailure(/* operation */);
-  return self();
-} catch (std::exception const& ex) {
-  TLOG(N) << "Operation failed: " << ex.what();
-  ThrowOnFailure(CallUndo());
-  return self();
+  // Extract and save final document
+  try {
+    auto dbDoc = builder.extract();
+    dbDoc.saveToFile("icarus_config.json");
+  } catch (const std::exception& e) {
+    std::cerr << "Failed to create document: " << e.what() << std::endl;
+  }
 }
 ```
-
-This ensures:
-- Exceptions are logged
-- State is restored on failure
-- Builder remains in consistent state
-
-## Thread Safety
-
-Not thread-safe:
-- Maintains mutable state
-- No synchronization
-- Intended for single-threaded use
-
-## Related Files
-
-- **JSONDocumentBuilder.cpp** - Implementation
-- **JSONDocument.h** - Wrapped document class
-- **JSONDocumentOverlay.h** - Overlay classes
-- **JSONDocumentMigrator.h** - Uses builder for migrations
-
-## Best Practices
-
-1. **Use builder for database documents** - Don't manually construct database documents
-2. **Extract once** - Builder should not be used after `extract()`
-3. **Set version early** - Required for most database operations
-4. **Generate new IDs** - Call `newObjectID()` for new documents
-5. **Check readonly status** - Before attempting modifications
-6. **Use createFromData** - When importing user configurations
-7. **Mark production docs readonly** - Protect important configurations
-
-## Notes
-
-- Builder is non-copyable and non-movable by design
-- All operations are logged via TRACE
-- Overlay is recreated after `createFromData()`
-- Undo mechanism is currently a placeholder (returns Success())
-- Comparison method name has a typo ("comapreUsingOverlays")
-- The class enforces database document structure through overlays

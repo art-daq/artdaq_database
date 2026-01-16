@@ -1,266 +1,290 @@
 # common.h
 
-## File Overview
+**Path:** `artdaq-database/Overlay/common.h`
 
-This header file serves as the common foundation for the Overlay module, providing essential type definitions, namespace aliases, constants, and the enumeration of document comparison flags used throughout the module. It aggregates dependencies from JSON handling, shared types, and establishes the overlay namespace infrastructure.
+**Purpose:** This header file serves as the common foundation for the Overlay module, providing essential type definitions, namespace aliases, constants, and the enumeration of document comparison flags used throughout the module. It aggregates dependencies from JSON handling, shared types, and establishes the overlay namespace infrastructure.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/Overlay/common.h`
 
-## Purpose
+## Key Concepts
 
-The Overlay module provides object-oriented wrappers around JSON data structures representing database records. This common header:
+### The Overlay Pattern Foundation
 
-1. **Imports JSON Types** - Brings in JSON handling types and implementations
-2. **Defines Namespace Aliases** - Creates convenient shortcuts for deeply nested namespaces
-3. **Declares Constants** - Provides standard error messages
-4. **Defines Comparison Flags** - Establishes a comprehensive flag system for selective document comparison
-5. **Declares Utilities** - Forward-declares the comparison mask utility function
+This header provides the building blocks for the Overlay Pattern implementation:
+- **JSON Types** - Brings in JSON handling types (`array_t`, `object_t`, `value_t`, `type_t`) from the JSON module
+- **Namespace Aliases** - Creates convenient shortcuts for deeply nested namespaces
+- **Error Constants** - Provides standard JSON-formatted error messages for consistent error handling
+- **Comparison Flags** - Establishes a comprehensive bit flag system for selective document comparison
+
+### Comparison Masking System
+
+The module provides fine-grained comparison control through bit flags. Each flag represents a specific component that can be selectively ignored during equality comparison. Flags can be combined using bitwise OR operations to create custom comparison behaviors for different use cases (testing, migration, synchronization).
+
+### Result Type Pattern
+
+The `result_t` type (a pair of bool and string) provides:
+- **Success/Failure Indication** - Boolean first element indicates operation outcome
+- **Error Messages** - String second element explains failures in human-readable form
+- **Composability** - Results can be aggregated and combined across multiple operations
+
+## Thread Safety
+
+- **Thread-safe:** No
+- **Concurrent access:** The `useCompareMask()` function uses a static variable without synchronization
+- **Locking:** None - callers must ensure single-threaded access to comparison operations
 
 ## Dependencies
 
-### JSON and Data Format Headers
-```cpp
-#include "artdaq-database/DataFormats/Json/json_common.h"
-#include "artdaq-database/DataFormats/Json/json_types_impl.h"
-#include "artdaq-database/DataFormats/shared_literals.h"
-```
-- `json_common.h` - Core JSON type definitions and utilities
-- `json_types_impl.h` - JSON type implementation details
-- `shared_literals.h` - String literal constants used across the database
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/DataFormats/Json/json_common.h` | Core JSON type definitions and utilities |
+| `artdaq-database/DataFormats/Json/json_types_impl.h` | JSON type implementation details including `unwrap()` |
+| `artdaq-database/DataFormats/shared_literals.h` | String literal constants for JSON field names |
+| `artdaq-database/SharedCommon/sharedcommon_common.h` | Common utilities, types, and standard library includes |
 
-### Shared Common Headers
-```cpp
-#include "artdaq-database/SharedCommon/sharedcommon_common.h"
-```
-- Provides common utilities, types, and standard library includes
+## Type Aliases
 
-## Namespace Structure
+### JSON Types (at file scope)
 
 ```cpp
-namespace artdaq {
-namespace database {
-namespace overlay {
-  // Overlay module code
-}}}
+using artdaq::database::json::array_t;    // JSON array type (vector-like container)
+using artdaq::database::json::object_t;   // JSON object type (map-like container)
+using artdaq::database::json::type_t;     // JSON type enumeration (OBJECT, ARRAY, STRING, etc.)
+using artdaq::database::json::value_t;    // JSON value variant type (holds any JSON value)
 ```
 
-### Type Aliases
+**Brief:** These type aliases bring JSON types into the overlay namespace for convenient access throughout the module.
 
-The file imports JSON types into the overlay namespace for convenience:
-
-```cpp
-using artdaq::database::json::array_t;    // JSON array type
-using artdaq::database::json::object_t;   // JSON object type
-using artdaq::database::json::type_t;     // JSON type enumeration
-using artdaq::database::json::value_t;    // JSON value variant type
-```
-
-### Namespace Aliases
+### Namespace Alias
 
 ```cpp
 namespace jsonliteral = artdaq::database::dataformats::literal;
 ```
-Provides short access to JSON field name literals (e.g., `jsonliteral::name`, `jsonliteral::timestamp`)
+
+**Brief:** Provides short access to JSON field name literals (e.g., `jsonliteral::name`, `jsonliteral::timestamp`, `jsonliteral::bookkeeping`).
+
+### Result Type
 
 ```cpp
 using result_t = artdaq::database::result_t;
 ```
-Standard result type for error handling (a pair of bool and string message)
+
+**Brief:** Standard result type (pair of bool and string) used for operation outcomes throughout the overlay module.
 
 ## Constants
 
-### Error Messages
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `msg_InvalidArgument` | `"{\"message\":\"Invalid Argument\"}"` | Returned when invalid parameters are passed to a function |
+| `msg_IsReadonly` | `"{\"message\":\"Document is readonly\"}"` | Returned when attempting to modify a readonly document |
+| `msg_ConvertionError` | `"{\"message\":\"Conversion error\"}"` | Returned on serialization or type conversion failure |
 
-```cpp
-constexpr auto msg_InvalidArgument = "{\"message\":\"Invalid Argument\"}";
-constexpr auto msg_IsReadonly = "{\"message\":\"Document is readonly\"}";
-constexpr auto msg_ConvertionError = "{\"message\":\"Conversion error\"}";
-```
+**Brief:** These JSON-formatted error message constants provide consistent error reporting across all overlay operations.
 
-These JSON-formatted error messages are used throughout the Overlay module when operations fail.
+## Enumerations
 
-## Document Comparison Flags
+### `DOCUMENT_COMPARE_FLAGS`
 
-The `DOCUMENT_COMPARE_FLAGS` enumeration provides fine-grained control over which aspects of database records should be compared when checking equality. Each flag represents a specific component that can be selectively ignored during comparison.
+**Brief:** Bit flags that control which document components are compared during equality operations. Combine flags with bitwise OR to ignore multiple components.
 
 ```cpp
 enum DOCUMENT_COMPARE_FLAGS {
-  DOCUMENT_COMPARE_MUTE_TIMESTAMPS       = (1 << 0),   // Ignore all timestamps
+  // Individual component flags
+  DOCUMENT_COMPARE_MUTE_TIMESTAMPS       = (1 << 0),   // Ignore all timestamp fields
   DOCUMENT_COMPARE_MUTE_OUIDS            = (1 << 1),   // Ignore object unique IDs
-  DOCUMENT_COMPARE_MUTE_COMMENTS         = (1 << 2),   // Ignore comments
-  DOCUMENT_COMPARE_MUTE_BOOKKEEPING      = (1 << 3),   // Ignore bookkeeping metadata
-  DOCUMENT_COMPARE_MUTE_ORIGIN           = (1 << 4),   // Ignore origin information
-  DOCUMENT_COMPARE_MUTE_VERSION          = (1 << 5),   // Ignore version
-  DOCUMENT_COMPARE_MUTE_CHANGELOG        = (1 << 6),   // Ignore changelog
-  DOCUMENT_COMPARE_MUTE_UPDATES          = (1 << 7),   // Ignore update history
+  DOCUMENT_COMPARE_MUTE_COMMENTS         = (1 << 2),   // Ignore comment entries
+  DOCUMENT_COMPARE_MUTE_BOOKKEEPING      = (1 << 3),   // Ignore entire bookkeeping section
+  DOCUMENT_COMPARE_MUTE_ORIGIN           = (1 << 4),   // Ignore origin/provenance information
+  DOCUMENT_COMPARE_MUTE_VERSION          = (1 << 5),   // Ignore version field
+  DOCUMENT_COMPARE_MUTE_CHANGELOG        = (1 << 6),   // Ignore changelog string
+  DOCUMENT_COMPARE_MUTE_UPDATES          = (1 << 7),   // Ignore update history array
   DOCUMENT_COMPARE_MUTE_CONFIGENTITY     = (1 << 8),   // Ignore configuration entities
   DOCUMENT_COMPARE_MUTE_CONFIGURATION    = (1 << 9),   // Ignore configurations
-  DOCUMENT_COMPARE_MUTE_ALIAS            = (1 << 10),  // Ignore aliases
-  DOCUMENT_COMPARE_MUTE_ALIAS_HISTORY    = (1 << 11),  // Ignore alias history
+  DOCUMENT_COMPARE_MUTE_ALIAS            = (1 << 10),  // Ignore alias assignments
+  DOCUMENT_COMPARE_MUTE_ALIAS_HISTORY    = (1 << 11),  // Ignore alias assignment history
   DOCUMENT_COMPARE_MUTE_RUN              = (1 << 12),  // Ignore run information
   DOCUMENT_COMPARE_MUTE_ATTACHMENT       = (1 << 13),  // Ignore attachments
   DOCUMENT_COMPARE_MUTE_SEARCH           = (1 << 14),  // Ignore search metadata
-  DOCUMENT_COMPARE_MUTE_RAWDATA          = (1 << 15),  // Ignore raw data
-  DOCUMENT_COMPARE_MUTE_UPDATE_VALUES    = (1 << 16),  // Ignore update values
+  DOCUMENT_COMPARE_MUTE_RAWDATA          = (1 << 15),  // Ignore raw data payloads
+  DOCUMENT_COMPARE_MUTE_UPDATE_VALUES    = (1 << 16),  // Ignore update values (keep events)
 
   // Broad scope flags - use with caution
-  DOCUMENT_COMPARE_MUTE_COLLECTION       = (1 << 28),  // Ignore collection
-  DOCUMENT_COMPARE_MUTE_DATA             = (1 << 29),  // Ignore user data
-  DOCUMENT_COMPARE_MUTE_METADATA         = (1 << 30)   // Ignore metadata
+  DOCUMENT_COMPARE_MUTE_COLLECTION       = (1 << 28),  // Ignore collection name
+  DOCUMENT_COMPARE_MUTE_DATA             = (1 << 29),  // Ignore entire user data section
+  DOCUMENT_COMPARE_MUTE_METADATA         = (1 << 30)   // Ignore entire metadata section
 };
 ```
 
-### Flag Usage Patterns
+## Functions
 
-**Bitwise Operations**: Flags are combined using bitwise OR:
-```cpp
-auto mask = DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_OUIDS;
-```
+### `useCompareMask(std::uint32_t) -> std::uint32_t`
 
-**Selective Comparison**: Enable comparison of content while ignoring metadata:
-```cpp
-auto mask = DOCUMENT_COMPARE_MUTE_BOOKKEEPING |
-            DOCUMENT_COMPARE_MUTE_TIMESTAMPS |
-            DOCUMENT_COMPARE_MUTE_ORIGIN;
-```
+**Brief:** Gets or sets the global comparison mask that controls which document components are compared during overlay equality operations. The mask value is initialized on the first call and cannot be changed afterward.
 
-**Complete Muting**: The broad flags at the end can ignore entire sections (use cautiously).
+**Parameters:**
+- `compareMask` - Optional mask value to set on first call (default: 0). This value is only used during initialization; subsequent calls ignore this parameter.
 
-## Utility Functions
+**Preconditions:**
+- None
 
-```cpp
-std::uint32_t useCompareMask(std::uint32_t = 0);
-```
+**Returns:** The current comparison mask value (always returns the value set during first initialization)
 
-This function manages the comparison mask as a static variable:
-- **First call with argument**: Sets the comparison mask
-- **Subsequent calls**: Returns the current mask
-- **Default parameter**: Allows querying current mask without changing it
+**Postconditions:**
+- First call: Initializes the static comparison mask to the provided value
+- All calls: Returns the current mask value
 
-Implementation is in `ovlKeyValue.cpp`.
+**Throws:**
 
-## Header Guard
+| Exception | Condition |
+|-----------|-----------|
+| None | This function does not throw |
 
-```cpp
-#ifndef _ARTDAQ_DATABASE_OVERLAY_COMMON_H_
-#define _ARTDAQ_DATABASE_OVERLAY_COMMON_H_
-// ... content ...
-#endif
-```
+**Thread Safety:** Unsafe - uses a static variable without synchronization. C++11 guarantees thread-safe initialization of static locals, but subsequent reads are not synchronized.
 
-Traditional include guard prevents multiple inclusion.
+**Side Effects:**
+- First call initializes a static variable that persists for program lifetime
+- The mask value cannot be changed after first initialization
 
-## Usage Context
-
-This header is included by virtually every file in the Overlay module:
-
-### Typical Include Pattern in Overlay Files
+**Example:**
 ```cpp
 #include "artdaq-database/Overlay/common.h"
-#include "artdaq-database/Overlay/ovlKeyValue.h"
+#include <iostream>
 
 using namespace artdaq::database::overlay;
-using namespace artdaq::database::result;
-```
 
-### Files That Include common.h
-All overlay implementation files include this header:
-- `ovlKeyValue.h/.cpp` - Base key-value wrapper
-- `ovlBookkeeping.h/.cpp` - Bookkeeping metadata
-- `ovlDocument.h/.cpp` - Document wrapper
-- `ovlDatabaseRecord.h/.cpp` - Complete database record
-- All other overlay files
+void setupComparisonMask() {
+  // Set mask to ignore timestamps, bookkeeping, and origin
+  // IMPORTANT: This must be done before any comparisons
+  auto mask = DOCUMENT_COMPARE_MUTE_TIMESTAMPS |
+              DOCUMENT_COMPARE_MUTE_BOOKKEEPING |
+              DOCUMENT_COMPARE_MUTE_ORIGIN;
 
-## Design Rationale
+  // Initialize the mask (only works on first call)
+  useCompareMask(mask);
 
-### Centralized Type Definitions
-By centralizing type imports and aliases, the module ensures:
-- **Consistency** - All files use the same type definitions
-- **Maintainability** - Changes to type aliases need only occur in one place
-- **Clarity** - Shorter, more readable type names throughout the codebase
+  // Query current mask value
+  auto currentMask = useCompareMask();
+  std::cout << "Current mask: " << currentMask << "\n";
+}
 
-### Flexible Comparison System
-The flag-based comparison system provides:
-- **Granularity** - Fine-grained control over what aspects matter in comparisons
-- **Composability** - Flags can be combined for complex comparison scenarios
-- **Testing** - Enables focused testing of specific record components
-- **Versioning** - Allows comparing records while ignoring version metadata
+void compareDocumentsIgnoringMetadata(value_t& json1, value_t& json2) {
+  // Assumes mask was set up before any comparisons
+  ovlDatabaseRecord record1{"record", json1};
+  ovlDatabaseRecord record2{"record", json2};
 
-### JSON Format for Errors
-Error messages in JSON format enable:
-- **Structured Error Handling** - Errors can be parsed and processed programmatically
-- **Consistency** - All errors follow the same format
-- **Extensibility** - Additional error fields can be added as needed
-
-## Common Usage Patterns
-
-### Setting a Comparison Mask
-```cpp
-using namespace artdaq::database::overlay;
-
-// Compare only data, ignore all metadata
-auto mask = DOCUMENT_COMPARE_MUTE_BOOKKEEPING |
-            DOCUMENT_COMPARE_MUTE_ORIGIN |
-            DOCUMENT_COMPARE_MUTE_TIMESTAMPS |
-            DOCUMENT_COMPARE_MUTE_COMMENTS;
-
-useCompareMask(mask);
-```
-
-### Checking Equality with Mask
-```cpp
-ovlDatabaseRecord record1{json1};
-ovlDatabaseRecord record2{json2};
-
-auto result = record1 == record2;  // Uses global mask set by useCompareMask()
-if (result.first) {
-  // Records are equal (considering mask)
-} else {
-  // Records differ: result.second contains explanation
+  auto result = record1 == record2;  // Uses global mask
+  if (result.first) {
+    std::cout << "Records are equal (ignoring masked components)\n";
+  } else {
+    std::cerr << "Records differ: " << result.second << "\n";
+  }
 }
 ```
 
-## Related Files
+## Relationship to Other Components
 
-- **JSONDocumentOverlay.h** - High-level include aggregator for the module
-- **ovlKeyValue.h/.cpp** - Base class using these types and flags
-- **ovlDatabaseRecord.h/.cpp** - Main record type using comparison flags
-- **DataFormats/shared_literals.h** - Defines the string literals used as JSON keys
+### Within the Overlay Module
 
-## Architecture Notes
+- **Included by all overlay files** - Every `.h` and `.cpp` file in the Overlay module includes this header
+- **Provides foundation types** - All overlay classes use the types defined here
+- **Comparison infrastructure** - The flags and `useCompareMask()` function are used by all `operator==` implementations
 
-### Overlay Pattern
-The Overlay module implements the **Overlay Pattern**:
-- JSON data remains as the underlying storage
-- C++ objects provide type-safe, convenient access
-- No data duplication - overlays reference the JSON AST directly
-- Changes to overlay objects modify the underlying JSON
+### Comparison with JSONDocumentOverlay.h
 
-### Result Type Pattern
-The `result_t` type (a pair of bool and string) provides:
-- **Success/Failure Indication** - Boolean first element
-- **Error Messages** - String second element explains failures
-- **Composability** - Results can be aggregated and combined
+| Aspect | common.h | JSONDocumentOverlay.h |
+|--------|----------|----------------------|
+| **Purpose** | Internal module foundation | External API entry point |
+| **Audience** | Overlay module implementation files | External code using the overlay |
+| **Contents** | Types, constants, flags, utilities | Just the main record interface |
+| **Include Frequency** | Included by every overlay `.cpp` file | Included by external code |
 
-### Static Mask Management
-The `useCompareMask()` function uses a static variable to maintain global comparison state:
-- **Thread Consideration** - Not thread-safe; assumes single-threaded comparison operations
-- **Global State** - Affects all comparisons until mask is changed
-- **Testing** - Tests should reset mask before comparison operations
+### Files That Include common.h
 
-## Best Practices
+All overlay implementation files include this header:
+- `ovlKeyValue.h/.cpp` - Base key-value overlay
+- `ovlBookkeeping.h/.cpp` - Bookkeeping metadata
+- `ovlDocument.h/.cpp` - Document overlay
+- `ovlDatabaseRecord.h/.cpp` - Complete database document record
+- All other overlay files
+
+## See Also
+
+- [ovlKeyValue.h](./ovlKeyValue.h.md) - Base class using types from this header
+- [JSONDocumentOverlay.h](./JSONDocumentOverlay.h.md) - External API entry point
+- [json_common.h](../DataFormats/Json/json_common.h.md) - JSON type definitions
+- [sharedcommon_common.h](../SharedCommon/sharedcommon_common.h.md) - Shared utilities
+
+## Notes for Developers
+
+### Using Comparison Flags
+
+```cpp
+#include "artdaq-database/Overlay/common.h"
+#include <iostream>
+
+using namespace artdaq::database::overlay;
+
+void compareDocumentsWithMask(value_t& json1, value_t& json2) {
+  // Compare content only, ignore all metadata
+  // IMPORTANT: Set this BEFORE creating any overlay objects that will be compared
+  auto mask = DOCUMENT_COMPARE_MUTE_BOOKKEEPING |
+              DOCUMENT_COMPARE_MUTE_TIMESTAMPS |
+              DOCUMENT_COMPARE_MUTE_ORIGIN |
+              DOCUMENT_COMPARE_MUTE_COMMENTS |
+              DOCUMENT_COMPARE_MUTE_CHANGELOG;
+
+  useCompareMask(mask);
+
+  try {
+    ovlDatabaseRecord record1{"record", json1};
+    ovlDatabaseRecord record2{"record", json2};
+
+    auto result = record1 == record2;
+    if (result.first) {
+      std::cout << "Records are equal (considering mask)\n";
+    } else {
+      std::cerr << "Records differ: " << result.second << "\n";
+    }
+  } catch (const std::exception& e) {
+    std::cerr << "Comparison failed: " << e.what() << "\n";
+  }
+}
+```
+
+### Common Pitfalls
+
+- **Static Mask State:** The `useCompareMask()` function uses a static variable that is initialized on first call. The mask cannot be changed after initialization. Always set the mask before any comparison operations.
+- **Flag Combination:** Use bitwise OR (`|`) to combine flags, never addition (`+`). While addition may work for non-overlapping flags, it fails for duplicate flags and is semantically incorrect.
+- **Thread Safety:** Do not use comparison operations from multiple threads without external synchronization. While static initialization is thread-safe in C++11, concurrent reads/writes to the mask are not.
+
+### Anti-patterns
+
+```cpp
+// DON'T: Use addition to combine flags
+auto mask = DOCUMENT_COMPARE_MUTE_TIMESTAMPS + DOCUMENT_COMPARE_MUTE_BOOKKEEPING;  // Wrong!
+
+// DO: Use bitwise OR
+auto mask = DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_BOOKKEEPING;  // Correct
+
+// DON'T: Try to change mask after first initialization
+useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS);  // First call - sets mask
+useCompareMask(DOCUMENT_COMPARE_MUTE_BOOKKEEPING); // Ignored! Mask is already set
+
+// DO: Set all desired flags in the first call
+auto allFlags = DOCUMENT_COMPARE_MUTE_TIMESTAMPS | DOCUMENT_COMPARE_MUTE_BOOKKEEPING;
+useCompareMask(allFlags);  // Set once with all needed flags
+```
+
+### Reserved Flag Positions
+
+- Flags at positions 17-27 are unused and reserved for future expansion
+- Flags at positions 28-30 are marked "use with caution" due to their broad scope (they ignore entire document sections)
+
+### Best Practices
 
 1. **Always include this header first** when creating Overlay module files
 2. **Use namespace aliases** (`jsonliteral`, not full `artdaq::database::dataformats::literal`)
-3. **Set comparison masks explicitly** in test code to avoid dependencies on default state
+3. **Set comparison mask early** in your program, before any comparison operations
 4. **Combine flags with bitwise OR**, never with addition
-5. **Use error constants** (`msg_IsReadonly`, etc.) for consistency
+5. **Use error constants** (`msg_IsReadonly`, etc.) for consistency across error reporting
 6. **Document which flags affect your comparisons** when implementing `operator==`
-
-## Notes
-
-- The comparison flag enum uses bit positions (1 << N) to allow bitwise combination
-- Flags at positions 17-27 are unused and reserved for future expansion
-- Flags at positions 28-30 are marked "use with caution" due to their broad scope
-- The module is designed for read-heavy workloads with occasional updates
-- All overlay classes assume valid JSON structure; invalid JSON causes undefined behavior
+7. **Consider mask implications in tests** - tests may need specific mask configurations

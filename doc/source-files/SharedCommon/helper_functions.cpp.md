@@ -1,731 +1,488 @@
 # helper_functions.cpp
 
-## File Overview
+**Path:** `artdaq-database/SharedCommon/helper_functions.cpp`
 
-This implementation file provides the actual implementations of the helper utility functions declared in `helper_functions.h`. It includes sophisticated time handling, string manipulation, JSON generation, and system information gathering capabilities.
+**Implements:** [helper_functions.h](./helper_functions.h.md)
 
-**Location**: `/home/user/artdaq-database/artdaq-database/SharedCommon/helper_functions.cpp`
+**Purpose:** Implements the utility functions declared in `helper_functions.h`. Provides sophisticated time handling with ISO 8601 support, string manipulation, JSON generation, and system information gathering.
 
-## Dependencies
+## Implementation Overview
 
-### System Headers
-- `<sys/utsname.h>` - Unix system name structure (uname)
-- `<wordexp.h>` - POSIX word expansion (shell variable expansion)
-- `<chrono>` - Time utilities
-- `<clocale>` - Locale support
-- `<ctime>` - C time utilities
-- `<fstream>` - File streams
-- `<regex>` - Regular expressions
+This file provides implementations for a wide variety of utility functions used throughout the artdaq-database library. The implementations prioritize clarity and correctness while maintaining reasonable performance. Key implementation decisions include using POSIX functions for environment variable expansion and system information, standard library algorithms for string manipulation, and a careful approach to timestamp handling that supports millisecond precision.
 
-### Project Headers
-- `"artdaq-database/SharedCommon/helper_functions.h"` - Function declarations
-- `"artdaq-database/SharedCommon/common.h"` - Common includes
-- `"artdaq-database/SharedCommon/configuraion_api_literals.h"` - String literals
-- `"artdaq-database/SharedCommon/shared_exceptions.h"` - Exception types
+## Key Algorithms
 
-## TRACE Configuration
+### Timestamp Formatting (`to_string`)
 
-```cpp
-#define TRACE_NAME "helper_functions.cpp"
-```
+Timestamps use a combination of standard C++ and C time functions:
 
-## Namespace Aliases
+**Steps:**
+1. Convert `time_point` to `time_t` using `std::chrono::system_clock::to_time_t()`
+2. Format the base timestamp with `strftime()` using the ISO 8601 format from `apiliteral::timestamp_format`
+3. Calculate milliseconds separately by extracting from the time_point's epoch count
+4. Insert milliseconds at position 20 in the formatted string (after the seconds)
+5. If fake time mode is enabled, return the fixed fake timestamp instead
 
-```cpp
-namespace db = artdaq::database;
-using namespace artdaq::database;
-namespace apiliteral = db::configapi::literal;
-```
+**Note:** The millisecond handling requires manual string manipulation because `strftime` does not support sub-second precision.
+
+### Timestamp Parsing (`to_timepoint`)
+
+**Steps:**
+1. Validate that the input string is not empty
+2. Extract the milliseconds substring (positions 20-22)
+3. Create a copy with milliseconds zeroed out (replace with "000")
+4. Parse the modified string with `strptime()` to get the base time
+5. Add the extracted milliseconds back to the resulting `time_point`
+
+### Environment Variable Expansion (`expand_environment_variables`)
+
+Uses POSIX `wordexp()` for comprehensive shell-style expansion:
+
+**Steps:**
+1. Call `wordexp()` on the input string
+2. Iterate through the resulting word array
+3. Concatenate all words with path separators
+4. Clean up with `wordfree()`
+5. Remove trailing slash if present
+
+**Expands:**
+- `$VAR` and `${VAR}` patterns
+- Tilde (`~`) to home directory
+- Wildcards and glob patterns
+
+### OID Generation (`generate_oid`)
+
+**Steps:**
+1. Read a UUID from `/proc/sys/kernel/random/uuid` (Linux-specific)
+2. Remove all hyphens from the UUID string
+3. Truncate to 24 characters to match MongoDB ObjectID format
+
+### OID Extraction (`extract_oid`)
+
+Uses regex pattern matching to extract object IDs from JSON filter strings:
+
+**Pattern:** `R"(^\{[^:]+:\s+([\s\S]+)\}$)"`
+
+**Steps:**
+1. Apply the regex pattern to the input filter
+2. Validate that exactly 2 matches are found (full match + capture group)
+3. Extract the second match (the captured OID value)
+4. Trim trailing whitespace
+5. Remove surrounding quotes if present
+
+### String Trimming (`trim`)
+
+Uses iterator-based algorithm for efficient single-pass operation:
+
+**Steps:**
+1. Find the first non-whitespace character from the beginning
+2. Find the first non-whitespace character from the end
+3. Construct a new string from those iterators
 
 ## Function Implementations
 
-### useFakeTime
+### `useFakeTime(bool) -> bool`
 
+**Brief:** Manages the fake time mode state using a static variable. Controls whether timestamp functions return real time or a fixed test value.
+
+**Implementation:**
 ```cpp
-bool db::useFakeTime(bool useFakeTime)
-```
-
-**Implementation Details**:
-- Uses static local variable to maintain state
-- Default parameter is false
-- State persists across function calls
-
-**Implementation**:
-```cpp
-static bool _useFakeTime = useFakeTime;
-return _useFakeTime;
-```
-
-**Usage Pattern**:
-```cpp
-// Set fake time mode
-useFakeTime(true);
-
-// Query current mode
-bool isFake = useFakeTime();
-```
-
-**Purpose**: Enables deterministic timestamps for testing and debugging.
-
----
-
-### set_default_locale
-
-```cpp
-void db::set_default_locale()
-```
-
-**Implementation**:
-```cpp
-std::setlocale(LC_ALL, apiliteral::database_format_locale);
-```
-
-**Sets**: `LC_ALL` to `"en_US.UTF-8"`
-
-**Purpose**: Ensures consistent string formatting, time parsing, and character handling across different systems.
-
-**Important**: Should be called early in program initialization before any locale-dependent operations.
-
----
-
-### timestamp
-
-```cpp
-std::string db::timestamp()
-```
-
-**Implementation**:
-```cpp
-auto now = std::chrono::system_clock::now();
-return db::to_string(now);
-```
-
-**Returns**: Current time in ISO 8601 format with milliseconds
-
-**Example Output**: `"2025-11-13T10:30:45.123-0600"`
-
----
-
-### to_string (time_point)
-
-```cpp
-std::string db::to_string(std::chrono::system_clock::time_point const& tp)
-```
-
-**Implementation Details**:
-- Converts time_point to time_t
-- Formats using strftime with custom format
-- Extracts milliseconds separately
-- Inserts milliseconds into formatted string
-- Handles compiler differences (GCC vs Clang)
-
-**Algorithm**:
-1. Convert time_point to time_t
-2. Format base timestamp using strftime: `"%FT%T.000%z"`
-3. Extract milliseconds from time_point
-4. Format milliseconds with snprintf (positions 30-34 in buffer)
-5. Copy 3 digits of milliseconds to position 20 in main buffer
-6. Return fake time if fake mode enabled
-7. Otherwise return formatted timestamp
-
-**Format String**: `"%FT%T.000%z"` produces `"YYYY-MM-DDTHH:MM:SS.000±ZZZZ"`
-
-**Compiler-Specific Code**:
-```cpp
-#ifndef __clang__
-#define FORMAT_DURATION_MILLISECONDS "%03ld"
-#else
-#define FORMAT_DURATION_MILLISECONDS "%03lld"
-#endif
-```
-This handles differences in long integer format specifiers between GCC and Clang.
-
-**GCC Warning Suppression**:
-```cpp
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstringop-truncation"
-strncpy(buff + 20, buff + 30, 3);
-#pragma GCC diagnostic pop
-```
-Suppresses warning about intentional partial string copy.
-
----
-
-### to_timepoint
-
-```cpp
-std::chrono::system_clock::time_point db::to_timepoint(std::string const& strtime)
-```
-
-**Implementation Details**:
-- Parses ISO 8601 timestamp string
-- Extracts milliseconds separately
-- Reconstructs time_point with millisecond precision
-
-**Algorithm**:
-1. Validate input is not empty
-2. Parse milliseconds from substring (positions 20-22)
-3. Zero out milliseconds in copy of input string
-4. Parse timestamp using strptime with format string
-5. Convert tm struct to time_point
-6. Add milliseconds to time_point
-7. Return result or throw on parse failure
-
-**Implementation**:
-```cpp
-auto timeinfo = std::tm();
-auto milliseconds = std::chrono::milliseconds(atoi(strtime.substr(20, 3).c_str()));
-
-auto tmptime = strtime;
-tmptime.at(20) = '0';
-tmptime.at(21) = '0';
-tmptime.at(22) = '0';
-
-if (strptime(tmptime.c_str(), apiliteral::timestamp_format, &timeinfo) != nullptr) {
-    timeinfo.tm_isdst = -1;  // Let system determine DST
-    return std::chrono::system_clock::from_time_t(std::mktime(&timeinfo)) + milliseconds;
-}
-
-throw std::invalid_argument(...);
-```
-
-**Error Handling**: Throws `std::invalid_argument` with detailed format/input info if parsing fails.
-
----
-
-### confirm_iso8601_timestamp
-
-```cpp
-std::string db::confirm_iso8601_timestamp(std::string const& strtime)
-```
-
-**Implementation Details**:
-- Handles both new ISO 8601 and legacy timestamp formats
-- Converts legacy format to ISO 8601
-
-**Algorithm**:
-1. Validate input is not empty
-2. Check if already ISO 8601 (starts with '2')
-3. If yes: return unchanged
-4. Attempt to parse as legacy format (`"%a %b %d %H:%M:%S %Y"`)
-5. If successful: convert to ISO 8601 format
-6. Otherwise: throw exception
-
-**Legacy Format Example**: `"Mon Feb 8 14:00:30 2016"`
-
-**Conversion**:
-```cpp
-auto timeinfo = std::tm();
-if (strptime(strtime.c_str(), apiliteral::timestamp_format_old, &timeinfo) != nullptr) {
-    timeinfo.tm_isdst = -1;
-    return db::to_string(std::chrono::system_clock::from_time_t(std::mktime(&timeinfo)));
+bool db::useFakeTime(bool useFakeTime = false) {
+  static bool _useFakeTime = useFakeTime;
+  return _useFakeTime;
 }
 ```
 
-**Use Case**: Database migration from old timestamp format to new ISO 8601 format.
+**Note:** The static variable captures the initial value and returns it for subsequent calls.
+
+**Thread Safety:** Not thread-safe (uses static variable)
 
 ---
 
-### unamejson
+### `set_default_locale() -> void`
 
+**Brief:** Sets the C locale for consistent string/time handling across the application.
+
+**Implementation:**
 ```cpp
-std::string db::unamejson()
-```
-
-**Implementation Details**:
-- Calls Unix uname() system call
-- Formats result as JSON object
-- Returns empty JSON on failure
-
-**Algorithm**:
-1. Create utsname structure
-2. Call uname() system call
-3. If fails: return "{}"
-4. Build JSON with system info fields
-5. Return JSON string
-
-**Implementation**:
-```cpp
-struct utsname thisuname;
-if (uname(&thisuname) == -1) {
-    return "{}";
-}
-
-std::ostringstream oss;
-oss << "{";
-oss << "sysname"_quoted << ":" << quoted_(thisuname.sysname) << ",";
-oss << "nodename"_quoted << ":" << quoted_(thisuname.nodename) << ",";
-oss << "release"_quoted << ":" << quoted_(thisuname.release) << ",";
-oss << "version"_quoted << ":" << quoted_(thisuname.version) << ",";
-oss << "machine"_quoted << ":" << quoted_(thisuname.machine);
-oss << "}";
-return oss.str();
-```
-
-**Example Output**:
-```json
-{
-  "sysname": "Linux",
-  "nodename": "hostname.domain.com",
-  "release": "4.4.0",
-  "version": "#1 SMP Tue Nov 12 2024",
-  "machine": "x86_64"
+void db::set_default_locale() {
+  std::setlocale(LC_ALL, apiliteral::database_format_locale);
 }
 ```
+
+**Thread Safety:** Not thread-safe (modifies global state)
 
 ---
 
-### quoted_
+### `timestamp() -> std::string`
 
+**Brief:** Returns current time in ISO 8601 format with milliseconds.
+
+**Implementation:**
 ```cpp
-std::string db::quoted_(std::string const& text, const char qchar)
-```
-
-**Implementation**:
-```cpp
-confirm((qchar == '\"' || qchar == '\''));
-return std::string{} + qchar + text + qchar;
-```
-
-**Validation**: Confirms quote character is either double or single quote.
-
-**Usage Example**:
-```cpp
-quoted_("hello", '\"');  // Returns: "hello"
-quoted_("world", '\'');  // Returns: 'world'
-```
-
----
-
-### bool_
-
-```cpp
-std::string db::bool_(bool value)
-```
-
-**Implementation**:
-```cpp
-return (value ? "true" : "false");
-```
-
-**Purpose**: Convert C++ bool to JSON-compatible string literal.
-
----
-
-### operator"" _quoted
-
-```cpp
-std::string db::operator"" _quoted(const char* text, std::size_t)
-```
-
-**Implementation**:
-```cpp
-return "\"" + std::string(text) + "\"";
-```
-
-**Usage**: String literal suffix for automatic quoting.
-
-**Example**:
-```cpp
-auto key = "name"_quoted;  // Equivalent to: "\"name\""
-```
-
----
-
-### debrace
-
-```cpp
-std::string db::debrace(std::string s)
-```
-
-**Implementation**:
-```cpp
-if (s[0] == '{' && s[s.length() - 1] == '}') {
-    return s.substr(1, s.length() - 2);
-}
-return s;
-```
-
-**Behavior**: Only removes braces if present at both ends.
-
----
-
-### quotation_type
-
-```cpp
-db::quotation_type_t db::quotation_type(std::string s)
-```
-
-**Implementation**:
-```cpp
-if (s[0] == '\"' && s[s.length() - 1] == '\"') {
-    return db::quotation_type_t::DOUBLE;
-}
-if (s[0] == '\'' && s[s.length() - 1] == '\'') {
-    return db::quotation_type_t::SINGLE;
-}
-return db::quotation_type_t::NONE;
-```
-
-**Returns**: Enum indicating quote type.
-
----
-
-### dequote
-
-```cpp
-std::string db::dequote(std::string s)
-```
-
-**Implementation**:
-```cpp
-if ((s[0] == '\"' && s[s.length() - 1] == '\"') ||
-    (s[0] == '\'' && s[s.length() - 1] == '\'')) {
-    return s.substr(1, s.length() - 2);
-}
-return s;
-```
-
-**Behavior**: Removes both single and double quotes if present at both ends.
-
----
-
-### debracket
-
-```cpp
-std::string db::debracket(std::string s)
-```
-
-**Implementation**:
-```cpp
-if (s[0] == '[' && s[s.length() - 1] == ']') {
-    return s.substr(1, s.length() - 2);
-}
-return s;
-```
-
----
-
-### annotate
-
-```cpp
-std::string db::annotate(std::string const& s)
-```
-
-**Implementation**:
-```cpp
-auto str = db::trim(s);
-
-if (str[0] == '#') {
-    return str;
-}
-
-if (str.empty()) {
-    return apiliteral::nullstring;
-}
-
-return std::string{"#"}.append(str);
-```
-
-**Algorithm**:
-1. Trim whitespace
-2. If already starts with '#': return as-is
-3. If empty: return empty string
-4. Otherwise: prepend '#'
-
----
-
-### generate_oid
-
-```cpp
-std::string db::generate_oid()
-```
-
-**Implementation Details**:
-- Reads from `/proc/sys/kernel/random/uuid`
-- Removes hyphens from UUID
-- Truncates to 24 characters (MongoDB ObjectId length)
-
-**Implementation**:
-```cpp
-TLOG(11) << "generate_oid() begin";
-
-std::ifstream is("/proc/sys/kernel/random/uuid");
-
-std::string oid((std::istreambuf_iterator<char>(is)),
-                std::istreambuf_iterator<char>());
-
-oid.erase(std::remove(oid.begin(), oid.end(), '-'), oid.end());
-oid.resize(24);
-
-TLOG(12) << "generate_oid() end";
-
-return oid;
-```
-
-**Example**:
-```
-UUID:   550e8400-e29b-41d4-a716-446655440000
-Remove: 550e8400e29b41d4a716446655440000
-Resize: 550e8400e29b41d4a7164466
-```
-
----
-
-### to_id
-
-```cpp
-std::string db::to_id(std::string const& oid)
-```
-
-**Implementation**:
-```cpp
-confirm(!oid.empty());
-
-std::ostringstream oss;
-oss << "{" << "_id"_quoted << ":{";
-oss << "$oid"_quoted << ":" << quoted_(oid);
-oss << "} }";
-
-return oss.str();
-```
-
-**Output Format**: `{"_id":{"$oid":"<oid>"}}`
-
-**Purpose**: Creates MongoDB extended JSON format for ObjectId.
-
----
-
-### to_json
-
-```cpp
-std::string db::to_json(std::string const& key, std::string const& value)
-```
-
-**Implementation**:
-```cpp
-confirm(!key.empty());
-confirm(!value.empty());
-
-std::ostringstream oss;
-oss << "{" << quoted_(key) << ":" << quoted_(value) << "}";
-return oss.str();
-```
-
-**Output**: Simple JSON object with one key-value pair.
-
----
-
-### expand_environment_variables
-
-```cpp
-std::string db::expand_environment_variables(const std::string& var)
-```
-
-**Implementation Details**:
-- Uses POSIX wordexp() for shell-style expansion
-- Expands environment variables ($VAR, ${VAR})
-- Expands tilde (~)
-- Expands wildcards
-
-**Implementation**:
-```cpp
-wordexp_t p;
-char** w;
-
-::wordexp(var.c_str(), &p, 0);
-
-w = p.we_wordv;
-
-std::ostringstream oss;
-
-for (size_t i = 0; i < p.we_wordc; i++) {
-    oss << w[i] << "/";
-}
-
-::wordfree(&p);
-
-auto result = oss.str();
-
-if (result.back() == '/') {
-    result.pop_back();  // remove trailing slash
-}
-
-return result;
-```
-
-**Examples**:
-```cpp
-expand_environment_variables("$HOME/data");
-// Returns: "/home/username/data"
-
-expand_environment_variables("~/configs");
-// Returns: "/home/username/configs"
-
-expand_environment_variables("${ARTDAQ_DATABASE_PATH}/files");
-// Returns: "/opt/artdaq/database/files"
-```
-
-**Note**: Can expand to multiple words if input contains wildcards.
-
----
-
-### equal / not_equal
-
-```cpp
-bool db::equal(std::string const& left, std::string const& right)
-{
-    confirm(!left.empty());
-    confirm(!right.empty());
-    return left == right;
-}
-
-bool db::not_equal(std::string const& left, std::string const& right)
-{
-    return !equal(left, right);
+std::string db::timestamp() {
+  auto now = std::chrono::system_clock::now();
+  return db::to_string(now);
 }
 ```
 
-**Purpose**: Wrapper functions for string comparison with validation.
+**Thread Safety:** Conditional (depends on `useFakeTime` state)
 
 ---
 
-### extract_oid
+### `to_string(time_point) -> std::string`
 
+**Brief:** Converts time_point to ISO 8601 string with millisecond precision.
+
+**Implementation Notes:**
+- Uses `strftime` for base formatting
+- Manually inserts milliseconds at position 20
+- Returns fake time if fake mode is enabled
+- Uses conditional compilation for clang vs GCC format specifiers
+
+**Thread Safety:** Conditional (depends on `useFakeTime` state)
+
+---
+
+### `to_timepoint(string) -> time_point`
+
+**Brief:** Parses ISO 8601 string to time_point.
+
+**Throws:** `std::invalid_argument` on empty string or format mismatch
+
+**Thread Safety:** Safe
+
+**Example:**
 ```cpp
-db::object_id_t db::extract_oid(std::string const& filter)
-```
+#include "artdaq-database/SharedCommon/helper_functions.h"
+#include <iostream>
 
-**Implementation Details**:
-- Uses regex to extract value from JSON-like filter
-- Dequotes the extracted value
-- Logs extraction steps
-
-**Regex Pattern**: `R"(^\{[^:]+:\s+([\s\S]+)\}$)"`
-- Matches: `{key: value}`
-- Captures: `value`
-
-**Implementation**:
-```cpp
-auto ex = std::regex(R"(^\{[^:]+:\s+([\s\S]+)\}$)");
-
-auto results = std::smatch();
-
-if (!std::regex_search(filter, results, ex)) {
-    throw std::logic_error(std::string("Regex ouid search failed; JSON buffer:") + filter);
-}
-
-if (results.size() != 2) {
-    // Log results
-    throw runtime_error(...);
-}
-
-auto match = std::string(results[1]);
-
-match.erase(match.find_last_not_of(" \n\r\t") + 1);  // Trim trailing whitespace
-
-auto dequote = [](auto s) {
-    if (s[0] == '"' && s[s.length() - 1] == '"') {
-        return s.substr(1, s.length() - 2);
+void parseAndValidate(const std::string& timestamp) {
+    try {
+        auto tp = artdaq::database::to_timepoint(timestamp);
+        std::cout << "Valid timestamp parsed successfully\n";
+    } catch (const std::invalid_argument& e) {
+        std::cerr << "Parse error: " << e.what() << "\n";
     }
-    return s;
-};
-
-match = dequote(match);
-
-return match;
-```
-
-**Example**:
-```cpp
-extract_oid("{\"_id\": \"507f1f77bcf86cd799439011\"}");
-// Returns: "507f1f77bcf86cd799439011"
+}
 ```
 
 ---
 
-### trim
+### `confirm_iso8601_timestamp(string) -> std::string`
 
-```cpp
-std::string db::trim(std::string const& s)
-```
+**Brief:** Validates and normalizes timestamps to ISO 8601 format.
 
-**Implementation**:
-```cpp
-auto wsfront = std::find_if_not(s.begin(), s.end(), [](int c) { return std::isspace(c); });
-return std::string(wsfront,
-    std::find_if_not(s.rbegin(), std::string::const_reverse_iterator(wsfront),
-                     [](int c) { return std::isspace(c); }).base());
-```
+**Implementation Notes:**
+- Strings starting with '2' are assumed to be ISO 8601 and returned as-is
+- Other formats are parsed using the legacy format and converted
 
-**Algorithm**:
-1. Find first non-whitespace from front
-2. Find first non-whitespace from back
-3. Return substring between these positions
-
-**Efficient**: Single-pass algorithm using iterators.
+**Thread Safety:** Safe
 
 ---
 
-### to_lower / to_upper
+### `unamejson() -> std::string`
 
+**Brief:** Returns system information as JSON.
+
+**Implementation:**
 ```cpp
-std::string db::to_lower(std::string const& c)
-{
-    auto s = c;
-    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
-    return s;
-}
-
-std::string db::to_upper(std::string const& c)
-{
-    auto s = c;
-    std::transform(s.begin(), s.end(), s.begin(), ::toupper);
-    return s;
+std::string db::unamejson() {
+  struct utsname thisuname;
+  if (uname(&thisuname) == -1) {
+    return "{}";
+  }
+  // Builds JSON with sysname, nodename, release, version, machine
 }
 ```
 
-**Implementation**: Uses std::transform with ::tolower/::toupper.
+**Thread Safety:** Safe
 
 ---
 
-### replace_all
+### `quoted_(text, qchar) -> std::string`
 
+**Brief:** Wraps text with specified quote character.
+
+**Implementation:**
 ```cpp
-std::string db::replace_all(std::string const& source,
-                            std::string const& match,
-                            std::string const& replacement)
-```
-
-**Implementation Details**:
-- Efficient algorithm that minimizes string allocations
-- Pre-reserves memory
-- Single pass through source string
-
-**Algorithm**:
-```cpp
-auto retValue = std::string{};
-auto match_len = match.size();
-retValue.reserve(match_len);
-
-std::size_t last, first = 0;
-
-while (std::string::npos != (last = source.find(match, first))) {
-    retValue.append(source, first, last - first);  // Append before match
-    retValue.append(replacement);                   // Append replacement
-    first = last + match_len;                       // Move past match
+std::string db::quoted_(std::string const& text, const char qchar) {
+  confirm((qchar == '\"' || qchar == '\''));
+  return std::string{} + qchar + text + qchar;
 }
-
-retValue.append(source, first, std::string::npos); // Append remainder
-
-return retValue;
 ```
 
-**Example**:
+**Thread Safety:** Safe
+
+---
+
+### `bool_(value) -> std::string`
+
+**Brief:** Converts boolean to string literal.
+
+**Implementation:**
 ```cpp
-replace_all("hello world hello", "hello", "hi");
-// Returns: "hi world hi"
+std::string db::bool_(bool value) {
+  return (value ? "true" : "false");
+}
 ```
+
+**Thread Safety:** Safe
+
+---
+
+### `operator"" _quoted(text, size) -> std::string`
+
+**Brief:** User-defined literal for double-quoted strings.
+
+**Implementation:**
+```cpp
+std::string db::operator"" _quoted(const char* text, std::size_t) {
+  return "\"" + std::string(text) + "\"";
+}
+```
+
+**Thread Safety:** Safe
+
+---
+
+### `debrace(s) -> std::string`
+
+**Brief:** Removes surrounding braces.
+
+**Implementation:**
+```cpp
+std::string db::debrace(std::string s) {
+  if (s[0] == '{' && s[s.length() - 1] == '}') {
+    return s.substr(1, s.length() - 2);
+  }
+  return s;
+}
+```
+
+**Thread Safety:** Safe
+
+---
+
+### `quotation_type(s) -> quotation_type_t`
+
+**Brief:** Determines the quotation type of a string.
+
+**Implementation:** Checks first and last characters for matching quotes.
+
+**Thread Safety:** Safe
+
+---
+
+### `dequote(s) -> std::string`
+
+**Brief:** Removes surrounding quotes (single or double).
+
+**Implementation:** Similar to `debrace`, checks for matching quote characters.
+
+**Thread Safety:** Safe
+
+---
+
+### `debracket(s) -> std::string`
+
+**Brief:** Removes surrounding brackets.
+
+**Implementation:** Similar to `debrace`, checks for `[` and `]`.
+
+**Thread Safety:** Safe
+
+---
+
+### `annotate(s) -> std::string`
+
+**Brief:** Prepends `#` to create a comment annotation.
+
+**Implementation:**
+- Trims input first
+- Returns null string literal for empty input
+- Preserves existing `#` prefix
+- Prepends `#` for other strings
+
+**Thread Safety:** Safe
+
+---
+
+### `generate_oid() -> std::string`
+
+**Brief:** Generates unique 24-character hex ID.
+
+**Implementation:**
+```cpp
+std::string db::generate_oid() {
+  std::ifstream is("/proc/sys/kernel/random/uuid");
+  std::string oid((std::istreambuf_iterator<char>(is)),
+                   std::istreambuf_iterator<char>());
+  oid.erase(std::remove(oid.begin(), oid.end(), '-'), oid.end());
+  oid.resize(24);
+  return oid;
+}
+```
+
+**Thread Safety:** Safe
+
+---
+
+### `to_id(oid) -> std::string`
+
+**Brief:** Creates MongoDB-style ID JSON structure.
+
+**Implementation:** Uses `_quoted` literal and `quoted_()` to build the JSON structure.
+
+**Thread Safety:** Safe
+
+---
+
+### `to_json(key, value) -> std::string`
+
+**Brief:** Creates simple JSON key-value object.
+
+**Implementation:**
+```cpp
+std::string db::to_json(std::string const& key, std::string const& value) {
+  confirm(!key.empty());
+  confirm(!value.empty());
+  std::ostringstream oss;
+  oss << "{" << quoted_(key) << ":" << quoted_(value) << "}";
+  return oss.str();
+}
+```
+
+**Thread Safety:** Safe
+
+---
+
+### `expand_environment_variables(var) -> std::string`
+
+**Brief:** Expands shell-style environment variables using POSIX `wordexp()`.
+
+**Security Note:** `wordexp()` can execute shell commands - sanitize inputs in security-sensitive contexts.
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+#include <iostream>
+
+void resolvePath() {
+    auto path = artdaq::database::expand_environment_variables("$HOME/configs");
+    std::cout << "Resolved path: " << path << "\n";
+}
+```
+
+---
+
+### `equal(left, right) -> bool`
+
+**Brief:** String equality comparison with assertion checking.
+
+**Implementation:**
+```cpp
+bool db::equal(std::string const& left, std::string const& right) {
+  confirm(!left.empty());
+  confirm(!right.empty());
+  return left == right;
+}
+```
+
+**Thread Safety:** Safe
+
+---
+
+### `not_equal(left, right) -> bool`
+
+**Brief:** String inequality comparison.
+
+**Implementation:** Returns `!equal(left, right)`.
+
+**Thread Safety:** Safe
+
+---
+
+### `extract_oid(filter) -> object_id_t`
+
+**Brief:** Extracts OID from JSON filter using regex.
+
+**Regex Pattern:** `R"(^\{[^:]+:\s+([\s\S]+)\}$)"`
+
+**Throws:**
+- `std::logic_error` on regex search failure
+- `runtime_error` on unexpected match count
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+#include <iostream>
+
+void processFilter(const std::string& filter) {
+    try {
+        auto oid = artdaq::database::extract_oid(filter);
+        std::cout << "Extracted OID: " << oid << "\n";
+    } catch (const std::logic_error& e) {
+        std::cerr << "Regex failed: " << e.what() << "\n";
+    } catch (const artdaq::database::runtime_error& e) {
+        std::cerr << "Extraction failed: " << e.what() << "\n";
+    }
+}
+```
+
+---
+
+### `trim(s) -> std::string`
+
+**Brief:** Removes leading and trailing whitespace.
+
+**Implementation:** Uses `find_if_not` with `std::isspace` predicate from both ends.
+
+**Thread Safety:** Safe
+
+---
+
+### `to_lower(c) -> std::string`
+
+**Brief:** Converts string to lowercase.
+
+**Implementation:**
+```cpp
+std::string db::to_lower(std::string const& c) {
+  auto s = c;
+  std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+  return s;
+}
+```
+
+**Thread Safety:** Safe
+
+---
+
+### `to_upper(c) -> std::string`
+
+**Brief:** Converts string to uppercase.
+
+**Implementation:** Similar to `to_lower`, uses `::toupper`.
+
+**Thread Safety:** Safe
+
+---
+
+### `replace_all(source, match, replacement) -> std::string`
+
+**Brief:** Replaces all occurrences of a substring.
+
+**Implementation:**
+- Uses efficient single-pass algorithm
+- Pre-allocates memory based on match length
+- Uses `find()` to locate matches and `append()` to build result
+
+**Thread Safety:** Safe
 
 ---
 
@@ -734,41 +491,71 @@ replace_all("hello world hello", "hello", "hi");
 ```cpp
 template <>
 std::string quoted<quotation_type_t::NONE>(std::string const& text) {
-    return text;
+  return text;
 }
 
 template <>
 std::string quoted<quotation_type_t::SINGLE>(std::string const& text) {
-    return quoted_(text, '\'');
+  return quoted_(text, '\'');
 }
 ```
 
-**Purpose**: Specialized implementations for different quote types.
+**Brief:** Template specializations for the `quoted` function template, providing specific behavior for `NONE` and `SINGLE` quotation types.
+
+**Thread Safety:** Safe
 
 ## Performance Considerations
 
-1. **String Operations**: Most functions minimize copying using references and move semantics where appropriate
+- `replace_all()` pre-allocates memory for efficiency
+- `trim()` uses iterators for single-pass operation
+- `generate_oid()` reads from `/proc` filesystem (I/O overhead)
+- Timestamp formatting involves multiple string operations
 
-2. **Memory Allocation**: Functions like replace_all pre-reserve memory to reduce reallocations
+## Error Handling Strategy
 
-3. **Static Variables**: useFakeTime uses static local for persistent state without global variable overhead
+Functions use `confirm()` assertions for precondition checking on inputs like empty strings or null pointers. Some functions throw specific exceptions:
+- `std::invalid_argument` for format errors in timestamp parsing
+- `std::logic_error` and `runtime_error` for regex failures
 
-4. **Iterator Usage**: trim() uses iterators for efficient traversal
+## Dependencies
 
-5. **System Calls**: uname() and wordexp() involve system calls which are relatively expensive
+| Include | Purpose |
+|---------|---------|
+| `<sys/utsname.h>` | System info (`uname()`) |
+| `<wordexp.h>` | Shell variable expansion |
+| `<chrono>` | Time utilities |
+| `<clocale>` | Locale support |
+| `<ctime>` | Time formatting (`strftime`, `strptime`) |
+| `<fstream>` | File I/O for OID generation |
+| `<regex>` | OID extraction |
+| `helper_functions.h` | Declarations |
+| `common.h` | TRACE logging macros |
+| `configuraion_api_literals.h` | Timestamp formats, locale constants |
+| `shared_exceptions.h` | Exception types |
 
-## Security Considerations
+## TRACE Configuration
 
-1. **wordexp()**: Can execute arbitrary shell commands if input contains command substitutions
-   - Should sanitize input or use safer alternatives
+The file defines `TRACE_NAME` as `"helper_functions.cpp"`. TRACE logging is used in:
+- `generate_oid()` - Entry/exit logging at levels 11-12
+- `extract_oid()` - Regex result logging at levels 13-15
 
-2. **File Operations**: generate_oid() reads from /proc which could fail in containers
+## Thread Safety
 
-3. **Regex**: extract_oid() could be vulnerable to ReDoS with malicious input patterns
+Most functions are thread-safe as they use only local variables and const parameters. Exceptions:
+- `useFakeTime()` uses a static variable (not thread-safe for concurrent mode changes)
+- `set_default_locale()` modifies global state
 
-## Related Files
+## Security Note
 
-- **helper_functions.h** - Function declarations
-- **configuraion_api_literals.h** - Constants for timestamp formats and locales
-- **shared_exceptions.h** - Exception types
-- **printStackTrace.h** - Stack trace functionality used by confirm()
+`expand_environment_variables()` uses `wordexp()` which can execute shell commands embedded in the input string. Sanitize inputs when using in security-sensitive contexts.
+
+## Testing Notes
+
+- **Unit tests:** Functions are tested indirectly through ConfigurationDB tests
+- **Key test cases:** Timestamp formatting/parsing, string manipulation, OID generation
+
+## See Also
+
+- [helper_functions.h](./helper_functions.h.md) - Function declarations
+- [configuraion_api_literals.h](./configuraion_api_literals.h.md) - Timestamp format strings, locale constants
+- [printStackTrace.h](./printStackTrace.h.md) - Stack trace used by `confirm()`

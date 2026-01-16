@@ -1,189 +1,216 @@
 # configurationdbifc_base.h
 
-## File Overview
+**Path:** `artdaq-database/ConfigurationDB/configurationdbifc_base.h`
 
-This header file defines the base infrastructure for configuration serialization in artdaq-database. It provides template classes for wrapping user configuration objects and making them serializable to/from JSON and FHiCL formats, along with helper structures for version management.
+**Purpose:** Defines the base infrastructure for configuration serialization in artdaq-database. This header provides template classes for wrapping user configuration objects and making them serializable to/from JSON and FHiCL formats, along with helper structures for version management. It serves as the foundation upon which `ConfigurationInterface` builds its database operations.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/ConfigurationDB/configurationdbifc_base.h`
 
-**Lines of Code**: 203
+## Key Concepts
 
-**Purpose**: Base classes and templates for configuration serialization and version management
+### Configuration Serialization Pattern
 
-## Dependencies
+This header implements a two-layer serialization pattern:
 
-### Standard Library
-- `<utility>` - std::pair for results
+1. **MakeSerializable<CONF>**: Low-level template that users must specialize to define how their configuration types serialize to/from data formats. This requires implementing `writeDocumentImpl`, `readDocumentImpl`, and `configurationNameImpl` methods.
 
-### Project Headers
-- `"artdaq-database/BasicTypes/basictypes.h"` - FhiclData, JsonData types
-- `"artdaq-database/ConfigurationDB/configurationdb.h"` - Configuration database types
-- `"artdaq-database/DataFormats/Json/json_reader.h"` - JSON parsing
-- `"artdaq-database/DataFormats/Json/json_writer.h"` - JSON serialization
-- `"artdaq-database/ConfigurationDB/options_operation_managedocument.h"` - Document operations
+2. **ConfigurationSerializer<CONF, SERIALIZABLE>**: High-level wrapper that provides noexcept guarantees and `result_t` return values instead of exceptions. This is the preferred interface for database operations.
 
-## Namespace: artdaq::database::configuration
+### Pointer/Reference Requirement
 
-All types and functions in this file are declared within the `artdaq::database::configuration` namespace.
-
-## Helper Functions
-
-### make_error_msg
-```cpp
-inline auto make_error_msg = [](const char* msg) {
-    return std::string("{error:\"").append(msg).append("\"}");
-};
-```
-
-**Purpose**: Lambda function to format error messages as JSON objects.
-
-**Parameters**:
-- `msg` - Error message string
-
-**Returns**: JSON-formatted error string
-
-**Usage Example**:
-```cpp
-auto error = make_error_msg("Connection failed");
-// Returns: "{error:"Connection failed"}"
-```
-
----
-
-## Template Class: MakeSerializable<CONF>
-
-### Purpose
-
-`MakeSerializable` is a template class that wraps user configuration objects and provides serialization/deserialization methods. Users must specialize this template for their custom configuration types.
-
-### Template Parameters
-
-- **CONF**: User configuration type (must be pointer or reference type)
-
-### Static Assertions
+Both template classes enforce that the configuration type parameter must be a pointer or reference:
 
 ```cpp
 static_assert(std::is_pointer<CONF>::value || std::is_reference<CONF>::value,
               "Template parameter must be either a pointer or reference type");
 ```
 
-**Purpose**: Enforces that configuration types must be passed by pointer or reference.
+This ensures:
+- Configuration objects can be mutated during deserialization
+- No unnecessary copies of potentially large configuration structures
+- Clear ownership semantics
 
-**Rationale**: Ensures efficient handling and allows mutation of configuration objects.
+### SFINAE for Format Selection
 
----
+The `ConfigurationSerializer` uses SFINAE (Substitution Failure Is Not An Error) to provide type-safe overloads for different data formats (JSON vs FHiCL). This enables compile-time format selection with no runtime overhead.
 
-### Public Methods
+## Thread Safety
 
-#### writeDocument
+- **Thread-safe:** No
+- **Concurrent access:** Not supported - create separate serializer instances per thread
+- **Locking:** None - classes are not designed for concurrent access
+
+**Recommendation:** Each thread that needs to serialize/deserialize configurations should create its own serializer instance. The serializers hold references to configuration objects, so sharing instances across threads could lead to data races.
+
+## Dependencies
+
+| Include | Purpose |
+|---------|---------|
+| `<utility>` | std::pair for result types, std::swap |
+| `artdaq-database/BasicTypes/basictypes.h` | FhiclData, JsonData type wrappers |
+| `artdaq-database/ConfigurationDB/configurationdb.h` | Configuration database types and result_t |
+| `artdaq-database/DataFormats/Json/json_reader.h` | JSON parsing utilities |
+| `artdaq-database/DataFormats/Json/json_writer.h` | JSON serialization utilities |
+| `artdaq-database/ConfigurationDB/options_operation_managedocument.h` | Document operation options |
+
+## Functions
+
+### `make_error_msg` (Lambda)
+
 ```cpp
-template <class TYPE>
-bool writeDocument(TYPE& data) const
+inline auto make_error_msg = [](const char* msg) -> std::string;
 ```
 
-**Purpose**: Serialize the configuration to JSON or FHiCL format.
+**Brief:** Formats an error message as a JSON object string for consistent error reporting.
 
-**Template Parameters**:
-- `TYPE` - Output format type (`JsonData` or `FhiclData`)
+**Parameters:**
+- `msg` - The error message text to wrap
 
-**Parameters**:
-- `data` - Output parameter to receive serialized data
+**Returns:** JSON-formatted error string in the format `{error:"<message>"}`
 
-**Returns**: `true` on success, `false` on failure
+**Thread Safety:** Safe - stateless lambda
 
-**Throws**: `artdaq::database::exception` with detailed error message
-
-**Usage**:
+**Example:**
 ```cpp
-MakeSerializable<MyConfig*> serializer(config_ptr);
+#include "artdaq-database/ConfigurationDB/configurationdbifc_base.h"
+
+void handleError() {
+  auto error = make_error_msg("Connection failed");
+  // Returns: "{error:\"Connection failed\"}"
+  std::cerr << error << std::endl;
+}
+```
+
+## Classes/Structures
+
+### `MakeSerializable<CONF>`
+
+A template class that wraps user configuration objects and provides serialization/deserialization methods. Users must specialize this template for their custom configuration types by implementing the private `*Impl` methods.
+
+**Thread Safety:** Not thread-safe - do not share instances across threads
+
+#### Constructor
+
+##### `MakeSerializable(CONF conf)`
+
+**Brief:** Constructs a serializer wrapper for the given configuration object.
+
+**Parameters:**
+- `conf` - Configuration object (must be pointer or reference type)
+
+**Preconditions:**
+- `CONF` must be a pointer or reference type (enforced at compile time)
+
+**Example:**
+```cpp
+struct MyConfig {
+  std::string name;
+  int value;
+};
+
+MyConfig config;
+config.name = "test";
+config.value = 42;
+
+// Using pointer type
+MakeSerializable<MyConfig*> serializer(&config);
+```
+
+#### Methods
+
+##### `writeDocument(TYPE& data) const -> bool`
+
+**Brief:** Serializes the wrapped configuration object to the specified data format (JSON or FHiCL).
+
+**Parameters:**
+- `data` - Output parameter to receive the serialized data
+
+**Preconditions:**
+- User must have specialized `writeDocumentImpl<TYPE>` for the configuration type
+
+**Returns:** `true` on successful serialization, `false` on failure
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| `artdaq::database::exception` | Serialization fails or implementation throws |
+
+**Thread Safety:** Not thread-safe
+
+**Example:**
+```cpp
+MakeSerializable<MyConfig*> serializer(&config);
 JsonData json_output;
 
-if (serializer.writeDocument(json_output)) {
-    // Use json_output
-} else {
-    // Handle error
+try {
+  if (serializer.writeDocument(json_output)) {
+    std::cout << "Serialized: " << std::string(json_output) << std::endl;
+  } else {
+    std::cerr << "Serialization returned false" << std::endl;
+  }
+} catch (const artdaq::database::exception& e) {
+  std::cerr << "Serialization error: " << e.what() << std::endl;
 }
 ```
 
-**Implementation**: Delegates to `writeDocumentImpl` which must be specialized by user.
-
 ---
 
-#### readDocument
+##### `readDocument(TYPE const& data) -> bool`
+
+**Brief:** Deserializes data from the specified format into the wrapped configuration object.
+
+**Parameters:**
+- `data` - Input data in JSON or FHiCL format
+
+**Preconditions:**
+- User must have specialized `readDocumentImpl<TYPE>` for the configuration type
+
+**Returns:** `true` on successful deserialization, `false` on failure
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| `artdaq::database::exception` | Deserialization fails or implementation throws |
+
+**Thread Safety:** Not thread-safe
+
+**Example:**
 ```cpp
-template <class TYPE>
-bool readDocument(TYPE const& data)
-```
+JsonData json_input{R"({"name": "test", "value": 42})"};
+MakeSerializable<MyConfig*> serializer(&config);
 
-**Purpose**: Deserialize JSON or FHiCL data into the configuration object.
-
-**Template Parameters**:
-- `TYPE` - Input format type (`JsonData` or `FhiclData`)
-
-**Parameters**:
-- `data` - Input data to deserialize
-
-**Returns**: `true` on success, `false` on failure
-
-**Throws**: `artdaq::database::exception` with detailed error message
-
-**Usage**:
-```cpp
-MakeSerializable<MyConfig*> serializer(config_ptr);
-JsonData json_input = loadFromFile("config.json");
-
-if (serializer.readDocument(json_input)) {
-    // config_ptr is now populated
-} else {
-    // Handle error
+try {
+  if (serializer.readDocument(json_input)) {
+    std::cout << "Loaded: " << config.name << std::endl;
+  }
+} catch (const artdaq::database::exception& e) {
+  std::cerr << "Deserialization error: " << e.what() << std::endl;
 }
 ```
 
-**Implementation**: Delegates to `readDocumentImpl` which must be specialized by user.
+---
+
+##### `configurationName() const -> std::string`
+
+**Brief:** Returns the collection name for this configuration type, used to determine which database collection stores these configurations.
+
+**Preconditions:**
+- User must have specialized `configurationNameImpl()` for the configuration type
+
+**Returns:** String identifying the configuration collection (e.g., "DetectorConfigs")
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| `artdaq::database::exception` | Implementation throws or fails |
+
+**Thread Safety:** Not thread-safe
 
 ---
 
-#### configurationName
-```cpp
-std::string configurationName() const
-```
-
-**Purpose**: Get the collection name for this configuration type.
-
-**Returns**: String identifying the configuration collection
-
-**Throws**: `artdaq::database::exception` on errors
-
-**Usage**:
-```cpp
-auto name = serializer.configurationName();
-// Returns: "MyConfigurations"
-```
-
-**Implementation**: Delegates to `configurationNameImpl` which must be specialized by user.
-
----
-
-### Constructor
-
-```cpp
-MakeSerializable(CONF conf)
-```
-
-**Purpose**: Construct serializer wrapper for a configuration object.
-
-**Parameters**:
-- `conf` - Configuration object (pointer or reference)
-
-**Usage**:
-```cpp
-MyConfig* config = new MyConfig();
-MakeSerializable<MyConfig*> serializer(config);
-```
-
----
-
-### Deleted Operations
+#### Deleted Operations
 
 ```cpp
 MakeSerializable() = delete;
@@ -193,614 +220,235 @@ MakeSerializable& operator=(MakeSerializable const&) = delete;
 MakeSerializable& operator=(MakeSerializable&&) = delete;
 ```
 
-**Design**: Serializer is non-copyable and non-movable to maintain association with wrapped configuration.
+The serializer is non-copyable and non-movable to maintain a stable association with the wrapped configuration object and prevent accidental aliasing.
 
 ---
 
-### Private Methods (Must be Specialized)
+### `ConfigurationSerializer<CONF, SERIALIZABLE>`
 
-#### writeDocumentImpl
-```cpp
-template <class TYPE>
-bool writeDocumentImpl(TYPE&) const;
-```
+A type-safe wrapper around `MakeSerializable` that provides noexcept guarantees and `result_t` return values instead of exceptions. This is the recommended interface for database operations.
 
-**Purpose**: Implementation hook for serialization - must be specialized by user.
+**Thread Safety:** Not thread-safe - create separate instances per thread
 
-**Specialization Example**:
-```cpp
-template <>
-template <>
-bool MakeSerializable<MyConfig*>::writeDocumentImpl<JsonData>(JsonData& data) const {
-    jsn::object_t json;
-    json["name"] = _conf->name;
-    json["value"] = _conf->value;
-
-    std::ostringstream oss;
-    oss << json;
-    data = JsonData{oss.str()};
-
-    return true;
-}
-```
-
----
-
-#### readDocumentImpl
-```cpp
-template <class TYPE>
-bool readDocumentImpl(TYPE const&);
-```
-
-**Purpose**: Implementation hook for deserialization - must be specialized by user.
-
-**Specialization Example**:
-```cpp
-template <>
-template <>
-bool MakeSerializable<MyConfig*>::readDocumentImpl<JsonData>(JsonData const& data) const {
-    jsn::object_t json;
-    if (!jsn::JsonReader().read(std::string(data), json)) {
-        return false;
-    }
-
-    _conf->name = unwrap(json).value_as<std::string>("name");
-    _conf->value = unwrap(json).value_as<int>("value");
-
-    return true;
-}
-```
-
----
-
-#### configurationNameImpl
-```cpp
-std::string configurationNameImpl() const;
-```
-
-**Purpose**: Implementation hook for collection name - must be specialized by user.
-
-**Specialization Example**:
-```cpp
-template <>
-std::string MakeSerializable<MyConfig*>::configurationNameImpl() const {
-    return "MyConfigurations";
-}
-```
-
----
-
-### Private Members
-
-```cpp
-CONF _conf;
-```
-
-**Purpose**: Stores the wrapped configuration object (pointer or reference).
-
----
-
-## Template Class: ConfigurationSerializer<CONF, SERIALIZABLE>
-
-### Purpose
-
-`ConfigurationSerializer` provides a type-safe wrapper around `MakeSerializable` with enhanced error handling and noexcept guarantees. It returns `result_t` instead of throwing exceptions.
-
-### Template Parameters
-
-- **CONF**: Configuration type (pointer or reference)
-- **SERIALIZABLE**: Serialization strategy template (typically `MakeSerializable`)
-
-### Static Assertions
-
-```cpp
-static_assert(std::is_pointer<CONF>::value || std::is_reference<CONF>::value,
-              "Template parameter must be either a pointer or reference type");
-```
-
----
-
-### Type Aliases
+#### Type Aliases
 
 ```cpp
 using Serializable_t = SERIALIZABLE<CONF>;
 ```
 
-**Purpose**: Convenience alias for the instantiated serialization strategy.
+#### Static Factory Method
 
----
+##### `wrap(CONF conf) -> ConfigurationSerializer<CONF, SERIALIZABLE>`
 
-### Factory Method
+**Brief:** Factory method to create a serializer instance wrapping the given configuration object.
 
-#### wrap
+**Parameters:**
+- `conf` - Configuration object (pointer or reference)
+
+**Returns:** A new ConfigurationSerializer instance
+
+**Thread Safety:** Safe (creates new instance)
+
+**Example:**
 ```cpp
-static ConfigurationSerializer<CONF, SERIALIZABLE> wrap(CONF conf)
+auto serializer = ConfigurationSerializer<MyConfig*, MakeSerializable>::wrap(&config);
 ```
 
-**Purpose**: Factory method to create a serializer instance.
+#### Methods
 
-**Parameters**:
-- `conf` - Configuration object to wrap
+##### `writeDocument<TYPE>(TYPE& data) const noexcept -> cf::result_t`
 
-**Returns**: ConfigurationSerializer instance
+**Brief:** Serializes the configuration to the specified format with result-based error handling. Uses SFINAE to select the appropriate implementation for JsonData or FhiclData.
 
-**Usage**:
+**Parameters:**
+- `data` - Output parameter for serialized data
+
+**Returns:** `result_t` pair containing:
+- `first`: `true` on success, `false` on failure
+- `second`: JSON-formatted message string
+
+**Postconditions:**
+- On success, `data` contains the serialized configuration
+- On failure, `data` is unchanged
+
+**Thread Safety:** Not thread-safe
+
+**Example:**
 ```cpp
-auto serializer = ConfigurationSerializer<MyConfig*, MakeSerializable>::wrap(config_ptr);
-```
+#include "artdaq-database/ConfigurationDB/configurationdbifc_base.h"
 
-**Design**: Preferred way to create instances - provides clear intent.
+using namespace artdaq::database::configuration;
 
----
+void serializeConfig(MyConfig* config) {
+  auto serializer = ConfigurationSerializer<MyConfig*, MakeSerializable>::wrap(config);
 
-### Public Methods
+  JsonData json;
+  auto result = serializer.writeDocument(json);
 
-#### writeDocument (FhiclData)
-```cpp
-template <class TYPE>
-typename std::enable_if<std::is_same<TYPE, FhiclData>::value, cf::result_t>::type
-writeDocument(TYPE& data) const noexcept
-```
-
-**Purpose**: Serialize configuration to FHiCL format with result handling.
-
-**SFINAE**: Only enabled when `TYPE` is `FhiclData`
-
-**Parameters**:
-- `data` - Output parameter for FHiCL data
-
-**Returns**: `result_t` - (success boolean, message string)
-
-**Exception Safety**: noexcept - never throws
-
-**Implementation**:
-1. Creates temporary FhiclData
-2. Calls underlying writeDocument
-3. Swaps on success
-4. Returns result with success/failure message
-
----
-
-#### writeDocument (JsonData)
-```cpp
-template <class TYPE>
-typename std::enable_if<std::is_same<TYPE, JsonData>::value, cf::result_t>::type
-writeDocument(TYPE& data) const noexcept
-```
-
-**Purpose**: Serialize configuration to JSON format with result handling.
-
-**SFINAE**: Only enabled when `TYPE` is `JsonData`
-
-**Parameters**:
-- `data` - Output parameter for JSON data
-
-**Returns**: `result_t` - (success boolean, message string)
-
-**Exception Safety**: noexcept - never throws
-
-**Usage Example**:
-```cpp
-auto serializer = ConfigurationSerializer<Config*, MakeSerializable>::wrap(&config);
-
-JsonData json;
-auto result = serializer.writeDocument(json);
-
-if (result.first) {
-    std::cout << "Serialized to JSON successfully\n";
-    // Use json
-} else {
-    std::cerr << "Error: " << result.second << "\n";
+  if (result.first) {
+    std::cout << "Success: " << std::string(json) << std::endl;
+  } else {
+    std::cerr << "Error: " << result.second << std::endl;
+  }
 }
 ```
 
 ---
 
-#### readDocument (FhiclData)
-```cpp
-template <class TYPE>
-typename std::enable_if<std::is_same<TYPE, FhiclData>::value, cf::result_t>::type
-readDocument(TYPE const& data) noexcept
-```
+##### `readDocument<TYPE>(TYPE const& data) noexcept -> cf::result_t`
 
-**Purpose**: Deserialize FHiCL data into configuration.
+**Brief:** Deserializes data into the configuration with result-based error handling.
 
-**SFINAE**: Only enabled when `TYPE` is `FhiclData`
+**Parameters:**
+- `data` - Input data in JSON or FHiCL format
 
-**Parameters**:
-- `data` - Input FHiCL data
+**Returns:** `result_t` pair with success status and message
 
-**Returns**: `result_t` - (success boolean, message string)
-
-**Exception Safety**: noexcept
+**Thread Safety:** Not thread-safe
 
 ---
 
-#### readDocument (JsonData)
-```cpp
-template <class TYPE>
-typename std::enable_if<std::is_same<TYPE, JsonData>::value, cf::result_t>::type
-readDocument(TYPE const& data) noexcept
-```
+##### `configurationName() const noexcept -> std::string`
 
-**Purpose**: Deserialize JSON data into configuration.
+**Brief:** Returns the collection name for this configuration type. If the specialized implementation throws, falls back to using the demangled type name.
 
-**SFINAE**: Only enabled when `TYPE` is `JsonData`
+**Returns:** Configuration collection name string
 
-**Parameters**:
-- `data` - Input JSON data
+**Postconditions:**
+- Always returns a non-empty string
+- Falls back to demangled type name on error
 
-**Returns**: `result_t` - (success boolean, message string)
-
-**Exception Safety**: noexcept
-
-**Usage Example**:
-```cpp
-auto serializer = ConfigurationSerializer<Config*, MakeSerializable>::wrap(&config);
-
-JsonData json = loadFromDatabase();
-auto result = serializer.readDocument(json);
-
-if (result.first) {
-    // config is now populated
-} else {
-    std::cerr << "Failed to deserialize: " << result.second << "\n";
-}
-```
+**Thread Safety:** Not thread-safe
 
 ---
 
-#### configurationName
+### `VersionInfo`
+
+A simple data structure representing a specific version of a configuration for a particular entity. Used primarily for global configuration composition operations.
+
+**Thread Safety:** Plain data struct - safe to copy and use across threads
+
+#### Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `configuration` | `std::string` | Collection/configuration type name |
+| `version` | `std::string` | Version identifier (e.g., "v1.0") |
+| `entity` | `std::string` | Entity/component name |
+
+#### Methods
+
+##### `validate() const -> void`
+
+**Brief:** Validates that all required fields are non-empty, throwing if validation fails.
+
+**Preconditions:**
+- None (validation is the purpose of this method)
+
+**Postconditions:**
+- If no exception thrown, all fields are guaranteed non-empty
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| `artdaq::database::invalid_option_exception` | `configuration` is empty |
+| `artdaq::database::invalid_option_exception` | `version` is empty |
+| `artdaq::database::invalid_option_exception` | `entity` is empty |
+
+**Thread Safety:** Safe (read-only operation)
+
+**Example:**
 ```cpp
-std::string configurationName() const noexcept
-```
+#include "artdaq-database/ConfigurationDB/configurationdbifc_base.h"
 
-**Purpose**: Get collection name for this configuration type.
+using namespace artdaq::database::configuration;
 
-**Returns**: Configuration collection name
+void useVersionInfo() {
+  VersionInfo info;
+  info.configuration = "DetectorConfigs";
+  info.version = "v1.0";
+  info.entity = "Detector_001";
 
-**Exception Safety**: noexcept - returns demangled type name on error
-
-**Fallback Behavior**: If specialized implementation throws:
-1. Demangles the configuration type name
-2. Extracts class name from fully-qualified name
-3. Returns extracted name
-
-**Example**:
-```cpp
-auto name = serializer.configurationName();
-// Returns: "MyConfigurations" (from specialization)
-// Or: "MyConfig" (from type demangling fallback)
-```
-
----
-
-### Constructor (Private)
-
-```cpp
-ConfigurationSerializer(CONF conf)
-```
-
-**Purpose**: Private constructor - use `wrap()` factory method instead.
-
-**Design**: Forces use of factory method for consistent creation pattern.
-
----
-
-### Deleted Operations
-
-```cpp
-ConfigurationSerializer() = delete;
-ConfigurationSerializer(ConfigurationSerializer const&) = delete;
-ConfigurationSerializer& operator=(ConfigurationSerializer const&) = delete;
-ConfigurationSerializer& operator=(ConfigurationSerializer&&) = delete;
-```
-
-**Design**: Non-copyable (but movable) to prevent accidental duplication.
-
----
-
-### Private Members
-
-```cpp
-CONF _conf;
-```
-
-**Purpose**: Stores wrapped configuration object.
-
----
-
-## Struct: VersionInfo
-
-### Purpose
-
-`VersionInfo` is a simple data structure that represents a specific version of a configuration for a particular entity. It's used primarily for global configuration composition.
-
-### Fields
-
-```cpp
-std::string configuration;  // Collection/configuration type name
-std::string version;        // Version identifier
-std::string entity;         // Entity/component name
-```
-
-**Example**:
-```cpp
-VersionInfo info;
-info.configuration = "ComponentConfigs";
-info.version = "v1.0";
-info.entity = "DAQComponent1";
-```
-
----
-
-### Methods
-
-#### validate
-```cpp
-void validate() const
-```
-
-**Purpose**: Validate that all required fields are non-empty.
-
-**Throws**: `invalid_option_exception` if any field is empty
-
-**Validation Rules**:
-- `configuration` must not be empty
-- `version` must not be empty
-- `entity` must not be empty
-
-**Usage**:
-```cpp
-VersionInfo info{"ComponentConfigs", "v1.0", "DAQ1"};
-
-try {
+  try {
     info.validate();
-    // All fields are valid
-} catch (artdaq::database::invalid_option_exception const& e) {
-    std::cerr << "Invalid version info: " << e.what() << "\n";
+    // Safe to use info
+  } catch (const artdaq::database::invalid_option_exception& e) {
+    std::cerr << "Invalid version info: " << e.what() << std::endl;
+  }
 }
 ```
 
-**Note**: Uses `confirm()` macro for debug-mode assertions before throwing.
+## Relationship to Other Components
 
----
+This file serves as the foundation layer for the ConfigurationDB serialization system:
 
-## Design Patterns
+```
+configurationdbifc.h (ConfigurationInterface)
+        |
+        v
+configurationdbifc_base.h (MakeSerializable, ConfigurationSerializer)
+        |
+        v
+BasicTypes/basictypes.h (JsonData, FhiclData)
+```
 
-### Template Specialization Pattern
+- **configurationdbifc.h**: The main `ConfigurationInterface` class uses `ConfigurationSerializer` internally to serialize/deserialize user configuration types
+- **options_operation_managedocument.h**: Provides operation options that work with the serialized data
+- **basictypes.h**: Defines the `JsonData` and `FhiclData` wrapper types used for serialization targets
 
-Users extend functionality by specializing template methods:
+## Common Pitfalls
+
+### Forgetting to Specialize Implementation Methods
 
 ```cpp
-// User specializes for their configuration type
+// DON'T: Try to use MakeSerializable without specialization
+MakeSerializable<MyConfig*> ser(&config);
+JsonData json;
+ser.writeDocument(json);  // LINKER ERROR: undefined reference to writeDocumentImpl
+
+// DO: Specialize the implementation methods first
 template <>
 template <>
 bool MakeSerializable<MyConfig*>::writeDocumentImpl<JsonData>(JsonData& data) const {
-    // Custom serialization logic
-    return true;
+  // Your serialization logic here
+  return true;
 }
 ```
 
-**Benefits**:
-1. Type-safe compile-time dispatch
-2. No runtime overhead
-3. Extensible without modifying base code
-
----
-
-### SFINAE for Type Selection
-
-`ConfigurationSerializer` uses SFINAE (Substitution Failure Is Not An Error) to provide different implementations for JSON vs FHiCL:
+### Using Value Types Instead of Pointers/References
 
 ```cpp
-template <class TYPE>
-typename std::enable_if<std::is_same<TYPE, JsonData>::value, cf::result_t>::type
-writeDocument(TYPE& data) const noexcept
+// DON'T: Use value types
+MakeSerializable<MyConfig> ser(config);  // COMPILE ERROR: static_assert fails
+
+// DO: Use pointer or reference types
+MakeSerializable<MyConfig*> ser(&config);  // OK
+MakeSerializable<MyConfig&> ser(config);   // OK
 ```
 
-**Benefits**:
-1. Single interface for multiple formats
-2. Compile-time type checking
-3. No runtime branching
-
----
-
-### Result Type Pattern
-
-Methods return `result_t` instead of throwing:
+### Sharing Serializers Across Threads
 
 ```cpp
-using result_t = std::pair<bool, std::string>;
+// DON'T: Share serializer across threads
+MakeSerializable<MyConfig*> shared_ser(&config);
+std::thread t1([&shared_ser]() { shared_ser.writeDocument(json1); });
+std::thread t2([&shared_ser]() { shared_ser.writeDocument(json2); });
+// DATA RACE!
+
+// DO: Create per-thread serializers
+std::thread t1([&config]() {
+  MakeSerializable<MyConfig*> ser(&config);
+  ser.writeDocument(json1);
+});
 ```
 
-**Benefits**:
-1. No exception overhead
-2. Explicit error handling
-3. C-compatible interfaces
-4. Predictable performance
+## See Also
 
----
-
-## Usage Example: Complete Implementation
-
-### Step 1: Define Configuration Type
-
-```cpp
-struct MyConfiguration {
-    std::string name;
-    int run_number;
-    std::vector<std::string> components;
-};
-```
-
-### Step 2: Specialize MakeSerializable
-
-```cpp
-namespace artdaq {
-namespace database {
-namespace configuration {
-
-template <>
-class MakeSerializable<MyConfiguration*> {
- public:
-  MakeSerializable(MyConfiguration* conf) : _conf(conf) {}
-
-  // JSON serialization
-  template <>
-  bool writeDocumentImpl<JsonData>(JsonData& data) const {
-    jsn::object_t json;
-    json["name"] = _conf->name;
-    json["run_number"] = _conf->run_number;
-
-    jsn::array_t components;
-    for (auto const& comp : _conf->components) {
-      components.push_back(comp);
-    }
-    json["components"] = components;
-
-    std::ostringstream oss;
-    oss << json;
-    data = JsonData{oss.str()};
-    return true;
-  }
-
-  // JSON deserialization
-  template <>
-  bool readDocumentImpl<JsonData>(JsonData const& data) {
-    jsn::object_t json;
-    if (!jsn::JsonReader().read(std::string(data), json)) {
-      return false;
-    }
-
-    _conf->name = unwrap(json).value_as<std::string>("name");
-    _conf->run_number = unwrap(json).value_as<int>("run_number");
-
-    auto const& comps = unwrap(json).value_as<jsn::array_t>("components");
-    _conf->components.clear();
-    for (auto const& comp : comps) {
-      _conf->components.push_back(unwrap(comp).value_as<std::string>());
-    }
-
-    return true;
-  }
-
-  std::string configurationNameImpl() const {
-    return "MyConfigurations";
-  }
-
- private:
-  MyConfiguration* _conf;
-};
-
-}  // namespace configuration
-}  // namespace database
-}  // namespace artdaq
-```
-
-### Step 3: Use with ConfigurationInterface
-
-```cpp
-#include "artdaq-database/ConfigurationDB/configurationdbifc.h"
-
-void example() {
-    MyConfiguration config;
-    config.name = "TestConfig";
-    config.run_number = 12345;
-    config.components = {"DAQ1", "DAQ2"};
-
-    ConfigurationInterface ifc;
-
-    // Store version
-    auto result = ifc.storeVersion<MyConfiguration*, JsonData>(
-        &config, "v1.0", "TestEntity"
-    );
-
-    if (result.first) {
-        std::cout << "Stored successfully\n";
-    }
-
-    // Load version
-    MyConfiguration loaded;
-    result = ifc.loadVersion<MyConfiguration*, JsonData>(
-        &loaded, "v1.0", "TestEntity"
-    );
-
-    if (result.first) {
-        std::cout << "Loaded: " << loaded.name << "\n";
-    }
-}
-```
-
----
-
-## Thread Safety
-
-- **MakeSerializable**: Not thread-safe - do not share instances across threads
-- **ConfigurationSerializer**: Not thread-safe - create separate instances per thread
-- **VersionInfo**: Plain data struct - safe to copy and use across threads
-
----
-
-## Best Practices
-
-### Implement All Format Methods
-
-```cpp
-// Implement both JSON and FHiCL serialization
-template <>
-bool writeDocumentImpl<JsonData>(...) { /* ... */ }
-
-template <>
-bool writeDocumentImpl<FhiclData>(...) { /* ... */ }
-```
-
-### Use Collection Names Consistently
-
-```cpp
-// Collection names should be plural and descriptive
-std::string configurationNameImpl() const {
-    return "ComponentConfigs";  // GOOD
-    // return "config";           // BAD - too generic
-    // return "Component";        // BAD - singular
-}
-```
-
-### Validate VersionInfo
-
-```cpp
-// Always validate before use
-VersionInfo info{config, version, entity};
-try {
-    info.validate();
-    // Safe to use
-} catch (...) {
-    // Handle invalid info
-}
-```
-
-### Handle Serialization Errors
-
-```cpp
-auto serializer = ConfigurationSerializer<Config*, MakeSerializable>::wrap(&config);
-
-JsonData json;
-auto result = serializer.writeDocument(json);
-
-if (!result.first) {
-    TLOG(TLVL_ERROR) << "Serialization failed: " << result.second;
-    // Take corrective action
-}
-```
-
----
-
-## Related Files
-
-- **configurationdbifc.h** - Main configuration interface using these base classes
-- **basictypes.h** - JsonData and FhiclData type definitions
-- **configurationdb.h** - Configuration database type definitions
-- **options_operation_managedocument.h** - Document operation options
+- [configurationdbifc.h](./configurationdbifc.h.md) - Main ConfigurationInterface that uses these base classes
+- [basictypes.h](../BasicTypes/basictypes.h.md) - JsonData and FhiclData type definitions
+- [configurationdb.h](./configurationdb.h.md) - Configuration database type definitions
+- [options_operation_managedocument.h](./options_operation_managedocument.h.md) - Document operation options
 
 ---
 

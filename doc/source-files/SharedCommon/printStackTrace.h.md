@@ -1,455 +1,350 @@
 # printStackTrace.h
 
-## File Overview
+**Path:** `artdaq-database/SharedCommon/printStackTrace.h`
 
-This header file declares functions and handlers for debugging and diagnostic purposes, including stack trace generation, exception handling hooks, signal handlers, and C++ ABI exception interception. It provides critical debugging infrastructure for the artdaq-database project.
+**Purpose:** Declares debugging infrastructure for stack traces, signal handling, and exception interception. Enables detailed diagnostics when crashes or exceptions occur by capturing stack traces at throw points and installing handlers for fatal signals.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/SharedCommon/printStackTrace.h`
+## Key Concepts
+
+### __cxa_throw Interception
+
+The C++ ABI function `__cxa_throw` is called by the runtime whenever an exception is thrown. By providing our own implementation that wraps the real one, we capture the stack trace at the throw point (not just at the catch point). This is invaluable for debugging because it shows exactly where exceptions originate.
+
+```cpp
+extern "C" void __cxa_throw(void*, void*, void (*)(void*));
+```
+
+### Signal Handlers
+
+Fatal signals (SIGSEGV, SIGABRT, etc.) normally terminate the process without useful diagnostic information. Custom handlers print stack traces before termination, making it much easier to diagnose crashes in production environments.
+
+### Name Demangling
+
+C++ compilers "mangle" function and type names to encode namespaces, template parameters, and overloading information. For example, `_ZNSt6vectorIiSaIiEE` represents `std::vector<int, std::allocator<int>>`. Demangling converts these cryptic names back to human-readable form for stack traces.
+
+## Thread Safety
+
+- **Thread-safe:** No
+- **Notes:** Stack trace capture uses global state (`debug::stack::last_frames`, `debug::stack::last_size`). Signal handlers modify global state. Handler registration is not thread-safe and should be done once at program startup before spawning threads.
 
 ## Dependencies
 
-### Standard Library
-- `<string>` - String handling
+| Include | Purpose |
+|---------|---------|
+| `<string>` | String class for return values |
 
-### System Headers
-- None explicitly in header (included in .cpp)
+## Types
 
-## Header Guard
+### `__cxa_throw_t`
 
-```cpp
-#ifndef PRINTSTACKTRACE_H
-#define PRINTSTACKTRACE_H
-```
-
-## External C Declarations
-
-The file declares C++ ABI exception throwing functions to allow interception:
-
-### __cxa_throw Declaration
+**Brief:** Function pointer type for the C++ ABI exception throwing function. Used to call the real `__cxa_throw` after capturing the stack trace.
 
 ```cpp
-extern "C" {
-
-#ifndef __clang__
+// GCC
 typedef void(__cxa_throw_t)(void*, void*, void (*)(void*));
-void __cxa_throw(void*, void*, void (*)(void*));
-#else   //__clang__
-typedef __attribute__((noreturn)) void(__cxa_throw_t)(void*, std::type_info*, void (*)(void*));
-__attribute__((noreturn)) void __cxa_throw(void*, std::type_info*, void (*)(void*));
-#endif  //__clang__
 
-}
+// Clang
+typedef __attribute__((noreturn)) void(__cxa_throw_t)(void*, std::type_info*, void (*)(void*));
 ```
 
-**Purpose**: Declare the C++ ABI's exception throwing mechanism to allow interception.
+**Note:** The type differs slightly between GCC and Clang compilers due to ABI differences.
 
-**Compiler Differences**:
-- **GCC**: Uses `void*` for type_info parameter
-- **Clang**: Uses `std::type_info*` and marks as `noreturn`
-
-**Function Signature**:
-- First parameter: Pointer to exception object
-- Second parameter: Type information (GCC: void*, Clang: std::type_info*)
-- Third parameter: Destructor function pointer
-
-**Usage Context**: This is implemented in printStackTrace.cpp to capture stack traces at exception throw points.
-
----
-
-## Namespace: debug
-
-All debugging utilities are in the `debug` namespace.
+## Functions
 
 ### Handler Registration Functions
 
-#### registerAbortHandler
+#### `registerUngracefullExitHandlers() -> void`
+
+**Brief:** One-call registration of all debugging handlers. This is the recommended function to call at program startup for comprehensive debugging support.
+
+**Thread Safety:** Not thread-safe (should be called once at startup before creating threads)
+
+**Side Effects:**
+- Enables TRACE logging
+- Installs signal handlers for fatal signals
+- Installs terminate handler
+
+**Example:**
 ```cpp
-void registerAbortHandler();
-```
+#include "artdaq-database/SharedCommon/printStackTrace.h"
 
-**Purpose**: Register signal handlers for fatal signals (SIGABRT, SIGSEGV, SIGBUS, etc.).
-
-**Behavior**:
-- Installs handlers for multiple fatal signals
-- Handlers print stack trace before terminating
-- Also calls std::set_terminate()
-
-**Signals Handled**:
-- SIGABRT - Abort signal
-- SIGSEGV - Segmentation fault
-- SIGBUS - Bus error
-- SIGILL - Illegal instruction
-- SIGFPE - Floating-point exception
-- SIGQUIT - Quit signal
-- SIGSTKFLT - Stack fault
-
-**Usage Example**:
-```cpp
-int main() {
-    debug::registerAbortHandler();
-    // ... rest of program ...
-}
-```
-
-**Important**: Should be called early in main() before any code that might crash.
-
----
-
-#### registerTerminateHandler
-```cpp
-void registerTerminateHandler();
-```
-
-**Purpose**: Register a handler for std::terminate() calls.
-
-**Behavior**:
-- Installs custom terminate handler
-- Prints exception information and stack trace
-- Calls std::set_terminate()
-
-**When Invoked**:
-- Exception thrown with no handler
-- Exception thrown during stack unwinding
-- Destructor throws during exception handling
-- std::terminate() called explicitly
-
-**Usage Example**:
-```cpp
-debug::registerTerminateHandler();
-```
-
----
-
-#### registerUncaughtExceptionHandler
-```cpp
-void registerUncaughtExceptionHandler();
-```
-
-**Purpose**: Register handler for uncaught exceptions (currently a no-op).
-
-**Note**: The implementation is commented out:
-```cpp
-/*std::set_unexpected(uncaughtExceptionHandler);*/
-```
-
-**Historical Context**: std::set_unexpected() was deprecated in C++11 and removed in C++17, explaining why this is disabled.
-
----
-
-#### registerUngracefullExitHandlers
-```cpp
-void registerUngracefullExitHandlers();
-```
-
-**Purpose**: One-call registration of all debugging handlers.
-
-**Behavior**:
-- Calls trace_enable()
-- Calls registerAbortHandler()
-- Calls registerTerminateHandler()
-- Calls registerUncaughtExceptionHandler()
-
-**Usage Example**:
-```cpp
-int main() {
-    debug::registerUngracefullExitHandlers();  // Register all handlers at once
-    // ... rest of program ...
-}
-```
-
-**Best Practice**: Call this at the very beginning of main() to ensure all crashes are properly diagnosed.
-
----
-
-### TRACE Configuration
-
-#### trace_enable
-```cpp
-void trace_enable();
-```
-
-**Purpose**: Enable and configure the TRACE logging system.
-
-**Behavior**:
-- Sets TRACE name
-- Configures log levels
-- Sets trace modes from process_exit_codes.h
-
-**Usage Example**:
-```cpp
-debug::trace_enable();
-TLOG(10) << "Logging is now enabled";
-```
-
----
-
-### Exception Information Functions
-
-#### current_exception_diagnostic_information
-```cpp
-std::string current_exception_diagnostic_information();
-```
-
-**Purpose**: Get detailed diagnostic information about the current exception.
-
-**Returns**: String containing:
-- Stack trace from exception throw point
-- Boost diagnostic information
-- Exception type and message
-
-**Usage Context**: Called from catch blocks to get detailed error information.
-
-**Usage Example**:
-```cpp
-try {
-    risky_operation();
-} catch (...) {
-    std::cerr << debug::current_exception_diagnostic_information();
-    throw;
+int main(int argc, char** argv) {
+    debug::registerUngracefullExitHandlers();
+    // ... rest of application ...
+    return 0;
 }
 ```
 
 ---
 
-### Symbol Demangling Functions
+#### `registerAbortHandler() -> void`
 
-C++ compilers "mangle" symbol names to encode type information. These functions reverse that process for human-readable output.
+**Brief:** Installs signal handlers for fatal signals that print stack traces before termination.
 
-#### demangle (const char*)
-```cpp
-std::string demangle(const char* mangled_name);
-```
+**Handles Signals:**
+- `SIGABRT` - Abort signal (e.g., from `abort()` or failed assertions)
+- `SIGSEGV` - Segmentation fault
+- `SIGBUS` - Bus error
+- `SIGILL` - Illegal instruction
+- `SIGFPE` - Floating-point exception
+- `SIGQUIT` - Quit signal
+- `SIGSTKFLT` - Stack fault
 
-**Purpose**: Convert mangled C++ symbol name to readable form.
+**Thread Safety:** Not thread-safe (modifies global signal handlers)
 
-**Parameters**:
-- `mangled_name` - Mangled symbol name from typeid or backtrace
-
-**Returns**: Human-readable symbol name
-
-**Usage Example**:
-```cpp
-const char* mangled = typeid(std::vector<int>).name();
-// mangled might be: "St6vectorIiSaIiEE"
-std::string readable = debug::demangle(mangled);
-// readable: "std::vector<int, std::allocator<int> >"
-```
+**Side Effects:**
+- Replaces default signal handlers
 
 ---
 
-#### demangle (std::string)
-```cpp
-std::string demangle(std::string const& mangled_name);
-```
+#### `registerTerminateHandler() -> void`
 
-**Purpose**: String overload of demangle function.
+**Brief:** Installs a custom handler for `std::terminate()` that prints diagnostic information including the stack trace.
 
-**Parameters**:
-- `mangled_name` - Mangled symbol name as string
+**Called When:**
+- Uncaught exception propagates out of `main()`
+- Exception thrown during exception handling (double exception)
+- `std::terminate()` called explicitly
+- Exception thrown from `noexcept` function
 
-**Returns**: Human-readable symbol name
+**Thread Safety:** Not thread-safe (modifies global terminate handler)
 
-**Usage Example**:
-```cpp
-std::string mangled = "St6vectorIiSaIiEE";
-std::string readable = debug::demangle(mangled);
-```
+**Side Effects:**
+- Replaces default terminate handler
+
+---
+
+#### `registerUncaughtExceptionHandler() -> void`
+
+**Brief:** Installs a handler for unexpected exceptions. Currently a placeholder as `std::set_unexpected` is deprecated in C++17.
+
+**Thread Safety:** Not thread-safe
+
+---
+
+#### `trace_enable() -> void`
+
+**Brief:** Enables and configures the TRACE logging system for the debugging infrastructure.
+
+**Thread Safety:** Not thread-safe (modifies global TRACE state)
+
+**Side Effects:**
+- Modifies TRACE logging configuration
 
 ---
 
 ### Stack Trace Functions
 
-#### getStackTrace
+#### `getStackTrace() -> std::string`
+
+**Brief:** Captures and returns the current call stack as a formatted, human-readable string. Useful for debugging and error reporting.
+
+**Returns:** Formatted stack trace with frame numbers and demangled function names
+
+**Thread Safety:** Not thread-safe (uses global stack frame storage)
+
+**Example:**
 ```cpp
-std::string getStackTrace();
-```
+#include "artdaq-database/SharedCommon/printStackTrace.h"
+#include <iostream>
 
-**Purpose**: Capture and return the current call stack.
-
-**Returns**: Formatted string with:
-- Number of frames
-- Each frame with:
-  - Frame number
-  - Function name (demangled)
-  - File and line information (if available)
-
-**Usage Example**:
-```cpp
-void problematic_function() {
+void debugFunction() {
     std::cerr << "Current stack:\n" << debug::getStackTrace();
 }
 ```
 
-**Output Format**:
+**Example Output:**
 ```
 Stack trace [10 frames]:
- 10 main (artdaq_database_tool.cpp:45)
-  9 process_request (request_handler.cpp:123)
+ 10 main (tool.cpp:45)
+  9 process_request (handler.cpp:123)
   8 execute_operation (operation.cpp:67)
   ...
 ```
 
 ---
 
-#### getCxaThrowStack
-```cpp
-std::string getCxaThrowStack();
-```
+#### `getCxaThrowStack() -> std::string`
 
-**Purpose**: Get the stack trace from the most recent exception throw point.
+**Brief:** Returns the stack trace captured at the most recent exception throw point. This shows where the exception was thrown, not where it was caught.
 
-**Returns**: Formatted stack trace captured at __cxa_throw()
+**Returns:** Formatted stack trace from throw point, or `"None"` if no exception has been thrown
 
-**Usage Context**: Called in exception handlers to see where exception originated.
+**Thread Safety:** Not thread-safe (reads global stack frame storage)
 
-**Usage Example**:
-```cpp
-try {
-    operation();
-} catch (const std::exception& e) {
-    std::cerr << "Exception thrown at:\n" << debug::getCxaThrowStack();
-}
-```
-
-**How It Works**: The __cxa_throw() interception (defined in .cpp) captures the stack before throwing, and this function retrieves it.
-
-**Output Format**:
-```
-Stack trace [8 frames] @ __cxa_throw():
-  8 artdaq::database::some_function (module.cpp:156)
-  7 artdaq::database::caller (caller.cpp:89)
-  ...
-```
-
----
-
-#### demangleStackTrace
-```cpp
-std::string demangleStackTrace(void* const* trace, int size);
-```
-
-**Purpose**: Convert array of raw stack frame addresses to readable stack trace.
-
-**Parameters**:
-- `trace` - Array of void pointers (return addresses from backtrace())
-- `size` - Number of frames in trace
-
-**Returns**: Formatted, human-readable stack trace
-
-**Usage Context**: Internal helper for getStackTrace() and getCxaThrowStack().
-
-**Implementation Note**: Uses backtrace_symbols() and demangle() to convert addresses to readable function names.
-
----
-
-## Usage Patterns
-
-### Basic Setup
-
+**Example:**
 ```cpp
 #include "artdaq-database/SharedCommon/printStackTrace.h"
+#include <iostream>
 
-int main(int argc, char* argv[]) {
-    // Register all debugging handlers
-    debug::registerUngracefullExitHandlers();
-
+void handleException() {
     try {
-        // Your program logic
-        run_application(argc, argv);
-        return 0;
+        operationThatMayThrow();
     } catch (const std::exception& e) {
         std::cerr << "Exception: " << e.what() << "\n";
-        std::cerr << debug::current_exception_diagnostic_information();
-        return 1;
+        std::cerr << "Thrown at:\n" << debug::getCxaThrowStack();
     }
 }
 ```
 
-### Selective Handler Registration
+---
 
+#### `demangleStackTrace(void* const* trace, int size) -> std::string`
+
+**Brief:** Converts raw backtrace addresses to a formatted, human-readable stack trace with demangled function names.
+
+**Parameters:**
+- `trace` - Array of void pointers from `backtrace()`
+- `size` - Number of frames in the trace
+
+**Returns:** Formatted stack trace string
+
+**Thread Safety:** Safe
+
+---
+
+### Utility Functions
+
+#### `demangle(const char* name) -> std::string`
+
+**Brief:** Converts a mangled C++ symbol name to its human-readable form.
+
+**Parameters:**
+- `name` - Mangled symbol name (e.g., `"_ZNSt6vectorIiSaIiEE"`)
+
+**Returns:** Demangled name (e.g., `"std::vector<int, std::allocator<int> >"`) or original name if demangling fails
+
+**Thread Safety:** Safe
+
+**Example:**
 ```cpp
-int main() {
-    // Only register specific handlers
-    debug::trace_enable();           // Enable logging
-    debug::registerTerminateHandler();  // Catch std::terminate
+#include "artdaq-database/SharedCommon/printStackTrace.h"
 
-    // Run program
+auto readable = debug::demangle("_ZNSt6vectorIiSaIiEE");
+// Returns: "std::vector<int, std::allocator<int> >"
+```
+
+---
+
+#### `demangle(std::string const& name) -> std::string`
+
+**Brief:** Overload that accepts a std::string parameter for convenience.
+
+**Parameters:**
+- `name` - Mangled symbol name as std::string
+
+**Returns:** Demangled name or original if demangling fails
+
+**Thread Safety:** Safe
+
+---
+
+#### `current_exception_diagnostic_information() -> std::string`
+
+**Brief:** Returns comprehensive diagnostic information about the current exception, including the stack trace from the throw point and Boost exception details.
+
+**Returns:** Multi-line string with exception diagnostics
+
+**Thread Safety:** Not thread-safe (reads global stack state)
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/printStackTrace.h"
+#include <iostream>
+
+void safeOperation() {
+    try {
+        riskyOperation();
+    } catch (...) {
+        std::cerr << debug::current_exception_diagnostic_information();
+        throw;  // Re-throw after logging
+    }
 }
 ```
 
-### Manual Stack Trace Capture
+---
+
+## External Functions (C Linkage)
+
+### `__cxa_throw(void* ex, void*/std::type_info* info, void (*dest)(void*)) -> void`
+
+**Brief:** Override of the C++ ABI exception throwing function. Captures the stack trace before delegating to the real implementation.
+
+**Parameters:**
+- `ex` - Pointer to the exception object
+- `info` - Type information (void* for GCC, std::type_info* for Clang)
+- `dest` - Destructor function for the exception object
+
+**Thread Safety:** Not thread-safe (writes to global stack frame storage)
+
+**Note:** This function is automatically called by the C++ runtime when exceptions are thrown. It should not be called directly.
+
+---
+
+## Relationship to Other Components
+
+- [printStackTrace.cpp](./printStackTrace.cpp.md) - Implementation file
+- [helper_functions.h](./helper_functions.h.md) - Uses `getStackTrace()` in `confirm()` assertion
+- [shared_exceptions.h](./shared_exceptions.h.md) - Exception types benefit from this infrastructure
+- [process_exit_codes.h](./process_exit_codes.h.md) - Exit codes used by signal handlers
+
+## Notes for Developers
+
+### Platform Specificity
+
+This code is Unix/Linux specific and relies on:
+- `__cxa_throw` - GCC/Clang C++ ABI function
+- `backtrace()` - glibc function for stack trace capture
+- Signal handling - POSIX signals
+- `abi::__cxa_demangle` - GCC/Clang demangling function
+
+### Performance Considerations
+
+| Operation | Overhead |
+|-----------|----------|
+| Handler registration | Minimal (done once at startup) |
+| `__cxa_throw` interception | Small overhead on every exception throw |
+| Stack trace capture | Expensive (only on errors, acceptable) |
+
+### Best Practices
+
+1. **Call early:** Call `registerUngracefullExitHandlers()` at the very beginning of `main()` before any other operations
+2. **Use in catch blocks:** Use `getCxaThrowStack()` in exception handlers to see where exceptions originated
+3. **Compile with debug info:** Use `-g` compiler flag for best stack trace quality with source file and line information
+4. **Optimization effects:** High optimization levels (`-O2`, `-O3`) may affect stack trace accuracy due to function inlining
+
+### Example Integration
 
 ```cpp
-void diagnose_issue() {
-    TLOG(TLVL_ERROR) << "Problem detected!";
-    TLOG(TLVL_ERROR) << debug::getStackTrace();
+#include "artdaq-database/SharedCommon/printStackTrace.h"
+#include <iostream>
+
+int main(int argc, char** argv) {
+    // Register all debugging handlers at startup
+    debug::registerUngracefullExitHandlers();
+
+    try {
+        // Application code
+        run_application(argc, argv);
+    } catch (const std::exception& e) {
+        std::cerr << "Fatal error: " << e.what() << std::endl;
+        std::cerr << debug::getCxaThrowStack();
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }
 ```
 
-### Exception Throw Point Diagnosis
+## Common Pitfalls
 
-```cpp
-try {
-    complex_operation();
-} catch (const artdaq::database::exception& e) {
-    std::cerr << "Exception message: " << e.what() << "\n";
-    std::cerr << "Thrown from:\n" << debug::getCxaThrowStack() << "\n";
-    std::cerr << "Caught at:\n" << debug::getStackTrace() << "\n";
-}
-```
+- **Late registration:** Registering handlers after threads are spawned may cause race conditions
+- **Missing `-g` flag:** Without debug symbols, stack traces only show addresses
+- **Inlining:** Aggressive optimization may hide function calls in stack traces
+- **Thread safety:** The global stack storage means concurrent exceptions may overwrite each other's traces
 
-## Design Rationale
+## See Also
 
-### Why Intercept __cxa_throw?
-- Captures stack trace at exception throw point
-- Standard catch blocks only show stack from catch point
-- Enables debugging of exception origin
-
-### Why Multiple Handlers?
-- Different failure modes need different handling
-- Signals vs. exceptions vs. terminate conditions
-- Provides comprehensive debugging coverage
-
-### Why Custom Demangling?
-- Makes stack traces human-readable
-- Essential for C++ template-heavy code
-- Aids in debugging without debugger attached
-
-## Platform Dependencies
-
-- **__cxa_throw**: GCC/Clang ABI specific
-- **backtrace()**: POSIX/glibc specific
-- **Signal handling**: Unix/POSIX specific
-
-**Portability**: This code is Unix/Linux specific and would need significant changes for Windows.
-
-## Performance Considerations
-
-1. **Handler Registration**: Minimal overhead, done once at startup
-2. **Stack Trace Capture**: Expensive operation, only done on errors
-3. **__cxa_throw Interception**: Adds small overhead to every exception throw
-4. **Demangling**: Can be slow for complex template names
-
-**Recommendation**: The debugging benefits far outweigh the minimal performance cost in production.
-
-## Related Files
-
-- **printStackTrace.cpp** - Implementation of these functions
-- **process_exit_codes.h** - Exit codes used by handlers
-- **helper_functions.h** - Uses getStackTrace() in confirm()
-- **shared_exceptions.h** - Exception types that benefit from this infrastructure
-
-## Best Practices
-
-1. **Always call registerUngracefullExitHandlers()** early in main()
-2. **Use getCxaThrowStack()** in exception handlers for better diagnostics
-3. **Enable TRACE** before registering handlers
-4. **Include stack traces in error logs** for production debugging
-5. **Demangle symbols** when displaying to users
-
-## Notes
-
-- The std::set_unexpected mechanism is deprecated and disabled
-- Stack traces work best with debug symbols (-g compiler flag)
-- Optimized builds (-O2, -O3) may have inaccurate stack traces due to inlining
-- Stack trace depth is limited (typically 1024 frames)
+- [printStackTrace.cpp](./printStackTrace.cpp.md) - Implementation details
+- [helper_functions.h](./helper_functions.h.md) - `confirm()` assertion that uses stack traces
+- [process_exit_codes.h](./process_exit_codes.h.md) - Exit codes for signal handlers

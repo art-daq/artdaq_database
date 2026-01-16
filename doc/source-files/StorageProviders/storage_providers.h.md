@@ -1,587 +1,334 @@
 # storage_providers.h
 
-## File Overview
+**Path:** `artdaq-database/StorageProviders/storage_providers.h`
 
-This header file defines the core `StorageProvider` template class that serves as a type-safe interface for all database storage backends in artdaq-database. It implements a generic storage abstraction that can work with different document types and provider implementations using compile-time polymorphism.
+**Purpose:** Defines the core `StorageProvider` template class that provides a unified interface for database storage operations. This template-based abstraction allows the artdaq-database system to work with different backend storage implementations (FileSystemDB, MongoDB, UconDB) through a consistent API, implementing the Strategy pattern for pluggable storage backends.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/StorageProviders/storage_providers.h`
+## Key Concepts
 
-**Lines of Code**: 81
+### Template-Based Provider Abstraction
+The `StorageProvider` class template takes two parameters:
+- `TYPE`: The storable document type (typically `JSONDocument`)
+- `IMPL`: The concrete backend implementation (e.g., `FileSystemDB`, `MongoDB`, `UconDB`)
 
-**Purpose**: Generic storage provider interface using template-based polymorphism
+This design enables compile-time polymorphism where operations are delegated to the specific backend implementation, providing better performance than virtual function dispatch.
 
-## Dependencies
+### PassKey Idiom
+The class uses the PassKey idiom to control instantiation. The `create()` factory method is the only public way to construct a `StorageProvider`, ensuring proper initialization and enabling connection pooling strategies.
 
-### Standard Library
-- `<memory>` - std::shared_ptr for provider management
-- `<string>` - std::string for database URIs and metadata
-- `<vector>` - std::vector for returning multiple results
-
-### Project Headers
-- `"artdaq-database/SharedCommon/configuraion_api_literals.h"` - Configuration constants
-- `"artdaq-database/SharedCommon/shared_datatypes.h"` - Common type definitions (object_id_t)
-
-## Namespace: artdaq::database
-
-All types and functions in this file are declared within the `artdaq::database` namespace.
-
-## Constants
-
-### system_metadata
-```cpp
-constexpr auto system_metadata = "SystemMetadata";
-```
-
-**Purpose**: String literal for the system metadata collection name.
-
-**Usage**: Identifies the special collection that stores database metadata.
-
----
-
-### ouid_invalid
-```cpp
-constexpr auto ouid_invalid = "000000000000000000000000";
-```
-
-**Purpose**: Represents an invalid or uninitialized object unique identifier (OUID).
-
-**Format**: 24-character hexadecimal string (all zeros)
-
-**Usage**: Used to indicate that an object ID is not valid or has not been assigned.
-
-**Example**:
-```cpp
-object_id_t id = artdaq::database::ouid_invalid;
-if (id == artdaq::database::ouid_invalid) {
-    // Handle invalid ID case
-}
-```
-
----
-
-## Class: StorageProvider<TYPE, IMPL>
-
-### Template Parameters
-
-- **TYPE**: The storable document type (e.g., JSONDocument)
-- **IMPL**: The concrete provider implementation (e.g., FileSystemDBProvider, MongoDBProvider, UconDBProvider)
-
-### Purpose
-
-`StorageProvider` is a template class that provides a unified interface for all storage backend implementations. It uses compile-time polymorphism (templates) rather than runtime polymorphism (virtual functions) for better performance and type safety.
-
-### Type Aliases
-
-```cpp
-using StorableType = TYPE;
-using Provider = StorageProvider<TYPE, IMPL>;
-using ProviderSPtr = std::shared_ptr<Provider>;
-```
-
-**Usage**:
-```cpp
-using FileDBProvider = StorageProvider<JSONDocument, FileSystemDBProviderImpl>;
-FileDBProvider::ProviderSPtr provider = ...;
-```
-
----
-
-## Factory Method
-
-### create
-```cpp
-static ProviderSPtr create(std::shared_ptr<IMPL> const& provider);
-```
-
-**Purpose**: Factory method to create a StorageProvider instance.
-
-**Parameters**:
-- `provider` - Shared pointer to the concrete provider implementation
-
-**Returns**: Shared pointer to newly created StorageProvider
-
-**Usage Example**:
-```cpp
-auto impl = std::make_shared<FileSystemDBProviderImpl>();
-auto provider = StorageProvider<JSONDocument, FileSystemDBProviderImpl>::create(impl);
-```
-
-**Design**: Uses the Pass-Key Idiom to restrict construction to the factory method only.
-
----
-
-## Pass-Key Idiom
-
-### PassKeyIdiom Class
-
-```cpp
-class PassKeyIdiom final {
- private:
-  template <typename T, typename I>
-  friend ProviderSPtr create(std::shared_ptr<I> const&);
-
- public:
-  PassKeyIdiom() = default;
-};
-```
-
-**Purpose**: Implements the Pass-Key Idiom design pattern to control object construction.
-
-**Design Pattern**:
-- Constructor is public but requires a PassKeyIdiom instance
-- Only the `create()` friend function can construct PassKeyIdiom
-- Prevents direct construction while allowing std::make_shared
-
-**Benefits**:
-- Enforces factory pattern
-- Allows use of std::make_shared (better than make_unique for shared_ptr)
-- Compile-time enforcement (no runtime overhead)
-
----
-
-## Constructor
-
-### StorageProvider
-```cpp
-StorageProvider(std::shared_ptr<IMPL> const& provider, PassKeyIdiom const&);
-```
-
-**Purpose**: Construct a storage provider with the given implementation.
-
-**Parameters**:
-- `provider` - Shared pointer to concrete implementation
-- `PassKeyIdiom const&` - Pass-key to restrict construction
-
-**Access**: Public, but can only be called by the `create()` factory method due to Pass-Key Idiom.
-
-**Implementation**: Stores the provider implementation in `_provider` member.
-
----
-
-## Document Operations
-
-### readDocument
-```cpp
-template <typename FILTER>
-std::vector<TYPE> readDocument(FILTER const&);
-```
-
-**Purpose**: Read one or more documents matching the filter criteria.
-
-**Template Parameters**:
-- `FILTER` - Type of filter object (typically contains search criteria)
-
-**Parameters**:
-- Filter object specifying which documents to retrieve
-
-**Returns**: Vector of documents matching the filter
-
-**Usage Example**:
-```cpp
-SearchFilter filter;
-filter.collection = "ComponentConfigs";
-filter.run = 12345;
-
-auto documents = provider->readDocument(filter);
-for (auto const& doc : documents) {
-    // Process each document
-}
-```
-
-**Design Note**: Returns a vector even for single results to maintain consistent interface.
-
----
-
-### writeDocument
-```cpp
-object_id_t writeDocument(TYPE const&);
-```
-
-**Purpose**: Write a document to storage.
-
-**Parameters**:
-- Document to write (TYPE, typically JSONDocument)
-
-**Returns**: Object ID of the written document
-
-**Usage Example**:
-```cpp
-JSONDocument doc;
-doc.setCollection("Configurations");
-doc.setData(configData);
-
-object_id_t id = provider->writeDocument(doc);
-std::cout << "Wrote document with ID: " << id << std::endl;
-```
-
-**Behavior**:
-- Creates new document if doesn't exist
-- Updates existing document based on provider implementation
-- Returns unique identifier for the document
-
----
-
-## Configuration Management Operations
-
-### findConfigurations
-```cpp
-template <typename FILTER>
-std::vector<FILTER> findConfigurations(FILTER const&);
-```
-
-**Purpose**: Search for configurations matching the given criteria.
-
-**Parameters**:
-- `FILTER` - Filter specifying search criteria
-
-**Returns**: Vector of filters, each representing a found configuration
-
-**Usage**: Used to discover available configurations in the database.
-
----
-
-### addConfiguration
-```cpp
-template <typename FILTER>
-std::vector<FILTER> addConfiguration(FILTER const&);
-```
-
-**Purpose**: Add a new configuration to the database.
-
-**Parameters**:
-- `FILTER` - Filter/specification for the new configuration
-
-**Returns**: Vector containing the added configuration information
-
-**Usage**: Creates new configuration entries in the database.
-
----
-
-### findVersions
-```cpp
-template <typename FILTER>
-std::vector<FILTER> findVersions(FILTER const&);
-```
-
-**Purpose**: Find all versions of a configuration.
-
-**Parameters**:
-- `FILTER` - Filter identifying the configuration
-
-**Returns**: Vector of filters, each representing a version
-
-**Usage**: Retrieve version history for a specific configuration.
-
----
-
-### findEntities
-```cpp
-template <typename FILTER>
-std::vector<FILTER> findEntities(FILTER const&);
-```
-
-**Purpose**: Find entities (components, systems) matching criteria.
-
-**Parameters**:
-- `FILTER` - Filter specifying search criteria
-
-**Returns**: Vector of filters representing found entities
-
-**Usage**: Discover what entities (hardware components, software modules) are configured.
-
----
-
-### configurationComposition
-```cpp
-template <typename FILTER>
-std::vector<FILTER> configurationComposition(FILTER const&);
-```
-
-**Purpose**: Get the composition (constituent parts) of a configuration.
-
-**Parameters**:
-- `FILTER` - Filter identifying the configuration
-
-**Returns**: Vector of filters representing the configuration's components
-
-**Usage**: Understand what makes up a complex configuration.
-
----
-
-## Database Metadata Operations
-
-### listCollections
-```cpp
-template <typename FILTER>
-std::vector<FILTER> listCollections(FILTER const&);
-```
-
-**Purpose**: List all collections in the database.
-
-**Parameters**:
-- `FILTER` - Filter that may specify which database to query
-
-**Returns**: Vector of filters, each representing a collection
-
-**Usage Example**:
-```cpp
-Filter filter;
-filter.database = "artdaq_db";
-
-auto collections = provider->listCollections(filter);
-for (auto const& col : collections) {
-    std::cout << "Collection: " << col.collection << std::endl;
-}
-```
-
----
-
-### listDatabases
-```cpp
-template <typename FILTER>
-std::vector<FILTER> listDatabases(FILTER const&);
-```
-
-**Purpose**: List all available databases.
-
-**Parameters**:
-- `FILTER` - Filter that may specify search criteria
-
-**Returns**: Vector of filters, each representing a database
-
-**Usage**: Discover what databases are available in the storage system.
-
----
-
-### databaseMetadata
-```cpp
-template <typename FILTER>
-std::vector<FILTER> databaseMetadata(FILTER const&);
-```
-
-**Purpose**: Retrieve metadata about a database (creation time, format, etc.).
-
-**Parameters**:
-- `FILTER` - Filter identifying the database
-
-**Returns**: Vector containing database metadata
-
-**Usage**: Get information about database creation, format version, etc.
-
----
-
-### searchCollection
-```cpp
-template <typename FILTER>
-std::vector<FILTER> searchCollection(FILTER const&);
-```
-
-**Purpose**: Search within a collection using flexible criteria.
-
-**Parameters**:
-- `FILTER` - Filter with search criteria
-
-**Returns**: Vector of matching results
-
-**Usage**: Generic search operation for finding documents in a collection.
-
----
-
-## Helper Functions
-
-### make_database_metadata
-```cpp
-std::string make_database_metadata(std::string const& name,
-                                   std::string const& uri);
-```
-
-**Purpose**: Generate JSON metadata for a new database.
-
-**Parameters**:
-- `name` - Database name
-- `uri` - Database connection URI
-
-**Returns**: JSON string containing database metadata
-
-**Throws**: Assertion failure if name or uri is empty
-
-**Implementation**: See storage_providers.cpp for details.
-
-**Generated Metadata Includes**:
-- Database name and URI
-- Locale setting
-- Creation timestamp
-- Creating user
-- System information (uname)
-- Database format version
-
-**Usage Example**:
-```cpp
-std::string metadata = make_database_metadata("artdaq_config_db",
-                                              "filesystemdb:///data/configs");
-// Store metadata in SystemMetadata collection
-```
-
----
-
-## Private Members
-
-### _provider
-```cpp
-std::shared_ptr<IMPL> _provider;
-```
-
-**Purpose**: Stores the concrete provider implementation.
-
-**Type**: Shared pointer to the template parameter IMPL
-
-**Lifetime**: Shared ownership - provider can be shared across multiple StorageProvider instances.
-
----
-
-## Design Patterns
-
-### Template-Based Interface
-
-**Advantage over Virtual Functions**:
-1. **Performance**: No virtual function call overhead
-2. **Type Safety**: Compile-time type checking
-3. **Flexibility**: Each provider can have different implementation details
-4. **No Runtime Overhead**: Template instantiation at compile time
-
-**Example**:
-```cpp
-// Instead of:
-class BaseProvider {
-    virtual void write(Document const&) = 0;  // Runtime polymorphism
-};
-
-// We have:
-template <typename TYPE, typename IMPL>
-class StorageProvider {
-    object_id_t writeDocument(TYPE const&);    // Compile-time polymorphism
-};
-```
-
-### Factory Pattern with Pass-Key Idiom
-
-The combination of factory method and pass-key idiom ensures:
-1. All instances are created through controlled factory
-2. Instances are properly initialized
-3. std::make_shared can still be used
-4. No runtime overhead
-
-### Type-Safe Filter Pattern
-
-Operations use template filters rather than fixed types:
-```cpp
-template <typename FILTER>
-std::vector<FILTER> findConfigurations(FILTER const&);
-```
-
-This allows different providers to use different filter implementations while maintaining the same interface.
-
----
-
-## Implementation Requirements
-
-Concrete provider implementations (IMPL) must provide implementations for all the template member functions. Typically this is done through explicit template instantiation in the .cpp file.
-
-**Example Structure**:
-```cpp
-// In provider_filedb.cpp
-template <>
-std::vector<JSONDocument>
-StorageProvider<JSONDocument, FileSystemDBProviderImpl>::readDocument(
-    SearchFilter const& filter) {
-    return _provider->read(filter);
-}
-```
-
----
-
-## Usage Example: Complete Workflow
-
-```cpp
-#include "artdaq-database/StorageProviders/storage_providers.h"
-#include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
-
-// Create provider implementation
-auto impl = std::make_shared<FileSystemDBProviderImpl>();
-impl->configure("/data/artdaq/configs");
-
-// Create storage provider
-auto provider = StorageProvider<JSONDocument, FileSystemDBProviderImpl>::create(impl);
-
-// Write a document
-JSONDocument doc;
-doc.setCollection("RunConfigs");
-doc.setData("{\"run\": 12345, \"config\": \"test\"}");
-object_id_t id = provider->writeDocument(doc);
-
-// Read it back
-SearchFilter filter;
-filter.collection = "RunConfigs";
-filter.run = 12345;
-auto results = provider->readDocument(filter);
-
-// List collections
-auto collections = provider->listCollections(SearchFilter{});
-```
-
----
+### Unified Storage Operations
+The provider exposes templated methods for document read/write operations and various query methods for configurations, versions, entities, and collections. All backends implement the same interface, allowing the application code to switch providers through configuration without code changes.
 
 ## Thread Safety
 
-The `StorageProvider` class itself is thread-safe for read operations if the underlying IMPL is thread-safe. Write operations require external synchronization or rely on IMPL thread safety.
+- **Thread-safe:** Depends on underlying implementation
+- **Concurrent access:** Read operations are thread-safe if the backend is thread-safe; writes may require synchronization
+- **Locking:** No internal locking; relies on backend implementation
 
-Check specific provider documentation:
-- FileSystemDB provider thread safety
-- MongoDB provider thread safety
-- UconDB provider thread safety
+## Dependencies
 
----
+| Include | Purpose |
+|---------|---------|
+| `<memory>` | Smart pointer support (`std::shared_ptr`) for provider management |
+| `<string>` | String handling for database URIs and metadata |
+| `<vector>` | Container for returning multiple document results |
+| `artdaq-database/SharedCommon/configuraion_api_literals.h` | API literal constants for operation names |
+| `artdaq-database/SharedCommon/shared_datatypes.h` | Shared type definitions including `object_id_t` |
 
-## Related Files
+## Classes/Structures
 
-- **storage_providers.cpp** - Implementation of `make_database_metadata()`
-- **FileSystemDB/provider_filedb.h** - FileSystem provider implementation
-- **MongoDB/provider_mongodb.h** - MongoDB provider implementation
-- **UconDB/provider_ucondb.h** - UconDB provider implementation
-- **SharedCommon/shared_datatypes.h** - Type definitions (object_id_t)
+### `StorageProvider<TYPE, IMPL>`
 
----
+Template class that wraps a backend implementation and provides a uniform storage API.
 
-## Best Practices
+**Thread Safety:** Depends on the `IMPL` type. FileSystemDB is not thread-safe for writes; MongoDB and UconDB are thread-safe.
 
-### Provider Creation
+#### Type Aliases
+
+| Alias | Definition | Purpose |
+|-------|------------|---------|
+| `StorableType` | `TYPE` | The document type being stored |
+| `Provider` | `StorageProvider<TYPE, IMPL>` | Self-referential type alias |
+| `ProviderSPtr` | `std::shared_ptr<Provider>` | Shared pointer to provider instance |
+
+#### Methods
+
+##### `create(std::shared_ptr<IMPL> const& provider) -> ProviderSPtr` [static]
+
+**Brief:** Factory method that creates a new StorageProvider instance wrapping the given backend implementation.
+
+**Parameters:**
+- `provider` - Shared pointer to the backend implementation (must not be null)
+
+**Preconditions:**
+- `provider` must be a valid, non-null shared pointer
+
+**Returns:** Shared pointer to the newly created StorageProvider instance
+
+**Postconditions:**
+- Returned pointer is valid and ready for use
+
+**Thread Safety:** Thread-safe
+
+**Example:**
 ```cpp
-// GOOD: Use factory method
-auto provider = StorageProvider<Doc, Impl>::create(impl_ptr);
+#include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
 
-// BAD: Don't try to construct directly
-// auto provider = std::make_shared<StorageProvider<Doc, Impl>>(impl_ptr, ???);
-// Won't compile - can't create PassKeyIdiom
-```
+using namespace artdaq::database;
+using namespace artdaq::database::filesystem;
 
-### Error Handling
-```cpp
-// Check for invalid IDs
-object_id_t id = provider->writeDocument(doc);
-if (id == artdaq::database::ouid_invalid) {
-    // Handle write failure
+void createProvider() {
+  auto config = DBConfig("filesystemdb:///data/artdaq/db");
+  auto backend = FileSystemDB::create(config);
+  auto provider = StorageProvider<JSONDocument, FileSystemDB>::create(backend);
+  // Use provider for operations...
 }
 ```
 
-### Filter Usage
+##### `StorageProvider(std::shared_ptr<IMPL> const& provider, PassKeyIdiom const&)`
+
+**Brief:** Constructor that initializes the StorageProvider with a backend implementation. Protected by the PassKey idiom to enforce use of the `create()` factory method.
+
+**Parameters:**
+- `provider` - Shared pointer to the backend implementation
+- `PassKeyIdiom const&` - PassKey token (only obtainable through `create()`)
+
+**Thread Safety:** Thread-safe
+
+##### `readDocument(FILTER const& filter) -> std::vector<TYPE>`
+
+**Brief:** Retrieves documents from the database that match the specified filter criteria.
+
+**Parameters:**
+- `filter` - JSON document containing search criteria
+
+**Preconditions:**
+- Filter must be a valid, non-empty document
+
+**Returns:** Vector of documents matching the filter (may be empty if none match)
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `runtime_error` | Database connection failure or query error |
+
+**Thread Safety:** Safe for concurrent calls if backend supports it
+
+##### `writeDocument(TYPE const& document) -> object_id_t`
+
+**Brief:** Writes a document to the database and returns its assigned object ID.
+
+**Parameters:**
+- `document` - The document to store
+
+**Preconditions:**
+- Document must be valid and non-empty
+
+**Returns:** The object ID assigned to the stored document
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `runtime_error` | Write failure or validation error |
+
+**Thread Safety:** May require external synchronization depending on backend
+
+##### `findConfigurations(FILTER const& filter) -> std::vector<FILTER>`
+
+**Brief:** Finds all global configurations in the database, optionally filtered by criteria.
+
+**Parameters:**
+- `filter` - Search criteria (can contain configuration name patterns)
+
+**Returns:** Vector of JSON documents describing available configurations, sorted by most recent assignment
+
+##### `addConfiguration(FILTER const& filter) -> std::vector<FILTER>`
+
+**Brief:** Adds a new configuration to the database. (Currently returns empty vector for FileSystemDB)
+
+**Parameters:**
+- `filter` - Configuration details to add
+
+**Returns:** Vector of result documents (implementation-dependent)
+
+##### `findVersions(FILTER const& filter) -> std::vector<FILTER>`
+
+**Brief:** Finds all versions of an entity or configuration matching the filter.
+
+**Parameters:**
+- `filter` - Must contain either `entities` or `configurations` field
+
+**Returns:** Vector of JSON documents with version information
+
+##### `findEntities(FILTER const& filter) -> std::vector<FILTER>`
+
+**Brief:** Finds all entities in the database matching the filter criteria.
+
+**Parameters:**
+- `filter` - Search criteria for entity names
+
+**Returns:** Vector of unique entity documents
+
+##### `configurationComposition(FILTER const& filter) -> std::vector<FILTER>`
+
+**Brief:** Gets the composition (list of entities) within a specific configuration.
+
+**Parameters:**
+- `filter` - Must contain configuration name
+
+**Returns:** Vector of entity documents that compose the configuration
+
+##### `listCollections(FILTER const& filter) -> std::vector<FILTER>`
+
+**Brief:** Lists all collections (entity types) in the database.
+
+**Parameters:**
+- `filter` - Optional filter criteria
+
+**Returns:** Vector of collection descriptor documents
+
+##### `listDatabases(FILTER const& filter) -> std::vector<FILTER>`
+
+**Brief:** Lists all available databases (sibling databases for FileSystemDB).
+
+**Parameters:**
+- `filter` - Optional filter criteria
+
+**Returns:** Vector of database descriptor documents
+
+##### `databaseMetadata(FILTER const& filter) -> std::vector<FILTER>`
+
+**Brief:** Retrieves metadata about the database from the SystemMetadata collection.
+
+**Parameters:**
+- `filter` - Optional filter criteria
+
+**Returns:** Vector of metadata documents
+
+##### `searchCollection(FILTER const& filter) -> std::vector<FILTER>`
+
+**Brief:** Performs advanced search within a collection. (Not implemented for FileSystemDB)
+
+**Parameters:**
+- `filter` - Advanced search criteria
+
+**Returns:** Vector of matching documents
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `runtime_error` | Not implemented for FileSystemDB |
+
+### `PassKeyIdiom` (Nested Class)
+
+**Brief:** Private nested class that restricts construction to the factory method, implementing the PassKey idiom pattern. This ensures that `StorageProvider` instances can only be created through the `create()` factory method.
+
+**Thread Safety:** Thread-safe (immutable after construction)
+
+## Functions
+
+### `make_database_metadata(name, uri) -> std::string`
+
+**Brief:** Creates a JSON-formatted metadata string for newly initialized databases, capturing creation context and system information.
+
+**Parameters:**
+- `name` - Database name (must not be empty)
+- `uri` - Connection URI for the database (must not be empty)
+
+**Preconditions:**
+- Both `name` and `uri` must be non-empty strings
+
+**Returns:** JSON-formatted string containing database metadata
+
+**Postconditions:**
+- Returned string is valid JSON with all required metadata fields
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `assertion_failure` | If name or uri is empty (in debug builds) |
+
+**Thread Safety:** Thread-safe (uses only local variables)
+
+**Example:**
 ```cpp
-// Create appropriate filter for the operation
-SearchFilter filter;
-filter.collection = "Configurations";  // Required
-filter.version = "v1.0";               // Optional
-auto results = provider->readDocument(filter);
+#include "artdaq-database/StorageProviders/storage_providers.h"
+
+void storeMetadata() {
+  auto metadata = artdaq::database::make_database_metadata(
+    "my_database",
+    "filesystemdb:///data/artdaq/my_database"
+  );
+  // metadata contains: {"document":{"name":"my_database","uri":"...", ...}}
+}
 ```
 
----
+## Constants
 
-**Documentation generated for artdaq-database StorageProviders module**
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `system_metadata` | `"SystemMetadata"` | Collection name for database metadata documents |
+| `ouid_invalid` | `"000000000000000000000000"` | Invalid object ID placeholder (24 hex zeros) |
+
+## Relationship to Other Components
+
+### Backend Implementations
+The template is specialized by three backend implementations:
+- **FileSystemDB**: File-based storage using JSON files organized in directories
+- **MongoDB**: MongoDB document database storage via mongocxx driver
+- **UconDB**: Fermilab's UconDB web service storage via REST API
+
+### ConfigurationDB Layer
+The `ConfigurationDB` module uses `StorageProvider` instances through dispatch mechanisms to route operations to the appropriate backend based on the `ARTDAQ_DATABASE_URI` environment variable.
+
+### Type Specializations
+Each backend provides explicit template specializations in their implementation files:
+```cpp
+template <>
+template <>
+std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::readDocument(JSONDocument const& filter) {
+    // MongoDB-specific implementation
+}
+```
+
+## See Also
+
+- [storage_providers.cpp](./storage_providers.cpp.md) - Implementation of `make_database_metadata()`
+- [FileSystemDB/provider_filedb.h](./FileSystemDB/provider_filedb.h.md) - FileSystemDB backend
+- [MongoDB/provider_mongodb.h](./MongoDB/provider_mongodb.h.md) - MongoDB backend
+- [UconDB/provider_ucondb.h](./UconDB/provider_ucondb.h.md) - UconDB backend
+- [ConfigurationDB/configurationdbifc.h](../ConfigurationDB/configurationdbifc.h.md) - High-level API
+
+## Notes for Developers
+
+### Template Specialization Pattern
+Backend implementations must provide explicit specializations for all `StorageProvider` methods. These are typically defined in the corresponding `provider_*_readwrite.cpp` and `provider_*.cpp` files.
+
+### Connection Handling
+The wrapped `_provider` member holds the actual backend connection. Connection pooling is handled by the backend implementation's factory method (e.g., MongoDB caches connections per thread+URI combination).
+
+### Error Handling
+Operations throw `runtime_error` exceptions with descriptive messages when failures occur. The exception message typically includes the backend name for debugging.
+
+### Adding New Backends
+To add a new storage backend:
+1. Create a new class similar to `FileSystemDB`, `MongoDB`, or `UconDB`
+2. Implement `connection()` method and any backend-specific configuration
+3. Provide template specializations for all `StorageProvider` methods
+4. Add URI scheme detection in the ConfigurationDB dispatch layer
+5. Update documentation
+
+### Common Pitfalls
+
+- **Pitfall 1:** Forgetting to provide all template specializations will cause linker errors. Ensure all methods are specialized for your backend.
+- **Pitfall 2:** Calling methods on a null provider will cause undefined behavior. Always use the `create()` factory method.
+
+### Anti-patterns
+
+```cpp
+// DON'T do this - bypasses factory pattern
+auto provider = StorageProvider<JSONDocument, FileSystemDB>(backend, PassKeyIdiom{});
+
+// DO this instead - use factory method
+auto provider = StorageProvider<JSONDocument, FileSystemDB>::create(backend);
+```

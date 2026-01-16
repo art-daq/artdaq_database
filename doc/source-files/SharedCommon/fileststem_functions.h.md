@@ -1,333 +1,514 @@
 # fileststem_functions.h
 
-## File Overview
+**Path:** `artdaq-database/SharedCommon/fileststem_functions.h`
 
-This header file declares a set of utility functions for filesystem operations used throughout the artdaq-database project. It provides high-level abstractions for common file and directory operations including recursive directory listing, path conversions, compression/archiving, and file I/O.
+**Purpose:** Filesystem utility functions for directory operations, file I/O, path conversions, and archive/compression. Used by the FileSystemDB storage provider and database export/import operations.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/SharedCommon/fileststem_functions.h`
+**Note:** Filename has historical typo ("fileststem" instead of "filesystem") - preserved for backward compatibility.
 
-**Note**: The filename contains a typo - "fileststem" should be "filesystem".
+## Key Concepts
+
+### Collection Name to Path Conversion
+
+Collection names use dots as separators while filesystem paths use slashes:
+```
+"SystemLayout.component1.json" <-> "SystemLayout/component1.json"
+```
+
+### Archive Format
+
+Database exports use tar + bzip2 + base64 encoding for the following benefits:
+- Portable across systems
+- Text-safe (base64 encoding)
+- Good compression ratio (bzip2)
+- Single-file output for easy transfer
+
+## Thread Safety
+
+- **Thread-safe:** No
+- **Notes:** Functions that call `system()` are not thread-safe. Functions using `rand()` for temp directory names are not thread-safe. File I/O operations may have race conditions if multiple processes access the same files.
 
 ## Dependencies
 
-### Standard Library
-- `<list>` - List container
-- `<string>` - String class
-- `<vector>` - Vector container
-
-### Project Headers
-- `"artdaq-database/SharedCommon/shared_datatypes.h"` - Common type definitions
-
-## Namespace
-
-All functions are declared in the `artdaq::database` namespace.
+| Include | Purpose |
+|---------|---------|
+| `<list>` | List container for path components |
+| `<string>` | String class |
+| `<vector>` | Container for file lists |
+| `shared_datatypes.h` | Type definitions |
 
 ## Functions
 
-### Directory Operations
+### Directory Listing
 
-#### list_files
+#### `list_files(std::string const& path) -> std::vector<std::string>`
+
+**Brief:** Recursively lists all regular files in a directory and its subdirectories. Skips symbolic links and special files.
+
+**Parameters:**
+- `path` - Directory path to scan
+
+**Preconditions:**
+- `path` must not be empty
+- `path` must point to an existing directory
+
+**Returns:** Vector of full file paths for all regular files found
+
+**Thread Safety:** Safe (read-only filesystem operation)
+
+**Example:**
 ```cpp
-std::vector<std::string> list_files(std::string const& path);
-```
+#include "artdaq-database/SharedCommon/fileststem_functions.h"
+#include <iostream>
 
-**Purpose**: Recursively list all files in a directory and its subdirectories.
-
-**Parameters**:
-- `path` - The directory path to search
-
-**Returns**: A vector of strings containing full paths to all files found
-
-**Usage Example**:
-```cpp
-auto files = artdaq::database::list_files("/path/to/config/dir");
-for (const auto& file : files) {
-    std::cout << file << std::endl;
+void processAllConfigs(const std::string& configDir) {
+    try {
+        auto files = artdaq::database::list_files(configDir);
+        std::cout << "Found " << files.size() << " files\n";
+        for (const auto& f : files) {
+            processFile(f);
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error listing files: " << e.what() << "\n";
+    }
 }
 ```
 
-#### mkdir
+---
+
+### Directory Creation
+
+#### `mkdir(std::string const& path) -> bool`
+
+**Brief:** Creates a directory path including all parent directories (equivalent to `mkdir -p`).
+
+**Parameters:**
+- `path` - Directory path to create
+
+**Preconditions:**
+- `path` must not be empty
+
+**Returns:** `true` if directory was created successfully, `false` otherwise
+
+**Thread Safety:** Not thread-safe (uses `system()`)
+
+**Side Effects:**
+- Creates directories on the filesystem
+
+**Example:**
 ```cpp
-bool mkdir(std::string const& path);
-```
+#include "artdaq-database/SharedCommon/fileststem_functions.h"
+#include <iostream>
 
-**Purpose**: Create a directory path, including all parent directories if they don't exist (similar to `mkdir -p`).
-
-**Parameters**:
-- `path` - The directory path to create
-
-**Returns**: `true` if successful, `false` otherwise
-
-**Usage Example**:
-```cpp
-if (artdaq::database::mkdir("/tmp/my/nested/path")) {
-    // Directory created successfully
+void ensureDirectoryExists(const std::string& path) {
+    if (artdaq::database::mkdir(path)) {
+        std::cout << "Directory created: " << path << "\n";
+    } else {
+        std::cerr << "Failed to create directory: " << path << "\n";
+    }
 }
 ```
 
-#### mkdirfile
+---
+
+#### `mkdirfile(std::string const& file) -> bool`
+
+**Brief:** Creates the parent directory structure for a file path, allowing the file to be written.
+
+**Parameters:**
+- `file` - Full file path whose parent directory should be created
+
+**Preconditions:**
+- `file` must not be empty
+
+**Returns:** `true` if parent directory was created successfully, `false` otherwise
+
+**Thread Safety:** Not thread-safe (uses `system()`)
+
+**Side Effects:**
+- Creates directories on the filesystem
+
+**Example:**
 ```cpp
-bool mkdirfile(std::string const& file);
+#include "artdaq-database/SharedCommon/fileststem_functions.h"
+
+void prepareForWrite(const std::string& filepath) {
+    if (artdaq::database::mkdirfile(filepath)) {
+        // Parent directory now exists, safe to write file
+        writeFile(filepath);
+    }
+}
 ```
 
-**Purpose**: Create the parent directory for a given file path. Useful before writing a file to ensure its directory exists.
+---
 
-**Parameters**:
-- `file` - Full path to a file
+### File I/O
 
-**Returns**: `true` if successful, `false` otherwise
+#### `write_buffer_to_file(std::string const& buffer, std::string const& file_out_name) -> bool`
 
-**Usage Example**:
-```cpp
-// Create /path/to/output/ before writing /path/to/output/file.json
-mkdirfile("/path/to/output/file.json");
-```
+**Brief:** Writes a string buffer to a file, creating parent directories if needed.
 
-### Path Conversion Functions
-
-#### collection_name_from_relative_path
-```cpp
-std::string collection_name_from_relative_path(std::string const& path);
-```
-
-**Purpose**: Convert a relative file path to a collection name by replacing directory separators with dots.
-
-**Parameters**:
-- `path` - Relative path to convert
-
-**Returns**: Collection name string
-
-**Usage Example**:
-```cpp
-// Input: "SystemLayout/component1.json"
-// Output: "SystemLayout.component1.json"
-auto collection = collection_name_from_relative_path("SystemLayout/component1.json");
-```
-
-#### relative_path_from_collection_name
-```cpp
-std::string relative_path_from_collection_name(std::string const& name);
-```
-
-**Purpose**: Convert a collection name to a relative file path by replacing dots with directory separators (inverse of above).
-
-**Parameters**:
-- `name` - Collection name to convert
-
-**Returns**: Relative path string
-
-**Usage Example**:
-```cpp
-// Input: "SystemLayout.component1.json"
-// Output: "SystemLayout/component1.json"
-auto path = relative_path_from_collection_name("SystemLayout.component1.json");
-```
-
-### File I/O Functions
-
-#### write_buffer_to_file
-```cpp
-bool write_buffer_to_file(std::string const& buffer,
-                         std::string const& file_out_name);
-```
-
-**Purpose**: Write a string buffer to a file, creating parent directories if needed.
-
-**Parameters**:
+**Parameters:**
 - `buffer` - String content to write
-- `file_out_name` - Output file path
+- `file_out_name` - Full path to the output file
 
-**Returns**: `true` if successful, `false` on error
+**Preconditions:**
+- `file_out_name` must not be empty
 
-**Behavior**:
-- Automatically creates parent directories
-- Overwrites existing file
-- Throws exception on failure
+**Returns:** `true` if file was written successfully
 
-**Usage Example**:
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `runtime_error` | Unable to create parent directory or write file |
+
+**Thread Safety:** Not thread-safe (file write operation)
+
+**Side Effects:**
+- Creates/overwrites file on the filesystem
+- Creates parent directories if they do not exist
+
+**Example:**
 ```cpp
-std::string json_data = "{\"config\": \"value\"}";
-write_buffer_to_file(json_data, "/path/to/output.json");
-```
+#include "artdaq-database/SharedCommon/fileststem_functions.h"
+#include <iostream>
 
-#### read_buffer_from_file
-```cpp
-bool read_buffer_from_file(std::string& buffer,
-                          std::string const& file_in_name);
-```
-
-**Purpose**: Read entire file contents into a string buffer.
-
-**Parameters**:
-- `buffer` - Output string to store file contents (must be empty on input)
-- `file_in_name` - Input file path
-
-**Returns**: `true` if successful, `false` on error
-
-**Behavior**:
-- Requires buffer to be empty initially (assertion check)
-- Reads entire file into memory
-- Throws exception on failure
-
-**Usage Example**:
-```cpp
-std::string content;
-if (read_buffer_from_file(content, "/path/to/input.json")) {
-    // Process content
+void saveConfiguration(const std::string& json, const std::string& path) {
+    try {
+        artdaq::database::write_buffer_to_file(json, path);
+        std::cout << "Configuration saved to: " << path << "\n";
+    } catch (const artdaq::database::runtime_error& e) {
+        std::cerr << "Failed to save: " << e.what() << "\n";
+    }
 }
 ```
 
-### Temporary Directory Functions
+---
 
-#### make_temp_dir
+#### `read_buffer_from_file(std::string& buffer, std::string const& file_in_name) -> bool`
+
+**Brief:** Reads the entire contents of a file into a string buffer.
+
+**Parameters:**
+- `buffer` - Output string to receive file contents (must be empty)
+- `file_in_name` - Full path to the input file
+
+**Preconditions:**
+- `file_in_name` must not be empty
+- `buffer` must be empty
+
+**Returns:** `true` if file was read successfully
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `invalid_argument` | File could not be opened |
+| `runtime_error` | Error during file read |
+
+**Thread Safety:** Safe for reading (may race with concurrent writers)
+
+**Example:**
 ```cpp
-std::string make_temp_dir();
+#include "artdaq-database/SharedCommon/fileststem_functions.h"
+#include <iostream>
+
+void loadConfiguration(const std::string& path) {
+    std::string content;
+    try {
+        artdaq::database::read_buffer_from_file(content, path);
+        std::cout << "Loaded " << content.size() << " bytes\n";
+        processConfiguration(content);
+    } catch (const artdaq::database::invalid_argument& e) {
+        std::cerr << "File not found: " << e.what() << "\n";
+    } catch (const artdaq::database::runtime_error& e) {
+        std::cerr << "Read error: " << e.what() << "\n";
+    }
+}
 ```
 
-**Purpose**: Create a temporary directory with a random name in `/tmp/`.
+---
 
-**Returns**: Path to the created temporary directory
+### Path Conversion
 
-**Behavior**:
-- Uses prefix from `apiliteral::tmpdirprefix` (`/tmp/adb`)
-- Appends random 7-digit number
-- Creates directory using system call
+#### `collection_name_from_relative_path(std::string const& path) -> std::string`
 
-**Usage Example**:
+**Brief:** Converts a relative file path to a collection name by replacing path separators with dots.
+
+**Parameters:**
+- `path` - Relative file path (e.g., `"Dir/file.json"`)
+
+**Returns:** Collection name with dots (e.g., `"Dir.file.json"`)
+
+**Thread Safety:** Safe
+
+**Example:**
 ```cpp
-auto tmp = make_temp_dir();  // Returns "/tmp/adb1234567"
-// Use temp directory
-delete_temp_dir(tmp);  // Clean up when done
+#include "artdaq-database/SharedCommon/fileststem_functions.h"
+
+auto name = artdaq::database::collection_name_from_relative_path("SystemLayout/component1.json");
+// name == "SystemLayout.component1.json"
 ```
 
-#### delete_temp_dir
+---
+
+#### `relative_path_from_collection_name(std::string const& collection_name) -> std::string`
+
+**Brief:** Converts a collection name back to a relative file path by replacing dots with path separators (except for the file extension).
+
+**Parameters:**
+- `collection_name` - Collection name with dots (e.g., `"Dir.file.json"`)
+
+**Preconditions:**
+- `collection_name` must not be empty
+
+**Returns:** Relative file path with slashes (e.g., `"Dir/file.json"`)
+
+**Thread Safety:** Safe
+
+**Example:**
 ```cpp
-void delete_temp_dir(std::string const& tmp_dir_name);
+#include "artdaq-database/SharedCommon/fileststem_functions.h"
+
+auto path = artdaq::database::relative_path_from_collection_name("SystemLayout.component1.json");
+// path == "SystemLayout/component1.json"
 ```
 
-**Purpose**: Recursively delete a temporary directory created by `make_temp_dir`.
+---
 
-**Parameters**:
-- `tmp_dir_name` - Path to temporary directory
+### Temporary Directory Management
 
-**Safety**: Only deletes directories that start with the expected prefix (`/tmp/adb`) to prevent accidental deletion.
+#### `make_temp_dir() -> std::string`
 
-**Usage Example**:
+**Brief:** Creates a temporary directory with a random name in the system temp location.
+
+**Returns:** Full path to the created temporary directory (e.g., `/tmp/adb1234567`)
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `runtime_error` | Unable to create temporary directory |
+
+**Thread Safety:** Not thread-safe (uses `rand()` and `system()`)
+
+**Side Effects:**
+- Creates a directory on the filesystem
+
+**Example:**
 ```cpp
-auto tmp = make_temp_dir();
-// ... use temp directory ...
-delete_temp_dir(tmp);
+#include "artdaq-database/SharedCommon/fileststem_functions.h"
+#include <iostream>
+
+void processWithTempStorage() {
+    std::string tmpDir;
+    try {
+        tmpDir = artdaq::database::make_temp_dir();
+        std::cout << "Using temp directory: " << tmpDir << "\n";
+        // ... use temp directory for processing ...
+        artdaq::database::delete_temp_dir(tmpDir);
+    } catch (const artdaq::database::runtime_error& e) {
+        std::cerr << "Temp dir error: " << e.what() << "\n";
+        if (!tmpDir.empty()) {
+            artdaq::database::delete_temp_dir(tmpDir);
+        }
+    }
+}
 ```
 
-### Archive/Compression Functions
+---
 
-#### dir_to_tarbzip2base64
+#### `delete_temp_dir(std::string const& tmp_dir_name) -> void`
+
+**Brief:** Recursively deletes a temporary directory. For safety, only deletes directories with the expected temp directory prefix.
+
+**Parameters:**
+- `tmp_dir_name` - Full path to the temporary directory to delete
+
+**Preconditions:**
+- `tmp_dir_name` must not be empty
+- `tmp_dir_name` must start with the expected temp directory prefix
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `runtime_error` | Unable to delete directory |
+
+**Thread Safety:** Not thread-safe (uses `system()`)
+
+**Side Effects:**
+- Recursively deletes directory and all contents
+
+**Example:**
 ```cpp
-std::string const& dir_to_tarbzip2base64(std::string const& tmp_dir_name,
-                                          std::string const& bzip2base64);
+#include "artdaq-database/SharedCommon/fileststem_functions.h"
+
+void cleanupTempDirectory(const std::string& tmpDir) {
+    try {
+        artdaq::database::delete_temp_dir(tmpDir);
+    } catch (const artdaq::database::runtime_error& e) {
+        // Log error but don't propagate - cleanup is best-effort
+        std::cerr << "Warning: Failed to delete temp dir: " << e.what() << "\n";
+    }
+}
 ```
 
-**Purpose**: Compress a directory to a tar.bzip2 archive and encode it as base64.
+---
 
-**Parameters**:
+### Archive Operations
+
+#### `dir_to_tarbzip2base64(std::string const& tmp_dir_name, std::string const& bzip2base64) -> std::string const&`
+
+**Brief:** Compresses a directory into a tar archive, bzip2 compresses it, and encodes the result as base64 text. Used for database exports.
+
+**Parameters:**
 - `tmp_dir_name` - Source directory to compress
 - `bzip2base64` - Output file path for the base64-encoded archive
 
-**Returns**: Reference to the output file path
+**Preconditions:**
+- `tmp_dir_name` must not be empty
+- `bzip2base64` must not be empty
 
-**Process**:
-1. Creates tar archive of directory
-2. Compresses with bzip2
-3. Encodes as base64
-4. Writes to output file
+**Returns:** Reference to `bzip2base64` parameter
 
-**Usage Example**:
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `runtime_error` | Unable to create output directory or create archive |
+
+**Thread Safety:** Not thread-safe (uses `system()`)
+
+**Side Effects:**
+- Creates file on filesystem
+- Invokes external commands (tar, bzip2, base64)
+
+**Example:**
 ```cpp
-auto archive = dir_to_tarbzip2base64("/tmp/adb123456",
-                                     "/output/backup.tar-bzip2-base64");
-```
+#include "artdaq-database/SharedCommon/fileststem_functions.h"
+#include <iostream>
 
-#### tarbzip2base64_to_dir
-```cpp
-std::string const& tarbzip2base64_to_dir(std::string const& bzip2base64,
-                                          std::string const& tmp_dir_name);
-```
-
-**Purpose**: Decode a base64-encoded tar.bzip2 archive and extract to a directory (inverse of above).
-
-**Parameters**:
-- `bzip2base64` - Input base64-encoded archive file
-- `tmp_dir_name` - Target directory for extraction
-
-**Returns**: Reference to the extraction directory path
-
-**Process**:
-1. Decodes base64
-2. Decompresses bzip2
-3. Extracts tar archive
-4. Places contents in target directory
-
-**Usage Example**:
-```cpp
-auto extracted = tarbzip2base64_to_dir("/input/backup.tar-bzip2-base64",
-                                       "/tmp/adb789012");
-```
-
-### Utility Functions
-
-#### extract_collectionname_from_filename
-```cpp
-bool extract_collectionname_from_filename(std::string const& file_name,
-                                         std::string& collection_name);
-```
-
-**Purpose**: Extract collection name from an export file name.
-
-**Parameters**:
-- `file_name` - Input filename
-- `collection_name` - Output parameter for extracted collection name
-
-**Returns**: `true` if filename has correct extension and name was extracted, `false` otherwise
-
-**Behavior**:
-- Checks if file has `.tar-bzip2-base64` extension
-- Extracts stem (filename without extension) as collection name
-
-**Usage Example**:
-```cpp
-std::string collection;
-if (extract_collectionname_from_filename("MyConfig.tar-bzip2-base64", collection)) {
-    // collection now contains "MyConfig"
+void exportDatabase(const std::string& sourceDir, const std::string& outputFile) {
+    try {
+        artdaq::database::dir_to_tarbzip2base64(sourceDir, outputFile);
+        std::cout << "Exported to: " << outputFile << "\n";
+    } catch (const artdaq::database::runtime_error& e) {
+        std::cerr << "Export failed: " << e.what() << "\n";
+    }
 }
 ```
 
-## Usage Context
+---
 
-These functions are used throughout the artdaq-database project for:
+#### `tarbzip2base64_to_dir(std::string const& bzip2base64, std::string const& tmp_dir_name) -> std::string const&`
 
-1. **Configuration File Management**: Reading and writing configuration files in filesystem-based storage
-2. **Database Export/Import**: Compressing and archiving database contents
-3. **Temporary Storage**: Managing temporary directories during operations
-4. **Collection Storage**: Converting between collection names and file paths
-5. **Batch Operations**: Listing all files for bulk processing
+**Brief:** Decodes a base64-encoded archive, decompresses it, and extracts the contents to a directory. Used for database imports.
 
-## Error Handling
+**Parameters:**
+- `bzip2base64` - Input file path containing base64-encoded archive
+- `tmp_dir_name` - Destination directory for extracted files
 
-Most functions use one or more of these error handling strategies:
-- Return boolean success/failure status
-- Throw exceptions (runtime_error, invalid_argument) with descriptive messages
-- Use `confirm()` assertions for precondition checking
-- Log errors using TRACE macros
+**Preconditions:**
+- `bzip2base64` must not be empty
+- `tmp_dir_name` must not be empty
 
-## Implementation Notes
+**Returns:** Reference to `tmp_dir_name` parameter
 
-- Functions use `system()` calls for operations like mkdir, tar, bzip2
-- The archive format (tar.bzip2.base64) is specifically designed for database export/import
-- Path conversions support dot-notation collection names used in MongoDB-style databases
-- Temporary directory names use random numbers to avoid collisions
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `runtime_error` | Unable to create destination directory or extract archive |
 
-## Related Files
+**Thread Safety:** Not thread-safe (uses `system()`)
 
-- **fileststem_functions.cpp** - Implementation of these functions
-- **configuraion_api_literals.h** - Defines constants like `tmpdirprefix`, `dbexport_extension`
-- **shared_datatypes.h** - Type definitions used by these functions
+**Side Effects:**
+- Creates directories and files on filesystem
+- Invokes external commands (cat, base64, tar)
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/fileststem_functions.h"
+#include <iostream>
+
+void importDatabase(const std::string& archiveFile, const std::string& destDir) {
+    try {
+        artdaq::database::tarbzip2base64_to_dir(archiveFile, destDir);
+        std::cout << "Imported to: " << destDir << "\n";
+    } catch (const artdaq::database::runtime_error& e) {
+        std::cerr << "Import failed: " << e.what() << "\n";
+    }
+}
+```
+
+---
+
+### File Metadata
+
+#### `extract_collectionname_from_filename(std::string const& file_name, std::string& collection_name) -> bool`
+
+**Brief:** Extracts the collection name from an export filename by removing the archive file extension.
+
+**Parameters:**
+- `file_name` - Export filename (e.g., `"MyCollection.tar-bzip2-base64"`)
+- `collection_name` - Output parameter for the extracted collection name
+
+**Preconditions:**
+- `file_name` must not be empty
+
+**Returns:** `true` if extraction was successful (file has correct extension), `false` otherwise
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/fileststem_functions.h"
+#include <iostream>
+
+void processExportFile(const std::string& filename) {
+    std::string collection;
+    if (artdaq::database::extract_collectionname_from_filename(filename, collection)) {
+        std::cout << "Collection: " << collection << "\n";
+    } else {
+        std::cerr << "Invalid export file format: " << filename << "\n";
+    }
+}
+```
+
+---
+
+## Relationship to Other Components
+
+- [fileststem_functions.cpp](./fileststem_functions.cpp.md) - Implementation file
+- **StorageProviders/FileSystemDB/** - Primary user for filesystem-based storage
+- **ConfigurationDB/BulkOperations/** - Uses for export/import operations
+- [configuraion_api_literals.h](./configuraion_api_literals.h.md) - Defines `tmpdirprefix`, `dbexport_extension`
+
+## Notes for Developers
+
+### Error Handling
+
+Functions use multiple error handling strategies:
+- Boolean return values for simple success/failure
+- Exceptions (`runtime_error`, `invalid_argument`) for unexpected errors
+- `confirm()` assertions for preconditions
+- TRACE logging for debugging
+
+### Security Considerations
+
+- `delete_temp_dir()` only deletes paths starting with the expected temp directory prefix to prevent accidental deletion of important directories
+- Archive operations use shell commands - ensure inputs are sanitized if accepting user-provided paths
+
+### System Requirements
+
+Archive operations (`dir_to_tarbzip2base64`, `tarbzip2base64_to_dir`) use `system()` calls to shell commands. The following commands must be available:
+- `tar` - Archive creation/extraction
+- `bzip2` / `bunzip2` - Compression
+- `base64` - Base64 encoding/decoding
+
+## Common Pitfalls
+
+- **Filename typo:** The filename `fileststem` contains a historical typo. This is intentional for backward compatibility and should not be "fixed".
+- **Thread safety:** Most functions use `system()` calls and are not thread-safe. Ensure proper synchronization when using in multi-threaded contexts.
+- **Temp directory collisions:** `make_temp_dir()` uses `rand()` seeded with `time(nullptr)`, which may cause collisions if called multiple times within the same second.
+
+## See Also
+
+- [fileststem_functions.cpp](./fileststem_functions.cpp.md) - Implementation details
+- [configuraion_api_literals.h](./configuraion_api_literals.h.md) - Filesystem-related constants

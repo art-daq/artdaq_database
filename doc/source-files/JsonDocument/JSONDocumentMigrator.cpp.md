@@ -1,207 +1,138 @@
 # JSONDocumentMigrator.cpp
 
-## File Overview
+**Path:** `artdaq-database/JsonDocument/JSONDocumentMigrator.cpp`
 
-This file implements the `JSONDocumentMigrator` class, providing the concrete migration logic for converting legacy JSON document formats into the modern database schema. The migration extracts data from an old document structure and reconstructs it using `JSONDocumentBuilder` to ensure proper metadata, versioning, and database compliance.
+**Implements:** [JSONDocumentMigrator.h](./JSONDocumentMigrator.h.md)
 
-**Location**: `/home/user/artdaq-database/artdaq-database/JsonDocument/JSONDocumentMigrator.cpp`
+**Purpose:** This file implements the `JSONDocumentMigrator` class, providing the concrete migration logic for converting legacy JSON document formats into the modern database schema. The migration extracts data from old document structures and reconstructs them using `JSONDocumentBuilder` to ensure proper metadata, versioning, and database compliance.
+
+## Implementation Overview
+
+The `JSONDocumentMigrator` class provides a conversion operator that transforms legacy document formats into the current schema. It uses the builder pattern via `JSONDocumentBuilder` to construct a properly structured document while preserving all data from the source.
+
+### Migration Process
+
+The conversion operator performs these steps:
+1. Create a new `JSONDocumentBuilder`
+2. Import document data using `createFromData()`
+3. Extract and set version from the legacy format
+4. Extract and add entity (from `configurable_entity` field)
+5. Iterate and add all configurations
+6. Extract and set object ID (from nested `_id._oid` path)
+7. Return the extracted document
+
+### Field Transformation
+
+Key transformations during migration:
+
+| Legacy Field | Modern Field | Transformation |
+|--------------|--------------|----------------|
+| `version` | `version.name` | Wrapped in object with "name" key |
+| `configurable_entity` | `entities[]` | Object becomes array element |
+| `configurations[]` | `configurations[]` | Each wrapped in configuration object |
+| `_id._oid` | `_id` | Nested structure flattened to string |
 
 ## Dependencies
 
-```cpp
-#include "artdaq-database/JsonDocument/JSONDocumentMigrator.h"
-#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
-#include "artdaq-database/JsonDocument/common.h"
-```
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/JsonDocument/JSONDocumentMigrator.h` | Class declaration for `JSONDocumentMigrator` |
+| `artdaq-database/JsonDocument/JSONDocumentBuilder.h` | Builder class used to construct the migrated document |
+| `artdaq-database/JsonDocument/common.h` | Module-wide types, literals, and utility functions |
 
-**Key Dependencies**:
-- **JSONDocumentMigrator.h** - Class definition
-- **JSONDocumentBuilder.h** - Used to build the migrated document
-- **common.h** - Module-wide types and utilities
+## Internal Functions
 
-## TRACE Configuration
+### `JSONDocumentMigrator::JSONDocumentMigrator(JSONDocument& document)`
 
-```cpp
-#ifdef TRACE_NAME
-#undef TRACE_NAME
-#endif
-#define TRACE_NAME "JSONDocumentMigrator.cpp"
-```
+**Brief:** Constructor that stores a reference to the source document for later migration.
 
-Sets TRACE subsystem name for logging migration operations.
+**Parameters:**
+- `document` - Non-const reference to the legacy JSONDocument to be migrated
 
-## Using Declarations
+**Postconditions:**
+- Internal `_document` reference is initialized and points to the source document
 
-```cpp
-using artdaq::database::result_t;
-using artdaq::database::json::array_t;
-using artdaq::database::json::object_t;
-using artdaq::database::json::value_t;
-using artdaq::database::overlay::ovlDatabaseRecordUPtr_t;
-using artdaq::database::docrecord::JSONDocument;
-using artdaq::database::docrecord::JSONDocumentBuilder;
-using artdaq::database::docrecord::JSONDocumentMigrator;
+**Thread Safety:** safe (construction only)
 
-namespace db = artdaq::database;
-namespace dbdr = artdaq::database::docrecord;
-namespace jsonliteral = artdaq::database::dataformats::literal;
-```
+### `JSONDocumentMigrator::operator JSONDocument()`
 
-## Constructor
+**Brief:** Conversion operator that performs the complete migration from legacy format to modern format by creating a builder, importing data, and transferring all metadata fields.
 
-### JSONDocumentMigrator Constructor
+**Returns:** New `JSONDocument` in modern format with proper metadata structure
 
-```cpp
-JSONDocumentMigrator::JSONDocumentMigrator(JSONDocument& document)
-    : _document(document) {}
-```
+**Throws:**
 
-**Simple Initialization**: Stores reference to the document to be migrated.
+| Exception | Condition |
+|-----------|-----------|
+| `notfound_exception` | When `version` field is missing from source document |
+| `notfound_exception` | When `configurable_entity` field is missing |
+| `notfound_exception` | When `configurations` field is missing |
+| `notfound_exception` | When `_id._oid` path is missing |
 
-**Parameter**: Non-const reference to document (allows reading during migration)
+**Thread Safety:** unsafe (modifies internal builder state)
 
-## Conversion Operator Implementation
+**Migration Algorithm:**
 
-### operator JSONDocument()
+1. **Create Builder and Import Data**
+   ```cpp
+   JSONDocumentBuilder builder{};
+   builder.createFromData(_document);
+   ```
+   Creates an empty builder and imports the document data, adding the required metadata scaffolding.
 
-```cpp
-JSONDocumentMigrator::operator JSONDocument()
-```
+2. **Extract and Set Version**
+   ```cpp
+   auto version = jsn::object_t{};
+   version[jsonliteral::name] = _document.findChildValue(jsonliteral::version);
+   builder.setVersion({version});
+   ```
+   Wraps the legacy version string value in an object with a "name" key as expected by `setVersion()`.
 
-**Purpose**: Performs the actual migration from legacy format to modern format.
+3. **Extract and Add Entity**
+   ```cpp
+   auto entity = _document.findChildDocument("configurable_entity");
+   builder.addEntity(entity);
+   ```
+   The single legacy entity becomes the first element in the modern entities array.
 
-**Implementation**:
-```cpp
-JSONDocumentMigrator::operator JSONDocument() {
-  JSONDocumentBuilder builder{};
+4. **Migrate Configurations**
+   ```cpp
+   jsn::value_t configs = _document.findChildValue(jsonliteral::configurations);
+   for (auto const& config : unwrap(configs).value_as<jsn::array_t>()) {
+     builder.addConfiguration({config});
+   }
+   ```
+   Iterates through the configurations array and adds each via the builder.
 
-  builder.createFromData(_document);
+5. **Extract and Set Object ID**
+   ```cpp
+   jsn::value_t oid = _document.findChildValue("_id._oid");
+   builder.setObjectID(db::to_id(unwrap(oid).value_as<std::string>()));
+   ```
+   Extracts the nested OID and converts it to the flat ID format.
 
-  auto version = jsn::object_t{};
-  version[jsonliteral::name] = _document.findChildValue(jsonliteral::version);
-  builder.setVersion({version});
+6. **Extract and Return**
+   ```cpp
+   return builder.extract();
+   ```
+   Returns the fully migrated document.
 
-  auto entity = _document.findChildDocument("configurable_entity");
-  builder.addEntity(entity);
+### `debug::JSONDocumentMigrator()`
 
-  jsn::value_t configs = _document.findChildValue(jsonliteral::configurations);
+**Brief:** Enables maximum TRACE logging for debugging migration operations by configuring the TRACE subsystem.
 
-  for (auto const& config : unwrap(configs).value_as<jsn::array_t>()) {
-    builder.addConfiguration({config});
-  }
+**Returns:** None (void)
 
-  jsn::value_t oid = _document.findChildValue("_id._oid");
-  builder.setObjectID(db::to_id(unwrap(oid).value_as<std::string>()));
+**Side Effects:**
+- Configures TRACE logging name to "JSONDocumentMigrator.cpp"
+- Sets TRACE level to maximum (0xFFFFFFFFFFFFFFFFLL)
+- Configures memory and slow modes
 
-  return builder.extract();
-}
-```
+**TRACE Level:** 20 (activation message)
 
-## Migration Steps
+## Expected Document Formats
 
-The migration process follows these steps:
-
-### Step 1: Create Builder
-
-```cpp
-JSONDocumentBuilder builder{};
-```
-
-Creates a new builder starting with an empty document template.
-
-### Step 2: Import User Data
-
-```cpp
-builder.createFromData(_document);
-```
-
-**Purpose**: Imports the document data into the builder's document structure.
-
-**Effect**: Copies user data fields into proper document structure with metadata scaffolding.
-
-### Step 3: Extract and Set Version
-
-```cpp
-auto version = jsn::object_t{};
-version[jsonliteral::name] = _document.findChildValue(jsonliteral::version);
-builder.setVersion({version});
-```
-
-**Process**:
-1. Create object for version
-2. Extract version value from legacy document
-3. Wrap in object with "name" key
-4. Set version via builder
-
-**Legacy Format**: `{"version": "v1.0.0"}`
-
-**Expected Builder Input**: `{"name": "v1.0.0"}`
-
-### Step 4: Extract and Add Entity
-
-```cpp
-auto entity = _document.findChildDocument("configurable_entity");
-builder.addEntity(entity);
-```
-
-**Purpose**: Migrates the legacy "configurable_entity" field to modern "entities" array.
-
-**Legacy Field**: `"configurable_entity"`
-
-**Modern Field**: `"entities"` (array)
-
-**Transformation**: Single entity becomes first element in entities array.
-
-### Step 5: Migrate Configurations
-
-```cpp
-jsn::value_t configs = _document.findChildValue(jsonliteral::configurations);
-
-for (auto const& config : unwrap(configs).value_as<jsn::array_t>()) {
-  builder.addConfiguration({config});
-}
-```
-
-**Process**:
-1. Extract configurations array from legacy document
-2. Unwrap value to get actual array
-3. Iterate through each configuration
-4. Add each to builder (wraps in proper structure)
-
-**Legacy Format**: Configurations may have different structure
-
-**Modern Format**: Each configuration wrapped with proper metadata
-
-### Step 6: Extract and Set Object ID
-
-```cpp
-jsn::value_t oid = _document.findChildValue("_id._oid");
-builder.setObjectID(db::to_id(unwrap(oid).value_as<std::string>()));
-```
-
-**Process**:
-1. Extract OID from nested path `"_id._oid"`
-2. Unwrap value to get string
-3. Convert string to ID format using `db::to_id()`
-4. Set as object ID via builder
-
-**Legacy Format**: `{"_id": {"_oid": "507f1f77bcf86cd799439011"}}`
-
-**Modern Format**: `{"_id": "507f1f77bcf86cd799439011"}`
-
-### Step 7: Extract and Return
-
-```cpp
-return builder.extract();
-```
-
-**Final Step**: Extracts the fully migrated document from the builder.
-
-**Returns**: Modern format document with all fields properly structured.
-
-## Legacy Document Structure
-
-Based on the implementation, the expected legacy format is:
+### Legacy Document Structure (Input)
 
 ```json
 {
@@ -223,16 +154,14 @@ Based on the implementation, the expected legacy format is:
 }
 ```
 
-## Modern Document Structure
-
-After migration, the document has this structure:
+### Modern Document Structure (Output)
 
 ```json
 {
   "version": "v1.0.0",
   "_id": "507f1f77bcf86cd799439011",
   "document": {
-    "data": { /* actual configuration data */ },
+    "data": { /* configuration data */ },
     "metadata": { }
   },
   "entities": [
@@ -255,223 +184,71 @@ After migration, the document has this structure:
 }
 ```
 
-## Key Transformations
+## Error Handling Strategy
 
-### 1. Version Field
-- **From**: Direct string value
-- **To**: Wrapped in structure with proper path
-
-### 2. Configurable Entity
-- **From**: Single object `"configurable_entity"`
-- **To**: Array of entities `"entities": [...]`
-
-### 3. Configurations
-- **From**: Array of simple configuration objects
-- **To**: Array of wrapped configuration objects with metadata
-
-### 4. Object ID
-- **From**: Nested structure `{"_id": {"_oid": "..."}}`
-- **To**: Flat string `"_id": "..."`
-
-### 5. Document Structure
-- **Added**: Bookkeeping metadata
-- **Added**: Proper document.metadata structure
-- **Preserved**: document.data content
-
-## Error Handling
-
-The migration can throw exceptions:
-
-**notfound_exception**: If required fields missing:
-- `version` field not found
-- `configurable_entity` not found
-- `configurations` not found
-- `_id._oid` not found
-
-**invalid_argument**: If data format is wrong:
-- `configurations` is not an array
-- `_id._oid` is not a string
-- Document structure invalid
-
-**Example Error Handling**:
-```cpp
-try {
-  auto migrated = JSONDocumentMigrator(legacy);
-  migrated.saveToFile("output.json");
-} catch (notfound_exception const& ex) {
-  std::cerr << "Missing required field: " << ex.what() << std::endl;
-  // Legacy document is incomplete or wrong format
-} catch (std::exception const& ex) {
-  std::cerr << "Migration failed: " << ex.what() << std::endl;
-}
-```
-
-## Debug Function
-
-### debug::JSONDocumentMigrator
+Migration throws `notfound_exception` for missing required fields. All fields (version, configurable_entity, configurations, _id._oid) are required:
 
 ```cpp
-void dbdr::debug::JSONDocumentMigrator() {
-  TRACE_CNTL("name", TRACE_NAME);
-  TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", trace_mode::modeM);
-  TRACE_CNTL("modeS", trace_mode::modeS);
+#include "artdaq-database/JsonDocument/JSONDocumentMigrator.h"
 
-  TLOG(20) << "artdaq::database::JSONDocumentMigrator trace_enable";
-}
-```
+using namespace artdaq::database::docrecord;
 
-**Purpose**: Enables maximum TRACE logging for debugging migrations.
-
-**TRACE Level**: 20 - Logs activation message
-
-**Usage**:
-```cpp
-artdaq::database::docrecord::debug::JSONDocumentMigrator();
-// Now all migration trace messages will output
-```
-
-## Usage Examples
-
-### Basic Migration
-
-```cpp
-JSONDocument legacy = JSONDocument::loadFromFile("old_format.json");
-JSONDocument modern = JSONDocumentMigrator(legacy);
-modern.saveToFile("new_format.json");
-```
-
-### With Error Handling
-
-```cpp
-try {
-  JSONDocument legacy("{\"version\":\"v1\", ...}");
-  JSONDocumentMigrator migrator(legacy);
-  JSONDocument modern = migrator;
-
-  std::cout << "Migration successful" << std::endl;
-  std::cout << modern.to_string() << std::endl;
-
-} catch (notfound_exception const& ex) {
-  std::cerr << "Legacy document missing required field: "
-            << ex.what() << std::endl;
-}
-```
-
-### Batch Migration
-
-```cpp
-for (auto const& filename : legacy_files) {
+void migrateDocument(JSONDocument& legacy) {
   try {
-    auto legacy = JSONDocument::loadFromFile(filename);
-    auto modern = JSONDocumentMigrator(legacy);
-    modern.saveToFile(filename + ".migrated");
-    std::cout << "Migrated: " << filename << std::endl;
-  } catch (std::exception const& ex) {
-    std::cerr << "Failed to migrate " << filename
-              << ": " << ex.what() << std::endl;
+    JSONDocument migrated = JSONDocumentMigrator(legacy);
+    // Use migrated document
+  } catch (notfound_exception const& ex) {
+    // Handle missing required field
+    std::cerr << "Migration failed: " << ex.what() << std::endl;
+    // Possible causes:
+    // - version field missing
+    // - configurable_entity field missing
+    // - configurations field missing
+    // - _id._oid field missing
   }
 }
 ```
 
 ## Performance Considerations
 
-1. **Builder Overhead**: Creates builder and overlay infrastructure
-2. **Field Extraction**: Multiple calls to `findChildValue` and `findChildDocument`
-3. **Array Iteration**: Loops through configurations
-4. **String Conversions**: OID conversion from string
-5. **Document Copy**: `createFromData` copies document content
+- **Single Pass:** Migration reads source document once
+- **Move Semantics:** Builder uses move semantics where possible
+- **No Validation:** Source document is not validated before migration
 
-**Optimization Note**: Migration is typically a one-time operation, so optimization is less critical than correctness.
+## Testing Notes
 
-## Assumptions
+- **Unit tests:** `test/JsonDocument/JSONDocumentMigrator_t.cc`
+- **Key test cases:** Legacy format detection, field transformation, error handling for missing fields
+
+## Maintenance Notes
+
+### Assumptions
 
 The implementation assumes:
+1. **Version field exists** - Required in legacy format
+2. **Configurable entity exists** - Single entity to migrate
+3. **Configurations is array** - Must be array type, not object
+4. **Object ID exists** - At nested path `_id._oid`
+5. **Document data exists** - Content to import via `createFromData`
 
-1. **Version field exists**: Required field in legacy format
-2. **Configurable entity exists**: Single entity to migrate
-3. **Configurations is array**: Must be array type
-4. **Object ID exists**: At path `_id._oid`
-5. **Document data exists**: Content to import via `createFromData`
+### Limitations
 
-## Limitations
+1. **Single Entity** - Only migrates one entity (the first/only one)
+2. **No Validation** - Does not validate legacy format before migration
+3. **No Rollback** - Migration is one-way; no reverse migration
+4. **Hard-coded Paths** - Assumes specific legacy field names
+5. **No Version Check** - Does not verify legacy document schema version
 
-1. **Single Entity**: Only migrates one entity (first/only one)
-2. **No Validation**: Doesn't validate legacy format before migration
-3. **No Rollback**: Migration is one-way
-4. **Hard-coded Paths**: Assumes specific legacy field names
-5. **No Version Check**: Doesn't verify legacy document version
+### TRACE Logging
 
-## Integration with Builder
+| Level | Purpose |
+|-------|---------|
+| 20 | Debug activation message |
 
-The migrator is essentially a thin wrapper that:
-1. Extracts fields from legacy format
-2. Uses `JSONDocumentBuilder` to construct modern format
-3. Returns the result
+## See Also
 
-**Builder Benefits**:
-- Ensures proper document structure
-- Adds metadata automatically
-- Validates field types
-- Maintains bookkeeping
-
-## Thread Safety
-
-Not thread-safe:
-- Relies on `JSONDocumentBuilder` which is not thread-safe
-- Reads from shared document reference
-- No synchronization
-
-## Related Files
-
-- **JSONDocumentMigrator.h** - Class definition
-- **JSONDocumentBuilder.cpp** - Used for building migrated document
-- **JSONDocument.cpp** - Used for field extraction
-
-## Best Practices
-
-1. **Validate First**: Check legacy document has required fields before migrating
-2. **Backup Originals**: Keep backup of legacy documents
-3. **Test Sample**: Test migration on sample document before batch
-4. **Enable Logging**: Use debug function to trace migration steps
-5. **Handle Exceptions**: Catch specific exceptions for better error messages
-
-## Migration Workflow
-
-```
-Legacy Document
-    ↓
-JSONDocumentMigrator Constructor (stores reference)
-    ↓
-Conversion Operator Called
-    ↓
-Create JSONDocumentBuilder
-    ↓
-Extract Fields from Legacy:
-  - version
-  - configurable_entity
-  - configurations
-  - _id._oid
-  - document data
-    ↓
-Build Modern Structure:
-  - Set version
-  - Add entity
-  - Add configurations
-  - Set object ID
-  - Import data
-    ↓
-Extract from Builder
-    ↓
-Return Modern Document
-```
-
-## Notes
-
-- Migration is destructive to builder but not to source document
-- Uses builder's `createFromData` to import document content
-- Configurations are migrated individually through a loop
-- Object ID undergoes format conversion via `db::to_id()`
-- Entity changes from singular to plural (entity → entities array)
-- The implementation is specific to one legacy format version
-- No reverse migration capability (modern → legacy)
+- [JSONDocumentMigrator.h.md](./JSONDocumentMigrator.h.md) - Class declaration
+- [JSONDocumentBuilder.h.md](./JSONDocumentBuilder.h.md) - Builder used for document construction
+- [JSONDocumentBuilder.cpp.md](./JSONDocumentBuilder.cpp.md) - Builder implementation
+- [JSONDocument.h.md](./JSONDocument.h.md) - Core document class
+- [docrecord_exceptions.h.md](./docrecord_exceptions.h.md) - Exception types thrown during migration

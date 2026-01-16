@@ -1,549 +1,487 @@
 # JSONDocument.cpp
 
-## File Overview
+**Path:** `artdaq-database/JsonDocument/JSONDocument.cpp`
 
-This file implements the core document tree manipulation methods of the `JSONDocument` class. It provides the path-based navigation and modification API that allows users to traverse, query, insert, replace, delete, and manipulate elements within JSON document structures.
+**Implements:** [JSONDocument.h](./JSONDocument.h.md)
 
-**Location**: `/home/user/artdaq-database/artdaq-database/JsonDocument/JSONDocument.cpp`
+**Purpose:** This file implements the core document tree manipulation methods of the `JSONDocument` class, providing path-based navigation and modification operations that allow users to traverse, query, insert, replace, delete, and manipulate elements within JSON document structures using recursive tree traversal algorithms.
+
+## Implementation Overview
+
+The implementation uses recursive lambda functions to traverse the JSON document tree based on dot-notation paths. Each path is split into tokens, reversed for bottom-up traversal, and the recursion navigates through nested objects to find, insert, replace, or delete the target element.
+
+## Key Algorithms
+
+### Path Validation and Splitting
+
+**Function:** `split_path_validate()`
+
+Validates that a path is non-empty and splits it into individual tokens for tree traversal.
+
+**Steps:**
+1. Validate caller is not empty (confirm macro)
+2. Validate path is not empty (throws `invalid_argument` if empty)
+3. Call `split_path()` to tokenize on `.` delimiter
+4. Validate tokens are not empty (throws `invalid_argument` if empty)
+5. Reverse the token order for bottom-up recursion
+6. Return reversed token vector
+
+**Why this approach:** Reversing the path allows the recursive traversal to work from `currentDepth = tokens.size() - 1` down to 0, making it easier to check when the target depth is reached.
+
+### Recursive Tree Traversal Pattern
+
+All modification operations use the same traversal pattern:
+
+**Steps:**
+1. Split and validate path into tokens
+2. Create recursive lambda with current depth tracking
+3. At each depth:
+   - Verify current value is an object type (throw if not)
+   - Look up the path token in the object (throw if not found)
+   - If at target depth (0), perform the operation
+   - Otherwise, recurse into the matched value
+4. Set `_isDirty` flag after successful modification
+5. Return the affected value wrapped in a JSONDocument
+6. Log and re-throw any exceptions
+
+### findChildValue Algorithm
+
+**Purpose:** Navigate to a path and return a const reference to the value found there.
+
+**Pseudocode:**
+```
+recurse(value, depth):
+  if value is not OBJECT: throw notfound_exception
+  if path_token not in value: throw notfound_exception
+  if depth == 0: return value[path_token]
+  return recurse(value[path_token], depth - 1)
+```
+
+### replaceChild Algorithm
+
+**Purpose:** Replace an existing value at a path with a new value.
+
+**Pseudocode:**
+```
+recurse(value, depth):
+  if value is not OBJECT: throw notfound_exception
+  if path_token not in value: throw notfound_exception
+  if depth == 0:
+    swap(value[path_token], newValue)
+    return newValue (which now contains old value)
+  return recurse(value[path_token], depth - 1)
+```
+
+### insertChild Algorithm
+
+**Purpose:** Insert a new value at a path (fails if path exists).
+
+**Pseudocode:**
+```
+recurse(value, depth):
+  if value is not OBJECT: throw notfound_exception
+  count = value.count(path_token)
+  if depth == 0 and count != 0: throw (exists, use replace)
+  if depth != 0 and count == 0: throw notfound_exception
+  if depth == 0 and count == 0:
+    value[path_token] = newValue
+    return newValue
+  return recurse(value[path_token], depth - 1)
+```
+
+### deleteChild Algorithm
+
+**Purpose:** Delete an element at a path and return the deleted value.
+
+**Pseudocode:**
+```
+recurse(value, depth):
+  if value is not OBJECT: throw notfound_exception
+  if path_token not in value: throw notfound_exception
+  if depth == 0:
+    return value.delete_at(path_token)
+  return recurse(value[path_token], depth - 1)
+```
 
 ## Dependencies
 
-```cpp
-#include "artdaq-database/JsonDocument/JSONDocument.h"
-#include "artdaq-database/DataFormats/Json/json_types_impl.h"
-```
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/JsonDocument/JSONDocument.h` | Class definition for JSONDocument |
+| `artdaq-database/DataFormats/Json/json_types_impl.h` | Implementation details for JSON types and operations, visitor functions like `print_visitor` |
 
-**Key Dependencies**:
-- **JSONDocument.h** - Class definition
-- **json_types_impl.h** - Implementation details for JSON types and operations
+## Internal Functions
 
-## TRACE Configuration
+### `validate(path_t const& path, std::string const& caller)`
 
-```cpp
-#ifdef TRACE_NAME
-#undef TRACE_NAME
-#endif
-#define TRACE_NAME "JSONDocument.cpp"
-```
+**Brief:** Validates that a path is not empty before attempting operations, throwing an exception with the caller name if invalid.
 
-Sets the TRACE subsystem name for all log messages from this file.
+**Called by:** `findChild()`, `removeChild()`
 
-## Using Declarations
+**Purpose:** Provides consistent path validation with informative error messages.
 
-```cpp
-using artdaq::database::json::array_t;
-using artdaq::database::json::object_t;
-using artdaq::database::json::type_t;
-using artdaq::database::json::value_t;
-using artdaq::database::sharedtypes::unwrap;
-using namespace artdaq::database;
-using artdaq::database::docrecord::JSONDocument;
-using artdaq::database::docrecord::split_path;
-
-namespace dbdr = artdaq::database::docrecord;
-```
-
-## Helper Functions
-
-### print_visitor
-
-```cpp
-std::string print_visitor(value_t const&);
-```
-
-Forward-declared utility function that converts a `value_t` to a human-readable string representation for debugging and logging.
-
-### validate
-
-```cpp
-void validate(path_t const& path, std::string const& caller) {
-  if (path.empty()) {
-    throw invalid_argument("JSONDocument")
-        << "Failed calling " << caller << "(): Invalid path; path is empty";
-  }
-}
-```
-
-**Purpose**: Validates that a path is not empty before attempting operations.
-
-**Parameters**:
+**Parameters:**
 - `path` - The path to validate
-- `caller` - Name of the calling function (for error messages)
+- `caller` - Name of calling function for error messages
 
-**Throws**: `invalid_argument` if path is empty
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `invalid_argument` | When path is empty |
 
-### split_path_validate
+### `split_path_validate(path_t const& path, std::string const& caller) -> std::vector<path_t>`
 
+**Brief:** Validates a path, splits it into components, and reverses the order for bottom-up traversal.
+
+**Called by:** `replaceChild()`, `insertChild()`, `deleteChild()`, `findChildValue()`
+
+**Purpose:** Centralizes path processing logic for all tree traversal operations.
+
+**Parameters:**
+- `path` - Dot-notation path to split
+- `caller` - Name of calling function for error messages
+
+**Returns:** Vector of path tokens in reversed order
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `invalid_argument` | When path is empty or produces no tokens |
+
+**Example:**
 ```cpp
-std::vector<path_t> split_path_validate(path_t const& path, std::string const& caller)
+// Input: "document.data.field"
+// Split: ["document", "data", "field"]
+// Reversed: ["field", "data", "document"]
 ```
 
-**Purpose**: Validates a path, splits it into components, and reverses the order for bottom-up traversal.
+### `print_visitor(value_t const&) -> std::string`
 
-**Algorithm**:
-1. Validates caller name is not empty
-2. Validates path is not empty using `validate()`
-3. Splits path using `split_path()` ("a.b.c" → ["a", "b", "c"])
-4. Reverses the tokens (["a", "b", "c"] → ["c", "b", "a"])
-5. Returns reversed tokens
+**Brief:** Converts a JSON value to a human-readable string for logging and error messages using Boost visitor pattern.
 
-**Why Reverse?**: The recursive traversal algorithms work from the deepest level up, so they need reversed paths.
+**Called by:** All recursive operations for TRACE logging
 
-**Example**:
-- Input: `"document.data.field"`
-- Split: `["document", "data", "field"]`
-- Reversed: `["field", "data", "document"]`
-- Traversal: Start at "field", work up through "data" to "document"
+**Purpose:** Provides debug output of JSON values.
 
-## Core Implementation Methods
+**Note:** Defined in `JSONDocument_utils.cpp` as `boost::apply_visitor(jsn::print_visitor(), value)`.
 
-### findChildValue (const version)
+## Functions
 
+### `JSONDocument::findChildValue(path_t const& path) const -> value_t const&`
+
+**Brief:** Private method that finds and returns a const reference to the value at the specified path using recursive traversal.
+
+**Parameters:**
+- `path` - Dot-notation path to the element
+
+**Preconditions:**
+- Path must not be empty
+- All path components must exist
+- All intermediate values must be object types
+
+**Returns:** Const reference to the value at the specified path
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `invalid_argument` | When path is empty |
+| `notfound_exception` | When path component doesn't exist |
+| `notfound_exception` | When intermediate value is not an object |
+
+**Thread Safety:** safe (const method)
+
+**TRACE Levels:** 20-23
+
+### `JSONDocument::findChild(path_t const& path) const -> JSONDocument`
+
+**Brief:** Finds a child element and returns it wrapped in a JSONDocument with the full path as the key.
+
+**Parameters:**
+- `path` - Dot-notation path to the element
+
+**Returns:** Document in format `{"path.to.element": <found_value>}`
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `invalid_argument` | When path is empty |
+| `notfound_exception` | When path doesn't exist |
+
+**Thread Safety:** safe (const method)
+
+**TRACE Levels:** 24-27
+
+**Example:**
 ```cpp
-value_t const& JSONDocument::findChildValue(path_t const& path) const
-```
-
-**Purpose**: Finds and returns a reference to the value at the specified path.
-
-**Algorithm**:
-1. Split and validate the path
-2. Recursively traverse the document tree
-3. At each level:
-   - Verify current value is an object
-   - Check if the path token exists as a key
-   - If at final depth (depth 0), return the matched value
-   - Otherwise, recurse deeper
-4. Return reference to found value
-
-**Recursive Lambda**:
-```cpp
-std::function<value_t const&(value_t const&, std::size_t)> recurse =
-    [&](value_t const& childValue, std::size_t currentDepth) -> value_t const& {
-  // Traversal logic
-};
-```
-
-**Key Features**:
-- **Bottom-up traversal** - Starts at highest depth, works down to 0
-- **Type checking** - Ensures each node is an object
-- **Detailed error messages** - Includes path, key, and value information
-- **Reference return** - No copying of potentially large JSON structures
-
-**Throws**: `notfound_exception` if:
-- Path component doesn't exist
-- Intermediate value is not an object
-- Any step of traversal fails
-
-**TRACE Points**:
-- Level 20: Entry with path
-- Level 21: Each recursion step
-- Level 22: Successful find
-- Level 23: Error during search
-
-### findChild
-
-```cpp
-JSONDocument JSONDocument::findChild(path_t const& path) const
-```
-
-**Purpose**: Finds a child element and returns it wrapped in a `JSONDocument` with the path as the key.
-
-**Algorithm**:
-1. Validate path
-2. Call `findChildValue()` to get the value
-3. Create new empty document
-4. Insert found value with path as key
-5. Return the document
-
-**Return Format**:
-```json
-{
-  "path.to.element": <found_value>
-}
-```
-
-**Example**:
-```cpp
+auto doc = JSONDocument(R"({"server": {"port": 8080}})");
 auto child = doc.findChild("server.port");
 // Returns: {"server.port": 8080}
 ```
 
-**TRACE Points**:
-- Level 24: Entry
-- Level 25: Found value
-- Level 26: Success
-- Level 27: Error
+### `JSONDocument::findChildDocument(path_t const& path) const -> JSONDocument`
 
-### findChildDocument
+**Brief:** Finds a child element and returns its value directly as a document (value must be an object).
 
+**Parameters:**
+- `path` - Dot-notation path to the element
+
+**Preconditions:**
+- Value at path must be an object type
+
+**Returns:** JSONDocument containing the found object value directly
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `invalid_argument` | When path is empty |
+| `notfound_exception` | When path doesn't exist |
+| `notfound_exception` | When found value is not an object type |
+
+**Thread Safety:** safe (const method)
+
+**TRACE Levels:** 28-30
+
+### `JSONDocument::replaceChild(JSONDocument const& newChild, path_t const& path) -> JSONDocument`
+
+**Brief:** Replaces an existing child element with a new value and returns the old value using swap semantics.
+
+**Parameters:**
+- `newChild` - Document containing the new value
+- `path` - Dot-notation path to the element to replace
+
+**Returns:** Document containing the old (replaced) value wrapped with path as key
+
+**Postconditions:**
+- Document is modified with new value at path
+- `_isDirty` is set to true
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `invalid_argument` | When path is empty |
+| `notfound_exception` | When path doesn't exist |
+
+**Thread Safety:** unsafe
+
+**TRACE Levels:** 31-35
+
+### `JSONDocument::insertChild(JSONDocument const& newChild, path_t const& path) -> JSONDocument`
+
+**Brief:** Inserts a new child element at the specified path. Fails if element already exists at that path.
+
+**Parameters:**
+- `newChild` - Document containing the value to insert
+- `path` - Dot-notation path where to insert
+
+**Returns:** Document containing the inserted value
+
+**Postconditions:**
+- New element exists at the specified path
+- `_isDirty` is set to true
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `invalid_argument` | When path is empty |
+| `notfound_exception` | When parent path doesn't exist |
+| `notfound_exception` | When target path already exists (message: "Child exists, call replace instead") |
+
+**Thread Safety:** unsafe
+
+**TRACE Levels:** 36-40
+
+### `JSONDocument::deleteChild(path_t const& path) -> JSONDocument`
+
+**Brief:** Deletes a child element at the specified path and returns the deleted value using object's `delete_at` method.
+
+**Parameters:**
+- `path` - Dot-notation path to the element to delete
+
+**Returns:** Document containing the deleted value
+
+**Postconditions:**
+- Element no longer exists at the specified path
+- `_isDirty` is set to true
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `invalid_argument` | When path is empty |
+| `notfound_exception` | When path doesn't exist |
+
+**Thread Safety:** unsafe
+
+**TRACE Levels:** 41-45
+
+### `JSONDocument::appendChild(JSONDocument const& newChild, path_t const& path) -> JSONDocument`
+
+**Brief:** Appends an element to an array at the specified path by getting the array via `findChildValue` and calling `push_back`.
+
+**Parameters:**
+- `newChild` - Document containing the value to append (payload extracted via `getPayloadValueForKey("null")`)
+- `path` - Dot-notation path to the array
+
+**Preconditions:**
+- Path must point to an existing array
+
+**Returns:** Document containing the appended value
+
+**Postconditions:**
+- New element is added to end of array
+- `_isDirty` is set to true
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `invalid_argument` | When path is empty |
+| `notfound_exception` | When path doesn't exist |
+| `std::exception` | When value at path is not an array |
+
+**Thread Safety:** unsafe
+
+**TRACE Levels:** 46-49
+
+### `JSONDocument::removeChild(JSONDocument const& delChild, path_t const& path) -> JSONDocument`
+
+**Brief:** Removes all matching elements from an array at the specified path using partial object matching via the `matches()` function.
+
+**Parameters:**
+- `delChild` - Document containing the pattern to match for deletion
+- `path` - Dot-notation path to the array
+
+**Returns:** Document containing array of removed values under key "0"
+
+**Postconditions:**
+- All matching elements are removed from the array
+- `_isDirty` is set to true
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `invalid_argument` | When path is empty |
+| `notfound_exception` | When path doesn't exist |
+| `std::exception` | When value at path is not an array |
+
+**Thread Safety:** unsafe
+
+**TRACE Levels:** 50-54
+
+**Example:**
 ```cpp
-JSONDocument JSONDocument::findChildDocument(path_t const& path) const
-```
-
-**Purpose**: Finds a child element and returns its value directly as a document (value must be an object).
-
-**Algorithm**:
-1. Validate path
-2. Call `findChildValue()` to get the value
-3. Verify the value is of type `OBJECT`
-4. Create new document from the value
-5. Return the document
-
-**Difference from findChild**:
-- `findChild`: Returns `{"path": value}`
-- `findChildDocument`: Returns `value` directly
-
-**Use Cases**:
-- When you know the value is an object
-- When you want to work with the object directly
-- For extracting nested document structures
-
-**Throws**: `notfound_exception` if:
-- Path doesn't exist (from `findChildValue`)
-- Found value is not an object type
-
-**TRACE Points**:
-- Level 28: Entry
-- Level 29: Success
-- Level 30: Error
-
-### replaceChild
-
-```cpp
-JSONDocument JSONDocument::replaceChild(JSONDocument const& newChild, path_t const& path)
-```
-
-**Purpose**: Replaces an existing child element with a new value and returns the old value.
-
-**Algorithm**:
-1. Split and validate path
-2. Extract new value from `newChild` using path token
-3. Recursively traverse to target
-4. At target (depth 0):
-   - Swap old value with new value
-   - Return old value
-5. Mark document as dirty
-6. Return old value wrapped in document
-
-**Key Operation**:
-```cpp
-matchedValue.swap(newValue);  // Efficient swap instead of copy
-return newValue;               // newValue now holds the old value after swap
-```
-
-**Modifies**: The document's internal structure (sets `_isDirty = true`)
-
-**Returns**: Document containing the old (replaced) value
-
-**Throws**: `notfound_exception` if:
-- Path doesn't exist
-- Intermediate value is not an object
-
-**TRACE Points**:
-- Level 31: Entry
-- Level 32: New value
-- Level 33: Each recursion
-- Level 34: Success
-- Level 35: Error
-
-### insertChild
-
-```cpp
-JSONDocument JSONDocument::insertChild(JSONDocument const& newChild, path_t const& path)
-```
-
-**Purpose**: Inserts a new child element at the specified path. Throws if element already exists.
-
-**Algorithm**:
-1. Split and validate path
-2. Extract new value from `newChild`
-3. Recursively traverse to target
-4. At each level, check:
-   - If at target depth (0) and element exists → error (use replace instead)
-   - If not at target and element missing → error (parent doesn't exist)
-   - If at target and element missing → insert and return
-5. Mark document as dirty
-
-**Insert vs. Replace**:
-- **Insert**: Fails if element exists (prevents accidental overwrites)
-- **Replace**: Requires element to exist (prevents accidental creates)
-
-**Returns**: Document containing the inserted value
-
-**Throws**: `notfound_exception` if:
-- Element already exists at target path
-- Parent path doesn't exist
-- Intermediate value is not an object
-
-**TRACE Points**:
-- Level 36: Entry
-- Level 37: New value
-- Level 38: Each recursion
-- Level 39: Success
-- Level 40: Error
-
-### deleteChild
-
-```cpp
-JSONDocument JSONDocument::deleteChild(path_t const& path)
-```
-
-**Purpose**: Deletes a child element at the specified path and returns the deleted value.
-
-**Algorithm**:
-1. Split and validate path
-2. Recursively traverse to target
-3. At target (depth 0):
-   - Call `childDocument.delete_at(path_token)`
-   - Return deleted value
-4. Mark document as dirty
-
-**Key Operation**:
-```cpp
-return childDocument.delete_at(path_token);  // Erase and return value
-```
-
-**Modifies**: The document's internal structure (sets `_isDirty = true`)
-
-**Returns**: Document containing the deleted value
-
-**Throws**: `notfound_exception` if:
-- Path doesn't exist
-- Intermediate value is not an object
-
-**TRACE Points**:
-- Level 41: Entry with JSON buffer
-- Level 42: Entry with path
-- Level 43: Each recursion
-- Level 44: Success
-- Level 45: Error
-
-### appendChild
-
-```cpp
-JSONDocument JSONDocument::appendChild(JSONDocument const& newChild, path_t const& path)
-```
-
-**Purpose**: Appends an element to an array at the specified path.
-
-**Algorithm**:
-1. Extract new value from `newChild` (using "null" as key)
-2. Find the array at the specified path
-3. Unwrap the value as an `array_t`
-4. Push the new value to the end of the array
-5. Mark document as dirty
-6. Return the appended value
-
-**Array Operation**:
-```cpp
-auto& valueArray = unwrap(findChildValue(path)).value_as<array_t>();
-valueArray.push_back(newValue);
-```
-
-**Requirements**:
-- Path must point to an array
-- Array must already exist
-
-**Returns**: Document containing the appended value
-
-**Throws**: Exception if path is not an array or doesn't exist
-
-**TRACE Points**:
-- Level 46: Entry
-- Level 47: New value
-- Level 48: Success
-- Level 49: Error
-
-### removeChild
-
-```cpp
-JSONDocument JSONDocument::removeChild(JSONDocument const& delChild, path_t const& path)
-```
-
-**Purpose**: Removes all matching elements from an array at the specified path.
-
-**Algorithm**:
-1. Extract delete pattern from `delChild`
-2. Find the array at the specified path
-3. Create result document with array for deleted values
-4. Iterate through array:
-   - If element matches pattern → add to deleted list, remove from array
-   - If element doesn't match → keep in array
-5. Mark document as dirty
-6. Return document with deleted values
-
-**Matching**:
-Uses the `matches()` function which supports partial matching for objects.
-
-**Multiple Removals**:
-Removes **all** matching elements, not just the first one.
-
-**Returns**: Document containing array of removed values under key "0"
-
-**Example**:
-```cpp
-// Remove all items with name="old"
+JSONDocument doc(R"({"items": [{"name":"old"}, {"name":"new"}, {"name":"old"}]})");
 JSONDocument pattern(R"({"name":"old"})");
 auto removed = doc.removeChild(pattern, "items");
-// Returns: {"0": [<array of removed items>]}
+// Returns: {"0": [{"name":"old"}, {"name":"old"}]}
+// doc now: {"items": [{"name":"new"}]}
 ```
 
-**TRACE Points**:
-- Level 50: Entry
-- Level 51: Delete pattern
-- Level 53: Success
-- Level 54: Error
+### `JSONDocument::extract() -> value_t`
 
-### extract
+**Brief:** Extracts the internal value_t from the document using swap, leaving the document with an empty object.
 
+**Parameters:** None
+
+**Returns:** The internal `value_t` that was held by the document
+
+**Postconditions:**
+- Document is left with an empty object `{}`
+- `_isDirty` is set to true
+
+**Thread Safety:** unsafe
+
+### `compareDocumentVersions(JSONDocument const& a, JSONDocument const& b) -> bool`
+
+**Brief:** Compares two documents by their "version" fields for sorting purposes using lexicographic string comparison.
+
+**Parameters:**
+- `a` - First document to compare
+- `b` - Second document to compare
+
+**Returns:** `true` if a's version is less than b's version
+
+**Thread Safety:** safe
+
+**Example:**
 ```cpp
-value_t JSONDocument::extract()
-```
-
-**Purpose**: Extracts the internal `value_t` from the document, leaving the document empty.
-
-**Algorithm**:
-```cpp
-value_t tmp = jsn::object_t{};
-std::swap(tmp, _value);
-_isDirty = true;
-return tmp;
-```
-
-**Characteristics**:
-- **Destructive** - Empties the source document
-- **Efficient** - Uses swap, no copying
-- **Invalidates cache** - Sets dirty flag
-
-**Use Case**: Transfer ownership of the JSON AST without copying.
-
-## Version Comparison
-
-### compareDocumentVersions
-
-```cpp
-bool dbdr::compareDocumentVersions(JSONDocument const& a, JSONDocument const& b) {
-  return a.value_as<std::string>(version) < b.value_as<std::string>(version);
-}
-```
-
-**Purpose**: Compares two documents by their version fields (lexicographic comparison).
-
-**Use Case**: Sorting documents by version, finding newest/oldest version.
-
-**Example**:
-```cpp
-std::vector<JSONDocument> docs = /* ... */;
 std::sort(docs.begin(), docs.end(), compareDocumentVersions);
-// Now sorted by version
 ```
 
-## Debug Function
+### `debug::JSONDocument()`
 
-### debug::JSONDocument
+**Brief:** Enables maximum TRACE logging for debugging JSONDocument operations by setting all TRACE levels.
 
-```cpp
-void dbdr::debug::JSONDocument() {
-  TRACE_CNTL("name", TRACE_NAME);
-  TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", trace_mode::modeM);
-  TRACE_CNTL("modeS", trace_mode::modeS);
-  TLOG(55) << "artdaq::database::JSONDocument trace_enable";
-}
-```
+**Parameters:** None
 
-**Purpose**: Enables maximum TRACE logging for debugging JSONDocument operations.
+**Returns:** None
 
-**Usage**:
-```cpp
-artdaq::database::docrecord::debug::JSONDocument();
-// Now all TRACE calls will output
-```
+**Side Effects:**
+- Configures TRACE logging for JSONDocument debugging
 
-## Implementation Patterns
-
-### Recursive Tree Traversal
-
-Most methods use a common pattern:
-1. **Split path** into tokens (reversed for bottom-up)
-2. **Define recursive lambda** that:
-   - Takes current value and depth
-   - Validates value is an object
-   - Checks if key exists
-   - If at target depth (0), performs operation
-   - Otherwise, recurses to next level
-3. **Invoke lambda** with root value and starting depth
-4. **Mark dirty** if modified
-
-### Error Handling
-
-Consistent error handling:
-```cpp
-try {
-  // Operation
-  TLOG(N) << "Success message";
-  return result;
-} catch (std::exception& ex) {
-  TLOG(N+1) << "Error message: " << ex.what();
-  throw;  // Re-throw
-}
-```
-
-### TRACE Logging Levels
-
-- **20-29**: findChildValue and findChild operations
-- **30-39**: replaceChild and insertChild operations
-- **40-49**: deleteChild, appendChild operations
-- **50-55**: removeChild, debug operations
+**TRACE Level:** 55 (activation message)
 
 ## Performance Considerations
 
-1. **Reference Returns**: `findChildValue` returns references to avoid copying
-2. **Swap Operations**: `replaceChild` uses swap instead of copy
-3. **Move Semantics**: Return values leverage RVO and move semantics
-4. **Lazy Cache**: `_isDirty` flag prevents unnecessary serialization
-5. **Bottom-up Traversal**: Efficient path navigation
+- **Recursion depth:** Limited by path depth; deeply nested documents require more stack frames
+- **Reference returns:** `findChildValue` returns references to avoid copying large values
+- **Swap operations:** `replaceChild` uses swap instead of copy for efficiency
+- **Move semantics:** Return values leverage RVO and move semantics
+- **Lazy caching:** The `_isDirty` flag prevents unnecessary re-serialization in `to_string()`
 
-## Thread Safety
+## Error Handling Strategy
 
-Not thread-safe:
-- Modifies `_value` and `_isDirty` without synchronization
-- Multiple readers safe only if no writers
-- Requires external synchronization for concurrent access
-
-## Error Messages
-
-All error messages follow a consistent format:
-```
-"JSONDocument: Failed calling <method>(): <reason>; <details>"
+All public methods use function-try blocks:
+```cpp
+JSONDocument JSONDocument::method(args) try {
+  // implementation
+} catch (std::exception& ex) {
+  TLOG(level) << "method() failed; Error:" << ex.what();
+  throw;
+}
 ```
 
-Example:
-```
-"JSONDocument: Failed calling findChildValue(): Search failed for JSON element name=field, search path =<document.data.field>."
-```
+This pattern:
+1. Logs all exceptions with TRACE including error message
+2. Re-throws to preserve the original exception type and message
+3. Provides consistent debugging output across all methods
 
-## Related Files
+## Testing Notes
 
-- **JSONDocument.h** - Class definition
-- **JSONDocument_utils.cpp** - Additional utility implementations
-- **json_types_impl.h** - JSON type operations
+- **Unit tests:** `test/JsonDocument/JSONDocument_t.cc`
+- **Key test cases:**
+  - Path navigation with various depths
+  - Insert/replace/delete operations
+  - Array append/remove operations
+  - Error conditions (empty paths, missing elements)
+  - Edge cases (empty documents, single-element documents)
 
-## Best Practices
+## Maintenance Notes
 
-1. **Check paths** before operations to provide better error messages
-2. **Use findChild** when you need the path preserved in the result
-3. **Use findChildDocument** when you want to work with the object directly
-4. **Use insertChild** for new elements to prevent accidental overwrites
-5. **Use replaceChild** for existing elements to ensure they exist
-6. **Handle notfound_exception** for optional fields
-7. **Enable debug traces** when investigating path traversal issues
+### TRACE Logging Levels
+The implementation uses incrementing TRACE levels organized by operation type:
+- **20-29:** findChildValue and findChild operations
+- **30-39:** replaceChild and insertChild operations
+- **40-49:** deleteChild and appendChild operations
+- **50-55:** removeChild and utility operations
 
-## Notes
+### Implementation Patterns
+All tree manipulation methods follow a consistent pattern:
+1. Log entry with TRACE including path argument
+2. Split and validate path using `split_path_validate()`
+3. Define recursive lambda for traversal with depth tracking
+4. Invoke lambda with root value `_value` and starting depth `tokens.size() - 1`
+5. Mark `_isDirty = true` if document was modified
+6. Return result wrapped in JSONDocument
+7. Catch exceptions in function-try block, log error, re-throw
 
-- All tree navigation happens recursively using lambdas
-- Paths are validated before any traversal begins
-- Type checking occurs at every level of traversal
-- The `_isDirty` flag is set after any modification
-- Extensive TRACE logging available at multiple levels for debugging
-- The implementation uses the visitor pattern extensively for JSON value operations
+### Key Implementation Details
+
+- **Path token reversal:** Paths are reversed so traversal goes from root to leaf while counting depth down to 0
+- **Const correctness:** `findChildValue` has both const and non-const overloads; non-const uses const_cast internally
+- **Value extraction:** `getPayloadValueForKey()` handles payload wrapping for child documents
+- **Matching semantics:** `matches()` function performs partial object matching for `removeChild()`
+
+## See Also
+
+- [JSONDocument.h.md](./JSONDocument.h.md) - Header file with class declaration
+- [JSONDocument_utils.cpp.md](./JSONDocument_utils.cpp.md) - Utility function implementations including constructors, file I/O, and `matches()`
+- [common.h.md](./common.h.md) - Common includes and types

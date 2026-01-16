@@ -1,10 +1,12 @@
 # BasicTypes Module Documentation
 
+**Last Updated:** 2026-01-14
+
 ## Overview
 
 The **BasicTypes** module is a core component of the artdaq-database system that provides fundamental data structures for representing and converting between different configuration formats. It enables seamless conversion between FHICL, JSON, and XML formats, with JSON serving as the pivot format for database storage.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/BasicTypes/`
+**Location**: `artdaq-database/BasicTypes/`
 
 ## Module Purpose
 

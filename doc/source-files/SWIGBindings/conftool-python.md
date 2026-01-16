@@ -8,27 +8,33 @@ The Python conftool bindings provide a Python interface to the artdaq-database c
 
 ### conftool.h
 
-**Location**: `/home/user/artdaq-database/artdaq-database/SWIGBindings/python/conftool/conftool.h`
+**Location**: `artdaq-database/SWIGBindings/python/conftool/conftool.h`
 
 **Type**: C++ header
 
 **Purpose**: Declares C++ functions to be wrapped for Python
 
+**Documentation**: [conftool.h.md](./conftool.h.md)
+
 ### conftool.cpp
 
-**Location**: `/home/user/artdaq-database/artdaq-database/SWIGBindings/python/conftool/conftool.cpp`
+**Location**: `artdaq-database/SWIGBindings/python/conftool/conftool.cpp`
 
 **Type**: C++ implementation
 
 **Purpose**: Implements wrapper functions that call library functions
 
+**Documentation**: [conftool.cpp.md](./conftool.cpp.md)
+
 ### conftool.i
 
-**Location**: `/home/user/artdaq-database/artdaq-database/SWIGBindings/python/conftool/conftool.i`
+**Location**: `artdaq-database/SWIGBindings/python/conftool/conftool.i`
 
 **Type**: SWIG interface file
 
 **Purpose**: Defines how to generate Python bindings
+
+**Documentation**: [conftool.i.md](./conftool.i.md)
 
 ---
 

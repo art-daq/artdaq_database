@@ -1,791 +1,348 @@
-# SWIGBindings Module Documentation
+# SWIGBindings Module
 
 ## Overview
 
 The SWIGBindings module provides language bindings for the artdaq-database C++ library, enabling access from scripting languages like Python. Using SWIG (Simplified Wrapper and Interface Generator), the module exposes the configuration database API to non-C++ environments.
 
-## Module Location
+This module is essential for:
+- **Automation scripts**: Programmatic configuration management
+- **Web interfaces**: Backend services for configuration GUIs
+- **Testing and validation**: Python-based test frameworks
+- **Integration**: Connecting artdaq-database with Python tooling
 
-**Path**: `/home/user/artdaq-database/artdaq-database/SWIGBindings/`
+## Architecture
 
-## Purpose
-
-Enable artdaq-database functionality in:
-- **Python**: For scripting, automation, and web interfaces
-- **Other languages**: Framework supports Java, Perl, Ruby, etc.
-
-Benefits:
-- Rapid prototyping and development
-- Integration with existing Python tooling
-- Web interface development
-- Testing and validation scripts
-- Configuration management automation
-
-## Module Structure
+### Three-Layer Design
 
 ```
-SWIGBindings/
-├── CMakeLists.txt           # Build configuration
-├── python/                  # Python-specific bindings
-│   ├── CMakeLists.txt
-│   ├── PythonAddon.cmake
-│   └── conftool/           # Configuration tool bindings
-│       ├── CMakeLists.txt
-│       ├── conftool.h      # C++ interface declarations
-│       ├── conftool.cpp    # C++ implementation
-│       └── conftool.i      # SWIG interface file
++----------------------------------+
+|   Python Application             |
+|   (imports conftoolp)            |
++------------------+---------------+
+                   |
++------------------v---------------+
+|   SWIG-Generated Python Module   |
+|   (conftoolp.so)                 |
++------------------+---------------+
+                   |
++------------------v---------------+
+|   C++ Wrapper Functions          |
+|   (conftool.cpp)                 |
++------------------+---------------+
+                   |
++------------------v---------------+
+|   artdaq-database C++ Library    |
+|   (configuration::json::*)       |
++----------------------------------+
 ```
 
-## Current Bindings
+### Data Flow
 
-### Python conftool
+All API calls follow a JSON-based pattern:
 
-**Module Name**: `conftoolp`
+1. Python application creates JSON query string
+2. SWIG converts Python `str` to C++ `std::string`
+3. Wrapper function sets locale and delegates to library
+4. Library returns `std::pair<bool, std::string>`
+5. SWIG converts to Python `tuple(bool, str)`
+6. Application parses JSON result
 
-**Purpose**: Python interface to configuration database operations
+## Key Classes
 
-**Documentation**: [conftool-python.md](./conftool-python.md)
+| Class/Type | Purpose |
+|------------|---------|
+| `result_t` | Type alias for `std::pair<bool, std::string>` - standard return type for all API functions |
 
-**Status**: Production-ready
+## Key Concepts
 
-**Key Features**:
-- Document read/write operations
-- Configuration management
-- Version and entity management
-- Import/export functionality
-- Database metadata operations
-- Optional FHiCL conversion support
+### SWIG (Simplified Wrapper and Interface Generator)
 
----
-
-## SWIG Overview
-
-### What is SWIG?
-
-SWIG (Simplified Wrapper and Interface Generator) automatically generates language bindings for C/C++ code. It:
+SWIG automatically generates language bindings from C++ code:
 - Parses C++ headers
 - Generates wrapper code
 - Handles type conversions
 - Manages memory across language boundaries
-- Supports multiple target languages
 
-### How SWIG Works
+### JSON-Based API
 
-```
-┌─────────────────┐
-│  C++ Header     │  conftool.h
-│  (Interface)    │
-└────────┬────────┘
-         │
-┌────────▼────────┐
-│  SWIG Interface │  conftool.i
-│  (Directives)   │
-└────────┬────────┘
-         │
-    ┌────▼─────┐
-    │   SWIG   │
-    │ Generator │
-    └────┬─────┘
-         │
-┌────────▼────────┐
-│  Wrapper Code   │  *_wrap.cxx
-│  (Generated)    │
-└────────┬────────┘
-         │
-┌────────▼────────┐
-│  Compile &      │
-│  Link           │
-└────────┬────────┘
-         │
-┌────────▼────────┐
-│  Python Module  │  conftoolp.so
-│  (Binary)       │
-└─────────────────┘
+The conftool API uses JSON strings for all communication:
+- **Input**: JSON query payloads specifying operation parameters
+- **Output**: JSON result data or error messages
+- **Advantages**: Simple type mapping, language-agnostic, human-readable
+
+### Result Tuple Pattern
+
+Every API function returns `(bool, str)`:
+- `True, data` - Operation succeeded, data contains JSON result
+- `False, error` - Operation failed, error contains error message
+
+```python
+success, result = conftoolp.read_document(query)
+if success:
+    data = json.loads(result)
+else:
+    print(f"Error: {result}")
 ```
 
-### SWIG Benefits
+## Dependencies
 
-**Automatic Generation**:
-- No manual wrapper code
-- Consistent interface
-- Easy to maintain
+### Internal Dependencies
+- **ConfigurationDB**: Core configuration database operations
+- **DataFormats/Fhicl**: FHiCL conversion (optional)
 
-**Type Safety**:
-- Type checking at compile time
-- Automatic type conversions
-- Error handling
+### External Dependencies
+- **SWIG 3.0+**: Wrapper code generation
+- **Python 3.x**: Target language runtime
+- **Python development headers**: For building the module
 
-**Multi-Language**:
-- Same interface file → multiple languages
-- Consistent API across languages
-- Reusable interface definitions
+## Thread Safety
 
----
+- **Module-level:** The conftoolp module is thread-safe for independent operations
+- **Function-level:** Each function call is atomic from Python's perspective
+- **GIL:** Python's Global Interpreter Lock provides serialization
+- **Notes:** Thread safety of underlying database operations depends on ConfigurationDB implementation
 
-## Python Bindings Details
+## Files
 
-### Installation
+| File | Description |
+|------|-------------|
+| `python/conftool/conftool.h` | C++ header declaring all API functions and the `result_t` type |
+| `python/conftool/conftool.cpp` | Implementation that delegates to ConfigurationDB library |
+| `python/conftool/conftool.i` | SWIG interface file driving Python wrapper generation |
 
-After building artdaq-database:
+### Documentation Files
 
-```bash
-# Module typically installed to:
-/usr/local/lib/pythonX.Y/site-packages/conftoolp.so
+| File | Description |
+|------|-------------|
+| [conftool.h.md](./conftool.h.md) | API documentation for the C++ header |
+| [conftool.cpp.md](./conftool.cpp.md) | Implementation details and patterns |
+| [conftool.i.md](./conftool.i.md) | SWIG interface file documentation |
+| [conftool-python.md](./conftool-python.md) | Comprehensive Python API reference |
 
-# Or in build directory:
-artdaq-database/build/lib/conftoolp.so
-```
+## Usage Examples
 
-### Python Usage
+### Basic Usage
 
 ```python
 import conftoolp
 import json
 
-# Check module is loaded
-print(dir(conftoolp))
-
-# Use functions
-query = json.dumps({"collection": "RunHistory"})
-success, result = conftoolp.list_collections(query)
-
+# List collections
+success, result = conftoolp.list_collections('{}')
 if success:
-    print("Collections:", result)
-else:
-    print("Error:", result)
+    collections = json.loads(result)
+    print("Collections:", collections)
 ```
 
-### API Categories
-
-| Category | Functions | Purpose |
-|----------|-----------|---------|
-| **Document Operations** | read_document, write_document, mark_document_* | Basic document CRUD |
-| **Version Management** | find_versions, add/remove_version_alias | Version control |
-| **Entity Management** | find_entities, add/remove_entity | Entity lifecycle |
-| **Configuration Ops** | create/read/write/assign_configuration | Configuration management |
-| **Import/Export** | export/import_* | Data transfer |
-| **Search** | search_collection | Query operations |
-| **Metadata** | list_databases/collections, read_dbinfo | Discovery |
-| **Utilities** | enable_trace, fhicl conversion | Support functions |
-
-### Return Value Pattern
-
-All functions return `(bool, str)` tuple:
+### Document Operations
 
 ```python
-success, result = conftoolp.some_function(args)
+import conftoolp
+import json
+
+# Read a document
+query = json.dumps({
+    "collection": "RunHistory",
+    "entity": "MyEntity",
+    "version": "v1"
+})
+success, result = conftoolp.read_document(query)
 
 if success:
-    # result contains JSON data
-    data = json.loads(result)
-    process(data)
+    document = json.loads(result)
+    print("Document:", document)
 else:
-    # result contains error message
-    print(f"Error: {result}")
+    print("Error:", result)
+
+# Write a document
+document = json.dumps({"threshold": 100, "enabled": True})
+success, msg = conftoolp.write_document(query, document)
 ```
 
----
+### Configuration Management
 
-## Building Bindings
+```python
+import conftoolp
+import json
+
+# List configurations
+success, configs = conftoolp.find_configurations('{}')
+if success:
+    for config in json.loads(configs):
+        print(f"Configuration: {config}")
+
+# Export configuration for backup
+query = json.dumps({"configuration": "Production_v1"})
+success, export_data = conftoolp.export_configuration(query)
+
+if success:
+    with open("backup.json", "w") as f:
+        f.write(export_data)
+```
+
+### Error Handling Pattern
+
+```python
+import conftoolp
+import json
+
+def safe_database_call(func, *args):
+    """Wrapper for conftoolp calls with proper error handling."""
+    try:
+        success, result = func(*args)
+        if success:
+            return json.loads(result) if result else None
+        else:
+            raise RuntimeError(f"Database operation failed: {result}")
+    except json.JSONDecodeError as e:
+        raise RuntimeError(f"Invalid JSON response: {e}")
+
+# Usage
+try:
+    collections = safe_database_call(conftoolp.list_collections, '{}')
+    print("Collections:", collections)
+except RuntimeError as e:
+    print(f"Error: {e}")
+```
+
+## Building
 
 ### Prerequisites
 
-**Required**:
-- SWIG 3.0 or later
-- Python development headers (`python-dev` or `python3-dev`)
-- C++ compiler with C++14 support
-- artdaq-database core libraries
+```bash
+# Required packages
+apt-get install swig python3-dev
 
-**Optional**:
-- fhiclcpp (for FHiCL conversion functions)
+# Or with yum
+yum install swig python3-devel
+```
 
 ### CMake Configuration
 
 ```cmake
-# Find SWIG
-find_package(SWIG 3.0 REQUIRED)
-include(UseSWIG)
+# Enable Python bindings
+cmake -DPYTHON_BINDINGS=ON ..
 
-# Find Python
-find_package(PythonLibs REQUIRED)
-find_package(PythonInterp REQUIRED)
-
-# Set SWIG flags
-set(CMAKE_SWIG_FLAGS "-c++" "-py3")
-
-# Add SWIG module
-swig_add_library(conftoolp
-  TYPE MODULE
-  LANGUAGE python
-  SOURCES conftool.i conftool.cpp
-)
-
-# Link libraries
-swig_link_libraries(conftoolp
-  artdaq-database_ConfigurationDB
-  ${PYTHON_LIBRARIES}
-)
+# With FHiCL support
+cmake -DPYTHON_BINDINGS=ON -DUSE_FHICLCPP=ON ..
 ```
 
-### Build Process
+### Build and Install
 
 ```bash
-# Configure
-cd artdaq-database
-mkdir build && cd build
-cmake .. -DPYTHON_BINDINGS=ON
-
-# Build
+cd build
 make
-
-# Python module created at:
-# build/lib/conftoolp.so
-
-# Install (optional)
 make install
-# Installs to Python site-packages
+
+# Module installed to Python site-packages
 ```
 
 ### Testing Installation
 
-```bash
-# Set Python path if not installed
-export PYTHONPATH=/path/to/build/lib:$PYTHONPATH
-
-# Test import
-python3 -c "import conftoolp; print('Success')"
-
-# Test function
-python3 -c "import conftoolp; print(dir(conftoolp))"
-```
-
----
-
-## Interface Files
-
-### conftool.h - C++ Interface
-
-**Purpose**: Declares functions to be wrapped
-
-**Structure**:
-```cpp
-// Type definitions
-typedef std::pair<bool, std::string> result_t;
-
-// Function declarations
-result_t read_document(std::string const& query_payload);
-result_t write_document(std::string const& query_payload,
-                        std::string const& json_document);
-// ... more functions
-
-// Utilities
-void enable_trace();
-void set_default_locale();
-```
-
-**Design Notes**:
-- Simple C-compatible signatures
-- No templates (SWIG limitation)
-- String-based parameters (JSON)
-- Consistent return type
-- No exceptions thrown
-
-### conftool.cpp - C++ Implementation
-
-**Purpose**: Implements wrapper functions
-
-**Pattern**:
-```cpp
-result_t function_name(std::string const& query_payload) {
-  set_default_locale();          // Ensure consistent formatting
-  auto output = std::string{};   // Prepare output
-  return impl::library_function(query_payload, output);
-}
-```
-
-**Responsibilities**:
-- Locale management
-- Variable preparation
-- Library function calls
-- Result forwarding
-
-### conftool.i - SWIG Interface
-
-**Purpose**: Directs SWIG code generation
-
-**Structure**:
-```swig
-%module conftoolp               // Python module name
-
-%{
-#include "conftool.h"           // Include in wrapper
-%}
-
-%include "std_pair.i"           // Enable std::pair
-%include "std_string.i"         // Enable std::string
-
-%template(result_pair_t) std::pair<bool, std::string>;
-
-%include "conftool.h"           // Process for wrapping
-```
-
-**Directives**:
-- `%module`: Sets target module name
-- `%{ ... %}`: Literal C++ code for wrapper
-- `%include`: Includes SWIG library or header
-- `%template`: Instantiates C++ templates
-
----
-
-## Use Cases
-
-### Automation Scripts
-
-```python
-#!/usr/bin/env python3
-"""Automated configuration backup"""
-import conftoolp
-import json
-from datetime import datetime
-
-# List all configurations
-success, configs_json = conftoolp.find_configurations('{}')
-configs = json.loads(configs_json)
-
-# Export each configuration
-for config in configs['configurations']:
-    query = json.dumps({"configuration": config['name']})
-    success, export_data = conftoolp.export_configuration(query)
-
-    if success:
-        filename = f"backup_{config['name']}_{datetime.now()}.json"
-        with open(filename, 'w') as f:
-            f.write(export_data)
-        print(f"Backed up {config['name']}")
-```
-
-### Web Interface Backend
-
-```python
-from flask import Flask, request, jsonify
-import conftoolp
-import json
-
-app = Flask(__name__)
-
-@app.route('/api/documents/<collection>/<entity>')
-def get_document(collection, entity):
-    query = json.dumps({
-        "collection": collection,
-        "entity": entity
-    })
-    success, result = conftoolp.read_document(query)
-
-    if success:
-        return jsonify(json.loads(result))
-    else:
-        return jsonify({"error": result}), 400
-
-@app.route('/api/configurations')
-def list_configurations():
-    success, result = conftoolp.find_configurations('{}')
-    if success:
-        return jsonify(json.loads(result))
-    else:
-        return jsonify({"error": result}), 500
-```
-
-### Testing and Validation
-
 ```python
 import conftoolp
-import json
-import pytest
+print(dir(conftoolp))  # List available functions
 
-def test_document_roundtrip():
-    """Test write and read document"""
-    query = json.dumps({
-        "collection": "TestCollection",
-        "entity": "TestEntity",
-        "version": "v1"
-    })
-
-    document = json.dumps({"test": "data"})
-
-    # Write
-    success, msg = conftoolp.write_document(query, document)
-    assert success, f"Write failed: {msg}"
-
-    # Read
-    success, result = conftoolp.read_document(query)
-    assert success, f"Read failed: {result}"
-
-    # Verify
-    read_doc = json.loads(result)
-    assert read_doc["test"] == "data"
+# Test connection
+success, result = conftoolp.list_databases('{}')
+print(f"Connected: {success}")
 ```
 
-### Configuration Migration
+## API Categories
 
-```python
-def migrate_configurations(source_db, target_db):
-    """Migrate configurations between databases"""
-    # List configurations
-    success, configs = conftoolp.find_configurations('{}')
+### Document Operations
+- `read_document` - Read a document from the database
+- `write_document` - Write a document to the database
+- `mark_document_readonly` - Mark document as read-only
+- `mark_document_deleted` - Soft delete a document
 
-    for config_name in json.loads(configs)['configurations']:
-        # Export from source
-        export_query = json.dumps({
-            "configuration": config_name,
-            "database": source_db
-        })
-        success, exported = conftoolp.export_configuration(export_query)
+### Version Management
+- `find_versions` - Find all versions of a document
+- `find_version_aliases` - List version aliases
+- `add_version_alias` - Add alias to a version
+- `remove_version_alias` - Remove a version alias
 
-        if not success:
-            print(f"Failed to export {config_name}")
-            continue
+### Entity Management
+- `find_entities` - Find entities in a collection
+- `add_entity` - Add a new entity
+- `remove_entity` - Remove an entity
 
-        # Import to target
-        import_query = json.dumps({
-            "configuration": config_name,
-            "database": target_db,
-            "data": json.loads(exported)
-        })
-        success, msg = conftoolp.import_configuration(import_query)
+### Configuration Operations
+- `find_configurations` - List configurations
+- `configuration_composition` - Get configuration contents
+- `create_configuration` - Create new configuration
+- `assign_configuration` - Assign configuration to run
+- `remove_configuration` - Remove a configuration
+- `read_configuration` - Read entire configuration
+- `write_configuration` - Write entire configuration
 
-        if success:
-            print(f"Migrated {config_name}")
-        else:
-            print(f"Failed to import {config_name}: {msg}")
-```
+### Import/Export
+- `export_configuration` - Export configuration to JSON
+- `import_configuration` - Import configuration from JSON
+- `export_database` - Export entire database
+- `import_database` - Import entire database
+- `export_collection` - Export a collection
+- `import_collection` - Import a collection
 
----
+### Search and Metadata
+- `search_collection` - Search within a collection
+- `list_databases` - List available databases
+- `read_dbinfo` - Get database information
+- `list_collections` - List collections
 
-## Advanced Topics
+### Utilities
+- `set_default_locale` - Set locale for number formatting
+- `enable_trace` - Enable debug tracing
 
-### Memory Management
-
-**SWIG handles memory automatically**:
-- C++ objects owned by C++
-- Python references don't affect C++ lifetime
-- Strings copied across boundary
-- No manual memory management needed
-
-**Caveats**:
-- Large strings copied (performance impact)
-- No shared memory between C++ and Python
-- Each call creates new string copies
-
-### Thread Safety
-
-**Python GIL**:
-- Global Interpreter Lock protects Python state
-- Multiple Python threads safe for SWIG calls
-- C++ library thread-safety still required
-
-**Recommendations**:
-- Check C++ library thread-safety documentation
-- Use Python threading locks if needed
-- Consider process-based parallelism
-
-### Error Handling
-
-**C++ exceptions caught by wrappers**:
-```cpp
-try {
-  // Library call
-} catch (...) {
-  return {false, error_message};
-}
-```
-
-**Python sees only result tuples**:
-- No Python exceptions from SWIG layer
-- All errors as `(False, error_string)`
-- Explicit error checking required
-
-### Performance Optimization
-
-**Minimize calls**:
-```python
-# Bad: Many small calls
-for entity in entities:
-    conftoolp.read_document(make_query(entity))
-
-# Better: Batch operation
-batch_query = make_batch_query(entities)
-conftoolp.search_collection(batch_query)
-```
-
-**Cache results**:
-```python
-class ConfigCache:
-    def __init__(self):
-        self.cache = {}
-
-    def get_config(self, name):
-        if name not in self.cache:
-            success, data = conftoolp.read_configuration(
-                json.dumps({"configuration": name})
-            )
-            if success:
-                self.cache[name] = json.loads(data)
-        return self.cache[name]
-```
-
----
+### FHiCL (Conditional)
+- `fhicl_to_json` - Convert FHiCL to JSON
+- `json_to_fhicl` - Convert JSON to FHiCL
 
 ## Troubleshooting
 
 ### Import Errors
 
-**Problem**: `ImportError: No module named 'conftoolp'`
+**Problem:** `ImportError: No module named 'conftoolp'`
 
-**Solutions**:
+**Solution:**
 ```bash
 # Set Python path
 export PYTHONPATH=/path/to/build/lib:$PYTHONPATH
 
-# Or install
-cd build
+# Or install system-wide
 make install
-
-# Or create symlink
-ln -s /path/to/build/lib/conftoolp.so \
-      ~/.local/lib/pythonX.Y/site-packages/
 ```
 
 ### Symbol Not Found
 
-**Problem**: `undefined symbol: _ZN...`
+**Problem:** `undefined symbol: _ZN...`
 
-**Causes**:
-- Missing library dependencies
-- Incorrect library path
-- Version mismatch
-
-**Solutions**:
+**Solution:**
 ```bash
 # Check dependencies
 ldd conftoolp.so
 
 # Set library path
 export LD_LIBRARY_PATH=/path/to/artdaq-database/lib:$LD_LIBRARY_PATH
-
-# Verify ABI compatibility
-nm conftoolp.so | grep symbol_name
 ```
 
-### Function Not Available
+### FHiCL Functions Not Available
 
-**Problem**: `AttributeError: module 'conftoolp' has no attribute 'function_name'`
+**Problem:** `AttributeError: module 'conftoolp' has no attribute 'fhicl_to_json'`
 
-**Causes**:
-- Function conditionally compiled (e.g., FHiCL functions)
-- SWIG didn't process function
-- Wrong module version
-
-**Debug**:
-```python
-import conftoolp
-print(dir(conftoolp))  # List available functions
-```
-
-### Type Errors
-
-**Problem**: `TypeError: expected string, got bytes`
-
-**Solution**: Python 3 uses Unicode strings
-```python
-# Ensure strings, not bytes
-query = json.dumps(data)  # Returns str in Python 3
-success, result = conftoolp.read_document(query)
-```
-
----
-
-## Future Enhancements
-
-### Potential Improvements
-
-1. **Higher-Level Python API**:
-   - Object-oriented wrapper classes
-   - Pythonic naming conventions
-   - Type hints and documentation
-
-2. **Additional Language Bindings**:
-   - Java (for Android/enterprise)
-   - Ruby (for DevOps tools)
-   - JavaScript/Node.js (for web)
-
-3. **Async Support**:
-   - Non-blocking operations
-   - Async/await pattern
-   - Callback mechanisms
-
-4. **Streaming APIs**:
-   - Large document handling
-   - Progressive download
-   - Memory efficiency
-
-5. **Error Enhancements**:
-   - Structured error objects
-   - Error codes
-   - Exception mapping
-
----
-
-## Best Practices
-
-### 1. Wrap in Python Classes
+**Solution:** FHiCL functions require building with `-DUSE_FHICLCPP=ON`
 
 ```python
-class Document:
-    """High-level document interface"""
-
-    def __init__(self, collection, entity, version=None):
-        self.collection = collection
-        self.entity = entity
-        self.version = version or "latest"
-
-    def read(self):
-        query = self._make_query()
-        success, result = conftoolp.read_document(query)
-        if not success:
-            raise IOError(f"Read failed: {result}")
-        return json.loads(result)
-
-    def write(self, data):
-        query = self._make_query()
-        success, msg = conftoolp.write_document(
-            query, json.dumps(data)
-        )
-        if not success:
-            raise IOError(f"Write failed: {msg}")
-
-    def _make_query(self):
-        return json.dumps({
-            "collection": self.collection,
-            "entity": self.entity,
-            "version": self.version
-        })
+# Check availability
+if hasattr(conftoolp, 'fhicl_to_json'):
+    # FHiCL support available
+else:
+    # FHiCL support not compiled
 ```
 
-### 2. Error Handling
+## See Also
 
-```python
-class DatabaseError(Exception):
-    """Base exception for database errors"""
-    pass
-
-def safe_call(func, *args):
-    """Safe wrapper for conftoolp calls"""
-    success, result = func(*args)
-    if not success:
-        raise DatabaseError(result)
-    return result
-```
-
-### 3. Configuration
-
-```python
-class DatabaseConfig:
-    """Centralized configuration"""
-
-    def __init__(self, uri=None):
-        self.uri = uri or os.environ.get('ARTDAQ_DATABASE_URI')
-        if not self.uri:
-            raise ValueError("Database URI not configured")
-
-    def set_global(self):
-        """Set as default for all operations"""
-        # Implementation depends on how URI is passed
-        pass
-```
-
-### 4. Documentation
-
-```python
-def read_document(collection: str, entity: str, version: str = "latest") -> dict:
-    """Read a document from the database.
-
-    Args:
-        collection: Collection name (e.g., "RunHistory")
-        entity: Entity name within collection
-        version: Version string (default: "latest")
-
-    Returns:
-        Document data as dictionary
-
-    Raises:
-        DatabaseError: If read operation fails
-    """
-    query = json.dumps({
-        "collection": collection,
-        "entity": entity,
-        "version": version
-    })
-    success, result = conftoolp.read_document(query)
-    if not success:
-        raise DatabaseError(result)
-    return json.loads(result)
-```
-
----
-
-## Dependencies
-
-### Build Dependencies
-- SWIG 3.0+
-- Python development headers
-- CMake 3.12+
-- C++14 compiler
-- artdaq-database core libraries
-
-### Runtime Dependencies
-- Python interpreter (2.7 or 3.6+)
-- artdaq-database shared libraries
-- conftoolp.so module
-
-### Optional Dependencies
-- fhiclcpp (for FHiCL conversion)
-- pytest (for testing)
-- Flask (for web interfaces)
-
----
-
-## Documentation
-
-### Module Documentation
-
-- **[conftool-python.md](./conftool-python.md)**: Comprehensive Python binding documentation
-
-### External Resources
-
-- **SWIG Documentation**: http://www.swig.org/documentation.html
-- **Python/C API**: https://docs.python.org/3/c-api/
-- **artdaq-database**: Core library documentation
-
----
-
-## Summary
-
-The SWIGBindings module provides production-ready Python bindings for artdaq-database through SWIG-generated wrappers. The bindings expose the complete configuration database API with a simple, consistent interface based on JSON payloads and result tuples.
-
-**Key Features**:
-- Complete API coverage
-- Automatic type conversion
-- Memory-safe string handling
-- Simple return value pattern
-- Optional FHiCL support
-- Extensible to other languages
-
-**Common Uses**:
-- Automation scripts
-- Web interfaces
-- Testing frameworks
-- Configuration management
-- Data migration tools
-- Integration with Python ecosystem
-
-**Status**: Production-ready, actively used in artdaq ecosystem
+- [ConfigurationDB/README.md](../ConfigurationDB/README.md) - Core database module
+- [DataFormats/README.md](../DataFormats/README.md) - Data format converters
+- [External: SWIG Documentation](http://www.swig.org/documentation.html)
+- [External: Python/C API](https://docs.python.org/3/c-api/)

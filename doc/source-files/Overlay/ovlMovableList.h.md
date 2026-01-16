@@ -1,106 +1,26 @@
 # ovlMovableList.h
 
-## File Overview
+**Path:** `artdaq-database/Overlay/ovlMovableList.h`
 
-Template class for managing JSON arrays with history tracking. Unlike `ovlFixedList`, this maintains two separate arrays: "active" for current items and "history" for removed items. Primarily used for alias management where historical tracking is important.
+**Purpose:** Template class for managing JSON arrays with full history tracking. Unlike `ovlFixedList`, this template maintains two separate arrays: "active" for current items and "history" for removed items. When an element is removed, it is moved to the history array (not deleted), preserving a complete audit trail. Primarily used for alias management where historical tracking is essential for reproducibility.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/Overlay/ovlMovableList.h`
+## Key Concepts
 
-## Purpose
+### Active/History Pattern
 
-Manages collections with historical tracking by:
-- Maintaining active and history arrays
-- Moving removed items to history (not deleting)
-- Adding removal timestamps
-- Supporting iteration over active items
-- Providing maskable comparison
+This template implements a two-list pattern:
+- **active** - Currently valid items
+- **history** - Previously removed items with removal timestamps
 
-## Template Definition
-
-```cpp
-template <typename T, std::uint32_t mask>
-class ovlMovableList final : public ovlKeyValue {
-  using List_t = array_t::container_type<T>;
-  using ElementUPtr_t = std::unique_ptr<T>;
-
- public:
-  ovlMovableList(object_t::key_type const& key, value_t& object);
-
-  // utils
-  void wipe();
-  result_t add(ElementUPtr_t&);
-  result_t remove(ElementUPtr_t&);
-
-  typename List_t::const_iterator begin() const { return _active.begin(); }
-  typename List_t::const_iterator end() const { return _active.end(); }
-
-  // overrides
-  std::string to_string() const override;
-
-  // ops
-  result_t operator==(ovlMovableList const&) const;
-
- private:
-  List_t make_list(array_t& list);
-  bool init(value_t& parent);
-
- private:
-  bool _initOK;
-  List_t _active;
-  List_t _history;
-};
-```
-
-## Key Differences from ovlFixedList
-
-| Feature | ovlFixedList | ovlMovableList |
-|---------|--------------|----------------|
-| **Structure** | Single array | Active + History arrays |
-| **Remove behavior** | Deletes from array | Moves to history |
-| **JSON structure** | `[...]` | `{"active": [...], "history": [...]}` |
-| **Primary use** | Configurations, entities, runs | Aliases |
-| **History tracking** | Via removed timestamp only | Full object preserved in history |
-
-## Type Alias
-
-```cpp
-// In ovlDatabaseRecord.h
-using ovlAliases = ovlMovableList<ovlAlias, DOCUMENT_COMPARE_MUTE_ALIAS>;
-```
-
-## Implementation
-
-### Constructor and Initialization
-```cpp
-template <typename T, std::uint32_t mask>
-ovlMovableList<T, mask>::ovlMovableList(object_t::key_type const& key, value_t& object)
-    : ovlKeyValue(key, object),
-      _initOK(init(object)),
-      _active(make_list(ovlKeyValue::value_as<array_t>(jsonliteral::active))),
-      _history(make_list(ovlKeyValue::value_as<array_t>(jsonliteral::history))) {}
-
-template <typename T, std::uint32_t mask>
-bool ovlMovableList<T, mask>::init(value_t& parent) try {
-  confirm(type(parent) == type_t::OBJECT);
-
-  auto& obj = object_value();
-
-  if (obj.count(jsonliteral::active) == 0) obj[jsonliteral::active] = array_t{};
-  if (obj.count(jsonliteral::history) == 0) obj[jsonliteral::history] = array_t{};
-
-  return true;
-} catch (...) {
-  confirm(false);
-  throw;
-}
-```
-
-**Initialization**:
-- Expects parent to be an object (not array like ovlFixedList)
-- Creates both "active" and "history" fields if missing
-- Wraps both arrays with overlay elements
+This pattern is essential when:
+- You need to track what was active at a specific time
+- Removed items should be preserved for audit purposes
+- Historical lookups are required (e.g., "what alias was active during run X?")
 
 ### JSON Structure
+
+Unlike `ovlFixedList` which overlays a simple array, this template expects an object containing two arrays:
+
 ```json
 {
   "aliases": {
@@ -114,247 +34,367 @@ bool ovlMovableList<T, mask>::init(value_t& parent) try {
 }
 ```
 
-### Adding Elements
+## Thread Safety
+
+- **Thread-safe:** No
+- **Concurrent access:** Not supported; instances hold mutable references to JSON data
+- **Locking:** None; caller must synchronize access if used from multiple threads
+
+## Dependencies
+
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/Overlay/common.h` | Types, result_t, comparison flags, JSON literals |
+| `artdaq-database/Overlay/ovlKeyValue.h` | Base class for key-value overlay |
+
+## Classes/Structures
+
+### `ovlMovableList<T, mask>`
+
+A template class extending `ovlKeyValue` that manages two JSON arrays (active and history) for named overlay elements. When elements are removed, they are moved to the history array with a removal timestamp.
+
+**Template Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `T` | Element type | Overlay class for list elements (must have `name()`, `key()`, `value()`, `object_value()` methods) |
+| `mask` | `std::uint32_t` | Bitmask for comparison control from `DOCUMENT_COMPARE_FLAGS` |
+
+**Internal Type Aliases:**
+
 ```cpp
-template <typename T, std::uint32_t mask>
-result_t ovlMovableList<T, mask>::add(ElementUPtr_t& newEntry) {
-  confirm(newEntry);
+using List_t = array_t::container_type<T>;  // Container of overlay elements
+using ElementUPtr_t = std::unique_ptr<T>;   // Smart pointer to element
+```
 
-  // Check for duplicates in active list
-  for (auto& entry : _active) {
-    if (entry.name() == newEntry->name()) {
-      return Success(msg_Ignored);
-    }
-  }
+**Thread Safety:** Not thread-safe
 
-  // Add to active JSON array
-  auto& entries = ovlKeyValue::value_as<array_t>(jsonliteral::active);
-  entries.push_back(newEntry->value());
+#### Methods
 
-  // Recreate active list
-  _active = make_list(entries);
+##### `ovlMovableList(object_t::key_type const& key, value_t& object)`
 
-  return Success(msg_Added);
+**Brief:** Constructs an overlay for a JSON object containing "active" and "history" arrays. Creates these arrays if they do not exist, then wraps each element in the appropriate overlay type T.
+
+**Parameters:**
+- `key` - The JSON key identifying this field within its parent
+- `object` - Reference to the JSON object value to overlay (must be an object, not array)
+
+**Preconditions:**
+- `object` must be a JSON object (type_t::OBJECT)
+
+**Postconditions:**
+- The "active" array exists (created if missing)
+- The "history" array exists (created if missing)
+- Each array element is wrapped in an overlay of type T
+
+**Thread Safety:** Not thread-safe
+
+**Example:**
+```cpp
+#include "artdaq-database/Overlay/ovlMovableList.h"
+#include "artdaq-database/Overlay/ovlKeyValueTimeStamp.h"
+
+using namespace artdaq::database::overlay;
+
+// Type aliases (typically defined in ovlDatabaseRecord.h)
+using ovlAlias = ovlKeyValueTimeStamp<DOCUMENT_COMPARE_MUTE_ALIAS, true, true>;
+using ovlAliases = ovlMovableList<ovlAlias, DOCUMENT_COMPARE_MUTE_ALIAS>;
+
+void createAliasList() {
+  value_t recordJson = object_t{};
+  auto& record = recordJson.value_as<object_t>();
+  record["aliases"] = object_t{};  // Note: object, not array
+
+  auto aliases = overlay<ovlAliases>(recordJson, "aliases");
+  // Both "active" and "history" arrays are now created
 }
 ```
 
-**Note**: Only checks active list for duplicates, not history.
+##### `wipe() -> void`
 
-### Removing Elements
+**Brief:** Clears both active and history lists, removing all elements from both internal overlay lists.
+
+**Postconditions:**
+- Both active and history lists are empty
+- Note: This clears the overlay lists but the underlying JSON may not be modified
+
+**Thread Safety:** Not thread-safe
+
+##### `add(ElementUPtr_t& newEntry) -> result_t`
+
+**Brief:** Adds a new element to the active list if an element with the same name does not already exist in the active list. History is not checked for duplicates.
+
+**Parameters:**
+- `newEntry` - Unique pointer to the element to add (must not be null)
+
+**Preconditions:**
+- `newEntry` must not be null
+
+**Returns:**
+- `Success(msg_Added)` - Element was added successfully
+- `Success(msg_Ignored)` - Element with same name already exists in active list
+
+**Postconditions:**
+- If added, the element is appended to the "active" JSON array
+- The internal active overlay list is rebuilt
+
+**Thread Safety:** Not thread-safe
+
+**Example:**
 ```cpp
-template <typename T, std::uint32_t mask>
-result_t ovlMovableList<T, mask>::remove(ElementUPtr_t& oldEntry) {
-  confirm(oldEntry);
+value_t aliasJson = object_t{};
+aliasJson.value_as<object_t>()["name"] = "production";
 
-  if (_active.empty()) Success(msg_Ignored);
+auto newAlias = std::make_unique<ovlAlias>("alias", aliasJson);
+newAlias->assigned() = timestamp();
 
-  // Remove from active array
-  auto& entries = ovlKeyValue::value_as<array_t>(jsonliteral::active);
-  auto oldCount = entries.size();
-
-  entries.erase(std::remove_if(entries.begin(), entries.end(),
-                               [&oldEntry](value_t& entry) -> bool {
-                                 auto candidate = std::make_unique<T>(oldEntry->key(), entry);
-                                 return candidate->name() == oldEntry->name();
-                               }),
-                entries.end());
-
-  if (oldCount == entries.size()) return Failure(msg_Missing);
-
-  confirm(oldCount - 1 == entries.size());
-
-  _active = make_list(entries);
-
-  // Move to history array
-  auto& history = ovlKeyValue::value_as<array_t>(jsonliteral::history);
-
-  oldCount = history.size();
-
-  // Add removed timestamp
-  oldEntry->object_value()[jsonliteral::removed] = timestamp();
-
-  // Add to history
-  history.push_back(oldEntry->value());
-
-  confirm(oldCount + 1 == history.size());
-
-  _history = make_list(history);
-
-  return Success(msg_Removed);
+auto result = aliases->add(newAlias);
+if (result.second == msg_Added) {
+  std::cout << "Alias added to active list" << std::endl;
 }
 ```
 
-**Removal Process**:
-1. Remove from active array
-2. Add "removed" timestamp to entry
-3. Add entry to history array
-4. Recreate both overlay lists
+##### `remove(ElementUPtr_t& oldEntry) -> result_t`
 
-**Historical Preservation**: The complete entry moves to history, preserving all fields plus removal timestamp.
+**Brief:** Removes an element from the active list and moves it to the history list with a removal timestamp. The complete element is preserved in history.
 
-### Wiping
+**Parameters:**
+- `oldEntry` - Unique pointer to an element with the name to remove (must not be null)
+
+**Preconditions:**
+- `oldEntry` must not be null
+- An element with the matching name should exist in the active list
+
+**Returns:**
+- `Success(msg_Removed)` - Element was moved to history successfully
+- `Success(msg_Ignored)` - Active list was empty
+- `Failure(msg_Missing)` - No element with matching name found in active list
+
+**Postconditions:**
+- If removed, the element is deleted from the "active" JSON array
+- The element has a "removed" timestamp added
+- The element is appended to the "history" JSON array
+- Both internal overlay lists are rebuilt
+
+**Thread Safety:** Not thread-safe
+
+**Example:**
 ```cpp
-template <typename T, std::uint32_t mask>
-void ovlMovableList<T, mask>::wipe() {
-  _active = ovlMovableList::List_t{};
-  _history = ovlMovableList::List_t{};
+value_t removeJson = object_t{};
+removeJson.value_as<object_t>()["name"] = "production";
+
+auto toRemove = std::make_unique<ovlAlias>("alias", removeJson);
+
+auto result = aliases->remove(toRemove);
+if (result.first) {
+  std::cout << "Alias moved to history" << std::endl;
+}
+// The alias is now in history with a "removed" timestamp
+```
+
+##### `begin() const -> List_t::const_iterator`
+
+**Brief:** Returns a const iterator to the beginning of the active element list. Does not provide access to history.
+
+**Returns:** Const iterator to the first active element
+
+**Thread Safety:** Not thread-safe
+
+##### `end() const -> List_t::const_iterator`
+
+**Brief:** Returns a const iterator to the end of the active element list.
+
+**Returns:** Const iterator past the last active element
+
+**Thread Safety:** Not thread-safe
+
+**Example:**
+```cpp
+// Range-based iteration over active aliases only
+for (auto const& alias : *aliases) {
+  std::cout << "Active alias: " << alias.name() << std::endl;
+  std::cout << "Assigned: " << alias.assigned() << std::endl;
 }
 ```
 
-Clears both active and history lists.
+##### `to_string() const -> std::string` [override]
 
-### Serialization
+**Brief:** Serializes both active and history lists to a JSON-formatted string representation.
+
+**Returns:** JSON string in format `{"key": {"active": [...], "history": [...]}}`
+
+**Thread Safety:** Not thread-safe
+
+##### `operator==(ovlMovableList const& other) const -> result_t`
+
+**Brief:** Compares this list with another for equality. Only compares active lists; history differences are ignored.
+
+**Parameters:**
+- `other` - The list to compare against
+
+**Returns:**
+- `Success()` if mask bit is set (comparison skipped) or active lists are equal
+- `Failure(message)` with detailed difference description if active lists differ
+
+**Thread Safety:** Not thread-safe
+
+**Note:** History is intentionally excluded from comparison because two records with the same current state should be considered equal regardless of their history.
+
+## Type Alias
+
+The following type alias is defined in `ovlDatabaseRecord.h`:
+
 ```cpp
-template <typename T, std::uint32_t mask>
-std::string ovlMovableList<T, mask>::to_string() const {
-  std::ostringstream oss;
-  oss << "{" << quoted_(key()) << ": {";
-
-  oss << quoted_(jsonliteral::active) << ": [";
-  for (auto const& entry : _active) oss << "\n" << entry.to_string() << ",";
-  if (!_active.empty()) oss.seekp(-1, oss.cur);
-  oss << "\n],";
-
-  oss << quoted_(jsonliteral::history) << ": [";
-  for (auto const& entry : _history) oss << "\n" << entry.to_string() << ",";
-  if (!_history.empty()) oss.seekp(-1, oss.cur);
-  oss << "\n]\n}\n}";
-
-  return oss.str();
-}
+using ovlAliases = ovlMovableList<ovlAlias, DOCUMENT_COMPARE_MUTE_ALIAS>;
 ```
-
-**Output**: Shows both active and history arrays in JSON format.
-
-### Comparison
-```cpp
-template <typename T, std::uint32_t mask>
-result_t ovlMovableList<T, mask>::operator==(ovlMovableList const& other) const {
-  if ((useCompareMask() & mask) == mask) return Success();
-
-  std::ostringstream oss;
-  oss << "\n " << key() << "nodes disagree.";
-  auto noerror_pos = oss.tellp();
-
-  if (_active.size() != other._active.size())
-    oss << "\n  Different active " << key() << " count: self,other="
-        << _active.size() << "," << other._active.size();
-
-  auto key_name = key();
-
-  if (oss.tellp() == noerror_pos &&
-      std::equal(_active.cbegin(), _active.end(), other._active.cbegin(),
-                 [&oss, &key_name](auto const& first, auto const& second) -> bool {
-                   auto result = first == second;
-                   if (result.first) return true;
-                   oss << "\n  " << key_name << " different: self,other="
-                       << first.to_string() << "," << second.to_string();
-                   return false;
-                 }))
-    return Success();
-
-  oss << "\n  Debug info:";
-  oss << "\n  Self  value:\n" << to_string();
-  oss << "\n  Other value:\n" << other.to_string();
-
-  return Failure(oss);
-}
-```
-
-**Note**: Compares only active lists, not history. History differences are ignored.
 
 ## Usage Examples
 
-### Managing Aliases
+### Managing Aliases with History
+
 ```cpp
-value_t recordJson;
-auto aliases = overlay<ovlAliases>(recordJson, "aliases");
+#include "artdaq-database/Overlay/ovlMovableList.h"
 
-// Add an alias
-auto newAlias = std::make_unique<ovlAlias>(/*...*/);
-newAlias->name("production");
-newAlias->assigned() = timestamp();
-aliases->add(newAlias);
+using namespace artdaq::database::overlay;
 
-// Remove an alias (moves to history)
-auto oldAlias = std::make_unique<ovlAlias>(/*...*/);
-oldAlias->name("production");
-aliases->remove(oldAlias);
+void manageAliases() {
+  value_t recordJson = object_t{};
+  auto& record = recordJson.value_as<object_t>();
+  record["aliases"] = object_t{};
 
-// Iterate active aliases only
-for (auto const& alias : *aliases) {
-  std::cout << "Active alias: " << alias.name() << std::endl;
+  auto aliases = overlay<ovlAliases>(recordJson, "aliases");
+
+  // Add an alias
+  value_t aliasJson = object_t{};
+  aliasJson.value_as<object_t>()["name"] = "production";
+  auto newAlias = std::make_unique<ovlAlias>("alias", aliasJson);
+  newAlias->assigned() = timestamp();
+  aliases->add(newAlias);
+
+  // Later: Remove the alias (moves to history)
+  value_t removeJson = object_t{};
+  removeJson.value_as<object_t>()["name"] = "production";
+  auto oldAlias = std::make_unique<ovlAlias>("alias", removeJson);
+  aliases->remove(oldAlias);
+
+  // Iterate active aliases only
+  for (auto const& alias : *aliases) {
+    std::cout << "Active: " << alias.name() << std::endl;
+  }
+
+  // History is preserved in the JSON but not directly iterable
+  // Access via JSON if needed for auditing
+  auto& aliasObj = recordJson.value_as<object_t>()["aliases"];
+  auto& history = aliasObj.value_as<object_t>()["history"];
+  // Process history array...
 }
 ```
 
-### Accessing History
+### Checking History via JSON
+
 ```cpp
-// History is private, access via JSON if needed
-auto& aliasObj = recordJson["aliases"];
-auto& history = aliasObj["history"];
-// Process history array...
+void auditAliasHistory(value_t& recordJson) {
+  auto& aliases = recordJson.value_as<object_t>()["aliases"];
+  auto& history = aliases.value_as<object_t>()["history"];
+  auto& historyArray = history.value_as<array_t>();
+
+  for (auto& entry : historyArray) {
+    auto& obj = entry.value_as<object_t>();
+    std::cout << "Historical alias: " << obj["name"].value_as<std::string>() << std::endl;
+    std::cout << "  Assigned: " << obj["assigned"].value_as<std::string>() << std::endl;
+    std::cout << "  Removed: " << obj["removed"].value_as<std::string>() << std::endl;
+  }
+}
 ```
 
-## Design Rationale
+## Comparison: ovlFixedList vs. ovlMovableList
 
-### Why Separate Active/History?
-
-**Advantages**:
-1. **Complete History** - Full entry preserved, not just name/timestamp
-2. **Queryable** - Can search history for when aliases were active
-3. **Audit Trail** - Maintains complete record of changes
-4. **Restoration** - Can potentially restore from history
-
-**Disadvantages**:
-1. **More Storage** - Keeps removed entries
-2. **More Complex** - Two arrays to manage
-3. **Slower** - More data to process
-
-### Why Only for Aliases?
-
-Aliases represent production state:
-- Need to know what alias pointed to historically
-- Critical for reproducing past runs
-- History helps debugging production issues
-
-Other entities (configurations, entities) don't need this level of history - their removal is tracked via timestamp alone.
-
-### Why Compare Only Active?
-
-Two records are "equal" if their current state matches:
-- Historical differences don't affect current functionality
-- Reduces false "different" results
-- Focuses on functional equality
+| Feature | ovlFixedList | ovlMovableList |
+|---------|--------------|----------------|
+| **JSON Structure** | `[...]` (array) | `{"active": [...], "history": [...]}` (object) |
+| **Remove behavior** | Deletes element | Moves to history |
+| **History tracking** | Only removed timestamp | Full object preserved |
+| **Storage cost** | O(active) | O(active + history) |
+| **Use case** | configs, entities, runs | aliases |
+| **Comparison** | Compares all elements | Compares only active |
 
 ## Performance Considerations
 
-- **Add**: O(n) duplicate check + O(1) append + O(n) list recreation
-- **Remove**: O(n) search + O(n) erase + O(1) history append + O(n) recreations
-- **Iteration**: Only over active list
-- **Storage**: O(n + h) where n=active, h=history
+| Operation | Complexity | Notes |
+|-----------|------------|-------|
+| **Constructor** | O(n+h) | Wraps active and history elements |
+| **add** | O(n) | Duplicate check in active + append + rebuild |
+| **remove** | O(n+h) | Search + erase + history append + rebuilds |
+| **begin/end** | O(1) | Iterator access (active only) |
+| **Comparison** | O(n) | Active list comparison only |
 
-## Related Files
+Where n = active count, h = history count
 
-- **ovlKeyValue.h** - Base class
-- **ovlFixedList.h** - Simpler alternative without history
-- **ovlDatabaseRecord.h** - Uses for ovlAliases
-- **common.h** - Mask constants
+## Relationship to Other Components
 
-## Best Practices
+This template is specifically designed for alias management in `ovlDatabaseRecord`:
+- Preserves complete history for audit and debugging
+- Enables "time travel" queries (what alias was active at time T)
+- Supports production environment tracking
 
-1. Use for data requiring historical tracking
-2. Keep history reasonable size (consider archiving old history)
-3. Don't assume iterators cover history (only active)
-4. Use ovlFixedList if history not needed
-5. Document why history tracking is necessary
+The history preservation is essential because:
+- Aliases represent production state
+- Debugging issues requires knowing historical alias bindings
+- Reproducibility of past runs requires knowing what alias pointed to
 
-## Notes
+## See Also
 
-- Header-only template
-- Final class (cannot be derived from)
-- Comparison ignores history list
-- Iterator support only for active list
-- History never automatically cleaned
-- JSON structure is object with two arrays, not a single array
-- Used exclusively for aliases in current codebase
-- Could be used for other entities requiring audit trails
+- [ovlKeyValue.h](./ovlKeyValue.h.md) - Base class providing core overlay functionality
+- [ovlFixedList.h](./ovlFixedList.h.md) - Simpler alternative without history tracking
+- [ovlKeyValueTimeStamp.h](./ovlKeyValueTimeStamp.h.md) - Element type used for aliases
+- [common.h](./common.h.md) - Defines `DOCUMENT_COMPARE_FLAGS` enum
+
+## Notes for Developers
+
+### Common Pitfalls
+
+- **Expects object, not array:** Unlike `ovlFixedList`, the constructor expects a JSON object that will contain "active" and "history" arrays, not a JSON array directly.
+- **Iterator only covers active:** The `begin()`/`end()` iterators only access the active list. History must be accessed via the underlying JSON if needed.
+- **History is not compared:** Two overlays with the same active list but different histories are considered equal.
+
+### Design Notes
+
+- This is a header-only template with no corresponding .cpp file
+- The class is `final` and cannot be derived from
+- History is never automatically cleaned (grows unbounded)
+- Used exclusively for aliases in the current codebase
+
+### Anti-patterns
+
+```cpp
+// DON'T: Pass an array instead of object
+value_t arrayValue = array_t{};
+ovlAliases aliases("aliases", arrayValue);  // Will assert!
+
+// DO: Pass an object (active/history arrays created automatically)
+value_t objectValue = object_t{};
+ovlAliases aliases("aliases", objectValue);  // OK
+
+// DON'T: Assume iterators cover history
+for (auto const& alias : aliases) {
+  // This only iterates active aliases, not history!
+}
+
+// DO: Access history via JSON if needed
+auto& historyArray = record["aliases"]["history"].value_as<array_t>();
+
+// DON'T: Rely on comparison detecting history differences
+// History is intentionally ignored during comparison
+```
+
+### Why Only for Aliases?
+
+Aliases represent production deployment state, and historical tracking is critical:
+- Need to know what configuration a "production" alias pointed to last week
+- Essential for debugging production issues
+- Required for reproducing past data-taking runs
+
+Other lists (configurations, entities, runs) can use simpler `ovlFixedList` because:
+- They track what was added, not what was replaced
+- Removed timestamp is sufficient for basic tracking
+- Full history preservation would be excessive storage overhead

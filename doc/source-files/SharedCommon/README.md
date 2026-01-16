@@ -7,6 +7,7 @@ This directory contains comprehensive documentation for all source files in the 
 **Module Location**: `/home/user/artdaq-database/artdaq-database/SharedCommon/`
 
 **Documentation Created**: November 13, 2025
+**Last Updated:** 2026-01-14
 
 ---
 
@@ -375,4 +376,4 @@ Documentation uses the actual filenames for accuracy, but notes the typos.
 
 **Documentation generated for artdaq-database SharedCommon module**
 **Target audience**: Junior to intermediate C++ developers
-**Last updated**: November 13, 2025
+**Last updated**: December 30, 2025

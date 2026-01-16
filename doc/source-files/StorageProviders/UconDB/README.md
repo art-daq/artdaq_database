@@ -1,153 +1,40 @@
-# UconDB Provider Documentation
+# UconDB Provider
+
+**Path:** `artdaq-database/StorageProviders/UconDB/`
+
+**Purpose:** Implements a storage provider for Fermilab's Unified Configuration Database (UConDB) service via REST API. This provider enables centralized configuration management across multiple experiments with version control, access control, audit trail, and web interface support.
 
 ## Overview
 
-This directory contains comprehensive documentation for all source files in the UconDB storage provider. The UconDB provider interfaces with Fermilab's Unified Configuration Database (UConDB) service via REST API, providing centralized configuration management for multiple experiments.
+The UconDB provider communicates with Fermilab's UConDB service to provide:
+- Centralized configuration storage shared across experiments
+- Version control with tags and validity times
+- Fine-grained access control and audit trail
+- Web interface for browsing and editing
+- No local database server required
 
-**Module Location**: `/home/user/artdaq-database/artdaq-database/StorageProviders/UconDB/`
+## Files in This Module
 
-**Documentation Created**: November 13, 2025
+| File | Purpose |
+|------|---------|
+| `provider_ucondb.h` | Main provider class, DBConfig, type aliases |
+| `provider_ucondb.cpp` | Query operation implementations |
+| `provider_ucondb_headers.h` | Aggregated includes for implementation files |
+| `provider_ucondb_readwrite.cpp` | Document read/write operations |
+| `provider_connection.cpp` | Connection management and initialization |
+| `ucondb_api.h` | REST API client declarations |
+| `ucondb_api.cpp` | REST API client implementation using libcurl |
 
----
+## Key Classes
 
-## Architecture
+### UconDB
+Main provider class that manages the connection to the UconDB REST service.
 
-### UConDB Service
+### DBConfig
+Configuration structure holding the UconDB connection URI with support for authentication.
 
-UConDB is Fermilab's centralized configuration database service:
-- **Multi-Experiment**: Shared service for DUNE, NOvA, MicroBooNE, etc.
-- **Web Service**: RESTful HTTP/HTTPS API
-- **Version Control**: Full configuration history
-- **Web Interface**: GUI for browsing and editing configurations
-
-### Communication Model
-
-- **Protocol**: HTTP/HTTPS REST API
-- **Format**: JSON request/response
-- **Authentication**: Token-based or username/password
-- **Operations**: GET, POST, PUT via REST endpoints
-
----
-
-## Documentation Files
-
-### Core Provider Files
-
-#### [provider_ucondb.h.md](./provider_ucondb.h.md)
-UConDB provider class and configuration.
-
-**Key Contents**:
-- `UconDB` class - REST API connection manager
-- `DBConfig` struct - Connection configuration
-- Authentication support
-- Type aliases
-
-#### [provider_ucondb.cpp.md](./provider_ucondb.cpp.md)
-Implementation of query operations via REST API.
-
-**Operations**:
-- `findConfigurations()` - Query configurations
-- `findVersions()` - Find versions
-- `findEntities()` - Discover entities
-- `listCollections()` / `listDatabases()` - Database discovery
-- `databaseMetadata()` - Retrieve metadata
-
----
-
-### REST API Client
-
-#### [ucondb_api.h.md](./ucondb_api.h.md) / [ucondb_api.cpp.md](./ucondb_api.cpp.md)
-REST API client implementation.
-
-**Key Functions**:
-- `folders()` - List configuration folders
-- `tags()` - List version tags
-- `objects()` - List configuration objects
-- `get_object()` - Retrieve specific object
-- `create_folder()` - Create new folder
-- `put_object()` - Upload/update object
-
-**HTTP Client**: libcurl-based implementation with SSL support
-
----
-
-### Read/Write Operations
-
-#### [provider_ucondb_readwrite.cpp.md](./provider_ucondb_readwrite.cpp.md)
-Document I/O via REST API.
-
-**Functions**:
-- `readDocument()` - HTTP GET for queries
-- `writeDocument()` - HTTP POST/PUT for updates
-
----
-
-### Supporting Files
-
-#### [provider_ucondb_headers.h.md](./provider_ucondb_headers.h.md)
-Aggregator header for UConDB implementation.
-
-#### [provider_connection.cpp.md](./provider_connection.cpp.md)
-Connection management and REST client initialization.
-
----
-
-## Key Features
-
-### Advantages
-
-1. **Centralized**: Single source of truth for all experiments
-2. **Multi-Experiment**: Shared infrastructure
-3. **Web Interface**: GUI access for browsing/editing
-4. **Version Control**: Full history tracking
-5. **No Local Installation**: Service-based, no database server to maintain
-6. **Access Control**: Fine-grained permissions
-7. **Auditing**: Complete audit trail
-
-### UConDB-Specific Features
-
-- **Folders**: Hierarchical organization
-- **Tags**: Version labeling (e.g., "production", "test")
-- **Validity Time**: Time-based version selection
-- **Templates**: Configuration templates
-- **Inheritance**: Configuration inheritance
-
----
-
-## Configuration
-
-### Connection URI
-
-```
-ucondb://http[s]://hostname:port/database
-```
-
-**Examples**:
-```
-ucondb://http://ucondb-dev.fnal.gov:8080/artdaq_db
-ucondb://https://ucondb.fnal.gov/production_db
-```
-
-### Environment Variables
-
-```bash
-export ARTDAQ_DATABASE_URI="ucondb://https://ucondb.fnal.gov:8080/artdaq_prod"
-```
-
-### Authentication
-
-Set credentials via environment:
-```bash
-export UCONDB_USER="username"
-export UCONDB_PASS="password"
-```
-
-Or via URI:
-```
-ucondb://https://username:password@ucondb.fnal.gov:8080/database
-```
-
----
+### UconDB API Client
+REST client implementation using libcurl for HTTP/HTTPS operations.
 
 ## Usage Example
 
@@ -156,7 +43,7 @@ ucondb://https://username:password@ucondb.fnal.gov:8080/database
 
 using namespace artdaq::database::ucon;
 
-// Configure
+// Configure UConDB
 DBConfig config("ucondb://https://ucondb.fnal.gov:8080/artdaq_db");
 
 // Create provider
@@ -177,143 +64,121 @@ doc.setData("{\"voltage\": 500, \"gain\": 1.5}");
 object_id_t id = provider->writeDocument(doc);
 ```
 
----
+## Configuration
 
-## UConDB API Structure
+### URI Format
 
-### Common Endpoints
-
-- `/folders` - List/create folders
-- `/folders/{folder}/objects` - List objects in folder
-- `/folders/{folder}/objects/{object}` - Get specific object
-- `/folders/{folder}/tags` - List tags for folder
-- `/metadata` - Database metadata
-
-### Request Format
-
-**GET Request**:
 ```
-GET /folders/Detectors/TPC/objects/TPC_config?tag=production
+ucondb://http[s]://hostname[:port]/database
 ```
 
-**POST Request**:
+**Examples:**
 ```
-POST /folders/Detectors/TPC/objects
-Content-Type: application/json
-
-{
-  "object": "TPC_config",
-  "data": {...},
-  "tags": ["production", "v2.0"],
-  "validity_time": 1699920000
-}
+ucondb://http://ucondb-dev.fnal.gov:8080/artdaq_db
+ucondb://https://ucondb.fnal.gov/production_db
+ucondb://https://username:password@ucondb.fnal.gov:8080/database
 ```
 
----
+### Environment Variables
+
+| Variable | Purpose |
+|----------|---------|
+| `ARTDAQ_DATABASE_URI` | Set UconDB connection URI |
+| `UCONDB_USER` | Authentication username |
+| `UCONDB_PASS` | Authentication password |
+
+## UconDB Concepts
+
+### Folders
+Hierarchical organization similar to a filesystem:
+```
+/Detectors/TPC/Config1
+/Detectors/ECAL/Config2
+/RunControl/Settings
+```
+
+### Tags
+Version labels for configurations:
+- `production` - Current production version
+- `test` - Testing version
+- `v2.0` - Specific version tag
+
+### Validity Time
+Time-based version selection for historical queries.
+
+## REST API Endpoints
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/folders` | GET | List folders |
+| `/folders/{folder}/objects` | GET/POST | List/create objects |
+| `/folders/{folder}/objects/{object}` | GET | Get specific object |
+| `/folders/{folder}/tags` | GET | List tags |
+| `/metadata` | GET | Database metadata |
+
+## Advantages
+
+1. **Centralized**: Single source of truth for all experiments
+2. **Multi-Experiment**: Shared infrastructure
+3. **Web Interface**: GUI access for browsing/editing
+4. **Version Control**: Full history tracking
+5. **No Local Installation**: Service-based
+6. **Access Control**: Fine-grained permissions
+7. **Auditing**: Complete audit trail
 
 ## Performance Characteristics
 
-### Network Latency
-
-- **On-Site**: ~1-10 ms
-- **Remote**: ~50-200 ms depending on location
-- **Caching**: Recommended for frequently accessed configurations
+| Scenario | Latency |
+|----------|---------|
+| On-site (Fermilab) | ~1-10 ms |
+| Remote | ~50-200 ms |
+| Large response | Depends on size |
 
 ### Recommended Use Cases
 
-- **Production Environments**: Centralized configuration management
-- **Multi-Site Experiments**: Configuration sharing across institutions
-- **Version Tracking**: Need complete configuration history
-- **Collaborative**: Multiple users/teams editing configurations
-- **Audit Requirements**: Need detailed audit trail
+- Production environments with centralized management
+- Multi-site experiments sharing configurations
+- Need complete configuration history
+- Multiple users/teams editing configurations
+- Audit requirements
 
 ### Not Recommended For
 
-- **High-Frequency Writes**: > 100 writes/sec
-- **Offline Operation**: Requires network connectivity
-- **Very Large Documents**: > 10 MB (use file storage instead)
+- High-frequency writes (> 100/sec)
+- Offline operation (requires network)
+- Very large documents (> 10 MB)
 
----
+## Thread Safety
 
-## UConDB Web Interface
-
-Access the web interface at:
-```
-https://ucondb.fnal.gov
-```
-
-**Features**:
-- Browse configurations
-- View history
-- Edit configurations
-- Manage tags
-- Search
-- Export/import
-
----
+**Thread-safe**: HTTP operations use connection pooling via libcurl.
 
 ## Debugging
 
 Enable TRACE debugging:
-
 ```cpp
 artdaq::database::ucon::debug::enable();      // All debugging
 artdaq::database::ucon::debug::ReadWrite();   // I/O only
 artdaq::database::ucon::debug::UconDBAPI();   // API calls only
 ```
 
----
-
 ## Error Handling
 
 ### HTTP Status Codes
 
-- **200 OK**: Success
-- **201 Created**: New object created
-- **400 Bad Request**: Invalid request
-- **401 Unauthorized**: Authentication required
-- **404 Not Found**: Object/folder not found
-- **500 Server Error**: UConDB service error
+| Code | Meaning |
+|------|---------|
+| 200 OK | Success |
+| 201 Created | New object created |
+| 400 Bad Request | Invalid request |
+| 401 Unauthorized | Authentication required |
+| 404 Not Found | Object/folder not found |
+| 500 Server Error | UconDB service error |
 
-### Network Errors
+## Web Interface
 
-- Connection timeouts
-- DNS resolution failures
-- SSL certificate validation errors
+Access the UconDB web interface at:
+```
+https://ucondb.fnal.gov
+```
 
----
-
-## Thread Safety
-
-**HTTP Client**: Thread-safe with connection pooling
-**Concurrent Operations**: Supported
-**Connection Management**: Automatic
-
----
-
-## File List
-
-All documented UConDB provider files:
-
-1. **provider_ucondb.h** - Provider declarations
-2. **provider_ucondb.cpp** - Query operations
-3. **provider_ucondb_headers.h** - Header aggregator
-4. **provider_ucondb_readwrite.cpp** - I/O operations
-5. **provider_connection.cpp** - Connection management
-6. **ucondb_api.h** - REST API client headers
-7. **ucondb_api.cpp** - REST API implementation
-
----
-
-## Related Documentation
-
-- **FileSystemDB Provider**: [../FileSystemDB/README.md](../FileSystemDB/README.md)
-- **MongoDB Provider**: [../MongoDB/README.md](../MongoDB/README.md)
-- **Storage Provider Interface**: [../storage_providers.h.md](../storage_providers.h.md)
-- **UConDB Documentation**: https://cdcvs.fnal.gov/redmine/projects/ucondb
-
----
-
-**Documentation generated for artdaq-database UConDB provider**
-**Target audience**: Junior to intermediate C++ developers
-**Last updated**: November 13, 2025
+Features: Browse, view history, edit, manage tags, search, export/import.

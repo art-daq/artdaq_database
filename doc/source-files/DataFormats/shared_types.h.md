@@ -1,386 +1,621 @@
 # shared_types.h
 
-## File Overview
+**Path:** `artdaq-database/DataFormats/shared_types.h`
 
-This header file defines a comprehensive set of template-based type aliases and structures for handling hierarchical data with optional metadata. It provides the foundational building blocks for representing configuration data, database documents, and structured data across different formats (JSON, XML, FHiCL, CONF).
+**Purpose:** Defines the foundational template-based type system for representing hierarchical data with optional metadata. This header provides building blocks for key-value pairs, collections, tables, and variant types that form the core data structures used by all DataFormats submodules (JSON, XML, FHiCL, Conf). The types support optional comments and annotations, enabling self-documenting configuration data.
 
-The file includes sophisticated template structures for key-value pairs with comments/annotations, collections, tables, and variant types that can hold multiple data types.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/DataFormats/shared_types.h`
+## Key Concepts
+
+### Metadata-Enriched Types
+
+The types in this header support attaching metadata (comments, annotations) to both keys and values. This is essential for configuration formats like FHiCL that allow inline comments, enabling round-trip preservation of documentation.
+
+### Ordered Collections
+
+Unlike `std::map`, the `table_of` type maintains insertion order and allows duplicate keys. This is necessary for configuration formats where order matters or duplicate keys are valid.
+
+### Recursive Variant Types
+
+The `variant_value_of` type uses `boost::recursive_wrapper` to allow values that can contain nested tables or arrays, enabling representation of arbitrarily nested data structures.
+
+### List-Based Storage
+
+The `vector_of` type uses `std::list` internally (despite its name) to provide iterator stability during insertions and deletions.
+
+## Thread Safety
+
+- **Thread-safe:** No
+- **Concurrent access:** All types are value types with no internal synchronization. External locking is required for concurrent access to shared instances.
+- **Locking:** None provided; user must synchronize access
 
 ## Dependencies
 
-### Standard Libraries
-- `<stdexcept>` - For std::out_of_range exceptions
-- `<string>` - For std::string type
-
-### Third-Party Libraries
-
-**Boost Libraries**:
-- `<boost/optional.hpp>` - Optional value types
-- `<boost/variant.hpp>` - Variant (discriminated union) types
-
-## Header Guard
-
-```cpp
-#ifndef _ARTDAQ_DATABASE_SHAREDTYPES_H_
-#define _ARTDAQ_DATABASE_SHAREDTYPES_H_
-...
-#endif
-```
-
-## Namespace
-
-All types are defined in:
-```cpp
-artdaq::database::sharedtypes
-```
-
-Some types are also in the parent namespace:
-```cpp
-artdaq::database
-```
+| Include | Purpose |
+|---------|---------|
+| `<stdexcept>` | Provides `std::out_of_range` for table access errors |
+| `<string>` | Provides `std::string` for key and value types |
+| `<boost/optional.hpp>` | Provides `boost::optional` for optional metadata |
+| `<boost/variant.hpp>` | Provides `boost::variant` for polymorphic value types |
 
 ## Type Aliases
 
-### Basic Numeric Types
+### Numeric Types (artdaq::database namespace)
+
+#### `decimal`
+
+**Brief:** Type alias for double-precision floating-point numbers.
+
+**Definition:** `using decimal = double;`
+
+**Usage:** Represents floating-point configuration values in variant types.
+
+---
+
+#### `integer`
+
+**Brief:** Type alias for 64-bit signed integers.
+
+**Definition:** `using integer = int64_t;`
+
+**Usage:** Represents integer configuration values in variant types. Uses 64-bit to avoid overflow with large values.
+
+---
+
+### Metadata Types (artdaq::database::sharedtypes namespace)
+
+#### `basic_key_t`
+
+**Brief:** Standard string type for keys in key-value pairs.
+
+**Definition:** `using basic_key_t = std::string;`
+
+---
+
+#### `optional_comment_t`
+
+**Brief:** Optional string for comments associated with keys.
+
+**Definition:** `using optional_comment_t = boost::optional<std::string>;`
+
+**Usage:** Allows keys to have optional inline comments (common in FHiCL format).
+
+---
+
+#### `optional_annotation_t`
+
+**Brief:** Optional string for annotations associated with values.
+
+**Definition:** `using optional_annotation_t = boost::optional<std::string>;`
+
+**Usage:** Allows values to have optional annotations or documentation.
+
+## Classes/Structures
+
+### `key_of<KEY, COMMENT>`
+
+**Brief:** A template structure representing a key with an optional comment. Used when configuration keys need associated documentation.
+
+**Template Parameters:**
+- `KEY` - The key type (typically `std::string`)
+- `COMMENT` - The comment type (typically `boost::optional<std::string>`)
+
+**Thread Safety:** Not thread-safe; no internal synchronization.
+
+#### Type Aliases
+
+| Alias | Type | Description |
+|-------|------|-------------|
+| `key_type` | `KEY` | The underlying key type |
+| `comment_type` | `COMMENT` | The comment type |
+
+#### Constructors
+
+##### `key_of()`
+
+**Brief:** Default constructor creating an empty key with no comment.
+
+##### `key_of(std::string const& k)`
+
+**Brief:** Constructs a key with the given string value and no comment.
+
+**Parameters:**
+- `k` - The key string value
+
+##### `key_of(std::string const& k, typename comment_type::value_type const& c)`
+
+**Brief:** Constructs a key with both a string value and a comment.
+
+**Parameters:**
+- `k` - The key string value
+- `c` - The comment string
+
+#### Methods
+
+##### `operator==(key_of const& other) const -> bool`
+
+**Brief:** Compares two keys for equality based only on the key value, ignoring comments.
+
+**Parameters:**
+- `other` - The key to compare against
+
+**Returns:** `true` if key values match, `false` otherwise
+
+**Note:** Comments are not considered in equality comparison.
+
+##### `operator=(key_type const& k) -> key_of&`
+
+**Brief:** Assigns a new key value, leaving the comment unchanged.
+
+**Parameters:**
+- `k` - The new key value
+
+**Returns:** Reference to this key
+
+##### `operator std::string() const`
+
+**Brief:** Converts the key to a string representation including the comment.
+
+**Returns:** String in format `"key, comment=comment_value"`
+
+#### Members
+
+| Member | Type | Description |
+|--------|------|-------------|
+| `key` | `key_type` | The key value |
+| `comment` | `comment_type` | Optional comment |
+
+#### Example
 
 ```cpp
-namespace artdaq::database {
-    using decimal = double;
-    using integer = int64_t;
-}
-```
+#include "artdaq-database/DataFormats/shared_types.h"
 
-| Type | Underlying Type | Description |
-|------|-----------------|-------------|
-| `decimal` | `double` | Floating-point numbers |
-| `integer` | `int64_t` | 64-bit signed integers |
+using namespace artdaq::database::sharedtypes;
 
-### Basic Metadata Types
+using CommentedKey = key_of<std::string, optional_comment_t>;
 
-```cpp
-namespace artdaq::database::sharedtypes {
-    using basic_key_t = std::string;
-    using optional_comment_t = boost::optional<std::string>;
-    using optional_annotation_t = boost::optional<std::string>;
-}
-```
+// Key without comment
+CommentedKey simple("threshold");
 
-| Type | Description |
-|------|-------------|
-| `basic_key_t` | Standard string type for keys |
-| `optional_comment_t` | Optional comment string (may or may not be present) |
-| `optional_annotation_t` | Optional annotation string |
+// Key with comment
+CommentedKey documented("max_events", "Maximum events per run");
 
-## Template Structures
+// Equality ignores comments
+CommentedKey another("threshold", "different comment");
+assert(simple == another);  // true - same key value
 
-### key_of<KEY, COMMENT>
-
-A template structure representing a key with an optional comment.
-
-**Template Parameters**:
-- `KEY` - The key type (typically std::string)
-- `COMMENT` - The comment type (typically boost::optional<std::string>)
-
-**Type Aliases**:
-```cpp
-using key_type = KEY;
-using comment_type = COMMENT;
-```
-
-**Constructors**:
-```cpp
-key_of();                                                    // Default
-key_of(std::string const& k);                               // Key only
-key_of(std::string const& k,                                // Key with comment
-       typename comment_type::value_type const& c);
-```
-
-**Operators**:
-```cpp
-bool operator==(key_of const& other) const;               // Equality (compares keys only)
-key_of& operator=(key_type const& k);                     // Assignment from key
-operator std::string() const;                              // Conversion to string
-```
-
-**Members**:
-```cpp
-key_type key;           // The key value
-comment_type comment;   // Optional comment
-```
-
-**Usage Example**:
-```cpp
-using MyKey = key_of<std::string, boost::optional<std::string>>;
-
-MyKey k1("temperature");              // Just a key
-MyKey k2("pressure", "in PSI");       // Key with comment
-
-if (k1 == k2) { /* ... */ }           // Compares keys only
-std::string str = k1;                  // "temperature, comment="
+// String conversion includes comment
+std::string str = documented;  // "max_events, comment=Maximum events per run"
 ```
 
 ---
 
-### any_key_of<KEY, COMMENT>
+### `any_key_of<KEY, COMMENT>`
 
-A variant type that can hold either a plain KEY or a key_of<KEY, COMMENT>.
+**Brief:** A variant type that can hold either a plain key or a key with comment metadata.
 
+**Definition:**
 ```cpp
 template <typename KEY, typename COMMENT>
 using any_key_of = boost::variant<KEY, key_of<KEY, COMMENT>>;
 ```
 
-**Purpose**: Allows code to accept either annotated or plain keys.
-
-**Usage Example**:
-```cpp
-using AnyKey = any_key_of<std::string, optional_comment_t>;
-
-AnyKey k1 = std::string("simple");
-AnyKey k2 = key_of<std::string, optional_comment_t>("annotated", "with comment");
-```
+**Usage:** Allows functions to accept either simple keys or annotated keys, providing flexibility without separate overloads.
 
 ---
 
-### value_of<VALUE, ANNOTATION>
+### `value_of<VALUE, ANNOTATION>`
 
-A template structure representing a value with an optional annotation.
+**Brief:** A template structure representing a value with an optional annotation. Used when configuration values need associated documentation.
 
-**Template Parameters**:
+**Template Parameters:**
 - `VALUE` - The value type (can be any type)
-- `ANNOTATION` - The annotation type (typically boost::optional<std::string>)
+- `ANNOTATION` - The annotation type (typically `boost::optional<std::string>`)
 
-**Type Aliases**:
+**Thread Safety:** Not thread-safe; no internal synchronization.
+
+#### Type Aliases
+
+| Alias | Type | Description |
+|-------|------|-------------|
+| `value_type` | `VALUE` | The underlying value type |
+| `annotation_type` | `ANNOTATION` | The annotation type |
+
+#### Constructors
+
+##### `value_of()`
+
+**Brief:** Default constructor creating a default-constructed value with no annotation.
+
+##### `value_of(value_type const& v)`
+
+**Brief:** Constructs with the given value and no annotation.
+
+**Parameters:**
+- `v` - The value
+
+##### `value_of(value_type const& v, typename annotation_type::value_type const& a)`
+
+**Brief:** Constructs with both a value and an annotation.
+
+**Parameters:**
+- `v` - The value
+- `a` - The annotation string
+
+#### Methods
+
+##### `operator value_type()`
+
+**Brief:** Implicit conversion to the underlying value type.
+
+**Returns:** The stored value
+
+#### Members
+
+| Member | Type | Description |
+|--------|------|-------------|
+| `value` | `value_type` | The actual value |
+| `annotation` | `annotation_type` | Optional annotation |
+
+#### Example
+
 ```cpp
-using value_type = VALUE;
-using annotation_type = ANNOTATION;
-```
+#include "artdaq-database/DataFormats/shared_types.h"
 
-**Constructors**:
-```cpp
-value_of();                                                  // Default
-value_of(value_type const& v);                              // Value only
-value_of(value_type const& v,                               // Value with annotation
-         typename annotation_type::value_type const& a);
-```
+using namespace artdaq::database::sharedtypes;
 
-**Operators**:
-```cpp
-operator value_type();                                       // Conversion to value type
-```
+using AnnotatedInt = value_of<int, optional_annotation_t>;
 
-**Members**:
-```cpp
-value_type value;              // The actual value
-annotation_type annotation;    // Optional annotation
-```
+// Value without annotation
+AnnotatedInt threshold(100);
 
-**Usage Example**:
-```cpp
-using AnnotatedInt = value_of<int, boost::optional<std::string>>;
+// Value with annotation
+AnnotatedInt maxRetries(5, "Number of retry attempts before failure");
 
-AnnotatedInt v1(42);                  // Just a value
-AnnotatedInt v2(100, "maximum");      // Value with annotation
-
-int plain = v1;                        // Implicit conversion to int
+// Implicit conversion
+int plain = threshold;  // plain = 100
 ```
 
 ---
 
-### any_value_of<VALUE, ANNOTATION>
+### `any_value_of<VALUE, ANNOTATION>`
 
-A variant type that can hold either a plain VALUE or a value_of<VALUE, ANNOTATION>.
+**Brief:** A variant type that can hold either a plain value or a value with annotation metadata.
 
+**Definition:**
 ```cpp
 template <typename VALUE, typename ANNOTATION>
 using any_value_of = boost::variant<VALUE, value_of<VALUE, ANNOTATION>>;
 ```
 
-**Purpose**: Allows code to accept either annotated or plain values.
-
 ---
 
-### vector_of<TYPE>
+### `vector_of<TYPE>`
 
-A list-based collection with a std::vector-like interface.
+**Brief:** A list-based collection with a vector-like interface. Uses `std::list` internally for iterator stability during modifications.
 
-**Template Parameters**:
+**Template Parameters:**
 - `TYPE` - The element type
 
-**Type Aliases**:
+**Thread Safety:** Not thread-safe; no internal synchronization.
+
+#### Type Aliases
+
+| Alias | Type | Description |
+|-------|------|-------------|
+| `value_type` | `TYPE` | Element type |
+| `container_type<Ts...>` | `std::list<Ts...>` | Underlying container template |
+| `collection_type` | `std::list<value_type>` | Actual container type |
+| `iterator` | `collection_type::iterator` | Iterator type |
+| `const_iterator` | `collection_type::const_iterator` | Const iterator type |
+| `size_type` | `collection_type::size_type` | Size type |
+
+#### Methods
+
+##### `empty() const -> bool`
+
+**Brief:** Checks if the collection contains no elements.
+
+**Returns:** `true` if empty, `false` otherwise
+
+##### `size() const -> size_type`
+
+**Brief:** Returns the number of elements in the collection.
+
+**Returns:** Number of elements
+
+##### `swap(vector_of<value_type>& other) -> void`
+
+**Brief:** Exchanges the contents with another vector_of.
+
+**Parameters:**
+- `other` - The vector to swap with
+
+##### `begin() -> iterator` / `begin() const -> const_iterator`
+
+**Brief:** Returns an iterator to the first element.
+
+**Returns:** Iterator to the beginning
+
+##### `end() -> iterator` / `end() const -> const_iterator`
+
+**Brief:** Returns an iterator past the last element.
+
+**Returns:** Iterator to the end
+
+##### `back() -> value_type&` / `back() const -> value_type const&`
+
+**Brief:** Returns a reference to the last element.
+
+**Returns:** Reference to the last element
+
+**Preconditions:**
+- Collection must not be empty
+
+##### `push_back(value_type const& val) -> void`
+
+**Brief:** Adds an element to the end of the collection.
+
+**Parameters:**
+- `val` - The value to add
+
+##### `erase(iterator position) -> iterator`
+
+**Brief:** Removes the element at the given position.
+
+**Parameters:**
+- `position` - Iterator to the element to remove
+
+**Returns:** Iterator to the element following the removed one
+
+##### `erase(iterator first, iterator last) -> iterator`
+
+**Brief:** Removes elements in the range [first, last).
+
+**Parameters:**
+- `first` - Iterator to the first element to remove
+- `last` - Iterator past the last element to remove
+
+**Returns:** Iterator to the element following the last removed one
+
+##### `insert(iterator position, value_type const& val) -> iterator`
+
+**Brief:** Inserts an element before the given position.
+
+**Parameters:**
+- `position` - Iterator before which to insert
+- `val` - The value to insert
+
+**Returns:** Iterator to the inserted element
+
+##### `operator()() -> collection_type&`
+
+**Brief:** Provides direct access to the underlying std::list.
+
+**Returns:** Reference to the internal collection
+
+#### Members
+
+| Member | Type | Description |
+|--------|------|-------------|
+| `values` | `collection_type` | The underlying std::list |
+
+#### Example
+
 ```cpp
-using value_type = TYPE;
-template <typename... Ts>
-using container_type = std::list<Ts...>;
-using collection_type = container_type<value_type>;
-using const_iterator = typename collection_type::const_iterator;
-using iterator = typename collection_type::iterator;
-using size_type = typename collection_type::size_type;
-```
+#include "artdaq-database/DataFormats/shared_types.h"
 
-**Note**: Despite the name "vector", this uses `std::list` internally for stable iterators.
+using namespace artdaq::database::sharedtypes;
 
-**Methods**:
-```cpp
-bool empty() const;
-void swap(vector_of<value_type>& other);
-size_type size() const;
-
-// Iterators
-iterator begin();
-iterator end();
-const_iterator begin() const;
-const_iterator end() const;
-
-// Element access
-value_type& back();
-value_type const& back() const;
-
-// Modifiers
-void push_back(value_type const& val);
-iterator erase(iterator position);
-iterator erase(iterator first, iterator last);
-iterator insert(iterator position, value_type const& val);
-
-// Direct access to underlying container
-collection_type& operator()();
-```
-
-**Member**:
-```cpp
-collection_type values;    // The underlying std::list
-```
-
-**Usage Example**:
-```cpp
 vector_of<int> numbers;
-numbers.push_back(1);
-numbers.push_back(2);
-numbers.push_back(3);
+numbers.push_back(10);
+numbers.push_back(20);
+numbers.push_back(30);
 
-for (auto& num : numbers) {
-    std::cout << num << " ";
+// Iteration
+for (auto& n : numbers) {
+    std::cout << n << " ";  // Output: 10 20 30
 }
+
+// Insert at beginning
+numbers.insert(numbers.begin(), 5);
+
+// Remove last
+numbers.erase(--numbers.end());
+
+// Direct access to list
+auto& list = numbers();
 ```
 
 ---
 
-### kv_pair_of<KEYTYPE, VALUETYPE>
+### `kv_pair_of<KEYTYPE, VALUETYPE>`
 
-A simple key-value pair structure.
+**Brief:** A simple key-value pair structure for use in ordered tables.
 
-**Template Parameters**:
+**Template Parameters:**
 - `KEYTYPE` - The key type
 - `VALUETYPE` - The value type
 
-**Type Aliases**:
-```cpp
-using key_type = KEYTYPE;
-using value_type = VALUETYPE;
-```
+**Thread Safety:** Not thread-safe; value type semantics.
 
-**Factory Method**:
-```cpp
-static kv_pair_of make(key_type const& key, value_type const& value);
-```
+#### Type Aliases
 
-**Members**:
-```cpp
-key_type key;
-value_type value;
-```
+| Alias | Type | Description |
+|-------|------|-------------|
+| `key_type` | `KEYTYPE` | The key type |
+| `value_type` | `VALUETYPE` | The value type |
 
-**Usage Example**:
-```cpp
-using IntPair = kv_pair_of<std::string, int>;
+#### Methods
 
-auto pair = IntPair::make("count", 42);
-std::cout << pair.key << ": " << pair.value;  // "count: 42"
+##### `make(key_type const& key, value_type const& value) -> kv_pair_of` [static]
+
+**Brief:** Factory method to create a key-value pair.
+
+**Parameters:**
+- `key` - The key
+- `value` - The value
+
+**Returns:** A new kv_pair_of instance
+
+#### Members
+
+| Member | Type | Description |
+|--------|------|-------------|
+| `key` | `key_type` | The key |
+| `value` | `value_type` | The value |
+
+#### Example
+
+```cpp
+#include "artdaq-database/DataFormats/shared_types.h"
+
+using namespace artdaq::database::sharedtypes;
+
+using StringPair = kv_pair_of<std::string, std::string>;
+
+auto pair = StringPair::make("host", "localhost");
+std::cout << pair.key << " = " << pair.value;  // host = localhost
 ```
 
 ---
 
-### table_of<KVP>
+### `table_of<KVP>`
 
-An ordered associative container (like a map) that maintains insertion order and supports duplicate keys.
+**Brief:** An ordered associative container that maintains insertion order and allows duplicate keys. Provides map-like access semantics while preserving order.
 
-**Template Parameters**:
-- `KVP` - Key-value pair type (must be kv_pair_of<K,V>)
+**Template Parameters:**
+- `KVP` - Key-value pair type (must be `kv_pair_of<K,V>`)
 
-**Inherits From**: `vector_of<KVP>`
+**Inherits From:** `vector_of<KVP>`
 
-**Type Aliases**:
+**Thread Safety:** Not thread-safe; no internal synchronization.
+
+#### Type Aliases
+
+| Alias | Type | Description |
+|-------|------|-------------|
+| `value_type` | `KVP` | The key-value pair type |
+| `key_type` | `KVP::key_type` | The key type |
+| `mapped_type` | `KVP::value_type` | The value type |
+| `size_type` | Inherited | Size type |
+| `iterator` | Inherited | Iterator type |
+| `const_iterator` | Inherited | Const iterator type |
+
+#### Methods
+
+##### `operator[](key_type const& key) -> mapped_type&`
+
+**Brief:** Accesses the value for a key, creating a default entry if the key does not exist.
+
+**Parameters:**
+- `key` - The key to look up
+
+**Returns:** Reference to the value associated with the key
+
+**Side Effects:** Creates a new entry with default value `{false}` if key not found
+
+**Complexity:** O(n) linear search
+
+##### `at(key_type const& key) -> mapped_type&` / `at(key_type const& key) const -> mapped_type const&`
+
+**Brief:** Accesses the value for a key, throwing if not found.
+
+**Parameters:**
+- `key` - The key to look up
+
+**Returns:** Reference to the value associated with the key
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `std::out_of_range` | Key not found in table |
+
+**Complexity:** O(n) linear search
+
+##### `find(key_type const& key) -> iterator` / `find(key_type const& key) const -> const_iterator`
+
+**Brief:** Searches for a key in the table.
+
+**Parameters:**
+- `key` - The key to search for
+
+**Returns:** Iterator to the first matching entry, or `end()` if not found
+
+**Complexity:** O(n) linear search
+
+##### `count(key_type const& key) const -> size_type`
+
+**Brief:** Counts the number of entries with the given key.
+
+**Parameters:**
+- `key` - The key to count
+
+**Returns:** Number of entries with the specified key (can be > 1 for duplicate keys)
+
+**Complexity:** O(n) linear search
+
+##### `delete_at(key_type const& key) -> mapped_type`
+
+**Brief:** Removes the first entry with the given key and returns its value.
+
+**Parameters:**
+- `key` - The key of the entry to remove
+
+**Returns:** The value that was associated with the key
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `std::out_of_range` | Key not found in table |
+
+**Complexity:** O(n) linear search
+
+#### Example
+
 ```cpp
-using value_type = KVP;
-using key_type = typename value_type::key_type;
-using mapped_type = typename value_type::value_type;
-using size_type = typename vector_of<KVP>::size_type;
-using const_iterator = typename vector_of<KVP>::const_iterator;
-using iterator = typename vector_of<KVP>::iterator;
-```
+#include "artdaq-database/DataFormats/shared_types.h"
 
-**Methods**:
+using namespace artdaq::database::sharedtypes;
 
-```cpp
-// Access (creates element if not found)
-mapped_type& operator[](key_type const& key);
+using ConfigTable = table_of<kv_pair_of<std::string, std::string>>;
 
-// Access (throws if not found)
-mapped_type& at(key_type const& key);
-mapped_type const& at(key_type const& key) const;
+ConfigTable config;
 
-// Search
-iterator find(key_type const& key);
-const_iterator find(key_type const& key) const;
-size_type count(key_type const& key) const;
-
-// Removal
-mapped_type delete_at(key_type const& key);
-```
-
-**Behavior**:
-
-1. **Ordered**: Maintains insertion order (unlike std::map)
-2. **Duplicate keys allowed**: count() can return > 1
-3. **operator[]**: Creates entry with default-constructed value if key not found
-4. **at()**: Throws std::out_of_range if key not found
-5. **find()**: Returns iterator to first matching key, or end()
-6. **delete_at()**: Removes first matching key and returns its value
-
-**Usage Example**:
-```cpp
-using StringTable = table_of<kv_pair_of<std::string, std::string>>;
-
-StringTable config;
+// Add entries (order preserved)
 config["host"] = "localhost";
 config["port"] = "8080";
-config["host"] = "backup.local";  // Duplicate key allowed
+config["timeout"] = "30";
 
-std::cout << config.count("host");  // Prints: 2
+// Duplicate keys allowed
+config["host"] = "backup.local";
+std::cout << config.count("host") << "\n";  // Output: 2
 
+// Safe access with at()
 try {
-    auto value = config.at("database");
+    auto& value = config.at("database");  // Throws - key not found
 } catch (std::out_of_range& e) {
-    // Key not found
+    std::cerr << "Key not found: " << e.what() << "\n";
 }
 
+// Search with find()
 auto it = config.find("port");
 if (it != config.end()) {
-    std::cout << it->value;  // "8080"
+    std::cout << "Found: " << it->value << "\n";  // Output: 8080
 }
 
-config.delete_at("host");     // Removes first "host" entry
-std::cout << config.count("host");  // Prints: 1
+// Remove first occurrence
+auto removed = config.delete_at("host");  // Removes "localhost"
+std::cout << config.count("host") << "\n";  // Output: 1
 ```
 
 ---
 
-### variant_value_of<TABLE_OF, VECTOR_OF>
+### `variant_value_of<TABLE_OF, VECTOR_OF>`
 
-A variant type representing a value that can be a table, vector, string, number (decimal/integer), or boolean.
+**Brief:** A variant type that can hold any of the common value types: nested tables, arrays, strings, decimal numbers, integers, or booleans. Uses recursive wrappers to support nested structures.
 
+**Definition:**
 ```cpp
 template <typename TABLE_OF, typename VECTOR_OF>
 using variant_value_of = boost::variant<
@@ -393,183 +628,233 @@ using variant_value_of = boost::variant<
 >;
 ```
 
-**Type Parameters**:
-- `TABLE_OF` - The table type (typically table_of<...>)
-- `VECTOR_OF` - The vector type (typically vector_of<...>)
+**Holds One Of:**
+| Type | Description |
+|------|-------------|
+| `boost::recursive_wrapper<TABLE_OF>` | Nested table (object) |
+| `boost::recursive_wrapper<VECTOR_OF>` | Nested array |
+| `std::string` | String value |
+| `decimal` (double) | Floating-point number |
+| `integer` (int64_t) | Integer number |
+| `bool` | Boolean value |
 
-**Holds One Of**:
-1. `boost::recursive_wrapper<TABLE_OF>` - Nested table (allows recursive structures)
-2. `boost::recursive_wrapper<VECTOR_OF>` - Nested vector/array
-3. `std::string` - String value
-4. `decimal` (double) - Floating-point number
-5. `integer` (int64_t) - Integer number
-6. `bool` - Boolean value
-
-**Recursive Wrapper**: Allows the variant to contain itself recursively (for nested structures).
-
-**Usage Example**:
+**Example:**
 ```cpp
-using MyTable = table_of<kv_pair_of<std::string, int>>;
-using MyVector = vector_of<int>;
+#include "artdaq-database/DataFormats/shared_types.h"
+
+using namespace artdaq::database::sharedtypes;
+using namespace artdaq::database;
+
+// Forward declare concrete types
+struct MyTable;
+struct MyVector;
+
 using MyVariant = variant_value_of<MyTable, MyVector>;
 
-MyVariant v1 = std::string("hello");
-MyVariant v2 = 3.14;
-MyVariant v3 = 42;
-MyVariant v4 = true;
+MyVariant strVal = std::string("hello");
+MyVariant intVal = integer{42};
+MyVariant decVal = decimal{3.14};
+MyVariant boolVal = true;
 
-// For nested structures, use recursive_wrapper
-MyTable nestedTable;
-MyVariant v5 = boost::recursive_wrapper<MyTable>(nestedTable);
+// Type checking with relaxed get
+if (auto* str = boost::get<std::string>(&strVal)) {
+    std::cout << "String: " << *str << "\n";
+}
 ```
 
 ---
 
-### unwrapper<A>
+### `unwrapper<A>`
 
-A helper template for working with variant types, providing convenient access to nested values.
+**Brief:** A helper template for convenient access to nested values in variant types. Provides methods to extract typed values from variant containers.
 
-**Template Parameters**:
+**Template Parameters:**
 - `A` - The variant type to unwrap
 
-**Constructor**:
-```cpp
-unwrapper(A&);
-```
+**Thread Safety:** Not thread-safe; operates on references.
 
-**Methods**:
+#### Constructor
 
-```cpp
-template <typename T>
-T& value_as();
+##### `unwrapper(A&)`
 
-template <typename T>
-T& value_as(std::string const& child);
+**Brief:** Constructs an unwrapper for the given variant reference.
 
-template <typename O>
-auto& value(std::string const& key);
+**Parameters:**
+- Reference to the variant to unwrap
 
-template <typename O, typename T>
-auto& value(std::string const& key);  // Creates if not found
-```
+#### Methods
 
-**Factory Function**:
-```cpp
-template <typename A>
-unwrapper<A> unwrap(A& any);
-```
+##### `value_as<T>() -> T&`
 
-**Usage Example**:
+**Brief:** Extracts a reference to the contained value as type T.
+
+**Template Parameters:**
+- `T` - The expected type
+
+**Returns:** Reference to the value as type T
+
+##### `value_as<T>(std::string const& child) -> T&`
+
+**Brief:** Extracts a child value as type T.
+
+**Parameters:**
+- `child` - The child key name
+
+**Returns:** Reference to the child value as type T
+
+##### `value<O>(std::string const& key) -> auto&`
+
+**Brief:** Gets the value at the specified key from container type O.
+
+**Template Parameters:**
+- `O` - The container type (must have `at()` method)
+
+**Parameters:**
+- `key` - The key to look up
+
+**Returns:** Reference to the value
+
+**Throws:** `std::out_of_range` if key not found
+
+##### `value<O, T>(std::string const& key) -> auto&`
+
+**Brief:** Gets the value at the specified key, creating a default T if not found.
+
+**Template Parameters:**
+- `O` - The container type
+- `T` - The default value type
+
+**Parameters:**
+- `key` - The key to look up
+
+**Returns:** Reference to the value (existing or newly created)
+
+#### Members
+
+| Member | Type | Description |
+|--------|------|-------------|
+| `any` | `A&` | Reference to the wrapped variant |
+
+---
+
+### `unwrap<A>(A& any) -> unwrapper<A>`
+
+**Brief:** Factory function to create an unwrapper for a variant.
+
+**Parameters:**
+- `any` - Reference to the variant to unwrap
+
+**Returns:** An unwrapper instance for the variant
+
+**Example:**
 ```cpp
 using MyVariant = variant_value_of<MyTable, MyVector>;
 
 MyVariant data = /* ... */;
-
 auto wrapper = unwrap(data);
 
 // Access nested table value
-auto& tableValue = wrapper.value<MyTable>("config");
-
-// Get typed value with default creation
-auto& intValue = wrapper.value<MyTable, int>("count");
-```
-
-**Method Details**:
-
-1. **value<O>(key)**: Gets value at key from type O, throws if not found
-2. **value<O,T>(key)**: Gets value at key from type O, creates default T if not found
-
-## Design Patterns
-
-### Optional Metadata Pattern
-
-The library provides a consistent pattern for optional metadata:
-
-```cpp
-// Keys can have optional comments
-key_of<std::string, optional_comment_t> key("name", "user's full name");
-
-// Values can have optional annotations
-value_of<int, optional_annotation_t> value(42, "maximum retries");
-```
-
-### Variant Access Pattern
-
-When working with variant types, use boost::get:
-
-```cpp
-variant_value_of<Table, Vector> var = /* ... */;
-
-if (auto* str = boost::get<std::string>(&var)) {
-    // Handle string case
-} else if (auto* num = boost::get<decimal>(&var)) {
-    // Handle decimal case
-} else if (auto* table = boost::get<boost::recursive_wrapper<Table>>(&var)) {
-    // Handle nested table case
-    auto& actualTable = table->get();  // Unwrap recursive_wrapper
-}
-```
-
-### Collection Building Pattern
-
-```cpp
-using ConfigTable = table_of<kv_pair_of<std::string, std::string>>;
-
-ConfigTable buildConfig() {
-    ConfigTable config;
-    config["host"] = "localhost";
-    config["port"] = "8080";
-    config["timeout"] = "30";
-    return config;
+try {
+    auto& tableValue = wrapper.value<MyTable>("config");
+} catch (std::out_of_range& e) {
+    // Key not found
 }
 ```
 
 ## Performance Considerations
 
-1. **std::list vs std::vector**:
-   - `vector_of` uses `std::list` internally
-   - Provides stable iterators (iterators not invalidated by insertions/deletions)
-   - Slower random access than std::vector
-   - Better for frequent insertions/deletions in the middle
+### List-Based Storage
 
-2. **table_of Lookups**:
-   - Linear search O(n) for find/at/count operations
-   - Not as efficient as std::map for large tables
-   - Maintains insertion order and allows duplicates
-   - Suitable for small to medium-sized tables
+`vector_of` uses `std::list` internally:
+- **Advantage:** Iterator stability - iterators remain valid during insertions/deletions
+- **Disadvantage:** No random access, cache-unfriendly memory layout
+- **Best for:** Frequent mid-sequence modifications
 
-3. **Variant Access**:
-   - boost::get with pointer has negligible overhead
-   - Avoid excessive type checking in tight loops
+### Linear Search in table_of
 
-4. **Recursive Wrappers**:
-   - Add indirection (pointer) overhead
-   - Necessary for recursive variant types
-   - Minimal impact for typical use cases
+All lookup operations in `table_of` are O(n):
+- **find(), at(), count(), operator[]:** Linear scan through entries
+- **Best for:** Small to medium-sized tables (< 100 entries)
+- **Consider alternatives:** For large tables with frequent lookups, consider std::unordered_map
 
-## Usage Across DataFormats
+### Variant Type Overhead
 
-These types are used extensively in all DataFormats submodules:
+Using `boost::variant` adds:
+- Type tag storage (typically 1-8 bytes)
+- Type checking on access
+- Recursive wrappers add pointer indirection
 
-- **Json**: JSON objects → `table_of`, JSON arrays → `vector_of`, JSON values → `variant_value_of`
-- **Xml**: XML elements → `table_of`, XML attributes → `key_of`, XML text → `value_of`
-- **FHiCL**: FHiCL tables → `table_of`, FHiCL sequences → `vector_of`, FHiCL parameters → `kv_pair_of`
-- **Conf**: Configuration tables → `table_of`, configuration values → `variant_value_of`
+## Relationship to Other Components
 
-## Related Files
+```
+shared_types.h
+    |
+    +-- Json/json_types.h (defines json_object_t, json_array_t using these templates)
+    +-- Xml/xml_types.h (defines xml_element_t using these templates)
+    +-- Fhicl/fhicl_types.h (defines fhicl_table_t, fhicl_sequence_t)
+    +-- Conf/conf_types.h (defines conf_table_t)
+    |
+    +-- Used by JsonDocument (document storage)
+    +-- Used by Overlay (document manipulation)
+```
 
-- **shared_literals.h** - String constants used as keys in tables
-- **common.h** - Includes boost/variant.hpp and sets BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
-- **Json/json_types.h** - JSON-specific type definitions using these templates
-- **Xml/xml_types.h** - XML-specific type definitions using these templates
-- **Fhicl/fhicl_types.h** - FHiCL-specific type definitions using these templates
-- **Conf/conf_types.h** - CONF-specific type definitions using these templates
+## See Also
 
-## Notes
+- [shared_literals.h](./shared_literals.h.md) - String constants used as keys in these types
+- [common.h](./common.h.md) - Configures boost::variant relaxed access mode
+- [Json/json_types.h](./Json/json_types.h.md) - JSON-specific instantiations
+- [External: Boost.Variant](https://www.boost.org/doc/libs/release/doc/html/variant.html) - boost::variant documentation
+- [External: Boost.Optional](https://www.boost.org/doc/libs/release/libs/optional/doc/html/index.html) - boost::optional documentation
 
-- All types are header-only with no separate implementation file
-- The use of `std::list` instead of `std::vector` in `vector_of` provides iterator stability
-- `table_of` allows duplicate keys, unlike std::map, which is important for certain configuration formats
-- The variant types support recursive structures through `boost::recursive_wrapper`
-- Template-based design allows type-safe, compile-time polymorphism
-- Optional metadata (comments, annotations) is pervasive, supporting self-documenting configurations
+## Notes for Developers
+
+### Common Pitfalls
+
+- **Pitfall 1:** The `vector_of` name is misleading - it uses `std::list` internally, so there is no random access operator[].
+- **Pitfall 2:** `table_of::operator[]` creates entries if they do not exist. Use `at()` or `find()` for safe lookups.
+- **Pitfall 3:** `key_of` equality ignores comments. Two keys with different comments but the same key value are considered equal.
+
+### Anti-patterns
+
+```cpp
+// DON'T assume vector_of has random access:
+vector_of<int> nums;
+// nums[0];  // Error - no operator[]!
+
+// DO iterate or use std::advance:
+auto it = nums.begin();
+std::advance(it, 0);
+int first = *it;
+
+// DON'T use operator[] for existence check (creates entry):
+if (table["key"]) { }  // BAD - creates entry if missing!
+
+// DO use find() for existence check:
+if (table.find("key") != table.end()) { }  // GOOD
+```
+
+### Best Practices
+
+1. **Use `at()` for safe access:**
+   ```cpp
+   try {
+       auto& value = table.at("key");
+   } catch (std::out_of_range&) {
+       // Handle missing key
+   }
+   ```
+
+2. **Use `find()` for conditional access:**
+   ```cpp
+   auto it = table.find("optional_key");
+   if (it != table.end()) {
+       process(it->value);
+   }
+   ```
+
+3. **Use relaxed boost::get for variant access:**
+   ```cpp
+   if (auto* str = boost::get<std::string>(&variant)) {
+       // Handle string case
+   }
+   ```

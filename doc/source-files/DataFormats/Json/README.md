@@ -18,8 +18,12 @@ The Json submodule provides comprehensive JSON support with Boost.Spirit-based p
 - **[json_writer.cpp](json_writer.cpp.md)** - JsonWriter implementation
 
 ### Conversion Utilities
-- **[convertjson2guijson.h](convertjson2guijson.h.md)** - Database ↔ GUI JSON conversion classes
+- **[convertjson2guijson.h](convertjson2guijson.h.md)** - Database to/from GUI JSON conversion classes
 - **[convertjson2guijson.cpp](convertjson2guijson.cpp.md)** - Conversion implementation
+
+### Utilities
+- **[presort_json.h](presort_json.h.md)** - Sort GUI JSON entries by name for consistent display
+- **[presort_json.cpp](presort_json.cpp.md)** - Pre-sorting implementation
 
 ### Convenience
 - **[json_common.h](json_common.h.md)** - Aggregator header including all JSON functionality

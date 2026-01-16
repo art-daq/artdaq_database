@@ -1,46 +1,71 @@
 # data_fhicl.h
 
-## File Overview
+**Path:** `artdaq-database/BasicTypes/data_fhicl.h`
 
-**Location**: `/home/user/artdaq-database/artdaq-database/BasicTypes/data_fhicl.h`
+**Purpose:** Defines the FhiclData structure, which wraps FHiCL (Fermilab Hierarchical Configuration Language) formatted configuration data. FHiCL is the primary configuration language in the artdaq ecosystem, and this class provides bidirectional conversion with JSON for database storage.
 
-This header defines the `FhiclData` class, which represents FHICL (Fermilab Hierarchical Configuration Language) formatted configuration data. FHICL is the primary configuration language used throughout the artdaq ecosystem for configuring DAQ systems.
 
-**Purpose**: Provides a wrapper class for FHICL configuration data with conversion capabilities to/from JSON format.
+## Key Concepts
+
+### FHiCL (Fermilab Hierarchical Configuration Language)
+
+FHiCL is a configuration language developed at Fermilab for high-energy physics experiments. It features:
+
+- **Hierarchical structure:** Nested tables using curly braces
+- **Human-readable syntax:** Similar to JSON but more flexible
+- **References and includes:** Configuration reuse via `@local::` references
+- **Flexible arrays:** Using square brackets
+
+Example FHiCL syntax:
+```fhicl
+# Comment
+module_name: {
+    parameter1: "value"
+    threshold: 100
+    enabled: true
+    channels: [0, 1, 2, 3, 4]
+    nested_table: {
+        inner_param: 42
+    }
+}
+```
+
+### JSON as Pivot Format
+
+FhiclData converts to/from JsonData for database storage. The conversion process:
+1. Parses FHiCL to an intermediate JSON structure
+2. Base64-encodes the original FHiCL for perfect round-trip fidelity
+3. Embeds both in the final JSON document
+
+This ensures:
+- Structured data for querying
+- Perfect preservation of original FHiCL formatting
+- Safe handling of special characters
+
+### File Name Metadata
+
+Unlike JsonData and XmlData, FhiclData includes a `fhicl_file_name` member. This metadata tracks the original source file and is useful for:
+- Debugging configuration issues
+- Audit trails
+- Error messages that reference file locations
+
+## Thread Safety
+
+- **Thread-safe:** No
+- **Concurrent access:** Multiple readers are safe; concurrent read/write requires external synchronization
+- **Locking:** No internal locking; callers must synchronize access when sharing FhiclData objects between threads
 
 ## Dependencies
 
-- `artdaq-database/BasicTypes/common.h` - Common utilities and TRACE logging support
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/BasicTypes/common.h` | TRACE logging framework and Boost.Core utilities |
 
-### TRACE Configuration
+## Classes/Structures
 
-```cpp
-#define TRACE_NAME "data_fhicl.h"
-```
+### `FhiclData`
 
-## Namespace Structure
-
-```cpp
-namespace artdaq {
-namespace database {
-namespace basictypes {
-    // FhiclData is defined here
-}}}
-```
-
-## Key Types/Classes
-
-### Forward Declarations
-
-```cpp
-struct JsonData;
-```
-
-**Purpose**: Forward declaration of `JsonData` to enable conversion operators without circular dependencies.
-
----
-
-### FhiclData
+**Brief:** A value type that wraps FHiCL-formatted configuration data with bidirectional JSON conversion support and optional filename metadata.
 
 ```cpp
 struct FhiclData final {
@@ -58,460 +83,585 @@ struct FhiclData final {
 };
 ```
 
-**Purpose**: A wrapper class for FHICL configuration data that provides:
-1. Storage for FHICL-formatted strings
-2. Bidirectional conversion with JSON format
-3. File name tracking for debugging/logging
-4. Stream I/O operators
-
-**Design**: Marked `final` - cannot be inherited from
+**Thread Safety:** Not thread-safe for concurrent modification. Multiple concurrent readers (const methods only) are safe.
 
 #### Member Variables
 
-##### fhicl_buffer
+##### `fhicl_buffer`
 
+**Brief:** Holds the FHiCL-formatted configuration string containing the actual configuration data.
+
+**Type:** `std::string`
+
+**Default:** Empty string `""`
+
+---
+
+##### `fhicl_file_name`
+
+**Brief:** Stores the original filename metadata for debugging and auditing purposes.
+
+**Type:** `std::string`
+
+**Default:** `"notprovided"`
+
+**Note:** This is metadata only - it does not affect the configuration content or database storage. Set this when loading from files to enable better error messages and audit trails.
+
+#### Constructors
+
+##### `FhiclData(std::string buffer)`
+
+**Brief:** Constructs a FhiclData object from a FHiCL-formatted string, using move semantics for efficiency.
+
+**Parameters:**
+- `buffer` - A string containing FHiCL configuration data. The string is moved into `fhicl_buffer`.
+
+**Preconditions:**
+- None (string may be empty, but empty strings may cause conversion failures later)
+
+**Postconditions:**
+- `fhicl_buffer` contains the provided string (moved)
+- `fhicl_file_name` remains at default value `"notprovided"`
+- Input `buffer` is in valid but unspecified state (moved-from)
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| `std::bad_alloc` | If memory allocation fails (extremely rare) |
+
+**Thread Safety:** Safe (constructor creates new object)
+
+**Example:**
 ```cpp
-std::string fhicl_buffer = "";
-```
+#include "artdaq-database/BasicTypes/data_fhicl.h"
+#include <iostream>
 
-**Purpose**: Holds the actual FHICL-formatted configuration string.
+using namespace artdaq::database::basictypes;
 
-**Default Value**: Empty string
+void createFhiclData() {
+  try {
+    // Create from FHiCL string
+    FhiclData config("daq_settings: { buffer_size: 8192 }");
 
-**Example Content**:
-```fhicl
-parameter1: value1
-parameter2: {
-    nested_param: value2
+    // Optionally set filename metadata for debugging
+    config.fhicl_file_name = "detector_config.fcl";
+
+    std::cout << "Configuration created:\n" << config << "\n";
+    std::cout << "Source file: " << config.fhicl_file_name << "\n";
+
+  } catch (const std::exception& e) {
+    std::cerr << "Error creating FhiclData: " << e.what() << "\n";
+  }
 }
-array_param: [1, 2, 3]
 ```
 
 ---
 
-##### fhicl_file_name
+##### `FhiclData()` (default)
 
+**Brief:** Creates an empty FhiclData with default values.
+
+**Preconditions:** None
+
+**Postconditions:**
+- `fhicl_buffer` is empty string `""`
+- `fhicl_file_name` is `"notprovided"`
+
+**Throws:** None
+
+**Thread Safety:** Safe (constructor creates new object)
+
+---
+
+##### `FhiclData(JsonData const& document)`
+
+**Brief:** Constructs FhiclData by extracting and decoding FHiCL from a JSON document that contains Base64-encoded FHiCL data. This is the reverse operation of the `operator JsonData()` conversion.
+
+**Parameters:**
+- `document` - A JsonData object containing Base64-encoded FHiCL. Must not be empty and must contain a "base64" field.
+
+**Preconditions:**
+- `document` must not be empty
+- `document.json_buffer` must contain a JSON structure with a "base64" field
+- The "base64" field must contain valid Base64-encoded data that decodes to valid JSON
+
+**Postconditions:**
+- `fhicl_buffer` contains the decoded FHiCL configuration
+- `fhicl_file_name` may be populated if the JSON contains filename metadata
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| `std::runtime_error` | When `document` is empty (assertion failure) |
+| `std::runtime_error` | When regex fails to find "base64" field in JSON |
+| `std::runtime_error` | When regex finds unexpected number of matches |
+| `std::runtime_error` | When Base64 decoding or FHiCL conversion fails |
+
+**Thread Safety:** Safe (constructor creates new object, reads from const input)
+
+**Example:**
 ```cpp
-std::string fhicl_file_name = "notprovided";
+#include "artdaq-database/BasicTypes/data_fhicl.h"
+#include "artdaq-database/BasicTypes/data_json.h"
+#include <iostream>
+
+using namespace artdaq::database::basictypes;
+
+void convertFromJson() {
+  // Assume we retrieved JSON from database
+  JsonData json_from_db = retrieveFromDatabase("config_id");
+
+  // Validate before conversion
+  if (json_from_db.empty()) {
+    std::cerr << "Error: Configuration not found in database\n";
+    return;
+  }
+
+  try {
+    // Convert to FHiCL
+    FhiclData fhicl(json_from_db);
+    std::cout << "Retrieved FHiCL configuration:\n" << fhicl << "\n";
+
+  } catch (const std::runtime_error& e) {
+    std::cerr << "Failed to convert JSON to FHiCL: " << e.what() << "\n";
+    // The JSON may be malformed or missing the base64 field
+  }
+}
 ```
 
-**Purpose**: Stores the original filename from which the FHICL data was loaded (if applicable).
+#### Conversion Operators
 
-**Default Value**: "notprovided"
+##### `operator JsonData() const`
 
-**Use Cases**:
-- Debugging: Identify source of configuration
-- Logging: Track which file caused errors
-- Error messages: Provide context in exceptions
-- Auditing: Record configuration sources
+**Brief:** Converts the FHiCL data to JSON format for database storage. The conversion includes Base64 encoding of the original FHiCL content for perfect round-trip fidelity.
 
-**Note**: This is metadata and doesn't affect the actual configuration content.
+**Returns:** JsonData containing the FHiCL configuration in JSON format with embedded Base64.
 
-## Constructors
+**Preconditions:**
+- `fhicl_buffer` should contain valid FHiCL syntax
 
-### FhiclData(std::string)
+**Postconditions:**
+- Returned JsonData contains the converted configuration
+- Original FhiclData object is unchanged
 
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| `std::runtime_error` | When FHiCL-to-JSON conversion fails (invalid FHiCL syntax) |
+
+**Thread Safety:** Safe (reads only, const method)
+
+**Side Effects:** None
+
+**Example:**
 ```cpp
-FhiclData(std::string buffer);
-```
+#include "artdaq-database/BasicTypes/data_fhicl.h"
+#include "artdaq-database/BasicTypes/data_json.h"
+#include <iostream>
 
-**Purpose**: Constructs a FhiclData object from a FHICL string.
+using namespace artdaq::database::basictypes;
 
-**Parameters**:
-- `buffer` - A string containing FHICL-formatted configuration data
+void storeToDatabase() {
+  try {
+    FhiclData fhicl("detector_module: { gain: 1.5 threshold: 100 }");
+    fhicl.fhicl_file_name = "detector.fcl";
 
-**Implementation**: Uses move semantics (see data_fhicl.cpp.md)
+    // Convert to JsonData (implicit conversion via operator)
+    JsonData json = fhicl;
 
-**Usage Example**:
-```cpp
-std::string config = R"(
-    daq_parameter: 1000
-    buffer_size: 4096
-)";
-FhiclData fhicl(config);
+    // Validate conversion succeeded
+    if (json.empty()) {
+      std::cerr << "Error: Conversion produced empty JSON\n";
+      return;
+    }
+
+    // Store JSON in database
+    std::cout << "Storing configuration, JSON size: "
+              << std::string(json).size() << " bytes\n";
+    // database.store("detector_config", json);
+
+  } catch (const std::runtime_error& e) {
+    std::cerr << "Conversion failed: " << e.what() << "\n";
+    // The FHiCL may have syntax errors
+  }
+}
 ```
 
 ---
 
-### FhiclData() (default)
+##### `operator std::string const&() const`
 
+**Brief:** Provides implicit conversion to const string reference, returning the raw FHiCL content.
+
+**Returns:** Const reference to `fhicl_buffer`.
+
+**Preconditions:** None
+
+**Postconditions:** None (no state change)
+
+**Throws:** None
+
+**Thread Safety:** Safe (returns const reference)
+
+**Example:**
 ```cpp
-FhiclData() = default;
+#include "artdaq-database/BasicTypes/data_fhicl.h"
+#include <iostream>
+
+using namespace artdaq::database::basictypes;
+
+void useFhiclAsString() {
+  FhiclData fhicl("param: value\ncount: 42");
+
+  // Implicit conversion to const string&
+  const std::string& content = fhicl;
+  std::cout << "FHiCL content: " << content << "\n";
+
+  // Works with functions expecting const string&
+  processString(fhicl);  // Implicit conversion
+}
 ```
 
-**Purpose**: Default constructor creates an empty FhiclData object.
+#### Static Methods
 
-**Result**:
-- `fhicl_buffer = ""`
-- `fhicl_file_name = "notprovided"`
+##### `type_version() -> const char*` (static constexpr)
 
-**Usage Example**:
+**Brief:** Returns a version identifier string used for database collection naming and schema compatibility.
+
+**Returns:** `"V100"` - indicates version 1.0.0 of the FhiclData schema.
+
+**Preconditions:** None
+
+**Postconditions:** None
+
+**Throws:** None
+
+**Thread Safety:** Safe (static constexpr, no state)
+
+**Example:**
 ```cpp
-FhiclData fhicl;  // Empty FHICL object
-// Later populate via stream or assignment
+#include "artdaq-database/BasicTypes/data_fhicl.h"
+#include <iostream>
+#include <string>
+
+using namespace artdaq::database::basictypes;
+
+void showSchemaVersion() {
+  // Get schema version at compile time
+  constexpr auto version = FhiclData::type_version();
+  std::cout << "FhiclData schema version: " << version << "\n";
+
+  // Used for collection naming
+  std::string collection = std::string("FhiclData_") + FhiclData::type_version();
+  std::cout << "Collection name: " << collection << "\n";  // "FhiclData_V100"
+}
 ```
 
----
+## Functions
 
-### FhiclData(JsonData const&)
+### `operator>>(std::istream& is, FhiclData& data) -> std::istream&`
 
-```cpp
-FhiclData(JsonData const& document);
-```
+**Brief:** Reads FHiCL data from an input stream. The input is expected to be JSON-encoded FHiCL, not raw FHiCL text.
 
-**Purpose**: Constructs a FhiclData object by converting from JSON format.
-
-**Parameters**:
-- `document` - JsonData object containing FHICL data encoded in JSON
-
-**Process**:
-1. Extracts Base64-encoded FHICL from JSON
-2. Decodes Base64 to get intermediate JSON
-3. Converts JSON to FHICL format
-4. Stores result in `fhicl_buffer`
-
-**Throws**: `std::runtime_error` if conversion fails
-
-**Usage Example**:
-```cpp
-JsonData json(R"({"base64": "cGFyYW1ldGVyOiB2YWx1ZQ=="})");
-FhiclData fhicl(json);  // Converts JSON → FHICL
-```
-
-**See**: data_fhicl.cpp.md for implementation details
-
-## Methods/Functions
-
-### Conversion to JsonData
-
-```cpp
-operator JsonData() const;
-```
-
-**Purpose**: Converts FHICL data to JSON format.
-
-**Return Value**: JsonData object containing the FHICL data encoded in JSON with Base64
-
-**Process**:
-1. Converts FHICL to JSON structure
-2. Encodes FHICL buffer in Base64
-3. Creates JSON document with encoded data
-4. Returns JsonData object
-
-**Throws**: `std::runtime_error` if conversion fails
-
-**Usage Example**:
-```cpp
-FhiclData fhicl("parameter: value");
-JsonData json = fhicl;  // Implicit conversion
-// json now contains Base64-encoded FHICL in JSON format
-```
-
----
-
-### Conversion to String
-
-```cpp
-operator std::string const&() const;
-```
-
-**Purpose**: Provides access to the raw FHICL buffer string.
-
-**Return Value**: Const reference to `fhicl_buffer`
-
-**Usage Example**:
-```cpp
-FhiclData fhicl("parameter: value");
-std::string config = fhicl;  // Implicit conversion
-std::cout << fhicl;  // Works via this operator
-```
-
----
-
-### type_version (static)
-
-```cpp
-static constexpr auto type_version() { return "V100"; }
-```
-
-**Purpose**: Returns the version identifier for the FhiclData type.
-
-**Return Value**: String literal "V100"
-
-**Usage**: Version tracking for database schema compatibility.
-
-**Note**: Used when creating collection names (e.g., "FhiclData_V100")
-
-## Stream Operators
-
-### operator>>
-
-```cpp
-std::istream& operator>>(std::istream& is, artdaq::database::basictypes::FhiclData& data);
-```
-
-**Purpose**: Reads FHICL data from an input stream (in JSON format).
-
-**Parameters**:
-- `is` - Input stream
+**Parameters:**
+- `is` - Input stream containing JSON-encoded FHiCL data
 - `data` - FhiclData object to populate
 
-**Return Value**: Reference to the stream (for chaining)
+**Preconditions:**
+- `is` should be in a valid state
+- Stream content should be JSON-encoded FHiCL (as produced by `operator JsonData()`)
 
-**Process**:
-1. Reads entire stream into a string
-2. Creates JsonData from the string
-3. Converts JsonData to FhiclData
-4. Stores result in `data`
+**Returns:** Reference to the input stream.
 
-**Note**: Input is expected to be JSON-encoded FHICL, not raw FHICL
+**Postconditions:**
+- `data` contains the decoded FHiCL configuration
+- Stream position is at EOF
 
-**Usage Example**:
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| `std::runtime_error` | When the stream content cannot be converted to FHiCL |
+
+**Thread Safety:** Unsafe (modifies `data`)
+
+**Side Effects:**
+- Reads entire stream content
+- Stream position will be at EOF after read
+
+**Example:**
 ```cpp
-std::ifstream file("config.json");
-FhiclData fhicl;
-file >> fhicl;  // Reads JSON, converts to FHICL
+#include "artdaq-database/BasicTypes/data_fhicl.h"
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
+using namespace artdaq::database::basictypes;
+
+bool loadJsonEncodedFhicl(const std::string& filepath, FhiclData& output) {
+  std::ifstream file(filepath);
+  if (!file) {
+    std::cerr << "Error: Cannot open file: " << filepath << "\n";
+    return false;
+  }
+
+  try {
+    file >> output;  // Reads JSON-encoded FHiCL
+    output.fhicl_file_name = filepath;
+    return true;
+
+  } catch (const std::runtime_error& e) {
+    std::cerr << "Error reading FHiCL: " << e.what() << "\n";
+    return false;
+  }
+}
 ```
 
 ---
 
-### operator<<
+### `operator<<(std::ostream& os, FhiclData const& data) -> std::ostream&`
 
-```cpp
-std::ostream& operator<<(std::ostream& os, artdaq::database::basictypes::FhiclData const& data);
-```
+**Brief:** Writes raw FHiCL text to the output stream (not JSON-encoded).
 
-**Purpose**: Writes raw FHICL data to an output stream.
-
-**Parameters**:
+**Parameters:**
 - `os` - Output stream
 - `data` - FhiclData object to write
 
-**Return Value**: Reference to the stream (for chaining)
+**Preconditions:**
+- `os` should be in a valid state
 
-**Output Format**: Raw FHICL text (not JSON-encoded)
+**Returns:** Reference to the output stream.
 
-**Usage Example**:
+**Postconditions:**
+- `fhicl_buffer` content written to stream
+- Stream position advanced
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| Stream exceptions | If stream is configured to throw on errors |
+
+**Thread Safety:** Safe if `data` is not concurrently modified
+
+**Side Effects:**
+- Writes `fhicl_buffer` content to stream
+
+**Example:**
 ```cpp
-FhiclData fhicl("parameter: value");
-std::cout << fhicl;  // Outputs: parameter: value
+#include "artdaq-database/BasicTypes/data_fhicl.h"
+#include <iostream>
+#include <fstream>
 
-std::ofstream file("config.fcl");
-file << fhicl;  // Writes raw FHICL to file
-```
+using namespace artdaq::database::basictypes;
 
-## TRACE Integration
+void writeFhiclToFile(const FhiclData& fhicl, const std::string& filepath) {
+  std::ofstream out(filepath);
+  if (!out) {
+    std::cerr << "Error: Cannot open file for writing: " << filepath << "\n";
+    return;
+  }
 
-### TraceStreamer Specialization
+  out << fhicl;  // Writes raw FHiCL text
 
-```cpp
-namespace {
-template <>
-inline TraceStreamer& TraceStreamer::operator<<(const artdaq::database::basictypes::FhiclData& r) {
-    std::ostringstream s;
-    s << r;
-    msg_append(s.str().c_str());
-    return *this;
-}
-}
-```
+  if (!out) {
+    std::cerr << "Error: Write operation failed\n";
+    return;
+  }
 
-**Purpose**: Allows FhiclData objects to be used in TRACE logging statements.
-
-**Usage Example**:
-```cpp
-FhiclData fhicl("debug_level: 10");
-TLOG(5) << "Configuration: " << fhicl;  // Works via this specialization
-```
-
-## Usage Context
-
-### Role in artdaq-database
-
-FHICL is the **primary configuration language** for artdaq systems:
-
-```
-FHICL Config File → FhiclData → JsonData → Database
-Database → JsonData → FhiclData → FHICL Config File
-```
-
-### Typical Usage Patterns
-
-#### 1. Load FHICL Configuration
-
-```cpp
-// From string
-FhiclData config(R"(
-    buffer_size: 8192
-    timeout_ms: 1000
-)");
-
-// From file (as JSON)
-std::ifstream file("config.json");
-FhiclData config2;
-file >> config2;
-```
-
-#### 2. Store in Database (via JSON)
-
-```cpp
-FhiclData fhicl("parameter: value");
-JsonData json = fhicl;  // Convert to JSON
-// Store json in database
-```
-
-#### 3. Retrieve from Database
-
-```cpp
-// Retrieve json from database
-JsonData json = get_from_database();
-FhiclData fhicl(json);  // Convert to FHICL
-std::cout << fhicl;     // Use the configuration
-```
-
-#### 4. Convert Formats
-
-```cpp
-// FHICL ↔ JSON conversions
-FhiclData fhicl("param: value");
-JsonData json = fhicl;         // FHICL → JSON
-FhiclData back = json;         // JSON → FHICL
-```
-
-## What is FHICL?
-
-**FHICL (Fermilab Hierarchical Configuration Language)** is a configuration language developed at Fermilab for configuring high-energy physics experiments.
-
-### FHICL Syntax Examples
-
-```fhicl
-# Simple parameter
-parameter: value
-
-# Nested structure
-module: {
-    name: "MyModule"
-    settings: {
-        threshold: 100
-        enabled: true
-    }
-}
-
-# Arrays
-channels: [0, 1, 2, 3, 4]
-
-# References
-base_config: {
-    timeout: 1000
-}
-my_config: @local::base_config
-```
-
-### Why FHICL?
-
-- **Hierarchical**: Supports nested configurations
-- **Readable**: Human-friendly syntax
-- **Powerful**: Supports references, includes, and substitutions
-- **Standard**: Used throughout artdaq ecosystem
-
-## JSON Encoding Format
-
-When FHICL is stored in JSON (for database), it uses Base64 encoding:
-
-```json
-{
-    "base64": "cGFyYW1ldGVyOiB2YWx1ZQ=="
+  std::cout << "Wrote FHiCL to: " << filepath << "\n";
 }
 ```
 
-This ensures:
-- FHICL special characters are preserved
-- Binary data (if any) is safely encoded
-- JSON remains valid
+---
 
-## Header Guards
+### `TraceStreamer::operator<<(const FhiclData& r)` (template specialization)
 
+**Brief:** Enables FhiclData objects to be used directly in TRACE logging statements for debugging.
+
+**Parameters:**
+- `r` - FhiclData object to log
+
+**Returns:** Reference to TraceStreamer (for chaining)
+
+**Thread Safety:** Safe (TRACE logging is thread-safe)
+
+**Example:**
 ```cpp
-#ifndef _ARTDAQ_DATABASE_BASICTYPES_FHICL_H_
-#define _ARTDAQ_DATABASE_BASICTYPES_FHICL_H_
+#include "artdaq-database/BasicTypes/data_fhicl.h"
+
+#ifdef TRACE_NAME
+#undef TRACE_NAME
+#endif
+#define TRACE_NAME "my_module.cpp"
+
+using namespace artdaq::database::basictypes;
+
+void debugWithTrace() {
+  FhiclData fhicl("param: value\nthreshold: 100");
+  fhicl.fhicl_file_name = "debug_config.fcl";
+
+  TLOG(10) << "Processing configuration: " << fhicl;
+  TLOG(11) << "Source file: " << fhicl.fhicl_file_name;
+}
 ```
+
+## Relationship to Other Components
+
+### Data Flow
+
+```
+FHiCL Config File --> FhiclData --> JsonData --> Database (MongoDB/FileSystemDB)
+Database --> JsonData --> FhiclData --> FHiCL Config File
+```
+
+### Module Dependencies
+
+- **data_fhicl.cpp** - Implements constructors, conversion operators, and template specializations
+- **data_fhicl_fusion.h** - Provides Boost.Fusion adaptation for generic programming
+- **data_json.h** - JsonData is the pivot format for all conversions
+- **base64.h** - Used internally for encoding FHiCL in JSON documents
+- **DataFormats/Fhicl/** - Provides underlying FHiCL parsing and conversion
+
+## See Also
+
+- [data_fhicl.cpp](./data_fhicl.cpp.md) - Implementation details
+- [data_fhicl_fusion.h](./data_fhicl_fusion.h.md) - Boost.Fusion adaptation
+- [data_json.h](./data_json.h.md) - JsonData pivot format
+- [basictypes.h](./basictypes.h.md) - Umbrella header
+- [External: FHiCL documentation](https://cdcvs.fnal.gov/redmine/projects/fhicl-cpp) - FHiCL language reference
 
 ## Notes for Developers
 
-### File Name Metadata
+### Common Pitfalls
 
-The `fhicl_file_name` member is informational:
-- Not used in comparisons
-- Not used in conversions
-- Helpful for debugging
-- Consider setting it when loading from files
+- **Pitfall 1:** Forgetting to set `fhicl_file_name` when loading from files. This metadata is useful for debugging error messages.
+- **Pitfall 2:** Expecting `operator>>` to read raw FHiCL text. It reads JSON-encoded FHiCL. For raw FHiCL, construct directly from a string read from the file.
+- **Pitfall 3:** Not handling exceptions during conversion. Always wrap conversions in try-catch when dealing with untrusted input.
+- **Pitfall 4:** Passing an empty JsonData to the constructor. This will throw a runtime error.
 
-### Conversion Path
+### Reading Raw FHiCL Files
 
-All FHICL↔JSON conversions go through:
-1. `FhiclData` ↔ intermediate JSON ↔ Base64 ↔ `JsonData`
+The `operator>>` expects JSON-encoded FHiCL, not raw FHiCL text. To read raw FHiCL files:
 
-### Error Handling
+```cpp
+#include "artdaq-database/BasicTypes/data_fhicl.h"
+#include <fstream>
+#include <iostream>
 
-Conversions can throw `std::runtime_error`:
-- Invalid JSON format
-- Base64 decoding failures
-- FHICL parsing errors
+using namespace artdaq::database::basictypes;
 
-Always wrap conversions in try-catch when dealing with untrusted input.
+bool loadRawFhicl(const std::string& filepath, FhiclData& output) {
+  std::ifstream file(filepath);
+  if (!file) {
+    std::cerr << "Error: Cannot open file: " << filepath << "\n";
+    return false;
+  }
 
-### Thread Safety
+  try {
+    // Read raw FHiCL content as a string
+    std::string content((std::istreambuf_iterator<char>(file)), {});
 
-The class is **not thread-safe** for concurrent writes.
+    if (content.empty()) {
+      std::cerr << "Error: File is empty\n";
+      return false;
+    }
 
-## Best Practices
+    // Create FhiclData from the raw string
+    output = FhiclData(content);
+    output.fhicl_file_name = filepath;
 
-1. **Set File Names**: When loading from files, set `fhicl_file_name` for debugging
-2. **Validate Input**: Check FHICL syntax before creating FhiclData objects
-3. **Handle Errors**: Wrap conversions in try-catch blocks
-4. **Use Constants**: Define configuration constants rather than string literals
+    return true;
 
-## Example: Complete Workflow
+  } catch (const std::exception& e) {
+    std::cerr << "Error loading FHiCL: " << e.what() << "\n";
+    return false;
+  }
+}
+```
+
+### Anti-patterns
+
+```cpp
+// DON'T do this - ignoring conversion errors:
+JsonData json = database.get("config");
+FhiclData fhicl(json);  // May throw if JSON is invalid!
+
+// DO this instead - handle conversion errors:
+try {
+  JsonData json = database.get("config");
+  if (json.empty()) {
+    std::cerr << "Configuration not found\n";
+    return;
+  }
+  FhiclData fhicl(json);
+  processConfig(fhicl);
+} catch (const std::runtime_error& e) {
+  std::cerr << "Configuration error: " << e.what() << "\n";
+}
+
+// DON'T do this - reading raw FHiCL with operator>>:
+std::ifstream file("config.fcl");  // Raw FHiCL file
+FhiclData fhicl;
+file >> fhicl;  // WRONG - expects JSON-encoded input!
+
+// DO this instead - read raw FHiCL as string:
+std::ifstream file("config.fcl");
+if (!file) {
+  std::cerr << "Cannot open file\n";
+  return;
+}
+std::string content((std::istreambuf_iterator<char>(file)), {});
+FhiclData fhicl(content);
+fhicl.fhicl_file_name = "config.fcl";
+
+// DON'T do this - forgetting to set filename metadata:
+FhiclData fhicl(loadedContent);
+// Later, error messages won't know which file caused the problem
+
+// DO this instead - always set filename when loading from files:
+FhiclData fhicl(loadedContent);
+fhicl.fhicl_file_name = filepath;
+```
+
+### Round-Trip Conversion
+
+FhiclData supports perfect round-trip conversion through JSON:
 
 ```cpp
 #include "artdaq-database/BasicTypes/data_fhicl.h"
 #include "artdaq-database/BasicTypes/data_json.h"
-#include <fstream>
+#include <iostream>
+#include <cassert>
 
-try {
-    // 1. Create FHICL configuration
-    FhiclData config(R"(
-        daq_settings: {
-            buffer_size: 8192
-            timeout_ms: 1000
-        }
-    )");
-    config.fhicl_file_name = "myconfig.fcl";
+using namespace artdaq::database::basictypes;
 
-    // 2. Convert to JSON for database storage
-    JsonData json = config;
+void testRoundTrip() {
+  try {
+    // Original FHiCL
+    FhiclData original("module: { param: value count: 42 }");
+    original.fhicl_file_name = "test.fcl";
 
-    // 3. Store to database (pseudo-code)
-    database.store("configurations", json);
+    // Convert to JSON
+    JsonData json = original;
 
-    // 4. Retrieve from database
-    JsonData retrieved = database.get("configurations");
+    if (json.empty()) {
+      std::cerr << "Error: Conversion to JSON failed\n";
+      return;
+    }
 
-    // 5. Convert back to FHICL
-    FhiclData restored(retrieved);
+    // Convert back to FHiCL
+    FhiclData restored(json);
 
-    // 6. Use the configuration
-    std::cout << "Config from " << restored.fhicl_file_name
-              << ":\n" << restored << "\n";
+    // Content should be equivalent (formatting may differ)
+    std::cout << "Original:\n" << original << "\n";
+    std::cout << "Restored:\n" << restored << "\n";
 
-} catch (const std::runtime_error& e) {
-    std::cerr << "Configuration error: " << e.what() << "\n";
+  } catch (const std::runtime_error& e) {
+    std::cerr << "Round-trip test failed: " << e.what() << "\n";
+  }
 }
 ```
-
-## Related Documentation
-
-- `data_fhicl.cpp.md` - Implementation details and conversion logic
-- `data_fhicl_fusion.h.md` - Boost.Fusion adaptation
-- `data_json.h.md` - JSON data type for conversions
-- FHICL documentation: See artdaq documentation

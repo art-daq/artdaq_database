@@ -1,90 +1,218 @@
 # ovlKeyValueWithMask.h
 
-## File Overview
+**Path:** `artdaq-database/Overlay/ovlKeyValueWithMask.h`
 
-A minimal template class that extends `ovlKeyValue` with maskable comparison support. Unlike `ovlKeyValueWithDefault`, this template does not initialize default values, making it suitable for overlaying existing complete JSON structures.
+**Purpose:** A minimal template class that extends `ovlKeyValue` with maskable comparison support. Unlike `ovlKeyValueWithDefault`, this template does not initialize default values, making it suitable for overlaying existing complete JSON structures such as document data and metadata fields that are expected to already exist.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/Overlay/ovlKeyValueWithMask.h`
+## Key Concepts
 
-## Purpose
+### Minimal Extension
 
-Provides comparison masking without default initialization, used for data and metadata fields where values should already exist.
+This template provides the simplest possible extension of `ovlKeyValue` - it only adds mask-aware comparison without any initialization logic. This makes it ideal for fields that:
+- Are required to exist before overlay creation
+- Do not need default values
+- Should support selective comparison masking
 
-## Class Definition
+### Comparison Masking
 
+Like other mask-enabled templates, the `mask` template parameter controls comparison behavior. When the corresponding bit is set in the global comparison mask, differences in this field are ignored during equality checks.
+
+## Thread Safety
+
+- **Thread-safe:** No
+- **Concurrent access:** Not supported; instances hold mutable references to JSON data
+- **Locking:** None; caller must synchronize access if used from multiple threads
+
+## Dependencies
+
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/Overlay/common.h` | Types, result_t, comparison flags, JSON literals |
+| `artdaq-database/Overlay/ovlKeyValue.h` | Base class for key-value overlay |
+
+## Classes/Structures
+
+### `ovlKeyValueWithMask<mask>`
+
+A template class extending `ovlKeyValue` with maskable comparison. Provides no additional initialization beyond the base class, suitable for required fields that already exist.
+
+**Template Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `mask` | `std::uint32_t` | Bitmask for comparison control from `DOCUMENT_COMPARE_FLAGS` |
+
+**Thread Safety:** Not thread-safe
+
+#### Methods
+
+##### `ovlKeyValueWithMask(object_t::key_type const& key, value_t& object)`
+
+**Brief:** Constructs an overlay for an existing JSON field. Simply wraps the value without any initialization or default value creation.
+
+**Parameters:**
+- `key` - The JSON key identifying this field within the parent
+- `object` - Reference to the JSON value to overlay
+
+**Preconditions:**
+- The field must already exist in the JSON structure
+
+**Postconditions:**
+- Overlay is ready to access the field value
+
+**Thread Safety:** Not thread-safe
+
+**Example:**
 ```cpp
-template <std::uint32_t mask>
-class ovlKeyValueWithMask : public ovlKeyValue {
- public:
-  ovlKeyValueWithMask(object_t::key_type const& key, value_t& object);
+#include "artdaq-database/Overlay/ovlKeyValueWithMask.h"
 
-  // defaults
-  ovlKeyValueWithMask(ovlKeyValueWithMask&&) = default;
-  ~ovlKeyValueWithMask() = default;
+using namespace artdaq::database::overlay;
 
-  // ops
-  result_t operator==(ovlKeyValueWithMask const&) const;
-};
-```
+void accessExistingField() {
+  value_t documentJson = object_t{};
+  auto& doc = documentJson.value_as<object_t>();
 
-## Implementation
+  // Field must exist before creating overlay
+  doc["data"] = object_t{{"key", "value"}};
 
-### Constructor
-```cpp
-template <std::uint32_t mask>
-ovlKeyValueWithMask<mask>::ovlKeyValueWithMask(object_t::key_type const& key,
-                                                value_t& value)
-    : ovlKeyValue(key, value) {}
-```
-Simple pass-through to base class, no initialization.
+  ovlKeyValueWithMask<DOCUMENT_COMPARE_MUTE_DATA> data("data", doc.at("data"));
 
-### Comparison
-```cpp
-template <std::uint32_t mask>
-result_t ovlKeyValueWithMask<mask>::operator==(ovlKeyValueWithMask const& other) const {
-  return ((useCompareMask() & mask) == mask) ? Success() : self() == other.self();
+  // Can now access the existing data
+  std::cout << data.to_string() << std::endl;
 }
 ```
-Checks mask bit and delegates to base comparison if not masked.
 
-## Usage
+##### `operator==(ovlKeyValueWithMask const& other) const -> result_t`
 
-### Type Aliases in ovlDocument.h
+**Brief:** Compares this overlay with another for equality, respecting the global comparison mask. If the mask bit is set, the comparison is skipped and returns success.
+
+**Parameters:**
+- `other` - The overlay to compare against
+
+**Returns:** `Success()` if the mask bit is set (comparison skipped) or if values are equal; delegates to base class `self() == other.self()` otherwise
+
+**Thread Safety:** Not thread-safe
+
+**Example:**
+```cpp
+// When mask bit is set, comparison always succeeds
+useCompareMask(DOCUMENT_COMPARE_MUTE_DATA);
+auto result = data1 == data2;  // Always Success(), regardless of actual content
+
+// When mask bit is not set, actual comparison is performed
+useCompareMask(0);
+result = data1 == data2;  // Compares actual JSON content
+```
+
+## Type Aliases
+
+The following type aliases are defined in `ovlDocument.h`:
+
 ```cpp
 using ovlData = ovlKeyValueWithMask<DOCUMENT_COMPARE_MUTE_DATA>;
 using ovlMetadata = ovlKeyValueWithMask<DOCUMENT_COMPARE_MUTE_METADATA>;
 ```
 
-### Example
+## Usage Examples
+
+### Document Data and Metadata
+
 ```cpp
-value_t documentJson;
-documentJson["data"] = object_t{/* user data */};
-documentJson["metadata"] = object_t{/* metadata */};
+#include "artdaq-database/Overlay/ovlKeyValueWithMask.h"
 
-ovlData data("data", documentJson.at("data"));
-ovlMetadata metadata("metadata", documentJson.at("metadata"));
+using namespace artdaq::database::overlay;
 
-// Compare with mask
-useCompareMask(DOCUMENT_COMPARE_MUTE_DATA);
-auto result = data == otherData;  // Always succeeds (data masked)
+// Type aliases for clarity
+using ovlData = ovlKeyValueWithMask<DOCUMENT_COMPARE_MUTE_DATA>;
+using ovlMetadata = ovlKeyValueWithMask<DOCUMENT_COMPARE_MUTE_METADATA>;
+
+void handleDocument() {
+  value_t documentJson = object_t{};
+  auto& doc = documentJson.value_as<object_t>();
+
+  // Both fields must exist
+  doc["data"] = object_t{{"threshold", 100}, {"enabled", true}};
+  doc["metadata"] = object_t{{"version", "1.0"}, {"author", "system"}};
+
+  ovlData data("data", doc.at("data"));
+  ovlMetadata metadata("metadata", doc.at("metadata"));
+
+  // Access values
+  auto& dataObj = data.object_value();
+  std::cout << "Threshold: " << dataObj["threshold"] << std::endl;
+}
 ```
 
-## Design Rationale
+### Masked Comparison for Testing
 
-**No Initialization**: Unlike `ovlKeyValueWithDefault`, this assumes values exist. Used for required fields like data/metadata in documents.
+```cpp
+#include "artdaq-database/Overlay/ovlKeyValueWithMask.h"
 
-**Template Mask**: Enables compile-time type differentiation and selective masking.
+using namespace artdaq::database::overlay;
 
-## Related Files
+bool compareDocumentsIgnoringData() {
+  value_t doc1, doc2;
+  // ... populate documents ...
 
-- **ovlKeyValue.h** - Base class
-- **ovlDocument.h** - Primary user (ovlData, ovlMetadata)
-- **ovlKeyValueWithDefault.h** - Similar but with default initialization
-- **common.h** - Mask constants
+  // Create overlays
+  ovlData data1("data", doc1.at("data"));
+  ovlData data2("data", doc2.at("data"));
 
-## Notes
+  // Ignore data differences, focus on structure
+  useCompareMask(DOCUMENT_COMPARE_MUTE_DATA);
 
-- Header-only template
-- No .cpp file needed
-- Minimal overhead over base class
-- Used primarily for document data and metadata fields
+  auto result = data1 == data2;
+  return result.first;  // Always true since data is masked
+}
+```
+
+## Comparison with Similar Templates
+
+| Template | Initialization | Default Value | Primary Use Case |
+|----------|---------------|---------------|------------------|
+| `ovlKeyValueWithMask` | None | None | Required fields (data, metadata) |
+| `ovlKeyValueWithDefault` | Creates empty object | `{}` | Optional object fields |
+| `ovlStringKeyValue` | Sets default string | "not-provided" | Optional string fields |
+
+## Relationship to Other Components
+
+This template provides the simplest mask-aware overlay, used primarily in `ovlDocument` for wrapping the main "data" and "metadata" sections of database documents. These are:
+- Required fields that must exist in valid documents
+- Large structures where full comparison may be expensive
+- Fields where masking provides flexibility in testing and validation
+
+## See Also
+
+- [ovlKeyValue.h](./ovlKeyValue.h.md) - Base class providing core overlay functionality
+- [ovlDocument.h](./ovlDocument.h.md) - Primary user of this template (ovlData, ovlMetadata)
+- [ovlKeyValueWithDefault.h](./ovlKeyValueWithDefault.h.md) - Similar template with default initialization
+- [common.h](./common.h.md) - Defines `DOCUMENT_COMPARE_FLAGS` enum
+
+## Notes for Developers
+
+### Common Pitfalls
+
+- **Field must exist:** Unlike `ovlKeyValueWithDefault`, this template does not create the field. The JSON structure must already contain the field before creating the overlay.
+- **No validation:** The constructor performs no type validation on the wrapped value.
+
+### Design Notes
+
+- This is a header-only template with no corresponding .cpp file
+- Minimal overhead - only adds mask checking to base class comparison
+- No member variables beyond inherited ones
+- Designed for high-performance scenarios where initialization is unnecessary
+
+### When to Use Which Template
+
+```cpp
+// Use ovlKeyValueWithMask for required, pre-existing fields
+// that need mask-aware comparison
+ovlKeyValueWithMask<MASK> data("data", existingValue);
+
+// Use ovlKeyValueWithDefault for optional fields that should
+// be auto-created if missing
+ovlKeyValueWithDefault<MASK> optional("optional", parentObject);
+
+// Use ovlStringKeyValue for string fields with default values
+ovlStringKeyValue<MASK> version("version", stringValue);
+```

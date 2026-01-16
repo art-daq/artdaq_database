@@ -1,75 +1,205 @@
 # json_common.h
 
-## File Overview
+**Path:** `artdaq-database/DataFormats/Json/json_common.h`
 
-This is a convenience aggregator header that provides a single include point for all common JSON DataFormat functionality. It bundles the JSON reader, writer, and core DataFormats includes.
+**Purpose:** Provides a single convenience include point that aggregates all common JSON DataFormat functionality. This header bundles the JSON reader (parser), JSON writer (generator), and core DataFormats infrastructure, simplifying includes for code that needs bidirectional JSON conversion capabilities.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/DataFormats/Json/json_common.h`
+
+## Key Concepts
+
+### Aggregator Header Pattern
+
+This header follows the "aggregator" or "umbrella" header pattern, which is common in C++ libraries. Instead of requiring users to include multiple related headers individually, an aggregator header provides a single include that brings in all commonly-needed functionality for a subsystem.
+
+### JSON Processing Pipeline
+
+The JSON DataFormats module provides a complete pipeline for JSON handling:
+1. **Parsing (Reading):** Convert JSON text to internal AST representation
+2. **Manipulation:** Work with JSON data using type-safe structures
+3. **Generation (Writing):** Convert AST back to JSON text
+
+This header provides access to both ends of the pipeline.
+
+## Thread Safety
+
+- **Thread-safe:** Not applicable (header-only aggregator)
+- **Concurrent access:** Thread safety depends on the included components
+- **Locking:** See individual component documentation
 
 ## Dependencies
 
-### Project Headers
-- `"artdaq-database/DataFormats/Json/json_reader.h"` - JSON parser functionality
-- `"artdaq-database/DataFormats/Json/json_writer.h"` - JSON generator functionality
-- `"artdaq-database/DataFormats/common.h"` - Common DataFormats headers
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/DataFormats/Json/json_reader.h` | JSON parser functionality using Boost.Spirit Qi |
+| `artdaq-database/DataFormats/Json/json_writer.h` | JSON generator functionality using Boost.Spirit Karma |
+| `artdaq-database/DataFormats/common.h` | Common DataFormats infrastructure (boost::variant configuration, standard libraries) |
 
-## Purpose
+## Included Functionality
 
-This header simplifies inclusion of JSON functionality by providing:
-1. **JSON Parsing** - Via json_reader.h (Boost.Spirit Qi parser)
-2. **JSON Generation** - Via json_writer.h (Boost.Spirit Karma generator)
-3. **Common Infrastructure** - Via common.h (boost::variant configuration, standard libraries)
+By including `json_common.h`, you gain access to:
 
-## Usage
+### From json_reader.h
 
-```cpp
-#include "artdaq-database/DataFormats/Json/json_common.h"
+- `JsonReader` class for parsing JSON text to AST
+- Grammar definitions for JSON syntax
 
-// Now you have access to:
-// - JsonReader class
-// - JsonWriter class
-// - json::object_t, json::array_t, json::value_t types
-// - All common DataFormats infrastructure
-```
+### From json_writer.h
 
-## Design Rationale
+- `JsonWriter` class for generating JSON text from AST
+- Formatting options for output
 
-**Benefits**:
-- Single include for complete JSON functionality
-- Reduces boilerplate in source files
-- Ensures consistent inclusion of related headers
+### From common.h
 
-**Use Cases**:
-- Converting between JSON text and AST
-- Reading and writing JSON documents
-- Working with JSON data structures
+- JSON type definitions (`json::object_t`, `json::array_t`, `json::value_t`)
+- Boost.variant configuration for recursive types
+- Standard library includes
 
-## Related Files
+## Usage Examples
 
-- **json_reader.h** - Parser implementation
-- **json_writer.h** - Generator implementation
-- **json_types.h** - JSON type definitions
-- **common.h** - DataFormats common infrastructure
-
-## Best Practices
-
-Include this header in .cpp files that need both reading and writing JSON:
+### Basic JSON Round-Trip
 
 ```cpp
 #include "artdaq-database/DataFormats/Json/json_common.h"
+#include <iostream>
+#include <string>
 
-void processJson(const std::string& input, std::string& output) {
-    json::object_t ast;
-    json::JsonReader{}.read(input, ast);
+void processJsonDocument() {
+  using namespace artdaq::database::json;
 
-    // Process ast...
+  // Input JSON text
+  std::string json_input = R"({
+    "name": "detector_config",
+    "version": 1,
+    "parameters": {
+      "threshold": 100,
+      "enabled": true
+    }
+  })";
 
-    json::JsonWriter{}.write(ast, output);
+  // Parse JSON to AST
+  object_t ast;
+  JsonReader reader;
+
+  try {
+    if (!reader.read(json_input, ast)) {
+      std::cerr << "Failed to parse JSON\n";
+      return;
+    }
+
+    // Manipulate AST (example: access a value)
+    // ... manipulation code ...
+
+    // Generate JSON from AST
+    std::string json_output;
+    JsonWriter writer;
+    if (!writer.write(ast, json_output)) {
+      std::cerr << "Failed to generate JSON\n";
+      return;
+    }
+
+    std::cout << "Processed JSON:\n" << json_output << "\n";
+
+  } catch (const std::exception& e) {
+    std::cerr << "JSON processing error: " << e.what() << "\n";
+  }
 }
 ```
 
-## Notes
+### Configuration Processing
 
-- This is a pure aggregator header with no code
-- Includes both parser and generator for bidirectional conversion
-- Automatically includes necessary type definitions and common infrastructure
+```cpp
+#include "artdaq-database/DataFormats/Json/json_common.h"
+
+namespace db = artdaq::database;
+namespace jsn = artdaq::database::json;
+
+bool validateAndReformat(const std::string& input, std::string& output) {
+  jsn::object_t document;
+
+  // Parse
+  jsn::JsonReader reader;
+  if (!reader.read(input, document)) {
+    return false;
+  }
+
+  // Validate structure (example)
+  if (document.count("version") == 0) {
+    return false;  // Missing required field
+  }
+
+  // Reformat with consistent formatting
+  jsn::JsonWriter writer;
+  return writer.write(document, output);
+}
+```
+
+## Relationship to Other Components
+
+This aggregator header sits at the interface layer of the JSON DataFormats module:
+
+```
+User Code
+    |
+    v
+json_common.h (this file)
+    |
+    +-- json_reader.h (parsing)
+    |       |
+    |       +-- json_types.h (AST types)
+    |
+    +-- json_writer.h (generation)
+    |       |
+    |       +-- json_types.h (AST types)
+    |
+    +-- common.h (infrastructure)
+```
+
+### Module Relationships
+
+- **ConfigurationDB**: Uses JSON DataFormats for configuration storage and retrieval
+- **JsonDocument**: Uses JSON types for document representation
+- **FHiCL DataFormats**: Converts to/from JSON format using these types
+
+## See Also
+
+- [json_reader.h](./json_reader.h.md) - JSON parser implementation details
+- [json_writer.h](./json_writer.h.md) - JSON generator implementation details
+- [json_types.h](./json_types.h.md) - JSON AST type definitions
+- [common.h](../common.h.md) - DataFormats common infrastructure
+- [README.md](./README.md) - JSON module overview
+
+## Notes for Developers
+
+### When to Use This Header
+
+**Use `json_common.h` when:**
+- You need both parsing and generation capabilities
+- You want a simple, single include for JSON functionality
+- You're writing code that processes JSON documents
+
+**Use individual headers when:**
+- You only need parsing (`json_reader.h`)
+- You only need generation (`json_writer.h`)
+- You only need type definitions (`json_types.h`)
+- Compilation time is critical (fewer includes = faster compilation)
+
+### Common Pitfalls
+
+- **Include order:** This header should be included before any code that uses JSON types
+- **Namespace usage:** Remember to use the `artdaq::database::json` namespace or the `jsn` alias
+
+### Best Practices
+
+```cpp
+// Prefer: Include at file scope
+#include "artdaq-database/DataFormats/Json/json_common.h"
+
+// Use namespace alias for cleaner code
+namespace jsn = artdaq::database::json;
+
+void example() {
+  jsn::object_t obj;
+  jsn::JsonReader reader;
+  // ...
+}
+```

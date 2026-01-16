@@ -2,13 +2,15 @@
 
 ## Overview
 
-The Utilities module contains command-line tools for managing, converting, and maintaining artdaq-database configurations and databases. These tools provide essential functionality for database operations, format conversions, and maintenance tasks.
+The Utilities module contains command-line tools, scripts, and configuration files for managing, converting, and maintaining artdaq-database configurations and databases. These tools provide essential functionality for database operations, format conversions, infrastructure management, and maintenance tasks.
 
 ## Module Location
 
-**Path**: `/home/user/artdaq-database/artdaq-database/Utilities/`
+**Path**: `artdaq-database/Utilities/`
 
-## Available Utilities
+---
+
+## Command-Line Tools (C++)
 
 ### Configuration Database Tools
 
@@ -20,7 +22,7 @@ The Utilities module contains command-line tools for managing, converting, and m
 - Direct database operations
 - Testing and debugging interface
 
-**Documentation**: [conftool.md](./conftool.md)
+**Documentation**: [conftool.cc.md](./conftool.cc.md)
 
 ---
 
@@ -29,18 +31,26 @@ The Utilities module contains command-line tools for managing, converting, and m
 #### bulkloader
 **Purpose**: High-performance bulk import of FHiCL files to database
 
+**Usage**:
+```bash
+bulkloader -p /path/to/configs -c MyConfig -r 1001 -t 8
+```
+
 **Key Features**:
 - Multi-threaded file loading
 - Configurable thread count
 - Performance statistics
 - Optional verification mode
 
-**Documentation**: [bulkloader.md](./bulkloader.md)
-
-**Typical Use**: Initial database population, configuration migration
+**Documentation**: [bulkloader.cc.md](./bulkloader.cc.md)
 
 #### bulkdownloader
 **Purpose**: High-performance bulk export of database configurations to files
+
+**Usage**:
+```bash
+bulkdownloader -p /path/to/export -c MyConfig -r 1001
+```
 
 **Key Features**:
 - Multi-threaded document retrieval
@@ -48,9 +58,7 @@ The Utilities module contains command-line tools for managing, converting, and m
 - Configuration composition-based export
 - Performance statistics
 
-**Documentation**: [bulkdownloader.md](./bulkdownloader.md)
-
-**Typical Use**: Database backup, configuration export, reverse migration
+**Documentation**: [bulkdownloader.cc.md](./bulkdownloader.cc.md)
 
 ---
 
@@ -59,18 +67,26 @@ The Utilities module contains command-line tools for managing, converting, and m
 #### migrate_database
 **Purpose**: Migrate database to new format with schema updates
 
+**Usage**:
+```bash
+migrate_database -u filesystemdb:///path/to/database
+```
+
 **Key Features**:
 - Document format migration
 - JSONDocumentMigrator integration
 - Non-destructive (creates new database)
 - Collection-by-collection processing
 
-**Documentation**: [migrate_database.md](./migrate_database.md)
-
-**Typical Use**: Schema upgrades, format migrations
+**Documentation**: [migrate_database.cc.md](./migrate_database.cc.md)
 
 #### rebuild_database_index
 **Purpose**: Rebuild search indexes for filesystem databases
+
+**Usage**:
+```bash
+rebuild_database_index -u filesystemdb:///path/to/database
+```
 
 **Key Features**:
 - Creates fresh indexes from documents
@@ -78,9 +94,7 @@ The Utilities module contains command-line tools for managing, converting, and m
 - Non-destructive (creates new database)
 - Auto-rebuild mode
 
-**Documentation**: [rebuild_database_index.md](./rebuild_database_index.md)
-
-**Typical Use**: Index corruption recovery, index format upgrades
+**Documentation**: [rebuild_database_index.cc.md](./rebuild_database_index.cc.md)
 
 ---
 
@@ -89,18 +103,28 @@ The Utilities module contains command-line tools for managing, converting, and m
 #### fhicl2json
 **Purpose**: Convert FHiCL configuration files to JSON format
 
+**Usage**:
+```bash
+fhicl2json -c config.fcl > config.json
+fhicl2json -c config.fcl -m  # Extract main subtree only
+```
+
 **Key Features**:
 - Full FHiCL syntax support
 - Subtree extraction (--main flag)
 - Include file resolution
 - Clean JSON output to stdout
 
-**Documentation**: [fhicl2json.md](./fhicl2json.md)
-
-**Typical Use**: Format conversion, database preparation, validation
+**Documentation**: [fhicl2json.cc.md](./fhicl2json.cc.md)
 
 #### readfhicl
 **Purpose**: Read and display FHiCL files with various processing options
+
+**Usage**:
+```bash
+readfhicl -c config.fcl -r -p  # Resolve and prune
+readfhicl -c config.fcl -s     # Show prolog
+```
 
 **Key Features**:
 - Display with/without prolog
@@ -108,24 +132,14 @@ The Utilities module contains command-line tools for managing, converting, and m
 - Prune nil values
 - Formatted output
 
-**Documentation**: [readfhicl.md](./readfhicl.md)
-
-**Typical Use**: Configuration inspection, debugging, validation
+**Documentation**: [readfhicl.cc.md](./readfhicl.cc.md)
 
 #### refactorfhicl
 **Purpose**: Refactor FHiCL files by extracting tables (experimental)
 
-**Key Features**:
-- Automatic table extraction
-- Version-based deduplication
-- Include directive generation
-- Modularization support
-
 **Status**: Experimental/incomplete
 
-**Documentation**: [refactorfhicl.md](./refactorfhicl.md)
-
-**Note**: Contains incomplete code; review before use
+**Documentation**: [refactorfhicl.cc.md](./refactorfhicl.cc.md)
 
 ---
 
@@ -134,30 +148,167 @@ The Utilities module contains command-line tools for managing, converting, and m
 #### readjson
 **Purpose**: JSON parser/serializer performance testing
 
-**Key Features**:
-- 100-iteration reliability test
-- Performance benchmarking
-- Round-trip validation
-- Progress indication
-
-**Documentation**: [readjson.md](./readjson.md)
-
-**Typical Use**: Performance testing, parser validation
+**Documentation**: [readjson.cc.md](./readjson.cc.md)
 
 #### fixtestjson
 **Purpose**: Convert JSON values to strings for schema compatibility
 
-**Key Features**:
-- Recursive type conversion
-- In-place file modification
-- Numbers/booleans → strings
-- Document.data migration
-
-**Documentation**: [fixtestjson.md](./fixtestjson.md)
-
 **Warning**: Overwrites original files
 
-**Typical Use**: Test data preparation, schema migration
+**Documentation**: [fixtestjson.cc.md](./fixtestjson.cc.md)
+
+---
+
+## Scripts and Wrappers
+
+### conftool.py (Python)
+**Purpose**: High-level Python wrapper for configuration management
+
+**Usage**:
+```bash
+conftool.py importConfiguration demo_safemode
+conftool.py exportConfiguration demo_safemode00003
+conftool.py archiveRunConfiguration production 12345
+conftool.py getListOfAvailableRunConfigurations
+```
+
+**Key Features**:
+- Configuration import/export with versioning
+- Run archival operations
+- Flag-based configuration filtering
+- Schema validation
+- Bulk operations via SSH
+
+**Documentation**: [conftool_py.md](./conftool_py.md)
+
+### readwrite.js (JavaScript)
+**Purpose**: Node.js utility for FHiCL/JSON round-trip testing
+
+**Usage**:
+```bash
+node readwrite.js config.fcl
+```
+
+**Documentation**: [readwrite_js.md](./readwrite_js.md)
+
+---
+
+## Configuration Files
+
+### .database.bash.rc
+**Path**: `bashrc/.database.bash.rc`
+
+**Purpose**: Shell environment setup for artdaq-database operations
+
+**Key Features**:
+- UPS product setup
+- Environment variable configuration
+- Web GUI server management functions
+- SSH tunnel utilities
+
+**Documentation**: [database_bash_rc.md](./database_bash_rc.md)
+
+### mongod.conf
+**Path**: `config/mongod.conf`
+
+**Purpose**: Template MongoDB configuration file
+
+**Documentation**: [mongod_conf.md](./mongod_conf.md)
+
+### schema.fcl
+**Path**: `schema.fcl`
+
+**Purpose**: Configuration schema defining file-to-collection mappings
+
+**Key Features**:
+- Regex patterns for file matching
+- Collection assignment rules
+- Entity name extraction
+- Support for artdaq processes, includes, run history, and system layout
+
+**Documentation**: [schema_fcl.md](./schema_fcl.md)
+
+---
+
+## Systemd Services and Infrastructure
+
+**Path**: `systemd/`
+
+### Service Unit Files
+
+| Service | Purpose |
+|---------|---------|
+| `mongodbserver@.service` | MongoDB server instances |
+| `mongodbarbiter@.service` | MongoDB arbiter for replica sets |
+| `webconfigeditor@.service` | Web configuration editor |
+| `ssh-tunnel@.service` | Persistent SSH tunnels |
+
+### Control Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `mongod-ctrl.sh` | MongoDB lifecycle management |
+| `webconfigeditor-ctrl.sh` | Web editor lifecycle management |
+| `backup_artdaq_database.sh` | Database backup operations |
+| `setup_database.sh` | Interactive environment setup |
+| `ssh-tunnel-ctr.sh` | SSH tunnel creation |
+
+### Support Files
+
+| File | Purpose |
+|------|---------|
+| `initd_functions` | Shell functions for service management |
+| `start.sh` / `stop.sh` / `status.sh` | Simple wrapper scripts |
+| `redeploy.sh` | Redeployment helper |
+
+**Documentation**: [systemd_services.md](./systemd_services.md)
+
+---
+
+## Quick Reference
+
+### Most Common Operations
+
+```bash
+# Import configuration to database
+conftool.py importConfiguration myconfig_prefix
+
+# Export configuration from database
+conftool.py exportConfiguration myconfig00001
+
+# Bulk load FHiCL files
+bulkloader -p /configs -c MyConfig -r 1001
+
+# Bulk export to files
+bulkdownloader -p /export -c MyConfig -r 1001
+
+# Convert FHiCL to JSON
+fhicl2json -c config.fcl > config.json
+
+# View resolved FHiCL
+readfhicl -c config.fcl -r
+
+# Archive run configuration
+conftool.py archiveRunConfiguration production 12345
+
+# List available configurations
+conftool.py getListOfAvailableRunConfigurations
+```
+
+### Environment Setup
+
+```bash
+# Required environment variable
+export ARTDAQ_DATABASE_URI="mongodb://localhost:27017/mydb"
+# or
+export ARTDAQ_DATABASE_URI="filesystemdb:///path/to/database"
+
+# Optional for FHiCL tools
+export FHICL_FILE_PATH="/configs:/common:."
+
+# Optional for remote operations
+export ARTDAQ_DATABASE_REMOTEHOST="remote-host.fnal.gov"
+```
 
 ---
 
@@ -167,145 +318,57 @@ The Utilities module contains command-line tools for managing, converting, and m
 
 | Category | Utilities |
 |----------|-----------|
-| **Database Operations** | conftool |
+| **Database Operations** | conftool, conftool.py |
 | **Bulk Transfer** | bulkloader, bulkdownloader |
 | **Maintenance** | migrate_database, rebuild_database_index |
 | **Format Conversion** | fhicl2json, readfhicl, refactorfhicl |
-| **Testing/Validation** | readjson, fixtestjson |
+| **Testing/Validation** | readjson, fixtestjson, readwrite.js |
+| **Infrastructure** | mongod-ctrl.sh, webconfigeditor-ctrl.sh, backup_artdaq_database.sh |
+
+### By Language
+
+| Language | Utilities |
+|----------|-----------|
+| **C++** | conftool, bulkloader, bulkdownloader, migrate_database, rebuild_database_index, fhicl2json, readfhicl, refactorfhicl, readjson, fixtestjson |
+| **Python** | conftool.py |
+| **JavaScript** | readwrite.js |
+| **Bash** | mongod-ctrl.sh, webconfigeditor-ctrl.sh, backup_artdaq_database.sh, setup_database.sh, ssh-tunnel-ctr.sh |
 
 ### By Database Interaction
 
-| Interaction Level | Utilities |
-|-------------------|-----------|
-| **Direct DB Access** | conftool, bulkloader, bulkdownloader, migrate_database, rebuild_database_index |
-| **File Operations** | fhicl2json, readfhicl, refactorfhicl, readjson, fixtestjson |
-
-### By Performance Characteristics
-
-| Performance | Utilities |
+| Interaction | Utilities |
 |-------------|-----------|
-| **Multi-threaded** | bulkloader, bulkdownloader |
-| **Single-threaded** | conftool, migrate_database, rebuild_database_index, fhicl2json, readfhicl, refactorfhicl, readjson, fixtestjson |
-
----
-
-## Common Workflows
-
-### Initial Database Setup
-
-```bash
-# 1. Prepare configurations (if needed)
-for fcl in *.fcl; do
-  fhicl2json -c "$fcl" > "${fcl%.fcl}.json"
-done
-
-# 2. Bulk load into database
-bulkloader -p /configs -c InitialConfig -r 1 -t 8
-
-# 3. Verify
-bulkdownloader -p /verify -c InitialConfig -r 1
-diff -r /configs /verify
-```
-
-### Database Migration
-
-```bash
-# 1. Backup original
-cp -r /db/original /db/backup
-
-# 2. Migrate schema
-migrate_database -u filesystemdb:///db/original
-
-# 3. Rebuild indexes
-rebuild_database_index -u filesystemdb:///db/original_migrated
-
-# 4. Test new database
-# ... perform tests ...
-
-# 5. Deploy if successful
-mv /db/original /db/old
-mv /db/original_migrated_new /db/original
-```
-
-### Configuration Backup
-
-```bash
-# Export all configurations
-for config in $(list_configurations); do
-  bulkdownloader -p "/backup/$(date +%Y%m%d)/$config" \
-                 -c "$config" \
-                 -r latest
-done
-```
-
-### Format Conversion Pipeline
-
-```bash
-# FHiCL → JSON → Database
-fhicl2json -c config.fcl | \
-  fixtestjson -c /dev/stdin | \
-  conftool --import
-```
-
-### Configuration Validation
-
-```bash
-# Validate FHiCL syntax
-readfhicl -c config.fcl -r > /dev/null && echo "Valid"
-
-# Validate JSON structure
-readjson -c document.json > /dev/null && echo "Valid"
-
-# Test database round-trip
-bulkloader -p /tmp/test -c TestConfig -r 999
-bulkdownloader -p /tmp/verify -c TestConfig -r 999
-diff -r /tmp/test /tmp/verify
-```
+| **Direct DB Access** | conftool, conftool.py, bulkloader, bulkdownloader, migrate_database, rebuild_database_index |
+| **File Operations** | fhicl2json, readfhicl, refactorfhicl, readjson, fixtestjson |
+| **Infrastructure** | mongod-ctrl.sh, webconfigeditor-ctrl.sh, backup scripts |
 
 ---
 
 ## Dependencies
 
-### Common Dependencies
-
-All utilities depend on:
-- Boost.Program_options (command-line parsing)
+### C++ Utilities
+- Boost.Program_options, Boost.Filesystem
 - artdaq-database core libraries
-- Standard C++ library
+- fhiclcpp, cetlib (for FHiCL tools)
 
-### Specific Dependencies
+### Python Wrapper
+- Python 2.7 or 3.x
+- conftoolp (C++ bindings module)
 
-| Utility | Special Dependencies |
-|---------|---------------------|
-| **bulkloader, bulkdownloader** | Boost.Filesystem, C++ threading |
-| **migrate_database, rebuild_database_index** | Boost.Filesystem, JSON document classes |
-| **fhicl2json, readfhicl, refactorfhicl** | fhiclcpp, cetlib |
-| **readjson, fixtestjson** | JSON library, Boost.Variant |
+### JavaScript Utility
+- Node.js
+- fhicljson native module
 
----
-
-## Environment Variables
-
-### FHICL_FILE_PATH
-
-Used by FHiCL utilities:
-- **Utilities**: fhicl2json, readfhicl, refactorfhicl
-- **Purpose**: Search path for `#include` files
-- **Format**: Colon-separated directory list
-- **Default**: Current directory (`.`)
-
-**Example**:
-```bash
-export FHICL_FILE_PATH="/configs:/configs/common:/configs/prolog"
-```
+### Infrastructure Scripts
+- MongoDB (via UPS)
+- artdaq_database, artdaq_node_server (via UPS)
+- Standard Unix utilities
 
 ---
 
 ## Exit Codes
 
-### Standard Exit Codes
-
-All utilities use consistent exit codes from `process_exit_codes.h`:
+All C++ utilities use consistent exit codes:
 
 | Code | Name | Meaning |
 |------|------|---------|
@@ -317,186 +380,28 @@ All utilities use consistent exit codes from `process_exit_codes.h`:
 
 ---
 
-## Performance Characteristics
-
-### Multi-threaded Utilities
-
-**bulkloader** and **bulkdownloader**:
-- Default threads: Hardware concurrency
-- Configurable via `-t` flag
-- Near-linear speedup up to CPU core count
-- Network databases benefit from higher thread counts
-
-### Single-threaded Utilities
-
-**migrate_database** and **rebuild_database_index**:
-- Sequential processing ensures consistency
-- Simpler error handling
-- Suitable for operations requiring order
-
-### File-based Utilities
-
-**Format converters** (fhicl2json, readfhicl, etc.):
-- Fast for typical config file sizes
-- Memory-bound for large files
-- I/O-bound for many files
-
----
-
 ## Safety Considerations
 
 ### Destructive Operations
-
-**Utilities that modify files in-place**:
 - **fixtestjson**: Overwrites original JSON file
-
-**Recommendation**: Always create backups before running
+- **backup_artdaq_database.sh**: Creates backups but verify storage
 
 ### Non-Destructive Operations
-
-**Utilities that create new outputs**:
 - **migrate_database**: Creates `{uri}_migrated`
 - **rebuild_database_index**: Creates `{uri}_new`
 - **bulkdownloader**: Creates new directory
 - **fhicl2json, readfhicl**: Output to stdout
 
----
-
-## Troubleshooting
-
-### Common Issues
-
-#### Command Not Found
-```bash
-# Add to PATH or use full path
-export PATH="/path/to/artdaq-database/build/bin:$PATH"
-```
-
-#### Permission Denied
-```bash
-# Check executable permissions
-ls -l bulkloader
-chmod +x bulkloader
-```
-
-#### Database URI Issues
-```bash
-# Ensure correct format
-filesystemdb:///absolute/path/to/database  # Correct
-filesystemdb://relative/path               # May fail
-```
-
-#### Missing Dependencies
-```bash
-# Set library path
-export LD_LIBRARY_PATH="/path/to/artdaq-database/lib:$LD_LIBRARY_PATH"
-```
-
-#### FHICL Include Errors
-```bash
-# Set include path
-export FHICL_FILE_PATH="/configs:/common:."
-```
-
----
-
-## Development Notes
-
-### Building Utilities
-
-Utilities are built as part of the main artdaq-database build:
-```bash
-cd /path/to/artdaq-database
-mkdir build && cd build
-cmake ..
-make
-# Binaries in: build/bin/
-```
-
-### Testing Utilities
-
-```bash
-# Run individual utility tests
-./bulkloader -h
-./fhicl2json -h
-
-# Integration tests
-cd artdaq-database/test
-./run_tests.sh
-```
-
-### Adding New Utilities
-
-To add a new utility:
-1. Create source file in `artdaq-database/Utilities/`
-2. Add to `CMakeLists.txt`
-3. Document in this directory
-4. Add to README.md
-5. Create unit tests
-
----
-
-## Additional Resources
-
-### Source Code
-- **Location**: `/home/user/artdaq-database/artdaq-database/Utilities/`
-- **Build System**: CMakeLists.txt
-
-### Related Documentation
-- **Python wrapper**: conftool.py (see SWIGBindings documentation)
-- **Core libraries**: See ConfigurationDB module documentation
-- **Database providers**: See StorageProviders documentation
-
-### External Documentation
-- **FHiCL Language**: https://cdcvs.fnal.gov/redmine/projects/fhicl-cpp
-- **artdaq**: https://cdcvs.fnal.gov/redmine/projects/artdaq
-- **Boost**: https://www.boost.org/doc/
-
----
-
-## Quick Reference
-
-### Most Common Commands
-
-```bash
-# Bulk load configurations
-bulkloader -p /configs -c MyConfig -r 1001
-
-# Bulk export configurations
-bulkdownloader -p /export -c MyConfig -r 1001
-
-# Convert FHiCL to JSON
-fhicl2json -c config.fcl > config.json
-
-# Rebuild database indexes
-rebuild_database_index -u filesystemdb:///var/lib/artdaq/db
-
-# Migrate database schema
-migrate_database -u filesystemdb:///var/lib/artdaq/db
-
-# View FHiCL resolved
-readfhicl -c config.fcl -r
-
-# Direct database operation
-conftool --operation readdocument --entity MyEntity
-```
-
-### Getting Help
-
-All utilities support `--help`:
-```bash
-bulkloader --help
-fhicl2json --help
-migrate_database --help
-```
+**Recommendation**: Always create backups before running maintenance operations
 
 ---
 
 ## Maintenance Status
 
-| Utility | Status | Notes |
-|---------|--------|-------|
+| Component | Status | Notes |
+|-----------|--------|-------|
 | conftool | Stable | Production-ready |
+| conftool.py | Stable | Production-ready |
 | bulkloader | Stable | Production-ready |
 | bulkdownloader | Stable | Production-ready |
 | migrate_database | Stable | Production-ready |
@@ -504,14 +409,36 @@ migrate_database --help
 | fhicl2json | Stable | Production-ready |
 | readfhicl | Stable | Production-ready |
 | readjson | Stable | Testing tool |
-| fixtestjson | Stable | Use with caution (destructive) |
-| refactorfhicl | Experimental | Incomplete implementation |
+| fixtestjson | Stable | Use with caution |
+| refactorfhicl | Experimental | Incomplete |
+| systemd services | Stable | Production-ready |
+| backup scripts | Stable | Production-ready |
 
 ---
 
-## Version History
+## Documentation Index
 
-See individual utility documentation for detailed change history and implementation notes.
+### C++ Utilities
+- [bulkdownloader.cc.md](./bulkdownloader.cc.md)
+- [bulkloader.cc.md](./bulkloader.cc.md)
+- [conftool.cc.md](./conftool.cc.md)
+- [fhicl2json.cc.md](./fhicl2json.cc.md)
+- [fixtestjson.cc.md](./fixtestjson.cc.md)
+- [migrate_database.cc.md](./migrate_database.cc.md)
+- [readfhicl.cc.md](./readfhicl.cc.md)
+- [readjson.cc.md](./readjson.cc.md)
+- [rebuild_database_index.cc.md](./rebuild_database_index.cc.md)
+- [refactorfhicl.cc.md](./refactorfhicl.cc.md)
+
+### Scripts and Configuration
+- [conftool_py.md](./conftool_py.md) - Python wrapper
+- [readwrite_js.md](./readwrite_js.md) - JavaScript utility
+- [database_bash_rc.md](./database_bash_rc.md) - Shell configuration
+- [mongod_conf.md](./mongod_conf.md) - MongoDB configuration
+- [schema_fcl.md](./schema_fcl.md) - Schema definition
+
+### Infrastructure
+- [systemd_services.md](./systemd_services.md) - Services and control scripts
 
 ---
 

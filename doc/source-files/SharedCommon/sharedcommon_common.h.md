@@ -1,512 +1,285 @@
 # sharedcommon_common.h
 
-## File Overview
+**Path:** `artdaq-database/SharedCommon/sharedcommon_common.h`
 
-This is a convenience aggregator header file that includes all major SharedCommon module headers in one place. It provides a single include point for code that needs access to the full SharedCommon infrastructure, simplifying dependency management and ensuring consistent inclusion order.
+**Purpose:** Master aggregator header that includes all SharedCommon module headers. Provides a single include point for code that needs the full SharedCommon infrastructure, simplifying dependency management and ensuring all module functionality is available with one include statement.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/SharedCommon/sharedcommon_common.h`
 
-## Dependencies
-
-This file aggregates the following SharedCommon headers:
-
-### Core Utilities
-- `"artdaq-database/SharedCommon/helper_functions.h"` - Helper utilities for strings, time, JSON, etc.
-- `"artdaq-database/SharedCommon/returned_result.h"` - Result type for error handling
-- `"artdaq-database/SharedCommon/shared_datatypes.h"` - Common type aliases
-- `"artdaq-database/SharedCommon/shared_exceptions.h"` - Exception type hierarchy
-
-### System Utilities
-- `"artdaq-database/SharedCommon/process_exit_codes.h"` - Exit codes and trace modes
-- `"artdaq-database/SharedCommon/printStackTrace.h"` - Stack trace and debugging support
-- `"artdaq-database/SharedCommon/fileststem_functions.h"` - Filesystem operations
-
-### Base Headers
-- `"artdaq-database/SharedCommon/common.h"` - Standard library includes and common types
-
-## Header Guard
-
-```cpp
-#ifndef _ARTDAQ_DATABASE_SHAREDCOMMON_COMMON_H_
-#define _ARTDAQ_DATABASE_SHAREDCOMMON_COMMON_H_
-```
-
-## Code Structure
-
-```cpp
-// clang-format off
-
-#include "artdaq-database/SharedCommon/helper_functions.h"
-#include "artdaq-database/SharedCommon/returned_result.h"
-#include "artdaq-database/SharedCommon/shared_datatypes.h"
-#include "artdaq-database/SharedCommon/shared_exceptions.h"
-#include "artdaq-database/SharedCommon/process_exit_codes.h"
-#include "artdaq-database/SharedCommon/printStackTrace.h"
-#include "artdaq-database/SharedCommon/fileststem_functions.h"
-
-#include "artdaq-database/SharedCommon/common.h"
-
-// clang-format on
-```
-
-**Note**: Includes are wrapped in clang-format directives to prevent automatic reordering, as the order may be significant.
-
-## Purpose and Design
+## Key Concepts
 
 ### Aggregator Pattern
 
-This header follows the **Aggregator Header** pattern:
-
-**Benefits**:
-1. **Single Include**: One line includes everything from SharedCommon
-2. **Dependency Management**: Ensures all dependencies are included together
-3. **Inclusion Order**: Guarantees correct order (common.h last)
-4. **Consistency**: All code using SharedCommon gets the same includes
-5. **Ease of Use**: Simpler for developers
-
-**Trade-offs**:
-1. **Compile Time**: Includes more than some files need
-2. **Dependencies**: Changes to this file affect many compilation units
-3. **Namespace Pollution**: Brings many symbols into scope
+One include provides access to the complete SharedCommon module:
+- Type definitions (`path_t`, `object_id_t`, `result_t`)
+- Exception types (`invalid_argument`, `runtime_error`, `runtime_exception`)
+- Helper functions (`timestamp()`, `generate_oid()`, `to_json()`)
+- Filesystem utilities (`list_files()`, `mkdir()`)
+- Result functions (`Success()`, `Failure()`, `ThrowOnFailure()`)
+- Debug infrastructure (`getStackTrace()`, `registerUngracefullExitHandlers()`)
+- Standard library (via `common.h`)
 
 ### Inclusion Order
 
-The order is deliberate:
+Headers are included in dependency order to ensure proper compilation:
 
-1. **helper_functions.h** - Core utilities, no dependencies on other SharedCommon files
-2. **returned_result.h** - Simple types, minimal dependencies
-3. **shared_datatypes.h** - Type aliases, no dependencies
-4. **shared_exceptions.h** - Exception types, depends on common types
-5. **process_exit_codes.h** - Constants, no dependencies
-6. **printStackTrace.h** - Debugging support, uses exceptions and exit codes
-7. **fileststem_functions.h** - Filesystem utilities, uses datatypes and helpers
-8. **common.h** - Standard library includes, included last to provide foundation
+1. `helper_functions.h` - Core utilities (depends only on standard library)
+2. `returned_result.h` - Result type (depends only on standard library)
+3. `shared_datatypes.h` - Type aliases (depends only on standard library)
+4. `shared_exceptions.h` - Exception types (depends on cetlib)
+5. `process_exit_codes.h` - Constants (no dependencies)
+6. `printStackTrace.h` - Debug support (depends on system headers)
+7. `fileststem_functions.h` - Filesystem (depends on Boost.Filesystem)
+8. `common.h` - Standard library aggregator (last to avoid ordering issues)
 
-**Rationale**: Dependencies are included before dependents. `common.h` is last because it provides standard library includes that everything uses.
+The `// clang-format off/on` directives prevent clang-format from automatically reordering these includes, which would break the intentional dependency order.
 
----
+## Thread Safety
 
-## What You Get By Including This File
+- **Thread-safe:** Conditional
+- **Concurrent access:** Thread safety depends on the specific functions and types used
+- **Locking:** Most types are thread-safe for concurrent reads; functions that modify shared state require external synchronization
 
-### Type Definitions
+See individual header documentation for detailed thread safety information:
+- `helper_functions.h` - Most functions are thread-safe
+- `returned_result.h` - Thread-safe (stateless factory functions)
+- `shared_datatypes.h` - Thread-safe for reads (type aliases)
+- `shared_exceptions.h` - Thread-safe (exceptions are value types)
+- `fileststem_functions.h` - Thread-safe (uses Boost.Filesystem)
 
-```cpp
-// From shared_datatypes.h
-artdaq::database::path_t
-artdaq::database::string_pair_t
-artdaq::database::object_id_t
-artdaq::database::timestamp_t
+## Dependencies
 
-// From returned_result.h
-artdaq::database::result_t
+| Include | Purpose |
+|---------|---------|
+| `helper_functions.h` | String manipulation, time utilities, JSON helpers |
+| `returned_result.h` | `result_t` type, `Success()`, `Failure()` functions |
+| `shared_datatypes.h` | `path_t`, `object_id_t`, `timestamp_t` type aliases |
+| `shared_exceptions.h` | Exception hierarchy (`invalid_argument`, `runtime_error`) |
+| `process_exit_codes.h` | Exit codes (`SUCCESS`, `FAILURE`), trace modes |
+| `printStackTrace.h` | Stack traces, signal handlers |
+| `fileststem_functions.h` | File I/O, directory operations |
+| `common.h` | Standard library, Boost, TRACE logging |
+
+## Provided Functionality
+
+This header does not define any classes, functions, or types itself. It aggregates all SharedCommon headers. After including this file, you have access to:
+
+### Types (from shared_datatypes.h)
+
+| Type | Description |
+|------|-------------|
+| `path_t` | Filesystem paths and URIs |
+| `object_id_t` | Document unique identifiers |
+| `timestamp_t` | ISO 8601 formatted timestamps |
+| `string_pair_t` | Key-value string pairs |
+| `result_t` | Success/failure pair with message |
+
+### Exception Classes (from shared_exceptions.h)
+
+| Class | Use Case |
+|-------|----------|
+| `exception` | Base class for all artdaq-database exceptions |
+| `invalid_argument` | Invalid function parameters |
+| `runtime_error` | Runtime failures (I/O, network, etc.) |
+| `invalid_option_exception` | Bad CLI or configuration options |
+| `runtime_exception` | General runtime errors with message |
+
+### Result Functions (from returned_result.h)
+
+| Function | Description |
+|----------|-------------|
+| `Success(msg)` | Create success result with message |
+| `Failure(msg)` | Create failure result with message |
+| `ThrowOnFailure(result)` | Convert failure to exception |
+
+### Exit Codes (from process_exit_codes.h)
+
+| Constant | Value | Use |
+|----------|-------|-----|
+| `process_exit_code::SUCCESS` | 0 | Normal completion |
+| `process_exit_code::FAILURE` | 1 | Generic failure |
+| `process_exit_code::INVALID_ARGUMENT` | 128 | Bad arguments |
+| `process_exit_code::UNCAUGHT_EXCEPTION` | 144 | Unhandled exception |
+
+## Relationship to Other Components
+
+This header sits at the top of the SharedCommon module hierarchy:
+
+```
+sharedcommon_common.h (this file - aggregates everything)
+    |
+    +-- helper_functions.h
+    +-- returned_result.h
+    +-- shared_datatypes.h
+    +-- shared_exceptions.h
+    +-- process_exit_codes.h
+    +-- printStackTrace.h
+    +-- fileststem_functions.h
+    +-- common.h
 ```
 
-### Exception Types
+**Used by:**
+- ConfigurationDB module implementation files
+- StorageProviders module implementation files
+- Utilities command-line tools
+- Test files
 
-```cpp
-// From shared_exceptions.h
-artdaq::database::exception
-artdaq::database::invalid_argument
-artdaq::database::runtime_error
-artdaq::database::invalid_option_exception
-artdaq::database::runtime_exception
-```
+**Important:** This header should only be included in `.cpp` implementation files, not in headers, to avoid excessive dependency propagation.
 
-### Constants
-
-```cpp
-// From process_exit_codes.h
-process_exit_code::SUCCESS
-process_exit_code::FAILURE
-process_exit_code::INVALID_ARGUMENT
-process_exit_code::UNCAUGHT_EXCEPTION
-trace_mode::modeM
-trace_mode::modeS
-```
-
-### Helper Functions
-
-```cpp
-// From helper_functions.h
-artdaq::database::timestamp()
-artdaq::database::quoted_()
-artdaq::database::generate_oid()
-artdaq::database::to_json()
-// ... and many more
-```
-
-### Filesystem Functions
-
-```cpp
-// From fileststem_functions.h
-artdaq::database::list_files()
-artdaq::database::mkdir()
-artdaq::database::read_buffer_from_file()
-artdaq::database::write_buffer_to_file()
-// ... and more
-```
-
-### Result Functions
-
-```cpp
-// From returned_result.h
-artdaq::database::Success()
-artdaq::database::Failure()
-artdaq::database::ThrowOnFailure()
-```
-
-### Debug Functions
-
-```cpp
-// From printStackTrace.h
-debug::getStackTrace()
-debug::getCxaThrowStack()
-debug::registerUngracefullExitHandlers()
-// ... and more
-```
-
-### Standard Library
-
-```cpp
-// From common.h
-std::vector, std::string, std::map, etc.
-std::chrono types
-boost::demangle, boost::lexical_cast
-```
-
----
-
-## Usage Patterns
-
-### Application Main Files
+## Example
 
 ```cpp
 #include "artdaq-database/SharedCommon/sharedcommon_common.h"
+#include <iostream>
 
-int main(int argc, char* argv[]) {
+namespace db = artdaq::database;
+
+int main() {
+    // Register signal handlers for clean crash reporting
     debug::registerUngracefullExitHandlers();
 
     try {
-        // Use all SharedCommon functionality
-        auto timestamp = artdaq::database::timestamp();
-        auto id = artdaq::database::generate_oid();
+        // Types available from shared_datatypes.h
+        db::path_t config_path = "/etc/artdaq/config.json";
+        db::object_id_t doc_id;
+        db::timestamp_t created;
 
-        // ... application logic ...
+        // Helper functions from helper_functions.h
+        created = db::timestamp();
+        doc_id = db::generate_oid();
+
+        std::cout << "Generated ID: " << doc_id << std::endl;
+        std::cout << "Timestamp: " << created << std::endl;
+
+        // Result handling from returned_result.h
+        db::result_t result = db::Success("Operation completed");
+        if (!result.first) {
+            std::cerr << "Operation failed: " << result.second << std::endl;
+            return process_exit_code::FAILURE;
+        }
+
+        // File operations from fileststem_functions.h
+        auto files = db::list_files(config_path);
+
+        // Convert result to exception if needed
+        db::ThrowOnFailure(result);
 
         return process_exit_code::SUCCESS;
 
-    } catch (artdaq::database::exception const& e) {
-        std::cerr << e.what() << std::endl;
+    } catch (db::invalid_argument const& e) {
+        std::cerr << "Invalid argument: " << e.what() << std::endl;
+        return process_exit_code::INVALID_ARGUMENT;
+
+    } catch (db::runtime_error const& e) {
+        std::cerr << "Runtime error: " << e.what() << std::endl;
+        return process_exit_code::FAILURE;
+
+    } catch (std::exception const& e) {
+        std::cerr << "Uncaught exception: " << e.what() << std::endl;
+        std::cerr << debug::current_exception_diagnostic_information() << std::endl;
         return process_exit_code::UNCAUGHT_EXCEPTION;
     }
 }
 ```
 
-### Implementation Files
+## Notes for Developers
+
+### When to Use
 
 ```cpp
-#include "my_module.h"
+// GOOD: Use in .cpp implementation files for full SharedCommon access
 #include "artdaq-database/SharedCommon/sharedcommon_common.h"
-
 namespace db = artdaq::database;
-
-db::result_t MyClass::process(db::path_t const& path) {
-    if (path.empty()) {
-        return db::Failure("Path cannot be empty");
-    }
-
-    try {
-        auto files = db::list_files(path);
-        // ... process files ...
-        return db::Success();
-
-    } catch (db::exception const& e) {
-        return db::Failure(e.what());
-    }
-}
 ```
 
-### When to Use This Header
-
-**Use sharedcommon_common.h when**:
-- Writing main() functions
-- Need multiple SharedCommon components
-- Implementing core database operations
-- Don't want to manage individual includes
-
-**Don't use (use specific headers instead) when**:
-- Writing header files (minimize dependencies)
-- Only need one or two specific utilities
-- Working on compile-time-sensitive code
-- Want to minimize namespace pollution
-
----
-
-## Comparison: Aggregator vs Individual Includes
-
-### Using Aggregator (sharedcommon_common.h)
+### When NOT to Use
 
 ```cpp
-#include "artdaq-database/SharedCommon/sharedcommon_common.h"
+// BAD: Don't use in .h header files - too many dependencies
+// This would slow down compilation and create unnecessary coupling
 
-// Everything available immediately
-auto ts = artdaq::database::timestamp();
-auto result = artdaq::database::list_files(path);
-debug::registerAbortHandler();
-```
-
-**Pros**:
-- One line to include everything
-- Don't need to know dependencies
-- Guaranteed correct order
-
-**Cons**:
-- Slower compilation
-- More dependencies
-- Larger precompiled header
-
-### Using Individual Includes
-
-```cpp
-#include "artdaq-database/SharedCommon/helper_functions.h"
-#include "artdaq-database/SharedCommon/fileststem_functions.h"
-
-// Only what you included is available
-auto ts = artdaq::database::timestamp();
-auto files = artdaq::database::list_files(path);
-// debug:: functions not available
-```
-
-**Pros**:
-- Faster compilation
-- Fewer dependencies
-- More explicit
-
-**Cons**:
-- More lines
-- Must know dependencies
-- Can get order wrong
-
----
-
-## Design Considerations
-
-### clang-format Directives
-
-```cpp
-// clang-format off
-#include "..."
-// clang-format on
-```
-
-**Purpose**: Prevents automatic reformatters from reordering includes.
-
-**Why Important**: Some includes may have order dependencies, and auto-formatting tools might break those dependencies.
-
-### Recursive Inclusion Protection
-
-All included headers have include guards, preventing duplicate inclusion:
-
-```cpp
-// sharedcommon_common.h includes common.h
-// common.h has include guard
-// If common.h is included elsewhere, guard prevents duplication
-```
-
-### Forward vs Full Includes
-
-This header uses full includes (not forward declarations) because:
-- It's meant to provide full functionality
-- Users expect complete types, not just declarations
-- It's an implementation file include, not a header file include
-
----
-
-## Compilation Impact
-
-### Include Graph
-
-```
-sharedcommon_common.h
-  ├─ helper_functions.h
-  │   └─ shared_datatypes.h
-  ├─ returned_result.h
-  ├─ shared_datatypes.h (already included)
-  ├─ shared_exceptions.h
-  ├─ process_exit_codes.h
-  ├─ printStackTrace.h
-  │   └─ process_exit_codes.h (already included)
-  ├─ fileststem_functions.h
-  │   └─ shared_datatypes.h (already included)
-  └─ common.h
-      └─ (many standard library headers)
-```
-
-### Compile Time Impact
-
-**First Compilation**:
-- Parses all SharedCommon headers
-- Parses all standard library headers from common.h
-- Can be slow (1-2 seconds)
-
-**Subsequent Compilations** (with precompiled headers):
-- Reuses cached parse trees
-- Much faster (0.1-0.2 seconds)
-
-**Recommendation**: Use precompiled headers in production builds.
-
----
-
-## Best Practices
-
-### In Implementation Files (.cpp)
-
-```cpp
-// Good: Use aggregator in .cpp files
-#include "my_module.h"
-#include "artdaq-database/SharedCommon/sharedcommon_common.h"
-
-void MyModule::process() {
-    // All functionality available
-}
-```
-
-### In Header Files (.h)
-
-```cpp
-// Bad: Don't use aggregator in headers
-#include "artdaq-database/SharedCommon/sharedcommon_common.h"
-
-class MyClass {
-    // Exposes all SharedCommon to every includer
-};
-```
-
-```cpp
-// Good: Use specific headers and forward declarations
+// GOOD: In headers, include specific headers only:
 #include "artdaq-database/SharedCommon/shared_datatypes.h"
-
-namespace artdaq::database {
-    class exception;  // Forward declaration
-}
-
-class MyClass {
-    artdaq::database::path_t path_;
-    // Minimal dependencies exposed
-};
-```
-
-### With Namespace Aliases
-
-```cpp
-#include "artdaq-database/SharedCommon/sharedcommon_common.h"
-
-namespace db = artdaq::database;  // Convenient alias
-
-db::result_t process(db::path_t const& path) {
-    // Shorter, more readable
-}
-```
-
-### In Precompiled Headers
-
-```cpp
-// stdafx.h or pch.h
-#pragma once
-
-#include "artdaq-database/SharedCommon/sharedcommon_common.h"
-// Other commonly-used headers
-
-// Then in source files:
-#include "pch.h"  // Gets everything
-```
-
----
-
-## Alternative Approaches
-
-### Modular Includes
-
-Create smaller aggregators:
-
-```cpp
-// sharedcommon_types.h
-#include "shared_datatypes.h"
-#include "shared_exceptions.h"
-
-// sharedcommon_utils.h
-#include "helper_functions.h"
-#include "fileststem_functions.h"
-
-// sharedcommon_debug.h
-#include "printStackTrace.h"
-#include "process_exit_codes.h"
-```
-
-Users include only what they need.
-
-### Individual Includes Only
-
-Eliminate aggregators entirely:
-
-```cpp
-// Each source file manages its own includes
-#include "artdaq-database/SharedCommon/helper_functions.h"
 #include "artdaq-database/SharedCommon/returned_result.h"
-// ... etc
 ```
 
-More explicit but more verbose.
+### Available Namespaces After Including
 
----
+| Namespace | Contents |
+|-----------|----------|
+| `artdaq::database` | Types, helper functions, result utilities |
+| `artdaq::database::result` | Result message constants (`msg_Success`, `msg_Failure`, etc.) |
+| `debug` | Stack traces, exception diagnostics |
+| `process_exit_code` | Exit code constants (`SUCCESS`, `FAILURE`, etc.) |
+| `trace_mode` | TRACE logging mode settings |
 
-## Maintenance Guidelines
+### Namespace Alias Convention
 
-### Adding New SharedCommon Headers
+```cpp
+// Recommended namespace alias for brevity
+namespace db = artdaq::database;
+namespace apiliteral = artdaq::database::configapi::literal;
 
-When adding a new header to SharedCommon:
+// Usage
+db::result_t result = db::Success();
+db::path_t path = "/path/to/file";
+```
 
-1. **Add to this file** if it's widely used
-2. **Consider dependencies** - include after dependencies
-3. **Test compilation** - ensure no circular dependencies
-4. **Update documentation** - document what the new header provides
+### Common Pitfalls
 
-### Removing Headers
+- **Pitfall 1:** Including in header files creates excessive compile-time dependencies. Always use in `.cpp` files only.
 
-When deprecating a SharedCommon header:
+- **Pitfall 2:** Forgetting to call `registerUngracefullExitHandlers()` in main programs means crashes will not generate stack traces.
 
-1. **Remove from this file** first
-2. **Update all direct includers** to include explicitly
-3. **Deprecate the header** before removing
-4. **Update documentation**
+- **Pitfall 3:** Not catching exceptions in main() leads to unclean termination:
+  ```cpp
+  // BAD: Exceptions cause abort()
+  int main() {
+      riskyOperation();
+      return 0;
+  }
 
-### Reordering Includes
+  // GOOD: Catch and return appropriate exit codes
+  int main() {
+      try {
+          riskyOperation();
+          return process_exit_code::SUCCESS;
+      } catch (db::invalid_argument const& e) {
+          std::cerr << e.what() << std::endl;
+          return process_exit_code::INVALID_ARGUMENT;
+      } catch (std::exception const& e) {
+          std::cerr << e.what() << std::endl;
+          return process_exit_code::UNCAUGHT_EXCEPTION;
+      }
+  }
+  ```
 
-If you need to reorder:
+### Anti-patterns
 
-1. **Verify dependencies** - ensure new order respects them
-2. **Test thoroughly** - compile all modules
-3. **Update comments** - explain new order if non-obvious
+```cpp
+// DON'T include in header files
+#ifndef MY_CLASS_H
+#define MY_CLASS_H
+#include "artdaq-database/SharedCommon/sharedcommon_common.h"  // BAD!
+class MyClass { };
+#endif
 
----
+// DO include only specific headers in .h files
+#ifndef MY_CLASS_H
+#define MY_CLASS_H
+#include "artdaq-database/SharedCommon/shared_datatypes.h"  // GOOD
+class MyClass {
+    artdaq::database::object_id_t id_;
+};
+#endif
+```
 
-## Related Files
+## See Also
 
-- **common.h** - Base standard library includes (included by this file)
-- All other SharedCommon headers - Aggregated by this file
-- Build system (CMakeLists.txt) - May use this for precompiled headers
-
----
-
-## Summary
-
-This aggregator header provides a convenient single-include access point to the entire SharedCommon module infrastructure. It's designed for use in implementation files where compile time is less critical than developer convenience. For header files and compile-time-sensitive code, prefer individual includes.
-
-**Key Points**:
-- Includes all major SharedCommon functionality
-- Maintains correct inclusion order
-- Best for .cpp files, not .h files
-- Trade-off: convenience vs compile time
-- Protected against format tool reordering
-
-**When in doubt**: Use this in .cpp files, specific headers in .h files.
+- [common.h](./common.h.md) - Standard library aggregator
+- [helper_functions.h](./helper_functions.h.md) - Utility functions
+- [returned_result.h](./returned_result.h.md) - Result type and factories
+- [shared_datatypes.h](./shared_datatypes.h.md) - Type aliases
+- [shared_exceptions.h](./shared_exceptions.h.md) - Exception hierarchy
+- [process_exit_codes.h](./process_exit_codes.h.md) - Exit codes
+- [printStackTrace.h](./printStackTrace.h.md) - Debug infrastructure
+- [fileststem_functions.h](./fileststem_functions.h.md) - File operations

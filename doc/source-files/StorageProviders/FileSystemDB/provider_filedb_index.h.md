@@ -1,332 +1,219 @@
 # provider_filedb_index.h
 
-## File Overview
+**Path:** `artdaq-database/StorageProviders/FileSystemDB/provider_filedb_index.h`
 
-This header file defines the SearchIndex class that provides fast document lookup capabilities for the FileSystemDB provider. The index maintains mappings between searchable attributes (version, configuration, entity, run) and document object IDs, enabling efficient queries without scanning all files.
+**Purpose:** Defines the `SearchIndex` class that provides fast document lookup capabilities for the FileSystemDB provider. The index maintains in-memory mappings between searchable attributes (version, configuration, entity, run, version alias) and document object IDs, enabling efficient queries without scanning all document files.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/StorageProviders/FileSystemDB/provider_filedb_index.h`
+## Key Concepts
 
-**Lines of Code**: 123
+### Inverted Index Structure
+The SearchIndex implements an inverted index where each searchable attribute (version, entity, configuration, run, version alias) maps to a list of document IDs that have that attribute value. This enables O(log n) lookups instead of O(n) file scanning.
 
-**Purpose**: Fast indexed search for filesystem-based document storage
+### Multi-Criteria AND Logic
+When searching with multiple criteria, the index finds documents matching ALL criteria by computing the intersection of matching document IDs for each criterion using a count-based approach.
+
+### Lazy Persistence
+The index is kept in memory for fast queries and only written to disk when modified (`_isDirty` flag) upon destruction, ensuring efficient operation while maintaining durability.
+
+### Path-Based Mutex System
+Each index file path has an associated mutex to prevent concurrent access to the same index from multiple threads, ensuring thread-safe operations within a single process.
+
+## Thread Safety
+
+- **Thread-safe:** Partially (per-path locking)
+- **Concurrent access:** Safe for multiple SearchIndex instances on different paths; single instance per path is locked for its lifetime
+- **Locking:** Acquires path-specific mutex on construction, releases on destruction
 
 ## Dependencies
 
-### Project Headers
-- `"artdaq-database/DataFormats/Json/json_common.h"` - JSON data structures
-- `"artdaq-database/StorageProviders/common.h"` - Common utilities
-- `"artdaq-database/StorageProviders/storage_providers.h"` - Provider interface
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/DataFormats/Json/json_common.h` | JSON data structures (`object_t`, `array_t`) |
+| `artdaq-database/StorageProviders/common.h` | Common utilities |
+| `artdaq-database/StorageProviders/storage_providers.h` | Provider interface and `object_id_t` |
+| `<boost/filesystem.hpp>` | Filesystem path handling |
+| `<map>` | Index data structures and path mutex storage |
+| `<memory>` | Smart pointers for mutex management |
+| `<mutex>` | Thread synchronization |
 
-### Third-Party Libraries
-- `<boost/filesystem.hpp>` - Filesystem path handling
+## Classes/Structures
 
-## Namespace: artdaq::database::filesystem::index
+### `SearchIndex`
 
-## Class: SearchIndex
+In-memory inverted index for fast document lookup with automatic persistence.
 
-### Purpose
+**Thread Safety:** Thread-safe through path-based locking; only one SearchIndex instance can access a given path at a time
 
-The SearchIndex class implements an in-memory inverted index that maps searchable attributes to document IDs. Each collection maintains an `index.json` file that is loaded into memory for fast queries.
+#### Constructors
 
-### Constructor and Destructor
+##### `SearchIndex(boost::filesystem::path const& path)`
 
+**Brief:** Constructs a SearchIndex for the given index file path, acquiring the path-specific mutex and loading or creating the index.
+
+**Parameters:**
+- `path` - Path to the `index.json` file
+
+**Preconditions:**
+- Path must be writable
+- Parent directory must exist or be creatable
+
+**Postconditions:**
+- Index is loaded into memory and ready for queries
+- Path mutex is held until destruction
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `runtime_error` | Index file is corrupt and auto-rebuild is disabled |
+| `runtime_error` | Failed to create index file |
+
+#### Destructor
+
+##### `~SearchIndex()`
+
+**Brief:** Saves the index to disk if modified and releases the path mutex. Exceptions are caught and logged to ensure safe destruction.
+
+**Postconditions:**
+- If `_isDirty`, index is written to disk
+- Path mutex is released
+
+#### Deleted Operations
+
+The following operations are explicitly deleted to prevent misuse:
+
+- `SearchIndex()` - Default constructor
+- `SearchIndex& operator=(SearchIndex const&)` - Copy assignment
+- `SearchIndex& operator=(SearchIndex&&)` - Move assignment
+- `SearchIndex(SearchIndex&&)` - Move constructor
+
+#### Static Methods
+
+##### `getMutexForPath(path) -> std::mutex&`
+
+**Brief:** Returns the mutex associated with a specific file path, creating one if needed.
+
+**Parameters:**
+- `path` - Path to get mutex for
+
+**Returns:** Reference to the path-specific mutex
+
+**Thread Safety:** Thread-safe (uses internal mutex for path map access)
+
+#### Search Methods
+
+##### `findDocumentIDs(search) -> std::vector<object_id_t>`
+
+**Brief:** Finds documents matching all search criteria (AND logic).
+
+**Parameters:**
+- `search` - JSONDocument containing search criteria (version, entity, configurations, runs, version_aliases)
+
+**Preconditions:**
+- `search` must not be empty
+
+**Returns:** Vector of object IDs matching all criteria (empty if no matches)
+
+**Thread Safety:** Thread-safe (index is locked during SearchIndex lifetime)
+
+**Example:**
 ```cpp
-SearchIndex(boost::filesystem::path const& path);
-~SearchIndex();
+#include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb_index.h"
+
+using namespace artdaq::database::filesystem::index;
+
+void searchDocuments() {
+  SearchIndex index(collection_path / "index.json");
+  auto search = JSONDocument{R"({"version":"v1.0","entities":"TPC_01"})"};
+  auto ids = index.findDocumentIDs(search);
+  // ids contains documents that have BOTH version v1.0 AND entity TPC_01
+}
 ```
 
-**Constructor Parameters**:
-- `path` - Path to the index file (typically `collection/index.json`)
+##### `findAllGlobalConfigurations(search) -> std::vector<std::pair<std::string, std::string>>`
 
-**Behavior**:
-- Opens or creates index file
-- Loads index into memory
-- Constructor opens, destructor auto-saves if dirty
+**Brief:** Finds all configurations and their associated entities.
 
-### Deleted Operations
+**Parameters:**
+- `search` - Filter criteria (can be empty JSON for all configurations)
 
-```cpp
-SearchIndex() = delete;
-SearchIndex& operator=(SearchIndex const&) = delete;
-SearchIndex& operator=(SearchIndex&&) = delete;
-SearchIndex(SearchIndex&&) = delete;
-```
+**Returns:** Vector of (configuration_name, entity_name) pairs
 
-**Design**: Non-copyable, non-movable to prevent accidental index duplication.
+##### `findVersionsByGlobalConfigName(search) -> std::vector<std::pair<std::string, std::string>>`
 
----
+**Brief:** Finds all versions within a specific configuration.
 
-## Public Search Methods
-
-### findDocumentIDs
-```cpp
-std::vector<object_id_t> findDocumentIDs(JSONDocument const& search);
-```
-
-**Purpose**: Find document IDs matching search criteria.
-
-**Parameters**:
-- `search` - JSON search criteria (e.g., `{"version": "v1.0", "entities": "TPC"}`)
-
-**Returns**: Vector of matching document object IDs
-
-**Algorithm**:
-- Parses search JSON into criteria
-- For each criterion, finds matching document IDs
-- Returns intersection of all matches (AND logic)
-
-**Example**:
-```cpp
-JSONDocument search("{\"version\": \"v1.0\", \"entities\": \"TPC_01\"}");
-auto ids = index.findDocumentIDs(search);
-// Returns: ["507f1f77bcf86cd799439011", ...]
-```
-
----
-
-### findAllGlobalConfigurations
-```cpp
-std::vector<std::pair<std::string, std::string>>
-findAllGlobalConfigurations(JSONDocument const& search);
-```
-
-**Purpose**: Find all global configurations and their entities.
-
-**Returns**: Vector of pairs: `(configuration_name, entity_name)`
-
-**Usage**: Discover what configurations exist and what entities they contain.
-
----
-
-### findVersionsByGlobalConfigName
-```cpp
-std::vector<std::pair<std::string, std::string>>
-findVersionsByGlobalConfigName(JSONDocument const& search);
-```
-
-**Purpose**: Find all versions within a specific configuration.
-
-**Parameters**:
+**Parameters:**
 - `search` - Must contain `configurations` field
 
-**Returns**: Pairs of `(version, entity_name)`
+**Returns:** Vector of (version, entity_name) pairs
 
----
+##### `findVersionsByEntityName(search) -> std::vector<std::pair<std::string, std::string>>`
 
-### findVersionsByEntityName
-```cpp
-std::vector<std::pair<std::string, std::string>>
-findVersionsByEntityName(JSONDocument const& search);
-```
+**Brief:** Finds all versions of a specific entity.
 
-**Purpose**: Find all versions of a specific entity.
-
-**Parameters**:
+**Parameters:**
 - `search` - Must contain `entities` field
 
-**Returns**: Pairs of `(version, entity_name)`
+**Returns:** Vector of (entity_name, version) pairs
 
----
+##### `findEntities(search) -> std::vector<std::string>`
 
-### findEntities
-```cpp
-std::vector<std::string> findEntities(JSONDocument const& search);
-```
+**Brief:** Finds all entity names matching the filter.
 
-**Purpose**: Find all entity names matching criteria.
+**Parameters:**
+- `search` - Filter criteria for entity names (supports prefix matching with wildcard `*`)
 
-**Returns**: Vector of entity names
+**Returns:** Vector of matching entity names
 
----
+##### `getConfigurationAssignedTimestamps(search) -> std::vector<std::string>`
 
-## Public Modification Methods
+**Brief:** Gets all timestamps when a configuration was assigned.
 
-### addDocument
-```cpp
-bool addDocument(JSONDocument const& doc, object_id_t const& oid);
-```
+**Parameters:**
+- `search` - Must contain `configurations` field
 
-**Purpose**: Add a document to the index.
+**Returns:** Vector of ISO 8601 timestamp strings
 
-**Parameters**:
-- `doc` - Document containing indexable fields
-- `oid` - Document's object ID
+#### Modification Methods
 
-**Returns**: true if successful
+##### `addDocument(document, oid) -> bool`
 
-**Side Effect**: Marks index as dirty (will be saved on destruction)
+**Brief:** Adds a document to the index, extracting and indexing all searchable attributes (version, configurations, entities, aliases, runs).
 
----
+**Parameters:**
+- `document` - JSONDocument containing the document data
+- `oid` - Object ID to associate with the document
 
-### removeDocument
-```cpp
-bool removeDocument(JSONDocument const& doc, object_id_t const& oid);
-```
+**Preconditions:**
+- Neither `document` nor `oid` may be empty
 
-**Purpose**: Remove a document from the index.
+**Returns:** `true` if successful, `false` on parsing error
 
-**Parameters**:
-- `doc` - Document to remove
-- `oid` - Document's object ID
+**Postconditions:**
+- Index is marked dirty and will be saved on destruction
 
-**Returns**: true if successful
+**Side Effects:**
+- Sets `_isDirty = true`
 
----
+##### `removeDocument(document, oid) -> bool`
 
-### getConfigurationAssignedTimestamps
-```cpp
-std::vector<std::string> getConfigurationAssignedTimestamps(JSONDocument const& search);
-```
+**Brief:** Removes a document from the index.
 
-**Purpose**: Get all timestamps when a configuration was assigned.
+**Parameters:**
+- `document` - JSONDocument containing the document data (for attribute extraction)
+- `oid` - Object ID to remove
 
-**Returns**: Vector of ISO 8601 timestamp strings
+**Preconditions:**
+- Neither `document` nor `oid` may be empty
 
----
+**Returns:** `true` if successful, `false` on error
 
-## Private Index Management Methods
+**Postconditions:**
+- Index is marked dirty and will be saved on destruction
 
-### Addition Methods
+## Index File Structure
 
-```cpp
-void _addVersion(object_id_t const& oid, std::string const& version);
-void _addId(object_id_t const& oid);
-void _addConfiguration(object_id_t const& oid, std::string const& config);
-void _addConfigurationAssigned(timestamp_t const& ts, std::string const& config);
-void _addEntity(object_id_t const& oid, std::string const& entity);
-void _addVersionAlias(object_id_t const& oid, std::string const& alias);
-void _addRun(object_id_t const& oid, std::string const& run);
-```
-
-**Purpose**: Add mappings to specific index attributes.
-
-### Removal Methods
-
-```cpp
-void _removeVersion(object_id_t const& oid, std::string const& version);
-void _removeId(object_id_t const& oid);
-void _removeConfiguration(object_id_t const& oid, std::string const& config);
-void _removeConfigurationAssigned(timestamp_t const& ts, std::string const& config);
-void _removeEntity(object_id_t const& oid, std::string const& entity);
-void _removeVersionAlias(object_id_t const& oid, std::string const& alias);
-void _removeRun(object_id_t const& oid, std::string const& run);
-```
-
-**Purpose**: Remove mappings from specific index attributes.
-
-### Matching Methods
-
-```cpp
-std::vector<object_id_t> _matchVersion(std::string const& version) const;
-std::vector<object_id_t> _matchVersionAlias(std::string const& alias) const;
-std::vector<object_id_t> _matchConfiguration(std::string const& config) const;
-std::vector<object_id_t> _matchEntity(std::string const& entity) const;
-std::vector<object_id_t> _matchObjectId(std::string const& oid) const;
-std::vector<object_id_t> _matchObjectIds(std::string const& oid) const;
-std::vector<object_id_t> _matchRun(std::string const& run) const;
-```
-
-**Purpose**: Find document IDs matching a specific attribute value.
-
----
-
-## Private Utility Methods
-
-### getObjectIds
-```cpp
-std::vector<object_id_t> getObjectIds() const;
-```
-
-**Purpose**: Get all document IDs in the index (for empty searches).
-
----
-
-### _build_ouid_map
-```cpp
-void _build_ouid_map(std::map<std::string, std::string>& map,
-                    std::string const& attribute) const;
-```
-
-**Purpose**: Build a map from attribute values to object IDs.
-
----
-
-### _make_unique_sorted (Template)
-```cpp
-template <typename TYPE>
-void _make_unique_sorted(jsn::array_t& ouids) const;
-```
-
-**Purpose**: Remove duplicates and sort an array of values.
-
-**Implementation**:
-```cpp
-// 1. Extract values into vector
-// 2. Sort
-// 3. Remove duplicates with std::unique
-// 4. Put back into JSON array
-```
-
----
-
-### _indexed_filtered_innerjoin_over_ouid
-```cpp
-std::vector<std::pair<std::string, std::string>>
-_indexed_filtered_innerjoin_over_ouid(std::string const& attr1,
-                                      std::string const& attr2,
-                                      std::string const& filter) const;
-```
-
-**Purpose**: Perform an inner join over two indexed attributes.
-
-**Example**: Join versions and configurations by object ID to find all version/configuration pairs.
-
----
-
-### _filtered_attribute_list
-```cpp
-std::vector<std::string>
-_filtered_attribute_list(std::string const& attribute,
-                        std::string const& attribute_begins_with) const;
-```
-
-**Purpose**: Get all values of an attribute that begin with a prefix.
-
----
-
-## Private File I/O Methods
-
-```cpp
-bool _open(boost::filesystem::path const& path);
-bool _create(boost::filesystem::path const& path);
-bool _close();
-bool _rebuild(boost::filesystem::path const& path);
-```
-
-**File Operations**:
-- `_open`: Load existing index from file
-- `_create`: Create new empty index
-- `_close`: Save index to file if dirty
-- `_rebuild`: Rebuild index by scanning all documents
-
----
-
-## Private Members
-
-```cpp
-private:
-  object_t _index;                    // JSON object holding the index
-  boost::filesystem::path _path;      // Path to index file
-  bool _isDirty;                      // True if index needs saving
-  bool _isOpen;                       // True if index is loaded
-```
-
----
-
-## Index Structure
-
-The index is stored as a JSON object with this structure:
-
+The index is stored as JSON in `index.json`:
 ```json
 {
   "version": {
@@ -340,125 +227,137 @@ The index is stored as a JSON object with this structure:
   "configurations": {
     "RunConfig": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439012"]
   },
+  "configurations.assigned": {
+    "RunConfig": ["2025-01-15T10:30:00.000Z", "2025-01-16T14:00:00.000Z"]
+  },
   "runs": {
     "12345": ["507f1f77bcf86cd799439011"]
   },
-  "objectids": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439012", ...]
+  "version_aliases": {
+    "latest": ["507f1f77bcf86cd799439013"]
+  },
+  "ouid": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439012", "507f1f77bcf86cd799439013"]
 }
 ```
 
-**Index Attributes**:
-- `version`: Maps version strings to document IDs
-- `entities`: Maps entity names to document IDs
-- `configurations`: Maps configuration names to document IDs
-- `runs`: Maps run numbers to document IDs
-- `objectids`: List of all document IDs
+## Functions
 
----
+### `shouldAutoRebuildSearchIndex(enable) -> bool`
 
-## Global Functions
+**Brief:** Gets or sets whether corrupt indexes should be automatically rebuilt by scanning document files.
 
-### shouldAutoRebuildSearchIndex
+**Parameters:**
+- `enable` - If `true`, enables auto-rebuild (optional, only affects first call)
+
+**Returns:** Current auto-rebuild setting
+
+**Thread Safety:** Thread-safe (static initialization)
+
+**Example:**
 ```cpp
-bool shouldAutoRebuildSearchIndex(bool enable = false);
-```
+// Enable auto-rebuild before first SearchIndex use
+shouldAutoRebuildSearchIndex(true);
 
-**Purpose**: Enable/disable automatic index rebuilding.
-
-**Parameters**:
-- `enable` - true to enable auto-rebuild, false to disable
-
-**Returns**: Current setting
-
-**Usage**: Call with true to enable automatic index rebuilds when index is corrupted.
-
----
-
-## Debug Functions
-
-```cpp
-namespace debug {
-    void enable();
+// Later: check current setting
+if (shouldAutoRebuildSearchIndex()) {
+  // Auto-rebuild is enabled
 }
 ```
 
-**Purpose**: Enable TRACE debugging for index operations.
+## Template Functions
 
----
+### `_make_unique_sorted<TYPE>(array) -> void`
 
-## Usage Example
+**Brief:** Sorts and removes duplicates from a JSON array in-place.
 
-```cpp
-#include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb_index.h"
+**Template Parameters:**
+- `TYPE` - The type of elements in the array (typically `std::string`)
 
-// Open index
-boost::filesystem::path index_path = "/data/configs/MyCollection/index.json";
-SearchIndex index(index_path);
+**Parameters:**
+- `array` - JSON array to sort and deduplicate
 
-// Search for documents
-JSONDocument search("{\"version\": \"v1.0\", \"entities\": \"TPC_01\"}");
-auto ids = index.findDocumentIDs(search);
+**Postconditions:**
+- Array is sorted and contains only unique elements
 
-// Add new document to index
-JSONDocument doc("{\"version\": \"v2.0\", \"entities\": \"TPC_01\"}");
-object_id_t new_id = generate_oid();
-index.addDocument(doc, new_id);
-// Index auto-saved on destruction
+## Private Members
+
+| Member | Type | Description |
+|--------|------|-------------|
+| `_index` | `object_t` | In-memory JSON index structure |
+| `_path` | `boost::filesystem::path` | Path to the index file |
+| `_isDirty` | `bool` | Whether the index has been modified |
+| `_isOpen` | `bool` | Whether the index is currently open |
+| `_path_lock` | `std::unique_lock<std::mutex>` | Lock on the path-specific mutex |
+
+## Static Members
+
+| Member | Type | Description |
+|--------|------|-------------|
+| `_path_mutexes` | `std::map<std::string, std::unique_ptr<std::mutex>>` | Map from path string to mutex |
+| `_path_mutexes_guard` | `std::mutex` | Mutex protecting the path_mutexes map |
+
+## Relationship to Other Components
+
+### Provider Integration
+- `provider_filedb.cpp`: Uses SearchIndex for all query operations
+- `provider_filedb_readwrite.cpp`: Updates index on document write/delete
+
+### File Storage
+Each collection directory contains an `index.json` file managed by SearchIndex:
+```
+collection/
+  |-- index.json          # Managed by SearchIndex
+  |-- document1.json
+  |-- document2.json
+  +-- ...
 ```
 
----
+## See Also
 
-## Performance Characteristics
+- [provider_filedb_index.cpp](./provider_filedb_index.cpp.md) - Implementation details
+- [provider_filedb.h](./provider_filedb.h.md) - FileSystemDB provider
+- [provider_filedb.cpp](./provider_filedb.cpp.md) - Query operations using SearchIndex
 
-**Time Complexity**:
-- `findDocumentIDs`: O(k * log n) where k = number of criteria, n = index size
-- `addDocument`: O(1) average
-- `removeDocument`: O(1) average
+## Notes for Developers
 
-**Space Complexity**: O(n * m) where n = documents, m = average attributes per document
+### Performance
 
-**Optimization**: Index is kept in memory for fast queries, only written to disk when dirty.
+| Operation | Time Complexity |
+|-----------|----------------|
+| `findDocumentIDs()` (single criterion) | O(log n) |
+| `findDocumentIDs()` (k criteria) | O(k * log n + intersection) |
+| `addDocument()` | O(m) where m = attributes in document |
+| `removeDocument()` | O(m) where m = attributes in document |
 
----
+**Space Complexity:** O(n * m) where n = documents, m = average attributes per document
 
-## Thread Safety
-
-**Not Thread-Safe**: Multiple concurrent access requires external synchronization.
-
-**Recommendations**:
-- Use reader-writer lock for concurrent reads
-- Exclusive lock for writes
-
----
-
-## Best Practices
+### Best Practices
 
 ```cpp
-// GOOD: RAII - index auto-saves
+// GOOD: RAII pattern - index auto-saves on destruction
 {
     SearchIndex index(path);
     index.addDocument(doc, oid);
-} // Saves here
+} // Automatically saves here if modified
 
-// GOOD: Check for errors
+// GOOD: Handle potential corruption
 try {
     SearchIndex index(path);
-} catch (std::exception const& e) {
-    // Handle corrupted index
+} catch (runtime_error const& e) {
+    // Handle corrupted index - enable rebuild and retry
+    shouldAutoRebuildSearchIndex(true);
+    SearchIndex index(path);  // Will rebuild from documents
 }
-
-// BAD: Don't keep index open too long
-// SearchIndex global_index(path);  // Held open entire program
 ```
 
----
+### Common Pitfalls
 
-## Related Files
+- **Pitfall 1:** Creating multiple SearchIndex instances for the same path in the same thread will deadlock. Use a single instance.
+- **Pitfall 2:** Not handling exceptions from constructor can leave index in inconsistent state.
+- **Pitfall 3:** Manually deleting index.json while SearchIndex is active causes undefined behavior.
 
-- **provider_filedb_index.cpp** - Implementation
-- **provider_filedb.cpp** - Uses SearchIndex for queries
-- **provider_filedb_readwrite.cpp** - Updates index on write operations
-
----
-
-**Documentation generated for artdaq-database FileSystemDB provider**
+### Debug Mode
+Enable detailed logging:
+```cpp
+artdaq::database::filesystem::index::debug::enable();
+```

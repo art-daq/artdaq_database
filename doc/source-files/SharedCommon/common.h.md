@@ -1,146 +1,228 @@
 # common.h
 
-## File Overview
+**Path:** `artdaq-database/SharedCommon/common.h`
 
-This is a convenience header file that aggregates commonly used Standard C++ library headers and third-party library includes. It serves as a precompiled header or common include to reduce repetition across the codebase and ensures consistent library usage throughout the SharedCommon module.
+**Purpose:** Convenience header that aggregates commonly used Standard C++ library and third-party headers. Including this single file provides access to containers, algorithms, I/O, chrono, Boost utilities, and the TRACE logging system. This reduces boilerplate and ensures consistent library usage across the codebase.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/SharedCommon/common.h`
+
+## Key Concepts
+
+### Precompiled Header Pattern
+
+This file is designed to be included in `.cpp` implementation files (not in headers) to:
+- Reduce repetitive includes across multiple source files
+- Enable precompiled header (PCH) optimization by compilers
+- Ensure consistent standard library usage throughout the codebase
+
+### TRACE Logging
+
+The `trace.h` include provides the artdaq TRACE logging system, a high-performance tracing mechanism used throughout the ARTDAQ ecosystem:
+
+```cpp
+#include "artdaq-database/SharedCommon/common.h"
+#include <iostream>
+
+void example_function() {
+    try {
+        TLOG(10) << "Debug message at level 10";
+        TLOG(TLVL_INFO) << "Info message";
+        TLOG(TLVL_WARNING) << "Warning message";
+    } catch (std::exception const& e) {
+        std::cerr << "Logging error: " << e.what() << std::endl;
+    }
+}
+```
+
+TRACE provides:
+- **Low overhead**: Messages can be compiled out in release builds
+- **Configurable levels**: Runtime-adjustable verbosity
+- **Memory buffering**: High-performance circular buffer for trace messages
+- **Thread safety**: Safe for concurrent logging from multiple threads
+
+## Thread Safety
+
+- **Thread-safe:** Yes (for included headers)
+- **Concurrent access:** All included standard library and Boost headers are thread-safe for read operations
+- **Locking:** The TRACE logging system uses internal locking for thread-safe concurrent writes
 
 ## Dependencies
 
-### Standard C++ Libraries
+| Include | Purpose |
+|---------|---------|
+| `<algorithm>` | Standard algorithms (sort, find, copy, transform, etc.) |
+| `<chrono>` | Time utilities, durations, and time points |
+| `<cstddef>` | Standard size types (`size_t`, `ptrdiff_t`, `nullptr_t`) |
+| `<cstdio>` | C-style I/O functions (`printf`, `fopen`, etc.) |
+| `<fstream>` | File stream I/O (`ifstream`, `ofstream`) |
+| `<functional>` | Function objects, `std::function`, `std::bind` |
+| `<iomanip>` | I/O manipulators (`setw`, `setprecision`, `setfill`) |
+| `<iostream>` | Standard I/O streams (`std::cin`, `std::cout`, `std::cerr`) |
+| `<iterator>` | Iterator utilities and traits |
+| `<memory>` | Smart pointers (`unique_ptr`, `shared_ptr`, `weak_ptr`) |
+| `<regex>` | Regular expression support |
+| `<sstream>` | String stream classes (`stringstream`, `ostringstream`) |
+| `<streambuf>` | Stream buffer base classes |
+| `<string>` | `std::string` class |
+| `<tuple>` | `std::tuple` container |
+| `<type_traits>` | Compile-time type information and transformations |
+| `<vector>` | Dynamic array container |
+| `<boost/core/demangle.hpp>` | C++ type name demangling for debugging output |
+| `<boost/lexical_cast.hpp>` | Type conversion utilities (string to/from numeric) |
+| `trace.h` | TRACE debugging/logging system |
 
-The file includes a comprehensive set of standard library headers:
+## Provided Functionality
 
-**Algorithms and Iterators**:
-- `<algorithm>` - Standard algorithms (sort, find, etc.)
-- `<iterator>` - Iterator definitions and utilities
+This header does not define any classes, functions, or types itself. It serves as an aggregator that makes the following available:
 
-**Containers**:
-- `<vector>` - Dynamic array container
-- `<tuple>` - Fixed-size heterogeneous container
+### Standard Library Components
 
-**String Handling**:
-- `<string>` - String class
-- `<sstream>` - String stream classes
-- `<streambuf>` - Stream buffer classes
-- `<regex>` - Regular expression support
+After including `common.h`, you have access to:
 
-**Memory Management**:
-- `<memory>` - Smart pointers (unique_ptr, shared_ptr)
+- **Containers:** `std::vector`, `std::string`, `std::tuple`
+- **Algorithms:** `std::sort`, `std::find`, `std::copy`, `std::transform`
+- **I/O:** `std::cout`, `std::cerr`, `std::ifstream`, `std::ofstream`, `std::stringstream`
+- **Memory:** `std::unique_ptr`, `std::shared_ptr`, `std::make_unique`, `std::make_shared`
+- **Time:** `std::chrono::system_clock`, `std::chrono::duration`
+- **Type Traits:** `std::is_same`, `std::enable_if`, `std::decay`
 
-**I/O Operations**:
-- `<iostream>` - Standard input/output streams
-- `<fstream>` - File input/output streams
-- `<iomanip>` - I/O manipulators (setw, setprecision)
+### Boost Components
 
-**Time and Chrono**:
-- `<chrono>` - Time utilities and duration types
+- **`boost::core::demangle()`:** Converts mangled C++ type names to human-readable form
+- **`boost::lexical_cast<T>()`:** Converts between string and numeric types
 
-**Type Utilities**:
-- `<type_traits>` - Type trait templates
-- `<functional>` - Function objects and utilities
-- `<cstddef>` - Size_t, nullptr_t, etc.
-- `<cstdio>` - C standard I/O (printf, etc.)
+### TRACE Macros
 
-### Third-Party Libraries
+- **`TLOG(level)`:** Log a message at the specified trace level
+- **`TLVL_*`:** Predefined trace levels (INFO, WARNING, ERROR, etc.)
 
-**Boost Libraries**:
-- `<boost/core/demangle.hpp>` - Utilities for demangling C++ type names
-- `<boost/lexical_cast.hpp>` - Type conversion utilities
+## Relationship to Other Components
 
-**Trace Library**:
-- `"trace.h"` - TRACE debugging/logging facility (artdaq tracing system)
+This file serves as the foundation for standard library access in the SharedCommon module:
 
-## Header Guard
+```
+common.h (this file)
+    ^
+    |
+sharedcommon_common.h (includes this + all SharedCommon utilities)
+    ^
+    |
+Implementation files (.cpp) throughout the project
+```
 
-The file uses a traditional include guard:
+**Used by:**
+- `sharedcommon_common.h` - Higher-level aggregator that includes this file
+- Most `.cpp` files in SharedCommon: `helper_functions.cpp`, `fileststem_functions.cpp`, `printStackTrace.cpp`
+- Implementation files throughout the project
+
+**Important:** This file should only be included in implementation files (`.cpp`), not in headers (`.h`), to avoid excessive dependency propagation.
+
+## Example
+
 ```cpp
-#ifndef _ARTDAQ_DATABASE_COMMON_H_
-#define _ARTDAQ_DATABASE_COMMON_H_
-...
+#include "artdaq-database/SharedCommon/common.h"
+#include <iostream>
+
+void demonstrateAvailableFeatures() {
+    try {
+        // Standard library containers and utilities
+        std::vector<std::string> data{"item1", "item2", "item3"};
+        std::stringstream ss;
+        auto ptr = std::make_unique<int>(42);
+
+        // Boost utilities for type demangling (useful for debugging)
+        auto type_name = boost::core::demangle(typeid(std::vector<int>).name());
+        std::cout << "Type name: " << type_name << std::endl;
+
+        // Boost lexical_cast for string conversion
+        auto num = boost::lexical_cast<int>("42");
+        auto str = boost::lexical_cast<std::string>(3.14);
+        std::cout << "Converted: " << num << ", " << str << std::endl;
+
+        // TRACE logging
+        TLOG(10) << "Processing " << data.size() << " items";
+
+    } catch (boost::bad_lexical_cast const& e) {
+        std::cerr << "Conversion error: " << e.what() << std::endl;
+    } catch (std::exception const& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+}
+
+int main() {
+    demonstrateAvailableFeatures();
+    return 0;
+}
+```
+
+## Notes for Developers
+
+### Best Practices
+
+```cpp
+// GOOD: In .cpp files - include common.h for standard library access
+#include "artdaq-database/SharedCommon/common.h"
+
+void processData() {
+    std::vector<std::string> data;
+    std::stringstream ss;
+    auto ptr = std::make_unique<MyClass>();
+    // ...
+}
+```
+
+```cpp
+// BAD: In .h files - include specific headers only
+// Don't do this in headers:
+// #include "artdaq-database/SharedCommon/common.h"
+
+// DO this instead in headers:
+#include <string>
+#include <vector>
+// Include only what's needed for the interface
+```
+
+### Common Pitfalls
+
+- **Pitfall 1:** Including this file in header files creates excessive compile-time dependencies and slows down builds. Always include in `.cpp` files only.
+
+- **Pitfall 2:** The TRACE macros require proper initialization. Ensure TRACE is configured before use in main programs.
+
+- **Pitfall 3:** `boost::lexical_cast` throws `boost::bad_lexical_cast` on conversion failure. Always wrap in try-catch when converting user input:
+  ```cpp
+  // GOOD: Handle conversion errors
+  try {
+      int value = boost::lexical_cast<int>(user_input);
+  } catch (boost::bad_lexical_cast const& e) {
+      std::cerr << "Invalid number: " << user_input << std::endl;
+  }
+
+  // BAD: Unhandled exception on invalid input
+  int value = boost::lexical_cast<int>(user_input);  // May throw!
+  ```
+
+### Anti-patterns
+
+```cpp
+// DON'T do this in a header file:
+#ifndef MY_HEADER_H
+#define MY_HEADER_H
+#include "artdaq-database/SharedCommon/common.h"  // Wrong! Too many dependencies
+class MyClass { /* ... */ };
+#endif
+
+// DO this instead:
+#ifndef MY_HEADER_H
+#define MY_HEADER_H
+#include <string>  // Only include what's needed
+class MyClass {
+    std::string name_;
+};
 #endif
 ```
 
-## Constants/Literals
+## See Also
 
-The file contains a commented-out macro definition:
-```cpp
-// #define extra_traces 0
-```
-This suggests there's an option for enabling extra trace output that is currently disabled.
-
-## Usage Context
-
-This header is included by most `.cpp` files in the SharedCommon module and serves as a foundation for:
-
-1. **String manipulation** - Using std::string, sstream, regex
-2. **Container operations** - Using vector, iterators, algorithms
-3. **Type introspection** - Using boost::demangle for readable type names
-4. **Memory management** - Using smart pointers
-5. **Time operations** - Using std::chrono for timestamps
-6. **Debugging** - Using TRACE macros for logging
-
-### Common Include Pattern
-
-Many source files in the project use this pattern:
-```cpp
-#include "artdaq-database/SharedCommon/common.h"
-
-// Now all standard library components are available
-std::vector<std::string> data;
-std::stringstream ss;
-auto ptr = std::make_unique<MyClass>();
-```
-
-### Files That Include common.h
-
-Based on the codebase exploration, the following SharedCommon files include this header:
-- `fileststem_functions.cpp`
-- `helper_functions.cpp`
-- `printStackTrace.cpp`
-- And likely many others throughout the project
-
-## Design Rationale
-
-**Benefits of this approach**:
-1. **Reduces boilerplate** - Source files don't need to individually include common headers
-2. **Consistency** - Ensures all modules use the same standard library components
-3. **Faster compilation** - Can be used as a precompiled header
-4. **Easier maintenance** - Adding a commonly-needed header only requires one change
-
-**Potential drawbacks**:
-1. **Compilation dependencies** - Changes to this file trigger recompilation of many files
-2. **Namespace pollution** - Includes more than some files might need
-3. **Longer initial compile** - First compilation includes everything
-
-## Best Practices
-
-When using this header:
-
-1. **Include it first** in your .cpp files (after your own module's header):
-   ```cpp
-   #include "my_module.h"
-   #include "artdaq-database/SharedCommon/common.h"
-   ```
-
-2. **Don't include it in other headers** - Only include in .cpp implementation files to minimize dependencies
-
-3. **Add specific includes in headers** - If your header file needs a type, include it explicitly
-
-4. **Use TRACE macros for debugging**:
-   ```cpp
-   TLOG(10) << "Debug message";
-   ```
-
-## Related Files
-
-- **sharedcommon_common.h** - A higher-level aggregator that includes this file along with other SharedCommon utilities
-- **trace.h** - The tracing/logging system included by this file
-
-## Notes
-
-- This is a pure aggregator header with no actual code implementation
-- The boost libraries are used for type demangling (showing readable C++ type names) and type conversions
-- The TRACE system is the artdaq-standard logging mechanism
-- Including chronos support suggests time-stamped operations are common in the codebase
+- [sharedcommon_common.h](./sharedcommon_common.h.md) - Module aggregator that includes this file plus all SharedCommon utilities
+- [External: Boost.Core demangle](https://www.boost.org/doc/libs/release/libs/core/doc/html/core/demangle.html) - Documentation for type name demangling
+- [External: Boost.Lexical_Cast](https://www.boost.org/doc/libs/release/libs/lexical_cast/) - Documentation for type conversion
+- [External: TRACE](https://cdcvs.fnal.gov/redmine/projects/trace/wiki) - ARTDAQ TRACE logging system documentation

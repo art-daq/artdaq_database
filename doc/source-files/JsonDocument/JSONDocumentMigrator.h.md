@@ -1,281 +1,201 @@
 # JSONDocumentMigrator.h
 
-## File Overview
+**Path:** `artdaq-database/JsonDocument/JSONDocumentMigrator.h`
 
-This header file defines the `JSONDocumentMigrator` class, which provides functionality for migrating JSON documents from older formats to the current database schema. It converts legacy document structures into the modern format with proper metadata, versioning, and database fields.
+**Purpose:** This header file defines the `JSONDocumentMigrator` class, which provides functionality for migrating JSON documents from legacy formats to the current database schema. It converts older document structures into the modern format with proper metadata, versioning, and database fields using an implicit conversion operator pattern.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/JsonDocument/JSONDocumentMigrator.h`
 
-## Dependencies
+## Key Concepts
 
-```cpp
-#include "artdaq-database/JsonDocument/JSONDocument.h"
-#include "artdaq-database/JsonDocument/common.h"
-```
-
-**Key Dependencies**:
-- **JSONDocument.h** - Core document class
-- **common.h** - Module-wide types and utilities
-
-## Namespace Structure
-
-```cpp
-namespace artdaq {
-namespace database {
-namespace docrecord {
-  // JSONDocumentMigrator class
-}
-}
-}
-```
-
-## JSONDocumentMigrator Class
-
-### Class Declaration
-
-```cpp
-class JSONDocumentMigrator final {
-public:
-  JSONDocumentMigrator(JSONDocument&);
-  operator JSONDocument();
-
-  // Defaults and deleted members...
-private:
-  JSONDocument& _document;
-};
-```
-
-**Key Characteristics**:
-- **final** - Cannot be inherited from
-- **Single-purpose** - Designed for one-time migration operations
-- **Reference-based** - Holds reference to document being migrated
-
-### Constructor
-
-```cpp
-JSONDocumentMigrator(JSONDocument&);
-```
-
-**Purpose**: Initializes migrator with a reference to a document to be migrated.
-
-**Parameter**: Non-const reference to `JSONDocument` (document to migrate)
-
-**Design Choice**: Takes reference (not copy) because migration may involve reading from the original document multiple times.
-
-### Conversion Operator
-
-```cpp
-operator JSONDocument();
-```
-
-**Purpose**: Performs the migration and returns the migrated document.
-
-**Return Type**: `JSONDocument` (new document in current format)
-
-**Usage Pattern**:
+### Conversion Operator Pattern
+The migrator uses a conversion operator to perform migration:
 ```cpp
 JSONDocument legacy = loadOldFormat();
 JSONDocumentMigrator migrator(legacy);
-JSONDocument modernDoc = migrator;  // Implicit conversion performs migration
+JSONDocument modern = migrator;  // Implicit conversion performs migration
 ```
 
-**Alternative Usage**:
-```cpp
-JSONDocument modernDoc = JSONDocumentMigrator(legacyDoc);
-```
+This pattern makes migration feel natural and self-documenting.
 
-### Special Member Functions
+### Single-Use Design
+The class is designed for immediate, single-use migration:
+- Takes a reference to the source document
+- Non-copyable and non-movable
+- No default constructor
+- Conversion operator produces the result
 
-```cpp
-// Defaults
-~JSONDocumentMigrator() = default;
-
-// Deleted
-JSONDocumentMigrator() = delete;
-JSONDocumentMigrator(JSONDocumentMigrator const&) = delete;
-JSONDocumentMigrator& operator=(JSONDocumentMigrator const&) = delete;
-JSONDocumentMigrator& operator=(JSONDocumentMigrator&&) = delete;
-JSONDocumentMigrator(JSONDocumentMigrator&&) = delete;
-```
-
-**Design Constraints**:
-- **No default constructor** - Must be constructed with a document
-- **Non-copyable** - Cannot copy migrator instances
-- **Non-movable** - Cannot move migrator instances
-- **Single-use** - Intended for immediate use and conversion
-
-**Rationale**:
-- Holds reference to external document, copying/moving would be problematic
-- Designed for immediate use via conversion operator
-- Prevents accidental misuse or state management issues
-
-### Private Member
-
-```cpp
-private:
-  JSONDocument& _document;
-```
-
-**_document**: Reference to the document being migrated.
-
-**Why Reference?**
-- Avoids copying potentially large document
-- Allows reading from original format multiple times during migration
-- Clear ownership semantics (migrator doesn't own document)
-
-## Free Functions
-
-### Debug Function
-
-```cpp
-namespace debug {
-  void JSONDocumentMigrator();
-}
-```
-
-**Purpose**: Enables detailed TRACE logging for migration operations.
-
-**Usage**:
-```cpp
-artdaq::database::docrecord::debug::JSONDocumentMigrator();
-// Now migration operations will produce detailed trace output
-```
-
-## Usage Patterns
-
-### Basic Migration
-
-```cpp
-// Load document in old format
-JSONDocument oldFormat = JSONDocument::loadFromFile("old_config.json");
-
-// Create migrator
-JSONDocumentMigrator migrator(oldFormat);
-
-// Convert to new format
-JSONDocument newFormat = migrator;
-
-// Save in new format
-newFormat.saveToFile("new_config.json");
-```
-
-### Inline Migration
-
-```cpp
-// One-liner migration
-auto modernDoc = JSONDocumentMigrator(legacyDoc);
-```
-
-### Batch Migration
-
-```cpp
-std::vector<JSONDocument> legacyDocs = loadLegacyDocuments();
-std::vector<JSONDocument> modernDocs;
-
-for (auto& doc : legacyDocs) {
-  modernDocs.push_back(JSONDocumentMigrator(doc));
-}
-```
-
-## Design Pattern
-
-### Conversion Operator Pattern
-
-The class uses the conversion operator pattern:
-
-**Benefits**:
-- Natural syntax (`JSONDocument modern = migrator;`)
-- Implicit conversion when needed
-- Clear intent (constructor takes old, conversion returns new)
-- One-time use enforced by deleted copy/move
-
-**Pattern Structure**:
-```
-Input (old format) → Constructor → Migrator → Conversion → Output (new format)
-```
-
-### Reference-Based Design
-
-Holding a reference instead of a copy:
-
-**Advantages**:
-- No copying overhead
-- Can read from original multiple times
-- Clear ownership (migrator doesn't own document)
-
-**Disadvantages**:
-- Source document must outlive migrator
-- Cannot be copied or moved safely
-- Must be used immediately
-
-## Migration Process
-
-While the header doesn't show implementation details, the typical migration process involves:
-
-1. **Extract Legacy Fields**: Read fields from old document structure
-2. **Use Builder**: Create new document using `JSONDocumentBuilder`
-3. **Transfer Data**: Move data to new structure with proper paths
-4. **Add Metadata**: Add version, ID, and bookkeeping information
-5. **Return Result**: Return the properly structured modern document
-
-## When to Use JSONDocumentMigrator
-
-Use this class when:
-
-1. **Format Changes**: Document schema has changed between versions
-2. **Database Upgrades**: Migrating from old database structure
-3. **Legacy Support**: Need to read old configuration files
-4. **Field Reorganization**: Fields moved to different paths
-5. **Metadata Addition**: Old documents lack required metadata
-
-## Related Classes
-
-**JSONDocumentBuilder**: Likely used internally for constructing the new format document:
-```cpp
-operator JSONDocument() {
-  JSONDocumentBuilder builder;
-  // Use builder to construct new format
-  // Transfer data from _document
-  return builder.extract();
-}
-```
-
-## Error Handling
-
-The class doesn't declare any explicit exception specifications, so migration can throw:
-- `notfound_exception` - If expected fields missing in old format
-- `invalid_argument` - If old format is malformed
-- Other exceptions from builder operations
-
-**Best Practice**: Wrap migration in try-catch:
-```cpp
-try {
-  auto modernDoc = JSONDocumentMigrator(legacyDoc);
-  modernDoc.saveToFile("migrated.json");
-} catch (notfound_exception const& ex) {
-  std::cerr << "Missing required field: " << ex.what() << std::endl;
-} catch (std::exception const& ex) {
-  std::cerr << "Migration failed: " << ex.what() << std::endl;
-}
-```
+### Reference-Based Architecture
+The migrator holds a reference (not a copy) to the source document:
+- Avoids copying potentially large documents
+- Allows reading from original multiple times during migration
+- **Important:** Source document must outlive the migrator
 
 ## Thread Safety
 
-Not thread-safe:
-- Holds reference to external document
-- Migration process likely modifies builder state
-- No synchronization mechanisms
-- Intended for single-threaded use
+- **Thread-safe:** No
+- **Concurrent access:** Not safe for concurrent read/write operations
+- **Locking:** No internal locks; external synchronization required for multi-threaded use
 
-## Typical Legacy Format vs. Modern Format
+## Dependencies
 
-### Legacy Format Example
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/JsonDocument/JSONDocument.h` | Core document class for input and output |
+| `artdaq-database/JsonDocument/common.h` | Module-wide types and utilities |
 
+## Classes/Structures
+
+### `JSONDocumentMigrator`
+
+A final, non-copyable class that converts legacy documents to modern format using an implicit conversion operator. Uses `JSONDocumentBuilder` internally to construct the output document.
+
+**Thread Safety:** Not thread-safe. Holds reference to external document.
+
+#### Constructor
+
+##### `JSONDocumentMigrator(JSONDocument& document)`
+
+**Brief:** Constructor that initializes the migrator with a non-const reference to the document to be migrated.
+
+**Parameters:**
+- `document` - Non-const reference to the legacy JSONDocument
+
+**Preconditions:**
+- Document must contain valid legacy format JSON with required fields
+- Document must outlive the migrator instance
+
+**Postconditions:**
+- Migrator holds reference to source document
+- Ready for conversion via operator
+
+**Throws:** None
+
+**Thread Safety:** safe (construction)
+
+**Example:**
+```cpp
+#include "artdaq-database/JsonDocument/JSONDocumentMigrator.h"
+
+using namespace artdaq::database::docrecord;
+
+void example() {
+  JSONDocument legacy = JSONDocument::loadFromFile("old_format.json");
+  JSONDocumentMigrator migrator(legacy);
+}
+```
+
+#### Conversion Operator
+
+##### `operator JSONDocument()`
+
+**Brief:** Conversion operator that performs the actual migration from legacy format to modern format by rebuilding the document using JSONDocumentBuilder.
+
+**Parameters:** None
+
+**Preconditions:**
+- Source document must be valid
+- Required fields must exist in legacy document:
+  - `version` - Version string
+  - `configurable_entity` - Entity object with name/type
+  - `configurations` - Array of configuration objects
+  - `_id._oid` - MongoDB ObjectId string
+
+**Returns:** New JSONDocument in modern format with proper metadata structure
+
+**Postconditions:**
+- New document has proper metadata structure
+- Original document is unchanged (read-only access)
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `notfound_exception` | When required field is missing (version, configurable_entity, configurations, _id._oid) |
+| `invalid_argument` | When data format is invalid or cannot be parsed |
+
+**Thread Safety:** unsafe
+
+**Example:**
+```cpp
+// Explicit conversion via assignment
+JSONDocument modern = migrator;
+
+// One-liner migration (creates temporary migrator)
+auto modern = static_cast<JSONDocument>(JSONDocumentMigrator(legacyDoc));
+```
+
+#### Destructor
+
+##### `~JSONDocumentMigrator() = default`
+
+**Brief:** Default destructor that releases the reference to the source document.
+
+**Thread Safety:** safe
+
+#### Deleted Special Members
+
+The class explicitly deletes copy and move operations to enforce single-use semantics:
+
+##### `JSONDocumentMigrator() = delete`
+
+**Brief:** Default constructor is deleted to require a source document.
+
+##### `JSONDocumentMigrator(JSONDocumentMigrator const&) = delete`
+
+**Brief:** Copy constructor is deleted to prevent copying migrator instances.
+
+##### `JSONDocumentMigrator& operator=(JSONDocumentMigrator const&) = delete`
+
+**Brief:** Copy assignment is deleted to prevent copying migrator instances.
+
+##### `JSONDocumentMigrator(JSONDocumentMigrator&&) = delete`
+
+**Brief:** Move constructor is deleted to prevent moving migrator instances.
+
+##### `JSONDocumentMigrator& operator=(JSONDocumentMigrator&&) = delete`
+
+**Brief:** Move assignment is deleted to prevent moving migrator instances.
+
+## Functions
+
+### `debug::JSONDocumentMigrator()`
+
+**Brief:** Enables detailed TRACE logging for migration operations to aid debugging at maximum verbosity.
+
+**Parameters:** None
+
+**Returns:** None
+
+**Side Effects:**
+- Configures TRACE logging for migration debugging
+
+**Thread Safety:** safe
+
+**Example:**
+```cpp
+artdaq::database::docrecord::debug::JSONDocumentMigrator();
+// Migration operations now produce detailed trace output
+```
+
+## Migration Process
+
+The conversion operator performs these steps:
+1. Create a new `JSONDocumentBuilder`
+2. Call `createFromData()` with the legacy document
+3. Extract and set version from `version` field
+4. Extract and add entity from `configurable_entity` field
+5. Iterate `configurations` array and add each configuration
+6. Extract ObjectId from `_id._oid` and set via `setObjectID()`
+7. Return the built document via `extract()`
+
+## Legacy Document Format
+
+The migration expects this legacy structure:
 ```json
 {
   "version": "v1.0.0",
   "configurable_entity": {
-    "name": "detector_A"
+    "name": "detector_A",
+    "type": "some_type"
   },
   "configurations": [
     {"name": "config1"},
@@ -283,28 +203,29 @@ Not thread-safe:
   ],
   "_id": {
     "_oid": "507f1f77bcf86cd799439011"
-  }
+  },
+  // ... other user data
 }
 ```
 
-### Modern Format (After Migration)
+## Modern Document Format
 
+After migration:
 ```json
 {
   "version": "v1.0.0",
+  "_id": "507f1f77bcf86cd799439011",
   "document": {
     "data": { /* user data */ },
-    "metadata": { /* metadata */ }
+    "metadata": { }
   },
   "entities": [
-    {"entity": {"name": "detector_A"}}
+    {"entity": {"name": "detector_A", "type": "some_type"}}
   ],
   "configurations": [
     {"configuration": {"name": "config1"}},
     {"configuration": {"name": "config2"}}
   ],
-  "_id": "507f1f77bcf86cd799439011",
-  "collection": "configurations",
   "bookkeeping": {
     "isreadonly": false,
     "isdeleted": false
@@ -312,50 +233,111 @@ Not thread-safe:
 }
 ```
 
-## Best Practices
+## Relationship to Other Components
 
-1. **Validate Before Migration**: Check that source document has required fields
-2. **Test Migration**: Test with sample documents before batch migration
-3. **Backup Original**: Keep original documents before migration
-4. **Log Migration**: Enable debug traces for troubleshooting
-5. **Version Check**: Verify source document version before migrating
-6. **Immediate Use**: Use migrator immediately, don't store instances
+### Within the JsonDocument Module
+- **JSONDocument** - Input (legacy) and output (modern) document type
+- **JSONDocumentBuilder** - Used internally to construct the modern format document with proper structure
+- **common.h** - Provides shared utilities and types
 
-## Performance Considerations
+### Dependencies
+- **JSONDocumentBuilder** - Used to construct properly structured output documents with metadata, versioning, and bookkeeping
+- **Overlay types** - Indirectly used via builder for structured access
 
-1. **Single-Use Object**: Designed for one-time use, not reusable
-2. **Reference Not Copy**: Avoids copying source document
-3. **Builder Overhead**: Uses builder which creates overlays
-4. **Field Extraction**: May need to traverse source document multiple times
+### Workflow Integration
+The migrator fits into document lifecycle:
+1. Load legacy document from storage
+2. Create migrator with document reference
+3. Convert to modern format via assignment
+4. Optionally use builder for additional modifications
+5. Store in database
 
-## Limitations
+## See Also
 
-1. **Single Document**: Migrates one document at a time
-2. **No State**: Cannot track progress across multiple migrations
-3. **No Rollback**: Migration is one-way, no undo mechanism
-4. **Format Specific**: Designed for specific legacy format
+- [JSONDocumentMigrator.cpp.md](./JSONDocumentMigrator.cpp.md) - Implementation details
+- [JSONDocumentBuilder.h.md](./JSONDocumentBuilder.h.md) - Builder used for document construction
+- [JSONDocument.h.md](./JSONDocument.h.md) - Core document class
+- [common.h.md](./common.h.md) - Common includes and types
 
-## Related Files
+## Notes for Developers
 
-- **JSONDocumentMigrator.cpp** - Implementation of migration logic
-- **JSONDocumentBuilder.h** - Used for building migrated documents
-- **JSONDocument.h** - Input and output document type
+### Lifetime Management
+The source document must outlive the migrator since the migrator holds a reference:
+```cpp
+// CORRECT - document outlives migrator
+JSONDocument legacy = loadDoc();
+JSONDocument modern = JSONDocumentMigrator(legacy);
 
-## Future Enhancements
+// DANGEROUS - don't do this with temporaries
+// The temporary JSONDocument is destroyed before conversion!
+// auto modern = JSONDocumentMigrator(loadDoc());  // Undefined behavior!
+```
 
-Possible improvements to migration system:
+### Common Pitfalls
 
-1. **Version Detection**: Automatically detect source format version
-2. **Multiple Formats**: Support migration from multiple legacy formats
-3. **Validation**: Validate migrated document before returning
-4. **Progress Callbacks**: Support for batch migration progress
-5. **Dry Run**: Option to validate without actually migrating
+- **Dangling reference:** Creating migrator from temporary document results in undefined behavior. Always store the source document in a variable first.
+- **Missing fields:** Migration throws `notfound_exception` if required legacy fields are missing. Validate documents before migration.
+- **Reusing migrator:** Migrator is designed for single use; create new instance for each document to migrate.
+- **Reference semantics:** The migrator does not copy the source document. Any modifications to the source before conversion will affect the result.
 
-## Notes
+### Usage Examples
 
-- The class is very lightweight (only one member variable)
-- Conversion operator makes migration feel natural
-- Deleted copy/move constructors prevent misuse
-- Reference-based design requires careful lifetime management
-- Migration is one-way (no reverse migration support)
-- Designed for use with `JSONDocumentBuilder` for constructing output
+#### Basic Migration
+```cpp
+#include "artdaq-database/JsonDocument/JSONDocumentMigrator.h"
+
+using namespace artdaq::database::docrecord;
+
+void migrateFile() {
+  try {
+    JSONDocument legacy = JSONDocument::loadFromFile("old_config.json");
+    JSONDocument modern = JSONDocumentMigrator(legacy);
+    modern.saveToFile("new_config.json");
+  } catch (const notfound_exception& e) {
+    std::cerr << "Missing required field: " << e.what() << std::endl;
+  } catch (const std::exception& e) {
+    std::cerr << "Migration failed: " << e.what() << std::endl;
+  }
+}
+```
+
+#### Batch Migration
+```cpp
+#include "artdaq-database/JsonDocument/JSONDocumentMigrator.h"
+
+using namespace artdaq::database::docrecord;
+
+void migrateBatch(const std::vector<std::string>& legacy_files) {
+  for (auto const& filename : legacy_files) {
+    try {
+      auto legacy = JSONDocument::loadFromFile(filename);
+      auto modern = JSONDocumentMigrator(legacy);
+      modern.saveToFile(filename + ".migrated");
+      std::cout << "Migrated: " << filename << std::endl;
+    } catch (std::exception const& ex) {
+      std::cerr << "Failed: " << filename << " - " << ex.what() << std::endl;
+    }
+  }
+}
+```
+
+#### Migration with Additional Modifications
+```cpp
+#include "artdaq-database/JsonDocument/JSONDocumentMigrator.h"
+#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
+
+using namespace artdaq::database::docrecord;
+
+void migrateAndEnhance() {
+  JSONDocument legacy = JSONDocument::loadFromFile("old.json");
+  JSONDocument modern = JSONDocumentMigrator(legacy);
+
+  // Add more metadata via builder
+  JSONDocumentBuilder builder(modern);
+  builder.addAlias(JSONDocument(R"({"alias":"migrated"})"));
+  builder.setCollection(JSONDocument(R"({"collection":"migrated_configs"})"));
+  auto enhanced = builder.extract();
+
+  enhanced.saveToFile("enhanced.json");
+}
+```

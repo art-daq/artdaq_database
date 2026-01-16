@@ -1,223 +1,234 @@
 # common.h
 
-## File Overview
+**Path:** `artdaq-database/BasicTypes/common.h`
 
-**Location**: `/home/user/artdaq-database/artdaq-database/BasicTypes/common.h`
+**Purpose:** Provides common includes and utilities shared across all BasicTypes headers. This header establishes the foundational dependencies for the module, including TRACE logging for diagnostics and Boost.Core utilities for type introspection.
 
-This header file provides common utilities and dependencies used throughout the BasicTypes module. It serves as a centralized location for shared includes that are needed by multiple files in the module.
 
-**Purpose**: Provides common includes and utilities for the BasicTypes module, primarily for TRACE logging support and type introspection.
+## Key Concepts
+
+### Module Foundation Header
+
+This header serves as the foundation for all BasicTypes headers by providing:
+
+1. **TRACE Logging:** The artdaq ecosystem's high-performance logging framework for debug and diagnostic output
+2. **Boost.Core Utilities:** Specifically `demangle.hpp` for converting mangled C++ type names to human-readable form
+3. **Consistent Setup:** Ensures all BasicTypes headers have the same baseline dependencies
+
+### TRACE Logging Framework
+
+TRACE is the artdaq ecosystem's logging framework, providing:
+
+- **Compile-time filtering:** Log statements below a threshold can be compiled out entirely
+- **Runtime control:** Log levels can be adjusted at runtime without recompilation
+- **High performance:** Minimal overhead when logging is disabled
+- **Source identification:** Each file defines its own `TRACE_NAME` for filtering
+
+### Type Demangling
+
+The `boost::core::demangle()` function converts compiler-generated mangled type names into human-readable form, which is useful for debugging template-heavy code like BasicTypes.
+
+## Thread Safety
+
+- **Thread-safe:** N/A (header-only, defines no runtime state)
+- **Concurrent access:** TRACE logging is thread-safe
+- **Locking:** See TRACE documentation for internal synchronization behavior
 
 ## Dependencies
 
-### Active Dependencies
+| Include | Purpose |
+|---------|---------|
+| `trace.h` | TRACE logging framework - provides `TLOG()` macro and `TraceStreamer` class for high-performance diagnostic output |
+| `<boost/core/demangle.hpp>` | Converts mangled C++ type names to human-readable strings for debugging |
 
-- `"trace.h"` - TRACE logging framework for debug and diagnostic output
-- `<boost/core/demangle.hpp>` - Boost utility for demangling C++ type names (useful for debugging and logging)
+### Commented-Out Dependencies (Historical Reference)
 
-### Commented Out Dependencies
+The header contains commented-out includes that document dependencies used across the module but not needed in every file:
 
-The file contains several commented-out includes that were previously used or may be used in the future:
+| Include | Where Used |
+|---------|-----------|
+| `<cassert>` | Assertions in debug builds |
+| `<ctime>` | Time utilities (not currently used in BasicTypes) |
+| `<iostream>` | Stream I/O in .cpp files |
+| `<iterator>` | Iterator utilities in .cpp files |
+| `<memory>` | Smart pointers (not currently used in BasicTypes) |
+| `<regex>` | Regular expressions in conversion functions |
+| `<string>` | String operations - included by individual headers as needed |
+| `<tuple>` | Tuple utilities (not currently used in BasicTypes) |
+| `<type_traits>` | Type introspection (included where needed) |
+| `<vector>` | Dynamic arrays (not currently used in BasicTypes) |
+
+These are included directly by the source files that need them, following the principle of minimal includes.
+
+## Provided Facilities
+
+### TRACE Logging
+
+**Brief:** TRACE provides high-performance, filterable logging for debugging and diagnostics across all BasicTypes files.
+
+All BasicTypes files use TRACE for logging with this pattern:
 
 ```cpp
-// #include <cassert>      // Assertions
-// #include <ctime>        // Time operations
-// #include <iostream>     // Standard I/O
-// #include <iterator>     // Iterator utilities
-// #include <memory>       // Smart pointers
-// #include <regex>        // Regular expressions
-// #include <string>       // String class
-// #include <tuple>        // Tuple utilities
-// #include <type_traits>  // Type traits
-// #include <vector>       // Vector container
+// At the top of each file, after includes:
+#ifdef TRACE_NAME
+#undef TRACE_NAME
+#endif
+#define TRACE_NAME "data_fhicl.cpp"  // Unique per file
+
+// In code:
+TLOG(11) << "Converting JSON to FHICL, buffer size: " << buffer.size();
+TLOG(12) << "Base64 encoded string: " << base64_str;
 ```
 
-These were likely consolidated elsewhere or found to be unnecessary in the common header.
+**Thread Safety:** TRACE logging operations are thread-safe.
 
-## Key Types/Classes
+**TRACE Levels Used in BasicTypes:**
 
-No types or classes are defined in this header.
+| Level Range | Purpose |
+|-------------|---------|
+| TLOG(1-5) | Errors and important warnings |
+| TLOG(10-21) | Detailed conversion steps for debugging |
 
-## Functions/Methods
-
-No functions are defined in this header.
-
-## Constants/Literals
-
-None defined.
-
-## TRACE Logging
-
-The primary purpose of this header is to ensure TRACE support is available. TRACE is a lightweight logging framework used throughout the artdaq project.
-
-### What is TRACE?
-
-TRACE provides:
-- Low-overhead logging
-- Configurable log levels
-- Runtime filtering of log messages
-- Minimal impact on performance when disabled
-
-### Usage in BasicTypes
-
-All data type headers (`data_fhicl.h`, `data_json.h`, `data_xml.h`) include this header to get TRACE support. They typically:
-
-1. Undefine any existing `TRACE_NAME`
-2. Define their own `TRACE_NAME`
-3. Use TRACE macros for logging
-
-Example pattern seen in data_*.h files:
+**Example with Error Handling:**
 ```cpp
 #include "artdaq-database/BasicTypes/common.h"
 
 #ifdef TRACE_NAME
 #undef TRACE_NAME
 #endif
+#define TRACE_NAME "my_module.cpp"
 
-#define TRACE_NAME "data_json.h"
-```
+void processConfiguration(const std::string& config_data) {
+  try {
+    TLOG(10) << "Processing configuration, size: " << config_data.size();
 
-## Boost Demangle Utility
+    if (config_data.empty()) {
+      TLOG(1) << "Error: Empty configuration data received";
+      throw std::invalid_argument("Configuration data cannot be empty");
+    }
 
-### Purpose of boost::core::demangle
+    // Process the configuration...
+    TLOG(11) << "Configuration processed successfully";
 
-The `boost::core::demangle` function converts mangled C++ type names into human-readable form:
-
-```cpp
-#include <boost/core/demangle.hpp>
-
-// Mangled name: "N6artdaq8database10basictypes8JsonDataE"
-// Demangled: "artdaq::database::basictypes::JsonData"
-```
-
-### Typical Usage
-
-```cpp
-template<typename T>
-void logType() {
-    std::string name = boost::core::demangle(typeid(T).name());
-    TLOG(10) << "Type: " << name;
+  } catch (const std::exception& e) {
+    TLOG(1) << "Exception during configuration processing: " << e.what();
+    throw;
+  }
 }
 ```
 
-### Use Cases in BasicTypes
+### Boost Demangle
 
-- Debugging type conversion issues
-- Logging type information during data transformations
-- Error messages that need to report type names
-- Template instantiation diagnostics
+**Brief:** Converts mangled type names to human-readable form for debugging template-heavy code.
 
-## Usage Context
+**Thread Safety:** Thread-safe (read-only operation on static type information).
 
-This header is included by:
-- `basictypes.h` - Main module header
-- `data_fhicl.h` - FHICL data type
-- `data_json.h` - JSON data type
-- `data_xml.h` - XML data type
-
-It provides foundational utilities that all BasicTypes components depend on.
-
-## Include Order
-
-When using BasicTypes headers, the include chain is:
-
-```
-Your Code
-    ↓
-#include "basictypes.h" or specific data_*.h
-    ↓
-#include "common.h"
-    ↓
-#include "trace.h" and <boost/core/demangle.hpp>
-```
-
-## Header Guards
-
+**Example:**
 ```cpp
-#ifndef _ARTDAQ_DATABASE_BASICTYPES_COMMON_H_
-#define _ARTDAQ_DATABASE_BASICTYPES_COMMON_H_
+#include "artdaq-database/BasicTypes/common.h"
+#include <typeinfo>
+#include <iostream>
+
+template<typename T>
+void printTypeName(const T& value) {
+  // Without demangle: "N6artdaq8database10basictypes8JsonDataE"
+  // With demangle: "artdaq::database::basictypes::JsonData"
+  std::cout << "Type: " << boost::core::demangle(typeid(value).name()) << "\n";
+}
+
+void debugTypeInformation() {
+  try {
+    artdaq::database::basictypes::JsonData json(R"({"key": "value"})");
+    printTypeName(json);  // Output: artdaq::database::basictypes::JsonData
+  } catch (const std::exception& e) {
+    std::cerr << "Error: " << e.what() << "\n";
+  }
+}
 ```
 
-Standard include guard prevents multiple inclusion.
+## Relationship to Other Components
 
-## Design Decisions
+```
+                common.h
+                   |
+    +--------------+--------------+
+    |              |              |
+data_json.h   data_fhicl.h   data_xml.h
+    |              |              |
+    +--------------+--------------+
+                   |
+             basictypes.h
+```
 
-### Why Comment Out Includes?
+Every BasicTypes header includes `common.h` to ensure:
+- Consistent TRACE setup across all files
+- Availability of Boost utilities
+- Standard module structure
 
-The commented-out includes suggest an evolution in the codebase:
-- **Original design**: Put all common includes here
-- **Current design**: Only include what's truly needed everywhere
-- **Benefit**: Faster compilation, clearer dependencies
+## See Also
 
-### Why Keep Comments?
-
-The comments serve as:
-- Documentation of previously used dependencies
-- Quick reference for developers who need to add includes
-- History of what was considered "common"
+- [basictypes.h](./basictypes.h.md) - Umbrella header including all types
+- [data_json.h](./data_json.h.md) - Uses common.h for TRACE and defines TraceStreamer specialization
+- [data_fhicl.h](./data_fhicl.h.md) - Uses common.h for TRACE and defines TraceStreamer specialization
+- [data_xml.h](./data_xml.h.md) - Uses common.h for TRACE and defines TraceStreamer specialization
+- [External: TRACE](https://cdcvs.fnal.gov/redmine/projects/trace) - TRACE logging documentation
+- [External: Boost.Core](https://www.boost.org/doc/libs/release/libs/core/) - Boost.Core documentation including demangle
 
 ## Notes for Developers
+
+### Common Pitfalls
+
+- **Pitfall 1:** Forgetting to `#undef TRACE_NAME` before `#define TRACE_NAME`. This causes compiler warnings about macro redefinition.
+- **Pitfall 2:** Defining `TRACE_NAME` in header files. This should only be done in source files to avoid conflicts when headers are included by multiple translation units.
+- **Pitfall 3:** Using TRACE macros in header-only code without checking that TRACE_NAME is defined.
+
+### TRACE_NAME Pattern
+
+Every BasicTypes source file follows this pattern:
+
+```cpp
+// After all #includes:
+#ifdef TRACE_NAME
+#undef TRACE_NAME
+#endif
+#define TRACE_NAME "filename.cpp"
+
+// Now TLOG() calls will identify this file
+TLOG(10) << "Processing configuration...";
+```
+
+This ensures clean TRACE output identifying the source of each log message, which is essential for debugging complex conversion chains.
+
+### Design Philosophy
+
+The commented-out includes document what was historically considered "common" but are now included only where needed. This follows the principle:
+
+1. **Minimal includes:** Only include what is truly needed everywhere
+2. **Documented history:** Comments show what might be needed in specific files
+3. **Faster compilation:** Fewer unnecessary includes reduces build time
 
 ### Adding New Common Dependencies
 
 When adding a new dependency that ALL BasicTypes components need:
 
-1. Add it to this header
+1. Add the include to common.h
 2. Update this documentation
-3. Remove it from individual data_*.h files
-4. Consider the compilation time impact
+3. Remove duplicate includes from individual data_*.h files
+4. Consider the compilation time impact - is it truly needed everywhere?
 
-### Removing Common Dependencies
+If the dependency is only needed by some files, include it directly in those files instead.
 
-When removing an include:
-
-1. Comment it out first (don't delete immediately)
-2. Ensure no BasicTypes file depends on it transitively
-3. After verification, the comment can be removed in a future cleanup
-
-### TRACE Configuration
-
-Each file defines its own `TRACE_NAME` after including this header:
-- This allows filtering log messages by component
-- Standard pattern throughout artdaq projects
-- Makes debugging easier by identifying message source
-
-## Best Practices
-
-1. **Keep it minimal**: Only add truly common dependencies
-2. **Document changes**: Update this file when modifying common.h
-3. **Consider compilation time**: Every include here affects all BasicTypes files
-4. **Use TRACE appropriately**: Follow artdaq logging guidelines
-
-## Related Documentation
-
-- TRACE documentation: See artdaq project documentation
-- Boost demangle: https://www.boost.org/doc/libs/release/libs/core/doc/html/core/demangle.html
-- artdaq logging standards: See project coding guidelines
-
-## Examples
-
-### Using TRACE (typical pattern in BasicTypes)
+### Anti-patterns
 
 ```cpp
-#include "artdaq-database/BasicTypes/common.h"
+// DON'T do this - defining TRACE_NAME in a header:
+// myheader.h
+#define TRACE_NAME "myheader.h"  // Wrong! Will conflict when included by multiple .cpp files
 
-#define TRACE_NAME "my_component"
-
-void myFunction() {
-    TLOG(10) << "Debug message";
-    TLOG(5) << "Important message";
-}
-```
-
-### Using boost::core::demangle
-
-```cpp
-#include "artdaq-database/BasicTypes/common.h"
-
-template<typename T>
-void processData(const T& data) {
-    auto typeName = boost::core::demangle(typeid(T).name());
-    TLOG(10) << "Processing type: " << typeName;
-}
+// DO this instead - define TRACE_NAME only in .cpp files:
+// mysource.cpp
+#ifdef TRACE_NAME
+#undef TRACE_NAME
+#endif
+#define TRACE_NAME "mysource.cpp"  // Correct!
 ```

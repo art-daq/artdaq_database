@@ -1,16 +1,25 @@
 # json_types.cpp
 
-## File Overview
+**Path:** `artdaq-database/DataFormats/Json/json_types.cpp`
 
-This implementation file provides the implementations for JSON type comparison operators, template specializations for unwrapper functions, and type conversion utilities. It includes sophisticated deep comparison logic that returns detailed error messages when objects differ.
+**Implements:** [json_types.h](./json_types.h.md)
 
-**Location**: `/home/user/artdaq-database/artdaq-database/DataFormats/Json/json_types.cpp`
+**Purpose:** Implements the comparison operators for JSON types, template specializations for unwrapper functions, and type conversion utilities. This file provides sophisticated deep comparison logic that returns detailed error messages when objects differ, making debugging and testing significantly easier.
+
+## Implementation Overview
+
+The implementation provides:
+
+1. **Unwrapper specializations:** Template specializations enabling type-safe value extraction from JSON variants
+2. **Comparison operators:** Deep recursive comparison for all JSON types with detailed error reporting
+3. **Type utilities:** Helper function for type enumeration to string conversion
 
 ## Dependencies
 
-### Project Headers
-- `"artdaq-database/DataFormats/Json/json_types.h"` - Type declarations
-- `"artdaq-database/DataFormats/common.h"` - Common includes
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/DataFormats/Json/json_types.h` | Type declarations |
+| `artdaq-database/DataFormats/common.h` | Common infrastructure |
 
 ## TRACE Configuration
 
@@ -18,35 +27,119 @@ This implementation file provides the implementations for JSON type comparison o
 #define TRACE_NAME "json_types.cpp"
 ```
 
-## Namespace Aliases
+## Key Algorithms
+
+### Deep Comparison Strategy
+
+All comparison operators follow a consistent pattern:
+1. Check structural compatibility (types match, sizes match)
+2. If incompatible, return `{false, "descriptive error"}`
+3. Recursively compare nested elements
+4. Return `{true, "Success"}` only if all checks pass
+
+This approach provides detailed diagnostics when comparisons fail, specifying exactly where and why the difference was found.
+
+---
+
+### compare_visitor
+
+**Brief:** A Boost static visitor that performs type-aware comparison of JSON values.
 
 ```cpp
-using artdaq::database::json::array_t;
-using artdaq::database::json::object_t;
-using artdaq::database::json::value_t;
+struct compare_visitor : public boost::static_visitor<bool>
 ```
+
+**Overloads:**
+
+| Types | Behavior |
+|-------|----------|
+| `object_t, object_t` | Delegates to `object_t::operator==` |
+| `array_t, array_t` | Delegates to `array_t::operator==` |
+| `std::string, std::string` | Direct string comparison |
+| `decimal, decimal` | Direct numeric comparison |
+| `integer, integer` | Direct numeric comparison |
+| `bool, bool` | Direct boolean comparison |
+| `A1, A2` (different types) | Returns `false` |
+
+**Template catch-all:**
+```cpp
+template <typename A1, typename A2>
+bool operator()(A1 const&, A2 const&) const {
+  return false;  // Different types are never equal
+}
+```
+
+---
+
+### Value Comparison (operator==)
+
+**Brief:** Compares two `value_t` variants for equality with type checking.
+
+**Algorithm:**
+1. Compare variant type indices using `which()`
+2. If indices differ, return false with type mismatch message
+3. Apply `compare_visitor` to compare actual values
+4. Return result with appropriate success/error message
+
+**Error Message Examples:**
+- Type mismatch: `"Values have different types <std::string(hello), integer(42)>"`
+- Value mismatch: `"Values are different <std::string(hello), std::string(world)>"`
+
+---
+
+### Data Comparison (operator==)
+
+**Brief:** Compares two `data_t` key-value pairs for equality.
+
+**Algorithm:**
+1. Compare keys using standard string comparison
+2. If keys differ, return false with key mismatch message
+3. Compare values using `compare_visitor`
+4. Return result with key context in error messages
+
+**Error Message Examples:**
+- Key mismatch: `"Keys are different <config, settings>"`
+- Value mismatch: `"Values are different <config:std::string(v1), config:std::string(v2)>"`
+
+---
+
+### Array Comparison (operator==)
+
+**Brief:** Compares two `array_t` arrays for element-wise equality.
+
+**Algorithm:**
+1. Compare array sizes
+2. If sizes differ, return false with size mismatch message
+3. Iterate through arrays in parallel
+4. Compare each element pair using `compare_visitor`
+5. Return on first mismatch or success after all elements
+
+**Error Message Examples:**
+- Size mismatch: `"Arrays have different sizes <array(...), array(...)>"`
+- Element mismatch: `"Arrays are different <array(...), array(...)>"`
+
+---
+
+### Object Comparison (operator==)
+
+**Brief:** Compares two `object_t` objects for pair-wise equality.
+
+**Algorithm:**
+1. Compare object sizes (number of key-value pairs)
+2. If sizes differ, return false with size mismatch message
+3. Iterate through both objects in parallel
+4. Compare each `data_t` pair using `data_t::operator==`
+5. Return on first mismatch with key context
+
+**Error Message Examples:**
+- Size mismatch: `"Objects have different sizes <object(...), object(...)>"`
+- Pair mismatch: `"Ojbects are different at key=\"threshold\" Values are different..."`
+
+**Note:** There is a typo in the error message ("Ojbects" instead of "Objects") which is preserved for compatibility.
 
 ## Unwrapper Template Specializations
 
-### For object_t and array_t
-
-```cpp
-template<>
-template<>
-object_t& unwrapper<object_t&>::value_as() {
-    return boost::get<object_t&>(any);
-}
-
-template<>
-template<>
-array_t& unwrapper<array_t&>::value_as() {
-    return boost::get<array_t&>(any);
-}
-```
-
-**Purpose**: Specializes the generic unwrapper template for JSON-specific types, enabling type-safe extraction from variants.
-
-### Unwrapper Constructors
+### Constructor Specializations
 
 ```cpp
 template<>
@@ -62,193 +155,146 @@ template<>
 unwrapper<const object_t>::unwrapper(const object_t& a) : any(a) {}
 ```
 
-**Purpose**: Provides specialized constructors for both const and non-const JSON types.
+**Brief:** Provides specialized constructors for both const and non-const JSON types.
 
-## Comparison Implementation
+---
 
-### compare_visitor
+### Value Extraction Specializations
 
 ```cpp
-struct compare_visitor : public boost::static_visitor<bool>
-```
-
-**Purpose**: Visitor that performs type-aware comparison of JSON values.
-
-**Overloads**:
-- Compares same types using appropriate comparison logic
-- Returns false when comparing different types
-
-**Implementation**:
-```cpp
-bool operator()(object_t const& first, object_t const& second) const {
-    return (first == second).first;
-}
-bool operator()(array_t const& first, array_t const& second) const {
-    return (first == second).first;
-}
-bool operator()(std::string const& first, std::string const& second) const {
-    return (first == second);
-}
-bool operator()(decimal const& first, decimal const& second) const {
-    return (first == second);
-}
-bool operator()(integer const& first, integer const& second) const {
-    return (first == second);
-}
-bool operator()(bool const& first, bool const& second) const {
-    return (first == second);
+template<>
+template<>
+object_t& unwrapper<object_t&>::value_as() {
+  return boost::get<object_t&>(any);
 }
 
-// Different types always compare false
-template <typename A1, typename A2>
-bool operator()(A1 const&, A2 const&) const {
-    return false;
+template<>
+template<>
+array_t& unwrapper<array_t&>::value_as() {
+  return boost::get<array_t&>(any);
 }
 ```
 
-### operator== (value_t)
-
-```cpp
-std::pair<bool, std::string> operator==(value_t const& first, value_t const& second)
-```
-
-**Algorithm**:
-1. Check if variants hold same type using `which()`
-2. If types differ, return false with descriptive error message
-3. Apply compare_visitor to perform type-specific comparison
-4. Return result with "Success" or detailed error message
-
-**Error Messages**:
-- Type mismatch: "Values have different types <type1, type2>"
-- Value mismatch: "Values are different <value1, value2>"
-
-### operator== (data_t)
-
-```cpp
-std::pair<bool, std::string> operator==(data_t const& first, data_t const& second)
-```
-
-**Algorithm**:
-1. Compare keys (must match exactly)
-2. If keys differ, return false with error
-3. Compare values using compare_visitor
-4. Return result with error message including key names
-
-**Error Messages**:
-- Key mismatch: "Keys are different <key1, key2>"
-- Value mismatch: "Values are different <key1:value1, key2:value2>"
-
-### operator== (array_t)
-
-```cpp
-std::pair<bool, std::string> operator==(array_t const& first, array_t const& second)
-```
-
-**Algorithm**:
-1. Compare array sizes
-2. If sizes differ, return false
-3. Iterate through arrays in parallel
-4. Compare each element pair using compare_visitor
-5. Return on first mismatch or success after all elements
-
-**Error Messages**:
-- Size mismatch: "Arrays have different sizes <array1, array2>"
-- Element mismatch: "Arrays are different <array1, array2>"
-
-### operator== (object_t)
-
-```cpp
-std::pair<bool, std::string> operator==(object_t const& first, object_t const& second)
-```
-
-**Algorithm**:
-1. Compare object sizes (number of key-value pairs)
-2. If sizes differ, return false
-3. Iterate through both objects in parallel
-4. Compare each data_t pair using data_t::operator==
-5. Return on first mismatch with key information
-
-**Error Messages**:
-- Size mismatch: "Objects have different sizes <object1, object2>"
-- Pair mismatch: "Ojbects are different at key=\"<key>\" <details>"
-
-**Note**: Typo in error message ("Ojbects" instead of "Objects") is in original code.
+**Brief:** Specializes the generic unwrapper template for JSON-specific types.
 
 ## Helper Functions
 
 ### to_string (type_t)
 
+**Brief:** Converts a `type_t` enumeration value to its string representation.
+
 ```cpp
-std::string to_string(type_t t)
+std::string to_string(type_t t) {
+  switch (t) {
+    case type_t::NOTSET: return "NOTSET";
+    case type_t::VALUE:  return "VALUE";
+    case type_t::DATA:   return "DATA";
+    case type_t::OBJECT: return "OBJECT";
+    case type_t::ARRAY:  return "ARRAY";
+  }
+  return "NOTSET";
+}
 ```
 
-**Implementation**: Simple switch statement converting enum to string.
+## Error Handling Strategy
 
-**Returns**:
-- `type_t::NOTSET` → "NOTSET"
-- `type_t::VALUE` → "VALUE"
-- `type_t::DATA` → "DATA"
-- `type_t::OBJECT` → "OBJECT"
-- `type_t::ARRAY` → "ARRAY"
-- Default → "NOTSET"
+### Informative Error Messages
+
+All comparison operators return detailed error messages that include:
+- The type of mismatch (key, value, size, type)
+- String representations of both values being compared
+- Context information (which key caused the failure)
+
+This design supports:
+- Efficient debugging when documents don't match
+- Automated testing with meaningful failure messages
+- Logging and diagnostics
+
+### No Exception Throwing
+
+Comparison operators do not throw exceptions; instead, they return failure status with error details. This allows callers to handle mismatches gracefully without try-catch blocks.
 
 ## Usage Examples
 
-### Deep Comparison
+### Deep Comparison with Error Reporting
 
 ```cpp
-object_t obj1, obj2;
-obj1["key"] = std::string("value");
-obj2["key"] = std::string("different");
+#include "artdaq-database/DataFormats/Json/json_types.h"
+#include <iostream>
 
-auto [equal, message] = obj1 == obj2;
-// equal == false
-// message == "Ojbects are different at key=\"key\" Values are different<...>"
+void compareDocuments() {
+  using namespace artdaq::database::json;
+
+  object_t doc1, doc2;
+  doc1["name"] = std::string("config");
+  doc1["version"] = static_cast<integer>(1);
+
+  doc2["name"] = std::string("config");
+  doc2["version"] = static_cast<integer>(2);  // Different!
+
+  auto [equal, message] = doc1 == doc2;
+
+  if (!equal) {
+    std::cerr << "Documents differ: " << message << "\n";
+    // Output: Documents differ: Ojbects are different at key="version" Values are different...
+  }
+}
 ```
 
 ### Type Debugging
 
 ```cpp
-type_t t = type_t::OBJECT;
-std::cout << to_string(t);  // Prints: "OBJECT"
+#include "artdaq-database/DataFormats/Json/json_types.h"
+
+void debugType() {
+  using namespace artdaq::database::json;
+
+  type_t t = type_t::OBJECT;
+  std::cout << "Type: " << to_string(t) << "\n";  // Output: Type: OBJECT
+}
 ```
 
-### Unwrapper Usage
+### Using Unwrapper
 
 ```cpp
-using namespace artdaq::database::sharedtypes;
+#include "artdaq-database/DataFormats/Json/json_types.h"
 
-value_t v = object_t{};
-auto wrapper = unwrap(v);
-auto& obj = wrapper.value_as<object_t>();
+void extractValue() {
+  using namespace artdaq::database::json;
+  using namespace artdaq::database::sharedtypes;
+
+  value_t v = object_t{};
+  auto& obj = unwrap(v).value_as<object_t>();
+
+  obj["key"] = std::string("value");
+}
 ```
 
-## Design Considerations
+## Performance Considerations
 
-**Error Messages**:
-- Provide detailed context for debugging
-- Include both sides of comparison
-- Specify exact location of mismatch (key names, array positions)
+- **Recursive comparison:** Deep structures may cause significant recursion; stack overflow possible for extremely nested documents
+- **Early termination:** Comparisons return on first mismatch, optimizing for the unequal case
+- **Size checks first:** Size comparisons are O(1) and performed before element-wise comparison
+- **String allocation:** Error messages allocate strings; in hot paths, consider checking `.first` before accessing `.second`
 
-**Performance**:
-- Recursive comparisons can be expensive for deeply nested structures
-- Early termination on first mismatch improves performance
-- Size checks performed before element-wise comparison
+## Testing Notes
 
-**Type Safety**:
-- Visitor pattern ensures type-safe comparisons
-- Template specializations prevent invalid type combinations
-- Boost variant provides runtime type checking
+- **Unit tests:** `test/DataFormats/Json/json_types_t.cc`
+- **Key test cases:**
+  - Value comparison for all primitive types
+  - Nested object and array comparison
+  - Type mismatch detection
+  - Size mismatch detection
+  - Error message content verification
 
-## Related Files
+## Maintenance Notes
 
-- **json_types.h** - Type declarations and visitor definitions
-- **json_types_impl.h** - Additional template implementations
-- **shared_types.h** - Base unwrapper template
+- The "Ojbects" typo in error messages is intentional for backward compatibility with existing tests and logs
+- The `noerror` constant (`"Success"`) is used for successful comparison results
+- Unwrapper specializations must match those in `json_types_impl.h`
 
-## Notes
+## See Also
 
-- All comparison operators return `std::pair<bool, std::string>` for detailed error reporting
-- The `compare_visitor` recursively calls comparison operators for nested structures
-- Unwrapper specializations enable clean syntax for accessing nested JSON values
-- Error messages use print_visitor to generate human-readable type representations
+- [json_types.h](./json_types.h.md) - Type declarations and visitor definitions
+- [json_types_impl.h](./json_types_impl.h.md) - Additional template implementations
+- [shared_types.h](../shared_types.h.md) - Base unwrapper template definition

@@ -1,360 +1,679 @@
 # ovlKeyValue.h
 
-## File Overview
+**Path:** `artdaq-database/Overlay/ovlKeyValue.h`
 
-This header defines `ovlKeyValue`, the fundamental base class for all overlay objects in the Overlay module. It provides the core abstraction for wrapping JSON key-value pairs with type-safe C++ accessors, enabling the overlay pattern where C++ objects provide convenient access to underlying JSON data structures without data duplication.
+**Purpose:** This header defines `ovlKeyValue`, the fundamental base class for all overlay objects in the Overlay module. It provides the core abstraction for wrapping JSON key-value pairs with type-safe C++ accessors, enabling the overlay pattern where C++ objects provide convenient access to underlying JSON data structures without data duplication.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/Overlay/ovlKeyValue.h`
 
-## Purpose
-
-`ovlKeyValue` serves as the foundation for the entire Overlay module by:
-
-1. **Wrapping JSON Data** - Provides object-oriented access to JSON values
-2. **Reference Semantics** - Maintains references to JSON AST, enabling zero-copy operations
-3. **Type-Safe Accessors** - Template methods for accessing typed values
-4. **Comparison Operations** - Implements deep equality comparison
-5. **Serialization** - Converts overlay objects back to JSON strings
-6. **Swap Operations** - Enables efficient value exchange
-
-## Class Definition
-
-```cpp
-class ovlKeyValue {
- public:
-  ovlKeyValue(object_t::key_type /*key*/, value_t& /*value*/);
-
-  // defaults
-  ovlKeyValue(ovlKeyValue&&) = default;
-  virtual ~ovlKeyValue() = default;
-
-  // Value accessors
-  value_t& value(object_t::key_type const& /*key*/);
-
-  template <typename T>
-  T& value_as(object_t::key_type const& /*key*/);
-
-  template <typename T>
-  T const& value_as(object_t::key_type const& /*key*/) const;
-
-  // Direct accessors
-  array_t& array_value();
-  object_t& object_value();
-  object_t::key_type& key();
-  object_t::key_type const& key() const;
-  value_t& value();
-  value_t const& value() const;
-  std::string& string_value();
-  std::string const& string_value() const;
-
-  // Self reference
-  ovlKeyValue const& self() const;
-  ovlKeyValue& self();
-
-  // virtuals
-  virtual std::string to_string() const;
-
-  // ops
-  result_t operator==(ovlKeyValue const&) const;
-  result_t swap(ovlKeyValue*);
-
- private:
-  object_t::key_type _key;
-  value_t& _value;
-};
-```
-
-## Core Concepts
+## Key Concepts
 
 ### Reference-Based Design
 
 The class stores a **reference** to JSON data, not a copy:
-
 ```cpp
 private:
   object_t::key_type _key;   // The JSON key (stored by value)
-  value_t& _value;            // Reference to JSON value (NOT a copy!)
+  value_t& _value;           // Reference to JSON value (NOT a copy!)
 ```
 
-**Implications**:
-- Changes through overlay object modify the underlying JSON
+**Implications:**
+- Changes through overlay objects modify the underlying JSON directly
 - Overlay object lifetime must not exceed JSON data lifetime
-- No data duplication - memory efficient
-- Multiple overlays can reference the same JSON
+- No data duplication - memory efficient for large documents
+- Multiple overlays can reference the same JSON structure
 
-### Template Accessor Methods
+### Template Accessor Pattern
 
+Type-safe access to nested values through template methods:
 ```cpp
 template <typename T>
 T& value_as(object_t::key_type const& key);
 ```
 
-Type-safe access to nested values:
+This pattern allows type-safe retrieval of nested JSON values without explicit casting at the call site.
 
+### Factory Function Pattern
+
+The `overlay<>()` template function creates overlay objects with automatic field initialization, creating missing fields with default values as needed.
+
+## Thread Safety
+
+- **Thread-safe:** No
+- **Concurrent access:** References mutable JSON data and uses a static comparison mask
+- **Locking:** None - callers must ensure single-threaded access
+
+## Dependencies
+
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/Overlay/common.h` | Module foundation types, constants, and comparison flags |
+
+## Classes/Structures
+
+### `ovlKeyValue`
+
+**Brief:** Base class for all overlay objects, wrapping a JSON key-value pair with type-safe accessors and comparison support.
+
+**Thread Safety:** Not thread-safe
+
+#### Constructor
+
+##### `ovlKeyValue(object_t::key_type key, value_t& value)`
+
+**Brief:** Constructs an overlay wrapping a JSON key-value pair. The key is moved into storage for efficiency, and the value is stored by reference.
+
+**Parameters:**
+- `key` - The JSON key this overlay represents (moved into storage)
+- `value` - Reference to the JSON value (stored by reference, not copied)
+
+**Preconditions:**
+- `value` must remain valid for the lifetime of the overlay
+- `value` should be the appropriate JSON type for the intended use
+
+**Postconditions:**
+- Overlay wraps the given key-value pair
+- Modifications through the overlay affect the original JSON
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| None | Constructor does not throw |
+
+**Thread Safety:** Unsafe
+
+**Example:**
 ```cpp
-// Access string value
-std::string& name = overlay.value_as<std::string>("name");
+#include "artdaq-database/Overlay/ovlKeyValue.h"
+#include <iostream>
 
-// Access integer value
-integer& count = overlay.value_as<integer>("count");
+using namespace artdaq::database::overlay;
 
-// Access boolean value
-bool& flag = overlay.value_as<bool>("enabled");
-```
-
-## Public Interface
-
-### Construction
-
-```cpp
-ovlKeyValue(object_t::key_type key, value_t& value);
-```
-
-**Parameters**:
-- `key` - The JSON key this overlay represents
-- `value` - Reference to the JSON value
-
-**Example**:
-```cpp
-object_t jsonObj;
-jsonObj["metadata"] = object_t{};
-auto& metadataValue = jsonObj.at("metadata");
-
-ovlKeyValue overlay("metadata", metadataValue);
-```
-
-### Value Access Methods
-
-#### Generic Value Access
-```cpp
-value_t& value(object_t::key_type const& key);
-```
-Access nested value by key (returns JSON variant type).
-
-#### Typed Value Access
-```cpp
-template <typename T>
-T& value_as(object_t::key_type const& key);
-
-template <typename T>
-T const& value_as(object_t::key_type const& key) const;
-```
-
-Access nested value with automatic type casting.
-
-**Supported Types**:
-- `std::string` - String values
-- `integer` - Integer values
-- `bool` - Boolean values
-- `object_t` - Nested objects
-- `array_t` - Arrays
-
-#### Direct Type Access
-
-```cpp
-array_t& array_value();          // Treat value as array
-object_t& object_value();        // Treat value as object
-std::string& string_value();     // Treat value as string
-```
-
-These assume the value is of the specified type.
-
-#### Key and Value Access
-
-```cpp
-object_t::key_type& key();              // Get the key
-object_t::key_type const& key() const;
-value_t& value();                        // Get the value reference
-value_t const& value() const;
-```
-
-### Self Reference
-
-```cpp
-ovlKeyValue const& self() const;
-ovlKeyValue& self();
-```
-
-Returns reference to the object itself. Used for:
-- Comparison operations in derived classes
-- Chaining operations
-- Type erasure patterns
-
-### Serialization
-
-```cpp
-virtual std::string to_string() const;
-```
-
-Converts the overlay back to JSON string representation.
-
-**Example Output**:
-```json
-{"metadata": {"name": "config1", "version": "1.0"}}
-```
-
-### Comparison
-
-```cpp
-result_t operator==(ovlKeyValue const& other) const;
-```
-
-Deep comparison of overlay objects:
-- Compares keys (must match)
-- Compares underlying JSON values
-- Returns `result_t` pair: {success: bool, message: string}
-
-**Example**:
-```cpp
-result_t result = overlay1 == overlay2;
-if (result.first) {
-  // Equal
-} else {
-  std::cout << "Difference: " << result.second << std::endl;
-}
-```
-
-### Swap Operation
-
-```cpp
-result_t swap(ovlKeyValue* other);
-```
-
-Swaps the key and value references with another overlay.
-
-**Use Case**: Efficient replacement of one overlay's data with another's.
-
-## Overlay Factory Function
-
-The header provides a template factory function for creating overlay objects:
-
-```cpp
-template <typename OVL, typename T = object_t>
-std::unique_ptr<OVL> overlay(value_t& parent,
-                              object_t::key_type const& self_key);
-```
-
-**Purpose**: Creates an overlay of specified type, initializing it with default values if needed.
-
-**Template Parameters**:
-- `OVL` - The overlay class to create (e.g., `ovlDocument`, `ovlBookkeeping`)
-- `T` - The expected JSON type (default: `object_t`)
-
-**Parameters**:
-- `parent` - Parent JSON object containing the target field
-- `self_key` - Key name within parent
-
-**Example**:
-```cpp
-value_t recordJson = /* ... */;
-
-// Create document overlay
-auto document = overlay<ovlDocument>(recordJson, "document");
-
-// Create bookkeeping overlay
-auto bookkeeping = overlay<ovlBookkeeping>(recordJson, "bookkeeping");
-```
-
-**Behavior**:
-- Checks that parent is an object
-- Uses `unwrap()` to access the underlying JSON structure
-- Calls the template method `value<object_t, T>(self_key)` which creates the field if it doesn't exist
-- Constructs the overlay object with the key and value reference
-- Returns a unique_ptr to the overlay
-
-## Implementation Details (from .cpp)
-
-### Comparison Mask Management
-
-```cpp
-std::uint32_t useCompareMask(std::uint32_t compareMask);
-```
-
-Manages a static comparison mask used globally:
-
-```cpp
-static std::uint32_t _compareMask = compareMask;
-return _compareMask;
-```
-
-### String Conversion
-
-```cpp
-std::string ovlKeyValue::to_string() const {
-  auto tmpAST = object_t{};
-  tmpAST[_key] = _value;
-
-  using artdaq::database::json::JsonWriter;
-  std::string retValue;
-
-  if (JsonWriter().write(tmpAST, retValue)) {
-    return retValue;
+void wrapJsonValue(value_t& jsonValue) {
+  try {
+    ovlKeyValue wrapper{"myKey", jsonValue};
+    std::cout << "Created overlay for key: " << wrapper.key() << "\n";
+    // wrapper now provides type-safe access to jsonValue
+  } catch (const std::exception& e) {
+    std::cerr << "Failed to create overlay: " << e.what() << "\n";
   }
-  return msg_ConvertionError;
 }
 ```
 
-Creates a temporary JSON object and serializes it.
+#### Special Member Functions
 
-### Value Access Implementation
+##### `ovlKeyValue(ovlKeyValue&&) = default`
 
+**Brief:** Move constructor, allowing overlays to be moved efficiently. The moved-from overlay should not be used after the move.
+
+##### `virtual ~ovlKeyValue() = default`
+
+**Brief:** Virtual destructor enabling proper cleanup when deleting derived classes through a base class pointer.
+
+#### Methods
+
+##### `value(object_t::key_type const& key) -> value_t&`
+
+**Brief:** Returns a reference to a nested JSON value by key. This method treats the wrapped value as a JSON object and retrieves the specified field.
+
+**Parameters:**
+- `key` - The key of the nested value to retrieve
+
+**Preconditions:**
+- The wrapped value must be a JSON object
+- The key must exist in the object
+
+**Returns:** Reference to the nested JSON value
+
+**Postconditions:**
+- None (returns reference to existing data)
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| `std::runtime_error` | If key does not exist |
+| `std::bad_cast` | If wrapped value is not an object |
+
+**Thread Safety:** Unsafe
+
+---
+
+##### `value_as<T>(object_t::key_type const& key) -> T&`
+
+**Brief:** Returns a typed reference to a nested value by key. This is a template method that provides type-safe access to nested JSON values.
+
+**Template Parameters:**
+- `T` - The expected C++ type of the nested value (e.g., `std::string`, `int`, `bool`, `object_t`, `array_t`)
+
+**Parameters:**
+- `key` - The key of the nested value to retrieve
+
+**Preconditions:**
+- The wrapped value must be a JSON object
+- The key must exist in the object
+- The nested value must be convertible to type T
+
+**Returns:** Reference to the nested value cast to type T
+
+**Postconditions:**
+- None (returns reference to existing data)
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| `std::bad_cast` | If value cannot be converted to type T |
+| `std::runtime_error` | If key does not exist |
+
+**Thread Safety:** Unsafe
+
+**Example:**
 ```cpp
-value_t& ovlKeyValue::value(object_t::key_type const& key) {
-  return objectValue(key);
-}
+#include "artdaq-database/Overlay/ovlKeyValue.h"
 
-value_t& ovlKeyValue::objectValue(object_t::key_type const& key) {
-  using artdaq::database::sharedtypes::unwrap;
-  return unwrap(_value).value<object_t>(key);
-}
-```
+using namespace artdaq::database::overlay;
 
-Uses `unwrap()` utility to access the underlying JSON structure.
+void accessNestedValues(ovlKeyValue& wrapper) {
+  try {
+    auto& count = wrapper.value_as<int>("count");
+    auto& name = wrapper.value_as<std::string>("name");
+    auto& enabled = wrapper.value_as<bool>("enabled");
 
-### Comparison Implementation
-
-```cpp
-result_t ovlKeyValue::operator==(ovlKeyValue const& other) const {
-  if (_key != other._key) {
-    return {false, "Keys are different: self,other=" + _key + "," + other._key + "."};
+    std::cout << "Name: " << name << ", Count: " << count << "\n";
+  } catch (const std::bad_cast& e) {
+    std::cerr << "Type mismatch: " << e.what() << "\n";
+  } catch (const std::runtime_error& e) {
+    std::cerr << "Key not found: " << e.what() << "\n";
   }
+}
+```
 
-  auto result = artdaq::database::json::operator==(_value, other._value);
+---
 
+##### `value_as<T>(object_t::key_type const& key) const -> T const&`
+
+**Brief:** Returns a const typed reference to a nested value by key. This is the const version of the template accessor.
+
+**Template Parameters:**
+- `T` - The expected C++ type of the nested value
+
+**Parameters:**
+- `key` - The key of the nested value to retrieve
+
+**Preconditions:**
+- The wrapped value must be a JSON object
+- The key must exist in the object
+
+**Returns:** Const reference to the nested value cast to type T
+
+**Postconditions:**
+- None (returns reference to existing data)
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| `std::bad_cast` | If value cannot be converted to type T |
+| `std::runtime_error` | If key does not exist |
+
+**Thread Safety:** Unsafe
+
+---
+
+##### `array_value() -> array_t&`
+
+**Brief:** Treats the wrapped value as a JSON array and returns a reference to it. Use this when the overlay wraps an array-type JSON value.
+
+**Preconditions:**
+- The wrapped value must be a JSON array
+
+**Returns:** Reference to the value as an array
+
+**Postconditions:**
+- None (returns reference to existing data)
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| `std::bad_cast` | If value is not a JSON array |
+
+**Thread Safety:** Unsafe
+
+---
+
+##### `object_value() -> object_t&`
+
+**Brief:** Treats the wrapped value as a JSON object and returns a reference to it. Use this when the overlay wraps an object-type JSON value.
+
+**Preconditions:**
+- The wrapped value must be a JSON object
+
+**Returns:** Reference to the value as an object
+
+**Postconditions:**
+- None (returns reference to existing data)
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| `std::bad_cast` | If value is not a JSON object |
+
+**Thread Safety:** Unsafe
+
+---
+
+##### `key() -> object_t::key_type&`
+
+**Brief:** Returns a mutable reference to the overlay's key. This allows changing the key associated with the overlay.
+
+**Preconditions:**
+- None
+
+**Returns:** Reference to the key string
+
+**Postconditions:**
+- None (returns reference to existing data)
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| None | This method does not throw |
+
+**Thread Safety:** Unsafe
+
+---
+
+##### `key() const -> object_t::key_type const&`
+
+**Brief:** Returns a const reference to the overlay's key for read-only access.
+
+**Preconditions:**
+- None
+
+**Returns:** Const reference to the key string
+
+**Postconditions:**
+- None
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| None | This method does not throw |
+
+**Thread Safety:** Unsafe
+
+---
+
+##### `value() -> value_t&`
+
+**Brief:** Returns a reference to the raw wrapped JSON value. This provides direct access to the underlying JSON without type conversion.
+
+**Preconditions:**
+- None
+
+**Returns:** Reference to the underlying JSON value
+
+**Postconditions:**
+- None (returns reference to existing data)
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| None | This method does not throw |
+
+**Thread Safety:** Unsafe
+
+---
+
+##### `value() const -> value_t const&`
+
+**Brief:** Returns a const reference to the raw wrapped JSON value for read-only access.
+
+**Preconditions:**
+- None
+
+**Returns:** Const reference to the underlying JSON value
+
+**Postconditions:**
+- None
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| None | This method does not throw |
+
+**Thread Safety:** Unsafe
+
+---
+
+##### `string_value() -> std::string&`
+
+**Brief:** Treats the wrapped value as a string and returns a reference to it. Use this when the overlay wraps a string-type JSON value.
+
+**Preconditions:**
+- The wrapped value must be a JSON string
+
+**Returns:** Reference to the value as a string
+
+**Postconditions:**
+- None (returns reference to existing data)
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| `std::bad_cast` | If value is not a string |
+
+**Thread Safety:** Unsafe
+
+---
+
+##### `string_value() const -> std::string const&`
+
+**Brief:** Returns a const reference to the wrapped value as a string for read-only access.
+
+**Preconditions:**
+- The wrapped value must be a JSON string
+
+**Returns:** Const reference to the value as a string
+
+**Postconditions:**
+- None
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| `std::bad_cast` | If value is not a string |
+
+**Thread Safety:** Unsafe
+
+---
+
+##### `self() -> ovlKeyValue&`
+
+**Brief:** Returns a reference to this overlay object. This is useful for comparison operations where you need to compare at the base class level.
+
+**Preconditions:**
+- None
+
+**Returns:** Reference to `*this`
+
+**Postconditions:**
+- None
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| None | This method does not throw |
+
+**Thread Safety:** Unsafe
+
+---
+
+##### `self() const -> ovlKeyValue const&`
+
+**Brief:** Returns a const reference to this overlay object.
+
+**Preconditions:**
+- None
+
+**Returns:** Const reference to `*this`
+
+**Postconditions:**
+- None
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| None | This method does not throw |
+
+**Thread Safety:** Unsafe
+
+---
+
+##### `to_string() const -> std::string` [virtual]
+
+**Brief:** Serializes the key-value pair to a JSON string representation. This method creates a temporary JSON object containing the key-value pair and serializes it.
+
+**Preconditions:**
+- None
+
+**Returns:** JSON string of the form `{"key": value}`, or `msg_ConvertionError` on serialization failure
+
+**Postconditions:**
+- None (creates temporary data for serialization)
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| None | Errors are returned as the `msg_ConvertionError` string |
+
+**Thread Safety:** Unsafe
+
+**Example:**
+```cpp
+#include "artdaq-database/Overlay/ovlKeyValue.h"
+#include <iostream>
+
+using namespace artdaq::database::overlay;
+
+void printOverlay(ovlKeyValue const& wrapper) {
+  std::string jsonStr = wrapper.to_string();
+  if (jsonStr == msg_ConvertionError) {
+    std::cerr << "Failed to serialize overlay\n";
+  } else {
+    std::cout << "Overlay content: " << jsonStr << "\n";
+  }
+}
+```
+
+---
+
+##### `operator==(ovlKeyValue const& other) const -> result_t`
+
+**Brief:** Compares this overlay with another for equality, returning detailed difference information. Compares both keys and values.
+
+**Parameters:**
+- `other` - The overlay to compare against
+
+**Preconditions:**
+- None
+
+**Returns:** `result_t` pair where:
+- `first` is `true` if equal, `false` otherwise
+- `second` contains a detailed description of differences if not equal, empty string if equal
+
+**Postconditions:**
+- None (read-only comparison)
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| None | Exceptions are caught internally |
+
+**Thread Safety:** Unsafe
+
+**Example:**
+```cpp
+#include "artdaq-database/Overlay/ovlKeyValue.h"
+#include <iostream>
+
+using namespace artdaq::database::overlay;
+
+void compareOverlays(ovlKeyValue const& wrapper1, ovlKeyValue const& wrapper2) {
+  auto result = wrapper1 == wrapper2;
   if (result.first) {
-    return result;
+    std::cout << "Overlays are equal\n";
+  } else {
+    std::cerr << "Overlays differ: " << result.second << "\n";
   }
-
-  std::ostringstream oss;
-  oss << "\n  Values disagree.";
-  oss << "\n  Key: " << quoted_(_key);
-  oss << "\n  Self  value: " << to_string();
-  oss << "\n  Other value: " << other.to_string();
-
-  return Failure(oss);
 }
 ```
 
-Provides detailed error messages showing where values differ.
+---
 
-## Usage Patterns
+##### `swap(ovlKeyValue* other) -> result_t`
 
-### Basic Wrapper Creation
+**Brief:** Swaps the key and value with another overlay object. Both the key and value references are exchanged.
 
+**Parameters:**
+- `other` - Pointer to the overlay to swap with (must not be null)
+
+**Preconditions:**
+- `other` must not be null
+
+**Returns:** `result_t` with success/failure status:
+- On success: `{true, ""}`
+- On failure: `{false, error_message}`
+
+**Postconditions:**
+- On success: This overlay has other's key/value, and other has this overlay's original key/value
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| None | Exceptions are caught and converted to Failure result |
+
+**Thread Safety:** Unsafe
+
+**Example:**
 ```cpp
-object_t config;
-config["metadata"] = object_t{};
-config["metadata"]["name"] = "myconfig";
+#include "artdaq-database/Overlay/ovlKeyValue.h"
+#include <iostream>
 
-ovlKeyValue wrapper("metadata", config.at("metadata"));
-std::string& name = wrapper.value_as<std::string>("name");
-name = "updated_config";  // Modifies underlying JSON
+using namespace artdaq::database::overlay;
+
+void swapOverlays(ovlKeyValue& first, ovlKeyValue& second) {
+  auto result = first.swap(&second);
+  if (result.first) {
+    std::cout << "Swap successful\n";
+  } else {
+    std::cerr << "Swap failed: " << result.second << "\n";
+  }
+}
 ```
 
-### Derived Class Pattern
+## Functions
 
-Most overlay classes derive from `ovlKeyValue`:
+### `overlay<OVL, T>(value_t& parent, object_t::key_type const& self_key) -> std::unique_ptr<OVL>`
 
+**Brief:** Factory function that creates an overlay object for a field within a parent JSON object. If the field does not exist, it is created with a default value of type T.
+
+**Template Parameters:**
+- `OVL` - The overlay class to create (e.g., `ovlDocument`, `ovlBookkeeping`)
+- `T` - The expected JSON type for the field (default: `object_t`)
+
+**Parameters:**
+- `parent` - Parent JSON object containing the target field
+- `self_key` - Key name of the field within the parent
+
+**Preconditions:**
+- `self_key` must not be empty
+- `parent` must be a JSON object (type_t::OBJECT)
+
+**Returns:** `std::unique_ptr<OVL>` to the created overlay
+
+**Postconditions:**
+- Field exists in parent (created with default value if missing)
+- Returned overlay wraps the field
+- Overlay is valid for the lifetime of the parent JSON
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| `std::runtime_error` | If `self_key` is empty |
+| `std::runtime_error` | If `parent` is not a JSON object |
+
+**Thread Safety:** Unsafe
+
+**Side Effects:**
+- May modify `parent` by adding a new field if it does not exist
+
+**Example:**
+```cpp
+#include "artdaq-database/Overlay/ovlKeyValue.h"
+#include "artdaq-database/Overlay/ovlBookkeeping.h"
+#include <iostream>
+
+using namespace artdaq::database::overlay;
+
+void createOverlayWithFactory(value_t& recordJson) {
+  try {
+    // Creates "bookkeeping" field if missing, returns overlay
+    auto bookkeepingOverlay = overlay<ovlBookkeeping>(recordJson, "bookkeeping");
+
+    // Now bookkeepingOverlay wraps recordJson["bookkeeping"]
+    if (!bookkeepingOverlay->isReadonly()) {
+      std::cout << "Record is modifiable\n";
+    }
+  } catch (const std::runtime_error& e) {
+    std::cerr << "Failed to create overlay: " << e.what() << "\n";
+  }
+}
+
+void createStringOverlay(value_t& recordJson) {
+  try {
+    // For string fields, specify std::string as the second template parameter
+    auto changelogOverlay = overlay<ovlChangeLog, std::string>(recordJson, "changelog");
+    std::cout << "Changelog: " << changelogOverlay->buffer() << "\n";
+  } catch (const std::runtime_error& e) {
+    std::cerr << "Failed to create overlay: " << e.what() << "\n";
+  }
+}
+```
+
+## Type Aliases
+
+### `ovlKeyValueUPtr_t`
+
+```cpp
+using ovlKeyValueUPtr_t = std::unique_ptr<ovlKeyValue>;
+```
+
+**Brief:** Convenience type alias for unique pointer to ovlKeyValue. Used for managing overlay lifetime through smart pointers.
+
+## Relationship to Other Components
+
+### Class Hierarchy
+
+```
+ovlKeyValue (this class - base)
+     ^
+     |
+     +-- ovlBookkeeping
+     +-- ovlChangeLog
+     +-- ovlComment
+     +-- ovlDocument
+     +-- ovlId
+     +-- ovlOrigin
+     +-- ovlTimeStamp
+     +-- ovlUpdate
+     +-- ovlKeyValueTimeStamp<>
+     +-- ovlKeyValueWithDefault<>
+     +-- ovlKeyValueWithMask<>
+     +-- ovlStringKeyValue<>
+     +-- ovlFixedList<>
+     +-- ovlMovableList<>
+     +-- ovlDatabaseRecord
+```
+
+### Usage Pattern
+
+All derived classes use `ovlKeyValue` as their base:
 ```cpp
 class ovlDocument : public ovlKeyValue {
  public:
@@ -363,32 +682,89 @@ class ovlDocument : public ovlKeyValue {
       _data{overlay<ovlData>(document, "data")},
       _metadata{overlay<ovlMetadata>(document, "metadata")}
   {}
-
- private:
-  ovlDataUPtr_t _data;
-  ovlMetadataUPtr_t _metadata;
 };
 ```
 
-### Comparison with Masking
+## See Also
+
+- [ovlKeyValue.cpp](./ovlKeyValue.cpp.md) - Implementation file
+- [common.h](./common.h.md) - Module foundation types
+- [ovlBookkeeping.h](./ovlBookkeeping.h.md) - Derived class example
+- [ovlDatabaseRecord.h](./ovlDatabaseRecord.h.md) - Root overlay class
+
+## Notes for Developers
+
+### Lifetime Management
 
 ```cpp
-// Set mask to ignore timestamps
-useCompareMask(DOCUMENT_COMPARE_MUTE_TIMESTAMPS);
+#include "artdaq-database/Overlay/ovlKeyValue.h"
 
-result_t result = overlay1 == overlay2;
-// Comparison will ignore timestamp differences
+using namespace artdaq::database::overlay;
+
+// BAD: JSON destroyed before overlay
+ovlKeyValue createOverlayBad() {
+  value_t json = object_t{};  // Local variable
+  return ovlKeyValue{"key", json};  // json destroyed on return!
+}
+
+// GOOD: JSON outlives overlay
+void useOverlayGood(value_t& json) {
+  ovlKeyValue overlay{"key", json};
+  // Use overlay...
+  // overlay destroyed first, json still valid
+}
+
+// GOOD: Store JSON and overlay together
+struct DocumentHolder {
+  value_t json;
+  std::unique_ptr<ovlKeyValue> overlay;
+
+  DocumentHolder() : json(object_t{}) {
+    overlay = std::make_unique<ovlKeyValue>("key", json);
+  }
+};
 ```
 
-## Design Rationale
+### Performance Considerations
 
-### Why References?
+- **Value access:** O(1) reference access - no copying
+- **Type casting:** No copies, just reference reinterpretation
+- **Comparison:** O(n) in data size - deep JSON comparison
+- **to_string():** O(n) - creates temporary JSON object and serializes
 
-**Reference-based design** provides:
-1. **Zero Copy** - No data duplication
-2. **Direct Modification** - Changes affect original JSON
-3. **Memory Efficiency** - Multiple overlays can reference same data
-4. **Consistency** - All overlays see the same data
+### Common Pitfalls
+
+- **Lifetime:** Overlay must not outlive the JSON it references. This is the most common source of bugs.
+- **Type Mismatch:** Using `value_as<T>` with wrong type causes `std::bad_cast` exception
+- **Empty Key:** Factory function throws if key is empty
+- **Null Pointer:** `swap()` returns failure if passed null pointer
+
+### Anti-patterns
+
+```cpp
+// DON'T: Returning overlay to local JSON
+ovlKeyValue bad() {
+  value_t local = object_t{};
+  return ovlKeyValue{"k", local};  // local dies after return!
+}
+
+// DO: Accept JSON by reference
+void good(value_t& external) {
+  ovlKeyValue overlay{"k", external};
+  // Safe - external outlives overlay
+}
+
+// DON'T: Assume type without checking
+auto& val = wrapper.value_as<int>("field");  // May throw if not int
+
+// DO: Handle type errors
+try {
+  auto& val = wrapper.value_as<int>("field");
+  // use val
+} catch (const std::bad_cast& e) {
+  // handle type mismatch
+}
+```
 
 ### Why Virtual Destructor?
 
@@ -397,95 +773,17 @@ virtual ~ovlKeyValue() = default;
 ```
 
 Allows proper cleanup when deleting derived classes through base pointer:
-
 ```cpp
 ovlKeyValue* ptr = new ovlDocument(...);
-delete ptr;  // Calls ovlDocument destructor
+delete ptr;  // Calls ovlDocument destructor correctly due to virtual
 ```
 
 ### Why result_t for Comparison?
 
 Standard `operator==` returns `bool`, but `result_t` provides:
 - Success/failure status
-- Detailed error messages
-- Composable comparisons
-- Better debugging
+- Detailed error messages explaining the difference
+- Composable comparisons across overlay hierarchies
+- Better debugging with `result.second` containing difference details
 
-## Thread Safety
-
-**Not thread-safe**:
-- References mutable JSON data
-- Static comparison mask
-- No internal synchronization
-
-**Thread-Safety Recommendations**:
-- Use one overlay per thread
-- Don't share overlays across threads
-- Synchronize access to underlying JSON
-
-## Performance Considerations
-
-### Efficient Operations
-- **Value access**: O(1) reference access
-- **Type casting**: No copies, just reinterpret
-- **Comparison**: O(n) in data size
-
-### Expensive Operations
-- **to_string()**: Requires JSON serialization
-- **Deep comparison**: Must traverse entire structure
-
-### Optimization Tips
-- Cache overlay objects when accessing same data repeatedly
-- Use direct accessors (`value_as`) when type is known
-- Minimize `to_string()` calls (only for debugging/serialization)
-
-## Related Files
-
-- **common.h** - Defines types and constants used by ovlKeyValue
-- **ovlKeyValue.cpp** - Implementation of methods
-- **ovlDocument.h** - Example derived class
-- **ovlBookkeeping.h** - Another derived class
-- **DataFormats/Json/json_types_impl.h** - Underlying JSON type system
-
-## Best Practices
-
-1. **Lifetime Management** - Ensure JSON outlives all overlay objects
-2. **Const Correctness** - Use const accessors when not modifying
-3. **Type Safety** - Use `value_as<T>()` with correct type
-4. **Error Checking** - Check result_t values from operations
-5. **Virtual Methods** - Override `to_string()` in derived classes for better output
-6. **Move Semantics** - Use move constructor (defaulted) for efficiency
-
-## Common Pitfalls
-
-### Dangling References
-```cpp
-// BAD: JSON destroyed before overlay
-ovlKeyValue createOverlay() {
-  value_t json = parseJSON("...");
-  return ovlKeyValue("key", json);  // json destroyed!
-}
-```
-
-### Wrong Type Access
-```cpp
-// BAD: Value is string, not integer
-integer& count = overlay.value_as<integer>("name");  // Runtime error
-```
-
-### Comparison Without Mask Setup
-```cpp
-// MAY BE PROBLEMATIC: Uses default mask (0)
-result_t result = overlay1 == overlay2;
-// Better: Set mask explicitly
-useCompareMask(desired_mask);
-result = overlay1 == overlay2;
-```
-
-## Notes
-
-- This is a polymorphic base class (virtual destructor)
-- All derived classes use move semantics (default move constructor)
-- The class is designed for short-lived objects wrapping long-lived JSON
-- Comparison operator returns result_t, not bool (non-standard but more informative)
-- The unwrap() utility handles both wrapped and unwrapped JSON values
+This enables callers to understand why two overlays differ, not just that they differ.

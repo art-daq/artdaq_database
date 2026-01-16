@@ -1,485 +1,410 @@
 # returned_result.cpp
 
-## File Overview
+**Path:** `artdaq-database/SharedCommon/returned_result.cpp`
 
-This implementation file provides the concrete implementations of the result creation and validation functions declared in `returned_result.h`. The implementations are straightforward, focusing on creating properly formatted result_t pairs and converting failures to exceptions when needed.
+**Implements:** [returned_result.h](./returned_result.h.md)
 
-**Location**: `/home/user/artdaq-database/artdaq-database/SharedCommon/returned_result.cpp`
+**Purpose:** Implements the result creation and validation functions declared in `returned_result.h`. These are simple factory functions that create `result_t` pairs and a utility to convert failures to exceptions, providing the bridge between result-based and exception-based error handling patterns used throughout the artdaq-database library.
 
-## Dependencies
+## Implementation Overview
 
-### Project Headers
-- `"artdaq-database/SharedCommon/returned_result.h"` - Function declarations and type definitions
-- `"artdaq-database/SharedCommon/shared_exceptions.h"` - Exception types (invalid_argument)
+This file provides minimal, efficient implementations of the result factory functions. The implementation is intentionally simple, as these functions are called frequently throughout the codebase. Each function creates a `std::pair<bool, std::string>` with the appropriate success/failure flag and message using C++11 aggregate initialization.
 
-## TRACE Configuration
+## Key Algorithms
 
+### Aggregate Initialization
+
+The implementations use C++11 aggregate initialization:
 ```cpp
-#define TRACE_NAME "returned_result.cpp"
+return {false, msg};  // Creates std::pair<bool, std::string>
 ```
+This is more concise than `std::make_pair(false, msg)` and equally efficient.
 
-Sets the TRACE logging identifier for this compilation unit.
+### Result-to-Exception Bridge
 
-## Namespace Aliases
-
-```cpp
-namespace db = artdaq::database;
-using artdaq::database::result_t;
-```
-
-Simplifies type names within the implementation.
+`ThrowOnFailure` allows mixing result-based and exception-based error handling in the same codebase, enabling seamless integration between different error handling strategies.
 
 ## Function Implementations
 
-### Failure (string overload)
+### `Failure(std::string const& msg) -> result_t`
 
+**Brief:** Creates a failure result with a message string, indicating an operation did not succeed.
+
+**Implementation:**
 ```cpp
 result_t db::Failure(std::string const& msg) {
     return {false, msg};
 }
 ```
 
-**Implementation Details**:
-- Uses aggregate initialization of std::pair
-- Returns pair with first=false (failure flag)
-- Second element contains the error message
+**Returns:** `result_t{false, msg}`
 
-**Efficiency**: Direct initialization, no intermediate objects.
+**Preconditions:**
+- None
 
-**Example Usage**:
+**Postconditions:**
+- Returned `result_t` has `first == false`
+- Returned `result_t` has `second == msg`
+
+**Thread Safety:** Thread-safe (uses only local variables and const parameters)
+
+**Example:**
 ```cpp
-if (file_not_found) {
-    return Failure("File not found: " + filename);
+#include "artdaq-database/SharedCommon/returned_result.h"
+#include <iostream>
+
+using namespace artdaq::database;
+
+result_t validateConfiguration(std::string const& config) {
+    if (config.empty()) {
+        return Failure("Configuration cannot be empty");
+    }
+    // ... validation logic ...
+    return Success();
+}
+
+int main() {
+    auto result = validateConfiguration("");
+    if (!result.first) {
+        std::cerr << "Error: " << result.second << std::endl;
+    }
+    return 0;
 }
 ```
 
 ---
 
-### Success (string overload)
+### `Success(std::string const& msg) -> result_t`
 
+**Brief:** Creates a success result with a message string, indicating an operation completed successfully.
+
+**Implementation:**
 ```cpp
 result_t db::Success(std::string const& msg) {
     return {true, msg};
 }
 ```
 
-**Implementation Details**:
-- Uses aggregate initialization of std::pair
-- Returns pair with first=true (success flag)
-- Second element contains the success message
+**Returns:** `result_t{true, msg}`
 
-**Efficiency**: Direct initialization, no intermediate objects.
+**Preconditions:**
+- None
 
-**Example Usage**:
+**Postconditions:**
+- Returned `result_t` has `first == true`
+- Returned `result_t` has `second == msg`
+
+**Thread Safety:** Thread-safe (uses only local variables and const parameters)
+
+**Example:**
 ```cpp
-return Success("Configuration loaded successfully");
+#include "artdaq-database/SharedCommon/returned_result.h"
+#include <iostream>
+
+using namespace artdaq::database;
+
+result_t storeDocument(std::string const& doc) {
+    // ... storage logic ...
+    return Success("{\"message\":\"Document stored successfully\"}");
+}
+
+int main() {
+    auto result = storeDocument("test data");
+    if (result.first) {
+        std::cout << "Success: " << result.second << std::endl;
+    }
+    return 0;
+}
 ```
 
 ---
 
-### Failure (ostringstream overload)
+### `Failure(std::ostringstream const& oss) -> result_t`
 
+**Brief:** Creates a failure result from a string stream by extracting its content. Useful for building complex error messages incrementally.
+
+**Implementation:**
 ```cpp
 result_t db::Failure(std::ostringstream const& oss) {
     return {false, oss.str()};
 }
 ```
 
-**Implementation Details**:
-- Calls .str() on the ostringstream to extract the string
-- Creates result_t pair with failure flag
-- Allows building complex error messages
+Calls `.str()` to extract the string from the stream.
 
-**String Extraction**: The .str() method creates a copy of the stream's contents.
+**Returns:** `result_t{false, oss.str()}`
 
-**Example Usage**:
+**Preconditions:**
+- None
+
+**Postconditions:**
+- Returned `result_t` has `first == false`
+- Returned `result_t` has `second == oss.str()`
+
+**Thread Safety:** Thread-safe (uses only local variables and const parameters)
+
+**Example:**
 ```cpp
-std::ostringstream oss;
-oss << "Failed to process " << count << " items. ";
-oss << "Expected range: [" << min << ", " << max << "]";
-return Failure(oss);
-```
+#include "artdaq-database/SharedCommon/returned_result.h"
+#include <sstream>
+#include <iostream>
 
-**Performance Note**: The string copy from oss.str() is unavoidable but typically not a concern for error paths.
+using namespace artdaq::database;
+
+result_t processItems(int count) {
+    if (count < 0) {
+        std::ostringstream oss;
+        oss << "Invalid item count: " << count << " (must be non-negative)";
+        return Failure(oss);
+    }
+    return Success();
+}
+
+int main() {
+    auto result = processItems(-5);
+    if (!result.first) {
+        std::cerr << result.second << std::endl;
+        // Output: "Invalid item count: -5 (must be non-negative)"
+    }
+    return 0;
+}
+```
 
 ---
 
-### Success (ostringstream overload)
+### `Success(std::ostringstream const& oss) -> result_t`
 
+**Brief:** Creates a success result from a string stream by extracting its content. Useful for building complex success messages incrementally.
+
+**Implementation:**
 ```cpp
 result_t db::Success(std::ostringstream const& oss) {
     return {true, oss.str()};
 }
 ```
 
-**Implementation Details**:
-- Calls .str() on the ostringstream to extract the string
-- Creates result_t pair with success flag
-- Useful for detailed success messages with statistics
+**Returns:** `result_t{true, oss.str()}`
 
-**Example Usage**:
+**Preconditions:**
+- None
+
+**Postconditions:**
+- Returned `result_t` has `first == true`
+- Returned `result_t` has `second == oss.str()`
+
+**Thread Safety:** Thread-safe (uses only local variables and const parameters)
+
+**Example:**
 ```cpp
-std::ostringstream oss;
-oss << "Successfully processed " << processed << " items. ";
-oss << "Skipped: " << skipped << ", Failed: " << failed;
-return Success(oss);
+#include "artdaq-database/SharedCommon/returned_result.h"
+#include <sstream>
+#include <vector>
+#include <iostream>
+
+using namespace artdaq::database;
+
+result_t processMultipleFiles(std::vector<std::string> const& files) {
+    // ... processing logic ...
+    std::ostringstream oss;
+    oss << "Processed " << files.size() << " files successfully";
+    return Success(oss);
+}
+
+int main() {
+    std::vector<std::string> files = {"file1.txt", "file2.txt"};
+    auto result = processMultipleFiles(files);
+    if (result.first) {
+        std::cout << result.second << std::endl;
+        // Output: "Processed 2 files successfully"
+    }
+    return 0;
+}
 ```
 
 ---
 
-### ThrowOnFailure
+### `ThrowOnFailure(result_t const& result) -> void`
 
+**Brief:** Converts a failure result to an exception, bridging result-based and exception-based error handling. If the result indicates success, this function does nothing.
+
+**Implementation:**
 ```cpp
 void db::ThrowOnFailure(result_t const& result) {
     if (result.first) {
         return;
     }
-
     throw invalid_argument(result.second);
 }
 ```
 
-**Implementation Details**:
+**Steps:**
+1. Check if the result indicates success (`result.first == true`)
+2. If successful, return immediately (no-op)
+3. If failed, throw an `invalid_argument` exception with the error message
 
-1. **Check Success**: If result.first is true, immediately return
-2. **Throw on Failure**: If false, throw invalid_argument exception
-3. **Preserve Message**: Exception message is the result's second element
+**Preconditions:**
+- None
 
-**Exception Type**: Uses `artdaq::database::invalid_argument` from shared_exceptions.h
+**Postconditions:**
+- If the function returns normally, the result indicated success (`result.first == true`)
+- If `result.first == false`, the function throws and never returns
 
-**Control Flow**:
-```
-result.first == true  → return (no exception)
-result.first == false → throw invalid_argument(result.second)
-```
+**Throws:**
 
-**Usage Example**:
+| Exception | Condition |
+|-----------|-----------|
+| `invalid_argument` | When `result.first` is `false`; exception message is `result.second` |
 
+**Thread Safety:** Thread-safe (uses only local variables and const parameters)
+
+**Called by:** Any code that needs to enforce success, particularly in initialization or critical operations where failure cannot be recovered from.
+
+**Example:**
 ```cpp
-// Must-succeed operation
-void critical_initialization() {
-    auto result = load_configuration();
-    ThrowOnFailure(result);  // Throws if load failed
+#include "artdaq-database/SharedCommon/returned_result.h"
+#include "artdaq-database/SharedCommon/shared_exceptions.h"
+#include "artdaq-database/SharedCommon/process_exit_codes.h"
+#include <iostream>
 
-    // Only reached if load succeeded
-    apply_configuration();
+using namespace artdaq::database;
+
+result_t connectToDatabase() {
+    // ... connection logic ...
+    return Success("Connected to database");
 }
 
-// Caller can catch the exception
-try {
-    critical_initialization();
-} catch (const artdaq::database::invalid_argument& e) {
-    std::cerr << "Initialization failed: " << e.what() << std::endl;
-    exit(1);
+void initializeDatabase() {
+    result_t result = connectToDatabase();
+
+    try {
+        ThrowOnFailure(result);  // Throws if connection failed
+        std::cout << "Database connected successfully\n";
+    } catch (invalid_argument const& e) {
+        std::cerr << "Failed to connect: " << e.what() << "\n";
+        throw;  // Re-throw or handle as appropriate
+    }
+}
+
+int main() {
+    try {
+        initializeDatabase();
+        return process_exit_code::SUCCESS;
+    } catch (invalid_argument const& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return process_exit_code::FAILURE;
+    }
 }
 ```
 
-**Design Pattern**: This function implements the "result to exception" conversion pattern, allowing code to mix result-based and exception-based error handling.
+## Performance Considerations
 
----
-
-## Implementation Patterns
-
-### Aggregate Initialization
-
-All creation functions use C++11 aggregate initialization:
-```cpp
-return {false, msg};  // Instead of: return std::make_pair(false, msg);
-```
-
-**Benefits**:
-- More concise
-- Easier to read
-- Same performance (no extra copies)
-- Works with auto return type deduction
-
-### Early Return Pattern
-
-ThrowOnFailure uses early return for the success case:
-```cpp
-if (result.first) {
-    return;  // Early return on success
-}
-// Only failure path continues
-throw invalid_argument(result.second);
-```
-
-**Benefits**:
-- Reduces nesting
-- Makes success path clear
-- Failure path is at the end (less common case)
-
-### String Extraction Pattern
-
-Ostringstream overloads extract string once:
-```cpp
-return {false, oss.str()};  // Single str() call
-```
-
-Alternative (less efficient):
-```cpp
-std::string msg = oss.str();
-return {false, msg};  // Extra copy
-```
-
-The direct approach avoids an intermediate variable and potential extra copy.
+- **Success/Failure creation:** ~10 ns (pair construction + string copy)
+- **ThrowOnFailure on success:** ~5 ns (bool check only)
+- **ThrowOnFailure on failure:** ~1000-10000 ns (exception throw overhead)
+- All factory functions use aggregate initialization which is efficient
+- The `ostringstream` overloads call `.str()` which may allocate a new string
 
 ## Error Handling Strategy
 
-This file demonstrates a dual-mode error handling approach:
-
-### 1. Result-Based (Primary)
-```cpp
-result_t result = operation();
-if (!result.first) {
-    // Handle error using result.second
-}
-```
-
-**Use When**:
-- Caller can reasonably handle failure
-- Multiple operations might fail
-- Performance is critical
-- Failure is expected/common
-
-### 2. Exception-Based (via ThrowOnFailure)
-```cpp
-auto result = operation();
-ThrowOnFailure(result);  // Convert to exception
-// Continue with success path
-```
-
-**Use When**:
-- Failure should propagate up
-- Caller can't reasonably handle error
-- Simpler control flow desired
-- Failure is exceptional
-
-### Hybrid Approach Example
-```cpp
-result_t complex_operation() {
-    // Internal operations use results
-    auto r1 = step1();
-    if (!r1.first) return r1;  // Propagate failure
-
-    auto r2 = step2();
-    if (!r2.first) return r2;  // Propagate failure
-
-    return Success("All steps completed");
-}
-
-void high_level_function() {
-    // High-level code converts to exceptions
-    auto result = complex_operation();
-    ThrowOnFailure(result);  // Must succeed here
-}
-```
-
-## Performance Analysis
-
-### Benchmarks (Approximate)
-
-**Success Case**:
-```cpp
-auto r = Success("message");  // ~10 ns
-```
-- Pair construction
-- String copy/move
-
-**Failure Case**:
-```cpp
-auto r = Failure("message");  // ~10 ns
-```
-- Same cost as success (just different bool value)
-
-**ThrowOnFailure (Success)**:
-```cpp
-ThrowOnFailure(success_result);  // ~5 ns
-```
-- Just a bool check and return
-
-**ThrowOnFailure (Failure)**:
-```cpp
-ThrowOnFailure(failure_result);  // ~1000-10000 ns
-```
-- Exception construction
-- Stack unwinding
-- Catch block execution
-
-### Comparison: result_t vs Direct Exception
-
-**With result_t**:
-```cpp
-// Caller code
-auto r = operation();  // ~10 ns
-if (!r.first) {
-    handle_error();     // ~100 ns
-}
-// Total: ~110 ns (common case: failure is frequent)
-```
-
-**With direct exception**:
-```cpp
-try {
-    operation();        // ~10 ns (success)
-                        // ~5000 ns (failure)
-} catch (...) {
-    handle_error();     // ~100 ns
-}
-// Total: ~10 ns (success) or ~5100 ns (failure)
-```
-
-**Conclusion**: For operations where failure is common (>1%), result_t provides significantly better performance.
-
-## Memory Management
-
-### String Lifetime
-```cpp
-result_t r = Failure("Error message");
-```
-- String is copied into the result_t
-- Result owns the string
-- Safe to return from functions
-- No dangling references
-
-### String Stream Conversion
-```cpp
-std::ostringstream oss;
-oss << "Message";
-return Failure(oss);  // oss.str() creates new string
-```
-- .str() creates a copy
-- Original oss can be destroyed
-- String is owned by result_t
+The file uses a simple conditional check in `ThrowOnFailure` to determine whether to throw. The exception type used is `invalid_argument` from `shared_exceptions.h`, which is the library's standard exception for invalid inputs or failed operations.
 
 ## Thread Safety
 
-All functions are thread-safe:
-- No shared state
-- Only local variables
-- const parameters
-- Pure functions (same input → same output)
+All functions are thread-safe - they use only local variables and const parameters. There is no shared state or global variables accessed by these functions.
 
-Multiple threads can safely call these functions concurrently.
+## Dependencies
 
-## Exception Safety
+| Include | Purpose |
+|---------|---------|
+| `returned_result.h` | Function declarations and `result_t` type |
+| `shared_exceptions.h` | `invalid_argument` exception type |
 
-### Strong Guarantee
-All functions provide strong exception safety:
-- If string allocation fails, no side effects
-- Original data unchanged
-- Can safely retry
+## TRACE Configuration
 
-### ThrowOnFailure
-- Success case: No-throw guarantee
-- Failure case: Throws by design (intended behavior)
+The file defines `TRACE_NAME` as `"returned_result.cpp"` for use with the TRACE logging system, though no TRACE calls are currently made in this implementation. These functions are called very frequently, and adding TRACE logging would create excessive noise. Errors are communicated through the result message instead.
 
-## Design Advantages
+## Relationship to Other Components
 
-1. **Simplicity**: Minimal implementation, easy to understand
-2. **Efficiency**: Direct initialization, no unnecessary copies
-3. **Flexibility**: Both string and ostringstream interfaces
-4. **Composability**: Easy to chain and transform results
-5. **Interoperability**: Works with both result and exception styles
+- **returned_result.h** - Declares the functions implemented here
+- **shared_exceptions.h** - Provides `invalid_argument` thrown by `ThrowOnFailure`
+- **ConfigurationDB** - Uses these functions extensively for operation results
+- **StorageProviders** - Uses these functions for database operation results
+- **Utilities** - Uses these functions in CLI tools
 
-## Limitations and Alternatives
+## Testing Notes
 
-### Current Limitations
+- **Unit tests:** See tests that exercise configuration operations
+- **Key test cases:**
+  - Success creation with default and custom messages
+  - Failure creation with default and custom messages
+  - Success creation from ostringstream
+  - Failure creation from ostringstream
+  - ThrowOnFailure with success result (should not throw)
+  - ThrowOnFailure with failure result (should throw `invalid_argument`)
+  - Exception message contains the original failure message
 
-1. **No Result Chaining**: Can't easily compose multiple results
-2. **Binary Success/Failure**: No partial success states
-3. **Single Error**: Can't accumulate multiple errors
+## Example
 
-### Potential Enhancements
-
-Could add:
 ```cpp
-// Chaining
-result_t operator&&(result_t const& a, result_t const& b);
+#include "artdaq-database/SharedCommon/returned_result.h"
+#include "artdaq-database/SharedCommon/shared_exceptions.h"
+#include "artdaq-database/SharedCommon/process_exit_codes.h"
+#include <iostream>
+#include <sstream>
 
-// Mapping
-template<typename F>
-result_t map(result_t const& r, F transform);
+namespace db = artdaq::database;
 
-// Multiple errors
-using multi_result_t = std::pair<bool, std::vector<std::string>>;
+// Multi-step operation demonstrating result chaining
+db::result_t step1() {
+    return db::Success("Step 1 complete");
+}
+
+db::result_t step2() {
+    // Simulate a failure
+    return db::Failure("Step 2 failed: resource unavailable");
+}
+
+db::result_t step3() {
+    return db::Success("Step 3 complete");
+}
+
+db::result_t performOperation() {
+    auto result1 = step1();
+    if (!result1.first) return result1;
+
+    auto result2 = step2();
+    if (!result2.first) return result2;
+
+    auto result3 = step3();
+    if (!result3.first) return result3;
+
+    return db::Success("All steps completed");
+}
+
+int main() {
+    try {
+        // Direct result checking
+        auto result = performOperation();
+        if (!result.first) {
+            std::cerr << "Operation failed: " << result.second << std::endl;
+            return process_exit_code::FAILURE;
+        }
+
+        // Or use ThrowOnFailure for cleaner code
+        auto result2 = performOperation();
+        db::ThrowOnFailure(result2);
+
+        std::cout << "Operation succeeded" << std::endl;
+        return process_exit_code::SUCCESS;
+
+    } catch (db::invalid_argument const& e) {
+        std::cerr << "Exception: " << e.what() << std::endl;
+        return process_exit_code::FAILURE;
+    }
+}
 ```
 
-But current implementation is intentionally minimal and sufficient for artdaq-database needs.
+## See Also
 
-## Testing Considerations
-
-### Test Cases to Cover
-
-1. **Success with default message**
-   ```cpp
-   auto r = Success();
-   assert(r.first && r.second == result::msg_Success);
-   ```
-
-2. **Success with custom message**
-   ```cpp
-   auto r = Success("Custom");
-   assert(r.first && r.second == "Custom");
-   ```
-
-3. **Failure with default message**
-   ```cpp
-   auto r = Failure();
-   assert(!r.first && r.second == result::msg_Failure);
-   ```
-
-4. **Failure with custom message**
-   ```cpp
-   auto r = Failure("Error");
-   assert(!r.first && r.second == "Error");
-   ```
-
-5. **Ostringstream overloads**
-   ```cpp
-   std::ostringstream oss;
-   oss << "Message " << 42;
-   auto r = Failure(oss);
-   assert(!r.first && r.second == "Message 42");
-   ```
-
-6. **ThrowOnFailure with success**
-   ```cpp
-   auto r = Success();
-   ThrowOnFailure(r);  // Should not throw
-   // Test passes if no exception
-   ```
-
-7. **ThrowOnFailure with failure**
-   ```cpp
-   auto r = Failure("Error");
-   try {
-       ThrowOnFailure(r);
-       assert(false);  // Should not reach here
-   } catch (const invalid_argument& e) {
-       assert(std::string(e.what()) == "Error");
-   }
-   ```
-
-## Related Files
-
-- **returned_result.h** - Function declarations and type definitions
-- **shared_exceptions.h** - Provides invalid_argument exception type
-- Database operation implementations - Primary users of result_t
-- API layer - Converts result_t to HTTP responses
-
-## Best Practices for Implementation
-
-1. **Use aggregate initialization**: `{false, msg}` instead of `std::make_pair`
-2. **Early return for success**: Makes code more readable
-3. **Single string extraction**: Call .str() only once
-4. **Minimal error handling**: Let exceptions propagate
-5. **Const correctness**: All parameters are const references
-
-## Notes
-
-- Implementation is intentionally minimal and focused
-- No TRACE logging in these functions (would add noise)
-- String copies are acceptable for error path
-- Exception from ThrowOnFailure is by design, not a bug
-- Functions are inline candidates but not marked inline (let compiler decide)
+- [returned_result.h](./returned_result.h.md) - Declares these functions and the `result_t` type
+- [shared_exceptions.h](./shared_exceptions.h.md) - Provides `invalid_argument` thrown by `ThrowOnFailure`

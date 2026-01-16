@@ -1,177 +1,90 @@
 # JSONDocumentOverlay.h
 
-## File Overview
+**Path:** `artdaq-database/Overlay/JSONDocumentOverlay.h`
 
-This is a minimal convenience header that serves as the main entry point for the Overlay module. It aggregates the primary overlay functionality by including the database record interface and common shared utilities. This header is designed to be included by external code that needs to work with database records through the overlay abstraction.
+**Purpose:** This is a minimal convenience header that serves as the main entry point for the Overlay module. It aggregates the primary overlay functionality by including the database document record interface and common shared utilities, providing external code with a single include point to access complete database document record functionality through the overlay abstraction.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/Overlay/JSONDocumentOverlay.h`
 
-## Purpose
+## Key Concepts
 
-This header serves as a **facade** for the Overlay module, providing:
+### The Overlay Pattern
 
-1. **Single Include Point** - External code can include just this one header to access database record functionality
-2. **Minimal Dependencies** - Only includes the essential database record interface
-3. **Clean API Surface** - Hides the internal complexity of individual overlay components
+The Overlay module implements the **Overlay Pattern**, where C++ objects provide type-safe, convenient access to underlying JSON data structures without data duplication. The overlay objects reference JSON directly rather than copying it, enabling efficient in-place manipulation.
 
-## Dependencies
-
-```cpp
-#include "artdaq-database/Overlay/ovlDatabaseRecord.h"
-#include "artdaq-database/SharedCommon/sharedcommon_common.h"
-```
-
-### ovlDatabaseRecord.h
-The main overlay interface - provides the `ovlDatabaseRecord` class which is the complete representation of a database record with all its components (document, bookkeeping, origin, etc.).
-
-### sharedcommon_common.h
-Provides common utilities, standard library includes, and shared types used throughout the project.
-
-## Header Guard
-
-```cpp
-#ifndef _ARTDAQ_DATABASE_JSONUTILS_JSONDOCUMENT_OVERLAY_H_
-#define _ARTDAQ_DATABASE_JSONUTILS_JSONDOCUMENT_OVERLAY_H_
-// ... includes ...
-#endif
-```
-
-**Note**: The header guard name contains `JSONUTILS` which may be a legacy naming convention from when this code was organized differently.
-
-## Usage
-
-### External Code Pattern
-
-External code that needs to work with database records should include this header:
-
-```cpp
-#include "artdaq-database/Overlay/JSONDocumentOverlay.h"
-
-using namespace artdaq::database::overlay;
-
-void processRecord(value_t& jsonRecord) {
-  // Create overlay wrapper around JSON data
-  ovlDatabaseRecord record{jsonRecord};
-
-  // Access document data
-  auto& document = record.document();
-  auto& data = document.data();
-
-  // Access metadata
-  auto& bookkeeping = record.bookkeeping();
-  if (!bookkeeping.isReadonly()) {
-    // Modify the record
-  }
-
-  // Access origin information
-  auto& origin = record.origin();
-  std::cout << "Format: " << origin.format() << std::endl;
-}
-```
-
-### What You Get
-
-By including this header, you get access to:
-
-- **ovlDatabaseRecord** - The complete database record wrapper
-- **All transitively included overlay classes**:
-  - `ovlDocument`, `ovlBookkeeping`, `ovlOrigin`
-  - `ovlId`, `ovlVersion`, `ovlCollection`
-  - `ovlEntities`, `ovlConfigurations`, `ovlRuns`
-  - `ovlComments`, `ovlAliases`, `ovlAttachments`
-  - And all their supporting types
-
-## Design Rationale
+Key characteristics:
+- **Zero-copy:** Overlays hold references to JSON, not copies
+- **Type-safe:** C++ types and methods replace raw JSON access
+- **Hierarchical:** Overlays compose to represent document structure
+- **Mutable:** Changes through overlays modify the underlying JSON
 
 ### Facade Pattern
 
 This header implements the **Facade Pattern**:
+- **Simplified Interface** - Users include one header, not dozens of internal files
+- **Reduced Compilation Dependencies** - Changes to internal overlay files do not force recompilation of external code
+- **Clear API Boundary** - Establishes what is public versus internal to the module
+- **Future-Proofing** - Internal reorganization does not affect external code
 
-**Benefits**:
-1. **Simplified Interface** - Users don't need to know about internal overlay components
-2. **Reduced Compilation Dependencies** - Changes to internal overlay files don't force recompilation of external code (in many cases)
-3. **Clear API Boundary** - Establishes what is public vs. internal to the module
-4. **Future-Proofing** - Internal reorganization doesn't affect external code
+### Zero-Copy Design
 
-### Minimal Header
+- **No Data Duplication** - Overlays reference JSON structures directly via references
+- **Type Safety** - C++ types and methods provide safe access to JSON values
+- **Lazy Evaluation** - Child overlay components are created on-demand
+- **Efficient Updates** - Changes modify JSON in-place without copying
 
-The header is intentionally minimal (only 7 lines):
-- **Fast Compilation** - Less code to parse
-- **Clear Purpose** - Obviously a facade/convenience header
-- **Easy Maintenance** - Rare changes needed
+## Thread Safety
 
-## Comparison with common.h
+- **Thread-safe:** No
+- **Concurrent access:** Overlays reference mutable JSON and share a static comparison mask
+- **Locking:** None - callers must ensure single-threaded access
 
-### common.h vs. JSONDocumentOverlay.h
+## Dependencies
 
-| Aspect | common.h | JSONDocumentOverlay.h |
-|--------|----------|----------------------|
-| **Purpose** | Internal module foundation | External API entry point |
-| **Audience** | Overlay module implementation files | External code using the overlay |
-| **Contents** | Types, constants, flags, utilities | Just the main record interface |
-| **Include Frequency** | Included by every overlay .cpp file | Included by external code |
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/Overlay/ovlDatabaseRecord.h` | Main database document record class providing complete record representation |
+| `artdaq-database/SharedCommon/sharedcommon_common.h` | Common utilities, standard library includes, and shared types |
 
-### When to Use Which
+## Classes/Structures
 
-**Use common.h when**:
-- Implementing new overlay classes
-- Working inside the Overlay module
-- Need access to comparison flags and error constants
+This header does not define any new classes or functions. It serves purely as an aggregation point, providing access to the full overlay hierarchy.
 
-**Use JSONDocumentOverlay.h when**:
-- Using database records from external code
-- Don't need internal overlay implementation details
-- Want a clean, stable API
+### Transitively Available Types
 
-## Related Files
+When you include `JSONDocumentOverlay.h`, these types become available:
 
-### Directly Included
-- **ovlDatabaseRecord.h** - The main database record class
-- **sharedcommon_common.h** - Shared utilities and common includes
+**Main Record Type:**
+- `ovlDatabaseRecord` - The complete database document record overlay (root of the overlay hierarchy)
 
-### Transitively Available
-When you include JSONDocumentOverlay.h, these are also available:
-- **common.h** - Via ovlDatabaseRecord.h
-- **ovlKeyValue.h** - Base overlay class
-- **ovlDocument.h**, **ovlBookkeeping.h**, **ovlOrigin.h** - Component overlays
-- **ovlFixedList.h**, **ovlMovableList.h** - List templates
-- All other overlay component headers
+**Component Overlays:**
+- `ovlDocument` - Provides access to the data and metadata sections
+- `ovlBookkeeping` - Manages readonly/deleted flags and update history
+- `ovlOrigin` - Tracks document provenance (format, source)
 
-## Usage in the Project
+**Simple Field Overlays:**
+- `ovlId` - Provides access to the document ID field
+- `ovlVersion` - Provides access to the version string
+- `ovlCollection` - Provides access to the collection name
+- `ovlChangeLog` - Provides access to the changelog string
 
-### Configuration API
+**List Overlays:**
+- `ovlEntities` - List of configuration entity references
+- `ovlConfigurations` - List of configuration references
+- `ovlRuns` - List of run assignments
+- `ovlComments` - List of comment entries
+- `ovlAliases` - List of alias assignments
+- `ovlAttachments` - List of attachment references
 
-The Configuration API uses this header to access database records:
+**Template Classes:**
+- `ovlFixedList<T>` - Fixed-position list overlay
+- `ovlMovableList<T>` - Reorderable list overlay
 
-```cpp
-#include "artdaq-database/Overlay/JSONDocumentOverlay.h"
+**Factory Function:**
+- `overlay<OVL, T>()` - Creates overlay instances from JSON values
 
-// API functions work with ovlDatabaseRecord
-result_t storeConfiguration(ovlDatabaseRecord& record);
-result_t retrieveConfiguration(std::string const& id, ovlDatabaseRecord& record);
-```
+## Relationship to Other Components
 
-### Testing
-
-Test files include this header to test record manipulation:
-
-```cpp
-#include "artdaq-database/Overlay/JSONDocumentOverlay.h"
-
-TEST(OverlayTest, DatabaseRecordCreation) {
-  value_t json = parseJSON("...");
-  ovlDatabaseRecord record{json};
-
-  EXPECT_FALSE(record.bookkeeping().isReadonly());
-  EXPECT_EQ(record.version().string_value(), "v1_0_0");
-}
-```
-
-## Architecture Notes
-
-### Overlay Module Structure
-
-The Overlay module has a layered architecture:
+### In the Overlay Module
 
 ```
 External Code
@@ -193,53 +106,185 @@ ovlKeyValue (base class for all overlays)
 JSON AST (actual data storage)
 ```
 
-### Zero-Copy Design
+### Comparison with common.h
 
-The overlay pattern used here provides:
-- **No Data Duplication** - Overlays reference JSON structures directly
-- **Type Safety** - C++ types and methods over raw JSON
-- **Lazy Evaluation** - Components created on-demand
-- **Efficient Updates** - Changes modify JSON in-place
+| Aspect | common.h | JSONDocumentOverlay.h |
+|--------|----------|----------------------|
+| **Purpose** | Internal module foundation | External API entry point |
+| **Audience** | Overlay module implementation files | External code using the overlay |
+| **Contents** | Types, constants, flags, utilities | Just the main record interface |
+| **Include Frequency** | Included by every overlay `.cpp` file | Included by external code once |
 
-## Best Practices
+### Usage by Other Modules
 
-### External Code
+- **ConfigurationDB** - Uses this header to access and manipulate database document records
+- **Test Files** - Include this header to test record manipulation
 
-1. **Include only JSONDocumentOverlay.h**, not individual overlay headers
+## See Also
+
+- [ovlDatabaseRecord.h](./ovlDatabaseRecord.h.md) - The main record class included by this header
+- [common.h](./common.h.md) - Internal module foundation
+- [ovlKeyValue.h](./ovlKeyValue.h.md) - Base class for all overlays
+
+## Notes for Developers
+
+### When to Use This Header
+
+**Use JSONDocumentOverlay.h when:**
+- Using database document records from external code (outside the Overlay module)
+- You need access to the complete overlay hierarchy
+- You want a clean, stable API that will not change with internal refactoring
+
+**Use common.h when:**
+- Implementing new overlay classes within the Overlay module
+- Working inside the Overlay module
+- You need access to comparison flags and error constants
+
+### Example Usage
+
+```cpp
+#include "artdaq-database/Overlay/JSONDocumentOverlay.h"
+#include <iostream>
+
+using namespace artdaq::database::overlay;
+
+void manipulateRecord(value_t& recordJson) {
+  try {
+    // Create overlay wrapping the JSON
+    ovlDatabaseRecord record{"record", recordJson};
+
+    // Access bookkeeping
+    if (record.bookkeeping()->isReadonly()) {
+      std::cerr << "Record is readonly, cannot modify\n";
+      return;
+    }
+
+    // Access document data
+    auto& document = record.document();
+
+    // Set version
+    record.version()->value("v2.0.0");
+
+    // Add a comment
+    record.addComment("Updated configuration for new run");
+
+    // Mark as readonly when done
+    record.bookkeeping()->markReadonly(true);
+
+    std::cout << "Record successfully modified\n";
+  } catch (const std::runtime_error& e) {
+    std::cerr << "Failed to manipulate record: " << e.what() << "\n";
+  } catch (const std::bad_cast& e) {
+    std::cerr << "Type mismatch in JSON structure: " << e.what() << "\n";
+  }
+}
+```
+
+### Creating and Accessing Document Records
+
+```cpp
+#include "artdaq-database/Overlay/JSONDocumentOverlay.h"
+#include "artdaq-database/DataFormats/Json/json_reader.h"
+#include <iostream>
+
+using namespace artdaq::database::overlay;
+using namespace artdaq::database::json;
+
+void processDocumentRecord() {
+  // Parse JSON from string
+  std::string jsonStr = R"({
+    "document": {
+      "data": {"threshold": 100},
+      "metadata": {"name": "DAQConfig"}
+    },
+    "bookkeeping": {
+      "isreadonly": false,
+      "isdeleted": false
+    }
+  })";
+
+  value_t recordJson;
+  try {
+    JsonReader reader;
+    if (!reader.read(jsonStr, recordJson)) {
+      std::cerr << "Failed to parse JSON\n";
+      return;
+    }
+
+    // Create overlay
+    ovlDatabaseRecord record{"record", recordJson};
+
+    // Check state before modification
+    if (record.bookkeeping()->isDeleted()) {
+      std::cerr << "Cannot modify deleted record\n";
+      return;
+    }
+
+    // Access nested data
+    auto& docOverlay = record.document();
+    std::cout << "Document overlay created successfully\n";
+
+    // Compare two records
+    value_t otherJson = recordJson;  // Copy for comparison
+    ovlDatabaseRecord otherRecord{"record", otherJson};
+
+    auto result = record == otherRecord;
+    if (result.first) {
+      std::cout << "Records are equal\n";
+    } else {
+      std::cout << "Records differ: " << result.second << "\n";
+    }
+  } catch (const std::exception& e) {
+    std::cerr << "Error: " << e.what() << "\n";
+  }
+}
+```
+
+### Common Pitfalls
+
+- **Lifetime Management:** The overlay holds a reference to JSON. The JSON must outlive the overlay. Returning an overlay to a local JSON variable causes undefined behavior.
+- **Thread Safety:** Do not access overlays from multiple threads without synchronization.
+- **Static Mask:** The comparison mask is global and affects all comparisons. Set it once at program startup.
+
+### Anti-patterns
+
+```cpp
+// DON'T: JSON destroyed before overlay
+ovlDatabaseRecord& createRecord() {
+  value_t json = object_t{};
+  return ovlDatabaseRecord{"record", json};  // Dangling reference!
+}
+
+// DO: JSON outlives overlay
+void useRecord(value_t& json) {
+  ovlDatabaseRecord record{"record", json};
+  // Use record...
+} // record destroyed before json
+
+// DON'T: Return overlay by value (still references local JSON)
+ovlDatabaseRecord createRecordBad() {
+  value_t json = object_t{};
+  return ovlDatabaseRecord{"record", json};  // json destroyed after return!
+}
+
+// DO: Accept JSON by reference, work with overlay locally
+void processRecord(value_t& externalJson) {
+  ovlDatabaseRecord record{"record", externalJson};
+  // Safe - externalJson outlives record
+  // ... do work ...
+}
+```
+
+### Header Guard Note
+
+The header guard name `_ARTDAQ_DATABASE_JSONUTILS_JSONDOCUMENT_OVERLAY_H_` contains "JSONUTILS" which is a legacy naming convention from when this code was organized differently. The guard name is kept for backward compatibility.
+
+### Best Practices
+
+1. **Include only JSONDocumentOverlay.h** for external code, not individual overlay headers
 2. **Work with ovlDatabaseRecord** as the primary interface
 3. **Check bookkeeping state** before modifying records
 4. **Use accessor methods** rather than accessing JSON directly
-
-### Module Implementation
-
-1. **Don't include JSONDocumentOverlay.h** in other overlay .h files (circular dependencies)
-2. **Use common.h** for internal module code
-3. **Keep this header minimal** - don't add convenience functions here
-4. **Update only when ovlDatabaseRecord changes** significantly
-
-## Future Considerations
-
-### Potential Enhancements
-
-1. **Version Namespace** - Consider adding version namespace for API stability:
-   ```cpp
-   namespace artdaq::database::overlay::v1 {
-     // Versioned API
-   }
-   ```
-
-2. **Forward Declarations** - Could add forward declarations for common types to reduce compile-time dependencies
-
-3. **Convenience Functions** - Could add free functions for common operations:
-   ```cpp
-   ovlDatabaseRecordUPtr_t createNewRecord();
-   result_t compareRecords(ovlDatabaseRecord const&, ovlDatabaseRecord const&);
-   ```
-
-## Notes
-
-- This is the recommended include for external code working with database records
-- The header name suggests historical organization (JSONUTILS vs. Overlay)
-- Despite the minimal content, this header is architecturally important as an API boundary
-- Including this header transitively includes most of the Overlay module
-- The header is header-guard protected but has no namespace declarations of its own
+5. **Ensure JSON lifetime** exceeds overlay lifetime
+6. **Handle exceptions** - overlay operations can throw on type mismatches
+7. **Set comparison mask early** if you need non-default comparison behavior

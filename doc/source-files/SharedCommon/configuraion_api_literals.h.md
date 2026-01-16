@@ -1,230 +1,452 @@
 # configuraion_api_literals.h
 
-## File Overview
+**Path:** `artdaq-database/SharedCommon/configuraion_api_literals.h`
 
-This header file defines a comprehensive set of string literals and constants used throughout the artdaq-database Configuration API. It serves as a central repository for all API operation names, parameter keys, provider names, filter keys, format types, and other literal values to ensure consistency across the codebase and prevent string literal typos.
+**Purpose:** Central repository of string constants for the Configuration API. Using named constants instead of string literals throughout the codebase prevents typos, enables IDE autocomplete, and makes refactoring easier. All constants are `constexpr` for zero runtime overhead.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/SharedCommon/configuraion_api_literals.h`
+
+**Note:** The filename contains a typo ("configuraion" instead of "configuration"). This is preserved for backward compatibility with existing code that includes this header.
+
+## Key Concepts
+
+### Why Use String Constants?
+
+```cpp
+// Without constants - error-prone, no IDE help
+opts.operation("writedocument");  // Typo? Hard to catch at compile time
+
+// With constants - safe, IDE autocomplete, compile-time verification
+opts.operation(apiliteral::operation::writedocument);  // IDE helps, refactor-safe
+```
+
+### Namespace Organization
+
+Constants are organized hierarchically for easy discovery:
+
+```
+artdaq::database::result              - Result messages (JSON format)
+artdaq::database::configapi::literal
+    +-- operation                     - API operation names (store, load, etc.)
+    +-- provider                      - Storage provider identifiers (mongo, filesystem)
+    +-- option                        - Request parameters (version, collection, etc.)
+    +-- filter                        - Query filter keys (entities.name, etc.)
+    +-- format                        - Output formats (json, gui)
+    +-- msg                           - User-facing messages
+```
+
+### Usage Pattern
+
+```cpp
+namespace apiliteral = artdaq::database::configapi::literal;
+
+// Now use apiliteral:: prefix for all constants
+auto op = apiliteral::operation::writedocument;
+auto prov = apiliteral::provider::mongo;
+auto fmt = apiliteral::format::json;
+```
+
+## Thread Safety
+
+- **Thread-safe:** Yes
+- **Concurrent access:** All values are `constexpr` constants evaluated at compile time
+- **Locking:** No locking needed; constants cannot be modified at runtime
 
 ## Dependencies
 
-This file has no external dependencies beyond standard C++ (it's a pure header file with only constexpr string literals).
+| Include | Purpose |
+|---------|---------|
+| (none) | Pure `constexpr` constants - no external dependencies |
 
-## Namespace Structure
+## Constants
 
-The file organizes literals in a hierarchical namespace structure:
+### Namespace: `artdaq::database::result`
 
+**Brief:** JSON-formatted result messages for API responses. These are used by the `result_t` type functions.
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `msg_EmptyFilter` | `"{\"message\":\"empty_filter\"}"` | Search filter is empty |
+| `msg_EmptyDocument` | `"{\"message\":\"Json document is empty\"}"` | Document content is empty |
+| `msg_SystemCallFailed` | (long message) | system() call failed due to setuid/setgid restrictions |
+
+---
+
+### Namespace: `artdaq::database::configapi::literal`
+
+**Brief:** Main namespace for API literal constants. Contains general constants and nested namespaces for specific categories.
+
+#### General Constants
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `operations` | `"operations"` | Operations key in JSON request |
+| `database` | `"database"` | Database key in request/response |
+| `name` | `"name"` | Name field identifier |
+| `notprovided` | `"notprovided"` | Placeholder for missing/optional values |
+| `apiname` | `"artdaq_database"` | API identifier string |
+| `whitespace` | `" "` | Single space character |
+| `nullstring` | `""` | Empty string constant |
+| `empty_json` | `"{ }"` | Empty JSON object |
+| `empty_search_result` | `"{\"search\":[ ]}"` | Empty search result JSON |
+| `database_format_version` | `3` | Current database schema version (integer) |
+| `database_format_locale` | `"en_US.UTF-8"` | Locale for string formatting |
+
+#### Timestamp Constants
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `timestamp_format` | `"%FT%T.000%z"` | ISO 8601 format string for `strftime` |
+| `timestamp_format_old` | `"%a %b %d %H:%M:%S %Y"` | Legacy timestamp format |
+| `timestamp_faketime` | `"2017-07-18T12:48:10.123-0500"` | Fixed timestamp for testing |
+
+**Timestamp format codes:**
+- `%F` = `%Y-%m-%d` (ISO 8601 date: 2024-01-15)
+- `%T` = `%H:%M:%S` (24-hour time: 14:30:25)
+- `%z` = Timezone offset (+HHMM or -HHMM: -0500)
+
+Example output: `2024-01-15T14:30:25.000-0500`
+
+#### Export/Import Constants
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `bzip2base64` | `"ascii.tar.bzip2.base64"` | Archive format identifier |
+| `tmpdirprefix` | `"/tmp/adb"` | Temp directory prefix for operations |
+| `dbexport_extension` | `".tar-bzip2-base64"` | Export file extension |
+| `empty_filesystem_index` | (JSON structure) | Template for empty FileSystemDB index |
+
+---
+
+### Namespace: `operation` - API Operations
+
+**Brief:** API operation identifiers used to specify which action to perform.
+
+#### Document Operations
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `writedocument` | `"store"` | Store a single document |
+| `readdocument` | `"load"` | Load a single document |
+| `overwritedocument` | `"overwritedocument"` | Overwrite an existing document |
+
+#### Configuration Operations
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `writeconfiguration` | `"globalconfstore"` | Store a global configuration |
+| `readconfiguration` | `"globalconfload"` | Load a global configuration |
+| `newconfig` | `"newconfig"` | Create a new configuration |
+| `assignconfig` | `"addconfig"` | Assign configuration to an entity |
+| `removeconfig` | `"rmconfig"` | Remove a configuration |
+| `confcomposition` | `"buildfilter"` | Build configuration composition filter |
+
+#### Search Operations
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `findconfigs` | `"findconfigs"` | Find configurations matching criteria |
+| `findversions` | `"findversions"` | Find versions of a document |
+| `findentities` | `"findentities"` | Find entities in the database |
+| `searchcollection` | `"searchcollection"` | Search within a collection |
+| `findcompositionscontaining` | `"findcompositionscontaining"` | Find compositions containing an item |
+
+#### Entity Operations
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `addentity` | `"addentity"` | Add a new entity |
+| `rmentity` | `"rmentity"` | Remove an entity |
+
+#### Alias Operations
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `addversionalias` | `"addveralias"` | Add a version alias |
+| `rmversionalias` | `"rmveralias"` | Remove a version alias |
+| `findversionalias` | `"findveralias"` | Find version aliases |
+| `addconfigalias` | `"addconfigalias"` | Add a configuration alias |
+| `rmconfigalias` | `"rmconfigalias"` | Remove a configuration alias |
+| `findconfigalias` | `"findconfigalias"` | Find configuration aliases |
+
+#### Database Operations
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `listcollections` | `"listcollections"` | List all collections in database |
+| `listdatabases` | `"listdatabases"` | List all available databases |
+| `readdbinfo` | `"readdbinfo"` | Read database information/statistics |
+
+#### Import/Export Operations
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `exportdatabase` | `"exportdatabase"` | Export entire database |
+| `importdatabase` | `"importdatabase"` | Import entire database |
+| `exportconfig` | `"exportconfig"` | Export a configuration |
+| `importconfig` | `"importconfig"` | Import a configuration |
+| `exportcollection` | `"exportcollection"` | Export a collection |
+| `importcollection` | `"importcollection"` | Import a collection |
+
+#### Status Operations
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `markdeleted` | `"markdeleted"` | Mark document as deleted |
+| `markreadonly` | `"markreadonly"` | Mark document as read-only |
+| `addrun` | `"addrun"` | Add a run number to document |
+
+---
+
+### Namespace: `provider` - Storage Providers
+
+**Brief:** Storage provider identifiers used to select which backend to use.
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `mongo` | `"mongo"` | MongoDB storage provider |
+| `filesystem` | `"filesystem"` | FileSystemDB storage provider (JSON files) |
+| `ucon` | `"ucon"` | UConDB conditions database |
+
+---
+
+### Namespace: `option` - Request Parameters
+
+**Brief:** Parameter names for API requests.
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `path` | `"path"` | File or URI path |
+| `operation` | `"operation"` | Operation type to perform |
+| `format` | `"dataformat"` | Data format (json, fhicl, xml) |
+| `provider` | `"dbprovider"` | Storage provider to use |
+| `result` | `"result"` | Result output field |
+| `source` | `"source"` | Source document field |
+| `version` | `"version"` | Version identifier |
+| `version_alias` | `"alias"` | Version alias name |
+| `run` | `"run"` | Run number |
+| `threads` | `"threads"` | Thread count for parallel operations |
+| `debug` | `"debug"` | Debug mode flag |
+| `searchfilter` | `"filter"` | Search filter expression |
+| `searchquery` | `"searchquery"` | Search query string |
+| `bulkoperations` | `"bulkoperations"` | Bulk operations flag |
+| `collection` | `"collection"` | Collection name |
+| `entity` | `"entity"` | Entity name |
+| `configuration` | `"configuration"` | Configuration name |
+| `configuration_alias` | `"configurationalias"` | Configuration alias name |
+
+---
+
+### Namespace: `filter` - Query Filter Keys
+
+**Brief:** Keys used in database query filters.
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `entities` | `"entities.name"` | Filter by entity name |
+| `configurations` | `"configurations.name"` | Filter by configuration name |
+| `version_aliases` | `"aliases.active.name"` | Filter by active version alias |
+| `configuration_aliases` | `"configaliases.active.name"` | Filter by active configuration alias |
+| `runs` | `"runs.name"` | Filter by run name |
+| `version` | `"version"` | Filter by version |
+| `version_alias` | `"alias"` | Version alias filter key |
+| `run` | `"run"` | Run filter key |
+| `configuration_alias` | `"configuration_alias"` | Configuration alias filter key |
+| `pipeline` | `"pipeline"` | MongoDB aggregation pipeline |
+
+---
+
+### Namespace: `format` - Output Formats
+
+**Brief:** Output format identifiers.
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `json` | `"json"` | Standard JSON format output |
+| `gui` | `"gui"` | GUI-friendly format output |
+
+---
+
+### Namespace: `msg` - User Messages
+
+**Brief:** User-facing error and status messages.
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `empty_filter` | `"Search filter is empty"` | Error when no filter provided |
+| `empty_document` | `"Json document is empty"` | Error when document is empty |
+| `cant_call_system` | (long message) | Error when system() cannot be called |
+
+## Relationship to Other Components
+
+- **ConfigurationDB** - Uses operation constants for dispatch and validation
+- **Utilities** - Uses option constants for CLI argument parsing
+- **StorageProviders** - Uses filter constants for query construction
+- **helper_functions.h** - Uses timestamp constants for formatting
+- Included by virtually every file that interacts with the Configuration API
+
+## Example
+
+```cpp
+#include "artdaq-database/SharedCommon/configuraion_api_literals.h"
+#include "artdaq-database/SharedCommon/shared_exceptions.h"
+#include <iostream>
+#include <string>
+
+namespace apiliteral = artdaq::database::configapi::literal;
+namespace db = artdaq::database;
+
+// Example: Setting up a request
+struct RequestOptions {
+    std::string operation;
+    std::string provider;
+    std::string version;
+    std::string collection;
+    std::string format;
+
+    void setOperation(std::string const& op) { operation = op; }
+    void setProvider(std::string const& prov) { provider = prov; }
+    void set(std::string const& key, std::string const& value) {
+        if (key == apiliteral::option::version) version = value;
+        else if (key == apiliteral::option::collection) collection = value;
+    }
+    void setFormat(std::string const& fmt) { format = fmt; }
+};
+
+void setupStoreRequest(RequestOptions& opts) {
+    // Using operation constants
+    opts.setOperation(apiliteral::operation::writedocument);
+
+    // Using provider constants
+    opts.setProvider(apiliteral::provider::mongo);
+
+    // Using option constants
+    opts.set(apiliteral::option::version, "v1.0");
+    opts.set(apiliteral::option::collection, "detector_configs");
+
+    // Using format constants
+    opts.setFormat(apiliteral::format::json);
+}
+
+// Example: Checking operation type
+bool handleOperation(std::string const& op) {
+    if (op == apiliteral::operation::writedocument) {
+        std::cout << "Performing store operation" << std::endl;
+        return true;
+    } else if (op == apiliteral::operation::readdocument) {
+        std::cout << "Performing load operation" << std::endl;
+        return true;
+    } else if (op == apiliteral::operation::findconfigs) {
+        std::cout << "Performing search operation" << std::endl;
+        return true;
+    }
+    throw db::invalid_argument("handleOperation")
+        << "Unknown operation: " << op;
+}
+
+int main() {
+    try {
+        RequestOptions opts;
+        setupStoreRequest(opts);
+
+        std::cout << "Operation: " << opts.operation << std::endl;
+        std::cout << "Provider: " << opts.provider << std::endl;
+
+        handleOperation(opts.operation);
+        return 0;
+    } catch (db::exception const& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
+}
 ```
-artdaq::database::result              - Result messages
-artdaq::database::configapi::literal  - Main literal definitions
-  ├─ operation                        - Operation names
-  ├─ provider                         - Database provider names
-  ├─ option                           - Option/parameter keys
-  ├─ filter                           - Filter keys for queries
-  ├─ format                           - Data format types
-  └─ msg                              - User-facing messages
-```
 
-## Constants and Literals
+## Notes for Developers
 
-### Result Messages (artdaq::database::result)
-
-| Constant | Value | Purpose |
-|----------|-------|---------|
-| `msg_EmptyFilter` | `"{\"message\":\"empty_filter\"}"` | JSON message for empty filter errors |
-| `msg_EmptyDocument` | `"{\"message\":\"Json document is empty\"}"` | JSON message for empty document errors |
-| `msg_SystemCallFailed` | Complex message | Error message when system() call fails due to permissions |
-
-### Operation Names (operation namespace)
-
-Configuration operations:
-- `writeconfiguration` = `"globalconfstore"` - Store complete configuration
-- `readconfiguration` = `"globalconfload"` - Load complete configuration
-- `newconfig` = `"newconfig"` - Create new configuration
-- `assignconfig` = `"addconfig"` - Assign/add configuration
-- `removeconfig` = `"rmconfig"` - Remove configuration
-
-Document operations:
-- `overwritedocument` = `"overwritedocument"` - Overwrite existing document
-- `writedocument` = `"store"` - Store document
-- `readdocument` = `"load"` - Load document
-
-Discovery operations:
-- `listcollections` = `"listcollections"` - List available collections
-- `listdatabases` = `"listdatabases"` - List available databases
-- `readdbinfo` = `"readdbinfo"` - Read database information
-
-Search operations:
-- `findconfigs` = `"findconfigs"` - Find configurations
-- `findversions` = `"findversions"` - Find versions
-- `findentities` = `"findentities"` - Find entities
-- `searchcollection` = `"searchcollection"` - Search within collection
-
-Entity management:
-- `addentity` = `"addentity"` - Add entity
-- `rmentity` = `"rmentity"` - Remove entity
-
-State operations:
-- `markdeleted` = `"markdeleted"` - Mark document as deleted
-- `markreadonly` = `"markreadonly"` - Mark document as read-only
-
-Composition operations:
-- `confcomposition` = `"buildfilter"` - Build configuration filter/composition
-
-Run management:
-- `addrun` = `"addrun"` - Add run information
-
-Alias operations:
-- `addversionalias` = `"addveralias"` - Add version alias
-- `rmversionalias` = `"rmveralias"` - Remove version alias
-- `findversionalias` = `"findveralias"` - Find version alias
-- `addconfigalias` = `"addconfigalias"` - Add configuration alias
-- `rmconfigalias` = `"rmconfigalias"` - Remove configuration alias
-- `findconfigalias` = `"findconfigalias"` - Find configuration alias
-
-Import/Export operations:
-- `exportdatabase` = `"exportdatabase"` - Export entire database
-- `importdatabase` = `"importdatabase"` - Import entire database
-- `exportconfig` = `"exportconfig"` - Export configuration
-- `importconfig` = `"importconfig"` - Import configuration
-- `exportcollection` = `"exportcollection"` - Export collection
-- `importcollection` = `"importcollection"` - Import collection
-
-### Provider Names (provider namespace)
-
-| Constant | Value | Purpose |
-|----------|-------|---------|
-| `mongo` | `"mongo"` | MongoDB database provider |
-| `filesystem` | `"filesystem"` | Filesystem-based database provider |
-| `ucon` | `"ucon"` | UConDB (Unified Conditions Database) provider |
-
-### Option Keys (option namespace)
-
-Request parameters:
-- `path` = `"path"` - File path parameter
-- `operation` = `"operation"` - Operation type
-- `format` = `"dataformat"` - Data format specification
-- `provider` = `"dbprovider"` - Database provider selection
-- `result` = `"result"` - Result field
-- `source` = `"source"` - Source field
-
-Version/Run parameters:
-- `version` = `"version"` - Version identifier
-- `version_alias` = `"alias"` - Version alias
-- `run` = `"run"` - Run number
-- `threads` = `"threads"` - Number of threads
-- `debug` = `"debug"` - Debug flag
-
-Search parameters:
-- `searchfilter` = `"filter"` - Search filter
-- `searchquery` = `"searchquery"` - Search query
-- `bulkoperations` = `"bulkoperations"` - Bulk operations flag
-
-Entity parameters:
-- `collection` = `"collection"` - Collection name
-- `entity` = `"entity"` - Entity name
-- `configuration` = `"configuration"` - Configuration name
-- `configuration_alias` = `"configurationalias"` - Configuration alias
-
-### Filter Keys (filter namespace)
-
-Query filter keys for searching within documents:
-- `entities` = `"entities.name"` - Filter by entity name
-- `configurations` = `"configurations.name"` - Filter by configuration name
-- `version_aliases` = `"aliases.active.name"` - Filter by active version aliases
-- `configuration_aliases` = `"configaliases.active.name"` - Filter by active configuration aliases
-- `runs` = `"runs.name"` - Filter by run name
-- `version` = `"version"` - Filter by version
-- `version_alias` = `"alias"` - Filter by version alias
-- `run` = `"run"` - Filter by run
-- `configuration_alias` = `"configuration_alias"` - Filter by configuration alias
-- `pipeline` = `"pipeline"` - Filter by pipeline
-
-### Format Types (format namespace)
-
-| Constant | Value | Purpose |
-|----------|-------|---------|
-| `gui` | `"gui"` | GUI-formatted output |
-| `json` | `"json"` | JSON-formatted output |
-
-### User Messages (msg namespace)
-
-- `empty_filter` = `"Search filter is empty"` - Error message for empty filter
-- `empty_document` = `"Json document is empty"` - Error message for empty document
-- `cant_call_system` = Complex message - Error when system() call is unavailable
-
-### General Literals
-
-Common values:
-- `name` = `"name"` - Generic "name" key
-- `notprovided` = `"notprovided"` - Value indicating not provided
-- `apiname` = `"artdaq_database"` - API name identifier
-- `whitespace` = `" "` - Single space character
-- `nullstring` = `""` - Empty string
-
-JSON templates:
-- `empty_json` = `"{ }"` - Empty JSON object
-- `empty_search_result` = `"{\"search\":[ ]}"` - Empty search result structure
-- `empty_filesystem_index` = Complex JSON - Template for empty filesystem index
-
-Export/Import settings:
-- `bzip2base64` = `"ascii.tar.bzip2.base64"` - Export format identifier
-- `tmpdirprefix` = `"/tmp/adb"` - Temporary directory prefix
-- `dbexport_extension` = `".tar-bzip2-base64"` - Export file extension
-
-Database format:
-- `database_format_version` = `3` - Current database format version number
-- `database_format_locale` = `"en_US.UTF-8"` - Database locale setting
-
-Timestamp formats:
-- `timestamp_format_old` = `"%a %b %d %H:%M:%S %Y"` - Legacy timestamp format
-- `timestamp_format` = `"%FT%T.000%z"` - ISO 8601 timestamp format
-- `timestamp_faketime` = `"2017-07-18T12:48:10.123-0500"` - Fake time for testing
-
-## Usage Context
-
-This file is included by virtually every source file in the artdaq-database project that needs to:
-- Construct API operation requests
-- Parse operation names
-- Build search queries
-- Format output
-- Handle database providers
-- Export/import data
-
-### Usage Example
+### Common Usage Pattern
 
 ```cpp
 #include "artdaq-database/SharedCommon/configuraion_api_literals.h"
 
+// Create namespace alias for brevity
 namespace apiliteral = artdaq::database::configapi::literal;
 
-// Using operation names
-std::string operation = apiliteral::operation::writedocument;
-
-// Using option keys
-std::string provider_key = apiliteral::option::provider;
-std::string mongo_provider = apiliteral::provider::mongo;
-
-// Using filter keys
-std::string entity_filter = apiliteral::filter::entities;
-
-// Building temporary directory
-std::string tmpdir = apiliteral::tmpdirprefix + "123456";
+// Use the alias throughout the file
+void example() {
+    auto op = apiliteral::operation::writedocument;
+    auto prov = apiliteral::provider::filesystem;
+    auto ver_key = apiliteral::option::version;
+}
 ```
 
-## Design Pattern
+### Adding New Constants
 
-This file follows the **String Literal Registry** pattern:
-- All string literals are defined as `constexpr` for compile-time evaluation
-- Organized in nested namespaces for logical grouping
-- Prevents typos and makes refactoring easier
-- Provides single source of truth for API strings
-- Enables compiler optimization (strings are compile-time constants)
+When adding new operations or options:
+1. Add to the appropriate namespace
+2. Use `constexpr auto` for compile-time evaluation
+3. Follow existing naming conventions (lowercase, underscores for multi-word)
+4. Update this documentation file
 
-## Notes
+```cpp
+namespace operation {
+    // Existing constants...
+    constexpr auto newoperation = "newoperation";  // New operation
+}
+```
 
-- The file name has a typo: "configuraion" should be "configuration" (note the missing 't')
-- All literals are `constexpr` meaning they have zero runtime overhead
-- The empty_filesystem_index template represents the structure of the filesystem provider's index
-- The database_format_version (3) indicates the schema version for compatibility checking
-- Timestamp formats support both old legacy format and new ISO 8601 format for backward compatibility
+### Common Pitfalls
+
+- **Pitfall 1:** Using string literals instead of constants defeats the purpose:
+  ```cpp
+  // BAD - no compile-time checking, typo-prone
+  opts.operation("stoer");  // Typo will not be caught!
+
+  // GOOD - compile-time verification
+  opts.operation(apiliteral::operation::writedocument);
+  ```
+
+- **Pitfall 2:** Forgetting the namespace alias makes code verbose:
+  ```cpp
+  // VERBOSE
+  opts.operation(artdaq::database::configapi::literal::operation::writedocument);
+
+  // BETTER - use namespace alias
+  namespace apiliteral = artdaq::database::configapi::literal;
+  opts.operation(apiliteral::operation::writedocument);
+  ```
+
+- **Pitfall 3:** Using the wrong namespace level:
+  ```cpp
+  // BAD - operation is in nested namespace
+  auto op = apiliteral::writedocument;  // Error: not in this namespace
+
+  // GOOD - use correct nested namespace
+  auto op = apiliteral::operation::writedocument;
+  ```
+
+### Anti-patterns
+
+```cpp
+// DON'T hardcode strings that have constants defined
+void badExample() {
+    std::string op = "store";  // BAD: use apiliteral::operation::writedocument
+    std::string prov = "mongo"; // BAD: use apiliteral::provider::mongo
+}
+
+// DO use the defined constants
+void goodExample() {
+    auto op = apiliteral::operation::writedocument;
+    auto prov = apiliteral::provider::mongo;
+}
+
+// DON'T compare with literal strings
+if (operation == "store") { }  // BAD
+
+// DO compare with constants
+if (operation == apiliteral::operation::writedocument) { }  // GOOD
+```
+
+## See Also
+
+- [helper_functions.h](./helper_functions.h.md) - Functions that use these constants
+- [returned_result.h](./returned_result.h.md) - Result constants in `artdaq::database::result` namespace
+- [shared_datatypes.h](./shared_datatypes.h.md) - Type aliases used with these constants

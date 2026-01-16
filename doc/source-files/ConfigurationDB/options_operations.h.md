@@ -1,94 +1,187 @@
 # options_operations.h
 
-## File Overview
+**Path:** `artdaq-database/ConfigurationDB/options_operations.h`
 
-This header file aggregates all operation option classes used in the ConfigurationDB module. It provides a single include point for accessing all operation configuration classes.
+**Purpose:** Convenience header that aggregates all operation options headers, providing a single include for accessing the complete operation options API. This header simplifies usage by combining `OperationBase`, `ManageDocumentOperation`, `ManageConfigsOperation`, `ManageAliasesOperation`, and `BulkOperations` classes in one include.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/ConfigurationDB/options_operations.h`
 
-**Lines of Code**: 11
+## Key Concepts
 
-**Purpose**: Aggregate header for all operation option classes
+### Header Aggregation Pattern
+This header follows a common C++ pattern of providing a single "umbrella" header that includes all related headers from a subsystem. This simplifies client code by reducing the number of includes needed and ensuring all related types are available together.
+
+### Operation Options Hierarchy
+The included headers define the following class hierarchy:
+
+```
+OperationBase (abstract base)
+    |
+    +-- ManageDocumentOperation  (document-level operations)
+    +-- ManageConfigsOperation   (configuration-level operations)
+    +-- ManageAliasesOperation   (alias management operations)
+
+BulkOperations (standalone container for multiple operations)
+```
+
+## Thread Safety
+
+- **Thread-safe:** N/A (header-only aggregation)
+- See individual headers for thread safety of contained classes
 
 ## Dependencies
 
-### Project Headers
-- `"artdaq-database/ConfigurationDB/options_operation_base.h"` - Base class for all operations
-- `"artdaq-database/ConfigurationDB/options_operation_bulkoperations.h"` - Bulk operation options
-- `"artdaq-database/ConfigurationDB/options_operation_managealiases.h"` - Alias management options
-- `"artdaq-database/ConfigurationDB/options_operation_manageconfigs.h"` - Configuration management options
-- `"artdaq-database/ConfigurationDB/options_operation_managedocument.h"` - Document management options
+This header includes the following headers, providing access to all operation option classes:
 
-## Included Classes
+| Include | Purpose |
+|---------|---------|
+| `options_operation_base.h` | Base class for all operation options |
+| `options_operation_bulkoperations.h` | Bulk operations container class |
+| `options_operation_managealiases.h` | Alias management operation options |
+| `options_operation_manageconfigs.h` | Configuration management operation options |
+| `options_operation_managedocument.h` | Document management operation options |
 
-### OperationBase
-Base class providing common functionality for all operation types:
-- Provider selection (filesystem, mongodb, ucondb)
-- Operation name (read, write, overwrite, etc.)
-- Data format (json, fhicl, xml, gui, db, csv)
-- Collection name
-- Query filter
-- Result file name
-- Conversion to/from JSON
-- Program options parsing
+## Thread Safety
 
-### ManageDocumentOperation
-Options for document-level operations:
-- Read document
-- Write document
-- Overwrite document
-- Mark document read-only
-- Find versions
-- List collections
-- Search collections
+- **Thread-safe:** N/A (header-only aggregation)
+- See individual headers for thread safety of contained classes:
+  - `OperationBase`: Not thread-safe
+  - `ManageDocumentOperation`: Not thread-safe
+  - `ManageConfigsOperation`: Not thread-safe
+  - `ManageAliasesOperation`: Not thread-safe
+  - `BulkOperations`: Not thread-safe
 
-### ManageConfigsOperation
-Options for configuration management:
-- Find configurations
-- Add configuration
-- Remove configuration
-- Assign configuration to global config
-- Get configuration composition
+## Included Classes Summary
 
-### ManageAliasesOperation
-Options for alias management:
-- Find aliases
-- Add alias
-- Remove alias
-- Assign alias to global config
-
-### BulkOperationsOperation
-Options for bulk operations:
-- Export configurations
-- Import configurations
-- Bulk document operations
+| Class | Purpose | Primary Use Case |
+|-------|---------|------------------|
+| `OperationBase` | Common operation parameters (provider, collection, format) | Base for all operations |
+| `ManageDocumentOperation` | Document-specific parameters (version, entity, run, source file) | Reading/writing individual documents |
+| `ManageConfigsOperation` | Configuration-specific parameters (lighter than document) | Listing/managing configurations |
+| `ManageAliasesOperation` | Alias parameters (version alias, config alias, run) | Creating/managing aliases |
+| `BulkOperations` | Container for multiple operations | Batch processing |
 
 ## Usage
+
+### Basic Usage
 
 ```cpp
 #include "artdaq-database/ConfigurationDB/options_operations.h"
 
-using artdaq::database::configuration::ManageDocumentOperation;
-using artdaq::database::configuration::ManageConfigsOperation;
-using artdaq::database::configuration::options::data_format_t;
+using namespace artdaq::database::configuration;
 
-void example() {
-    // Document operation
-    ManageDocumentOperation doc_opts("MyApp");
-    doc_opts.operation("readdocument");
-    doc_opts.collection("ComponentConfigs");
-    doc_opts.version("v1.0");
-    doc_opts.format(data_format_t::json);
+void performOperations() {
+  // All operation types available via single include
 
-    // Configuration operation
-    ManageConfigsOperation cfg_opts("MyApp");
-    cfg_opts.operation("findconfigs");
-    cfg_opts.configuration("Run12345");
-    cfg_opts.format(data_format_t::gui);
+  // Document operation
+  auto docOpts = ManageDocumentOperation{"myapp"};
+  docOpts.operation("writedocument");
+  docOpts.entity("MyComponent");
+  docOpts.version("v1.0");
+
+  // Configuration operation
+  auto cfgOpts = ManageConfigsOperation{"myapp"};
+  cfgOpts.operation("listconfigs");
+
+  // Alias operation
+  auto aliasOpts = ManageAliasesOperation{"myapp"};
+  aliasOpts.operation("addversionalias");
+  aliasOpts.versionAlias("production");
+
+  // Bulk operations
+  auto bulkOpts = BulkOperations{"myapp"};
+  bulkOpts.readJsonData(jsonData);
 }
 ```
 
-## Design Pattern
+### Selecting Specific Headers
+
+For minimal compilation dependencies, you can include individual headers instead:
+
+```cpp
+// Only need document operations
+#include "artdaq-database/ConfigurationDB/options_operation_managedocument.h"
+
+// Only need bulk operations
+#include "artdaq-database/ConfigurationDB/options_operation_bulkoperations.h"
+```
+
+## Operation Hierarchy
+
+```
+OperationBase (base functionality)
+    +-- operation()       - Operation name (read, write, etc.)
+    +-- provider()        - Storage provider (filesystem, mongodb)
+    +-- collection()      - Target collection name
+    +-- format()          - Data format (json, fhicl, xml, gui)
+    +-- queryFilter()     - Search filter
+    +-- resultFileName()  - Output file path
+    |
+    +-- ManageDocumentOperation (document-level operations)
+    |       +-- version()
+    |       +-- entity()
+    |       +-- run()
+    |       +-- configuration()
+    |       +-- sourceFileName()
+    |
+    +-- ManageConfigsOperation (configuration management)
+    |       +-- version()
+    |       +-- entity()
+    |       +-- configuration()
+    |
+    +-- ManageAliasesOperation (alias management)
+            +-- version()
+            +-- versionAlias()
+            +-- entity()
+            +-- run()
+            +-- configuration()
+            +-- configurationAlias()
+
+BulkOperations (container - not derived from OperationBase)
+    +-- bulkOperations()  - JSON specification
+    +-- begin()/end()     - Iteration over contained operations
+```
+
+## Relationship to Other Components
+
+This header is used by:
+- **ConfigurationDB API implementation** - For handling all operation types
+- **CLI tools** - For unified access to operation options
+- **Test files** - For testing operation option handling
+
+The aggregated headers provide the options-handling foundation used by:
+- `configurationdbifc.h` - Main API interface
+- `dboperation_*.h` - Database operation implementations
+- `dispatch_*.h` - Operation dispatching logic
+
+## See Also
+
+- [options_operation_base.h](./options_operation_base.h.md) - Base class documentation
+- [options_operation_managedocument.h](./options_operation_managedocument.h.md) - Document operations
+- [options_operation_manageconfigs.h](./options_operation_manageconfigs.h.md) - Configuration operations
+- [options_operation_managealiases.h](./options_operation_managealiases.h.md) - Alias operations
+- [options_operation_bulkoperations.h](./options_operation_bulkoperations.h.md) - Bulk operations
+
+## Notes for Developers
+
+### When to Use This Header
+
+**Use this header when:**
+- You need multiple operation types in the same file
+- You want simplified includes for client code
+- You're writing tests that cover multiple operation types
+- You're implementing dispatch functions that handle multiple operations
+
+**Use individual headers when:**
+- You only need one operation type
+- Compilation time is critical
+- You want minimal header dependencies
+- Writing header files (minimize transitive dependencies)
+
+### Include Guard
+
+The header uses the include guard `_ARTDAQ_DATABASE_CONFIGURATIONDB_OPTIONS_OPERATIONS_H_` to prevent multiple inclusion.
+
+### Design Pattern
 
 **Aggregate Header Pattern**: Simplifies includes by providing a single header for related functionality.
 
@@ -97,36 +190,6 @@ void example() {
 2. **Organized**: Logically groups related operation classes
 3. **Maintainable**: Easy to add new operation types
 4. **Clear Dependencies**: Explicit list of what's included
-
-## When to Use
-
-**Use this header when**:
-- You need multiple operation types in one file
-- You're implementing dispatch functions that handle multiple operations
-- You want to avoid managing multiple includes
-
-**Use specific headers when**:
-- You only need one operation type (faster compilation)
-- Writing header files (minimize dependencies)
-- Creating modular components
-
-## Operation Hierarchy
-
-```
-OperationBase (base functionality)
-├── ManageDocumentOperation (document-level operations)
-├── ManageConfigsOperation (configuration management)
-├── ManageAliasesOperation (alias management)
-└── BulkOperationsOperation (bulk operations)
-```
-
-## Related Files
-
-- **options_operation_base.h** - Base class implementation
-- **options_operation_managedocument.h** - Document operation details
-- **options_operation_manageconfigs.h** - Configuration operation details
-- **options_operation_managealiases.h** - Alias operation details
-- **options_operation_bulkoperations.h** - Bulk operation details
 
 ---
 

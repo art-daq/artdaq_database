@@ -1,263 +1,238 @@
 # docrecord_literals.h
 
-## File Overview
+**Path:** `artdaq-database/JsonDocument/docrecord_literals.h`
 
-This header file defines string literals and constants used throughout the JsonDocument module. It provides a centralized location for action names, field names, and template strings that are used for JSON document operations, ensuring consistency and reducing the risk of typos in string literals.
+**Purpose:** This header file defines string literals and constants used throughout the JsonDocument module. It provides action name constants for document operations and template strings for document initialization, ensuring consistency and reducing the risk of typos in string literals used for JSON field names and operations.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/JsonDocument/docrecord_literals.h`
 
-## Header Guard
+## Key Concepts
 
-```cpp
-#ifndef _ARTDAQ_DATABASE_DOCRECORD_DOCUMENT_LITERALS_H_
-#define _ARTDAQ_DATABASE_DOCRECORD_DOCUMENT_LITERALS_H_
-...
-#endif
-```
+### Compile-Time Constants
 
-## Namespace Structure
+All constants use `constexpr auto`:
+- **Compile-time evaluation** - No runtime overhead for constant values
+- **Type deduction** - Automatically gets correct type (`const char*`)
+- **String literals** - Stored in read-only memory segment
+- **No initialization order issues** - Constants are guaranteed available
 
-```cpp
-namespace artdaq {
-namespace database {
-namespace docrecord {
-  // Literals and constants defined here
-}
-}
-}
-```
+### Centralized String Management
 
-All constants are defined in the `artdaq::database::docrecord` namespace.
+Benefits of centralizing string literals:
+- **Compiler catches typos** at compile-time rather than runtime
+- **Refactoring requires changes** in one place only
+- **Code is more readable** (`actions::markDeleted` vs `"markDeleted"`)
+- **IDE autocomplete support** for constant names
 
-## Contents
+### Historical Note
 
-The file contains two main sections:
-1. **Commented-out literal namespace** - Legacy field path definitions (disabled)
-2. **Actions namespace** - Active action name constants
-3. **Template constants** - JSON document templates
+The file contains a disabled `literal` namespace (wrapped in `#if 0`) with field path constants. These are likely disabled because:
+- The project now uses literals from `json_common.h` or `configuration_api_literals.h`
+- Migration to different literal organization occurred
+- Kept for reference documentation of expected document structure
 
-## 1. Literal Namespace (Disabled)
+## Thread Safety
 
-The file contains an extensive set of commented-out string literals (wrapped in `#if 0 ... #endif`):
+- **Thread-safe:** Yes (all constants are `constexpr` and read-only)
+- **Concurrent access:** Inherently thread-safe for reading
+- **Locking:** No locks needed (compile-time constants)
 
-```cpp
-#if 0
-namespace literal {
-  constexpr auto document = "document";
-  constexpr auto data = "document.data";
-  constexpr auto search = "document.search";
-  // ... many more ...
-}
-#endif
-```
+## Dependencies
 
-### Why Disabled?
+This header has no includes - it only defines constants.
 
-These literals are likely disabled because:
-- The project now uses literals from `artdaq-database/DataFormats/Json/json_common.h` instead
-- These were part of an older API design
-- They're kept for reference or potential future use
-- Migration to a different literal organization system
+## Constants
 
-### Disabled Literal Categories
+### namespace actions
 
-Even though disabled, these literals document the JSON document structure:
+**Brief:** Defines string constants for document modification operations. These action names are used in logging, audit trails, and operation dispatch.
 
-**Document Structure**:
-- `document` - Root document object
-- `data` - Document data path ("document.data")
-- `search` - Search metadata ("document.search")
-- `metadata` - Document metadata ("document.metadata")
-- `comments` - Metadata comments ("document.metadata.comments")
+#### `addAlias`
 
-**Document Identity**:
-- `id` - Document ID field ("document._id")
-- `version` - Version field
-- `alias` - Single alias field
-- `name` - Name field
+**Brief:** Action constant for adding an alias (alternate name) to a document version.
 
-**Collections and Arrays**:
-- `aliases` - Aliases array
-- `aliases_active` - Active aliases
-- `aliases_history` - Alias history
-- `configurations` - Configurations array
-- `configurations_name` - Configuration names
-- `entities` - Entities array
-- `entities_name` - Entity names
+**Type:** `constexpr auto` (const char*)
 
-**Bookkeeping**:
-- `bookkeeping` - Bookkeeping metadata
-- `bookkeeping_updates` - Update tracking
-- `bookkeeping_isdeleted` - Deletion flag
-- `bookkeeping_isreadonly` - Read-only flag
+**Value:** `"addAlias"`
 
-**Other Fields**:
-- `changelog` - Change history
-- `origin` - Origin metadata
-- `source_rawdata` - Raw data source
-- `configuration` - Single configuration
-- `document_root` - Root identifier
+**Usage:** `JSONDocumentBuilder::addAlias()` operation logging
 
-## 2. Actions Namespace (Active)
+**Related Method:** `JSONDocumentBuilder::addAlias(JSONDocument const&)`
 
-The `actions` namespace defines string constants for document modification operations:
+#### `setentity`
 
-```cpp
-namespace actions {
-  constexpr auto addAlias = "addAlias";
-  constexpr auto setentity = "setentity";
-  constexpr auto removeAlias = "removeAlias";
-  constexpr auto addToGlobalConfig = "addToGlobalConfig";
-  constexpr auto setVersion = "setVersion";
-  constexpr auto markDeleted = "markDeleted";
-  constexpr auto markReadonly = "markReadonly";
-}
-```
+**Brief:** Action constant for setting or configuring an entity within a document.
 
-### Action Descriptions
+**Type:** `constexpr auto` (const char*)
 
-#### addAlias
-**Purpose**: Add an alias (alternate name) to a document
-**Usage**: `JSONDocumentBuilder::addAlias()`
-**Example**: Adding "latest_stable" as an alias for a specific configuration version
+**Value:** `"setentity"`
 
-#### setentity
-**Purpose**: Set or configure an entity within a document
-**Usage**: Entity configuration operations
-**Example**: Defining a component entity in the system configuration
-**Note**: Uses lowercase naming convention (different from other actions)
+**Note:** Uses lowercase (inconsistent with other camelCase names in this namespace)
 
-#### removeAlias
-**Purpose**: Remove an existing alias from a document
-**Usage**: `JSONDocumentBuilder::removeAlias()`
-**Example**: Removing an obsolete alias when a new version is promoted
+**Related Method:** `JSONDocumentBuilder::setEntity(JSONDocument const&)`
 
-#### addToGlobalConfig
-**Purpose**: Add a configuration to the global configuration list
-**Usage**: Global configuration management operations
-**Example**: Registering a new detector configuration in the global registry
+#### `removeAlias`
 
-#### setVersion
-**Purpose**: Set or update the version identifier of a document
-**Usage**: `JSONDocumentBuilder::setVersion()`
-**Example**: Updating document version to "v2.1.0"
+**Brief:** Action constant for removing an existing alias from a document.
 
-#### markDeleted
-**Purpose**: Mark a document as deleted (soft delete)
-**Usage**: `JSONDocumentBuilder::markDeleted()`
-**Example**: Marking an obsolete configuration as deleted without physically removing it
-**Behavior**: Sets bookkeeping flag, document remains in database
+**Type:** `constexpr auto` (const char*)
 
-#### markReadonly
-**Purpose**: Mark a document as read-only (write-protected)
-**Usage**: `JSONDocumentBuilder::markReadonly()`
-**Example**: Protecting a production configuration from accidental modification
-**Behavior**: Prevents further modifications, throws `readonly_exception` on write attempts
+**Value:** `"removeAlias"`
 
-### Usage Pattern
+**Usage:** `JSONDocumentBuilder::removeAlias()` operation logging
 
-These action constants are typically used for:
-1. **Operation Logging** - Recording what operation was performed
-2. **Change Tracking** - Building changelog entries
-3. **API Consistency** - Ensuring operation names are consistent
-4. **String Comparison** - Comparing operation types safely
+**Related Method:** `JSONDocumentBuilder::removeAlias(JSONDocument const&)`
 
-Example usage:
-```cpp
-// In logging or changelog
-TLOG(10) << "Performing action: " << actions::addAlias;
+#### `addToGlobalConfig`
 
-// In operation dispatch
-if (operation == actions::markReadonly) {
-  builder.markReadonly();
-}
-```
+**Brief:** Action constant for adding a configuration to the global configuration list.
 
-## 3. Template Constants
+**Type:** `constexpr auto` (const char*)
+
+**Value:** `"addToGlobalConfig"`
+
+**Usage:** Logging when configurations are added to global configuration compositions
+
+**Related Method:** `JSONDocumentBuilder::addConfiguration(JSONDocument const&)`
+
+#### `setVersion`
+
+**Brief:** Action constant for setting or updating the version identifier of a document.
+
+**Type:** `constexpr auto` (const char*)
+
+**Value:** `"setVersion"`
+
+**Usage:** `JSONDocumentBuilder::setVersion()` operation logging
+
+**Related Method:** `JSONDocumentBuilder::setVersion(JSONDocument const&)`
+
+#### `markDeleted`
+
+**Brief:** Action constant for marking a document as deleted (soft delete operation).
+
+**Type:** `constexpr auto` (const char*)
+
+**Value:** `"markDeleted"`
+
+**Usage:** `JSONDocumentBuilder::markDeleted()` operation logging
+
+**Behavior:** Sets `bookkeeping.isdeleted` flag to true; document remains in database but is excluded from normal queries
+
+**Related Method:** `JSONDocumentBuilder::markDeleted()`
+
+#### `markReadonly`
+
+**Brief:** Action constant for marking a document as read-only (write-protected).
+
+**Type:** `constexpr auto` (const char*)
+
+**Value:** `"markReadonly"`
+
+**Usage:** `JSONDocumentBuilder::markReadonly()` operation logging
+
+**Behavior:** Sets `bookkeeping.isreadonly` flag to true; subsequent modification attempts throw `readonly_exception`
+
+**Related Method:** `JSONDocumentBuilder::markReadonly()`
 
 ### template__empty_document
 
+**Brief:** Provides a minimal valid JSON document template containing only an empty JSON object.
+
+**Type:** `constexpr auto` (const char*)
+
+**Value:**
 ```cpp
 constexpr auto template__empty_document =
     "{\n"
     "}";
 ```
 
-**Purpose**: Provides a minimal valid JSON document template
-
-**Characteristics**:
-- Contains only an empty JSON object
+**Characteristics:**
+- Contains only an empty JSON object `{}`
 - Includes newline for formatting
 - Used as starting point for new documents
 
-**Usage**:
+**Usage:**
 ```cpp
-// From JSONDocumentBuilder.cpp
+// From JSONDocumentBuilder constructor
 JSONDocumentBuilder::JSONDocumentBuilder()
     : _document(std::string(template__empty_document)),
-      _overlay(std::make_unique<ovlDatabaseRecord>(_document._value)),
-      _initOK(init()) {}
+      // ...
+
+// From createFromData
+_createFromTemplate({std::string{template__empty_document}});
 ```
 
-**Why This Pattern?**
-- Ensures all documents start with valid JSON
-- Provides consistent initialization
-- Overlay classes can add structure to this empty foundation
-- Simpler than hard-coding "{}" in multiple places
+### Disabled literal Namespace
 
-## Design Rationale
+**Brief:** A disabled namespace containing field path constants that document the expected JSON document structure.
 
-### Using constexpr
+The file contains commented-out (`#if 0`) field path constants:
 
-All constants use `constexpr auto`:
-- **Compile-time evaluation** - No runtime overhead
-- **Type deduction** - Automatically gets correct type
-- **String literals** - Stored in read-only memory
-- **No initialization order issues** - Guaranteed available
-
-### Centralized Literals
-
-Benefits of centralizing these strings:
-1. **Typo Prevention** - Compiler catches typos at compile-time
-2. **Refactoring Safety** - Change string value in one place
-3. **Code Readability** - `actions::markDeleted` is clearer than `"markDeleted"`
-4. **Autocomplete** - IDEs can suggest available actions
-5. **Documentation** - Single source of truth for operation names
-
-### Namespace Organization
-
-Using nested namespaces (`actions`, formerly `literal`):
-- Groups related constants logically
-- Prevents naming conflicts
-- Provides context (e.g., `actions::addAlias` vs just `addAlias`)
-- Allows selective imports via `using namespace actions`
-
-## Migration Notes
-
-The commented-out `literal` namespace suggests this file is in transition:
-
-**Old Approach** (disabled):
 ```cpp
+#if 0
 namespace literal {
+  // Document structure paths
+  constexpr auto document = "document";
   constexpr auto data = "document.data";
+  constexpr auto search = "document.search";
+  constexpr auto metadata = "document.metadata";
+  constexpr auto comments = "document.metadata.comments";
+
+  // Version and ID
+  constexpr auto version = "version";
+  constexpr auto id = "document._id";
+
+  // Alias management
+  constexpr auto alias = "alias";
+  constexpr auto aliases = "aliases";
+  constexpr auto aliases_active = "aliases.active";
+  constexpr auto aliases_history = "aliases.history";
+
+  // Bookkeeping
+  constexpr auto bookkeeping = "bookkeeping";
+  constexpr auto bookkeeping_updates = "bookkeeping.updates";
+  constexpr auto bookkeeping_isdeleted = "bookkeeping.isdeleted";
+  constexpr auto bookkeeping_isreadonly = "bookkeeping.isreadonly";
+
+  // Configurations
+  constexpr auto configuration = "configuration";
+  constexpr auto configurations = "configurations";
+  constexpr auto configurations_name = "configurations.name";
+
+  // Entities
+  constexpr auto name = "name";
+  constexpr auto entities = "entities";
+  constexpr auto entities_name = "entities.name";
+
+  // Origin and changelog
+  constexpr auto changelog = "changelog";
+  constexpr auto origin = "origin";
+  constexpr auto source_rawdata = "origin.rawdata";
+
+  constexpr auto document_root = "root";
 }
+#endif
 ```
 
-**New Approach** (likely):
-Use literals from `artdaq-database/DataFormats/Json/json_common.h` or related headers, such as `configuration_api_literals.h`.
+These constants document the expected JSON document structure even though they are disabled in compilation.
 
-**Why Migrate?**
-- Centralize literals across multiple modules
-- Reduce duplication between JsonDocument and other modules
-- Use a more standardized literal organization system
-- Keep module-specific actions here, common paths elsewhere
+## Relationship to Other Components
 
-## Related Files
+### Within the JsonDocument Module
 
-- **json_common.h** - Provides JSON data format literals (likely replacement for disabled literals)
-- **configuration_api_literals.h** - Contains configuration-related string constants
-- **JSONDocumentBuilder.cpp** - Primary consumer of action constants
-- **JSONDocument.cpp** - Uses path literals for navigation
+- **JSONDocumentBuilder.cpp** - Uses action constants for logging and audit trails
+- **JSONDocumentBuilder.h** - Uses `template__empty_document` for initialization
+- **common.h** - Includes this header for module-wide availability
+- **JSONDocumentMigrator.cpp** - References action semantics during migration
+
+### Field Literals Location
+
+Field path literals have migrated to:
+- `artdaq-database/DataFormats/Json/json_common.h` - Core field names
+- `artdaq-database/SharedCommon/configuration_api_literals.h` - API-specific literals
+
+The `actions` namespace and `template__empty_document` constant remain active in this file.
 
 ## Usage Examples
 
@@ -265,15 +240,17 @@ Use literals from `artdaq-database/DataFormats/Json/json_common.h` or related he
 
 ```cpp
 #include "artdaq-database/JsonDocument/docrecord_literals.h"
+#include <string>
 
 using namespace artdaq::database::docrecord;
 
-// In a function
-void performAction(std::string const& action) {
+void logAction(std::string const& action) {
   if (action == actions::markReadonly) {
-    builder.markReadonly();
+    std::cout << "Document marked as read-only" << std::endl;
   } else if (action == actions::addAlias) {
-    builder.addAlias(alias_doc);
+    std::cout << "Alias added to document" << std::endl;
+  } else if (action == actions::markDeleted) {
+    std::cout << "Document soft-deleted" << std::endl;
   }
 }
 ```
@@ -282,51 +259,92 @@ void performAction(std::string const& action) {
 
 ```cpp
 #include "artdaq-database/JsonDocument/docrecord_literals.h"
+#include "artdaq-database/JsonDocument/JSONDocument.h"
 
 using namespace artdaq::database::docrecord;
 
-// Create empty document
-JSONDocument doc(std::string(template__empty_document));
+void createEmptyDocument() {
+  // Create empty document from template
+  JSONDocument doc(std::string(template__empty_document));
+  // doc now contains: {}
+}
 ```
 
-## Best Practices
+### Action Dispatch Pattern
 
-1. **Always use these constants** instead of string literals in code
+```cpp
+#include "artdaq-database/JsonDocument/docrecord_literals.h"
+
+using namespace artdaq::database::docrecord;
+
+void performAction(JSONDocumentBuilder& builder,
+                   std::string const& action,
+                   JSONDocument const& data) {
+  if (action == actions::addAlias) {
+    builder.addAlias(data);
+  } else if (action == actions::removeAlias) {
+    builder.removeAlias(data);
+  } else if (action == actions::setVersion) {
+    builder.setVersion(data);
+  } else if (action == actions::markDeleted) {
+    builder.markDeleted();
+  } else if (action == actions::markReadonly) {
+    builder.markReadonly();
+  }
+}
+```
+
+## Notes for Developers
+
+### Best Practices
+
+1. **Always use constants** instead of string literals:
    ```cpp
-   // Good
+   // Good - typo caught at compile time
    if (action == actions::markDeleted)
 
-   // Bad
-   if (action == "markDeleted")
+   // Bad - typo causes runtime bug
+   if (action == "markDleted")
    ```
 
-2. **Import namespace selectively** for clarity
+2. **Import namespace selectively** for clarity:
    ```cpp
    using namespace artdaq::database::docrecord::actions;
    // Now can use: markDeleted, addAlias, etc.
    ```
 
-3. **Don't modify action names** - They may be persisted in databases or logs
+3. **Do not modify action names** - They may be persisted in databases, logs, or audit trails
 
-4. **Use in switch statements** when appropriate
+4. **Use in logging consistently** - Ensures searchable audit trails:
    ```cpp
-   // Note: Can't use strings in switch, but can use in if-else chains
-   if (action == actions::addAlias) { /* ... */ }
-   else if (action == actions::removeAlias) { /* ... */ }
+   TLOG(10) << "Performing action: " << actions::markReadonly;
    ```
 
-## Future Considerations
+### Naming Conventions
 
-The disabled `literal` namespace may be:
-- **Removed** - Once migration to new literal system is complete
+| Pattern | Example | Notes |
+|---------|---------|-------|
+| Action names | `addAlias`, `markDeleted` | camelCase |
+| Exception | `setentity` | lowercase (inconsistency) |
+| Template constants | `template__empty_document` | double underscore separator |
+
+### The `#if 0` Block
+
+The disabled `literal` namespace code is completely excluded from compilation but serves as documentation for:
+- Expected document field structure
+- Path naming conventions
+- Historical reference for document schema
+
+This may be:
+- **Removed** - Once migration is complete
 - **Re-enabled** - If module-specific literals are needed again
-- **Partially restored** - Cherry-pick specific literals that don't conflict
-- **Archived** - Kept as reference documentation
+- **Partially restored** - Cherry-picking specific literals
+- **Kept as documentation** - Reference for document structure
 
-## Notes
+## See Also
 
-- The double underscore in `template__empty_document` follows C++ convention for avoiding name conflicts
-- Action names are camelCase except `setentity` (all lowercase)
-- The template string includes actual newline (`\n`) for readable JSON output
-- These constants have internal linkage when used as `constexpr` in header-only contexts
-- The `#if 0` block is a C/C++ preprocessor directive that completely excludes code from compilation
+- [common.h.md](./common.h.md) - Aggregator header that includes this file
+- [JSONDocumentBuilder.h.md](./JSONDocumentBuilder.h.md) - Primary user of action constants
+- [JSONDocumentBuilder.cpp.md](./JSONDocumentBuilder.cpp.md) - Implementation using these constants
+- [docrecord_exceptions.h.md](./docrecord_exceptions.h.md) - Exception types (readonly_exception relates to markReadonly)
+- [../DataFormats/Json/json_common.h.md](../DataFormats/Json/json_common.h.md) - Current location of field literals

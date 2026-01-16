@@ -1,163 +1,105 @@
 # ovlStringKeyValue.h
 
-## File Overview
+**Path:** `artdaq-database/Overlay/ovlStringKeyValue.h`
 
-This header-only template class provides a specialized overlay for JSON string values with optional comparison masking. It extends `ovlKeyValue` to handle string-valued fields while supporting selective comparison through template-based mask parameters.
+**Purpose:** Header-only template class providing a specialized overlay for JSON string values with automatic default value initialization and maskable comparison. Extends `ovlKeyValue` to handle string-valued fields, automatically setting empty strings to "not-provided" and supporting selective comparison through template-based mask parameters.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/Overlay/ovlStringKeyValue.h`
+## Key Concepts
 
-## Purpose
+### String Field Handling
 
-`ovlStringKeyValue` simplifies working with JSON string fields by:
+Many document fields are simple strings (versions, collections, configuration types). This template provides:
+- Type-safe string access via the base class `string_value()` method
+- Automatic default value for empty strings (set to "not-provided")
+- Mask-aware comparison for ignoring string differences
 
-1. **String-Specific Overlay** - Wraps string values with type-safe access
-2. **Default Value Initialization** - Provides default "not-provided" value for empty strings
-3. **Maskable Comparison** - Template parameter enables selective comparison
+### Default Value Pattern
 
-## Class Definition
+Empty strings are automatically replaced with the literal "not-provided" during initialization. This:
+- Distinguishes between "not set" and "intentionally empty"
+- Provides consistent debugging output
+- Prevents confusion when examining JSON documents
 
+## Thread Safety
+
+- **Thread-safe:** No
+- **Concurrent access:** Not supported; instances hold mutable references to JSON data
+- **Locking:** None; caller must synchronize access if used from multiple threads
+
+## Dependencies
+
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/Overlay/common.h` | Types, result_t, comparison flags, JSON literals |
+| `artdaq-database/Overlay/ovlKeyValue.h` | Base class for key-value overlay |
+
+## Classes/Structures
+
+### `ovlStringKeyValue<mask>`
+
+A template class extending `ovlKeyValue` for string-valued JSON fields. Automatically initializes empty strings to "not-provided" and supports mask-aware comparison.
+
+**Template Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `mask` | `std::uint32_t` | Bitmask for comparison control from `DOCUMENT_COMPARE_FLAGS` |
+
+**Thread Safety:** Not thread-safe
+
+#### Methods
+
+##### `ovlStringKeyValue(object_t::key_type const& key, value_t& value)`
+
+**Brief:** Constructs an overlay for a JSON string field. If the string value is empty, it is automatically set to "not-provided".
+
+**Parameters:**
+- `key` - The JSON key identifying this field
+- `value` - Reference to the JSON string value to overlay
+
+**Preconditions:**
+- `value` must be a primitive value type (type_t::VALUE), not an object or array
+
+**Postconditions:**
+- If the string was empty, it now contains "not-provided"
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| assertion failure | If `value` is not a primitive value type |
+
+**Thread Safety:** Not thread-safe
+
+**Example:**
 ```cpp
-template <std::uint32_t mask>
-class ovlStringKeyValue : public ovlKeyValue {
- public:
-  ovlStringKeyValue(object_t::key_type const& key, value_t& value);
+#include "artdaq-database/Overlay/ovlStringKeyValue.h"
 
-  // defaults
-  ovlStringKeyValue(ovlStringKeyValue&&) = default;
-  ~ovlStringKeyValue() = default;
+using namespace artdaq::database::overlay;
 
-  // ops
-  result_t operator==(ovlStringKeyValue const&) const;
+void initializeVersion() {
+  value_t parent = object_t{};
+  auto& obj = parent.value_as<object_t>();
+  obj["version"] = "";  // Empty string
 
- private:
-  bool init(value_t& parent);
-  bool _initOK;
-};
-```
+  // After construction, empty string becomes "not-provided"
+  ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_VERSION> version("version", obj.at("version"));
 
-## Template Parameter
-
-```cpp
-template <std::uint32_t mask>
-```
-
-**mask**: Comparison flag from `DOCUMENT_COMPARE_FLAGS` enum that determines if this field should be ignored during comparisons.
-
-**Example Usage**:
-```cpp
-// Version that can be muted in comparisons
-using ovlVersion = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_VERSION>;
-
-// Changelog that can be muted
-using ovlChangeLog = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_CHANGELOG>;
-
-// Collection that can be muted
-using ovlCollection = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_COLLECTION>;
-```
-
-## Implementation
-
-### Constructor
-
-```cpp
-template <std::uint32_t mask>
-ovlStringKeyValue<mask>::ovlStringKeyValue(object_t::key_type const& key,
-                                            value_t& value)
-    : ovlKeyValue(key, value), _initOK(init(value)) {}
-```
-
-**Behavior**:
-1. Calls base class constructor
-2. Initializes the value with defaults if needed
-3. Stores initialization status
-
-### Initialization
-
-```cpp
-template <std::uint32_t mask>
-bool ovlStringKeyValue<mask>::init(value_t& parent) try {
-  confirm(type(parent) == type_t::VALUE);
-
-  auto& value = string_value();
-
-  if (value.empty()) value = std::string{jsonliteral::notprovided};
-
-  return true;
-} catch (...) {
-  confirm(false);
-  throw;
+  std::cout << version.string_value() << std::endl;  // Outputs: not-provided
 }
 ```
 
-**Logic**:
-1. Confirms the value type is a simple value (not object/array)
-2. Gets reference to the string
-3. If empty, sets to "not-provided" literal
-4. Returns success status
+##### `operator==(ovlStringKeyValue const& other) const -> result_t`
 
-**Safety**: Exception-safe with try-catch and assertions.
+**Brief:** Compares this overlay with another for equality, respecting the global comparison mask. If the mask bit is set, the comparison is skipped.
 
-### Comparison Operator
+**Parameters:**
+- `other` - The overlay to compare against
 
-```cpp
-template <std::uint32_t mask>
-result_t ovlStringKeyValue<mask>::operator==(ovlStringKeyValue const& other) const {
-  return ((useCompareMask() & mask) == mask) ? Success() : self() == other.self();
-}
-```
+**Returns:** `Success()` if the mask bit is set or values are equal; `Failure(message)` with difference description otherwise
 
-**Behavior**:
-- If the global comparison mask has the template mask bit set, returns success (ignores differences)
-- Otherwise, delegates to base class comparison (`self() == other.self()`)
+**Thread Safety:** Not thread-safe
 
-## Type Aliases in ovlDatabaseRecord.h
-
-The template is used to create concrete types:
-
-```cpp
-// In ovlDatabaseRecord.h
-using ovlVersion = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_VERSION>;
-using ovlVersionUPtr_t = std::unique_ptr<ovlVersion>;
-
-using ovlCollection = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_COLLECTION>;
-using ovlCollectionUPtr_t = std::unique_ptr<ovlCollection>;
-
-using ovlConfigurationType = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_CONFIGURATION>;
-using ovlConfigurationTypeUPtr_t = std::unique_ptr<ovlConfigurationType>;
-```
-
-Also used in other files:
-
-```cpp
-// In ovlChangeLog.h
-class ovlChangeLog final : public ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_CHANGELOG> {
-  // ...
-};
-
-// In ovlOrigin.h
-using ovlRawData = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_RAWDATA>;
-```
-
-## Usage Examples
-
-### Creating a Version Overlay
-
-```cpp
-value_t recordJson;
-auto& versionValue = recordJson["version"];
-
-// Initialize with empty string creates "not-provided"
-versionValue = std::string{};
-
-ovlVersion version("version", versionValue);
-// version.string_value() == "not-provided"
-
-// Set actual version
-version.string_value() = "v1_0_0";
-```
-
-### Comparison with Masking
-
+**Example:**
 ```cpp
 ovlVersion v1("version", json1.at("version"));
 ovlVersion v2("version", json2.at("version"));
@@ -170,105 +112,173 @@ useCompareMask(0);
 auto result = v1 == v2;
 // result.first == false
 
-// With mask: versions ignored
+// With mask: version differences ignored
 useCompareMask(DOCUMENT_COMPARE_MUTE_VERSION);
 result = v1 == v2;
-// result.first == true (version differences ignored)
+// result.first == true
+```
+
+## Type Aliases
+
+The following type aliases are defined throughout the codebase:
+
+```cpp
+// In ovlDatabaseRecord.h
+using ovlVersion = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_VERSION>;
+using ovlVersionUPtr_t = std::unique_ptr<ovlVersion>;
+
+using ovlCollection = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_COLLECTION>;
+using ovlCollectionUPtr_t = std::unique_ptr<ovlCollection>;
+
+using ovlConfigurationType = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_CONFIGURATION>;
+using ovlConfigurationTypeUPtr_t = std::unique_ptr<ovlConfigurationType>;
+
+// In ovlOrigin.h
+using ovlRawData = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_RAWDATA>;
+```
+
+## Usage Examples
+
+### Version Field Management
+
+```cpp
+#include "artdaq-database/Overlay/ovlStringKeyValue.h"
+
+using namespace artdaq::database::overlay;
+
+// Type alias for clarity
+using ovlVersion = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_VERSION>;
+
+void manageVersion() {
+  value_t recordJson = object_t{};
+  auto& record = recordJson.value_as<object_t>();
+  record["version"] = std::string{};  // Empty initially
+
+  ovlVersion version("version", record.at("version"));
+
+  // Initially "not-provided"
+  std::cout << "Initial: " << version.string_value() << std::endl;
+
+  // Set actual version
+  version.string_value() = "v1_0_0";
+  std::cout << "Updated: " << version.string_value() << std::endl;
+}
+```
+
+### Collection Field
+
+```cpp
+#include "artdaq-database/Overlay/ovlStringKeyValue.h"
+
+using namespace artdaq::database::overlay;
+using ovlCollection = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_COLLECTION>;
+
+void handleCollection() {
+  value_t docJson = object_t{};
+  auto& doc = docJson.value_as<object_t>();
+  doc["collection"] = "configurations";
+
+  ovlCollection collection("collection", doc.at("collection"));
+
+  // Read collection name
+  std::cout << "Collection: " << collection.string_value() << std::endl;
+
+  // Modify if needed
+  collection.string_value() = "detector_configs";
+}
 ```
 
 ### Derived Class Pattern
 
 ```cpp
+// In ovlChangeLog.h - extending the template
 class ovlChangeLog final : public ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_CHANGELOG> {
  public:
   ovlChangeLog(object_t::key_type const& key, value_t& changelog)
     : ovlStringKeyValue(key, changelog) {}
 
-  // Additional methods specific to changelog
-  std::string& buffer();
-  std::string& append(std::string const& entry);
+  // Additional changelog-specific methods
+  std::string& buffer() {
+    return string_value();
+  }
+
+  std::string& append(std::string const& entry) {
+    auto& buf = buffer();
+    if (!buf.empty() && buf != jsonliteral::notprovided) {
+      buf += "\n";
+    } else {
+      buf = "";
+    }
+    buf += entry;
+    return buf;
+  }
 };
 ```
 
-## Design Rationale
-
-### Template-Based Masking
-
-**Why template parameter?**
-- **Compile-Time Configuration** - Mask is part of the type
-- **Type Safety** - Different string fields are different types
-- **Zero Runtime Cost** - Mask checking can be optimized by compiler
-- **Clear Intent** - Type alias names indicate maskable fields
-
-### Default "not-provided" Value
-
-**Why provide default?**
-- **Consistency** - All string fields have a value, never truly empty
-- **Validation** - Can distinguish between "not set" and "empty"
-- **Debugging** - Clear indication of uninitialized fields
-
-### String Validation
-
-The `init()` method assumes the value is of type `type_t::VALUE` (primitive), not `type_t::OBJECT` or `type_t::ARRAY`.
-
 ## Common Use Cases
 
-### Version Fields
+| Type Alias | Mask | Purpose |
+|------------|------|---------|
+| `ovlVersion` | `DOCUMENT_COMPARE_MUTE_VERSION` | Database record version strings |
+| `ovlCollection` | `DOCUMENT_COMPARE_MUTE_COLLECTION` | Collection identifiers |
+| `ovlConfigurationType` | `DOCUMENT_COMPARE_MUTE_CONFIGURATION` | Configuration type labels |
+| `ovlRawData` | `DOCUMENT_COMPARE_MUTE_RAWDATA` | Raw data content |
+| (derived) `ovlChangeLog` | `DOCUMENT_COMPARE_MUTE_CHANGELOG` | Human-readable change descriptions |
+
+## Relationship to Other Components
+
+This template is used throughout the Overlay module for string-valued metadata fields:
+- `ovlDatabaseRecord` uses it for version and collection fields
+- `ovlOrigin` uses it for raw data fields
+- `ovlChangeLog` extends it with additional methods
+
+It differs from `ovlKeyValueWithMask` in that:
+- It expects primitive string values, not objects
+- It provides automatic default value initialization
+- It uses `string_value()` for type-safe string access
+
+## See Also
+
+- [ovlKeyValue.h](./ovlKeyValue.h.md) - Base class providing core overlay functionality
+- [ovlChangeLog.h](./ovlChangeLog.h.md) - Derived class extending this template
+- [ovlKeyValueWithMask.h](./ovlKeyValueWithMask.h.md) - Similar template for object values
+- [common.h](./common.h.md) - Defines `DOCUMENT_COMPARE_FLAGS` enum and `jsonliteral::notprovided`
+
+## Notes for Developers
+
+### Common Pitfalls
+
+- **Value must be primitive:** The constructor asserts that the value type is `type_t::VALUE` (a primitive), not an object or array. Using this with object fields will fail.
+- **Default literal:** The "not-provided" literal comes from `jsonliteral::notprovided`. This is a fixed string constant.
+
+### Design Notes
+
+- This is a header-only template with no corresponding .cpp file
+- The `_initOK` member tracks successful initialization (useful for debugging)
+- Exception-safe initialization with try-catch block
+- Different template instantiations create incompatible types
+
+### Anti-patterns
+
 ```cpp
+// DON'T: Use with object values
+value_t objValue = object_t{};
+ovlStringKeyValue<MASK> field("key", objValue);  // Will assert!
+
+// DO: Use with string values
+value_t strValue = std::string{"hello"};
+ovlStringKeyValue<MASK> field("key", strValue);  // OK
+
+// DON'T: Use ovlStringKeyValue directly
+ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_VERSION> version(...);  // Unclear intent
+
+// DO: Use type aliases
 using ovlVersion = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_VERSION>;
+ovlVersion version(...);  // Clear semantic meaning
 ```
-Database record version strings that should be ignored when comparing configurations.
 
-### Collection Names
-```cpp
-using ovlCollection = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_COLLECTION>;
-```
-Collection identifiers that may differ between environments.
+### Performance Considerations
 
-### Configuration Types
-```cpp
-using ovlConfigurationType = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_CONFIGURATION>;
-```
-Configuration type labels that can be selectively ignored.
-
-### Changelogs
-```cpp
-using ovlChangeLog = ovlStringKeyValue<DOCUMENT_COMPARE_MUTE_CHANGELOG>;
-```
-Human-readable change descriptions that don't affect functional equality.
-
-## Performance Considerations
-
-- **Header-Only** - No separate compilation, allows inlining
-- **Template Instantiation** - Each mask value creates a separate type
-- **Minimal Overhead** - Adds only initialization check and mask comparison
-
-## Thread Safety
-
-Same as base `ovlKeyValue`:
-- Not thread-safe
-- References mutable JSON data
-- No internal synchronization needed (read-only after init)
-
-## Related Files
-
-- **ovlKeyValue.h** - Base class
-- **common.h** - Mask constants and types
-- **ovlDatabaseRecord.h** - Uses this template for version, collection, etc.
-- **ovlChangeLog.h** - Derives from this template
-- **ovlOrigin.h** - Uses for raw data fields
-
-## Best Practices
-
-1. **Use Type Aliases** - Don't use `ovlStringKeyValue<mask>` directly; use named aliases
-2. **Choose Appropriate Masks** - Match mask to the semantic meaning of the field
-3. **Initialize Properly** - Let the template handle default initialization
-4. **Check _initOK** - Verify initialization succeeded in debug builds
-
-## Notes
-
-- This is a header-only template (no .cpp file)
-- The "not-provided" literal comes from `jsonliteral::notprovided`
-- Type checking is strict: value must be `type_t::VALUE`, not object or array
-- The template parameter makes different instantiations incompatible types
-- Comparison operator checks the global mask, enabling runtime control of comparison behavior
+- Header-only implementation allows inlining
+- Minimal overhead: just initialization check and mask comparison
+- Each mask value creates a separate type (template instantiation)

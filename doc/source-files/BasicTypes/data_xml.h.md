@@ -1,48 +1,69 @@
 # data_xml.h
 
-## File Overview
+**Path:** `artdaq-database/BasicTypes/data_xml.h`
 
-**Location**: `/home/user/artdaq-database/artdaq-database/BasicTypes/data_xml.h`
+**Purpose:** Defines the XmlData structure, which wraps XML (Extensible Markup Language) formatted configuration data. XML provides an alternative configuration format in artdaq-database, enabling interoperability with external systems and standard XML tooling.
 
-This header defines the `XmlData` class, which represents XML (Extensible Markup Language) formatted configuration data. XML is used as an alternative configuration format in the artdaq-database system, providing a structured, hierarchical representation of configuration data.
 
-**Purpose**: Provides a wrapper class for XML configuration data with conversion capabilities to/from JSON format.
+## Key Concepts
+
+### XML Configuration Format
+
+XML (Extensible Markup Language) is a widely-used markup language for structured data:
+
+```xml
+<?xml version="1.0"?>
+<configuration>
+    <module name="detector">
+        <parameter name="buffer_size">8192</parameter>
+        <parameter name="enabled">true</parameter>
+        <channels>
+            <channel id="0"/>
+            <channel id="1"/>
+            <channel id="2"/>
+        </channels>
+    </module>
+</configuration>
+```
+
+### JSON as Pivot Format
+
+Like FhiclData, XmlData converts to/from JsonData for database storage. The conversion process:
+1. Parses XML to an intermediate JSON structure
+2. Base64-encodes the original XML for perfect round-trip fidelity
+3. Embeds both in the final JSON document
+
+This Base64 encoding is critical: it preserves the exact original XML format during round-trips through the database, including whitespace, comments, and formatting that would otherwise be lost in the JSON intermediate representation.
+
+### Simpler Than FhiclData
+
+XmlData has only `xml_buffer` (no filename metadata), making it simpler than FhiclData. This reflects the typical use case where XML configurations are programmatically generated or retrieved from external systems rather than local files.
+
+## Thread Safety
+
+- **Thread-safe:** No
+- **Concurrent access:** Multiple readers are safe; concurrent read/write requires external synchronization
+- **Locking:** No internal locking; callers must synchronize access when sharing XmlData objects between threads
 
 ## Dependencies
 
-- `artdaq-database/BasicTypes/common.h` - Common utilities and TRACE logging support
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/BasicTypes/common.h` | TRACE logging and Boost.Core utilities |
 
-### TRACE Configuration
-
-```cpp
-#define TRACE_NAME "BTPS:XmlData_H"
-```
-
-**Note**: Uses abbreviated TRACE name "BTPS:XmlData_H" (BTPS = BasicTypes)
-
-## Namespace Structure
-
-```cpp
-namespace artdaq {
-namespace database {
-namespace basictypes {
-    // XmlData is defined here
-}}}
-```
-
-## Key Types/Classes
-
-### Forward Declarations
+## Forward Declarations
 
 ```cpp
 struct JsonData;
 ```
 
-**Purpose**: Forward declaration of `JsonData` to enable conversion operators without circular dependencies.
+Forward declaration of JsonData enables conversion operators without requiring the full JsonData definition in this header.
 
----
+## Classes/Structures
 
-### XmlData
+### `XmlData`
+
+**Brief:** A value type that wraps XML-formatted configuration data with bidirectional JSON conversion support for database storage.
 
 ```cpp
 struct XmlData final {
@@ -59,495 +80,358 @@ struct XmlData final {
 };
 ```
 
-**Purpose**: A wrapper class for XML configuration data that provides:
-1. Storage for XML-formatted strings
-2. Bidirectional conversion with JSON format
-3. Stream I/O operators
-4. Version tracking
-
-**Design**: Marked `final` - cannot be inherited from
-
-**Comparison with FhiclData**:
-- XmlData has only `xml_buffer` (no filename metadata)
-- Simpler structure than FhiclData
-- Same conversion pattern as FhiclData
+**Thread Safety:** Not thread-safe for concurrent modification
 
 #### Member Variables
 
-##### xml_buffer
+##### `xml_buffer`
 
+**Brief:** Holds the XML-formatted configuration string containing the complete XML document.
+
+**Type:** `std::string`
+
+**Default:** Empty string (when using default constructor)
+
+#### Constructors
+
+##### `XmlData(std::string buffer)`
+
+**Brief:** Constructs an XmlData object from an XML-formatted string, using move semantics for efficiency.
+
+**Parameters:**
+- `buffer` - A string containing valid XML data. The string is moved into `xml_buffer`.
+
+**Preconditions:**
+- None (string may be empty, but empty strings will cause conversion failures)
+
+**Postconditions:**
+- `xml_buffer` contains the provided string
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| None | Constructor does not throw |
+
+**Thread Safety:** safe (construction)
+
+**Example:**
 ```cpp
-std::string xml_buffer;
-```
+#include "artdaq-database/BasicTypes/data_xml.h"
 
-**Purpose**: Holds the actual XML-formatted configuration string.
+using namespace artdaq::database::basictypes;
 
-**Default Value**: Empty (implicitly initialized)
-
-**Example Content**:
-```xml
-<?xml version="1.0"?>
-<configuration>
-    <parameter name="buffer_size">8192</parameter>
-    <parameter name="timeout">1000</parameter>
-    <settings>
-        <debug>true</debug>
-    </settings>
-</configuration>
-```
-
-## Constructors
-
-### XmlData(std::string)
-
-```cpp
-XmlData(std::string buffer);
-```
-
-**Purpose**: Constructs an XmlData object from an XML string.
-
-**Parameters**:
-- `buffer` - A string containing XML-formatted data
-
-**Implementation**: Uses move semantics (see data_xml.cpp.md)
-
-**Usage Example**:
-```cpp
-std::string xml_str = R"(
+void createXmlData() {
+  // Create from XML string
+  XmlData config(R"(
     <config>
-        <param>value</param>
+      <param name="threshold">100</param>
+      <param name="enabled">true</param>
     </config>
-)";
-XmlData xml(xml_str);
-```
+  )");
 
----
-
-### XmlData() (default)
-
-```cpp
-XmlData() = default;
-```
-
-**Purpose**: Default constructor creates an empty XmlData object.
-
-**Result**: `xml_buffer` is empty
-
-**Usage Example**:
-```cpp
-XmlData xml;  // Empty XML object
-// Later populate via stream or assignment
-```
-
----
-
-### XmlData(JsonData const&)
-
-```cpp
-XmlData(JsonData const& document);
-```
-
-**Purpose**: Constructs an XmlData object by converting from JSON format.
-
-**Parameters**:
-- `document` - JsonData object containing XML data encoded in JSON
-
-**Process**:
-1. Validates JSON is not empty
-2. Extracts Base64-encoded XML from JSON
-3. Decodes Base64 to get intermediate JSON
-4. Converts JSON to XML format
-5. Stores result in `xml_buffer`
-
-**Throws**: `std::runtime_error` if conversion fails
-
-**Usage Example**:
-```cpp
-JsonData json(R"({"base64": "PGNvbmZpZz48L2NvbmZpZz4="})");
-XmlData xml(json);  // Converts JSON → XML
-```
-
-**See**: data_xml.cpp.md for implementation details
-
-## Methods/Functions
-
-### Conversion to JsonData
-
-```cpp
-operator JsonData() const;
-```
-
-**Purpose**: Converts XML data to JSON format.
-
-**Return Value**: JsonData object containing the XML data encoded in JSON with Base64
-
-**Process**:
-1. Converts XML to JSON structure
-2. Encodes XML buffer in Base64
-3. Creates JSON document with encoded data
-4. Returns JsonData object
-
-**Throws**: `std::runtime_error` if conversion fails
-
-**Usage Example**:
-```cpp
-XmlData xml("<config><param>value</param></config>");
-JsonData json = xml;  // Implicit conversion
-// json now contains Base64-encoded XML in JSON format
-```
-
----
-
-### Conversion to String
-
-```cpp
-operator std::string const&() const;
-```
-
-**Purpose**: Provides access to the raw XML buffer string.
-
-**Return Value**: Const reference to `xml_buffer`
-
-**Usage Example**:
-```cpp
-XmlData xml("<config></config>");
-std::string config = xml;  // Implicit conversion
-std::cout << xml;  // Works via this operator
-```
-
----
-
-### type_version (static)
-
-```cpp
-static constexpr auto type_version() { return "V100"; }
-```
-
-**Purpose**: Returns the version identifier for the XmlData type.
-
-**Return Value**: String literal "V100"
-
-**Usage**: Version tracking for database schema compatibility.
-
-**Note**: Used when creating collection names (e.g., "XmlData_V100")
-
-## Stream Operators
-
-### operator>>
-
-```cpp
-std::istream& operator>>(std::istream& is, artdaq::database::basictypes::XmlData& data);
-```
-
-**Purpose**: Reads XML data from an input stream (in JSON format).
-
-**Parameters**:
-- `is` - Input stream
-- `data` - XmlData object to populate
-
-**Return Value**: Reference to the stream (for chaining)
-
-**Process**:
-1. Reads entire stream into a string
-2. Creates JsonData from the string
-3. Converts JsonData to XmlData
-4. Stores result in `data`
-
-**Note**: Input is expected to be JSON-encoded XML, not raw XML
-
-**Usage Example**:
-```cpp
-std::ifstream file("config.json");
-XmlData xml;
-file >> xml;  // Reads JSON, converts to XML
-```
-
----
-
-### operator<<
-
-```cpp
-std::ostream& operator<<(std::ostream& os, artdaq::database::basictypes::XmlData const& data);
-```
-
-**Purpose**: Writes raw XML data to an output stream.
-
-**Parameters**:
-- `os` - Output stream
-- `data` - XmlData object to write
-
-**Return Value**: Reference to the stream (for chaining)
-
-**Output Format**: Raw XML text (not JSON-encoded)
-
-**Usage Example**:
-```cpp
-XmlData xml("<config><param>value</param></config>");
-std::cout << xml;  // Outputs: <config><param>value</param></config>
-
-std::ofstream file("config.xml");
-file << xml;  // Writes raw XML to file
-```
-
-## TRACE Integration
-
-### TraceStreamer Specialization
-
-```cpp
-namespace {
-template <>
-inline TraceStreamer& TraceStreamer::operator<<(const artdaq::database::basictypes::XmlData& r) {
-    std::ostringstream s;
-    s << r;
-    msg_append(s.str().c_str());
-    return *this;
-}
+  std::cout << "Config: " << config << "\n";
 }
 ```
 
-**Purpose**: Allows XmlData objects to be used in TRACE logging statements.
+---
 
-**Usage Example**:
-```cpp
-XmlData xml("<debug>info</debug>");
-TLOG(5) << "Configuration: " << xml;  // Works via this specialization
-```
+##### `XmlData()` (default)
 
-## Usage Context
+**Brief:** Creates an empty XmlData with an empty `xml_buffer`, suitable for later assignment or stream input.
 
-### Role in artdaq-database
+**Postconditions:**
+- `xml_buffer` is empty string
 
-XML is an **alternative configuration format** in artdaq-database:
+**Thread Safety:** safe (construction)
 
-```
-XML Config File → XmlData → JsonData → Database
-Database → JsonData → XmlData → XML Config File
-```
+---
 
-Similar to FHICL, XML conversions use JSON as an intermediary format.
+##### `XmlData(JsonData const& document)`
 
-### Typical Usage Patterns
+**Brief:** Constructs XmlData by extracting and decoding XML from a JSON document that contains Base64-encoded XML data. This constructor is used when retrieving XML configurations from the database.
 
-#### 1. Load XML Configuration
+**Parameters:**
+- `document` - A JsonData object containing Base64-encoded XML. Must not be empty.
 
-```cpp
-// From string
-XmlData config(R"(
-    <daq>
-        <buffer_size>8192</buffer_size>
-        <timeout_ms>1000</timeout_ms>
-    </daq>
-)");
+**Preconditions:**
+- `document` must not be empty
+- `document` must contain a "base64" field with valid Base64-encoded data
 
-// From file (as JSON)
-std::ifstream file("config.json");
-XmlData config2;
-file >> config2;
-```
+**Postconditions:**
+- `xml_buffer` contains the decoded XML configuration
 
-#### 2. Store in Database (via JSON)
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `std::runtime_error` | When `document` is empty |
+| `std::runtime_error` | When regex fails to find "base64" field in JSON |
+| `std::runtime_error` | When regex match returns unexpected size (not exactly 1 match) |
+| `std::runtime_error` | When Base64 decoding or XML conversion fails |
 
-```cpp
-XmlData xml("<config><param>value</param></config>");
-JsonData json = xml;  // Convert to JSON
-// Store json in database
-```
+**Thread Safety:** safe (construction)
 
-#### 3. Retrieve from Database
-
-```cpp
-// Retrieve json from database
-JsonData json = get_from_database();
-XmlData xml(json);  // Convert to XML
-std::cout << xml;   // Use the configuration
-```
-
-#### 4. Convert Formats
-
-```cpp
-// XML ↔ JSON conversions
-XmlData xml("<param>value</param>");
-JsonData json = xml;         // XML → JSON
-XmlData back = json;         // JSON → XML
-```
-
-## What is XML?
-
-**XML (Extensible Markup Language)** is a markup language for encoding data in a format that is both human-readable and machine-readable.
-
-### XML Syntax Examples
-
-```xml
-<!-- Simple element -->
-<parameter>value</parameter>
-
-<!-- Element with attributes -->
-<module name="MyModule" enabled="true"/>
-
-<!-- Nested structure -->
-<configuration>
-    <settings>
-        <threshold>100</threshold>
-        <enabled>true</enabled>
-    </settings>
-    <channels>
-        <channel id="0"/>
-        <channel id="1"/>
-        <channel id="2"/>
-    </channels>
-</configuration>
-
-<!-- With XML declaration -->
-<?xml version="1.0" encoding="UTF-8"?>
-<config>
-    <data>content</data>
-</config>
-```
-
-### Why XML?
-
-- **Structured**: Hierarchical data representation
-- **Standard**: Widely used, many parsing libraries available
-- **Extensible**: Can define custom tags and attributes
-- **Interoperable**: Works across different systems and platforms
-
-## JSON Encoding Format
-
-When XML is stored in JSON (for database), it uses Base64 encoding:
-
-```json
-{
-    "base64": "PGNvbmZpZz48cGFyYW0+dmFsdWU8L3BhcmFtPjwvY29uZmlnPg=="
-}
-```
-
-This ensures:
-- XML special characters are preserved
-- Nested structures are maintained
-- JSON remains valid
-
-## Header Guards
-
-```cpp
-#ifndef _ARTDAQ_DATABASE_BASICTYPES_XML_H_
-#define _ARTDAQ_DATABASE_BASICTYPES_XML_H_
-```
-
-**Note**: Comment at end says `_ARTDAQ_DATABASE_BASICTYPES_FHICL_H_` - this appears to be a copy-paste error from data_fhicl.h.
-
-## Notes for Developers
-
-### Differences from FhiclData
-
-1. **No File Name**: XmlData doesn't have a `file_name` member like FhiclData
-2. **Simpler**: Only one data member (`xml_buffer`)
-3. **Same Pattern**: Conversion logic follows the same pattern as FHICL
-
-### Why No File Name?
-
-The design choice to omit a filename member could be:
-- XML files are often generated programmatically
-- Less emphasis on tracking source files for XML
-- Simpler structure for serialization
-
-If you need to track the source file, you can wrap XmlData in another struct.
-
-### Conversion Path
-
-All XML↔JSON conversions go through:
-1. `XmlData` ↔ intermediate JSON ↔ Base64 ↔ `JsonData`
-
-### Error Handling
-
-Conversions can throw `std::runtime_error`:
-- Invalid JSON format
-- Base64 decoding failures
-- XML parsing errors
-
-Always wrap conversions in try-catch when dealing with untrusted input.
-
-### Thread Safety
-
-The class is **not thread-safe** for concurrent writes.
-
-## Best Practices
-
-1. **Validate XML**: Check XML syntax before creating XmlData objects
-2. **Handle Errors**: Wrap conversions in try-catch blocks
-3. **Use Well-Formed XML**: Ensure XML has proper structure and closing tags
-4. **Consider Alternatives**: FHICL might be more appropriate for artdaq configurations
-
-## Example: Complete Workflow
-
+**Example:**
 ```cpp
 #include "artdaq-database/BasicTypes/data_xml.h"
 #include "artdaq-database/BasicTypes/data_json.h"
-#include <fstream>
+#include <iostream>
 
-try {
-    // 1. Create XML configuration
-    XmlData config(R"(
-        <daq_settings>
-            <buffer_size>8192</buffer_size>
-            <timeout_ms>1000</timeout_ms>
-        </daq_settings>
-    )");
+using namespace artdaq::database::basictypes;
 
-    // 2. Convert to JSON for database storage
-    JsonData json = config;
+void convertFromJson() {
+  // Assume we retrieved JSON from database
+  JsonData json_from_db = retrieveFromDatabase("xml_config_id");
 
-    // 3. Store to database (pseudo-code)
-    database.store("xml_configurations", json);
-
-    // 4. Retrieve from database
-    JsonData retrieved = database.get("xml_configurations");
-
-    // 5. Convert back to XML
-    XmlData restored(retrieved);
-
-    // 6. Use the configuration
-    std::cout << "Restored config:\n" << restored << "\n";
-
-} catch (const std::runtime_error& e) {
-    std::cerr << "Configuration error: " << e.what() << "\n";
+  try {
+    XmlData xml(json_from_db);
+    std::cout << "Retrieved XML configuration:\n" << xml << "\n";
+  } catch (const std::runtime_error& e) {
+    std::cerr << "Failed to convert JSON to XML: " << e.what() << "\n";
+  }
 }
 ```
 
-## XML vs FHICL
+#### Conversion Operators
 
-When to use XML vs FHICL:
+##### `operator JsonData() const`
 
-### Use XML When:
-- Interoperating with external systems that use XML
-- Need standard XML tooling (XPath, XSLT, etc.)
-- Configuration comes from XML-based systems
-- Strict schema validation is required (XML Schema)
+**Brief:** Converts the XML data to JSON format for database storage. The conversion includes Base64 encoding of the original XML content to preserve exact formatting during round-trips.
 
-### Use FHICL When:
-- Working within artdaq ecosystem
+**Returns:** JsonData containing the XML configuration in JSON format with embedded Base64.
+
+**Postconditions:**
+- Returned JsonData can be converted back to identical XmlData
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `std::runtime_error` | When XML-to-JSON conversion fails (invalid XML syntax) |
+
+**Thread Safety:** safe (reads only)
+
+**Example:**
+```cpp
+#include "artdaq-database/BasicTypes/data_xml.h"
+#include "artdaq-database/BasicTypes/data_json.h"
+
+using namespace artdaq::database::basictypes;
+
+void storeToDatabase() {
+  XmlData xml("<config><buffer_size>8192</buffer_size></config>");
+
+  try {
+    // Implicit conversion to JsonData
+    JsonData json = xml;
+
+    // Store JSON in database
+    storeInDatabase("xml_config", json);
+  } catch (const std::runtime_error& e) {
+    std::cerr << "Conversion failed: " << e.what() << "\n";
+  }
+}
+```
+
+---
+
+##### `operator std::string const&() const`
+
+**Brief:** Provides implicit conversion to const string reference, returning the raw XML content for direct access to the XML buffer.
+
+**Returns:** Const reference to `xml_buffer`.
+
+**Thread Safety:** safe (returns const reference)
+
+**Example:**
+```cpp
+XmlData xml("<config/>");
+std::string content = xml;  // Implicit conversion
+const std::string& ref = xml;  // Reference to buffer
+```
+
+#### Static Methods
+
+##### `type_version() -> const char*`
+
+**Brief:** Returns a version identifier string used for database collection naming and schema compatibility tracking.
+
+**Returns:** `"V100"` - indicates version 1.0.0 of the XmlData schema.
+
+**Thread Safety:** safe (constexpr)
+
+**Example:**
+```cpp
+// Used for collection naming
+std::string collection = std::string("XmlData_") + XmlData::type_version();
+// Result: "XmlData_V100"
+```
+
+## Functions
+
+### `operator>>(std::istream& is, XmlData& data) -> std::istream&`
+
+**Brief:** Reads XML data from an input stream. The input is expected to be JSON-encoded XML (as stored in the database), not raw XML.
+
+**Parameters:**
+- `is` - Input stream containing JSON-encoded XML data
+- `data` - XmlData object to populate
+
+**Returns:** Reference to the input stream.
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `std::runtime_error` | When the stream content cannot be converted to XML |
+
+**Thread Safety:** unsafe (modifies data)
+
+**Side Effects:**
+- Reads entire stream content
+- Stream position will be at EOF after read
+
+**Example:**
+```cpp
+#include <fstream>
+
+std::ifstream file("config.json");  // JSON-encoded XML
+XmlData xml;
+file >> xml;  // Reads and converts
+```
+
+---
+
+### `operator<<(std::ostream& os, XmlData const& data) -> std::ostream&`
+
+**Brief:** Writes raw XML text to the output stream (not JSON-encoded). Useful for displaying or saving the XML configuration.
+
+**Parameters:**
+- `os` - Output stream
+- `data` - XmlData object to write
+
+**Returns:** Reference to the output stream.
+
+**Thread Safety:** safe (reads only)
+
+**Side Effects:**
+- Writes `xml_buffer` content to stream
+
+**Example:**
+```cpp
+XmlData xml("<config><param>value</param></config>");
+
+// Write to console
+std::cout << xml << "\n";
+
+// Write to file
+std::ofstream out("config.xml");
+out << xml;
+```
+
+---
+
+### `TraceStreamer::operator<<(const XmlData& r)` (template specialization)
+
+**Brief:** Enables XmlData objects to be used directly in TRACE logging statements for debugging and diagnostics.
+
+**Thread Safety:** safe (reads only)
+
+**Example:**
+```cpp
+XmlData xml("<config/>");
+TLOG(10) << "Configuration: " << xml;
+```
+
+## Relationship to Other Components
+
+### Data Flow
+
+```
+XML Config --> XmlData --> JsonData --> Database (MongoDB/FileSystemDB)
+Database --> JsonData --> XmlData --> XML Config
+```
+
+### Comparison with FhiclData
+
+| Feature | XmlData | FhiclData |
+|---------|---------|-----------|
+| Buffer member | `xml_buffer` | `fhicl_buffer` |
+| File name member | None | `fhicl_file_name` |
+| Complexity | Simpler | Slightly more complex |
+| Primary use | External systems integration | artdaq ecosystem configurations |
+
+### Module Dependencies
+
+- **data_xml.cpp** - Implements constructors, conversion operators, and template specializations
+- **data_xml_fusion.h** - Provides Boost.Fusion adaptation for generic programming
+- **data_json.h** - JsonData is the pivot format for all conversions
+- **base64.h** - Used internally for encoding XML in JSON documents to preserve original format
+- **DataFormats/Xml/** - Provides underlying XML parsing and conversion
+
+## See Also
+
+- [data_xml.cpp](./data_xml.cpp.md) - Implementation details
+- [data_xml_fusion.h](./data_xml_fusion.h.md) - Boost.Fusion adaptation
+- [data_json.h](./data_json.h.md) - JsonData pivot format
+- [data_fhicl.h](./data_fhicl.h.md) - FHiCL format wrapper (similar structure)
+- [base64.h](./base64.h.md) - Base64 encoding for round-trip preservation
+- [basictypes.h](./basictypes.h.md) - Umbrella header
+
+## Notes for Developers
+
+### When to Use XML vs FHiCL
+
+**Use XML when:**
+- Interoperating with external XML-based systems
+- Need standard XML tooling (XPath, XSLT, schema validation)
+- Configuration comes from XML sources (web services, legacy systems)
+- Strict schema validation is required (XML Schema, DTD)
+
+**Use FHiCL when:**
+- Working within the artdaq ecosystem
 - Need artdaq-specific features (references, includes)
 - Human-readable configuration files are priority
-- Simpler syntax is preferred
+- Familiar with existing FHiCL configurations
 
-## Related Documentation
+### Common Pitfalls
 
-- `data_xml.cpp.md` - Implementation details and conversion logic
-- `data_xml_fusion.h.md` - Boost.Fusion adaptation
-- `data_json.h.md` - JSON data type for conversions
-- `data_fhicl.h.md` - FHICL data type (similar pattern)
+- **Pitfall 1:** Expecting `operator>>` to read raw XML. It reads JSON-encoded XML. For raw XML, construct directly from a string.
+- **Pitfall 2:** Not handling exceptions during conversion. Always wrap conversions in try-catch when dealing with untrusted input.
+- **Pitfall 3:** Assuming XML schema validation occurs. The class stores raw XML without validation.
 
-## Known Issues
+### Anti-patterns
 
-### Header Guard Comment
-
-The final endif comment references the wrong header:
 ```cpp
-#endif /* _ARTDAQ_DATABASE_BASICTYPES_FHICL_H_ */
+// DON'T do this - ignoring conversion errors:
+JsonData json = database.get("config");
+XmlData xml(json);  // May throw if JSON is invalid!
+
+// DO this instead - handle conversion errors:
+try {
+  JsonData json = database.get("config");
+  if (json.empty()) {
+    std::cerr << "Configuration not found\n";
+    return;
+  }
+  XmlData xml(json);
+  processConfig(xml);
+} catch (const std::runtime_error& e) {
+  std::cerr << "Configuration error: " << e.what() << "\n";
+}
+
+// DON'T do this - reading raw XML with operator>>:
+std::ifstream file("config.xml");  // Raw XML file
+XmlData xml;
+file >> xml;  // WRONG - expects JSON-encoded input!
+
+// DO this instead - read raw XML as string:
+std::ifstream file("config.xml");
+std::string content((std::istreambuf_iterator<char>(file)), {});
+XmlData xml(content);
 ```
 
-Should be:
-```cpp
-#endif /* _ARTDAQ_DATABASE_BASICTYPES_XML_H_ */
-```
+### Known Issues
 
-This is a cosmetic issue and doesn't affect functionality.
+The header guard endif comment references the wrong file name:
+```cpp
+#endif /* _ARTDAQ_DATABASE_BASICTYPES_FHICL_H_ */  // Should be XML_H
+```
+This is a cosmetic issue and does not affect functionality.

@@ -1,45 +1,43 @@
 # json_types.h
 
-## File Overview
+**Path:** `artdaq-database/DataFormats/Json/json_types.h`
 
-This header file defines the core data structures for representing JSON documents as Abstract Syntax Trees (AST). It provides type definitions for JSON objects, arrays, values, and key-value pairs, along with visitor patterns for type-safe operations on JSON data structures.
+**Purpose:** Defines the core data structures for representing JSON documents as Abstract Syntax Trees (AST). This header provides type definitions for JSON objects, arrays, values, and key-value pairs, along with visitor patterns for type-safe operations on JSON data structures. These types form the foundation for all JSON manipulation in artdaq-database.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/DataFormats/Json/json_types.h`
+
+## Key Concepts
+
+### JSON Abstract Syntax Tree (AST)
+
+The JSON AST represents parsed JSON documents as a tree of C++ objects. This approach allows:
+- Type-safe manipulation of JSON data
+- Efficient traversal and transformation
+- Integration with C++ type system
+
+### Recursive Variant Types
+
+JSON structures are inherently recursive (objects can contain objects, arrays can contain arrays). This is handled using `boost::recursive_wrapper` which allows variants to contain types that include the variant itself.
+
+### Boost.Fusion Adaptation
+
+The `data_t` structure is adapted for Boost.Fusion, enabling automatic parser/generator creation with Boost.Spirit. This powers the JSON reader and writer implementations.
+
+## Thread Safety
+
+- **Thread-safe:** No (mutable data structures)
+- **Concurrent access:** Multiple readers are safe; any writer requires exclusive access
+- **Locking:** No internal locking; callers must synchronize
 
 ## Dependencies
 
-### Third-Party Libraries
+| Include | Purpose |
+|---------|---------|
+| `<boost/fusion/adapted/struct/adapt_struct.hpp>` | Boost.Fusion structure adaptation for Boost.Spirit integration |
+| `<boost/fusion/include/adapt_struct.hpp>` | Boost.Fusion includes |
+| `artdaq-database/DataFormats/common.h` | Common infrastructure (boost::variant configuration) |
+| `artdaq-database/DataFormats/shared_types.h` | Shared template types (`table_of`, `vector_of`, `variant_value_of`) |
 
-**Boost Libraries**:
-- `<boost/fusion/adapted/struct/adapt_struct.hpp>` - Boost.Fusion structure adaptation for introspection
-- `<boost/fusion/include/adapt_struct.hpp>` - Boost.Fusion includes
-
-### Project Headers
-
-- `"artdaq-database/DataFormats/common.h"` - Common DataFormats headers and boost::variant configuration
-- `"artdaq-database/DataFormats/shared_types.h"` - Shared template types (table_of, vector_of, variant_value_of)
-
-## Header Guard
-
-```cpp
-#ifndef _ARTDAQ_DATABASE_JSONTYPES_H_
-#define _ARTDAQ_DATABASE_JSONTYPES_H_
-...
-#endif
-```
-
-## Namespace
-
-```cpp
-artdaq::database::json
-```
-
-**Namespace Alias**:
-```cpp
-namespace jsn = artdaq::database::json;
-```
-
-## Core Type Definitions
+## Type Definitions
 
 ### Forward Declarations
 
@@ -48,15 +46,19 @@ struct object_t;
 struct array_t;
 ```
 
-These are forward-declared because they participate in a recursive type definition with `variant_value_t`.
+**Brief:** Forward declarations allowing recursive type definitions.
 
-### Variant Value Type
+---
+
+### `variant_value_t`
 
 ```cpp
 using variant_value_t = sharedtypes::variant_value_of<object_t, array_t>;
 ```
 
-A variant that can hold any JSON value type:
+**Brief:** A boost::variant that can hold any JSON value type including nested objects and arrays.
+
+**Contained Types:**
 - `boost::recursive_wrapper<object_t>` - Nested JSON object
 - `boost::recursive_wrapper<array_t>` - Nested JSON array
 - `std::string` - String value
@@ -64,141 +66,286 @@ A variant that can hold any JSON value type:
 - `integer` (int64_t) - Integer number
 - `bool` - Boolean value
 
-### Basic Types
+---
+
+### `key_t`
 
 ```cpp
-using key_t = sharedtypes::basic_key_t;         // std::string
+using key_t = sharedtypes::basic_key_t;
+```
+
+**Brief:** Type alias for JSON object keys (std::string).
+
+---
+
+### `value_t`
+
+```cpp
 using value_t = variant_value_t;
+```
+
+**Brief:** Type alias for JSON values, equivalent to `variant_value_t`.
+
+---
+
+### `data_t`
+
+```cpp
 using data_t = sharedtypes::kv_pair_of<key_t, value_t>;
 ```
 
-| Type | Description |
-|------|-------------|
-| `key_t` | JSON object key (string) |
-| `value_t` | JSON value (variant of all possible types) |
-| `data_t` | JSON key-value pair |
+**Brief:** A key-value pair representing a single entry in a JSON object.
 
-### Composite Types
+**Members:**
+- `key` - The string key
+- `value` - The variant value
 
-```cpp
-struct object_t : sharedtypes::table_of<data_t> {};
-struct array_t : sharedtypes::vector_of<value_t> {};
-```
+---
 
-**object_t**: Represents a JSON object as an ordered collection of key-value pairs
-- Inherits from `table_of<data_t>`, providing map-like interface
-- Maintains insertion order
-- Allows duplicate keys (for FHiCL compatibility)
-
-**array_t**: Represents a JSON array as a list of values
-- Inherits from `vector_of<value_t>`, providing vector-like interface
-- Elements can be of different types (heterogeneous)
-
-## Type Enumeration
+### `type_t`
 
 ```cpp
 enum struct type_t {
-    NOTSET = 0,
-    VALUE,
-    DATA,
-    OBJECT,
-    ARRAY
+  NOTSET = 0,
+  VALUE,
+  DATA,
+  OBJECT,
+  ARRAY
 };
 ```
 
-**Values**:
-- `NOTSET` - Type not yet determined
-- `VALUE` - Primitive value (string, number, bool)
-- `DATA` - Key-value pair
-- `OBJECT` - JSON object
-- `ARRAY` - JSON array
+**Brief:** Enumeration for categorizing JSON node types.
 
-**Helper Function**:
+| Value | Description |
+|-------|-------------|
+| `NOTSET` | Type not yet determined |
+| `VALUE` | Primitive value (string, number, bool) |
+| `DATA` | Key-value pair |
+| `OBJECT` | JSON object (collection of key-value pairs) |
+| `ARRAY` | JSON array (ordered list of values) |
+
+## Classes/Structures
+
+### `object_t`
+
 ```cpp
-std::string to_string(type_t t);
+struct object_t : sharedtypes::table_of<data_t> {};
 ```
 
-Converts type enum to string representation.
+**Brief:** Represents a JSON object as an ordered collection of key-value pairs.
 
-## Visitor Patterns
+**Thread Safety:** Not thread-safe
 
-### print_visitor
+**Characteristics:**
+- Maintains insertion order (unlike std::map)
+- Allows duplicate keys (for FHiCL compatibility)
+- Provides map-like interface (`at()`, `operator[]`, `count()`)
+
+**Example:**
+```cpp
+#include "artdaq-database/DataFormats/Json/json_types.h"
+
+void createJsonObject() {
+  using namespace artdaq::database::json;
+
+  object_t config;
+  config["name"] = std::string("detector");
+  config["threshold"] = static_cast<integer>(100);
+  config["enabled"] = true;
+
+  // Access value
+  auto& name = boost::get<std::string>(config.at("name"));
+}
+```
+
+---
+
+### `array_t`
+
+```cpp
+struct array_t : sharedtypes::vector_of<value_t> {};
+```
+
+**Brief:** Represents a JSON array as a list of values.
+
+**Thread Safety:** Not thread-safe
+
+**Characteristics:**
+- Provides vector-like interface (`push_back()`, `size()`, iteration)
+- Elements can be of different types (heterogeneous)
+- Supports nesting (arrays of arrays, arrays of objects)
+
+**Example:**
+```cpp
+#include "artdaq-database/DataFormats/Json/json_types.h"
+
+void createJsonArray() {
+  using namespace artdaq::database::json;
+
+  array_t numbers;
+  numbers.push_back(static_cast<integer>(1));
+  numbers.push_back(static_cast<integer>(2));
+  numbers.push_back(static_cast<integer>(3));
+
+  // Heterogeneous array
+  array_t mixed;
+  mixed.push_back(std::string("text"));
+  mixed.push_back(static_cast<integer>(42));
+  mixed.push_back(true);
+}
+```
+
+---
+
+### `print_visitor`
 
 ```cpp
 struct print_visitor : public boost::static_visitor<std::string>
 ```
 
-Converts variant values to debug-friendly string representations.
+**Brief:** Visitor that converts variant values to debug-friendly string representations.
 
-**Overloads**:
-```cpp
-std::string operator()(object_t const&) const;       // Returns: "object(...)"
-std::string operator()(array_t const&) const;        // Returns: "array(...)"
-std::string operator()(std::string const& val) const; // Returns: "std::string(<val>)"
-std::string operator()(decimal const& val) const;     // Returns: "decimal(<val>)"
-std::string operator()(integer const& val) const;     // Returns: "integer(<val>)"
-std::string operator()(bool const& val) const;        // Returns: "bool(true/false)"
-```
+**Thread Safety:** Thread-safe (stateless)
 
-**Usage**:
+#### Methods
+
+##### `operator()(object_t const&) -> std::string`
+
+**Brief:** Returns `"object(...)"` for objects.
+
+##### `operator()(array_t const&) -> std::string`
+
+**Brief:** Returns `"array(...)"` for arrays.
+
+##### `operator()(std::string const& val) -> std::string`
+
+**Brief:** Returns `"std::string(<value>)"` for strings.
+
+##### `operator()(decimal const& val) -> std::string`
+
+**Brief:** Returns `"decimal(<value>)"` for floating-point numbers.
+
+##### `operator()(integer const& val) -> std::string`
+
+**Brief:** Returns `"integer(<value>)"` for integers.
+
+##### `operator()(bool const& val) -> std::string`
+
+**Brief:** Returns `"bool(true)"` or `"bool(false)"` for booleans.
+
+**Example:**
 ```cpp
 value_t v = std::string("hello");
 std::string debug = boost::apply_visitor(print_visitor(), v);
 // debug == "std::string(hello)"
 ```
 
-### tostring_visitor
+---
+
+### `tostring_visitor`
 
 ```cpp
 struct tostring_visitor : public boost::static_visitor<std::string>
 ```
 
-Converts variant values to their actual string representations (not debug format).
+**Brief:** Visitor that converts variant values to their actual string representations.
 
-**Overloads**:
-```cpp
-std::string operator()(object_t const&) const;       // Returns: "object(...)"
-std::string operator()(array_t const&) const;        // Returns: "array(...)"
-std::string operator()(std::string const& val) const; // Returns: val
-std::string operator()(decimal const& val) const;     // Returns: std::to_string(val)
-std::string operator()(integer const& val) const;     // Returns: std::to_string(val)
-std::string operator()(bool const& val) const;        // Returns: "true" or "false"
-```
+**Thread Safety:** Thread-safe (stateless)
 
-**Usage**:
+#### Methods
+
+##### `operator()(object_t const&) -> std::string`
+
+**Brief:** Returns `"object(...)"` for objects (cannot be fully stringified).
+
+##### `operator()(array_t const&) -> std::string`
+
+**Brief:** Returns `"array(...)"` for arrays (cannot be fully stringified).
+
+##### `operator()(std::string const& val) -> std::string`
+
+**Brief:** Returns the string value directly.
+
+##### `operator()(decimal const& val) -> std::string`
+
+**Brief:** Returns the numeric string representation.
+
+##### `operator()(integer const& val) -> std::string`
+
+**Brief:** Returns the numeric string representation.
+
+##### `operator()(bool const& val) -> std::string`
+
+**Brief:** Returns `"true"` or `"false"`.
+
+**Example:**
 ```cpp
-value_t v = 42;
+value_t v = static_cast<integer>(42);
 std::string str = boost::apply_visitor(tostring_visitor(), v);
 // str == "42"
 ```
 
-### type_visitor
+---
+
+### `type_visitor`
 
 ```cpp
 struct type_visitor : public boost::static_visitor<type_t>
 ```
 
-Determines the type_t enum value for a variant.
+**Brief:** Visitor that determines the `type_t` enumeration value for a variant.
 
-**Overloads** (both const and non-const):
-```cpp
-type_t operator()(object_t const&) const;    // Returns: type_t::OBJECT
-type_t operator()(array_t const&) const;     // Returns: type_t::ARRAY
-type_t operator()(std::string const&) const; // Returns: type_t::VALUE
-type_t operator()(decimal const&) const;     // Returns: type_t::VALUE
-type_t operator()(integer const&) const;     // Returns: type_t::VALUE
-type_t operator()(bool const&) const;        // Returns: type_t::VALUE
-```
+**Thread Safety:** Thread-safe (stateless)
 
-**Helper Template**:
-```cpp
-template <typename T>
-type_t type(T& var);
-```
+#### Methods
 
-Convenience function that applies type_visitor to a variant.
+All overloads return the appropriate `type_t` value:
+- `object_t` -> `type_t::OBJECT`
+- `array_t` -> `type_t::ARRAY`
+- `std::string`, `decimal`, `integer`, `bool` -> `type_t::VALUE`
 
-**Usage**:
+Provides both const and non-const overloads for flexibility.
+
+## Functions
+
+### `to_string(t) -> std::string`
+
+**Brief:** Converts a `type_t` enumeration value to its string representation.
+
+**Parameters:**
+- `t` - The type enumeration value
+
+**Returns:** String representation ("NOTSET", "VALUE", "DATA", "OBJECT", "ARRAY")
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| None | This function does not throw |
+
+**Thread Safety:** Safe
+
+---
+
+### `type<T>(var) -> type_t`
+
+**Brief:** Template function that determines the type of a variant value.
+
+**Parameters:**
+- `var` - Reference to the variant value
+
+**Preconditions:**
+- `var` must not be empty
+
+**Returns:** The `type_t` enumeration value for the variant's current type
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| None | Uses `confirm()` macro for precondition |
+
+**Thread Safety:** Safe
+
+**Example:**
 ```cpp
 value_t v = object_t{};
 type_t t = type(v);  // t == type_t::OBJECT
@@ -207,44 +354,73 @@ type_t t = type(v);  // t == type_t::OBJECT
 ## Comparison Operators
 
 All comparison operators return `std::pair<bool, std::string>`:
-- `.first`: true if equal, false otherwise
-- `.second`: "Success" if equal, detailed error message if not equal
+- `.first`: `true` if equal, `false` otherwise
+- `.second`: `"Success"` if equal, detailed error message if not equal
 
-```cpp
-std::pair<bool, std::string> operator==(value_t const&, value_t const&);
-std::pair<bool, std::string> operator==(data_t const&, data_t const&);
-std::pair<bool, std::string> operator==(array_t const&, array_t const&);
-std::pair<bool, std::string> operator==(object_t const&, object_t const&);
-```
+This design provides detailed diagnostic information when comparisons fail, useful for testing and debugging.
 
-**Comparison Semantics**:
+### `operator==(value_t const&, value_t const&) -> std::pair<bool, std::string>`
 
-1. **value_t**: Type-sensitive comparison
-   - Different types → not equal
-   - Same type → deep comparison
+**Brief:** Compares two JSON values for equality.
 
-2. **data_t**: Compares both key and value
-   - Keys must match exactly
-   - Values compared recursively
+**Returns:** Pair indicating equality and error message if different
 
-3. **array_t**: Element-wise comparison
-   - Sizes must match
-   - Elements compared in order
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| None | This function does not throw |
 
-4. **object_t**: Pair-wise comparison
-   - Sizes must match
-   - Pairs compared in order (order matters!)
+**Comparison Semantics:**
+- Different variant types -> not equal
+- Same type -> type-specific deep comparison
 
-**Usage Example**:
+---
+
+### `operator==(data_t const&, data_t const&) -> std::pair<bool, std::string>`
+
+**Brief:** Compares two key-value pairs for equality.
+
+**Returns:** Pair indicating equality and error message if different
+
+**Comparison Semantics:**
+- Keys must match exactly
+- Values compared using value_t comparison
+
+---
+
+### `operator==(array_t const&, array_t const&) -> std::pair<bool, std::string>`
+
+**Brief:** Compares two JSON arrays for equality.
+
+**Returns:** Pair indicating equality and error message if different
+
+**Comparison Semantics:**
+- Sizes must match
+- Elements compared in order using value_t comparison
+
+---
+
+### `operator==(object_t const&, object_t const&) -> std::pair<bool, std::string>`
+
+**Brief:** Compares two JSON objects for equality.
+
+**Returns:** Pair indicating equality and error message if different
+
+**Comparison Semantics:**
+- Sizes must match
+- Pairs compared in order (order matters!)
+
+**Example:**
 ```cpp
 object_t obj1, obj2;
-// ... populate objects ...
+obj1["key"] = std::string("value");
+obj2["key"] = std::string("value");
 
-auto result = obj1 == obj2;
-if (result.first) {
-    std::cout << "Objects are equal\n";
+auto [equal, message] = obj1 == obj2;
+if (equal) {
+  std::cout << "Objects are equal\n";
 } else {
-    std::cout << "Objects differ: " << result.second << "\n";
+  std::cout << "Objects differ: " << message << "\n";
 }
 ```
 
@@ -256,144 +432,141 @@ BOOST_FUSION_ADAPT_STRUCT(jsn::data_t,
     (jsn::value_t, value))
 ```
 
-**Purpose**: Adapts `data_t` for use with Boost.Fusion and Boost.Spirit parsers/generators.
+**Brief:** Adapts `data_t` for use with Boost.Fusion and Boost.Spirit parsers/generators.
 
-**Benefits**:
+**Purpose:**
 - Enables automatic parser/generator creation
 - Allows tuple-like access to struct members
 - Integrates with Boost.Spirit Qi (parser) and Karma (generator)
+
+## Namespace Alias
+
+```cpp
+namespace jsn = artdaq::database::json;
+```
+
+**Brief:** Convenience alias for the `artdaq::database::json` namespace.
 
 ## Usage Examples
 
 ### Creating JSON Structures
 
 ```cpp
-using namespace artdaq::database::json;
+#include "artdaq-database/DataFormats/Json/json_types.h"
 
-// Create JSON object
-object_t config;
-config["host"] = std::string("localhost");
-config["port"] = static_cast<integer>(8080);
-config["enabled"] = true;
+void createComplexJson() {
+  using namespace artdaq::database::json;
 
-// Create JSON array
-array_t numbers;
-numbers.push_back(static_cast<integer>(1));
-numbers.push_back(static_cast<integer>(2));
-numbers.push_back(static_cast<integer>(3));
+  // Create nested structure
+  object_t config;
+  config["name"] = std::string("detector_config");
+  config["version"] = static_cast<integer>(1);
 
-// Nest structures
-object_t root;
-root["config"] = config;
-root["numbers"] = numbers;
+  object_t parameters;
+  parameters["threshold"] = static_cast<integer>(100);
+  parameters["enabled"] = true;
+  config["parameters"] = parameters;
+
+  array_t channels;
+  channels.push_back(static_cast<integer>(0));
+  channels.push_back(static_cast<integer>(1));
+  channels.push_back(static_cast<integer>(2));
+  config["channels"] = channels;
+}
 ```
 
 ### Type Checking
 
 ```cpp
-value_t v = /* ... */;
+#include "artdaq-database/DataFormats/Json/json_types.h"
 
-if (type(v) == type_t::OBJECT) {
-    auto& obj = boost::get<object_t>(v);
-    // Work with object
-} else if (type(v) == type_t::ARRAY) {
-    auto& arr = boost::get<array_t>(v);
-    // Work with array
+void checkValueType(const value_t& v) {
+  using namespace artdaq::database::json;
+
+  switch (type(v)) {
+    case type_t::OBJECT:
+      std::cout << "Value is an object\n";
+      break;
+    case type_t::ARRAY:
+      std::cout << "Value is an array\n";
+      break;
+    case type_t::VALUE:
+      std::cout << "Value is a primitive\n";
+      break;
+    default:
+      std::cout << "Unknown type\n";
+  }
 }
 ```
 
-### Visiting Values
+### Safe Value Extraction
 
 ```cpp
-value_t v = 3.14;
+#include "artdaq-database/DataFormats/Json/json_types.h"
 
-// Debug output
-std::cout << boost::apply_visitor(print_visitor(), v);
-// Output: "decimal(3.140000)"
+void safeExtraction(const value_t& v) {
+  using namespace artdaq::database::json;
 
-// Value as string
-std::cout << boost::apply_visitor(tostring_visitor(), v);
-// Output: "3.140000"
-```
-
-### Comparing Structures
-
-```cpp
-object_t obj1, obj2;
-obj1["key"] = std::string("value");
-obj2["key"] = std::string("value");
-
-auto [equal, message] = obj1 == obj2;
-if (equal) {
-    // Objects are identical
+  // Safe extraction using pointer
+  if (auto* str = boost::get<std::string>(&v)) {
+    std::cout << "String value: " << *str << "\n";
+  } else if (auto* num = boost::get<integer>(&v)) {
+    std::cout << "Integer value: " << *num << "\n";
+  } else {
+    std::cout << "Other type\n";
+  }
 }
 ```
 
-## Design Patterns
+## Relationship to Other Components
 
-### Recursive Structures
+This header is foundational to the JSON DataFormats module:
 
-The use of `boost::recursive_wrapper` allows infinite nesting:
+- **json_reader.h/cpp**: Parser produces these types from JSON text
+- **json_writer.h/cpp**: Generator converts these types to JSON text
+- **json_types_impl.h**: Template implementations for unwrapper functions
+- **convertfhicl2jsondb.h**: Uses these types for FHiCL to JSON conversion
+- **JsonDocument**: Uses these types for document representation
+
+## See Also
+
+- [json_types.cpp](./json_types.cpp.md) - Implementation of comparison operators
+- [json_types_impl.h](./json_types_impl.h.md) - Template implementations for unwrapper
+- [json_reader.h](./json_reader.h.md) - JSON parser
+- [json_writer.h](./json_writer.h.md) - JSON generator
+- [shared_types.h](../shared_types.h.md) - Base templates used by these types
+- [External: Boost.Variant](https://www.boost.org/doc/libs/release/doc/html/variant.html) - Variant type documentation
+
+## Notes for Developers
+
+### Common Pitfalls
+
+- **Type casting for integers:** Use `static_cast<integer>()` when assigning integer literals to avoid ambiguity
+- **Order sensitivity:** `object_t` comparison is order-sensitive, which differs from standard JSON semantics
+- **Recursive structures:** Deep nesting can cause stack overflow during operations
+
+### Anti-patterns
 
 ```cpp
-object_t root;
-object_t nested;
-nested["depth"] = static_cast<integer>(2);
-root["nested"] = nested;  // Object contains another object
+// DON'T: Assign integer literal directly (ambiguous)
+object["count"] = 42;  // May become decimal instead of integer
+
+// DO: Cast explicitly
+object["count"] = static_cast<integer>(42);
+
+// DON'T: Assume map-like key uniqueness
+object["key"] = "first";
+object["key"] = "second";  // Creates duplicate, doesn't overwrite!
+
+// DO: Check before inserting if uniqueness needed
+if (object.count("key") == 0) {
+  object["key"] = "value";
+}
 ```
 
-### Heterogeneous Arrays
+### Performance Considerations
 
-Arrays can hold mixed types:
-
-```cpp
-array_t mixed;
-mixed.push_back(std::string("text"));
-mixed.push_back(static_cast<integer>(42));
-mixed.push_back(true);
-mixed.push_back(object_t{});  // Nested object
-```
-
-### Ordered Object Keys
-
-Unlike standard JSON semantics, `object_t` maintains insertion order:
-
-```cpp
-object_t obj;
-obj["z"] = 1;
-obj["a"] = 2;
-obj["m"] = 3;
-// Iteration order: z, a, m (insertion order, not alphabetical)
-```
-
-## Performance Considerations
-
-1. **Variant Access**: Use `boost::get<T>()` with pointer syntax for safe access:
-   ```cpp
-   if (auto* str = boost::get<std::string>(&v)) {
-       // Use *str
-   }
-   ```
-
-2. **Comparison Overhead**: Comparison operators perform deep recursive comparisons, which can be expensive for large structures
-
-3. **Memory**: `boost::recursive_wrapper` adds pointer indirection overhead
-
-4. **Iteration**: `object_t` uses `std::list` internally, providing stable iterators but slower random access
-
-## Related Files
-
-- **json_types.cpp** - Implements comparison operators and unwrapper specializations
-- **json_types_impl.h** - Template implementations for unwrapper functions
-- **json_reader.h** - Parser that produces these types from JSON text
-- **json_writer.h** - Generator that converts these types to JSON text
-- **common.h** - Configures boost::variant relaxed mode
-- **shared_types.h** - Base templates used by these types
-
-## Notes
-
-- The types represent JSON in a format suitable for AST manipulation and transformation
-- Order preservation in objects supports FHiCL compatibility (which allows duplicate keys and cares about order)
-- The visitor pattern provides type-safe operations without explicit type checking
-- Boost.Fusion adaptation enables declarative parser/generator definitions
-- All comparison operators return detailed error messages, useful for debugging and testing
+1. **Variant access:** Use `boost::get<T>()` with pointer syntax for safe, fast access
+2. **Comparison overhead:** Deep comparison is recursive and can be expensive
+3. **Memory:** `boost::recursive_wrapper` adds pointer indirection
+4. **Iteration:** `object_t` uses list-based storage, slower random access than map

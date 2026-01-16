@@ -1,419 +1,147 @@
 # storage_providers.cpp
 
-## File Overview
+**Path:** `artdaq-database/StorageProviders/storage_providers.cpp`
 
-This implementation file provides the `make_database_metadata()` function that generates standardized JSON metadata for new databases. This metadata is stored in the SystemMetadata collection and tracks important information about database creation and format.
+**Implements:** [storage_providers.h](./storage_providers.h.md)
 
-**Location**: `/home/user/artdaq-database/artdaq-database/StorageProviders/storage_providers.cpp`
+**Purpose:** Implements the `make_database_metadata()` function that creates a JSON-formatted metadata document for newly initialized databases. This metadata includes database name, connection URI, locale information, timestamps, and system details for tracking database provenance and supporting schema migrations.
 
-**Lines of Code**: 29
+## Implementation Overview
 
-**Purpose**: Generate database metadata JSON for system tracking
+This file provides a single function that generates structured metadata when a new database is created. The metadata serves as an audit trail and enables future schema migrations by tracking the database format version used at creation time.
 
-## Dependencies
+## Key Algorithms
 
-### Project Headers
-- `"artdaq-database/StorageProviders/storage_providers.h"` - Provider interface declarations
-- `"artdaq-database/SharedCommon/configuraion_api_literals.h"` - Configuration constants
-- `"artdaq-database/SharedCommon/helper_functions.h"` - Utility functions (timestamp, quoted_, etc.)
+### Metadata Generation
 
-### Standard Library
-- `<sstream>` - std::ostringstream for JSON construction
+The `make_database_metadata()` function constructs a JSON object containing system and creation information.
 
-## Namespace Aliases
+**Steps:**
+1. Validate that name and uri parameters are non-empty using `confirm()` macro
+2. Create output stream for JSON construction
+3. Write each metadata field with proper JSON formatting using `_quoted` literal and `quoted_()` function
+4. Include system information from environment and `unamejson()` helper
+5. Return the complete JSON string
 
+**Why this approach:** Direct string construction is used instead of a JSON library to minimize dependencies and because the structure is simple and fixed. The `_quoted` literal and `quoted_()` function ensure proper JSON string escaping.
+
+## Internal Functions
+
+### `make_database_metadata(name, uri) -> std::string`
+
+**Brief:** Creates a JSON metadata document for database initialization, capturing creation context.
+
+**Called by:** `FileSystemDB::connection()`, `MongoDB::connection()` when initializing a new database
+
+**Purpose:** Provides audit trail and schema versioning for database instances
+
+**Implementation:**
 ```cpp
-namespace db = artdaq::database;
-namespace apiliteral = db::configapi::literal;
-```
+std::string db::make_database_metadata(std::string const& name, std::string const& uri) {
+  confirm(!name.empty());
+  confirm(!uri.empty());
 
-**Purpose**: Convenience aliases to shorten long namespace paths.
+  std::ostringstream oss;
+  oss << "document"_quoted << ":" << "{";
+  oss << "name"_quoted     << ":" << quoted_(name) << ",";
+  oss << "uri"_quoted      << ":" << quoted_(uri)  << ",";
+  oss << "locale"_quoted   << ":" << quoted_(apiliteral::database_format_locale) << ",";
+  oss << "create_time"_quoted << ":" << quoted_(timestamp()) << ",";
+  oss << "create_user"_quoted << ":" << quoted_(expand_environment_variables("$USER")) << ",";
+  oss << "uname"_quoted << ":" << unamejson() << ",";
+  oss << "database_format"_quoted << ":" << apiliteral::database_format_version;
+  oss << "}";
 
----
-
-## Function: make_database_metadata
-
-```cpp
-std::string db::make_database_metadata(std::string const& name,
-                                       std::string const& uri);
-```
-
-### Purpose
-
-Generates a JSON string containing metadata about a newly created database. This metadata is stored in the special `SystemMetadata` collection and provides crucial information for database management, migration, and auditing.
-
-### Parameters
-
-- **name** - The database name
-  - Type: `std::string const&`
-  - Must not be empty (validated with `confirm()`)
-  - Example: `"artdaq_configuration_db"`
-
-- **uri** - The database connection URI
-  - Type: `std::string const&`
-  - Must not be empty (validated with `confirm()`)
-  - Example: `"filesystemdb:///data/artdaq/configs"`
-
-### Returns
-
-A JSON string (as `std::string`) containing the database metadata.
-
-### Validation
-
-```cpp
-confirm(!name.empty());
-confirm(!uri.empty());
-```
-
-Both parameters are validated using the `confirm()` macro/function:
-- **Debug builds**: Assertions will fire if empty
-- **Release builds**: Will throw exception if empty
-
-### Generated JSON Structure
-
-The function generates a JSON object with the following structure:
-
-```json
-{
-  "document": {
-    "name": "artdaq_configuration_db",
-    "uri": "filesystemdb:///data/artdaq/configs",
-    "locale": "en_US.UTF-8",
-    "create_time": "2025-11-13T10:30:45.123-0600",
-    "create_user": "artdaq",
-    "uname": {
-      "sysname": "Linux",
-      "nodename": "daq-host",
-      "release": "4.4.0",
-      "version": "#1 SMP",
-      "machine": "x86_64"
-    },
-    "database_format": 1
-  }
+  return oss.str();
 }
 ```
 
 ### Metadata Fields
 
-#### name
-- **Source**: Function parameter
-- **Type**: String
-- **Purpose**: Human-readable database name
-- **Example**: `"artdaq_configuration_db"`
+| Field | Source | Description |
+|-------|--------|-------------|
+| `name` | Function parameter | Database identifier name |
+| `uri` | Function parameter | Full connection URI |
+| `locale` | `apiliteral::database_format_locale` | System locale for consistent formatting |
+| `create_time` | `timestamp()` | ISO 8601 timestamp of creation |
+| `create_user` | `$USER` environment variable | Username who created the database |
+| `uname` | `unamejson()` | System information (OS, hostname, architecture) |
+| `database_format` | `apiliteral::database_format_version` | Schema version for migrations |
 
-#### uri
-- **Source**: Function parameter
-- **Type**: String
-- **Purpose**: Connection string to access the database
-- **Format**: `<provider>://<path>` or `<provider>://<host>:<port>/<database>`
-- **Examples**:
-  - `"filesystemdb:///data/artdaq/configs"`
-  - `"mongodb://localhost:27017/artdaq_db"`
-  - `"ucondb://http://ucondb-server.fnal.gov:8080/artdaq"`
+### Example Output
 
-#### locale
-- **Source**: `apiliteral::database_format_locale` constant
-- **Type**: String
-- **Purpose**: Character encoding and locale for the database
-- **Value**: `"en_US.UTF-8"` (standard)
-- **Usage**: Ensures consistent string/time formatting
-
-#### create_time
-- **Source**: `timestamp()` function
-- **Type**: String (ISO 8601 format)
-- **Purpose**: Records when the database was created
-- **Format**: `YYYY-MM-DDTHH:MM:SS.mmm±ZZZZ`
-- **Example**: `"2025-11-13T10:30:45.123-0600"`
-- **Precision**: Milliseconds
-
-#### create_user
-- **Source**: `expand_environment_variables("$USER")`
-- **Type**: String
-- **Purpose**: Records which user created the database
-- **Example**: `"artdaq"`, `"jsmith"`
-- **Usage**: Audit trail and ownership tracking
-
-#### uname
-- **Source**: `unamejson()` function
-- **Type**: JSON object
-- **Purpose**: System information where database was created
-- **Fields**:
-  - `sysname`: Operating system name (e.g., "Linux")
-  - `nodename`: Hostname (e.g., "daq-host")
-  - `release`: OS version/release (e.g., "4.4.0")
-  - `version`: Detailed version string
-  - `machine`: Hardware architecture (e.g., "x86_64")
-
-#### database_format
-- **Source**: `apiliteral::database_format_version` constant
-- **Type**: Integer
-- **Purpose**: Schema/format version for database migration
-- **Value**: Numeric version number
-- **Usage**: Allows automatic detection of old database formats
-
-### Implementation Details
-
-#### String Construction
-
-The function uses `std::ostringstream` for efficient string building:
-
-```cpp
-std::ostringstream oss;
-oss << "document"_quoted << ":" << "{";
-oss << "name"_quoted     << ":" << quoted_(name) << ",";
-// ... more fields
-oss << "}";
-return oss.str();
-```
-
-#### Formatting
-
-The code uses `// clang-format off` and `// clang-format on` comments to preserve the manual formatting alignment of the JSON construction code.
-
-#### Helper Functions Used
-
-- **`_quoted` literal operator**: Adds quotes to string literals
-  - `"document"_quoted` → `"\"document\""`
-
-- **`quoted_()` function**: Adds quotes to runtime strings
-  - `quoted_(name)` → `"\"artdaq_configuration_db\""`
-
-- **`timestamp()`**: Generates ISO 8601 timestamp
-  - Returns: `"2025-11-13T10:30:45.123-0600"`
-
-- **`expand_environment_variables()`**: Expands shell variables
-  - `expand_environment_variables("$USER")` → `"artdaq"`
-
-- **`unamejson()`**: System information as JSON
-  - Returns: `{"sysname":"Linux",...}`
-
-### Usage Example
-
-```cpp
-#include "artdaq-database/StorageProviders/storage_providers.h"
-
-// Create metadata for a new FileSystem database
-std::string metadata = artdaq::database::make_database_metadata(
-    "my_config_db",
-    "filesystemdb:///data/configs"
-);
-
-// Write to SystemMetadata collection
-JSONDocument metaDoc;
-metaDoc.setCollection(artdaq::database::system_metadata);
-metaDoc.setData(metadata);
-provider->writeDocument(metaDoc);
-```
-
-### Usage in Provider Initialization
-
-Typically called during database creation:
-
-```cpp
-// In FileSystemDB provider
-void FileSystemDBProvider::initializeDatabase(std::string const& path) {
-    // Create database directory structure
-    createDirectories(path);
-
-    // Generate and store metadata
-    std::string uri = "filesystemdb://" + path;
-    std::string metadata = make_database_metadata(getDatabaseName(), uri);
-
-    // Write to SystemMetadata
-    writeSystemMetadata(metadata);
+```json
+{
+  "document": {
+    "name": "artdaq_config",
+    "uri": "filesystemdb:///data/artdaq/artdaq_config",
+    "locale": "en_US.UTF-8",
+    "create_time": "2025-01-15T10:30:00.123-0600",
+    "create_user": "artdaq",
+    "uname": {
+      "sysname": "Linux",
+      "nodename": "daq-server-01",
+      "release": "5.14.0-503.38.1.el9_5.x86_64",
+      "version": "#1 SMP ...",
+      "machine": "x86_64"
+    },
+    "database_format": 2
+  }
 }
 ```
 
-### Error Handling
+## Dependencies
 
-#### Validation Errors
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/StorageProviders/storage_providers.h` | Header file with function declaration |
+| `artdaq-database/SharedCommon/configuraion_api_literals.h` | API literal constants |
+| `artdaq-database/SharedCommon/helper_functions.h` | Helper utilities (`timestamp()`, `quoted_()`, `expand_environment_variables()`, `unamejson()`) |
+| `<sstream>` | String stream for JSON construction |
 
-If either parameter is empty:
-- **Debug build**: Program terminates with assertion failure and stack trace
-- **Release build**: Throws exception (runtime_exception)
+## Performance Considerations
 
+- **Minimal overhead:** Function is called only during database initialization (infrequent)
+- **No caching:** Each call generates fresh metadata with current timestamp
+- **String operations:** Uses `std::ostringstream` for efficient string building
+
+## Error Handling Strategy
+
+- Uses `confirm()` macro to validate preconditions
+- In debug builds: assertions fire on empty parameters
+- In release builds: throws exception on validation failure
+- No exception handling for helper functions; errors propagate to caller
+
+## Testing Notes
+
+- **Unit tests:** Covered in `test/StorageProviders/storage_providers_t.cc`
+- **Key test cases:**
+  - Non-empty name and URI produce valid JSON
+  - Empty name triggers precondition failure
+  - Empty URI triggers precondition failure
+  - Timestamp format is ISO 8601 compliant
+
+## Maintenance Notes
+
+### String Literals
+The `_quoted` suffix is a user-defined literal that wraps strings in JSON quotes at compile time:
 ```cpp
-// This will fail validation
-try {
-    auto metadata = make_database_metadata("", "uri");  // Empty name
-} catch (std::exception const& e) {
-    // Handle error
-}
+"document"_quoted  // produces: "\"document\""
 ```
+The `quoted_()` function does the same for runtime strings.
 
-#### Environment Variable Expansion
-
-If `$USER` is not defined:
-- `expand_environment_variables()` returns empty string
-- No error thrown (empty create_user field)
-- Check implementation of `expand_environment_variables()` for details
+### Extending Metadata
+To add new metadata fields:
+1. Add the field to the output stream in `make_database_metadata()`
+2. Consider updating `database_format_version` if the change affects consumers
+3. Update any code that parses this metadata
+4. Update this documentation
 
 ### Thread Safety
+This function is thread-safe as it only uses local variables and reads from global constants. Multiple threads can call this function concurrently without synchronization.
 
-This function is **thread-safe** because:
-1. No shared state is modified
-2. All operations are on local variables
-3. Helper functions are thread-safe
-4. Uses const references for parameters
+## See Also
 
-Multiple threads can safely call this function concurrently.
-
-### Performance Considerations
-
-#### Efficiency
-- **String Building**: Uses ostringstream for efficient concatenation
-- **Small JSON**: Generated JSON is typically < 500 bytes
-- **System Calls**: One system call for uname, one for timestamp
-- **Memory**: Single allocation for the ostringstream buffer
-
-#### Optimization
-
-The function is not called frequently (only during database creation), so optimization is not critical. Current implementation prioritizes:
-- Readability
-- Correctness
-- Maintainability
-
-### Testing Considerations
-
-#### Unit Testing
-
-To test this function:
-
-```cpp
-// Test basic functionality
-auto metadata = make_database_metadata("test_db", "file:///tmp/test");
-assert(metadata.find("\"name\":\"test_db\"") != std::string::npos);
-assert(metadata.find("\"uri\":\"file:///tmp/test\"") != std::string::npos);
-
-// Test validation
-try {
-    make_database_metadata("", "uri");
-    assert(false);  // Should not reach here
-} catch (...) {
-    // Expected
-}
-```
-
-#### Fake Time Mode
-
-For reproducible testing:
-
-```cpp
-// Enable fake time mode
-artdaq::database::useFakeTime(true);
-
-auto metadata = make_database_metadata("db", "uri");
-// create_time will be a fixed fake timestamp
-
-// Disable fake time
-artdaq::database::useFakeTime(false);
-```
-
-### Design Rationale
-
-#### JSON Format
-
-The metadata is generated as a JSON string rather than using a JSON library:
-- **Simplicity**: Small, fixed structure doesn't need complex library
-- **Performance**: Direct string construction is faster
-- **Dependencies**: Reduces dependency on heavy JSON libraries
-- **Control**: Exact control over formatting
-
-#### SystemMetadata Collection
-
-The metadata is stored in a special `SystemMetadata` collection:
-- **Separation**: Keeps system info separate from user data
-- **Discovery**: Easy to find database metadata
-- **Migration**: Format version enables database upgrades
-- **Auditing**: Tracks creation information
-
-#### Included Information
-
-The specific fields were chosen for:
-- **name/uri**: Essential for database identification
-- **locale**: Ensures consistent string/date handling
-- **create_time/user**: Audit trail
-- **uname**: Debugging and support (identify system issues)
-- **database_format**: Forward compatibility and migration
-
-### Related Files
-
-- **storage_providers.h** - Function declaration
-- **SharedCommon/helper_functions.h** - Helper function implementations
-- **SharedCommon/configuraion_api_literals.h** - Constants used
-- **FileSystemDB/provider_filedb.cpp** - Example usage
-- **MongoDB/provider_mongodb.cpp** - Example usage
-
-### Migration Considerations
-
-When the `database_format` version changes:
-1. Update `apiliteral::database_format_version`
-2. Add migration code to detect old format
-3. Document format changes
-4. Provide upgrade path for existing databases
-
-### Best Practices
-
-#### Always Validate Parameters
-```cpp
-// GOOD: Parameters are validated
-std::string meta = make_database_metadata(name, uri);
-
-// BAD: Don't assume parameters are valid
-// Will fail at runtime if empty
-```
-
-#### Store Immediately
-```cpp
-// GOOD: Store metadata immediately after creation
-auto metadata = make_database_metadata(name, uri);
-storeSystemMetadata(metadata);
-
-// BAD: Don't delay storage
-// Database may be used without metadata
-```
-
-#### Use Standard Collection Name
-```cpp
-// GOOD: Use the constant
-metaDoc.setCollection(artdaq::database::system_metadata);
-
-// BAD: Don't hardcode
-// metaDoc.setCollection("SystemMetadata");
-```
-
----
-
-## Complete Example
-
-```cpp
-#include "artdaq-database/StorageProviders/storage_providers.h"
-#include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
-#include <iostream>
-
-void createNewDatabase(std::string const& name, std::string const& path) {
-    // Generate database URI
-    std::string uri = "filesystemdb://" + path;
-
-    // Generate metadata
-    std::string metadata = artdaq::database::make_database_metadata(name, uri);
-
-    // Print metadata (for debugging)
-    std::cout << "Database metadata:\n" << metadata << std::endl;
-
-    // Create provider and initialize database
-    auto provider = createFileSystemProvider(path);
-
-    // Store metadata in SystemMetadata collection
-    JSONDocument metaDoc;
-    metaDoc.setCollection(artdaq::database::system_metadata);
-    metaDoc.setData(metadata);
-
-    auto id = provider->writeDocument(metaDoc);
-    std::cout << "Metadata stored with ID: " << id << std::endl;
-}
-```
-
----
-
-**Documentation generated for artdaq-database StorageProviders module**
+- [storage_providers.h](./storage_providers.h.md) - Header file with function declaration
+- [SharedCommon/helper_functions.h](../SharedCommon/helper_functions.h.md) - Helper utilities used (`timestamp()`, `quoted_()`)
+- [SharedCommon/configuraion_api_literals.h](../SharedCommon/configuraion_api_literals.h.md) - API constants

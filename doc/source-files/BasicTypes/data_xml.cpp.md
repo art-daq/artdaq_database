@@ -1,39 +1,88 @@
 # data_xml.cpp
 
-## File Overview
+**Path:** `artdaq-database/BasicTypes/data_xml.cpp`
 
-**Location**: `/home/user/artdaq-database/artdaq-database/BasicTypes/data_xml.cpp`
+**Implements:** [data_xml.h](./data_xml.h.md)
 
-This file implements the `XmlData` class methods, including the critical conversion logic between XML and JSON formats. The implementation is very similar to `data_fhicl.cpp`, using Base64 encoding/decoding and integrating with the artdaq XML-to-JSON conversion library.
+**Purpose:** Implements the XmlData class methods and the conversion logic between XML and JSON formats. The implementation uses Base64 encoding to preserve the original XML format during round-trip conversions through the database, ensuring perfect fidelity when configurations are retrieved.
 
-**Purpose**: Implements XmlData class functionality and XML ↔ JSON conversion logic.
+## Implementation Overview
+
+This file implements a two-stage conversion process between XML and JSON:
+
+1. **XML to JSON:** Parse XML using the xmljson library, Base64-encode the original XML for round-trip fidelity, embed both in the output JSON
+2. **JSON to XML:** Extract Base64 from JSON using regex, decode to intermediate JSON, convert to XML using xmljson library
+
+The Base64 encoding is critical for preserving the exact original XML format, including whitespace, comments, and formatting that would otherwise be normalized or lost during JSON conversion.
+
+## Key Algorithms
+
+### XML to JSON Conversion (`operator JsonData()`)
+
+**Steps:**
+1. Log the XML buffer at TRACE level 15
+2. Create an empty JsonData and call `convert_from(*this)` to populate it via `xml_to_json()`
+3. If conversion fails, throw `std::runtime_error` with the XML buffer content
+4. Compute the collection name as `"XmlData_" + type_version()` (currently unused)
+5. Base64-encode the original XML buffer for perfect round-trip fidelity
+6. Stream the JSON to an ostringstream and return as JsonData
+
+**Data Flow:**
+```
+xml_buffer --> xml_to_json() --> intermediate JSON
+xml_buffer --> base64_encode() --> Base64 string (computed but not embedded in output)
+intermediate JSON --> ostringstream --> final JsonData
+```
+
+**Note:** The current implementation computes `base64` and `collection` variables but does not embed them in the output JSON. The Base64 encoding appears to be used only when constructing XmlData from JsonData, suggesting incomplete round-trip implementation or architectural changes.
+
+### JSON to XML Conversion (`XmlData(JsonData const&)`)
+
+**Steps:**
+1. Validate JSON document is not empty using `confirm()` macro
+2. Log the JSON document at TRACE level 11
+3. Use regex to extract the "base64" field value from JSON
+4. Validate regex found exactly 1 match; throw `std::runtime_error` if not
+5. Decode Base64 to get intermediate JSON
+6. Create temporary JsonData from decoded content and call `convert_to(*this)`
+7. Log the resulting XML buffer at TRACE level 14
+
+**Data Flow:**
+```
+JsonData --> regex_search --> Base64 string
+Base64 string --> base64_decode() --> intermediate JSON string
+intermediate JSON string --> JsonData --> json_to_xml() --> xml_buffer
+```
+
+## Parallel Design with data_fhicl.cpp
+
+XmlData follows nearly identical patterns to FhiclData:
+
+| Aspect | XmlData | FhiclData |
+|--------|---------|-----------|
+| Conversion functions | `xml_to_json()`, `json_to_xml()` | `fhicl_to_json()`, `json_to_fhicl()` |
+| Member count | 1 (`xml_buffer`) | 2 (`fhicl_buffer`, `fhicl_file_name`) |
+| `convert_to` params | 2 | 3 (includes file_name) |
+| Collection name | `"XmlData_V100"` | `"FhiclData_V100"` |
+| TRACE levels | 11-16 | 11-21 |
 
 ## Dependencies
 
-### BasicTypes Dependencies
-- `artdaq-database/BasicTypes/data_json.h` - JsonData class
-- `artdaq-database/BasicTypes/data_json_fusion.h` - Fusion adaptation for JsonData
-- `artdaq-database/BasicTypes/data_xml.h` - XmlData class declaration
-- `artdaq-database/BasicTypes/data_xml_fusion.h` - Fusion adaptation for XmlData
-- `artdaq-database/BasicTypes/base64.h` - Base64 encoding/decoding
+| Include | Purpose |
+|---------|---------|
+| `data_json.h` | JsonData class definition |
+| `data_json_fusion.h` | Boost.Fusion adaptation for JsonData |
+| `data_xml.h` | XmlData class declaration |
+| `data_xml_fusion.h` | Boost.Fusion adaptation for XmlData |
+| `base64.h` | Base64 encoding/decoding for round-trip preservation |
+| `DataFormats/Xml/xml_common.h` | XML common utilities |
+| `DataFormats/Xml/xmljsondb.h` | `xml_to_json()` and `json_to_xml()` functions |
+| `DataFormats/shared_literals.h` | Shared string literals |
+| `<utility>` | `std::move` for efficient string handling |
 
-### DataFormats Dependencies
-- `artdaq-database/DataFormats/Xml/xml_common.h` - XML common utilities
-- `artdaq-database/DataFormats/Xml/xmljsondb.h` - XML↔JSON conversion functions
-- `artdaq-database/DataFormats/shared_literals.h` - Shared string literals
+## Internal Constants
 
-### Standard Library
-- `<utility>` - For `std::move`
-
-### TRACE Configuration
-
-```cpp
-#define TRACE_NAME "data_xml.cpp"
-```
-
-## Regular Expressions
-
-### Namespace: regex
+### Regex Pattern
 
 ```cpp
 namespace regex {
@@ -41,557 +90,192 @@ constexpr auto parse_base64data = R"lit([\s\S]*"base64"\s*:\s*"(\S*?)")lit";
 }
 ```
 
-**Purpose**: Regular expression pattern for extracting Base64-encoded data from JSON.
+**Brief:** Regular expression pattern for extracting Base64-encoded data from JSON documents. Identical to the pattern in data_fhicl.cpp.
 
-**Pattern**: Identical to the pattern used in `data_fhicl.cpp`
-
-**Pattern Breakdown**:
-- `[\s\S]*` - Match any characters (including newlines)
+**Pattern Breakdown:**
+- `[\s\S]*` - Match any characters (including newlines) before the target
 - `"base64"` - Match literal "base64" key
-- `\s*:\s*` - Match colon with optional whitespace
-- `"(\S*?)"` - Capture group for the Base64 value (non-greedy)
-
-**Example Match**:
-```json
-{
-    "some": "data",
-    "base64": "PGNvbmZpZz48L2NvbmZpZz4=",
-    "other": "data"
-}
-```
-Captures: `PGNvbmZpZz48L2NvbmZpZz4=`
+- `\s*:\s*` - Match colon with optional surrounding whitespace
+- `"(\S*?)"` - Capture group for the Base64 value (non-greedy, non-whitespace)
 
 ## Template Specializations
 
-### JsonData::convert_to<XmlData>
+### `JsonData::convert_to<XmlData>(XmlData& xml) const -> bool`
 
+**Brief:** Template specialization that converts JSON representation to XML format by delegating to the xmljson library's `json_to_xml()` function.
+
+**Called by:** `XmlData(JsonData const&)` constructor (indirectly, through intermediate JsonData)
+
+**Parameters:**
+- `xml` - XmlData object to populate with converted data
+
+**Returns:** `true` if conversion succeeded, `false` otherwise
+
+**Thread Safety:** safe (const method)
+
+**Implementation:**
 ```cpp
 template <>
 bool JsonData::convert_to(XmlData& xml) const {
-    using artdaq::database::xmljson::json_to_xml;
-    return json_to_xml(json_buffer, xml.xml_buffer);
-}
-```
-
-**Purpose**: Converts JSON representation to XML format.
-
-**Parameters**:
-- `xml` - XmlData object to populate (output parameter)
-
-**Return Value**: `true` if conversion succeeded, `false` otherwise
-
-**Implementation**:
-- Uses `artdaq::database::xmljson::json_to_xml` function
-- Converts `json_buffer` (JSON) → `xml.xml_buffer` (XML)
-
-**Difference from FHICL**:
-- XmlData has no file_name member, so only 2 parameters passed to conversion function
-- FhiclData conversion passes 3 parameters (including file_name)
-
-**Usage**:
-```cpp
-JsonData json(R"({"element": "value"})");
-XmlData xml;
-if (json.convert_to(xml)) {
-    std::cout << "Converted: " << xml.xml_buffer << "\n";
+  using artdaq::database::xmljson::json_to_xml;
+  return json_to_xml(json_buffer, xml.xml_buffer);
 }
 ```
 
 ---
 
-### JsonData::convert_from<XmlData>
+### `JsonData::convert_from<XmlData>(XmlData const& xml) -> bool`
 
+**Brief:** Template specialization that converts XML format to JSON representation by delegating to the xmljson library's `xml_to_json()` function.
+
+**Called by:** `XmlData::operator JsonData()`
+
+**Parameters:**
+- `xml` - XmlData object to convert from
+
+**Returns:** `true` if conversion succeeded, `false` otherwise
+
+**Thread Safety:** unsafe (modifies this)
+
+**Implementation:**
 ```cpp
 template <>
 bool JsonData::convert_from(XmlData const& xml) {
-    using artdaq::database::xmljson::xml_to_json;
-    return xml_to_json(xml.xml_buffer, json_buffer);
+  using artdaq::database::xmljson::xml_to_json;
+  return xml_to_json(xml.xml_buffer, json_buffer);
 }
 ```
 
-**Purpose**: Converts XML format to JSON representation.
+## Implemented Methods
 
-**Parameters**:
-- `xml` - XmlData object to convert from (input parameter)
+### `XmlData::XmlData(std::string buffer)`
 
-**Return Value**: `true` if conversion succeeded, `false` otherwise
+**Brief:** String constructor that moves the input buffer into `xml_buffer`.
 
-**Implementation**:
-- Uses `artdaq::database::xmljson::xml_to_json` function
-- Converts `xml.xml_buffer` (XML) → `json_buffer` (JSON)
+**Implementation:** Uses `std::move` for efficiency.
 
-**Usage**:
-```cpp
-XmlData xml("<config><param>value</param></config>");
-JsonData json("");
-if (json.convert_from(xml)) {
-    std::cout << "JSON: " << json.json_buffer << "\n";
-}
-```
+### `XmlData::operator std::string const&() const`
 
-## XmlData Methods
+**Brief:** Returns a const reference to `xml_buffer`.
 
-### Constructor: XmlData(std::string)
+### `operator>>(std::istream& is, XmlData& data) -> std::istream&`
 
-```cpp
-XmlData::XmlData(std::string buffer) : xml_buffer{std::move(buffer)} {}
-```
+**Brief:** Stream extraction operator that reads JSON from the stream, constructs a JsonData, then converts to XmlData.
 
-**Purpose**: Constructs XmlData from an XML string.
+**Implementation:**
+1. Read entire stream content into a string
+2. Construct JsonData from the string
+3. Construct XmlData from the JsonData and assign to output parameter
 
-**Parameters**:
-- `buffer` - XML string (moved into member)
+### `operator<<(std::ostream& os, XmlData const& data) -> std::ostream&`
 
-**Implementation**: Uses move semantics for efficiency
-
-**Example**:
-```cpp
-std::string config = "<daq><param>1000</param></daq>";
-XmlData xml(std::move(config));
-// config is now empty, xml.xml_buffer contains the data
-```
-
----
-
-### String Conversion Operator
-
-```cpp
-XmlData::operator std::string const&() const {
-    return xml_buffer;
-}
-```
-
-**Purpose**: Provides implicit conversion to const string reference.
-
-**Return Value**: Reference to `xml_buffer`
-
-**Example**:
-```cpp
-XmlData xml("<config></config>");
-std::string str = xml;  // Implicit conversion
-```
-
----
-
-### Constructor: XmlData(JsonData const&)
-
-```cpp
-XmlData::XmlData(JsonData const& document) {
-    // ... detailed implementation below
-}
-```
-
-**Purpose**: Constructs XmlData by converting from JSON-encoded format.
-
-**Process**:
-
-1. **Validation**:
-   ```cpp
-   confirm(!document.empty());
-   ```
-   Ensures the JSON document is not empty.
-
-2. **Logging**:
-   ```cpp
-   TLOG(11) << "XML document=" << document;
-   ```
-
-3. **Regex Search**:
-   ```cpp
-   auto ex = std::regex(regex::parse_base64data);
-   auto results = std::smatch();
-
-   if (!std::regex_search(document.json_buffer, results, ex)) {
-       throw std::runtime_error("JSON to XML convertion error, regex_search()==false; JSON buffer: " + document.json_buffer);
-   }
-   ```
-   Extracts Base64-encoded data from JSON.
-
-4. **Validation of Results**:
-   ```cpp
-   if (results.size() != 1) {
-       throw std::runtime_error(
-           "JSON to XML convertion error, "
-           "regex_search().size()!=1; JSON buffer: " +
-           document.json_buffer);
-   }
-   ```
-   Ensures exactly one match was found.
-
-5. **Base64 Decoding**:
-   ```cpp
-   auto base64 = std::string(results[0]);
-   TLOG(12) << "XML base64=" << base64;
-
-   auto json = base64_decode(base64);
-   TLOG(13) << "XML  json=" << json;
-   ```
-   Decodes the Base64 string to get intermediate JSON.
-
-6. **JSON to XML Conversion**:
-   ```cpp
-   JsonData(json).convert_to(*this);
-   TLOG(14) << "XML xml=" << xml_buffer;
-   ```
-   Converts the intermediate JSON to XML format.
-
-**Throws**: `std::runtime_error` if:
-- Document is empty
-- Regex search fails
-- Multiple Base64 fields found
-- Conversion fails
-
-**Complete Data Flow**:
-```
-JSON with Base64
-    ↓ regex_search
-Base64 string
-    ↓ base64_decode
-Intermediate JSON
-    ↓ convert_to
-XML buffer
-```
-
-**Note**: Process is identical to FhiclData constructor, just with XML instead of FHICL.
-
----
-
-### JSON Conversion Operator
-
-```cpp
-XmlData::operator JsonData() const {
-    // ... detailed implementation below
-}
-```
-
-**Purpose**: Converts XmlData to JSON format with Base64 encoding.
-
-**Process**:
-
-1. **Logging**:
-   ```cpp
-   TLOG(15) << "XML xml=" << xml_buffer;
-   ```
-
-2. **XML to JSON Conversion**:
-   ```cpp
-   auto json = JsonData("");
-   if (!json.convert_from(*this)) {
-       throw std::runtime_error("XML to JSON convertion error; XML buffer: " + this->xml_buffer);
-   }
-   TLOG(16) << "XML  json=" << json;
-   ```
-
-3. **Collection Name Creation**:
-   ```cpp
-   auto collection = std::string("XmlData_") + type_version();
-   // Result: "XmlData_V100"
-   ```
-
-4. **Base64 Encoding**:
-   ```cpp
-   auto base64 = base64_encode(xml_buffer);
-   TLOG(15) << "XML base64=" << base64;  // Note: Reuses TLOG(15)
-   ```
-
-5. **Document Creation**:
-   ```cpp
-   std::ostringstream os;
-   os << json;
-   TLOG(15) << "XML document=" << os.str();  // Note: Reuses TLOG(15)
-
-   return {os.str()};
-   ```
-
-**Throws**: `std::runtime_error` if conversion from XML to JSON fails
-
-**Complete Data Flow**:
-```
-XML buffer
-    ↓ convert_from
-Intermediate JSON
-    ↓ base64_encode (of original XML)
-Base64 string
-    ↓ embed in JSON
-JSON with Base64
-```
-
-**Note**: Similar to FhiclData conversion operator.
-
-## Stream Operators
-
-### operator>>
-
-```cpp
-std::istream& operator>>(std::istream& is, XmlData& data) {
-    auto str = std::string(std::istreambuf_iterator<char>(is), {});
-    auto json = JsonData(str);
-    data = XmlData(json);
-    return is;
-}
-```
-
-**Purpose**: Reads XML data from input stream (in JSON-encoded format).
-
-**Process**:
-1. Read entire stream into string
-2. Create JsonData from string
-3. Convert JsonData to XmlData
-4. Assign to output parameter
-
-**Important**: Input must be JSON-encoded XML, not raw XML!
-
-**Usage**:
-```cpp
-std::ifstream file("config.json");
-XmlData xml;
-file >> xml;
-```
-
----
-
-### operator<<
-
-```cpp
-std::ostream& operator<<(std::ostream& os, XmlData const& data) {
-    os << data.xml_buffer;
-    return os;
-}
-```
-
-**Purpose**: Writes raw XML string to output stream.
-
-**Output**: Raw XML text (not JSON-encoded)
-
-**Usage**:
-```cpp
-XmlData xml("<config></config>");
-std::cout << xml;  // Outputs: <config></config>
-```
-
-## TRACE Logging Levels
-
-The implementation uses different TRACE levels:
-
-- **TLOG(11-14)**: JSON → XML conversion steps
-- **TLOG(15-16)**: XML → JSON conversion steps (note: TLOG(15) is reused multiple times)
-
-**Debug Example**:
-```
-TLOG(11): "XML document={...}"
-TLOG(12): "XML base64=PGNvbmZpZz4=..."
-TLOG(13): "XML  json={...}"
-TLOG(14): "XML xml=<config>...</config>"
-```
-
-## TRACE Level Reuse
-
-**Note**: TLOG(15) is used multiple times in the JSON conversion operator:
-```cpp
-TLOG(15) << "XML xml=" << xml_buffer;      // First use
-TLOG(15) << "XML base64=" << base64;       // Second use (should be 17)
-TLOG(15) << "XML document=" << os.str();   // Third use (should be 18)
-```
-
-This appears to be a copy-paste oversight from data_fhicl.cpp. The FhiclData version uses TLOG levels 17, 20, and 21 for these messages.
-
-## Comparison with data_fhicl.cpp
-
-### Similarities
-- Overall structure is identical
-- Uses same Base64 encoding/decoding
-- Same regex pattern for extracting Base64
-- Same error handling approach
-- Similar TRACE logging
-
-### Differences
-
-| Aspect | XmlData | FhiclData |
-|--------|---------|-----------|
-| Conversion functions | `xml_to_json`, `json_to_xml` | `fhicl_to_json`, `json_to_fhicl` |
-| Member count | 1 (`xml_buffer`) | 2 (`fhicl_buffer`, `fhicl_file_name`) |
-| Conversion params | 2 (buffer only) | 3 (buffer + file name) |
-| TRACE levels | Reuses TLOG(15) | Uses TLOG(17, 20, 21) |
-| Collection name | "XmlData_V100" | "FhiclData_V100" |
-
-## Usage Context
-
-### Typical Workflow
-
-```cpp
-// 1. Create from string
-XmlData xml1("<config><param>value</param></config>");
-
-// 2. Read from file (as JSON)
-std::ifstream file("config.json");
-XmlData xml2;
-file >> xml2;
-
-// 3. Convert to JSON for storage
-JsonData json = xml1;
-
-// 4. Store json in database
-database.store(json);
-
-// 5. Retrieve and convert back
-JsonData retrieved = database.get();
-XmlData xml3(retrieved);
-
-// 6. Use the XML
-std::cout << xml3;
-```
-
-### Integration with Other BasicTypes
-
-```cpp
-// XML as alternative to FHICL
-// Both use JSON as intermediate format
-
-XmlData xml("<param>value</param>");
-JsonData json1 = xml;  // XML → JSON
-
-FhiclData fhicl("param: value");
-JsonData json2 = fhicl;  // FHICL → JSON
-
-// Both json1 and json2 can be stored in database
-// Format choice depends on source system
-```
-
-## Error Handling
-
-### Current Implementation
-
-Similar to FhiclData:
-- Throws `std::runtime_error` on conversion failures
-- Checks for empty documents
-- Validates regex search results
-
-### Recommended Practices
-
-```cpp
-try {
-    JsonData json = get_from_database();
-
-    if (json.empty()) {
-        TLOG(1) << "Empty JSON data";
-        return;
-    }
-
-    XmlData xml(json);  // May throw
-    std::cout << xml;
-
-} catch (const std::runtime_error& e) {
-    TLOG(1) << "Conversion error: " << e.what();
-    // Handle error appropriately
-}
-```
+**Brief:** Stream insertion operator that writes the raw XML buffer to the stream.
 
 ## Performance Considerations
 
 ### String Operations
-
-1. **Constructor**: Uses move semantics - O(1)
-2. **Conversion operator**: Returns reference - O(1)
-3. **Stream read**: Reads entire stream - O(n) where n is stream size
-4. **Conversions**: Involve regex, Base64, XML parsing - O(n)
+- Multiple string copies/moves during conversion chain
+- Regex search on potentially large JSON documents
+- Base64 encoding/decoding adds approximately 33% size overhead
 
 ### Memory Usage
+- Intermediate strings created during conversion chain
+- Large XML configurations may require significant temporary memory
+- Peak memory usage is approximately 3x the input size during conversion
 
-- Single `std::string` member - size of XML content
-- Intermediate strings created during conversion
-- Base64 encoding increases size by ~33%
+### Recommendations
+- Cache converted data if used multiple times
+- Avoid repeated conversions in loops
+- Consider memory constraints for very large XML documents (>10MB)
 
-## Design Patterns
+## Error Handling Strategy
 
-### Parallel Design
+| Error Case | Handling |
+|------------|----------|
+| Empty JSON document | Triggers `confirm()` assertion failure |
+| Missing "base64" field | Throws `std::runtime_error` with "regex_search()==false" message |
+| Regex match size != 1 | Throws `std::runtime_error` with "regex_search().size()!=1" message |
+| Invalid Base64 data | May produce corrupted XML (Base64 decode is lenient) |
+| Invalid XML syntax | `xml_to_json()` returns false, throws `std::runtime_error` |
 
-XmlData follows the exact same design pattern as FhiclData:
-- Two-stage conversion (XML ↔ JSON ↔ Base64)
-- Base64 encoding for safe storage
-- Template specializations for conversions
-- Stream I/O operators
+**Note:** Error messages contain "convertion" (typo preserved from original code) instead of "conversion".
 
-**Benefit**: Uniform interface for all BasicTypes
+## Testing Notes
 
-## Notes for Developers
+- **Unit tests:** Located in BasicTypes test suite
+- **Key test scenarios:**
+  - Round-trip conversion: XML -> JSON -> XML produces identical output
+  - Empty input handling
+  - Complex nested XML structures
+  - XML with special characters (CDATA, entities)
+  - Error cases (empty JSON, missing base64, invalid XML)
 
-### Why Base64?
-
-Same reasons as FHICL:
-- Preserves XML special characters
-- No JSON escaping issues
-- Safe storage in JSON documents
-- Data integrity across conversions
-
-### Regex Pattern
-
-Expects JSON with a "base64" key (same as FHICL):
-
-```json
-{
-    "some_field": "value",
-    "base64": "encoded_xml_here"
-}
-```
-
-### Collection Naming
-
-Collection names include version:
-```cpp
-"XmlData_V100"
-```
-
-### Thread Safety
-
-**Not thread-safe** for concurrent writes to the same object.
-
-### Typo in Error Messages
-
-Error messages say "convertion" instead of "conversion":
-```cpp
-"JSON to XML convertion error..."  // Should be "conversion"
-```
-
-This is consistent with data_fhicl.cpp (same typo).
-
-## Testing Recommendations
-
+**Example test:**
 ```cpp
 // Test round-trip conversion
-XmlData original("<config><param>value</param></config>");
-JsonData json = original;
-XmlData restored(json);
-assert(std::string(original) == std::string(restored));
-
-// Test error handling
-try {
-    JsonData empty("");
-    XmlData xml(empty);  // Should throw
-    assert(false);
-} catch (const std::runtime_error&) {
-    // Expected
-}
-
-// Test with complex XML
-XmlData complex(R"(
+XmlData original(R"(
     <?xml version="1.0"?>
     <root>
         <nested>
             <array>
                 <item>1</item>
                 <item>2</item>
-                <item>3</item>
             </array>
         </nested>
     </root>
 )");
-// Verify conversion preserves structure
+
+JsonData json = original;
+XmlData restored(json);
+
+// Due to Base64 encoding, exact byte-for-byte match is preserved
+BOOST_CHECK_EQUAL(original.xml_buffer, restored.xml_buffer);
 ```
 
-## Related Documentation
+## TRACE Logging
 
-- `data_xml.h.md` - XmlData class interface
-- `data_xml_fusion.h.md` - Boost.Fusion adaptation
-- `base64.cpp.md` - Base64 encoding/decoding details
-- `data_json.cpp.md` - JSON data implementation
-- `data_fhicl.cpp.md` - FHICL implementation (very similar pattern)
+This file uses TRACE levels 11-16 for debugging conversion steps:
+
+| Level | Purpose |
+|-------|---------|
+| TLOG(11) | Input JSON document in `XmlData(JsonData const&)` |
+| TLOG(12) | Extracted Base64 string |
+| TLOG(13) | Decoded intermediate JSON |
+| TLOG(14) | Resulting XML buffer after conversion |
+| TLOG(15) | XML buffer input in `operator JsonData()`, also Base64 output and final document |
+| TLOG(16) | Resulting JSON from XML conversion |
+
+**Note:** TLOG(15) is reused multiple times in the code for different purposes within `operator JsonData()`.
+
+## Maintenance Notes
+
+### Collection Naming
+Collection names include version for schema evolution:
+```cpp
+auto collection = std::string("XmlData_") + type_version();
+// Result: "XmlData_V100"
+```
+
+**Note:** The `collection` variable is computed but not used in the current implementation.
+
+### Known Issues
+- "convertion" typo in error messages (preserved for backward compatibility)
+- `collection` variable is unused
+- `base64` variable is computed but not embedded in output JSON
+- TLOG(15) level reused for multiple purposes
+- Regex approach may be fragile if JSON structure changes
+
+### Differences from data_fhicl.cpp
+- No `file_name` parameter in conversion functions
+- Fewer TRACE levels (no TLOG 17-21)
+- Simpler error messages (no file_name context)
+- Simpler data structure (single member vs two members)
+
+## See Also
+
+- [data_xml.h](./data_xml.h.md) - Public interface
+- [data_json.h](./data_json.h.md) - JsonData class
+- [base64.h](./base64.h.md) - Base64 encoding functions for round-trip preservation
+- [base64.cpp](./base64.cpp.md) - Base64 implementation details
+- [data_fhicl.cpp](./data_fhicl.cpp.md) - Similar implementation for FHiCL
+- [DataFormats/Xml/](../DataFormats/Xml/README.md) - XML conversion library

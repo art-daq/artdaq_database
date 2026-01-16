@@ -1,37 +1,59 @@
 # data_json.h
 
-## File Overview
+**Path:** `artdaq-database/BasicTypes/data_json.h`
 
-**Location**: `/home/user/artdaq-database/artdaq-database/BasicTypes/data_json.h`
+**Purpose:** Defines the JsonData structure, which is the central pivot format for all configuration data in artdaq-database. JsonData serves as both a standalone JSON container and the intermediary format for converting between FHiCL and XML, making it essential for all database storage operations.
 
-This header defines the `JsonData` class, which is the central data type for representing JSON-formatted configuration data in the artdaq-database system. It serves as both a standalone JSON container and an intermediary format for converting between other data types (FHICL and XML).
 
-**Purpose**: Provides a wrapper class for JSON data with conversion capabilities to/from other configuration formats.
+## Key Concepts
+
+### JSON as Pivot Format
+
+JsonData is the central data type through which all conversions flow:
+
+```
+FHiCL <--> JSON <--> XML
+              |
+          Database
+     (MongoDB/FileSystemDB)
+```
+
+All format conversions go through JSON, and all database storage uses JSON. This design simplifies the conversion matrix and ensures consistent database representation.
+
+### Template Method Pattern
+
+The `convert_to<T>()` and `convert_from<T>()` methods are templates with explicit specializations provided in format-specific implementation files:
+
+- `JsonData::convert_to<FhiclData>()` - Implemented in `data_fhicl.cpp`
+- `JsonData::convert_from<FhiclData>()` - Implemented in `data_fhicl.cpp`
+- `JsonData::convert_to<XmlData>()` - Implemented in `data_xml.cpp`
+- `JsonData::convert_from<XmlData>()` - Implemented in `data_xml.cpp`
+
+### Simple Value Type
+
+JsonData is designed as a simple value type:
+- Just a string wrapper with conversion capabilities
+- Does NOT parse or validate JSON syntax
+- Stores JSON as raw text for maximum flexibility
+- Copyable, movable, marked `final`
+
+## Thread Safety
+
+- **Thread-safe:** No
+- **Concurrent access:** Multiple readers are safe (const methods); concurrent read/write requires external synchronization
+- **Locking:** No internal locking; callers must synchronize shared access
 
 ## Dependencies
 
-- `artdaq-database/BasicTypes/common.h` - Common utilities and TRACE logging support
-- `trace.h` (via common.h) - TRACE logging framework
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/BasicTypes/common.h` | TRACE logging framework and Boost.Core utilities |
 
-### TRACE Configuration
+## Classes/Structures
 
-```cpp
-#define TRACE_NAME "data_json.h"
-```
+### `JsonData`
 
-## Namespace Structure
-
-```cpp
-namespace artdaq {
-namespace database {
-namespace basictypes {
-    // JsonData is defined here
-}}}
-```
-
-## Key Types/Classes
-
-### JsonData
+**Brief:** A value type that wraps JSON-formatted string data with template conversion methods for transforming to/from other configuration formats.
 
 ```cpp
 struct JsonData final {
@@ -54,365 +76,658 @@ struct JsonData final {
 };
 ```
 
-**Purpose**: A wrapper class for JSON data that provides:
-1. Storage for JSON-formatted strings
-2. Conversion capabilities to/from other formats (FHICL, XML)
-3. Stream I/O operators
-4. Version tracking
-
-**Design**: Marked `final` - cannot be inherited from
+**Thread Safety:** Not thread-safe for concurrent modification. Multiple concurrent readers (const methods only) are safe.
 
 #### Member Variables
 
-##### json_buffer
+##### `json_buffer`
 
+**Brief:** Holds the JSON-formatted string data. Public member allows direct access when needed.
+
+**Type:** `std::string`
+
+**Note:** This is a public member, allowing direct modification. Use `convert_to/from` methods when validation is needed; use direct access for performance-critical code.
+
+#### Constructor
+
+##### `JsonData(std::string buffer)`
+
+**Brief:** Constructs a JsonData object from a JSON string, using move semantics for efficiency.
+
+**Parameters:**
+- `buffer` - A string containing JSON data. The string is moved into `json_buffer`. May be empty; no JSON syntax validation is performed.
+
+**Preconditions:**
+- None (accepts any string including empty)
+
+**Postconditions:**
+- `json_buffer` contains the provided string (moved)
+- Input `buffer` is in valid but unspecified state (moved-from)
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| `std::bad_alloc` | If memory allocation fails (extremely rare) |
+
+**Thread Safety:** Safe (constructor creates new object)
+
+**Example:**
 ```cpp
-std::string json_buffer;
-```
+#include "artdaq-database/BasicTypes/data_json.h"
+#include <iostream>
 
-**Purpose**: Holds the actual JSON-formatted string data.
+using namespace artdaq::database::basictypes;
 
-**Access**: Public member, can be accessed directly or through conversion operators.
+void createJsonData() {
+  try {
+    // Create from JSON string
+    JsonData json(R"({"parameter": "value", "count": 42})");
 
-## Constructors
+    // Check if data was created successfully
+    if (json.empty()) {
+      std::cerr << "Warning: Created empty JsonData\n";
+    } else {
+      std::cout << "Created JsonData with " << json.json_buffer.size() << " bytes\n";
+    }
 
-### JsonData(std::string)
+    // Create empty (will need population later)
+    JsonData empty_json("");
+    if (empty_json.empty()) {
+      std::cout << "Empty JsonData created as expected\n";
+    }
 
-```cpp
-JsonData(std::string buffer);
-```
+    // Move existing string for efficiency
+    std::string large_json = R"({"large": "data"})";
+    JsonData moved(std::move(large_json));
+    // Note: large_json is now in moved-from state
 
-**Purpose**: Constructs a JsonData object from a JSON string.
-
-**Parameters**:
-- `buffer` - A string containing JSON-formatted data
-
-**Usage Example**:
-```cpp
-std::string json_str = R"({"config": "value"})";
-JsonData json(json_str);
-```
-
-**Note**: The implementation (in data_json.cpp) uses move semantics for efficiency.
-
-## Methods/Functions
-
-### convert_to
-
-```cpp
-template <typename TYPE>
-bool convert_to(TYPE& target) const;
-```
-
-**Purpose**: Converts the JSON data to another format (e.g., FHICL, XML).
-
-**Template Parameter**:
-- `TYPE` - The target type to convert to (FhiclData or XmlData)
-
-**Parameters**:
-- `target` - Reference to object that will receive the converted data
-
-**Return Value**: `true` if conversion succeeded, `false` otherwise
-
-**Usage Example**:
-```cpp
-JsonData json(R"({"parameter": "value"})");
-FhiclData fhicl;
-if (json.convert_to(fhicl)) {
-    // Conversion successful
+  } catch (const std::bad_alloc& e) {
+    std::cerr << "Memory allocation failed: " << e.what() << "\n";
+  }
 }
 ```
 
-**Specializations**:
-- `bool convert_to(FhiclData&)` - Implemented in data_fhicl.cpp
-- `bool convert_to(XmlData&)` - Implemented in data_xml.cpp
+#### Template Methods
 
----
+##### `convert_to<TYPE>(TYPE& target) const -> bool`
 
-### convert_from
+**Brief:** Converts the JSON data to another format type (FhiclData or XmlData). Template specializations are provided in the respective format implementation files.
 
+**Parameters:**
+- `target` - Object to receive the converted data (output parameter)
+
+**Preconditions:**
+- For FhiclData: JSON must contain valid structure for FHiCL conversion
+- For XmlData: JSON must contain valid structure for XML conversion
+- `json_buffer` should contain valid JSON (invalid JSON will cause conversion failure)
+
+**Returns:** `true` if conversion succeeded, `false` otherwise.
+
+**Postconditions:**
+- On success: `target` contains the converted data
+- On failure: `target` may be in an undefined state; do not use
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| None | Returns false on failure instead of throwing |
+
+**Thread Safety:** Safe (reads only, const method)
+
+**Side Effects:** None (const method)
+
+**Example:**
 ```cpp
-template <typename TYPE>
-bool convert_from(TYPE const& source);
-```
+#include "artdaq-database/BasicTypes/data_json.h"
+#include "artdaq-database/BasicTypes/data_fhicl.h"
+#include <iostream>
 
-**Purpose**: Converts data from another format (FHICL, XML) into JSON.
+using namespace artdaq::database::basictypes;
 
-**Template Parameter**:
-- `TYPE` - The source type to convert from
+void convertToFhicl() {
+  // Start with JSON data
+  JsonData json(R"({"parameter": "value", "count": 42})");
 
-**Parameters**:
-- `source` - Const reference to the source data
+  // Validate JSON is not empty before conversion
+  if (json.empty()) {
+    std::cerr << "Error: Cannot convert empty JSON\n";
+    return;
+  }
 
-**Return Value**: `true` if conversion succeeded, `false` otherwise
+  FhiclData fhicl;
 
-**Usage Example**:
-```cpp
-FhiclData fhicl("parameter: value");
-JsonData json("");
-if (json.convert_from(fhicl)) {
-    // Conversion successful, json.json_buffer now contains JSON
+  // Attempt conversion
+  if (json.convert_to(fhicl)) {
+    std::cout << "Conversion successful\n";
+    std::cout << "FHiCL content:\n" << fhicl << "\n";
+  } else {
+    std::cerr << "Conversion failed - JSON may be malformed or incompatible\n";
+    // Do NOT use fhicl here - it may be in an undefined state
+  }
 }
 ```
 
-**Specializations**:
-- `bool convert_from(FhiclData const&)` - Implemented in data_fhicl.cpp
-- `bool convert_from(XmlData const&)` - Implemented in data_xml.cpp
-
 ---
 
-### Conversion Operators
+##### `convert_from<TYPE>(TYPE const& source) -> bool`
 
-#### operator std::string const&
+**Brief:** Converts data from another format type into this JsonData object. Template specializations are provided in the respective format implementation files.
 
+**Parameters:**
+- `source` - Object to convert from (input parameter)
+
+**Preconditions:**
+- `source` must contain valid format data
+
+**Returns:** `true` if conversion succeeded, `false` otherwise.
+
+**Postconditions:**
+- On success: `json_buffer` contains the converted JSON
+- On failure: `json_buffer` may be in an undefined state
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| None | Returns false on failure instead of throwing |
+
+**Thread Safety:** Unsafe (modifies json_buffer)
+
+**Side Effects:**
+- Modifies `json_buffer` (replaces existing content)
+
+**Example:**
 ```cpp
-operator std::string const&() const;
-```
+#include "artdaq-database/BasicTypes/data_json.h"
+#include "artdaq-database/BasicTypes/data_fhicl.h"
+#include <iostream>
 
-**Purpose**: Implicitly converts JsonData to a const string reference.
+using namespace artdaq::database::basictypes;
 
-**Return Value**: Const reference to the internal `json_buffer`
+void convertFromFhicl() {
+  // Start with FHiCL data
+  FhiclData fhicl("parameter: value\ncount: 42");
+  fhicl.fhicl_file_name = "test_config.fcl";
 
-**Usage Example**:
-```cpp
-JsonData json(R"({"key": "value"})");
-std::string str = json;  // Implicit conversion
-std::cout << json;       // Works because of this operator
-```
+  // Create empty JsonData to receive conversion
+  JsonData json("");
 
----
+  // Attempt conversion
+  if (json.convert_from(fhicl)) {
+    std::cout << "Conversion successful\n";
+    std::cout << "JSON content:\n" << json << "\n";
 
-#### operator std::string&
-
-```cpp
-operator std::string&();
-```
-
-**Purpose**: Implicitly converts JsonData to a mutable string reference.
-
-**Return Value**: Reference to the internal `json_buffer` (allows modification)
-
-**Usage Example**:
-```cpp
-JsonData json("{}");
-std::string& ref = json;
-ref = R"({"new": "data"})";  // Modifies json.json_buffer
-```
-
-**Warning**: Use carefully - modifying through this reference bypasses any validation.
-
----
-
-### empty
-
-```cpp
-bool empty() const;
-```
-
-**Purpose**: Checks if the JSON buffer is empty.
-
-**Return Value**: `true` if `json_buffer` is empty, `false` otherwise
-
-**Usage Example**:
-```cpp
-JsonData json("");
-if (json.empty()) {
-    std::cout << "No JSON data\n";
+    // Validate result
+    if (json.empty()) {
+      std::cerr << "Warning: Conversion produced empty JSON\n";
+    }
+  } else {
+    std::cerr << "Conversion failed - FHiCL may be malformed\n";
+    // Do NOT use json here - it may be in an undefined state
+  }
 }
 ```
 
-**Use Cases**:
+#### Conversion Operators
+
+##### `operator std::string const&() const`
+
+**Brief:** Provides implicit conversion to const string reference for read-only access to the JSON content.
+
+**Returns:** Const reference to `json_buffer`.
+
+**Preconditions:** None
+
+**Postconditions:** None (no state change)
+
+**Throws:** None
+
+**Thread Safety:** Safe (returns const reference to internal state)
+
+**Example:**
+```cpp
+#include "artdaq-database/BasicTypes/data_json.h"
+#include <iostream>
+
+using namespace artdaq::database::basictypes;
+
+void processJson(const std::string& json_str) {
+  std::cout << "Processing JSON of size: " << json_str.size() << "\n";
+}
+
+void useConstConversion() {
+  JsonData json(R"({"key": "value"})");
+
+  // Implicit conversion to const string&
+  const std::string& ref = json;
+  std::cout << "JSON content: " << ref << "\n";
+
+  // Works with functions expecting const string&
+  processJson(json);  // Implicit conversion
+}
+```
+
+---
+
+##### `operator std::string&()`
+
+**Brief:** Provides implicit conversion to mutable string reference, allowing direct modification of the JSON buffer.
+
+**Returns:** Mutable reference to `json_buffer`.
+
+**Preconditions:** None
+
+**Postconditions:** None (caller may modify buffer)
+
+**Throws:** None
+
+**Thread Safety:** Unsafe (allows modification)
+
+**Warning:** Direct modification bypasses any validation. Use with caution.
+
+**Example:**
+```cpp
+#include "artdaq-database/BasicTypes/data_json.h"
+#include <iostream>
+
+using namespace artdaq::database::basictypes;
+
+void modifyJson(std::string& json_str) {
+  // Append to existing JSON (demonstration only - not recommended)
+  json_str = R"({"modified": true})";
+}
+
+void useMutableConversion() {
+  JsonData json(R"({"key": "value"})");
+
+  // Get mutable reference - use with caution!
+  std::string& buffer = json;
+  buffer = R"({"new_key": "new_value"})";  // Direct modification
+
+  // Or use with functions that modify
+  modifyJson(json);  // Implicit conversion
+
+  std::cout << "Modified JSON: " << json << "\n";
+}
+```
+
+#### Methods
+
+##### `empty() const -> bool`
+
+**Brief:** Checks if the JSON buffer is empty.
+
+**Returns:** `true` if `json_buffer.empty()`, `false` otherwise.
+
+**Preconditions:** None
+
+**Postconditions:** None (no state change)
+
+**Throws:** None
+
+**Thread Safety:** Safe (const method, reads only)
+
+**Complexity:** O(1)
+
+**Use Cases:**
 - Validation before processing
 - Checking if data was successfully loaded
 - Guard conditions in conversion functions
 
----
-
-### type_version (static)
-
+**Example:**
 ```cpp
-static constexpr auto type_version() { return "V1.0.0"; }
-```
+#include "artdaq-database/BasicTypes/data_json.h"
+#include <iostream>
 
-**Purpose**: Returns the version identifier for the JsonData type.
+using namespace artdaq::database::basictypes;
 
-**Return Value**: String literal "V1.0.0"
+void processConfiguration(const JsonData& json) {
+  // Always check for empty before processing
+  if (json.empty()) {
+    std::cerr << "Error: Configuration not found or empty\n";
+    return;
+  }
 
-**Usage**: Version tracking for serialization/deserialization, ensuring compatibility across different versions of the database schema.
-
-## Stream Operators
-
-### operator<<
-
-```cpp
-std::ostream& operator<<(std::ostream& os, artdaq::database::basictypes::JsonData const& data);
-```
-
-**Purpose**: Writes JsonData to an output stream.
-
-**Parameters**:
-- `os` - Output stream
-- `data` - JsonData to write
-
-**Return Value**: Reference to the stream (for chaining)
-
-**Usage Example**:
-```cpp
-JsonData json(R"({"config": "value"})");
-std::cout << json << "\n";  // Outputs the JSON string
+  // Safe to process
+  std::cout << "Processing configuration of size: "
+            << std::string(json).size() << " bytes\n";
+}
 ```
 
 ---
 
-### operator>>
+##### `type_version() -> const char*` (static constexpr)
 
+**Brief:** Returns a version identifier string used for database schema compatibility and collection naming.
+
+**Returns:** `"V1.0.0"` - indicates version 1.0.0 of the JsonData schema.
+
+**Preconditions:** None
+
+**Postconditions:** None
+
+**Throws:** None
+
+**Thread Safety:** Safe (static constexpr, no state)
+
+**Note:** JsonData uses a different version format ("V1.0.0") than FhiclData/XmlData ("V100"). This is intentional for distinguishing schema versions.
+
+**Example:**
 ```cpp
-std::istream& operator>>(std::istream& is, artdaq::database::basictypes::JsonData& data);
-```
+#include "artdaq-database/BasicTypes/data_json.h"
+#include <iostream>
+#include <string>
 
-**Purpose**: Reads JSON data from an input stream.
+using namespace artdaq::database::basictypes;
 
-**Parameters**:
-- `is` - Input stream
-- `data` - JsonData to populate
+void showSchemaVersion() {
+  // Get schema version at compile time
+  constexpr auto version = JsonData::type_version();
+  std::cout << "JsonData schema version: " << version << "\n";
 
-**Return Value**: Reference to the stream (for chaining)
-
-**Implementation**: Reads entire stream content into `json_buffer` using `istreambuf_iterator`
-
-**Usage Example**:
-```cpp
-std::ifstream file("config.json");
-JsonData json("");
-file >> json;  // Reads entire file into json.json_buffer
-```
-
-## TRACE Integration
-
-### TraceStreamer Specialization
-
-```cpp
-namespace {
-template <>
-inline TraceStreamer& TraceStreamer::operator<<(const artdaq::database::basictypes::JsonData& r) {
-    std::ostringstream s;
-    s << r;
-    msg_append(s.str().c_str());
-    return *this;
-}
+  // Use for collection naming
+  std::string collection = std::string("configurations_") + JsonData::type_version();
+  std::cout << "Collection name: " << collection << "\n";
 }
 ```
 
-**Purpose**: Allows JsonData objects to be used directly in TRACE logging statements.
+## Functions
 
-**Usage Example**:
+### `operator<<(std::ostream& os, JsonData const& data) -> std::ostream&`
+
+**Brief:** Writes the JSON data to an output stream.
+
+**Parameters:**
+- `os` - Output stream to write to
+- `data` - JsonData object to write
+
+**Preconditions:**
+- `os` must be in a valid state
+
+**Returns:** Reference to the output stream (for chaining).
+
+**Postconditions:**
+- `json_buffer` content written to stream
+- Stream position advanced
+
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| Stream exceptions | If stream is configured to throw on errors |
+
+**Thread Safety:** Safe if `data` is not concurrently modified
+
+**Side Effects:**
+- Writes `json_buffer` content to stream
+- Modifies stream position
+
+**Example:**
 ```cpp
-JsonData json(R"({"debug": "info"})");
-TLOG(10) << "JSON data: " << json;  // Works because of this specialization
+#include "artdaq-database/BasicTypes/data_json.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+using namespace artdaq::database::basictypes;
+
+void writeJsonToOutput() {
+  JsonData json(R"({"key": "value", "count": 42})");
+
+  // Write to console
+  std::cout << "JSON content: " << json << "\n";
+
+  // Write to file with error handling
+  std::ofstream out("config.json");
+  if (!out) {
+    std::cerr << "Error: Cannot open file for writing\n";
+    return;
+  }
+  out << json;
+  if (!out) {
+    std::cerr << "Error: Write operation failed\n";
+    return;
+  }
+  out.close();
+
+  // Write to string stream
+  std::ostringstream ss;
+  ss << json;
+  std::string copy = ss.str();
+  std::cout << "Copied to string of size: " << copy.size() << "\n";
+}
 ```
 
-## Usage Context
+---
 
-### Role in the System
+### `operator>>(std::istream& is, JsonData& data) -> std::istream&`
 
-`JsonData` is the **pivot format** in the artdaq-database system:
+**Brief:** Reads the entire stream content into the JSON buffer.
 
-```
-FHICL ←→ JSON ←→ XML
-         ↓
-     Database
-```
+**Parameters:**
+- `is` - Input stream to read from
+- `data` - JsonData object to populate
 
-All conversions go through JSON as an intermediary format.
+**Preconditions:**
+- `is` should be in a valid state
+- Stream should contain JSON data
 
-### Typical Usage Patterns
+**Returns:** Reference to the input stream (for chaining).
 
-#### 1. Direct JSON Storage
+**Postconditions:**
+- `data.json_buffer` contains entire stream content from current position
+- Any previous content in `data.json_buffer` is replaced
+- Stream position is at EOF
 
+**Throws:**
+
+| Exception | Condition |
+|-----------|-----------|
+| `std::bad_alloc` | If memory allocation fails for large content |
+
+**Thread Safety:** Unsafe (modifies `data`)
+
+**Side Effects:**
+- Reads entire stream from current position to EOF
+- Replaces any existing content in `json_buffer`
+- Stream position will be at EOF after read
+
+**Example:**
 ```cpp
-JsonData json(R"({"parameter": "value"})");
-// Store json in database
+#include "artdaq-database/BasicTypes/data_json.h"
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
+using namespace artdaq::database::basictypes;
+
+bool loadJsonFromFile(const std::string& filepath, JsonData& output) {
+  std::ifstream file(filepath);
+  if (!file) {
+    std::cerr << "Error: Cannot open file: " << filepath << "\n";
+    return false;
+  }
+
+  try {
+    file >> output;  // Reads entire file
+
+    // Check for read errors (not EOF, which is expected)
+    if (file.bad()) {
+      std::cerr << "Error: Read operation failed\n";
+      return false;
+    }
+
+    // Validate result
+    if (output.empty()) {
+      std::cerr << "Warning: File was empty\n";
+    }
+
+    return true;
+
+  } catch (const std::bad_alloc& e) {
+    std::cerr << "Error: Memory allocation failed: " << e.what() << "\n";
+    return false;
+  }
+}
+
+void readFromStringStream() {
+  std::istringstream ss(R"({"key": "value"})");
+  JsonData json("");
+
+  ss >> json;
+
+  if (!json.empty()) {
+    std::cout << "Read JSON: " << json << "\n";
+  }
+}
 ```
 
-#### 2. FHICL → JSON Conversion
+---
 
+### `TraceStreamer::operator<<(const JsonData& r)` (template specialization)
+
+**Brief:** Enables JsonData objects to be used directly in TRACE logging statements for debugging.
+
+**Parameters:**
+- `r` - JsonData object to log
+
+**Returns:** Reference to TraceStreamer (for chaining).
+
+**Thread Safety:** Safe (TRACE logging is thread-safe)
+
+**Example:**
 ```cpp
-FhiclData fhicl("parameter: value");
-JsonData json = fhicl;  // Uses FhiclData::operator JsonData()
+#include "artdaq-database/BasicTypes/data_json.h"
+
+#ifdef TRACE_NAME
+#undef TRACE_NAME
+#endif
+#define TRACE_NAME "my_module.cpp"
+
+using namespace artdaq::database::basictypes;
+
+void debugWithTrace() {
+  JsonData json(R"({"debug": "data"})");
+
+  // Log JSON content directly
+  TLOG(10) << "Processing configuration: " << json;
+  TLOG(11) << "Configuration size: " << std::string(json).size() << " bytes";
+}
 ```
 
-#### 3. JSON → FHICL Conversion
+## Relationship to Other Components
 
-```cpp
-JsonData json(R"({"parameter": "value"})");
-FhiclData fhicl(json);  // Uses FhiclData constructor
+### Central Role in BasicTypes
+
+```
++-----------+           +-----------+           +---------+
+| FhiclData |<--------->|  JsonData |<--------->|  XmlData |
++-----------+   convert +-----+-----+   convert +---------+
+                              |
+                              v
+                         Database
+                    (MongoDB/FileSystemDB)
 ```
 
-#### 4. Reading from File
+### Files Using JsonData
 
-```cpp
-std::ifstream file("config.json");
-JsonData json("");
-file >> json;
-```
+- **data_fhicl.cpp** - Implements `convert_to<FhiclData>` and `convert_from<FhiclData>`
+- **data_xml.cpp** - Implements `convert_to<XmlData>` and `convert_from<XmlData>`
+- **data_json_fusion.h** - Boost.Fusion adaptation for generic programming
+- **ConfigurationDB module** - Uses JsonData for all storage operations
+- **StorageProviders** - Store and retrieve JsonData to/from databases
 
-### Files That Use JsonData
+## See Also
 
-- `data_fhicl.cpp` - Implements FHICL ↔ JSON conversions
-- `data_xml.cpp` - Implements XML ↔ JSON conversions
-- Database interface modules (throughout the project)
-- Configuration management systems
-
-## Header Guards
-
-```cpp
-#ifndef _ARTDAQ_DATABASE_BASICTYPES_JSON_H_
-#define _ARTDAQ_DATABASE_BASICTYPES_JSON_H_
-```
+- [data_json.cpp](./data_json.cpp.md) - Implementation details
+- [data_json_fusion.h](./data_json_fusion.h.md) - Boost.Fusion adaptation
+- [data_fhicl.h](./data_fhicl.h.md) - FHiCL format wrapper
+- [data_xml.h](./data_xml.h.md) - XML format wrapper
+- [basictypes.h](./basictypes.h.md) - Umbrella header
 
 ## Notes for Developers
 
-### Template Method Pattern
+### No JSON Validation
 
-The `convert_to` and `convert_from` methods use template specialization:
-- **Declaration**: In this header (generic template)
-- **Specializations**: In data_fhicl.cpp and data_xml.cpp
-- **Benefit**: Keeps conversion logic with the respective types
+The class does NOT validate JSON syntax:
+- Invalid JSON can be stored and passed around
+- Validation occurs during conversion or by external parsers
+- This is intentional for performance and flexibility
 
-### Why `final`?
+```cpp
+// This compiles and runs - no validation!
+JsonData invalid("this is { not valid } json");
 
-The class is marked `final` to:
-- Prevent inheritance
-- Enable compiler optimizations
-- Clearly indicate design intent (this is a value type, not a base class)
+// Validation happens when you try to use it
+FhiclData fhicl;
+if (!invalid.convert_to(fhicl)) {
+  // Conversion fails due to invalid JSON
+  std::cerr << "Conversion failed - check JSON syntax\n";
+}
+```
 
-### Design Philosophy
+### Common Pitfalls
 
-- **Simplicity**: Just a string wrapper with conversion capabilities
-- **Flexibility**: Public member allows direct access when needed
-- **Safety**: Conversion methods provide validation
-- **Convenience**: Implicit conversions and stream operators
+- **Pitfall 1:** Assuming JSON is validated on construction. It is not - validate externally if needed.
+- **Pitfall 2:** Using `operator std::string&()` without understanding it bypasses validation. Direct modification can corrupt the JSON structure.
+- **Pitfall 3:** Forgetting to check `empty()` before processing data from database.
+- **Pitfall 4:** Not handling the moved-from state after moving a string into the constructor.
 
-### Potential Issues
+### Anti-patterns
 
-1. **No JSON Validation**: The class doesn't validate JSON syntax
-2. **Direct Access**: Public `json_buffer` can be modified without validation
-3. **Memory**: Large JSON documents are stored as strings (not parsed structures)
+```cpp
+// DON'T do this - no empty check:
+JsonData json = database.get("config");
+FhiclData fhicl(json);  // May fail if json is empty!
 
-### Best Practices
+// DO this instead:
+JsonData json = database.get("config");
+if (json.empty()) {
+  std::cerr << "Configuration not found\n";
+  return;
+}
+try {
+  FhiclData fhicl(json);
+  // Use fhicl...
+} catch (const std::runtime_error& e) {
+  std::cerr << "Conversion error: " << e.what() << "\n";
+}
 
-1. **Validation**: Validate JSON syntax before creating JsonData objects
-2. **Use Conversion Methods**: Prefer `convert_to/from` over direct buffer manipulation
-3. **Check `empty()`**: Always check if data is empty before processing
-4. **Error Handling**: Check return values of conversion methods
+// DON'T do this - assuming valid JSON:
+JsonData json(userInput);  // User input may be invalid!
+process(json);
 
-## Related Documentation
+// DO this instead - validate or handle conversion failure:
+JsonData json(userInput);
+FhiclData fhicl;
+if (!json.convert_to(fhicl)) {
+  std::cerr << "Invalid JSON input\n";
+  return;
+}
+process(fhicl);
 
-- `data_json.cpp.md` - Implementation details
-- `data_json_fusion.h.md` - Boost.Fusion adaptation for serialization
-- `data_fhicl.h.md` - FHICL data type and conversions
-- `data_xml.h.md` - XML data type and conversions
+// DON'T do this - ignoring stream errors:
+std::ifstream file("config.json");
+JsonData json("");
+file >> json;
+// Using json without checking if file was opened or read succeeded
 
-## Version History
-
-- **V1.0.0** - Current version (returned by `type_version()`)
+// DO this instead:
+std::ifstream file("config.json");
+if (!file) {
+  std::cerr << "Cannot open file\n";
+  return;
+}
+JsonData json("");
+file >> json;
+if (file.bad()) {
+  std::cerr << "Read error\n";
+  return;
+}
+if (json.empty()) {
+  std::cerr << "File was empty\n";
+  return;
+}
+```

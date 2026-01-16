@@ -1,1007 +1,535 @@
 # JSONDocument_utils.cpp
 
-## File Overview
+**Path:** `artdaq-database/JsonDocument/JSONDocument_utils.cpp`
 
-This file implements utility functions and supplementary methods for the `JSONDocument` and `JSONDocumentBuilder` classes. It provides JSON serialization/deserialization, value matching, path splitting, file I/O operations, and the critical `createFromData` method that wraps user data in proper database structure.
+**Implements:** [JSONDocument.h](./JSONDocument.h.md), [JSONDocumentBuilder.h](./JSONDocumentBuilder.h.md)
 
-**Location**: `/home/user/artdaq-database/artdaq-database/JsonDocument/JSONDocument_utils.cpp`
+**Purpose:** This file implements utility functions and supplementary methods for both the `JSONDocument` and `JSONDocumentBuilder` classes. It provides JSON serialization/deserialization, value matching for array operations, path splitting, file I/O operations, and the critical `createFromData` method that wraps user data in the proper database structure.
+
+## Implementation Overview
+
+This file contains a mix of free functions, `JSONDocument` methods (constructors, serialization, file I/O), and `JSONDocumentBuilder` methods (data import). The code implements lazy serialization with caching, recursive value matching, and flexible document structure handling.
+
+## Key Algorithms
+
+### Lazy Serialization with Caching
+
+The `to_string()` method implements lazy serialization:
+- Uses `_isDirty` flag to track if document was modified since last serialization
+- Caches serialized JSON in `_cached_json_buffer`
+- Only regenerates JSON when dirty flag is set
+- Improves performance for read-heavy operations
+
+### Value Matching for Arrays
+
+The `matches()` function enables flexible array element matching:
+- Supports partial object matching (template can have subset of fields)
+- Recursive comparison for nested structures
+- Used by `removeChild()` to find elements to remove from arrays
+
+### Flexible Data Import
+
+The `_importUserData()` method handles various document formats:
+- Imports optional fields (metadata, changelog, origin, collection, attachments)
+- Falls back to treating entire document as data if no specific structure found
+- Uses try-catch to silently skip missing optional fields
 
 ## Dependencies
 
-```cpp
-#include "artdaq-database/BasicTypes/data_json.h"
-#include "artdaq-database/JsonDocument/JSONDocument.h"
-#include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
-#include "artdaq-database/JsonDocument/common.h"
-#include <boost/filesystem.hpp>
-#include <utility>
-```
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/BasicTypes/data_json.h` | JSON data type definitions, `JsonData` wrapper |
+| `artdaq-database/JsonDocument/JSONDocument.h` | Document class definition |
+| `artdaq-database/JsonDocument/JSONDocumentBuilder.h` | Builder class definition |
+| `artdaq-database/JsonDocument/common.h` | Module utilities, types, and literals |
+| `<boost/filesystem.hpp>` | File existence check and copy operations |
+| `<utility>` | `std::move` for move semantics |
 
-**Key Dependencies**:
-- **data_json.h** - JSON data type definitions
-- **JSONDocument.h** - Document class
-- **JSONDocumentBuilder.h** - Builder class
-- **common.h** - Module utilities
-- **boost/filesystem.hpp** - File operations
+## Functions
 
-## TRACE Configuration
+### `print_visitor(value_t const& value) -> std::string`
 
-```cpp
-#ifdef TRACE_NAME
-#undef TRACE_NAME
-#endif
-#define TRACE_NAME "JSONDocument_utils.cpp"
-```
+**Brief:** Converts a JSON value to a human-readable string for debugging by applying `jsn::print_visitor` to the variant type.
 
-## Using Declarations
+**Parameters:**
+- `value` - JSON value variant to convert
 
-```cpp
-using artdaq::database::json::array_t;
-using artdaq::database::json::object_t;
-using artdaq::database::json::type_t;
-using artdaq::database::json::value_t;
-using artdaq::database::json::JsonReader;
-using artdaq::database::json::JsonWriter;
-using artdaq::database::Failure;
-using artdaq::database::result_t;
-using artdaq::database::Success;
-using artdaq::database::docrecord::JSONDocument;
-using artdaq::database::docrecord::JSONDocumentBuilder;
-using artdaq::database::sharedtypes::unwrap;
+**Returns:** Human-readable string representation suitable for logging
 
-namespace db = artdaq::database;
-namespace utl = db::docrecord;
-namespace dbdr = artdaq::database::docrecord;
-namespace jsonliteral = artdaq::database::dataformats::literal;
-```
+**Thread Safety:** safe (pure function)
 
-## Visitor Functions
+### `tostring_visitor(value_t const& value) -> std::string`
 
-### print_visitor
+**Brief:** Converts a JSON value to its raw string representation, providing the unformatted value rather than debug output.
 
-```cpp
-std::string print_visitor(value_t const& value) {
-  return boost::apply_visitor(jsn::print_visitor(), value);
-}
-```
+**Parameters:**
+- `value` - JSON value variant to convert
 
-**Purpose**: Converts a JSON value to human-readable string for debugging.
+**Returns:** Raw string representation of the value
 
-**Uses Visitor Pattern**: Applies `print_visitor` to the variant type.
+**Thread Safety:** safe (pure function)
 
-**Use Case**: Logging and debugging JSON values.
+### `matches(value_t const& left, value_t const& right) -> bool`
 
-### tostring_visitor
+**Brief:** Recursively compares two JSON values for equality with support for partial object matching, where the template can have more fields than the candidate.
 
-```cpp
-std::string tostring_visitor(value_t const& value) {
-  return boost::apply_visitor(jsn::tostring_visitor(), value);
-}
-```
+**Parameters:**
+- `left` - Template value (pattern to match against)
+- `right` - Candidate value (value being tested)
 
-**Purpose**: Converts a JSON value to its string representation.
+**Returns:** `true` if values match (partial match for objects), `false` otherwise
 
-**Difference from print_visitor**: Provides raw string value rather than formatted output.
+**Thread Safety:** safe (pure function)
 
-## Value Matching Function
+**Algorithm:**
+1. **Type Check:** Return false if types differ
+2. **Object Matching:** Uses partial matching where template can have more fields than candidate; recursively matches nested values
+3. **Array Matching:** Requires same size; element-by-element comparison
+4. **Primitive Matching:** Converts to strings and compares
 
-### matches
+**TRACE Level:** 20 (logs object differences)
 
-```cpp
-bool matches(value_t const& left, value_t const& right)
-```
-
-**Purpose**: Recursively compares two JSON values for equality, supporting partial matching for objects.
-
-**Algorithm**:
-
-#### Step 1: Type Check
-
-```cpp
-if (left.type() != right.type()) {
-  return false;
-}
-```
-
-Ensures both values have the same JSON type.
-
-#### Step 2: Object Matching
-
-```cpp
-if (type(left) == type_t::OBJECT) {
-  auto const& leftObj = unwrap(left).value_as<const object_t>();
-  auto const& rightObj = unwrap(right).value_as<const object_t>();
-
-  // Partial match support - sizes don't need to match
-  if (leftObj.empty() || rightObj.empty()) {
-    return false;
-  }
-
-  auto const& tempateObj = leftObj.size() >= rightObj.size() ? leftObj : rightObj;
-  auto const& candidateObj = leftObj.size() >= rightObj.size() ? rightObj : leftObj;
-
-  for (auto const& templateKVP : tempateObj) {
-    if (candidateObj.count(templateKVP.key) != 1) {
-      continue;  // Skip keys not in candidate
-    }
-
-    auto const& candidateVal = candidateObj.at(templateKVP.key);
-    auto const& templateVal = templateKVP.value;
-
-    if (!matches(templateVal, candidateVal)) {
-      TLOG(20) << "matches() objects are different at key=<" << templateKVP.key << ">";
-      return false;
-    }
-  }
-
-  return true;
-}
-```
-
-**Object Matching Characteristics**:
-- **Partial Matching**: Template can have more fields than candidate
-- **Empty Check**: Rejects empty objects
-- **Recursive Comparison**: Recursively matches nested values
-- **Skips Missing Keys**: If key not in candidate, continues (allows partial match)
-
-**Use Case**: Finding objects in arrays where you only care about certain fields.
-
-**Example**:
+**Example:**
 ```cpp
 // Template: {"name": "test"}
 // Candidate: {"name": "test", "value": 42}
-// Result: true (partial match)
+// Result: true (partial match succeeds)
 ```
 
-#### Step 3: Array Matching
+**Known Issue:** Contains bug on line 79 - uses `unwrap(left)` twice instead of `unwrap(right)` for the right array.
 
+### `utl::split_path(std::string const& path) -> std::vector<std::string>`
+
+**Brief:** Splits a dot-notation path into individual components by replacing dots with spaces and using string stream tokenization.
+
+**Parameters:**
+- `path` - Dot-notation path string (e.g., "document.data.field")
+
+**Returns:** Vector of path components (e.g., `["document", "data", "field"]`)
+
+**Thread Safety:** safe (pure function)
+
+**Example:**
 ```cpp
-if (type(left) == type_t::ARRAY) {
-  auto const& leftObj = unwrap(left).value_as<const array_t>();
-  auto const& rightObj = unwrap(left).value_as<const array_t>();  // Note: Bug here!
-
-  if (leftObj.size() != rightObj.size()) {
-    return false;
-  }
-
-  if (leftObj.empty() || rightObj.empty()) {
-    return false;
-  }
-
-  auto elementCount = leftObj.size();
-  auto leftObjIter = leftObj.begin();
-  auto rightObjIter = rightObj.begin();
-
-  while ((elementCount--) != 0u) {
-    if (!matches(*leftObjIter, *rightObjIter)) {
-      return false;
-    }
-    std::advance(leftObjIter, 1);
-    std::advance(rightObjIter, 1);
-  }
-  return true;
-}
+auto parts = utl::split_path("document.data.field");
+// parts = {"document", "data", "field"}
 ```
 
-**Array Matching Characteristics**:
-- **Exact Size**: Arrays must have same number of elements
-- **Element-wise**: Compares elements at same positions
-- **Recursive**: Uses `matches` for each element
+### `utl::operator<<(std::ostream& os, JSONDocument const& document) -> std::ostream&`
 
-**Bug Alert**: Line 79 uses `unwrap(left)` twice instead of `unwrap(right)`, which is likely a bug that would cause incorrect comparisons.
+**Brief:** Stream output operator that writes the document's JSON string representation to an output stream.
 
-#### Step 4: Primitive Matching
+**Parameters:**
+- `os` - Output stream to write to
+- `document` - Document to output
 
-```cpp
-auto leftObj = tostring_visitor(left);
-auto rightObj = tostring_visitor(right);
-return leftObj == rightObj;
-```
+**Returns:** Reference to the output stream for chaining
 
-For primitives (string, number, boolean, null), converts both to strings and compares.
+**Thread Safety:** conditional (depends on stream thread safety)
 
-## Path Utilities
+### `JSONDocument::readJson(std::string const& json) -> value_t` [static]
 
-### split_path
+**Brief:** Parses a JSON string into internal `value_t` representation using the JSON reader.
 
-```cpp
-std::vector<std::string> utl::split_path(std::string const& path)
-```
+**Parameters:**
+- `json` - JSON string to parse
 
-**Purpose**: Splits a dot-notation path into individual components.
+**Preconditions:**
+- JSON string must not be empty
+- JSON must be syntactically valid
 
-**Algorithm**:
-```cpp
-auto tmp = std::string{path};
+**Returns:** Parsed `value_t` containing the JSON structure
 
-// Replace dots with spaces
-std::replace(tmp.begin(), tmp.end(), '.', ' ');
+**Throws:**
 
-// Use string stream to split on spaces
-std::istringstream iss(tmp);
-std::vector<std::string> tokens{
-    std::istream_iterator<std::string>{iss},
-    std::istream_iterator<std::string>{}
-};
+| Exception | Condition |
+|-----------|-----------|
+| `invalid_argument` | When JSON string is empty |
+| `invalid_argument` | When JSON is malformed or unparseable |
 
-// Optional debug logging (commented out in actual code)
-if (!tokens.empty()) {
-  std::ostringstream oss;
-  for (auto const& token : tokens) {
-    oss << "\"" << token << "\",";
-  }
-}
+**Thread Safety:** safe (static method, no shared state)
 
-return tokens;
-```
+### `JSONDocument::writeJson() const -> std::string`
 
-**Example**:
-- Input: `"document.data.field"`
-- Output: `["document", "data", "field"]`
+**Brief:** Serializes the internal `value_t` to a JSON string using the JSON writer.
 
-**TRACE Level**: None (debug code commented out)
+**Preconditions:**
+- Internal value must be of type OBJECT
 
-## Stream Output Operator
+**Returns:** JSON string representation of the document
 
-### operator<<
+**Throws:**
 
-```cpp
-std::ostream& utl::operator<<(std::ostream& os, JSONDocument const& document) {
-  os << document.to_string();
-  return os;
-}
-```
+| Exception | Condition |
+|-----------|-----------|
+| `invalid_argument` | When internal type is not OBJECT |
+| `invalid_argument` | When serialization fails (invalid AST) |
 
-**Purpose**: Enables streaming `JSONDocument` to output streams.
+**Thread Safety:** conditional (const but accesses mutable cache)
 
-**Usage**:
-```cpp
-std::cout << doc << std::endl;
-std::ofstream file("output.txt");
-file << doc;
-```
+### `JSONDocument::to_string() const -> std::string`
 
-## JSON Serialization/Deserialization
+**Brief:** Returns the JSON string representation with caching for performance, only regenerating the JSON when the dirty flag is set.
 
-### readJson
+**Returns:** Cached or freshly serialized JSON string
 
-```cpp
-value_t JSONDocument::readJson(std::string const& json)
-```
+**Postconditions:**
+- Result is cached in `_cached_json_buffer`
+- `_isDirty` flag is set to false
 
-**Purpose**: Parses JSON string into internal `value_t` representation.
+**Thread Safety:** conditional (modifies mutable members `_cached_json_buffer` and `_isDirty`)
 
-**Implementation**:
-```cpp
-if (json.empty()) {
-  throw invalid_argument("JSONDocument")
-      << "Failed reading JSON: Empty JSON buffer";
-}
+### `JSONDocument::operator std::string() const`
 
-auto tmpObject = object_t{};
+**Brief:** Implicit conversion operator to string that delegates to `to_string()` method for seamless string conversion.
 
-if (JsonReader().read(json, tmpObject)) {
-  return {tmpObject};
-}
+**Returns:** JSON string representation (identical to `to_string()`)
 
-throw invalid_argument("JSONDocument")
-    << "Failed reading JSON: Invalid json; json_buffer=" << json;
-```
+**Thread Safety:** conditional (same as `to_string()`)
 
-**Process**:
-1. Validate JSON string is not empty
-2. Create temporary object
-3. Use `JsonReader` to parse JSON
-4. Return parsed object as `value_t`
-5. Throw if parsing fails
+### `JSONDocument::empty() const -> bool`
 
-**Throws**: `invalid_argument` if JSON is empty or malformed
+**Brief:** Checks if the document has no value by examining whether the internal value is empty.
 
-### writeJson
+**Returns:** `true` if document is empty, `false` otherwise
 
-```cpp
-std::string JSONDocument::writeJson() const
-```
+**Thread Safety:** safe (const method, no state modification)
 
-**Purpose**: Serializes internal `value_t` to JSON string.
+### `JSONDocument::JSONDocument(JsonData const& data)`
 
-**Implementation**:
-```cpp
-if (type(_value) != type_t::OBJECT) {
-  throw invalid_argument("JSONDocument")
-      << "Failed writing JSON: Wrong value type: type(_value) != type_t::OBJECT";
-}
+**Brief:** Constructor that parses JSON content from a `JsonData` wrapper structure into the document.
 
-auto const& tmpObject = boost::get<object_t>(_value);
+**Parameters:**
+- `data` - `JsonData` structure containing JSON string
 
-if (tmpObject.empty()) {
-  return jsonliteral::empty_json;
-}
+**Postconditions:**
+- Document contains parsed JSON structure
+- `_isDirty` is set to true
+- `_cached_json_buffer` is initialized to empty JSON literal
 
-auto json = std::string{};
+**Throws:**
 
-if (!JsonWriter().write(tmpObject, json)) {
-  throw invalid_argument("JSONDocument")
-      << "Failed writing JSON: JSONDocument::_value has invalid AST";
-}
+| Exception | Condition |
+|-----------|-----------|
+| `invalid_argument` | When JSON in data is empty or malformed |
 
-return json;
-```
+**Thread Safety:** safe (construction)
 
-**Process**:
-1. Verify value is an object type
-2. Extract object from variant
-3. Return empty JSON if object is empty
-4. Use `JsonWriter` to serialize
-5. Throw if serialization fails
+### `JSONDocument::JSONDocument(std::string const& json)`
 
-**Returns**: JSON string or empty JSON literal
+**Brief:** Constructor that parses a JSON string directly into the document.
 
-**Throws**: `invalid_argument` if type is wrong or serialization fails
+**Parameters:**
+- `json` - JSON string to parse
 
-## Public JSONDocument Methods
+**Postconditions:**
+- Document contains parsed JSON structure
+- `_isDirty` is set to true
 
-### to_string
+**Throws:**
 
-```cpp
-std::string JSONDocument::to_string() const
-```
+| Exception | Condition |
+|-----------|-----------|
+| `invalid_argument` | When JSON string is empty or malformed |
 
-**Purpose**: Returns JSON string with caching for performance.
+**Thread Safety:** safe (construction)
 
-**Implementation**:
-```cpp
-if (_isDirty) {
-  _cached_json_buffer = writeJson();
-  _isDirty = false;
-}
-return _cached_json_buffer;
-```
+### `JSONDocument::JSONDocument(value_t value)`
 
-**Lazy Evaluation**:
-- Only serializes if dirty flag is set
-- Caches result for future calls
-- Clears dirty flag after serialization
+**Brief:** Constructor that wraps an existing `value_t` variant in a document without parsing.
 
-**Performance**: Avoids redundant serialization for read-heavy operations.
+**Parameters:**
+- `value` - JSON value variant to wrap (moved)
 
-### operator std::string()
+**Postconditions:**
+- Document wraps the provided value
+- `_isDirty` is set to true
 
-```cpp
-JSONDocument::operator std::string() const
-```
+**Thread Safety:** safe (construction)
 
-**Purpose**: Implicit conversion to string.
+### `JSONDocument::JSONDocument()`
 
-**Implementation**: Identical to `to_string()` with caching.
+**Brief:** Default constructor that creates an empty document containing an empty JSON object.
 
-**Usage**:
-```cpp
-JSONDocument doc = /* ... */;
-std::string json = doc;  // Implicit conversion
-```
+**Postconditions:**
+- Document contains empty JSON object `{}`
+- `_isDirty` is set to true
 
-### empty
+**Thread Safety:** safe (construction)
 
-```cpp
-bool JSONDocument::empty() const {
-  return _value.empty();
-}
-```
+### `JSONDocument::cached_json_buffer() const -> std::string const&`
 
-**Purpose**: Checks if document has no value.
+**Brief:** Returns a reference to the cached JSON string without triggering re-serialization.
 
-## JSONDocument Constructors (Implementations)
+**Returns:** Const reference to cached JSON string (may be stale if document was modified)
 
-### Constructor from JsonData
+**Thread Safety:** safe (const method)
 
-```cpp
-JSONDocument::JSONDocument(JsonData const& data)
-    : _value{readJson(data)},
-      _cached_json_buffer(jsonliteral::empty_json),
-      _isDirty(true) {}
-```
+### `JSONDocument::getPayloadValueForKey(object_t::key_type const& key) const -> value_t const&`
 
-### Constructor from string
+**Brief:** Extracts the payload value from the document, handling different document formats with fallback logic.
 
-```cpp
-JSONDocument::JSONDocument(std::string const& json)
-    : _value{readJson(json)},
-      _cached_json_buffer(jsonliteral::empty_json),
-      _isDirty(true) {}
-```
+**Parameters:**
+- `key` - Key to look for in payload section
 
-### Constructor from value_t
+**Preconditions:**
+- `key` must not be empty
 
-```cpp
-JSONDocument::JSONDocument(value_t value)
-    : _value{std::move(value)},
-      _cached_json_buffer(jsonliteral::empty_json),
-      _isDirty(true) {}
-```
+**Returns:** Const reference to the extracted value
 
-### Default Constructor
+**Thread Safety:** safe (const method)
 
-```cpp
-JSONDocument::JSONDocument()
-    : _value{object_t{}},
-      _cached_json_buffer(jsonliteral::empty_json),
-      _isDirty(true) {}
-```
+**TRACE Level:** 21
 
-**Pattern**: All constructors mark document as dirty and initialize cache to empty.
+**Logic:**
+1. If document has "payload" key with requested key inside: return that nested value
+2. If document has "payload" key without requested key: return entire payload
+3. If document has single key: return that value
+4. Otherwise: return entire document value
 
-## Helper Methods
+### `JSONDocument::equals(JSONDocument const& other) const -> bool`
 
-### cached_json_buffer
+**Brief:** Compares two documents for structural equality by comparing their internal value representations.
 
-```cpp
-std::string const& JSONDocument::cached_json_buffer() const {
-  return _cached_json_buffer;
-}
-```
+**Parameters:**
+- `other` - Document to compare with
 
-**Purpose**: Provides access to cached JSON string without triggering serialization.
+**Returns:** `true` if documents are structurally equal, `false` otherwise
 
-### getPayloadValueForKey
+**Thread Safety:** safe (const method)
 
-```cpp
-value_t const& JSONDocument::getPayloadValueForKey(object_t::key_type const& key) const
-```
+**TRACE Levels:** 22 (result), 23 (error details)
 
-**Purpose**: Extracts payload value from document, handling different document formats.
+### `JSONDocument::loadFromFile(std::string const& fileName) -> JSONDocument` [static]
 
-**Algorithm**:
-```cpp
-confirm(!key.empty());
+**Brief:** Static factory method that loads and parses a JSON document from a file.
 
-TLOG(21) << "getPayloadValueForKey() document=<" << cached_json_buffer() << ">";
+**Parameters:**
+- `fileName` - Path to the JSON file
 
-if (unwrap(_value).value_as<const object_t>().count("payload") == 1) {
-  auto const& value = unwrap(_value).value<const object_t>("payload");
+**Returns:** `JSONDocument` containing the parsed file content
 
-  if (type(value) == type_t::OBJECT &&
-      unwrap(value).value_as<const object_t>().count(key) == 1) {
-    return unwrap(value).value<const object_t>(key);
-  }
-  return value;
-} else if (unwrap(_value).value_as<const object_t>().size() == 1) {
-  return unwrap(_value).value_as<const object_t>().begin()->value;
-}
+**Throws:**
 
-return _value;
-```
+| Exception | Condition |
+|-----------|-----------|
+| `invalid_argument` | When file cannot be opened or read |
+| `runtime_error` | When JSON parsing fails |
 
-**Logic**:
-1. If document has "payload" key:
-   - If payload is object with requested key: return that value
-   - Otherwise: return entire payload
-2. Else if document has exactly one key:
-   - Return that key's value
-3. Otherwise: return entire document value
+**Thread Safety:** safe (static method)
 
-**Use Case**: Flexible extraction supporting different document wrapper formats.
+**Side Effects:**
+- Reads from filesystem
 
-**TRACE Level**: 21
+### `JSONDocument::saveToFile(std::string const& fileName) -> bool`
 
-### equals
+**Brief:** Saves the JSON document to a file, creating a backup (.bak) of any existing file first.
 
-```cpp
-bool JSONDocument::equals(JSONDocument const& other) const
-```
+**Parameters:**
+- `fileName` - Path to the output file
 
-**Purpose**: Compares two documents for equality.
+**Returns:** `true` on success
 
-**Implementation**:
-```cpp
-auto result = jsn::operator==(_value, other._value);
+**Postconditions:**
+- File contains JSON representation of document
+- If file existed, backup created with `.bak` extension
 
-TLOG(22) << "matches() JSON buffers are "
-         << (result.first ? "equal." : "not equal.");
+**Throws:**
 
-if (result.first) {
-  return true;
-}
+| Exception | Condition |
+|-----------|-----------|
+| `invalid_argument` | When fileName is empty |
+| `runtime_error` | When file write fails |
 
-TLOG(23) << "matches() Error message=<" << result.second << ">";
+**Thread Safety:** unsafe (filesystem operations)
 
-return false;
-```
+**Side Effects:**
+- Writes to filesystem
+- Creates backup file if original exists
+- Uses Boost.Filesystem for copy operations
 
-**Returns**: `true` if documents are equal, `false` otherwise.
+### `JSONDocument::value(JSONDocument const& document) -> std::string` [static]
 
-**TRACE Levels**:
-- 22: Comparison result
-- 23: Error message if not equal
+**Brief:** Static utility method that extracts the primary value from a document as a string.
 
-## File I/O Operations
+**Parameters:**
+- `document` - Document to extract value from
 
-### loadFromFile
+**Returns:** String representation of the document's payload value
 
-```cpp
-JSONDocument JSONDocument::loadFromFile(std::string const& fileName)
-```
+**Thread Safety:** safe (static method)
 
-**Purpose**: Loads JSON document from file.
+**TRACE Level:** 39
 
-**Implementation**:
-```cpp
-try {
-  auto json_buffer = std::string{};
+### `JSONDocument::value_at(JSONDocument const& document, std::size_t index) -> std::string` [static]
 
-  if (!db::read_buffer_from_file(json_buffer, fileName)) {
-    throw invalid_argument("JSONDocument")
-        << "Failed calling loadFromFile(): Failed opening a JSON file=" << fileName;
-  }
+**Brief:** Static utility method that extracts a value at a specific index from an array document.
 
-  return {json_buffer};
-} catch (std::exception& ex) {
-  throw runtime_error("JSONDocument")
-      << "Failed calling loadFromFile(): Caught exception:" << ex.what();
-}
-```
+**Parameters:**
+- `document` - Document containing an array
+- `index` - Zero-based index into the array
 
-**Process**:
-1. Read file content into string buffer
-2. Throw if file read fails
-3. Create document from JSON string
-4. Re-throw exceptions as `runtime_error`
+**Returns:** String representation of the value at the specified index
 
-**Throws**:
-- `invalid_argument` if file cannot be opened
-- `runtime_error` for other exceptions
+**Throws:**
 
-### saveToFile
+| Exception | Condition |
+|-----------|-----------|
+| `runtime_error` | When array is empty |
+| `runtime_error` | When index exceeds array size |
 
-```cpp
-bool JSONDocument::saveToFile(std::string const& fileName)
-```
+**Thread Safety:** safe (static method)
 
-**Purpose**: Saves JSON document to file with backup.
+**TRACE Levels:** 40 (document), 41 (index)
 
-**Implementation**:
-```cpp
-try {
-  if (fileName.empty()) {
-    throw invalid_argument("JSONDocument")
-        << "Failed calling saveToFile(): File name is empty.";
-  }
+### `JSONDocument::findChildValue(path_t const& path) -> value_t&` [non-const overload]
 
-  if (boost::filesystem::exists(fileName)) {
-    boost::filesystem::copy_file(
-        fileName,
-        std::string{fileName} + ".bak",
-        boost::filesystem::copy_options::overwrite_existing);
-  }
+**Brief:** Non-const version of findChildValue that returns a mutable reference by casting away constness from the const version.
 
-  auto buffer = to_string();
+**Parameters:**
+- `path` - Dot-notation path to the child value
 
-  return db::write_buffer_to_file(buffer, fileName);
-} catch (std::exception& ex) {
-  throw runtime_error("JSONDocument")
-      << "Failed calling saveToFile(): Caught exception:" << ex.what();
-}
-```
+**Returns:** Mutable reference to the child value
 
-**Features**:
-1. Validates filename is not empty
-2. Creates `.bak` backup if file exists
-3. Serializes document to string
-4. Writes to file
-5. Returns success/failure
+**Throws:**
 
-**Backup Strategy**: Overwrites existing backup with current file before saving new version.
+| Exception | Condition |
+|-----------|-----------|
+| `notfound_exception` | When path does not exist |
 
-**Throws**: `runtime_error` for failures
+**Thread Safety:** unsafe (returns mutable reference)
 
-## Static Utility Methods
+**TRACE Level:** 42 (error logging)
 
-### value (static)
+### `JSONDocumentBuilder::createFromData(JSONDocument doc) -> JSONDocumentBuilder&`
 
-```cpp
-std::string JSONDocument::value(JSONDocument const& document)
-```
+**Brief:** Creates a database document from user data by resetting the overlay, creating a template, importing user data fields, and refreshing the overlay structure.
 
-**Purpose**: Extracts string value from document.
+**Parameters:**
+- `doc` - User-provided document containing configuration data
 
-**Implementation**:
-```cpp
-TLOG(39) << "value() document=<" << document.cached_json_buffer() << ">";
+**Returns:** Reference to this builder for method chaining
 
-auto docValue = document.getPayloadValueForKey("null");
+**Postconditions:**
+- Document contains user data wrapped in database structure
+- Overlay is refreshed to reflect new structure
 
-if (type(docValue) == type_t::OBJECT) {
-  return JSONDocument{docValue}.to_string();
-}
-{ return tostring_visitor(docValue); }
-```
+**Thread Safety:** unsafe (modifies internal state)
 
-**Logic**:
-- Extract payload using "null" as key (gets first/only value)
-- If value is object: create document and serialize
-- Otherwise: convert to string
+**TRACE Level:** 24
 
-**TRACE Level**: 39
+**Process:**
+1. Reset overlay to nullptr
+2. Move user document to local variable
+3. Create empty template using `template__empty_document`
+4. Create initial overlay from template
+5. Import user data via `_importUserData()`
+6. Refresh overlay to reflect imported data
+7. Return self reference for chaining
 
-### value_at (static)
+### `JSONDocumentBuilder::_importUserData(JSONDocument const& document)` [private]
 
-```cpp
-std::string JSONDocument::value_at(JSONDocument const& document, std::size_t index)
-```
+**Brief:** Private method that imports optional user data fields into the document structure, using try-catch to silently skip missing optional fields.
 
-**Purpose**: Extracts value at specific index from document containing an array.
+**Parameters:**
+- `document` - User document to import data from
 
-**Implementation**:
-```cpp
-try {
-  TLOG(40) << "value_at() begin json=<" << document.cached_json_buffer() << ">";
-  TLOG(41) << "value_at() begin index=<" << index << ">";
+**Thread Safety:** unsafe (modifies builder state)
 
-  auto docValue = document.getPayloadValueForKey("0");
+**TRACE Levels:** 25-38
 
-  auto const& valueArray = unwrap(docValue).value_as<const array_t>();
+**Fields Imported (in order):**
+1. `document.metadata` - Document metadata section
+2. `changelog` - Change history
+3. `origin` - Data origin information
+4. `collection` - Collection assignment
+5. `attachments` - File attachments
+6. `document.data` - Primary configuration data
+7. Fallback: entire document treated as data if no structure found
 
-  if (valueArray.empty()) {
-    throw runtime_error("JSONDocument")
-        << "Failed calling value_at(): valueArray is empty, document=<"
-        << document.cached_json_buffer() << ">";
-  }
+### `JSONDocumentBuilder::SaveUndo() -> result_t`
 
-  if (valueArray.size() < index) {
-    throw runtime_error("JSONDocument")
-        << "Failed to call value_at(); not enough elements, document=<"
-        << document.cached_json_buffer() << ">";
-  }
+**Brief:** Placeholder method for saving undo state that currently always returns Success without actually preserving state.
 
-  auto pos = valueArray.begin();
-  std::advance(pos, index);
+**Returns:** `Success()` (always)
 
-  if (type(*pos) == type_t::OBJECT) {
-    return JSONDocument{*pos}.to_string();
-  }
-  { return tostring_visitor(*pos); }
-} catch (std::exception& ex) {
-  throw runtime_error("JSONDocument")
-      << "Failed calling value_at(): Caught exception:" << ex.what();
-}
-```
+**Note:** Actual state preservation not implemented
 
-**Process**:
-1. Extract array from document
-2. Validate array is not empty
-3. Validate index is within bounds
-4. Advance iterator to index
-5. Return value as string (serialize if object)
+### `JSONDocumentBuilder::CallUndo() noexcept -> result_t`
 
-**TRACE Levels**: 40-41
+**Brief:** Placeholder method for restoring undo state that currently always returns Success without actually restoring state.
 
-**Throws**: `runtime_error` if array empty, index out of bounds, or other errors
+**Returns:** `Success()` (always, catches all exceptions internally)
 
-### findChildValue (non-const wrapper)
+**Note:** Actual state restoration not implemented
 
-```cpp
-value_t& JSONDocument::findChildValue(path_t const& path)
-```
+### `debug::JSONDocumentUtils()`
 
-**Purpose**: Non-const version that wraps const version.
+**Brief:** Enables maximum TRACE logging for debugging utility operations by configuring the TRACE subsystem.
 
-**Implementation**:
-```cpp
-try {
-  auto const& myslef = self();  // Note: typo "myslef"
-  return const_cast<value_t&>(myslef.findChildValue(path));
-} catch (std::exception& ex) {
-  TLOG(42) << "findChildValue() Search failed; Error:" << ex.what();
-  throw;
-}
-```
+**Side Effects:**
+- Configures TRACE name to "JSONDocument_utils.cpp"
+- Sets TRACE level to maximum (0xFFFFFFFFFFFFFFFFLL)
+- Configures memory and slow modes
 
-**Pattern**: const_cast delegation to const version.
+**TRACE Level:** 43 (activation message)
 
-**TRACE Level**: 42 (errors only)
+### `toJSONDocument<string_pair_t>(string_pair_t const& pair) -> JSONDocument` [template specialization]
 
-## JSONDocumentBuilder Methods
+**Brief:** Template specialization that converts a string pair to a JSON document with the format `{"first_value": "second_value"}`.
 
-### createFromData
+**Parameters:**
+- `pair` - String pair (std::pair<std::string, std::string>) to convert
 
-```cpp
-JSONDocumentBuilder& JSONDocumentBuilder::createFromData(JSONDocument doc)
-```
+**Returns:** `JSONDocument` containing the converted pair
 
-**Purpose**: Critical method that wraps user data in proper database document structure.
+**Thread Safety:** safe (creates new document)
 
-**Implementation**:
-```cpp
-_overlay.reset(nullptr);
-
-auto const document = std::move(doc);
-
-TLOG(24) << "createFrom() begin args";
-
-#ifdef EXTRA_TRACES
-TLOG(24) << "createFrom() document=<" << document << ">";
-#endif
-
-_createFromTemplate({std::string{template__empty_document}});
-
-{  // create a new document template using overlay classes
-  auto ovl = std::make_unique<ovlDatabaseRecord>(_document._value);
-  std::swap(_overlay, ovl);
-}
-
-_importUserData(document);
-
-{  // refresh overlays
-  auto ovl = std::make_unique<ovlDatabaseRecord>(_document._value);
-  std::swap(_overlay, ovl);
-}
-
-TLOG(24) << "createFrom() end";
-
-return self();
-```
-
-**Process**:
-1. Reset overlay
-2. Move user document
-3. Create empty template
-4. Create initial overlay
-5. Import user data
-6. Refresh overlay
-7. Return self
-
-**TRACE Level**: 24
-
-### _importUserData (private)
-
-```cpp
-void JSONDocumentBuilder::_importUserData(JSONDocument const& document)
-```
-
-**Purpose**: Imports various optional user data fields into the document structure.
-
-**Implementation**: Tries to import multiple optional fields:
-
-#### 1. Document Metadata
-
-```cpp
-try {
-  auto path = ""s + jsonliteral::document + jsonliteral::dot + jsonliteral::metadata;
-  auto metadata = document.findChild(path);
-
-  TLOG(26) << "_importUserData() Found document.metadata=<" << metadata << ">";
-
-  _document.replaceChild(metadata, path);
-
-} catch (notfound_exception const&) {
-  TLOG(27) << "_importUserData() No document.metadata";
-}
-```
-
-#### 2. Changelog
-
-```cpp
-try {
-  auto data = document.findChild(jsonliteral::changelog);
-  TLOG(28) << "_importUserData() Found converted.changelog=<" << data << ">";
-  _document.replaceChild(data, jsonliteral::changelog);
-} catch (notfound_exception const&) {
-  TLOG(29) << "_importUserData() No converted.changelog";
-}
-```
-
-#### 3. Origin
-
-```cpp
-try {
-  auto data = document.findChild(jsonliteral::origin);
-  TLOG(30) << "_importUserData() Found origin=<" << data << ">";
-  _document.replaceChild(data, jsonliteral::origin);
-} catch (notfound_exception const&) {
-  TLOG(31) << "_importUserData() No origin";
-}
-```
-
-#### 4. Collection
-
-```cpp
-try {
-  auto collection = document.findChild(jsonliteral::collection);
-  TLOG(32) << "_importUserData() Found origin=<" << collection << ">";  // Note: says "origin" but is collection
-  _document.replaceChild(collection, jsonliteral::collection);
-} catch (notfound_exception const&) {
-  TLOG(33) << "_importUserData() No collection";
-}
-```
-
-#### 5. Attachments
-
-```cpp
-try {
-  auto attachments = document.findChild(jsonliteral::attachments);
-  TLOG(34) << "_importUserData() Found origin=<" << attachments << ">";  // Note: says "origin" but is attachments
-  _document.replaceChild(attachments, jsonliteral::attachments);
-} catch (notfound_exception const&) {
-  TLOG(35) << "_importUserData() No attachments";
-}
-```
-
-#### 6. Document Data
-
-```cpp
-try {
-  auto path = ""s + jsonliteral::document + jsonliteral::dot + jsonliteral::data;
-  auto data = document.findChild(path);
-  TLOG(36) << "_importUserData() Found document.data=<" << data << ">";
-  _document.replaceChild(data, path);
-  return;
-} catch (notfound_exception const&) {
-  TLOG(37) << "_importUserData() No document.data";
-}
-```
-
-#### 7. Fallback: Entire Document as Data
-
-```cpp
-try {
-  auto path = ""s + jsonliteral::document + jsonliteral::dot + jsonliteral::data;
-  _document.replaceChild(document, path);
-} catch (notfound_exception const&) {
-  TLOG(38) << "_importUserData() No document.data";
-}
-
-TLOG(25) << "_importUserData() end";
-```
-
-**Strategy**:
-- Try to import each optional field
-- Silently skip if not found (catches `notfound_exception`)
-- Log what was found or not found
-- If no specific data field, treat entire document as data
-
-**TRACE Levels**: 25-38
-
-## Undo Mechanism
-
-### SaveUndo
-
-```cpp
-result_t JSONDocumentBuilder::SaveUndo() {
-  return Success();
-}
-```
-
-**Current Implementation**: Placeholder - always returns success.
-
-### CallUndo
-
-```cpp
-result_t JSONDocumentBuilder::CallUndo() noexcept try {
-  return Success();
-} catch (...) {
-  return Failure();
-}
-```
-
-**Current Implementation**: Placeholder - returns success unless exception thrown.
-
-## Debug Function
-
-### debug::JSONDocumentUtils
-
-```cpp
-void dbdr::debug::JSONDocumentUtils() {
-  TRACE_CNTL("name", TRACE_NAME);
-  TRACE_CNTL("lvlset", 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL, 0LL);
-  TRACE_CNTL("modeM", trace_mode::modeM);
-  TRACE_CNTL("modeS", trace_mode::modeS);
-
-  TLOG(43) << "artdaq::database::JSONDocument trace_enable";
-}
-```
-
-**Purpose**: Enables maximum TRACE logging for utilities.
-
-**TRACE Level**: 43
-
-## Template Specializations
-
-### toJSONDocument<string_pair_t>
-
-```cpp
-namespace artdaq::database::docrecord {
-template <>
-JSONDocument toJSONDocument<string_pair_t>(string_pair_t const& pair) {
-  std::ostringstream oss;
-  oss << '{';
-  oss << db::quoted_(pair.first) << ":" << db::quoted_(pair.second);
-  oss << '}';
-
-  return {oss.str()};
-}
-}
-```
-
-**Purpose**: Converts a string pair to JSON document.
-
-**Format**: `{"first": "second"}`
-
-**Example**:
+**Example:**
 ```cpp
 string_pair_t pair("name", "value");
 auto doc = toJSONDocument(pair);
 // Result: {"name":"value"}
 ```
 
-## Key Features and Patterns
+## Known Issues
 
-### Lazy Serialization
+1. **Array Matching Bug:** Line 79 uses `unwrap(left)` twice:
+   ```cpp
+   auto const& rightObj = unwrap(left).value_as<const array_t>();
+   // Should be: unwrap(right).value_as<const array_t>();
+   ```
 
-Uses `_isDirty` flag and `_cached_json_buffer` for performance:
-- Only serializes when dirty
-- Caches result
-- Invalidates cache on modification
+2. **TRACE Message Inconsistencies:** Some log messages say "origin" when referring to other fields (lines 336, 346)
 
-### Partial Matching
+3. **Variable Name Typo:** Line 421 uses `myslef` instead of `myself` in `findChildValue()`
 
-`matches()` function supports partial object matching:
-- Useful for finding objects in arrays
-- Only requires subset of fields to match
-- Flexible search capability
+## TRACE Logging Levels
 
-### Flexible Data Import
-
-`_importUserData` handles multiple optional fields:
-- Doesn't require specific structure
-- Imports what's available
-- Falls back to treating entire document as data
-
-### Error Recovery
-
-Most functions catch exceptions and:
-- Log the error
-- Re-throw with context
-- Provide detailed error messages
+| Level | Function | Purpose |
+|-------|----------|---------|
+| 20 | `matches()` | Object differences |
+| 21 | `getPayloadValueForKey()` | Document inspection |
+| 22-23 | `equals()` | Comparison results |
+| 24 | `createFromData()` | Builder operations |
+| 25-38 | `_importUserData()` | Field import progress |
+| 39 | `value()` | Value extraction |
+| 40-41 | `value_at()` | Array access |
+| 42 | `findChildValue()` | Error logging |
+| 43 | `debug::JSONDocumentUtils()` | Debug activation |
 
 ## Performance Considerations
 
-1. **Caching**: Lazy serialization reduces redundant JSON generation
-2. **Move Semantics**: Used throughout for efficiency
-3. **Reference Returns**: Avoids copies where possible
-4. **Visitor Pattern**: Efficient type-safe variant access
+1. **Caching** - Lazy serialization reduces redundant JSON generation
+2. **Move Semantics** - Used throughout for efficiency
+3. **Reference Returns** - Avoids copies where possible
+4. **Visitor Pattern** - Efficient type-safe variant access
 
-## Thread Safety
+## See Also
 
-Not thread-safe:
-- Modifies mutable state
-- No synchronization
-- Intended for single-threaded use
-
-## Known Issues
-
-1. **Array Matching Bug**: Line 79 uses `unwrap(left)` twice instead of `unwrap(right)`
-2. **TRACE Message Typos**: Some TRACE messages say "origin" when referring to other fields
-3. **Variable Name Typo**: "myslef" instead of "myself"
-
-## Related Files
-
-- **JSONDocument.h/cpp** - Main document class
-- **JSONDocumentBuilder.h/cpp** - Builder class
-- **data_json.h** - JSON data types
-
-## Best Practices
-
-1. **Use caching**: Call `to_string()` multiple times without performance penalty
-2. **Enable TRACE**: Use debug functions when troubleshooting
-3. **Handle exceptions**: Wrap file I/O in try-catch blocks
-4. **Partial matching**: Leverage for flexible array searches
-5. **Import user data**: Use `createFromData` for proper document structure
-
-## Notes
-
-- File contains mix of member function implementations and free functions
-- Extensive TRACE logging for debugging
-- Supports flexible document formats through `getPayloadValueForKey`
-- Backup functionality in `saveToFile` prevents data loss
-- Path splitting enables dot-notation navigation
-- Visitor pattern used extensively for type-safe variant access
+- [JSONDocument.h.md](./JSONDocument.h.md) - Class declaration
+- [JSONDocument.cpp.md](./JSONDocument.cpp.md) - Tree manipulation methods
+- [JSONDocumentBuilder.h.md](./JSONDocumentBuilder.h.md) - Builder class declaration
+- [JSONDocumentBuilder.cpp.md](./JSONDocumentBuilder.cpp.md) - Builder implementation
+- [common.h.md](./common.h.md) - Common includes and types
+- [docrecord_exceptions.h.md](./docrecord_exceptions.h.md) - Exception types used

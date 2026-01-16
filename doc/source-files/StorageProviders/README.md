@@ -1,454 +1,224 @@
-# StorageProviders Module Documentation
+# StorageProviders Module
+
+**Path:** `artdaq-database/StorageProviders/`
+
+**Purpose:** Implements the storage provider abstraction layer for artdaq-database, providing a unified interface for different database backends (FileSystemDB, MongoDB, UconDB). This module enables the application to work with different storage systems through a consistent API using the Strategy pattern with compile-time template specialization.
 
 ## Overview
 
-This directory contains comprehensive documentation for all source files in the artdaq-database StorageProviders module. The StorageProviders module implements multiple database backend adapters, allowing artdaq-database to work with different storage systems through a unified interface.
+The StorageProviders module provides:
+- A template-based `StorageProvider<TYPE, IMPL>` class that defines the storage interface
+- Three concrete backend implementations for different use cases
+- Consistent read/write/query operations across all backends
+- Backend selection via URI scheme in `ARTDAQ_DATABASE_URI` environment variable
 
-**Module Location**: `/home/user/artdaq-database/artdaq-database/StorageProviders/`
+## Architecture
 
-**Documentation Created**: November 13, 2025
+```
+StorageProvider<TYPE, IMPL>
+        |
+        +-- StorageProvider<JSONDocument, FileSystemDB>
+        |       |-- Filesystem-based storage
+        |       +-- JSON files in directory structure
+        |
+        +-- StorageProvider<JSONDocument, MongoDB>
+        |       |-- MongoDB document database
+        |       +-- mongocxx C++ driver
+        |
+        +-- StorageProvider<JSONDocument, UconDB>
+                |-- Fermilab UConDB service
+                +-- REST API via libcurl
+```
 
----
-
-## Module Architecture
-
-### Provider Pattern
-
-The StorageProviders module implements a provider pattern where:
-- **StorageProvider<TYPE, IMPL>** - Template class providing unified interface
-- **TYPE** - Document type (e.g., JSONDocument)
-- **IMPL** - Concrete provider implementation (FileSystemDB, MongoDB, UconDB)
-
-### Three Provider Implementations
-
-1. **FileSystemDB** - Filesystem-based storage
-2. **MongoDB** - MongoDB database server
-3. **UconDB** - REST API to UConDB service
-
-Each provider implements the same interface but uses different storage backends.
-
----
-
-## Documentation Structure
+## Files in This Module
 
 ### Root Files
 
-#### [common.h.md](./common.h.md)
-Aggregator header providing common utilities for all providers.
+| File | Purpose |
+|------|---------|
+| `common.h` | Aggregator header for common includes |
+| `storage_providers.h` | Template class definition and interface |
+| `storage_providers.cpp` | Database metadata generation |
 
-**Contents**: Includes SharedCommon headers for standard library utilities.
+### Subdirectories
 
-#### [storage_providers.h.md](./storage_providers.h.md)
-Core StorageProvider template class interface.
+| Directory | Provider | Use Case |
+|-----------|----------|----------|
+| `FileSystemDB/` | Filesystem-based | Development, testing, small deployments |
+| `MongoDB/` | MongoDB database | Production, large-scale, performance-critical |
+| `UconDB/` | UConDB REST service | Fermilab experiments, centralized management |
 
-**Key Contents**:
-- `StorageProvider<TYPE, IMPL>` template class
-- Pass-Key Idiom for factory pattern
-- Template method declarations for all operations
-- `make_database_metadata()` function
+## Key Concepts
 
-**Operations Defined**:
-- `readDocument()` / `writeDocument()` - Document I/O
-- `findConfigurations()` - Query configurations
-- `configurationComposition()` - Get configuration entities
-- `findVersions()` - Find document versions
-- `findEntities()` - Discover entities
-- `listCollections()` / `listDatabases()` - Database discovery
-- `databaseMetadata()` - Retrieve metadata
-- `searchCollection()` - Generic search
+### StorageProvider Template
 
-#### [storage_providers.cpp.md](./storage_providers.cpp.md)
-Implementation of `make_database_metadata()` function.
-
-**Purpose**: Generate JSON metadata for new databases including creation info, format version, and system details.
-
----
-
-## Provider Implementations
-
-### FileSystemDB Provider
-
-**Location**: [FileSystemDB/README.md](./FileSystemDB/README.md)
-
-**Description**: Filesystem-based database where directories are collections and JSON files are documents.
-
-**Best For**:
-- Development and testing
-- Small databases (< 1000 documents)
-- Portable databases
-- No server requirements
-
-**Features**:
-- Simple directory structure
-- Human-readable JSON files
-- JSON-based search index
-- No external dependencies
-
-**Limitations**:
-- Limited scalability
-- No transaction support
-- Limited concurrency
-- Performance constraints
-
-**Files Documented**: 8 files (provider, index, read/write, connection, filesystem utilities)
-
----
-
-### MongoDB Provider
-
-**Location**: [MongoDB/README.md](./MongoDB/README.md)
-
-**Description**: Production-grade database using MongoDB server via mongocxx C++ driver.
-
-**Best For**:
-- Production deployments
-- Large databases (millions of documents)
-- High-performance queries
-- Scalability requirements
-
-**Features**:
-- Full MongoDB query language
-- Indexed queries (B-tree)
-- Replication and sharding
-- ACID transactions
-- Aggregation pipeline
-
-**Advantages**:
-- Scalability to petabytes
-- High availability
-- Rich query capabilities
-- Enterprise features
-
-**Files Documented**: 9 files (provider, BSON/JSON conversion, read/write, connection, utilities)
-
----
-
-### UconDB Provider
-
-**Location**: [UconDB/README.md](./UconDB/README.md)
-
-**Description**: REST API client for Fermilab's Unified Configuration Database service.
-
-**Best For**:
-- Multi-experiment environments
-- Centralized configuration management
-- Version control requirements
-- Collaborative editing
-
-**Features**:
-- REST HTTP/HTTPS API
-- Folder-based organization
-- Version tagging
-- Web interface
-- Audit trail
-
-**Advantages**:
-- No local database installation
-- Centralized service
-- Multi-site access
-- Built-in version control
-
-**Files Documented**: 7 files (provider, REST API client, read/write, connection)
-
----
-
-## Choosing a Provider
-
-### Decision Matrix
-
-| Requirement | FileSystemDB | MongoDB | UconDB |
-|-------------|--------------|---------|--------|
-| Development/Testing | ✓✓✓ | ✓✓ | ✓ |
-| Production | ✓ | ✓✓✓ | ✓✓✓ |
-| Scalability | ✓ | ✓✓✓ | ✓✓ |
-| Performance | ✓✓ | ✓✓✓ | ✓✓ |
-| No Server Required | ✓✓✓ | ✗ | ✓✓✓ |
-| Offline Operation | ✓✓✓ | ✓✓ | ✗ |
-| Multi-Site | ✓ | ✓✓ | ✓✓✓ |
-| Version Control | ✓ | ✓ | ✓✓✓ |
-| Setup Complexity | ✓✓✓ | ✓✓ | ✓✓✓ |
-
-### Recommendations
-
-**Use FileSystemDB when**:
-- Developing or testing
-- Need portable database
-- Want human-readable files
-- Database is small (< 1000 documents)
-
-**Use MongoDB when**:
-- Running in production
-- Need high performance
-- Database is large (> 10,000 documents)
-- Need complex queries
-- Require scalability
-
-**Use UconDB when**:
-- Part of Fermilab experiment
-- Need centralized configuration
-- Require version control
-- Multiple sites/collaborators
-- Want web interface access
-
----
-
-## Common Interface
-
-All providers implement the same interface through the StorageProvider template:
+The core `StorageProvider<TYPE, IMPL>` template provides:
+- Factory pattern via `create()` method with PassKey idiom
+- Document read/write operations
+- Query operations (findConfigurations, findVersions, findEntities)
+- Collection and database discovery
 
 ```cpp
-// Create provider (example with FileSystemDB)
-auto db = FileSystemDB::create(config);
-auto provider = StorageProvider<JSONDocument, FileSystemDB>::create(db);
+template <typename TYPE, typename IMPL>
+class StorageProvider final {
+public:
+    static ProviderSPtr create(std::shared_ptr<IMPL> const& provider);
 
-// Same interface for all providers
-auto results = provider->readDocument(query);
-object_id_t id = provider->writeDocument(doc);
-auto configs = provider->findConfigurations(filter);
-auto collections = provider->listCollections(query);
+    template <typename FILTER>
+    std::vector<TYPE> readDocument(FILTER const&);
+
+    object_id_t writeDocument(TYPE const&);
+
+    template <typename FILTER>
+    std::vector<FILTER> findConfigurations(FILTER const&);
+
+    // ... additional query methods
+};
 ```
 
-This allows switching providers by changing configuration, not code.
+### Backend Selection
 
----
+Backends are selected by URI scheme:
+```
+filesystemdb:///path/to/db    -> FileSystemDB
+mongodb://host:port/db        -> MongoDB
+ucondb://http://host/db       -> UconDB
+```
 
-## Configuration
+### Template Specialization
 
-### Connection URIs
+Each backend provides explicit template specializations for all StorageProvider methods in their implementation files.
 
-Each provider uses a different URI scheme:
+## Provider Comparison
+
+| Feature | FileSystemDB | MongoDB | UconDB |
+|---------|-------------|---------|--------|
+| **Storage** | Local filesystem | MongoDB server | REST service |
+| **Scalability** | < 10K docs | Billions | Moderate |
+| **Thread Safety** | No | Yes | Yes |
+| **Setup** | None | MongoDB server | Network |
+| **Best For** | Development | Production | Fermilab |
+| **Performance** | O(log n) index | O(log n) index | Network latency |
+
+## Usage Example
 
 ```cpp
-// FileSystemDB
-"filesystemdb:///absolute/path/to/database"
-
-// MongoDB
-"mongodb://hostname:port/database"
-
-// UconDB
-"ucondb://https://hostname:port/database"
-```
-
-### Environment Variable
-
-All providers check `ARTDAQ_DATABASE_URI` environment variable:
-
-```bash
-# Development (FileSystemDB)
-export ARTDAQ_DATABASE_URI="filesystemdb:///tmp/test_db"
-
-# Production (MongoDB)
-export ARTDAQ_DATABASE_URI="mongodb://prodserver:27017/artdaq_prod"
-
-# Fermilab (UconDB)
-export ARTDAQ_DATABASE_URI="ucondb://https://ucondb.fnal.gov:8080/artdaq"
-```
-
----
-
-## Performance Comparison
-
-### Document Read (by ID)
-
-| Provider | Time Complexity | Typical Latency |
-|----------|----------------|-----------------|
-| FileSystemDB | O(1) | ~1 ms |
-| MongoDB | O(log n) | ~1 ms (indexed) |
-| UconDB | O(1) | ~10-100 ms (network) |
-
-### Query (multiple criteria)
-
-| Provider | Time Complexity | Typical Time |
-|----------|----------------|--------------|
-| FileSystemDB | O(k * log n) | ~10 ms |
-| MongoDB | O(log n) | ~1-5 ms (indexed) |
-| UconDB | O(log n) | ~50-200 ms (network) |
-
-### Document Write
-
-| Provider | Time Complexity | Typical Latency |
-|----------|----------------|-----------------|
-| FileSystemDB | O(1) | ~1-5 ms |
-| MongoDB | O(log n) | ~1-5 ms |
-| UconDB | O(1) | ~50-200 ms (network) |
-
----
-
-## Database Metadata
-
-All providers store database metadata in the `SystemMetadata` collection:
-
-```json
-{
-  "document": {
-    "name": "artdaq_configuration_db",
-    "uri": "mongodb://server:27017/artdaq_db",
-    "locale": "en_US.UTF-8",
-    "create_time": "2025-11-13T10:30:45.123-0600",
-    "create_user": "artdaq",
-    "uname": {...},
-    "database_format": 1
-  }
-}
-```
-
-**Purpose**: Track database creation, format version (for migrations), and system info.
-
----
-
-## Thread Safety
-
-| Provider | Thread-Safe | Notes |
-|----------|-------------|-------|
-| FileSystemDB | No | Requires external synchronization |
-| MongoDB | Yes | Driver handles thread safety |
-| UconDB | Yes | HTTP client is thread-safe |
-
----
-
-## Total Documentation
-
-### Files Documented
-
-- **Root**: 3 files (common.h, storage_providers.h/cpp)
-- **FileSystemDB**: 8 files
-- **MongoDB**: 9 files
-- **UconDB**: 7 files
-- **README files**: 4 files (root + 3 providers)
-
-**Total**: **31 documentation files** covering all source files in StorageProviders module
-
-### Documentation Features
-
-Each file documentation includes:
-- File overview and purpose
-- Dependencies
-- Detailed function/class documentation
-- Usage examples
-- Design rationale
-- Performance considerations
-- Thread safety notes
-- Related files
-- Best practices
-
----
-
-## Usage Examples
-
-### Switching Providers
-
-```cpp
-// Configuration-driven provider selection
+// Select provider based on URI
 std::string uri = getenv("ARTDAQ_DATABASE_URI");
 
 if (uri.find("filesystemdb://") == 0) {
+    // FileSystemDB provider
     auto db = FileSystemDB::create(DBConfig(uri));
     auto provider = FileSystemDBProvider<JSONDocument>::create(db);
-    // Use provider...
 }
 else if (uri.find("mongodb://") == 0) {
+    // MongoDB provider
     auto db = MongoDB::create(DBConfig(uri));
     auto provider = MongoDBProvider<JSONDocument>::create(db);
-    // Use provider...
 }
 else if (uri.find("ucondb://") == 0) {
+    // UconDB provider
     auto db = UconDB::create(DBConfig(uri));
     auto provider = UconDBProvider<JSONDocument>::create(db);
-    // Use provider...
 }
+
+// All providers have the same interface
+JSONDocument doc;
+doc.setCollection("Configurations");
+doc.setData("{\"run\": 12345}");
+auto id = provider->writeDocument(doc);
+
+JSONDocument query;
+query.setFilter("{\"run\": 12345}");
+auto results = provider->readDocument(query);
 ```
 
-### Uniform Operations
+## Configuration
 
-```cpp
-// Same code works with all providers
-template <typename PROVIDER>
-void processConfigurations(std::shared_ptr<PROVIDER> provider) {
-    JSONDocument query("{}");
-    auto configs = provider->findConfigurations(query);
+### Environment Variable
 
-    for (auto const& config : configs) {
-        auto docs = provider->readDocument(config);
-        // Process documents...
-    }
-}
+```bash
+export ARTDAQ_DATABASE_URI="mongodb://localhost:27017/artdaq_db"
 ```
 
----
+### URI Formats
+
+**FileSystemDB:**
+```
+filesystemdb:///absolute/path/to/database
+filesystemdb://$ARTDAQ_DATABASE_DIR/configs
+```
+
+**MongoDB:**
+```
+mongodb://localhost:27017/database
+mongodb://user:pass@host:port/database?authSource=admin
+mongodb://host1,host2,host3/database?replicaSet=rs0
+```
+
+**UconDB:**
+```
+ucondb://http://ucondb.fnal.gov:8080/database
+ucondb://https://ucondb.fnal.gov/database
+```
+
+## Choosing a Provider
+
+### FileSystemDB
+**Best for:**
+- Development and testing
+- Small deployments (< 10K documents)
+- Portable configurations
+- Human-readable storage
+
+**Limitations:**
+- Not thread-safe
+- Limited scalability
+- No transactions
+
+### MongoDB
+**Best for:**
+- Production deployments
+- Large-scale storage
+- High-performance queries
+- Enterprise features
+
+**Requirements:**
+- MongoDB server
+- Network connectivity
+
+### UconDB
+**Best for:**
+- Fermilab experiments
+- Centralized management
+- Multi-site coordination
+- Audit requirements
+
+**Requirements:**
+- Network to Fermilab
+- Authentication credentials
 
 ## Debugging
 
-Enable debugging for all providers:
-
+Enable TRACE debugging per provider:
 ```cpp
-// FileSystemDB
-artdaq::database::filesystem::debug::enable();
-
-// MongoDB
-artdaq::database::mongo::debug::enable();
-
-// UconDB
-artdaq::database::ucon::debug::enable();
+artdaq::database::filesystem::debug::enable();  // FileSystemDB
+artdaq::database::mongo::debug::enable();       // MongoDB
+artdaq::database::ucon::debug::enable();        // UconDB
 ```
-
----
-
-## Migration Between Providers
-
-To migrate from one provider to another:
-
-1. **Export** from source provider (readDocument all collections)
-2. **Transform** if needed (adjust for destination provider)
-3. **Import** to destination provider (writeDocument to new database)
-4. **Verify** data integrity
-5. **Update** configuration to point to new provider
-
-Example migration script structure:
-
-```cpp
-// Read from FileSystemDB
-auto source = FileSystemDBProvider<JSONDocument>::create(...);
-auto collections = source->listCollections(query);
-
-// Write to MongoDB
-auto dest = MongoDBProvider<JSONDocument>::create(...);
-for (auto const& col : collections) {
-    auto docs = source->readDocument(col);
-    for (auto const& doc : docs) {
-        dest->writeDocument(doc);
-    }
-}
-```
-
----
 
 ## Related Documentation
 
-- **SharedCommon Module**: [../SharedCommon/README.md](../SharedCommon/README.md)
-- **JsonDocument Module**: [../JsonDocument/README.md](../JsonDocument/README.md)
-- **BasicTypes Module**: [../BasicTypes/README.md](../BasicTypes/README.md)
+- [FileSystemDB Provider](./FileSystemDB/README.md)
+- [MongoDB Provider](./MongoDB/README.md)
+- [UconDB Provider](./UconDB/README.md)
 
----
+## Adding New Backends
 
-**Documentation generated for artdaq-database StorageProviders module**
-**Target audience**: Junior to intermediate C++ developers
-**Last updated**: November 13, 2025
-
----
-
-## Quick Reference
-
-### FileSystemDB
-- **URI**: `filesystemdb:///path`
-- **Best For**: Development, small databases
-- **Docs**: [FileSystemDB/README.md](./FileSystemDB/README.md)
-
-### MongoDB
-- **URI**: `mongodb://host:port/db`
-- **Best For**: Production, large databases
-- **Docs**: [MongoDB/README.md](./MongoDB/README.md)
-
-### UconDB
-- **URI**: `ucondb://https://host:port/db`
-- **Best For**: Multi-site, centralized
-- **Docs**: [UconDB/README.md](./UconDB/README.md)
+To add a new storage backend:
+1. Create a new subdirectory (e.g., `NewDB/`)
+2. Implement `DBConfig` struct for connection configuration
+3. Implement main provider class with `create()` factory method
+4. Provide template specializations for all `StorageProvider` methods
+5. Add URI scheme detection in ConfigurationDB dispatch layer
+6. Create documentation following the template structure

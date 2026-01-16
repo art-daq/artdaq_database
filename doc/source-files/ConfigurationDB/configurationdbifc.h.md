@@ -19,6 +19,7 @@ This header file defines the primary `ConfigurationInterface` class that provide
 - `"artdaq-database/ConfigurationDB/Multitasker.h"` - Multi-threaded task execution
 - `"artdaq-database/ConfigurationDB/configurationdbifc_base.h"` - Base classes and serialization support
 - `"artdaq-database/JsonDocument/JSONDocumentBuilder.h"` - JSON document construction
+- `"dboperation_findcompositions.h"` - Find compositions containing specific versions
 - `"options_operation_manageconfigs.h"` - Configuration management operations
 
 ## Namespace: artdaq::database::configuration
@@ -395,14 +396,16 @@ try {
 ```cpp
 cf::result_t storeGlobalConfiguration(
     VersionInfoList_t const& versionInfoList,
-    std::string const& configuration) const
+    std::string const& configuration,
+    bool allowOverwrite = false) const
 ```
 
-**Purpose**: Store a global configuration as a composition of multiple configuration versions.
+**Purpose**: Store a global configuration as a composition of multiple configuration versions. By default, rejects duplicate composition names. Use `allowOverwrite=true` to update existing compositions.
 
 **Parameters**:
-- `versionInfoList` - List of configuration versions to include
-- `configuration` - Name for the global configuration
+- `versionInfoList` - List of configuration versions to include (must not be empty)
+- `configuration` - Name for the global configuration (must not be empty)
+- `allowOverwrite` - If true, allows updating existing compositions via merge-based overwrite
 
 **Returns**: `result_t` - Success status and message
 
@@ -412,6 +415,12 @@ cf::result_t storeGlobalConfiguration(
 - Configuration name must not be empty
 - Version info list must not be empty
 - Each VersionInfo must be valid (configuration, version, entity all non-empty)
+
+**Overwrite Behavior** (when `allowOverwrite=true`):
+- Performs merge-based overwrite rather than full replacement
+- Unassigns old members that are no longer in the new composition
+- Assigns only new members (skips unchanged ones)
+- Efficient for incremental updates to large compositions
 
 **Usage Example**:
 ```cpp
@@ -423,14 +432,21 @@ composition.push_back({"ComponentConfigs", "v1.0", "DAQ1"});
 composition.push_back({"ComponentConfigs", "v1.0", "DAQ2"});
 composition.push_back({"BoardConfigs", "v2.3", "BoardReader1"});
 
+// Store new composition
 auto result = ifc.storeGlobalConfiguration(composition, "Run12345");
 
 if (result.first) {
     std::cout << "Global configuration stored successfully\n";
 }
+
+// Update existing composition
+composition.push_back({"TriggerConfigs", "v1.1", "Trigger1"});
+result = ifc.storeGlobalConfiguration(composition, "Run12345", true);  // allowOverwrite
 ```
 
-**Implementation**: Creates JSON payload with multiple assign operations and submits to database.
+**Implementation**:
+- Without overwrite: Creates JSON payload with multiple assign operations
+- With overwrite: Computes diff between old and new members, then unassigns removed and assigns new
 
 ---
 
@@ -438,24 +454,32 @@ if (result.first) {
 ```cpp
 cf::result_t storeGlobalConfiguration_mt(
     VersionInfoList_t const& versionInfoList,
-    std::string const& configuration) const
+    std::string const& configuration,
+    bool overwrite = false) const
 ```
 
-**Purpose**: Multi-threaded version of storeGlobalConfiguration for faster performance.
+**Purpose**: Multi-threaded version of storeGlobalConfiguration for faster performance with large compositions.
 
-**Parameters**: Same as `storeGlobalConfiguration`
+**Parameters**:
+- `versionInfoList` - List of configuration versions to include
+- `configuration` - Name for the global configuration
+- `overwrite` - If true, allows updating existing compositions
 
 **Returns**: `result_t` - Merged results from all threads
 
 **Performance**:
 - Uses thread pool with size = min(versionInfoList.size(), hardware_concurrency/2)
 - Each version assignment runs in parallel
+- Unassignments (when overwriting) also run in parallel
 - Results are merged and returned together
 
 **Usage**:
 ```cpp
 // Same as storeGlobalConfiguration but faster for large lists
 auto result = ifc.storeGlobalConfiguration_mt(largeComposition, "Run12345");
+
+// Overwrite with parallel execution
+result = ifc.storeGlobalConfiguration_mt(updatedComposition, "Run12345", true);
 ```
 
 **Thread Safety**: Creates new Multitasker instance per call - safe to call from multiple threads.
@@ -501,6 +525,193 @@ for (auto const& col : all) {
 - `BoardConfigs`
 - `DAQConfigs`
 - etc.
+
+---
+
+### findGlobalConfigurationsContaining
+```cpp
+std::set<std::string> findGlobalConfigurationsContaining(
+    std::string const& configurationType,
+    std::string const& version,
+    std::string const& entity = "") const
+```
+
+**Purpose**: Find all global configurations (compositions) that contain a specific configuration version. This provides reverse lookup capability for impact analysis.
+
+**Parameters**:
+- `configurationType` - Configuration type/collection name to search for (required, non-empty)
+- `version` - Version identifier to match (required, non-empty)
+- `entity` - Entity name to filter by (optional, empty string matches all)
+
+**Returns**: `std::set<std::string>` - Set of global configuration names containing the specified member
+
+**Throws**:
+- `invalid_option_exception` - If configurationType or version is empty
+- `runtime_exception` - On database errors
+
+**Usage Example**:
+```cpp
+ConfigurationInterface ifc;
+
+try {
+    // Find which runs use TriggerConfig v2.1 for DAQ1
+    auto compositions = ifc.findGlobalConfigurationsContaining(
+        "TriggerConfig", "v2.1", "DAQ1"
+    );
+
+    std::cout << "Global configurations using TriggerConfig v2.1:\n";
+    for (auto const& name : compositions) {
+        std::cout << "  - " << name << "\n";
+    }
+} catch (std::exception const& e) {
+    std::cerr << "Search failed: " << e.what() << "\n";
+}
+```
+
+**Implementation Notes**:
+- First attempts an optimized path using direct storage provider queries
+- Falls back to brute-force search if optimized path fails
+- Brute-force: loads all compositions and checks membership individually
+
+**Use Cases**:
+- Impact analysis before modifying a configuration version
+- Finding all runs that used a specific configuration
+- Auditing configuration usage across the system
+
+---
+
+## Safe Wrapper Methods
+
+These methods provide exception-free alternatives to the throwing methods above. They return `result_t` instead of throwing exceptions, making them suitable for C-compatible APIs and contexts where exceptions must be avoided.
+
+### getVersions_safe
+```cpp
+template <typename CONF>
+cf::result_t getVersions_safe(CONF configuration,
+                               std::string const& entity,
+                               std::list<std::string>& versions) const noexcept
+```
+
+**Purpose**: Exception-safe version of `getVersions()`. Returns versions via output parameter instead of return value.
+
+**Parameters**:
+- `configuration` - Configuration object (used for collection name)
+- `entity` - Entity name filter (empty for all)
+- `versions` - Output parameter receiving the list of versions
+
+**Returns**: `result_t` - Pair of (success flag, message)
+
+**Postconditions**:
+- On success: `versions` contains the version list
+- On failure: `versions` is cleared
+
+**Usage**:
+```cpp
+ConfigurationInterface ifc;
+MyConfiguration config;
+std::list<std::string> versions;
+
+auto result = ifc.getVersions_safe(&config, "Entity1", versions);
+if (result.first) {
+    for (auto const& v : versions) {
+        std::cout << "Version: " << v << "\n";
+    }
+} else {
+    std::cerr << "Error: " << result.second << "\n";
+}
+```
+
+---
+
+### findGlobalConfigurations_safe
+```cpp
+cf::result_t findGlobalConfigurations_safe(
+    std::string const& search,
+    std::set<std::string>& configurations) const noexcept
+```
+
+**Purpose**: Exception-safe version of `findGlobalConfigurations()`.
+
+**Parameters**:
+- `search` - Search pattern (empty for all)
+- `configurations` - Output parameter receiving matching configuration names
+
+**Returns**: `result_t` - Success status and message
+
+**Postconditions**:
+- On success: `configurations` contains matching names
+- On failure: `configurations` is cleared
+
+---
+
+### loadGlobalConfiguration_safe
+```cpp
+cf::result_t loadGlobalConfiguration_safe(
+    std::string const& configuration,
+    VersionInfoList_t& members) const noexcept
+```
+
+**Purpose**: Exception-safe version of `loadGlobalConfiguration()`.
+
+**Parameters**:
+- `configuration` - Global configuration name to load
+- `members` - Output parameter receiving the composition members
+
+**Returns**: `result_t` - Success status and message
+
+**Postconditions**:
+- On success: `members` contains the composition's VersionInfo list
+- On failure: `members` is cleared
+
+---
+
+### listCollections_safe
+```cpp
+cf::result_t listCollections_safe(
+    std::string const& name_prefix,
+    std::set<std::string>& collections) const noexcept
+```
+
+**Purpose**: Exception-safe version of `listCollections()`.
+
+**Parameters**:
+- `name_prefix` - Optional prefix filter
+- `collections` - Output parameter receiving collection names
+
+**Returns**: `result_t` - Success status and message
+
+---
+
+### findGlobalConfigurationsContaining_safe
+```cpp
+cf::result_t findGlobalConfigurationsContaining_safe(
+    std::string const& configurationType,
+    std::string const& version,
+    std::string const& entity,
+    std::set<std::string>& compositions) const noexcept
+```
+
+**Purpose**: Exception-safe version of `findGlobalConfigurationsContaining()`.
+
+**Parameters**:
+- `configurationType` - Configuration type to search for
+- `version` - Version to match
+- `entity` - Entity filter (empty matches all)
+- `compositions` - Output parameter receiving matching composition names
+
+**Returns**: `result_t` - Success status and message
+
+**Usage**:
+```cpp
+std::set<std::string> compositions;
+auto result = ifc.findGlobalConfigurationsContaining_safe(
+    "TriggerConfig", "v2.1", "", compositions
+);
+
+if (result.first) {
+    std::cout << "Found " << compositions.size() << " compositions\n";
+}
+```
 
 ---
 

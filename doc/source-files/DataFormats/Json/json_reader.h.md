@@ -1,240 +1,294 @@
 # json_reader.h
 
-## File Overview
+**Path:** `artdaq-database/DataFormats/Json/json_reader.h`
 
-This header defines a Boost.Spirit Qi-based parser for JSON documents. It provides a grammar that parses JSON text into the internal AST representation (object_t) and includes a comparison utility for JSON objects.
+**Purpose:** Defines a Boost.Spirit Qi-based parser for JSON documents, converting JSON text into the internal AST representation (`object_t`). This file provides the core parsing functionality for reading JSON configuration data throughout the artdaq-database system, along with a utility function for comparing two JSON objects.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/DataFormats/Json/json_reader.h`
+
+## Key Concepts
+
+### Boost.Spirit Qi Parser Framework
+
+Boost.Spirit Qi is a parser generator library that uses C++ template metaprogramming to create parsers at compile time. Key concepts:
+
+- **Grammar**: A set of rules defining valid syntax. In Spirit Qi, grammars are C++ structs inheriting from `qi::grammar`.
+- **Rule**: A single parsing rule that matches input and produces an attribute (output value).
+- **Skipper**: A parser that automatically skips certain characters (like whitespace) between tokens.
+- **Attribute**: The value produced by a successful parse. Rules can synthesize complex types.
+
+### JSON AST Types
+
+The parser produces an Abstract Syntax Tree (AST) using these types from `json_types.h`:
+
+- `object_t`: A JSON object (key-value pairs, ordered list)
+- `array_t`: A JSON array (ordered list of values)
+- `value_t`: A variant type holding any JSON value (string, number, boolean, object, array)
+- `data_t`: A key-value pair (`key_t` + `value_t`)
+- `key_t`: A string key (alias for `std::string`)
+
+## Thread Safety
+
+- **Thread-safe:** No (grammar and parser are not thread-safe)
+- **Concurrent access:** Each thread must create its own `JsonReader` instance
+- **Locking:** No internal locking; callers must synchronize if sharing instances
 
 ## Dependencies
 
-### Third-Party Libraries
-- `<boost/spirit/include/qi.hpp>` - Boost.Spirit Qi parser framework
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/DataFormats/Json/json_types.h` | JSON AST type definitions (`object_t`, `array_t`, `value_t`, etc.) |
+| `artdaq-database/DataFormats/common.h` | Common includes, TRACE logging macros, `confirm()` assertions |
+| `<boost/spirit/include/qi.hpp>` | Boost.Spirit Qi parser framework |
 
-### Project Headers
-- `"artdaq-database/DataFormats/Json/json_types.h"` - JSON AST types
-- `"artdaq-database/DataFormats/common.h"` - Common includes
+## Classes/Structures
 
-## Namespace Aliases
+### `json_parser_grammar<Iter>`
 
-```cpp
-using namespace boost::spirit;
-```
+A Boost.Spirit Qi grammar that defines the syntax rules for parsing JSON documents.
 
-## Parser Grammar
-
-### json_parser_grammar
+**Thread Safety:** Not thread-safe. Create a new instance for each parse operation.
 
 ```cpp
 template <typename Iter>
 struct json_parser_grammar : qi::grammar<Iter, object_t(), ascii::space_type>
 ```
 
-**Template Parameters**:
-- `Iter` - Iterator type (typically `std::string::const_iterator`)
+**Template Parameters:**
+- `Iter` - Iterator type for input (typically `std::string::const_iterator`)
 
-**Base Type**: `qi::grammar<Iter, object_t(), ascii::space_type>`
-- Produces: `object_t` (JSON object AST)
-- Skipper: `ascii::space_type` (automatically skips whitespace)
+**Grammar Rules:**
 
-**Grammar Rules**:
+| Rule | Type | Description |
+|------|------|-------------|
+| `start` | `object_t` | Entry point; matches a JSON object |
+| `object_rule` | `object_t` | Matches `{ key:value, ... }` |
+| `array_rule` | `array_t` | Matches `[ value, ... ]` |
+| `data_rule` | `data_t` | Matches `"key" : value` |
+| `key_rule` | `key_t` | Matches a quoted string for keys |
+| `value_rule` | `value_t` | Matches any JSON value type |
+| `quoted_string` | `std::string` | Matches `"..."` with escape handling |
+| `text_string` | `std::string` | Matches text inside quotes |
+| `escape_rule` | `std::string` | Matches escape sequences (`\\`, `\"`, `\b`, `\f`, `\n`, `\r`, `\t`) |
 
+**Grammar Definition:**
 ```cpp
-qi::rule<Iter, std::string(), ascii::space_type> quoted_string;
-qi::rule<Iter, value_t(), ascii::space_type> value_rule;
-qi::rule<Iter, key_t(), ascii::space_type> key_rule;
-qi::rule<Iter, data_t(), ascii::space_type> data_rule;
-qi::rule<Iter, object_t(), ascii::space_type> start, object_rule;
-qi::rule<Iter, array_t(), ascii::space_type> array_rule;
-qi::rule<Iter, std::string()> text_string;
-qi::rule<Iter, std::string()> escape_rule;
-```
-
-**Grammar Definition** (from constructor):
-
-```cpp
-// Escape sequences: \\ \" \b \f \n \r \t
 escape_rule = ascii::char_('\\') >> ascii::char_("\\\"bfnrt");
-
-// Text inside quotes (with escapes)
 text_string = +(escape_rule | ~ascii::char_('"'));
-
-// Quoted string: "..."
 quoted_string = qi::lexeme['"' >> *text_string >> '"'];
-
-// JSON object: { key:value, key:value, ... }
 object_rule = '{' >> -(data_rule % ',') >> '}';
-
-// Object key (quoted string)
 key_rule = quoted_string;
-
-// Key-value pair: "key" : value
 data_rule = key_rule >> ':' >> value_rule;
-
-// JSON array: [ value, value, ... ]
 array_rule = '[' >> -(value_rule % ',') >> ']';
-
-// JSON value: object | array | string | integer | float | boolean
 value_rule = object_rule | array_rule | quoted_string |
              (qi::long_ >> !qi::lit('.')) | qi::double_ | qi::bool_;
-
-// Top-level must be object
 start = object_rule;
 ```
 
-**Key Features**:
-- **Escape handling**: Supports standard JSON escape sequences
-- **Type inference**: Automatically determines number types (integer vs decimal)
-- **Integer detection**: Uses `(qi::long_ >> !qi::lit('.'))` to distinguish integers from decimals
-- **Recursive**: Handles nested objects and arrays
-- **Whitespace skipping**: Automatically ignores whitespace
-- **Comma-separated lists**: Uses `%` operator for comma-delimited sequences
+### `JsonReader`
 
-## JsonReader Class
+A class that provides a simple interface for parsing JSON strings into AST objects.
+
+**Thread Safety:** Not thread-safe. Create a new instance per thread or synchronize access.
 
 ```cpp
 struct JsonReader final {
-    bool read(std::string const&, object_t&);
+  bool read(std::string const&, object_t&);
 };
 ```
 
-**Method**: `read(input, ast)`
+#### Methods
 
-**Parameters**:
-- `input` - JSON string to parse
-- `ast` - Output object_t (must be empty)
+##### `read(input, ast) -> bool`
 
-**Returns**: `true` if parsing succeeded, `false` otherwise
+**Brief:** Parses a JSON string and populates the output AST object with the parsed structure.
 
-**Preconditions**:
-- `input` must not be empty
-- `ast` must be empty
+**Parameters:**
+- `input` - The JSON string to parse. Must not be empty.
+- `ast` - Output parameter for the parsed AST. Must be empty before calling.
 
-**Behavior**:
-- Creates parser grammar
-- Invokes Boost.Spirit phrase_parse
-- On success, swaps parsed AST into output parameter
-- On failure, leaves output parameter unchanged
+**Preconditions:**
+- `input` must not be empty (enforced by `confirm()`)
+- `ast` must be empty (enforced by `confirm()`)
 
-## Comparison Utility
+**Returns:** `true` if parsing succeeded and the AST was populated; `false` if parsing failed.
 
+**Postconditions:**
+- On success: `ast` contains the parsed JSON structure
+- On failure: `ast` remains empty (unchanged)
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| None | This method is non-throwing; errors are indicated by return value |
+
+**Thread Safety:** Not thread-safe
+
+**Side Effects:**
+- TRACE logging at levels 20-23 for debugging
+- Stack trace logged for inputs larger than 512 bytes
+
+**Example:**
 ```cpp
-std::pair<bool, std::string> compare_json_objects(
-    std::string const& first,
-    std::string const& second);
-```
+#include "artdaq-database/DataFormats/Json/json_reader.h"
+#include <iostream>
 
-**Purpose**: Compares two JSON strings for equality.
-
-**Algorithm**:
-1. Parse first JSON string
-2. Parse second JSON string
-3. Compare resulting ASTs using operator==
-4. Return comparison result with error message
-
-**Returns**:
-- `.first`: `true` if equal, `false` otherwise
-- `.second`: "Success" or detailed error message
-
-**Error Messages**:
-- "Unable to read first Json buffer" - Parse error on first string
-- "Unable to read second Json buffer" - Parse error on second string
-- Plus any differences from AST comparison
-
-## Usage Examples
-
-### Basic Parsing
-
-```cpp
 using namespace artdaq::database::json;
 
-std::string json_text = R"({"key": "value", "number": 42})";
-object_t ast;
+void parseConfiguration() {
+  std::string json_text = R"({
+    "detector": {
+      "name": "TPC",
+      "channels": 1024,
+      "enabled": true
+    }
+  })";
 
-JsonReader reader;
-if (reader.read(json_text, ast)) {
-    // Success - ast contains parsed structure
-    auto& key_value = boost::get<std::string>(ast.at("key"));
-    // key_value == "value"
+  object_t ast;
+  JsonReader reader;
+
+  if (reader.read(json_text, ast)) {
+    // Access parsed data
+    auto& detector = boost::get<object_t>(ast.at("detector"));
+    auto& name = boost::get<std::string>(detector.at("name"));
+    std::cout << "Detector: " << name << "\n";  // Output: Detector: TPC
+  } else {
+    std::cerr << "Failed to parse JSON configuration\n";
+  }
 }
 ```
 
-### Comparing JSON
+## Functions
+
+### `compare_json_objects(first, second) -> std::pair<bool, std::string>`
+
+**Brief:** Compares two JSON strings for structural and value equality by parsing both and comparing their AST representations.
+
+**Parameters:**
+- `first` - First JSON string to compare. Must not be empty.
+- `second` - Second JSON string to compare. Must not be empty.
+
+**Preconditions:**
+- `first` must not be empty (enforced by `confirm()`)
+- `second` must not be empty (enforced by `confirm()`)
+
+**Returns:** A pair where:
+- `.first` is `true` if both JSON documents are equal, `false` otherwise
+- `.second` is an error/difference message (empty on exact match, descriptive on difference)
+
+**Postconditions:**
+- Return value accurately reflects the comparison result
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| None | Parse errors are returned as error messages in the result pair |
+
+**Thread Safety:** Safe to call concurrently (creates internal reader instances)
+
+**Example:**
+```cpp
+#include "artdaq-database/DataFormats/Json/json_reader.h"
+#include <iostream>
+
+using namespace artdaq::database::json;
+
+void validateConfiguration() {
+  std::string expected = R"({"threshold": 100, "enabled": true})";
+  std::string actual = R"({"threshold": 100, "enabled": false})";
+
+  auto [equal, message] = compare_json_objects(expected, actual);
+
+  if (!equal) {
+    std::cerr << "Configuration mismatch: " << message << "\n";
+    // Handle the difference
+  } else {
+    std::cout << "Configurations match\n";
+  }
+}
+
+void handleParseErrors() {
+  std::string valid_json = R"({"key": "value"})";
+  std::string invalid_json = R"({"key": value})";  // Missing quotes
+
+  auto [equal, message] = compare_json_objects(valid_json, invalid_json);
+
+  if (!equal) {
+    if (message.find("Unable to read") != std::string::npos) {
+      std::cerr << "Parse error: " << message << "\n";
+    }
+  }
+}
+```
+
+## Relationship to Other Components
+
+This file is part of the DataFormats/Json module which provides JSON parsing and generation:
+
+```
+json_reader.h (this file)
+    |
+    +-- json_types.h (AST type definitions)
+    |
+    +-- Used by: JsonDocument, ConfigurationDB, StorageProviders
+    |
+    +-- Complementary: json_writer.h (generates JSON from AST)
+```
+
+The `JsonReader` is used throughout the codebase whenever JSON text needs to be converted to the internal AST representation for manipulation or storage.
+
+## See Also
+
+- [json_reader.cpp](./json_reader.cpp.md) - Implementation of `JsonReader::read()` and `compare_json_objects()`
+- [json_writer.h](./json_writer.h.md) - Complementary JSON generator (AST to text)
+- [json_types.h](./json_types.h.md) - JSON AST type definitions
+- [External: Boost.Spirit Qi](https://www.boost.org/doc/libs/release/libs/spirit/doc/html/spirit/qi.html) - Parser framework documentation
+
+## Notes for Developers
+
+### Common Pitfalls
+
+- **Pitfall 1:** Passing a non-empty `ast` parameter to `read()`. The function uses `confirm()` which will abort in debug builds. Always pass an empty `object_t`.
+
+- **Pitfall 2:** Expecting array-only JSON to parse. The grammar's start rule requires the top-level to be an object (`{}`). Arrays at the top level will fail to parse.
+
+- **Pitfall 3:** Assuming thread safety. Each thread must create its own `JsonReader` instance; the grammar is not designed for concurrent use.
+
+### Anti-patterns
 
 ```cpp
-std::string json1 = R"({"a": 1, "b": 2})";
-std::string json2 = R"({"a": 1, "b": 3})";
-
-auto [equal, message] = compare_json_objects(json1, json2);
-if (!equal) {
-    std::cout << "JSON differs: " << message << "\n";
-}
-```
-
-### Parsing Complex Structures
-
-```cpp
-std::string json = R"({
-    "config": {
-        "host": "localhost",
-        "port": 8080,
-        "enabled": true
-    },
-    "items": [1, 2, 3, "four"]
-})";
-
+// DON'T do this - ast must be empty:
 object_t ast;
-if (JsonReader{}.read(json, ast)) {
-    // Access nested object
-    auto& config = boost::get<object_t>(ast.at("config"));
+ast["existing"] = std::string("data");
+JsonReader{}.read(json_str, ast);  // Will fail confirm() assertion
 
-    // Access array
-    auto& items = boost::get<array_t>(ast.at("items"));
-}
+// DO this instead - use a fresh ast:
+object_t ast;  // Empty
+JsonReader{}.read(json_str, ast);  // Correct
+
+// DON'T do this - top-level must be object:
+std::string array_json = R"([1, 2, 3])";
+object_t ast;
+JsonReader{}.read(array_json, ast);  // Will return false
+
+// DO this instead - wrap in object if needed:
+std::string object_json = R"({"items": [1, 2, 3]})";
+object_t ast;
+JsonReader{}.read(object_json, ast);  // Correct
 ```
 
-## Parsing Details
+### Parsing Details
 
-**Number Handling**:
-- Integers: Matched first with `qi::long_` followed by negative lookahead for '.'
-- Decimals: Matched with `qi::double_`
-- Scientific notation: Supported via `qi::double_`
+**Number Handling:**
+- Integers are matched with `qi::long_` followed by negative lookahead for `.` to prevent matching decimals
+- Decimals are matched with `qi::double_`
+- Scientific notation is supported via `qi::double_`
 
-**String Handling**:
-- Supports escape sequences: `\\`, `\"`, `\b`, `\f`, `\n`, `\r`, `\t`
-- Uses `qi::lexeme` to prevent whitespace skipping inside strings
+**String Handling:**
+- Escape sequences supported: `\\`, `\"`, `\b`, `\f`, `\n`, `\r`, `\t`
+- Unicode escapes (`\uXXXX`) are not explicitly handled by the grammar
+- `qi::lexeme` prevents whitespace skipping inside strings
 
-**Whitespace**:
-- Automatically skipped between tokens via `ascii::space_type` skipper
-- Preserved inside quoted strings via `qi::lexeme`
-
-**Error Handling**:
-- Parser returns false on syntax errors
-- No exception thrown on parse failure
-- Use TRACE logging to debug parse issues (enable with BOOST_SPIRIT_DEBUG_NODE)
-
-## Performance Considerations
-
-**Optimization**:
-- Grammar compiled once per parse operation
-- Could be optimized by making grammar static
-- Memory pre-allocated for result buffer
-
-**Tracing**:
-- Debug nodes commented out for performance
-- Enable by uncommenting BOOST_SPIRIT_DEBUG_NODE calls
-- TRACE logging for large inputs (>512 bytes)
-
-## Related Files
-
-- **json_reader.cpp** - Implementation of JsonReader::read()
-- **json_writer.h** - Complementary generator (AST to JSON text)
-- **json_types.h** - AST type definitions
-- **Boost.Spirit Qi documentation** - Parser framework
-
-## Notes
-
-- Grammar requires input to be a JSON object (not array or value)
-- Parser is non-throwing - check return value
-- Comparison utility is useful for testing and validation
-- Boost.Fusion adaptation (in json_types.h) enables automatic rule synthesis
+**Performance:**
+- Grammar is instantiated for each parse operation
+- For high-throughput scenarios, consider caching the grammar instance
+- Inputs larger than 512 bytes trigger stack trace logging for performance monitoring

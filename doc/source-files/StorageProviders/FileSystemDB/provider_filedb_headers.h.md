@@ -1,60 +1,118 @@
 # provider_filedb_headers.h
 
-## File Overview
+**Path:** `artdaq-database/StorageProviders/FileSystemDB/provider_filedb_headers.h`
 
-Aggregator header file that includes all necessary headers for FileSystemDB provider implementation files. Reduces boilerplate includes and ensures consistent dependencies.
+**Purpose:** Aggregator header file that includes all necessary headers for FileSystemDB provider implementation files. This reduces boilerplate includes across implementation files and ensures consistent dependencies and namespace aliases throughout the FileSystemDB module.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/StorageProviders/FileSystemDB/provider_filedb_headers.h`
+## Key Concepts
 
-**Lines of Code**: 27
+### Header Aggregation
+This file collects all commonly-needed includes in one place, so implementation files only need a single include statement to access all required types and utilities. This pattern improves code maintainability and reduces the chance of missing dependencies.
 
-**Purpose**: Centralized header aggregation for FileSystemDB implementation
+### Namespace Aliasing
+Provides consistent short namespace aliases used throughout the FileSystemDB implementation files, ensuring uniform naming conventions across the module.
 
-## Included Headers
+## Thread Safety
 
-### FileSystemDB Headers
-- `provider_filedb.h` - Main provider class
-- `provider_filedb_index.h` - Search index
-- `common.h` - Common utilities
+- **Thread-safe:** Yes (header-only, no mutable state)
+- **Concurrent access:** No restrictions
+- **Locking:** None required
 
-### Shared Headers
-- `shared_literals.h` - String literal constants
-- `sharedcommon_common.h` - Shared utilities
-- `JSONDocumentBuilder.h` - JSON document construction
+## Dependencies
+
+| Include | Purpose |
+|---------|---------|
+| `artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h` | Main provider class declarations |
+| `artdaq-database/StorageProviders/FileSystemDB/provider_filedb_index.h` | SearchIndex class for fast queries |
+| `artdaq-database/StorageProviders/common.h` | Common utilities and macros |
+| `artdaq-database/DataFormats/shared_literals.h` | String literal constants |
+| `artdaq-database/SharedCommon/sharedcommon_common.h` | Shared utilities |
+| `artdaq-database/JsonDocument/JSONDocumentBuilder.h` | JSON document construction |
+| `artdaq-database/SharedCommon/configuraion_api_literals.h` | API literal constants |
+| `<sstream>` | String stream for JSON construction |
 
 ## Namespace Aliases
 
-```cpp
-namespace db = artdaq::database;
-namespace dbfs = artdaq::database::filesystem;
-namespace dbfsl = dbfs::literal;
-namespace jsonliteral = artdaq::database::dataformats::literal;
+| Alias | Full Namespace | Purpose |
+|-------|----------------|---------|
+| `db` | `artdaq::database` | Root database namespace |
+| `apiliteral` | `artdaq::database::configapi::literal` | API string literals |
+| `dbfs` | `artdaq::database::filesystem` | FileSystemDB namespace |
+| `dbfsl` | `artdaq::database::filesystem::literal` | FileSystemDB literals |
+| `jsonliteral` | `artdaq::database::dataformats::literal` | JSON format literals |
+
+## Type Aliases (using declarations)
+
+| Alias | Full Type | Purpose |
+|-------|-----------|---------|
+| `DBConfig` | `artdaq::database::filesystem::DBConfig` | Configuration structure |
+| `FileSystemDB` | `artdaq::database::filesystem::FileSystemDB` | Provider class |
+| `SearchIndex` | `artdaq::database::filesystem::index::SearchIndex` | Index class |
+| `JSONDocument` | `artdaq::database::docrecord::JSONDocument` | Document type |
+| `JSONDocumentBuilder` | `artdaq::database::docrecord::JSONDocumentBuilder` | Builder class |
+
+## Relationship to Other Components
+
+### Implementation Files Using This Header
+- `provider_filedb.cpp` - Query operations
+- `provider_filedb_readwrite.cpp` - Read/write operations
+- `provider_filedb_index.cpp` - Index operations
+- `provider_connection.cpp` - Connection management
+- `filesystem_functions.cpp` - Filesystem utilities
+
+### Included Components
+```
+provider_filedb_headers.h
+  |
+  +-- provider_filedb.h
+  |     +-- storage_providers.h
+  |     +-- boost/filesystem.hpp
+  |
+  +-- provider_filedb_index.h
+  |     +-- json_common.h
+  |     +-- storage_providers.h
+  |
+  +-- common.h
+  |     +-- SharedCommon/common.h
+  |
+  +-- shared_literals.h
+  +-- sharedcommon_common.h
+  +-- JSONDocumentBuilder.h
+  +-- configuraion_api_literals.h
+  +-- <sstream>
 ```
 
-**Purpose**: Shorter namespace paths for implementation files.
+## See Also
 
-## Type Aliases
+- [provider_filedb.h](./provider_filedb.h.md) - Main provider class
+- [provider_filedb_index.h](./provider_filedb_index.h.md) - SearchIndex class
+- [../common.h](../common.h.md) - StorageProviders common header
 
-```cpp
-using artdaq::database::filesystem::DBConfig;
-using artdaq::database::filesystem::FileSystemDB;
-using artdaq::database::filesystem::index::SearchIndex;
-using artdaq::database::docrecord::JSONDocument;
-using artdaq::database::docrecord::JSONDocumentBuilder;
-```
+## Notes for Developers
 
-**Purpose**: Convenient type names without full qualification.
-
-## Usage
-
-Include this header in FileSystemDB .cpp files:
-
+### Usage
+Include this header at the top of FileSystemDB implementation files:
 ```cpp
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb_headers.h"
-
-// Now have access to all necessary types and utilities
 ```
 
----
+### Benefits
+- **Reduces code duplication:** Single include instead of many
+- **Ensures consistency:** All files use same namespace aliases
+- **Simplifies maintenance:** Add new common includes in one place
+- **Improves readability:** Implementation files are more concise
 
-**Documentation generated for artdaq-database FileSystemDB provider**
+### When to Modify
+Add includes to this header when:
+- A new dependency is needed by multiple FileSystemDB implementation files
+- A new namespace alias would benefit multiple files
+- A new common type alias is needed
+
+### When NOT to Modify
+Do not add includes that are:
+- Only needed by a single implementation file
+- Specific to a particular operation or feature
+- Heavy dependencies that increase compile time significantly
+
+### Include Guard
+The header guard `_ARTDAQ_DATABASE_PROVIDER_FILESYSTEM_HEADERS_H_` prevents multiple inclusion.

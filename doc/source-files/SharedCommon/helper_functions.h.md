@@ -1,736 +1,870 @@
 # helper_functions.h
 
-## File Overview
+**Path:** `artdaq-database/SharedCommon/helper_functions.h`
 
-This header file declares a comprehensive set of helper utility functions used throughout the artdaq-database project. It provides functionality for string manipulation, time/timestamp handling, type conversion, JSON generation, environment variable expansion, and debugging assertions.
+**Purpose:** Comprehensive utility functions for string manipulation, timestamp handling, JSON generation, environment variable expansion, and debugging assertions. These functions are used throughout artdaq-database for configuration processing, data formatting, and error handling.
 
-**Location**: `/home/user/artdaq-database/artdaq-database/SharedCommon/helper_functions.h`
+## Key Concepts
 
-## Dependencies
+### confirm() Assertion
 
-### Standard Library
-- `<cassert>` - Assertion support
-- `<chrono>` - Time and duration types
-- `<iostream>` - Standard I/O
-- `<iterator>` - Iterator utilities
-- `<memory>` - Smart pointers
-- `<sstream>` - String streams
-- `<string>` - String class
+A runtime assertion that works in both debug and release builds:
+- **Debug build**: Prints stack trace and calls `assert()` (terminates)
+- **Release build**: Prints stack trace and throws `runtime_exception`
 
-### Project Headers
-- `"artdaq-database/SharedCommon/shared_datatypes.h"` - Common type definitions
-
-## Namespace: debug
-
-This namespace contains debugging utilities available globally (not in artdaq::database).
-
-### getStackTrace
-```cpp
-std::string getStackTrace();
-```
-
-**Purpose**: Get current call stack trace as a string.
-
-**Returns**: String containing formatted stack trace
-
-**Usage**: Primarily used for debugging and error reporting
-
----
-
-## Confirm Macro/Function
-
-The `confirm()` function provides runtime assertions with stack trace support:
-
-### Debug Build (NDEBUG not defined)
-
-```cpp
-template <typename T>
-inline void confirm(std::unique_ptr<T> const& expr);
-
-inline void confirm(bool expr);
-```
-
-**Behavior**:
-- Checks condition
-- If false: prints stack trace to stderr
-- Calls `assert()` which terminates program
-
-### Release Build (NDEBUG defined)
-
-```cpp
-template <typename T>
-inline void confirm(std::unique_ptr<T> const& expr);
-
-inline void confirm(bool expr);
-```
-
-**Behavior**:
-- Checks condition
-- If false: prints stack trace and throws `runtime_exception`
-
-**Usage Example**:
 ```cpp
 confirm(!path.empty());  // Ensure path is not empty
 confirm(ptr);            // Ensure pointer is not null
 ```
 
-**Design Note**: The dual behavior allows detection of assertion failures in release builds instead of undefined behavior.
+### Fake Time Mode
 
----
-
-## Namespace: artdaq::database
-
-### Type Definitions
-
-#### quotation_type_t
+For testing, timestamps can return a fixed value instead of real time:
 ```cpp
-enum class quotation_type_t {
-    NONE = 0,
-    SINGLE = 1,
-    DOUBLE = 2
-};
+useFakeTime(true);       // Enable fake time
+auto ts = timestamp();   // Returns fixed test timestamp
+useFakeTime(false);      // Return to real time
 ```
 
-**Purpose**: Represents the type of quotes surrounding a string.
+### Quotation Type Enum
 
-**Values**:
-- `NONE` - No quotes
-- `SINGLE` - Single quotes (')
-- `DOUBLE` - Double quotes (")
-
----
-
-## Time and Timestamp Functions
-
-### timestamp
+Used to identify the type of quotation around a string:
 ```cpp
-std::string timestamp();
+enum class quotation_type_t { NONE = 0, SINGLE = 1, DOUBLE };
 ```
 
-**Purpose**: Get current timestamp as ISO 8601 formatted string.
+## Thread Safety
 
-**Returns**: Current time in format `"2017-07-18T12:48:10.123-0500"`
+- **Thread-safe:** No (static state in `useFakeTime`)
+- **Notes:** The `useFakeTime` function uses a static variable that is not thread-safe. All other functions are thread-safe as they use only local variables and const parameters.
 
-**Usage Example**:
+## Dependencies
+
+| Include | Purpose |
+|---------|---------|
+| `<cassert>` | Debug assertions |
+| `<chrono>` | Time types (`system_clock`, `time_point`) |
+| `<iostream>` | Error output for failed assertions |
+| `<iterator>` | `ostream_iterator` for `to_csv` |
+| `<memory>` | `unique_ptr` for `confirm` overload |
+| `<sstream>` | String streams for building strings |
+| `<string>` | String class |
+| `shared_datatypes.h` | Type definitions (`object_id_t`) |
+
+## Functions
+
+### Assertion Functions
+
+#### `confirm(std::unique_ptr<T> const& expr) -> void`
+
+**Brief:** Runtime assertion that checks if a unique_ptr is not null. In debug builds, terminates on failure; in release builds, throws an exception.
+
+**Parameters:**
+- `expr` - Unique pointer to check for null
+
+**Preconditions:**
+- None
+
+**Postconditions:**
+- If the function returns, `expr` is guaranteed to be non-null
+
+**Behavior:**
+- If `expr` is null, prints stack trace to stderr
+- Debug build: calls `assert(expr)`
+- Release build: throws `runtime_exception`
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `runtime_exception` | When `expr` is null (release build only) |
+
+**Thread Safety:** Safe
+
+**Example:**
 ```cpp
-auto now = artdaq::database::timestamp();
-// Returns: "2025-11-13T10:30:45.123-0600"
-```
-
----
-
-### to_string
-```cpp
-std::string to_string(system_clock::time_point const& tp);
-```
-
-**Purpose**: Convert a chrono time_point to ISO 8601 formatted string.
-
-**Parameters**:
-- `tp` - Time point to convert
-
-**Returns**: Formatted timestamp string with milliseconds
-
-**Format**: `YYYY-MM-DDTHH:MM:SS.mmm±ZZZZ`
-
-**Usage Example**:
-```cpp
-auto tp = std::chrono::system_clock::now();
-auto str = artdaq::database::to_string(tp);
-```
-
----
-
-### to_timepoint
-```cpp
-system_clock::time_point to_timepoint(std::string const& strtime);
-```
-
-**Purpose**: Parse ISO 8601 timestamp string to chrono time_point.
-
-**Parameters**:
-- `strtime` - Timestamp string to parse
-
-**Returns**: Corresponding time_point
-
-**Throws**: `std::invalid_argument` if format doesn't match
-
-**Usage Example**:
-```cpp
-auto tp = artdaq::database::to_timepoint("2017-07-18T12:48:10.123-0500");
-```
-
----
-
-### confirm_iso8601_timestamp
-```cpp
-std::string confirm_iso8601_timestamp(std::string const& strtime);
-```
-
-**Purpose**: Validate and convert timestamp to ISO 8601 format (handles legacy formats).
-
-**Parameters**:
-- `strtime` - Timestamp string (ISO 8601 or legacy format)
-
-**Returns**: ISO 8601 formatted timestamp string
-
-**Behavior**:
-- If already ISO 8601: returns unchanged
-- If legacy format: converts to ISO 8601
-- Otherwise: throws exception
-
-**Legacy Format**: `"Mon Feb 8 14:00:30 2016"`
-
----
-
-### useFakeTime
-```cpp
-bool useFakeTime(bool useFakeTime = false);
-```
-
-**Purpose**: Enable/disable fake time mode for testing.
-
-**Parameters**:
-- `useFakeTime` - true to enable fake time, false for real time
-
-**Returns**: Current fake time setting
-
-**Behavior**: When enabled, all timestamp functions return a fixed fake time string instead of real time.
-
-**Usage Example**:
-```cpp
-artdaq::database::useFakeTime(true);  // Enable for testing
-auto ts = timestamp();                 // Returns fake time
-useFakeTime(false);                    // Disable
-```
-
----
-
-## String Manipulation Functions
-
-### quoted_
-```cpp
-std::string quoted_(std::string const& text, const char qchar = '\"');
-```
-
-**Purpose**: Wrap a string with quotation marks.
-
-**Parameters**:
-- `text` - String to quote
-- `qchar` - Quote character (' or ")
-
-**Returns**: Quoted string
-
-**Usage Example**:
-```cpp
-auto s1 = quoted_("hello");       // Returns: "hello"
-auto s2 = quoted_("world", '\''); // Returns: 'world'
-```
-
----
-
-### operator"" _quoted
-```cpp
-std::string operator"" _quoted(const char* text, std::size_t);
-```
-
-**Purpose**: String literal operator for automatic double-quoting.
-
-**Returns**: Double-quoted string
-
-**Usage Example**:
-```cpp
-auto key = "name"_quoted;  // Returns: "\"name\""
-```
-
----
-
-### debrace
-```cpp
-std::string debrace(std::string s);
-```
-
-**Purpose**: Remove surrounding braces from string.
-
-**Parameters**:
-- `s` - String potentially surrounded by { }
-
-**Returns**: String without braces (or unchanged if no braces)
-
-**Usage Example**:
-```cpp
-debrace("{data}");   // Returns: "data"
-debrace("data");     // Returns: "data"
-```
-
----
-
-### dequote
-```cpp
-std::string dequote(std::string s);
-```
-
-**Purpose**: Remove surrounding quotes (single or double) from string.
-
-**Parameters**:
-- `s` - String potentially quoted
-
-**Returns**: String without quotes (or unchanged if no quotes)
-
-**Usage Example**:
-```cpp
-dequote("\"text\"");  // Returns: "text"
-dequote("'text'");    // Returns: "text"
-dequote("text");      // Returns: "text"
-```
-
----
-
-### debracket
-```cpp
-std::string debracket(std::string s);
-```
-
-**Purpose**: Remove surrounding brackets from string.
-
-**Parameters**:
-- `s` - String potentially surrounded by [ ]
-
-**Returns**: String without brackets (or unchanged if no brackets)
-
-**Usage Example**:
-```cpp
-debracket("[array]");  // Returns: "array"
-debracket("array");    // Returns: "array"
-```
-
----
-
-### annotate
-```cpp
-std::string annotate(std::string const& s);
-```
-
-**Purpose**: Add '#' prefix to a string (for comments/annotations).
-
-**Parameters**:
-- `s` - String to annotate
-
-**Returns**: String with '#' prefix
-
-**Behavior**:
-- If already starts with '#': returns unchanged
-- If empty: returns empty string
-- Otherwise: prepends '#'
-
-**Usage Example**:
-```cpp
-annotate("comment");   // Returns: "#comment"
-annotate("#comment");  // Returns: "#comment"
-annotate("");          // Returns: ""
-```
-
----
-
-### quotation_type
-```cpp
-quotation_type_t quotation_type(std::string text);
-```
-
-**Purpose**: Determine what type of quotes surround a string.
-
-**Parameters**:
-- `text` - String to check
-
-**Returns**: quotation_type_t enum value
-
-**Usage Example**:
-```cpp
-quotation_type("\"text\"");  // Returns: quotation_type_t::DOUBLE
-quotation_type("'text'");    // Returns: quotation_type_t::SINGLE
-quotation_type("text");      // Returns: quotation_type_t::NONE
-```
-
----
-
-### quoted (template)
-```cpp
-template <quotation_type_t Q>
-std::string quoted(std::string const& text);
-```
-
-**Purpose**: Quote a string based on compile-time template parameter.
-
-**Template Parameters**:
-- `Q` - Quotation type (NONE, SINGLE, or DOUBLE)
-
-**Returns**: Appropriately quoted string
-
-**Usage Example**:
-```cpp
-auto s1 = quoted<quotation_type_t::DOUBLE>("text");  // "text"
-auto s2 = quoted<quotation_type_t::SINGLE>("text");  // 'text'
-auto s3 = quoted<quotation_type_t::NONE>("text");    // text
-```
-
----
-
-### trim
-```cpp
-std::string trim(std::string const& s);
-```
-
-**Purpose**: Remove leading and trailing whitespace.
-
-**Parameters**:
-- `s` - String to trim
-
-**Returns**: Trimmed string
-
-**Usage Example**:
-```cpp
-trim("  hello  ");     // Returns: "hello"
-trim("\t\ntext\n");    // Returns: "text"
-```
-
----
-
-### to_lower
-```cpp
-std::string to_lower(std::string const& c);
-```
-
-**Purpose**: Convert string to lowercase.
-
-**Parameters**:
-- `c` - String to convert
-
-**Returns**: Lowercase string
-
-**Usage Example**:
-```cpp
-to_lower("HELLO World");  // Returns: "hello world"
-```
-
----
-
-### to_upper
-```cpp
-std::string to_upper(std::string const& c);
-```
-
-**Purpose**: Convert string to uppercase.
-
-**Parameters**:
-- `c` - String to convert
-
-**Returns**: Uppercase string
-
-**Usage Example**:
-```cpp
-to_upper("hello World");  // Returns: "HELLO WORLD"
-```
-
----
-
-### replace_all
-```cpp
-std::string replace_all(std::string const& source,
-                       std::string const& match,
-                       std::string const& replacement);
-```
-
-**Purpose**: Replace all occurrences of a substring.
-
-**Parameters**:
-- `source` - Original string
-- `match` - Substring to find
-- `replacement` - Replacement string
-
-**Returns**: String with all replacements made
-
-**Usage Example**:
-```cpp
-replace_all("hello world hello", "hello", "hi");
-// Returns: "hi world hi"
-```
-
----
-
-## Boolean and Conversion Functions
-
-### bool_
-```cpp
-std::string bool_(bool value);
-```
-
-**Purpose**: Convert boolean to JSON-compatible string.
-
-**Parameters**:
-- `value` - Boolean value
-
-**Returns**: "true" or "false" (as string)
-
-**Usage Example**:
-```cpp
-bool_(true);   // Returns: "true"
-bool_(false);  // Returns: "false"
-```
-
----
-
-## Locale Functions
-
-### set_default_locale
-```cpp
-void set_default_locale();
-```
-
-**Purpose**: Set the C locale to the database's default locale ("en_US.UTF-8").
-
-**Usage**: Call at program startup to ensure consistent string/time handling.
-
-**Usage Example**:
-```cpp
-int main() {
-    artdaq::database::set_default_locale();
-    // ... rest of program
+#include "artdaq-database/SharedCommon/helper_functions.h"
+#include <memory>
+
+void processDocument(std::unique_ptr<Document> doc) {
+    confirm(doc);  // Terminates/throws if doc is null
+    // Safe to use doc here
+    doc->process();
 }
 ```
 
 ---
 
-## String Comparison Functions
+#### `confirm(bool expr) -> void`
 
-### equal
+**Brief:** Runtime assertion that checks if a boolean expression is true. In debug builds, terminates on failure; in release builds, throws an exception.
+
+**Parameters:**
+- `expr` - Boolean expression to verify
+
+**Preconditions:**
+- None
+
+**Postconditions:**
+- If the function returns, `expr` was true
+
+**Behavior:**
+- If `expr` is false, prints stack trace to stderr
+- Debug build: calls `assert(expr)`
+- Release build: throws `runtime_exception`
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `runtime_exception` | When `expr` is false (release build only) |
+
+**Thread Safety:** Safe
+
+**Example:**
 ```cpp
-bool equal(std::string const& left, std::string const& right);
+#include "artdaq-database/SharedCommon/helper_functions.h"
+
+void loadConfiguration(const std::string& filename) {
+    confirm(!filename.empty());  // Ensure filename is not empty
+    confirm(filename.size() < 256);  // Ensure reasonable length
+    // Safe to proceed with loading
+}
 ```
 
-**Purpose**: Compare two strings for equality.
+---
 
-**Parameters**:
+### Timestamp Functions
+
+#### `timestamp() -> std::string`
+
+**Brief:** Returns the current time as an ISO 8601 formatted string with millisecond precision.
+
+**Returns:** ISO 8601 timestamp string (e.g., `"2024-01-15T14:30:25.123-0500"`)
+
+**Thread Safety:** Conditional (depends on `useFakeTime` state; fake time mode is not thread-safe)
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+#include <iostream>
+
+void logEvent(const std::string& message) {
+    std::cout << "[" << artdaq::database::timestamp() << "] " << message << "\n";
+    // Output: [2024-01-15T14:30:25.123-0500] message
+}
+```
+
+---
+
+#### `to_string(system_clock::time_point const& tp) -> std::string`
+
+**Brief:** Converts a `std::chrono::system_clock::time_point` to an ISO 8601 formatted string with millisecond precision.
+
+**Parameters:**
+- `tp` - Time point to convert
+
+**Returns:** ISO 8601 timestamp string with millisecond precision
+
+**Thread Safety:** Conditional (depends on `useFakeTime` state)
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+#include <chrono>
+
+void recordEventTime() {
+    auto now = std::chrono::system_clock::now();
+    auto str = artdaq::database::to_string(now);
+    // str contains formatted timestamp
+}
+```
+
+---
+
+#### `to_timepoint(std::string const& strtime) -> system_clock::time_point`
+
+**Brief:** Parses an ISO 8601 timestamp string into a `time_point`. Throws on invalid input.
+
+**Parameters:**
+- `strtime` - ISO 8601 formatted timestamp string
+
+**Preconditions:**
+- `strtime` must not be empty
+- `strtime` must be in a recognized format
+
+**Returns:** Corresponding `system_clock::time_point`
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `std::invalid_argument` | Empty string or format mismatch |
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+#include <iostream>
+
+void parseTimestamp(const std::string& ts) {
+    try {
+        auto tp = artdaq::database::to_timepoint(ts);
+        // Use tp for time comparisons
+    } catch (const std::invalid_argument& e) {
+        std::cerr << "Invalid timestamp: " << e.what() << "\n";
+    }
+}
+```
+
+---
+
+#### `confirm_iso8601_timestamp(std::string const& strtime) -> std::string`
+
+**Brief:** Validates and normalizes a timestamp string to ISO 8601 format, converting from legacy format if necessary.
+
+**Parameters:**
+- `strtime` - Timestamp string to validate/convert
+
+**Preconditions:**
+- `strtime` must not be empty
+
+**Returns:** ISO 8601 formatted timestamp string
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `std::invalid_argument` | Empty string or unrecognized format |
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+
+std::string normalizeTimestamp(const std::string& ts) {
+    try {
+        return artdaq::database::confirm_iso8601_timestamp(ts);
+    } catch (const std::invalid_argument& e) {
+        // Handle invalid format
+        return "";
+    }
+}
+```
+
+---
+
+#### `useFakeTime(bool) -> bool`
+
+**Brief:** Enables or disables fake time mode for testing purposes. When enabled, `timestamp()` returns a fixed test timestamp instead of the real current time.
+
+**Parameters:**
+- `useFakeTime` - `true` to enable fake time, `false` to use real time (default: `false`)
+
+**Returns:** Previous state of fake time mode
+
+**Thread Safety:** Not thread-safe (uses static variable)
+
+**Side Effects:**
+- Modifies global fake time state
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+#include <cassert>
+
+void testTimestampConsistency() {
+    artdaq::database::useFakeTime(true);   // Enable fake time
+    auto ts1 = artdaq::database::timestamp();
+    auto ts2 = artdaq::database::timestamp();
+    assert(ts1 == ts2);  // Same fixed timestamp
+    artdaq::database::useFakeTime(false);  // Restore real time
+}
+```
+
+---
+
+### String Manipulation Functions
+
+#### `trim(std::string const& s) -> std::string`
+
+**Brief:** Removes leading and trailing whitespace from a string.
+
+**Parameters:**
+- `s` - String to trim
+
+**Returns:** String with leading/trailing whitespace removed
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+
+auto result = artdaq::database::trim("  hello world  ");
+// result == "hello world"
+```
+
+---
+
+#### `to_lower(std::string const& c) -> std::string`
+
+**Brief:** Converts all characters in a string to lowercase.
+
+**Parameters:**
+- `c` - String to convert
+
+**Returns:** Lowercase copy of the string
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+
+auto result = artdaq::database::to_lower("Hello World");
+// result == "hello world"
+```
+
+---
+
+#### `to_upper(std::string const& c) -> std::string`
+
+**Brief:** Converts all characters in a string to uppercase.
+
+**Parameters:**
+- `c` - String to convert
+
+**Returns:** Uppercase copy of the string
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+
+auto result = artdaq::database::to_upper("Hello World");
+// result == "HELLO WORLD"
+```
+
+---
+
+#### `replace_all(std::string const& source, std::string const& match, std::string const& replacement) -> std::string`
+
+**Brief:** Replaces all occurrences of a substring with another substring.
+
+**Parameters:**
+- `source` - Source string to search in
+- `match` - Substring to find
+- `replacement` - Substring to replace matches with
+
+**Returns:** New string with all occurrences replaced
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+
+auto result = artdaq::database::replace_all("foo bar foo", "foo", "baz");
+// result == "baz bar baz"
+```
+
+---
+
+#### `quoted_(std::string const& text, const char qchar = '"') -> std::string`
+
+**Brief:** Wraps a string with quote characters.
+
+**Parameters:**
+- `text` - String to quote
+- `qchar` - Quote character to use (default: double quote `"`)
+
+**Preconditions:**
+- `qchar` must be either `'"'` or `'\''`
+
+**Returns:** String wrapped in quote characters
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+
+auto result = artdaq::database::quoted_("hello");
+// result == "\"hello\""
+
+auto single = artdaq::database::quoted_("hello", '\'');
+// single == "'hello'"
+```
+
+---
+
+#### `operator"" _quoted(const char* text, std::size_t) -> std::string`
+
+**Brief:** User-defined string literal that wraps text in double quotes. Provides convenient syntax for creating JSON keys.
+
+**Parameters:**
+- `text` - String literal to quote
+
+**Returns:** String wrapped in double quotes
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+using namespace artdaq::database;
+
+auto key = "name"_quoted;
+// key == "\"name\""
+```
+
+---
+
+#### `dequote(std::string s) -> std::string`
+
+**Brief:** Removes surrounding quotes (single or double) from a string if present.
+
+**Parameters:**
+- `s` - String to dequote
+
+**Returns:** String with surrounding quotes removed, or original string if not quoted
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+
+auto result = artdaq::database::dequote("\"hello\"");  // "hello"
+auto result2 = artdaq::database::dequote("'world'");   // "world"
+auto result3 = artdaq::database::dequote("noquotes");  // "noquotes"
+```
+
+---
+
+#### `debrace(std::string s) -> std::string`
+
+**Brief:** Removes surrounding braces `{ }` from a string if present.
+
+**Parameters:**
+- `s` - String to debrace
+
+**Returns:** String with surrounding braces removed, or original string if not braced
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+
+auto result = artdaq::database::debrace("{content}");
+// result == "content"
+```
+
+---
+
+#### `debracket(std::string s) -> std::string`
+
+**Brief:** Removes surrounding brackets `[ ]` from a string if present.
+
+**Parameters:**
+- `s` - String to debracket
+
+**Returns:** String with surrounding brackets removed, or original string if not bracketed
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+
+auto result = artdaq::database::debracket("[content]");
+// result == "content"
+```
+
+---
+
+#### `annotate(std::string const& s) -> std::string`
+
+**Brief:** Prepends a `#` character to create a comment annotation, handling empty strings and existing annotations.
+
+**Parameters:**
+- `s` - String to annotate
+
+**Returns:** Annotated string with `#` prefix, null string literal if empty, or unchanged if already annotated
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+
+auto result = artdaq::database::annotate("This is a comment");
+// result == "#This is a comment"
+
+auto result2 = artdaq::database::annotate("#Already annotated");
+// result2 == "#Already annotated" (unchanged)
+```
+
+---
+
+#### `quotation_type(std::string s) -> quotation_type_t`
+
+**Brief:** Determines the type of quotation marks surrounding a string.
+
+**Parameters:**
+- `s` - String to analyze
+
+**Returns:** `quotation_type_t::DOUBLE`, `quotation_type_t::SINGLE`, or `quotation_type_t::NONE`
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+
+auto type1 = artdaq::database::quotation_type("\"hello\"");  // DOUBLE
+auto type2 = artdaq::database::quotation_type("'hello'");    // SINGLE
+auto type3 = artdaq::database::quotation_type("hello");      // NONE
+```
+
+---
+
+#### `quoted<quotation_type_t Q>(std::string const& text) -> std::string`
+
+**Brief:** Template function that wraps text with the specified quotation type.
+
+**Template Parameters:**
+- `Q` - Quotation type (`NONE`, `SINGLE`, or `DOUBLE`)
+
+**Parameters:**
+- `text` - String to quote
+
+**Returns:** Quoted string according to template parameter
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+using namespace artdaq::database;
+
+auto double_quoted = quoted<quotation_type_t::DOUBLE>("hello");  // "\"hello\""
+auto single_quoted = quoted<quotation_type_t::SINGLE>("hello");  // "'hello'"
+auto unquoted = quoted<quotation_type_t::NONE>("hello");         // "hello"
+```
+
+---
+
+### Comparison Functions
+
+#### `equal(std::string const& left, std::string const& right) -> bool`
+
+**Brief:** Compares two strings for equality with assertion checking. Asserts that both strings are non-empty.
+
+**Parameters:**
 - `left` - First string
 - `right` - Second string
 
-**Returns**: true if equal, false otherwise
+**Preconditions:**
+- `left` must not be empty
+- `right` must not be empty
 
-**Note**: This seems redundant with operator== but may be used for consistency or function pointer contexts.
+**Returns:** `true` if strings are equal, `false` otherwise
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+
+if (artdaq::database::equal(name, "expected")) {
+    // strings match
+}
+```
 
 ---
 
-### not_equal
-```cpp
-bool not_equal(std::string const& left, std::string const& right);
-```
+#### `not_equal(std::string const& left, std::string const& right) -> bool`
 
-**Purpose**: Compare two strings for inequality.
+**Brief:** Compares two strings for inequality.
 
-**Parameters**:
+**Parameters:**
 - `left` - First string
 - `right` - Second string
 
-**Returns**: true if not equal, false otherwise
+**Returns:** `true` if strings are not equal, `false` if equal
 
----
+**Thread Safety:** Safe
 
-## Environment and System Functions
-
-### expand_environment_variables
+**Example:**
 ```cpp
-std::string expand_environment_variables(const std::string& var);
-```
+#include "artdaq-database/SharedCommon/helper_functions.h"
 
-**Purpose**: Expand environment variables and shell patterns in a path string.
-
-**Parameters**:
-- `var` - String containing environment variables (e.g., "$HOME/data")
-
-**Returns**: Expanded string
-
-**Usage Example**:
-```cpp
-auto path = expand_environment_variables("$HOME/artdaq/configs");
-// Returns: "/home/username/artdaq/configs"
+if (artdaq::database::not_equal(name, "forbidden")) {
+    // strings don't match
+}
 ```
 
 ---
 
-### unamejson
+### JSON Generation Functions
+
+#### `to_json(std::string const& key, std::string const& value) -> std::string`
+
+**Brief:** Creates a simple JSON object with a single key-value pair.
+
+**Parameters:**
+- `key` - JSON object key
+- `value` - JSON object value
+
+**Preconditions:**
+- `key` must not be empty
+- `value` must not be empty
+
+**Returns:** JSON object string `{"key":"value"}`
+
+**Thread Safety:** Safe
+
+**Example:**
 ```cpp
-std::string unamejson();
-```
+#include "artdaq-database/SharedCommon/helper_functions.h"
 
-**Purpose**: Get system information as JSON string.
-
-**Returns**: JSON object with system information (sysname, nodename, release, version, machine)
-
-**Usage Example**:
-```cpp
-auto sysinfo = unamejson();
-// Returns: {"sysname":"Linux","nodename":"host","release":"4.4.0",...}
-```
-
----
-
-## Object ID Functions
-
-### generate_oid
-```cpp
-std::string generate_oid();
-```
-
-**Purpose**: Generate a unique object ID (24-character hex string).
-
-**Returns**: Unique object ID string
-
-**Implementation**: Uses /proc/sys/kernel/random/uuid
-
-**Usage Example**:
-```cpp
-auto id = generate_oid();  // Returns: "507f1f77bcf86cd799439011"
+auto json = artdaq::database::to_json("name", "test_configuration");
+// json == "{\"name\":\"test_configuration\"}"
 ```
 
 ---
 
-### extract_oid
+#### `to_id(std::string const& oid) -> std::string`
+
+**Brief:** Creates a MongoDB-style document ID JSON structure.
+
+**Parameters:**
+- `oid` - Object ID string (24-character hex)
+
+**Preconditions:**
+- `oid` must not be empty
+
+**Returns:** MongoDB-style ID JSON: `{"_id":{"$oid":"..."}}`
+
+**Thread Safety:** Safe
+
+**Example:**
 ```cpp
-object_id_t extract_oid(std::string const& filter);
-```
+#include "artdaq-database/SharedCommon/helper_functions.h"
 
-**Purpose**: Extract object ID from a JSON filter string using regex.
-
-**Parameters**:
-- `filter` - JSON string containing object ID
-
-**Returns**: Extracted object ID
-
-**Throws**: std::logic_error or runtime_error if extraction fails
-
-**Usage Example**:
-```cpp
-auto oid = extract_oid("{\"_id\": \"507f1f77bcf86cd799439011\"}");
-// Returns: "507f1f77bcf86cd799439011"
-```
-
----
-
-## JSON Generation Functions
-
-### to_id
-```cpp
-std::string to_json(std::string const& oid);
-```
-
-**Purpose**: Convert object ID to MongoDB-style JSON _id object.
-
-**Parameters**:
-- `oid` - Object ID string
-
-**Returns**: JSON string: `{"_id":{"$oid":"<oid>"}}`
-
-**Usage Example**:
-```cpp
-auto json = to_id("507f1f77bcf86cd799439011");
-// Returns: {"_id":{"$oid":"507f1f77bcf86cd799439011"}}
+auto id = artdaq::database::to_id("507f1f77bcf86cd799439011");
+// id == "{\"_id\":{\"$oid\":\"507f1f77bcf86cd799439011\"} }"
 ```
 
 ---
 
-### to_json
+#### `generate_oid() -> std::string`
+
+**Brief:** Generates a unique 24-character hexadecimal object ID using the system's random UUID generator.
+
+**Returns:** 24-character hexadecimal string
+
+**Thread Safety:** Safe
+
+**Side Effects:**
+- Reads from `/proc/sys/kernel/random/uuid` (Linux-specific)
+
+**Example:**
 ```cpp
-std::string to_json(std::string const& key, std::string const& value);
-```
+#include "artdaq-database/SharedCommon/helper_functions.h"
 
-**Purpose**: Create simple JSON object with one key-value pair.
-
-**Parameters**:
-- `key` - JSON key
-- `value` - JSON value
-
-**Returns**: JSON string: `{"key":"value"}`
-
-**Usage Example**:
-```cpp
-auto json = to_json("name", "component1");
-// Returns: {"name":"component1"}
+auto oid = artdaq::database::generate_oid();
+// oid is something like "507f1f77bcf86cd7994390"
 ```
 
 ---
 
-## Template Functions
+### Environment Functions
 
-### to_csv
+#### `expand_environment_variables(const std::string& var) -> std::string`
+
+**Brief:** Expands shell-style environment variables (`$VAR` and `${VAR}`) in a string using POSIX `wordexp()`.
+
+**Parameters:**
+- `var` - String containing environment variable references
+
+**Returns:** String with environment variables expanded
+
+**Thread Safety:** Safe
+
+**Side Effects:**
+- Reads environment variables
+
+**Example:**
 ```cpp
-template <typename T>
-std::string to_csv(T const& data);
+#include "artdaq-database/SharedCommon/helper_functions.h"
+
+auto path = artdaq::database::expand_environment_variables("$HOME/data");
+// path == "/home/username/data"
+
+auto uri = artdaq::database::expand_environment_variables("${ARTDAQ_DATABASE_URI}");
+// uri == value of ARTDAQ_DATABASE_URI environment variable
 ```
 
-**Purpose**: Convert a container of strings to comma-separated values.
+---
 
-**Template Parameters**:
-- `T` - Container type (must have begin(), end(), empty())
+#### `unamejson() -> std::string`
 
-**Parameters**:
+**Brief:** Returns system information (from `uname`) as a JSON object. Provides hostname, kernel version, and architecture details.
+
+**Returns:** JSON object with system info, or `"{}"` on error
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+
+auto info = artdaq::database::unamejson();
+// info == {"sysname":"Linux","nodename":"host","release":"5.14.0",...}
+```
+
+---
+
+#### `set_default_locale() -> void`
+
+**Brief:** Sets the C locale to `"en_US.UTF-8"` for consistent string and time handling across the application.
+
+**Thread Safety:** Not thread-safe (modifies global locale)
+
+**Side Effects:**
+- Modifies global locale settings
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+
+int main() {
+    artdaq::database::set_default_locale();  // Call early in main()
+    // ... rest of application
+}
+```
+
+---
+
+### Utility Functions
+
+#### `bool_(bool value) -> std::string`
+
+**Brief:** Converts a boolean value to its string representation (`"true"` or `"false"`).
+
+**Parameters:**
+- `value` - Boolean value to convert
+
+**Returns:** `"true"` or `"false"`
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+
+auto str = artdaq::database::bool_(true);   // "true"
+auto str2 = artdaq::database::bool_(false); // "false"
+```
+
+---
+
+#### `extract_oid(std::string const& filter) -> object_id_t`
+
+**Brief:** Extracts an object ID from a JSON filter string using regex parsing.
+
+**Parameters:**
+- `filter` - JSON filter string containing an object ID
+
+**Returns:** Extracted object ID string
+
+**Throws:**
+| Exception | Condition |
+|-----------|-----------|
+| `std::logic_error` | Regex search failed |
+| `runtime_error` | Unexpected number of regex matches |
+
+**Thread Safety:** Safe
+
+**Example:**
+```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+#include <iostream>
+
+void findDocument(const std::string& filter) {
+    try {
+        auto oid = artdaq::database::extract_oid(filter);
+        std::cout << "Found OID: " << oid << "\n";
+    } catch (const std::exception& e) {
+        std::cerr << "Failed to extract OID: " << e.what() << "\n";
+    }
+}
+```
+
+---
+
+#### `to_csv<T>(T const& data) -> std::string`
+
+**Brief:** Template function that converts a container of strings to a comma-separated values string.
+
+**Template Parameters:**
+- `T` - Container type (must support `begin()`, `end()`, `empty()`)
+
+**Parameters:**
 - `data` - Container of strings
 
-**Returns**: Comma-separated string
+**Returns:** Comma-separated string, or empty string if container is empty
 
-**Usage Example**:
+**Thread Safety:** Safe
+
+**Example:**
 ```cpp
+#include "artdaq-database/SharedCommon/helper_functions.h"
+#include <vector>
+
 std::vector<std::string> items = {"apple", "banana", "cherry"};
-auto csv = to_csv(items);  // Returns: "apple,banana,cherry"
+auto csv = artdaq::database::to_csv(items);
+// csv == "apple,banana,cherry"
 ```
 
 ---
 
-### static_cast_as_uint8_t
-```cpp
-template <typename T>
-constexpr std::uint8_t static_cast_as_uint8_t(T const& t);
-```
+#### `static_cast_as_uint8_t<T>(T const& t) -> std::uint8_t`
 
-**Purpose**: Safely cast any type to uint8_t at compile time.
+**Brief:** Constexpr template function for safe casting to `uint8_t`.
 
-**Template Parameters**:
+**Template Parameters:**
 - `T` - Source type
 
-**Parameters**:
+**Parameters:**
 - `t` - Value to cast
 
-**Returns**: Value as uint8_t
+**Returns:** Value cast to `std::uint8_t`
 
-**Usage Example**:
+**Thread Safety:** Safe
+
+**Example:**
 ```cpp
-auto byte = static_cast_as_uint8_t(42);
-auto flag = static_cast_as_uint8_t(true);
+#include "artdaq-database/SharedCommon/helper_functions.h"
+
+auto byte = artdaq::database::static_cast_as_uint8_t(65);
+// byte == 65 as uint8_t
 ```
 
 ---
 
-## Usage Context
+## Relationship to Other Components
 
-These helper functions are used throughout the artdaq-database project for:
+- [helper_functions.cpp](./helper_functions.cpp.md) - Implementation file
+- [shared_datatypes.h](./shared_datatypes.h.md) - Provides `object_id_t`, `timestamp_t`
+- [printStackTrace.h](./printStackTrace.h.md) - Provides `getStackTrace()` used by `confirm()`
+- [shared_exceptions.h](./shared_exceptions.h.md) - Exception types for release-build `confirm()`
+- Used by ConfigurationDB, StorageProviders, and Utilities modules
 
-1. **Configuration Processing**: String manipulation, quoting, JSON generation
-2. **Timestamp Management**: Consistent time formatting across database operations
-3. **Error Handling**: Stack traces and assertions
-4. **Path Processing**: Environment variable expansion
-5. **Data Formatting**: CSV generation, case conversion
-6. **System Information**: Collecting system metadata
-7. **Testing**: Fake time mode for reproducible tests
+## See Also
 
-## Design Patterns
-
-1. **Namespace Organization**: Global debug functions separate from artdaq::database functions
-2. **Template Functions**: Generic algorithms work with any container type
-3. **Const Correctness**: Most functions take const references
-4. **String Literals**: User-defined literal `_quoted` for convenience
-5. **Dual-Mode Assertions**: confirm() behaves differently in debug vs release
-
-## Related Files
-
-- **helper_functions.cpp** - Implementation of these functions
-- **shared_datatypes.h** - Type definitions like object_id_t
-- **printStackTrace.h** - Stack trace implementation
-- **shared_exceptions.h** - Exception types used
+- [helper_functions.cpp](./helper_functions.cpp.md) - Implementation details
+- [configuraion_api_literals.h](./configuraion_api_literals.h.md) - Timestamp format constants

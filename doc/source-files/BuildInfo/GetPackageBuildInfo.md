@@ -1,14 +1,23 @@
 # GetPackageBuildInfo
 
+**Last Updated:** 2026-01-14
+
 ## Overview
 
 The GetPackageBuildInfo module provides version and build information for the artdaq-database package. It follows the artdaq convention for package build information, allowing runtime querying of version numbers and build timestamps.
+
+## Individual File Documentation
+
+For detailed per-file documentation following the standard template, see:
+
+- [GetPackageBuildInfo.hh.md](./GetPackageBuildInfo.hh.md) - Header file documentation
+- [GetPackageBuildInfo.cc.in.md](./GetPackageBuildInfo.cc.in.md) - CMake template documentation
 
 ## Files
 
 ### GetPackageBuildInfo.hh
 
-**Location**: `/home/user/artdaq-database/artdaq-database/BuildInfo/GetPackageBuildInfo.hh`
+**Path:** `artdaq-database/BuildInfo/GetPackageBuildInfo.hh`
 
 **Type**: Header file
 
@@ -16,7 +25,7 @@ The GetPackageBuildInfo module provides version and build information for the ar
 
 ### GetPackageBuildInfo.cc.in
 
-**Location**: `/home/user/artdaq-database/artdaq-database/BuildInfo/GetPackageBuildInfo.cc.in`
+**Path:** `artdaq-database/BuildInfo/GetPackageBuildInfo.cc.in`
 
 **Type**: CMake template implementation file
 
