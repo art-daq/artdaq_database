@@ -1,8 +1,8 @@
 add_executable(ConvertFhicl_t ConvertFhicl_t.cc)
 
 target_link_libraries(ConvertFhicl_t PRIVATE
-  artdaq-database_DataFormats_Json
-  artdaq-database_DataFormats_Fhicl
+  artdaq-database::DataFormats_Json
+  artdaq-database::DataFormats_Fhicl
   Boost::program_options
 )
 

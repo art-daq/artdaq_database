@@ -4,8 +4,8 @@ SET ( TEST_NUMBER "013" )
 add_executable(DataIntegrity_t DataIntegrity_t.cc)
 target_link_libraries(DataIntegrity_t PRIVATE
   test_CaseStudy_OtsDaqCPPInterface
-  artdaq-database_BasicTypes
-  artdaq-database_ConfigurationDB
+  artdaq-database::BasicTypes
+  artdaq-database::ConfigurationDB
   Boost::unit_test_framework
 )
 

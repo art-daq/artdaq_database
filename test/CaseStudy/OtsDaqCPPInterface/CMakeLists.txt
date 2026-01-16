@@ -4,7 +4,7 @@ add_library(test_CaseStudy_OtsDaqCPPInterface
 )
 
 target_link_libraries(test_CaseStudy_OtsDaqCPPInterface PUBLIC
-  artdaq-database_ConfigurationDB
+  artdaq-database::ConfigurationDB
   Boost::unit_test_framework
 )
 

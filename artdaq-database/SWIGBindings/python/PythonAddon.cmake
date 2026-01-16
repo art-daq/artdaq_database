@@ -1,26 +1,18 @@
 
 set(CAN_BUILD true)
 
-if(NOT EXISTS "$ENV{PYTHON_DIR}")
-    message("Directory \"$ENV{PYTHON_DIR}\" does not exist, can't build Python addons!")
+include(GNUInstallDirs)
+
+FIND_PACKAGE(SWIG)
+INCLUDE(${SWIG_USE_FILE})
+if ( NOT ${SWIG_FOUND} )
   set(CAN_BUILD false)
-endif(NOT EXISTS "$ENV{PYTHON_DIR}")
+endif()
 
-if(NOT EXISTS "$ENV{SWIG_DIR}")
-    message("Directory \"$ENV{SWIG_DIR}\" does not exist, can't build Python addons!")
+FIND_PACKAGE(Python3 COMPONENTS Development.Embed)
+if ( NOT ${Python3_FOUND})
   set(CAN_BUILD false)
-endif(NOT EXISTS "$ENV{SWIG_DIR}")
-
-
-if(CAN_BUILD)
-  #find_ups_product(swig v3)
-  #include(FindSWIG)
-
-  FIND_PACKAGE(SWIG REQUIRED)
-  INCLUDE(${SWIG_USE_FILE})
-
-  FIND_PACKAGE(Python3 COMPONENTS Development)
-endif(CAN_BUILD)
+endif()
 
 macro (create_python_addon)
     if(CAN_BUILD)
@@ -41,7 +33,7 @@ macro (create_python_addon)
     list(APPEND PIA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR} ${PYTHON_INCLUDE_PATH})
 
     INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
-
+    
     #swig_add_module (${PIA_ADDON_NAME} python ${PIA_SOURCES} ${LIB_SOURCES})
 	swig_add_library(${PIA_ADDON_NAME} LANGUAGE python SOURCES ${PIA_SOURCES} ${LIB_SOURCES})
     swig_link_libraries (${PIA_ADDON_NAME} ${PIA_LIBRARIES} Python3::Python)
@@ -54,23 +46,12 @@ macro (create_python_addon)
 		endif()
 
     set(PIA_ADDON_LIBNAME _${PIA_ADDON_NAME})
-
-    set( mrb_build_dir $ENV{MRB_BUILDDIR} )
-    if( mrb_build_dir )
-        set( this_build_path ${mrb_build_dir}/${product} )
-    else()
-        set( this_build_path $ENV{CETPKG_BUILD} )
-    endif()
-
+    
+    get_target_property(PIA_LIB_DIR ${PIA_ADDON_NAME} LIBRARY_OUTPUT_DIRECTORY)
     add_custom_command(TARGET ${PIA_ADDON_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/${PIA_ADDON_NAME}.py ${this_build_path}/${artdaq_LIBRARY_DIR})
-
-    install (FILES ${this_build_path}/${artdaq_database_LIBRARY_DIR}/${PIA_ADDON_LIBNAME}.so
-      PERMISSIONS OWNER_EXECUTE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_READ WORLD_EXECUTE
-      DESTINATION ./${flavorqual_dir}/python/)
-
-    install (FILES ${this_build_path}/${PIA_ADDON_NAME}.py DESTINATION ./${flavorqual_dir}/python/)
-
+                        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/${PIA_ADDON_NAME}.py ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages/${PIA_ADDON_NAME}.py
+                        COMMAND ${CMAKE_COMMAND} -E copy ${PIA_LIB_DIR}/${PIA_ADDON_LIBNAME}.so ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages/${PIA_ADDON_LIBNAME}.so
+     )
 
     else(CAN_BUILD)
         message("Compatible version of Swig found. NOT building ${PIA_ADDON_NAME}")

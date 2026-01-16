@@ -4,8 +4,8 @@ SET ( TEST_NUMBER "017" )
 add_executable(WorkflowIntegration_t WorkflowIntegration_t.cc)
 target_link_libraries(WorkflowIntegration_t PRIVATE
   test_CaseStudy_OtsDaqCPPInterface
-  artdaq-database_BasicTypes
-  artdaq-database_ConfigurationDB
+  artdaq-database::BasicTypes
+  artdaq-database::ConfigurationDB
   Boost::unit_test_framework
 )
 
