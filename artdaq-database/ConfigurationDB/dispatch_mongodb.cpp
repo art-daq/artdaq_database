@@ -4,6 +4,7 @@
 #include "artdaq-database/ConfigurationDB/options_operations.h"
 
 #include "artdaq-database/BasicTypes/basictypes.h"
+#include "artdaq-database/DataFormats/Json/json_reader.h"
 #include "artdaq-database/DataFormats/shared_literals.h"
 #include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/JsonDocument/JSONDocumentBuilder.h"
@@ -19,6 +20,7 @@
 using namespace artdaq::database::configuration;
 namespace cf = artdaq::database::configuration;
 namespace db = artdaq::database;
+namespace jsn = artdaq::database::json;
 
 namespace DBI = artdaq::database::mongo;
 namespace prov = artdaq::database::configuration::mongo;
@@ -601,31 +603,27 @@ std::vector<JSONDocument> prov::findCompositionsContaining(ManageDocumentOperati
     throw runtime_error("operation_findcompositionscontaining") << "Version is empty or not provided.";
   }
 
-  TLOG(27) << "Searching SystemConfiguration for configurationType=<" << configurationType << ">, version=<" << version << ">, entity=<" << entity
-           << ">";
-
-  std::ostringstream matchQuery;
-  matchQuery << "{";
-  matchQuery << "\"configurations." << configurationType << ".version\": " << quoted_(version);
-
-  if (!entity.empty() && entity != apiliteral::notprovided) {
-    matchQuery << ", \"configurations." << configurationType << ".entity\": " << quoted_(entity);
-  }
-
-  matchQuery << "}";
+  TLOG(27) << "Searching " << configurationType << " for version=<" << version << ">, entity=<" << entity << ">";
 
   std::ostringstream pipeline;
   pipeline << "[";
-  pipeline << "{ \"$match\": " << matchQuery.str() << " },";
-  pipeline << "{ \"$project\": { \"_id\": 0, \"name\": 1 } }";
+  pipeline << "{\"$match\":{\"version\":" << quoted_(version);
+  if (!entity.empty() && entity != apiliteral::notprovided) {
+    pipeline << ",\"entities.name\":" << quoted_(entity);
+  }
+  pipeline << "}},";
+  pipeline << "{\"$unwind\":{\"path\":\"$configurations\"}},";
+  pipeline << "{\"$match\":{\"configurations.name\":{\"$ne\":\"notprovided\"}}},";
+  pipeline << "{\"$group\":{\"_id\":0,\"configurations\":{\"$addToSet\":\"$configurations.name\"}}},";
+  pipeline << "{\"$project\":{\"_id\":0,\"configurations\":1}}";
   pipeline << "]";
 
   TLOG(27) << "MongoDB aggregation pipeline: " << pipeline.str();
 
   std::ostringstream queryPayload;
   queryPayload << "{";
-  queryPayload << quoted_(apiliteral::option::collection) << ": " << quoted_("SystemConfiguration") << ",";
-  queryPayload << quoted_(apiliteral::option::searchfilter) << ": " << pipeline.str();
+  queryPayload << quoted_(apiliteral::option::collection) << ":" << quoted_(configurationType) << ",";
+  queryPayload << quoted_(apiliteral::option::searchfilter) << ":" << pipeline.str();
   queryPayload << "}";
 
   TLOG(27) << "Query payload: " << queryPayload.str();
@@ -638,28 +636,41 @@ std::vector<JSONDocument> prov::findCompositionsContaining(ManageDocumentOperati
 
   TLOG(27) << "Search returned " << search_results.size() << " results.";
 
-  for (auto const& search_result : search_results) {
-    try {
-      auto result_node = search_result.findChild(apiliteral::option::result);
-      auto result_doc_str = JSONDocument::value(result_node.value());
+  if (search_results.empty()) {
+    TLOG(27) << "operation_findcompositionscontaining: no results found";
+    return returnValue;
+  }
 
-      TLOG(28) << "Processing result document: " << result_doc_str;
+  auto const& search_result = search_results.front();
+  try {
+    auto result_node = search_result.findChild(apiliteral::option::result);
+    auto result_doc_str = result_node.findChildDocument(apiliteral::option::result).to_string();
 
-      auto result_doc = JSONDocument{result_doc_str};
-      auto name_node = result_doc.findChild(apiliteral::name);
-      auto composition_name = JSONDocument::value(name_node.value());
+    TLOG(28) << "Processing aggregation result: " << result_doc_str;
 
-      TLOG(28) << "Found composition: " << composition_name;
-
-      std::ostringstream oss;
-      oss << "{";
-      oss << quoted_(apiliteral::name) << ": " << quoted_(composition_name);
-      oss << "}";
-
-      returnValue.emplace_back(oss.str());
-    } catch (std::exception const& e) {
-      TLOG(29) << "Error processing search result: " << e.what();
+    auto resultAST = jsn::object_t{};
+    if (!jsn::JsonReader{}.read(result_doc_str, resultAST)) {
+      throw runtime_error("operation_findcompositionscontaining") << "Failed to parse aggregation result JSON";
     }
+
+    auto configsIt = resultAST.find("configurations");
+    if (configsIt != resultAST.end()) {
+      auto const& configs = boost::get<jsn::array_t>(configsIt->value);
+
+      for (auto const& config : configs) {
+        auto composition_name = boost::get<std::string>(config);
+        TLOG(28) << "Found composition: " << composition_name;
+
+        std::ostringstream oss;
+        oss << "{";
+        oss << quoted_(apiliteral::name) << ":" << quoted_(composition_name);
+        oss << "}";
+
+        returnValue.emplace_back(oss.str());
+      }
+    }
+  } catch (std::exception const& e) {
+    TLOG(29) << "Error processing search result: " << e.what();
   }
 
   TLOG(27) << "operation_findcompositionscontaining: end (found " << returnValue.size() << " compositions)";

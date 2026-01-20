@@ -32,7 +32,7 @@ constexpr auto apiname = "ConfigurationInterface";
 struct ConfigurationInterface final {
   using VersionInfoList_t = std::list<VersionInfo>;
 
-  ConfigurationInterface(std::string const&){};
+  ConfigurationInterface(std::string const&) {};
 
   //==============================================================================
   // stores configuration version to database
@@ -303,7 +303,7 @@ struct ConfigurationInterface final {
     }
 
     return returnSet;  // RVO
-  }                    // namespace configuration
+  }  // namespace configuration
 
   //==============================================================================
   // Loads a composition (global configuration) and returns its members.
@@ -664,6 +664,7 @@ struct ConfigurationInterface final {
       bool optimizedPathSucceeded = false;
       try {
         auto opts = ManageDocumentOperation{apiname};
+        opts.provider(getProviderFromURI());
         opts.operation(apiliteral::operation::findcompositionscontaining);
         opts.collection(configurationType);
         opts.version(version);
@@ -678,15 +679,12 @@ struct ConfigurationInterface final {
           if (jsn::JsonReader().read(optimizedResults, resultAST)) {
             try {
               auto const& searches = unwrap(resultAST).value_as<jsn::array_t>(jsonliteral::search);
-              if (!searches.empty()) {
-                for (auto const& search : searches) {
-                  auto const& name_value = unwrap(search).value_as<const jsn::object_t>(jsonliteral::name);
-                  if (!name_value.empty()) {
-                    auto const& compositionName = unwrap(search).value_as<const std::string>(apiliteral::name);
-                    returnSet.insert(compositionName);
-                  }
+              optimizedPathSucceeded = true;
+              for (auto const& search : searches) {
+                auto const& compositionName = unwrap(search).value_as<const std::string>(apiliteral::name);
+                if (!compositionName.empty()) {
+                  returnSet.insert(compositionName);
                 }
-                optimizedPathSucceeded = true;
               }
             } catch (std::exception const& e) {
               TLOG(TLVL_DEBUG) << apifunctname << ": Optimized path JSON parsing failed: " << e.what() << "; falling back to brute force";
@@ -896,6 +894,17 @@ struct ConfigurationInterface final {
       return {false, "JsonWriter failed to serialize operation"};
     }
     return {true, "Success"};
+  }
+
+  static std::string getProviderFromURI() {
+    auto tmpURI = getenv("ARTDAQ_DATABASE_URI") != nullptr ? std::string(getenv("ARTDAQ_DATABASE_URI")) : std::string("");
+
+    auto mongoPrefix = std::string(apiliteral::provider::mongo);
+    if (tmpURI.length() >= mongoPrefix.length() && std::equal(mongoPrefix.begin(), mongoPrefix.end(), tmpURI.begin())) {
+      return apiliteral::provider::mongo;
+    }
+
+    return apiliteral::provider::filesystem;
   }
 };
 
