@@ -1,7 +1,7 @@
 add_executable(OtsDaqTests_DatabaseConfiguration_t DatabaseConfiguration_t.cc)
 target_link_libraries(OtsDaqTests_DatabaseConfiguration_t
   test_CaseStudy_OtsDaqTests
-  artdaq-database_ConfigurationDB
+  artdaq-database::ConfigurationDB
   Boost::program_options
   Boost::unit_test_framework
 )

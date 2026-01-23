@@ -1,13 +1,13 @@
 add_executable(JSONConvert_t JSONConvert_t.cc)
 
 target_link_libraries(JSONConvert_t PRIVATE
-  artdaq-database_BasicTypes
-  artdaq-database_FhiclJson
-  artdaq-database_JsonDocument
-  artdaq-database_ConfigurationDB
-  artdaq-database_StorageProviders_MongoDB
-  artdaq-database_StorageProviders_FileSystemDB
-  artdaq-database_StorageProviders_UconDB
+  artdaq-database::BasicTypes
+  artdaq-database::FhiclJson
+  artdaq-database::JsonDocument
+  artdaq-database::ConfigurationDB
+  artdaq-database::StorageProviders_MongoDB
+  artdaq-database::StorageProviders_FileSystemDB
+  artdaq-database::StorageProviders_UconDB
   Boost::program_options
 )
 

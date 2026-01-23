@@ -1,90 +1,75 @@
 cet_make_exec(NAME conftool
   LIBRARIES
-  artdaq-database_SharedCommon
-  artdaq-database_BasicTypes
-  artdaq-database_DataFormats_Json
-  artdaq-database_JsonDocument
-  artdaq-database_ConfigurationDB
-  artdaq-database_StorageProviders_MongoDB
-  artdaq-database_StorageProviders_FileSystemDB
-  artdaq-database_StorageProviders_UconDB
+  artdaq-database::SharedCommon
+  artdaq-database::BasicTypes
+  artdaq-database::DataFormats_Json
+  artdaq-database::JsonDocument
+  artdaq-database::ConfigurationDB
+  artdaq-database::StorageProviders_MongoDB
+  artdaq-database::StorageProviders_FileSystemDB
+  artdaq-database::StorageProviders_UconDB
   Boost::program_options
 )
 
 cet_make_exec(NAME readjson
   LIBRARIES
-  artdaq-database_SharedCommon
-  artdaq-database_DataFormats_Json
-  artdaq-database_JsonDocument
+  artdaq-database::SharedCommon
+  artdaq-database::DataFormats_Json
+  artdaq-database::JsonDocument
 
   Boost::program_options
 )
 
-if(USE_FHICL)
 cet_make_exec(NAME readfhicl
   LIBRARIES
-  artdaq-database_SharedCommon
-  artdaq-database_DataFormats_Fhicl
-  fhiclcpp
-  cetlib
-  cetlib_except
+  artdaq-database::SharedCommon
+  artdaq-database::DataFormats_Fhicl
   Boost::program_options
 )
 
 if (NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 cet_make_exec(NAME refactorfhicl
   LIBRARIES
-  artdaq-database_SharedCommon
-  artdaq-database_DataFormats_Fhicl
-  fhiclcpp
-  cetlib
-  cetlib_except
+  artdaq-database::SharedCommon
+  artdaq-database::DataFormats_Fhicl
   Boost::program_options
 )
 endif()
 
 cet_make_exec(NAME fhicl2json
   LIBRARIES
-  artdaq-database_SharedCommon
-  artdaq-database_JsonDocument
-  artdaq-database_DataFormats_Fhicl
-  fhiclcpp
-  cetlib
-  cetlib_except
+  artdaq-database::SharedCommon
+  artdaq-database::JsonDocument
+  artdaq-database::DataFormats_Fhicl
   Boost::program_options
 )
-endif()
 
 cet_make_exec(NAME bulkloader
   LIBRARIES
-  artdaq-database_SharedCommon
-  artdaq-database_BasicTypes
+  artdaq-database::SharedCommon
+  artdaq-database::BasicTypes
 
-  artdaq-database_DataFormats_Json
-  artdaq-database_JsonDocument
-  artdaq-database_ConfigurationDB
-  artdaq-database_StorageProviders_MongoDB
-  artdaq-database_StorageProviders_FileSystemDB
-  artdaq-database_StorageProviders_UconDB
-  cetlib
-  cetlib_except
+  artdaq-database::DataFormats_Json
+  artdaq-database::JsonDocument
+  artdaq-database::ConfigurationDB
+  artdaq-database::StorageProviders_MongoDB
+  artdaq-database::StorageProviders_FileSystemDB
+  artdaq-database::StorageProviders_UconDB
   Boost::program_options
   -lpthread
 )
 
 cet_make_exec(NAME bulkdownloader
   LIBRARIES
-  artdaq-database_SharedCommon
-  artdaq-database_BasicTypes
+  artdaq-database::SharedCommon
+  artdaq-database::BasicTypes
 
-  artdaq-database_DataFormats_Json
-  artdaq-database_JsonDocument
-  artdaq-database_ConfigurationDB
-  artdaq-database_StorageProviders_MongoDB
-  artdaq-database_StorageProviders_FileSystemDB
-  artdaq-database_StorageProviders_UconDB
-  cetlib
-  cetlib_except
+  artdaq-database::DataFormats_Json
+  artdaq-database::JsonDocument
+  artdaq-database::ConfigurationDB
+  artdaq-database::StorageProviders_MongoDB
+  artdaq-database::StorageProviders_FileSystemDB
+  artdaq-database::StorageProviders_UconDB
   Boost::program_options
   -lpthread
 )
@@ -93,37 +78,34 @@ cet_make_exec(NAME bulkdownloader
 cet_make_exec(NAME migrate_database
   LIBRARIES
 
-  artdaq-database_BasicTypes
-  artdaq-database_DataFormats_Json
-  artdaq-database_JsonDocument
-  artdaq-database_ConfigurationDB
-  artdaq-database_StorageProviders_MongoDB
-  artdaq-database_StorageProviders_FileSystemDB
-  artdaq-database_StorageProviders_UconDB
+  artdaq-database::BasicTypes
+  artdaq-database::DataFormats_Json
+  artdaq-database::JsonDocument
+  artdaq-database::ConfigurationDB
+  artdaq-database::StorageProviders_MongoDB
+  artdaq-database::StorageProviders_FileSystemDB
+  artdaq-database::StorageProviders_UconDB
   Boost::program_options
-  cetlib_except
 )
 
 cet_make_exec(NAME rebuild_database_index
   LIBRARIES
 
-  artdaq-database_BasicTypes
-  artdaq-database_DataFormats_Json
-  artdaq-database_JsonDocument
-  artdaq-database_ConfigurationDB
-  artdaq-database_StorageProviders_MongoDB
-  artdaq-database_StorageProviders_FileSystemDB
-  artdaq-database_StorageProviders_UconDB
+  artdaq-database::BasicTypes
+  artdaq-database::DataFormats_Json
+  artdaq-database::JsonDocument
+  artdaq-database::ConfigurationDB
+  artdaq-database::StorageProviders_MongoDB
+  artdaq-database::StorageProviders_FileSystemDB
+  artdaq-database::StorageProviders_UconDB
   Boost::program_options
-  cetlib_except
 )
 
 cet_make_exec(NAME fixtestjson
   LIBRARIES
-  artdaq-database_SharedCommon
-  artdaq-database_DataFormats_Json
+  artdaq-database::SharedCommon
+  artdaq-database::DataFormats_Json
   Boost::program_options
-  cetlib_except
 )
 
 

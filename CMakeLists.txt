@@ -42,26 +42,6 @@ IF (SANITIZE_ADDRESS)
   endif()
 ENDIF()
 
-string(FIND "x${artdaq-database_EXEC_PREFIX}" "ots" OTS_FOUND)
-if(${OTS_FOUND} GREATER -1)
-  MESSAGE(STATUS "DISABLE built-in FHICLCPP")
-  set(USE_FHICLCPP FALSE)
-endif()
-
-if(DEFINED ENV{USE_FHICLCPP})
-  if($ENV{USE_FHICLCPP} STREQUAL "0")
-    MESSAGE( STATUS "Disable built-in FHICLCPP")
-    set(USE_FHICLCPP FALSE)
-  else()
-    MESSAGE( STATUS "Enable built-in FHICLCPP")
-    set(USE_FHICLCPP TRUE)
-  endif()
-endif()
-
-if(NOT DEFINED USE_FHICLCPP)
-    MESSAGE( STATUS "Enable built-in FHICLCPP")
-  set(USE_FHICLCPP TRUE)
-endif()
 #cet_report_compiler_flags()
 
 # Debug streamer.
@@ -98,45 +78,14 @@ endif()
 find_package(Boost QUIET COMPONENTS filesystem program_options system unit_test_framework REQUIRED)
 find_package(TRACE REQUIRED)
 
-# built-in libraries
-if(USE_FHICLCPP)
-  add_compile_definitions(ADFHICLCPP)
-  add_subdirectory(built-in)
-  include(BuiltinTargets)
-  include(BuiltinFHICLCPP)
-  include(BuiltinCETLIB)
-  include(BuiltinCETLIBEXCEPT)
-else()
-  find_package(cetlib 3.13.00 REQUIRED QUIET)
-  find_package(cetlib_except 1.07.00 REQUIRED QUIET)
-endif()
-#include(BuiltinPARAMICO)
+find_package(cetlib 3.13.00 REQUIRED QUIET)
+find_package(cetlib_except 1.07.00 REQUIRED QUIET)
 
 # Build Node Addons
 #include(NodeJSAddon)
 
-if(USE_MONGOCXX)
-  # MongoDB Libraries
-  include(BuiltinMONGOC)
-  include(BuiltinMONGOCXX)
-  set(BSONCLIB bsonc)
-  set(MONGOCLIB mongoc)
-  set(BSONCXXLIB bsoncxx)
-  set(MONGOCXXLIB mongocxx)
-  add_dependencies(mongo-cxx-driver mongo-c-driver )
-else()
-  find_package(mongocxx REQUIRED)
-  find_package(bsoncxx REQUIRED)
-  set(BSONCXXLIB mongo::bsoncxx_shared)
-  set(MONGOCXXLIB mongo::mongocxx_shared)
-  set(BSONCLIB bsonc::bsonc)
-  set(MONGOCLIB mongoc::mongoc)
-endif()
-
-#find_library(BSONCXXLIB NAMES bsoncxx HINTS $ENV{MONGODB_LIB} )
-#find_library(MONGOCXXLIB NAMES mongocxx HINTS $ENV{MONGODB_LIB} )
-#find_library(BSONCLIB NAMES bsonc HINTS $ENV{MONGODB_LIB} )
-#find_library(MONGOCLIB NAMES mongoc HINTS $ENV{MONGODB_LIB} )
+find_package(mongocxx REQUIRED)
+find_package(bsoncxx REQUIRED)
 
 # testing
 SET(RUN_TESTS $ENV{RUN_TESTS})
@@ -157,7 +106,5 @@ add_subdirectory(artdaq-database)
 
 # doc- Documentation
 #add_subdirectory(doc)
-
-add_dependencies(artdaq-database_StorageProviders_MongoDB ${MONGOCXXLIB})
 
 cet_cmake_config()

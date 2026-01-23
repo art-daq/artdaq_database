@@ -4,8 +4,8 @@ SET ( TEST_NUMBER "014" )
 add_executable(FindLatestVersion_t FindLatestVersion_t.cc)
 target_link_libraries(FindLatestVersion_t PRIVATE
   test_CaseStudy_OtsDaqCPPInterface
-  artdaq-database_BasicTypes
-  artdaq-database_ConfigurationDB
+  artdaq-database::BasicTypes
+  artdaq-database::ConfigurationDB
   Boost::unit_test_framework
 )
 

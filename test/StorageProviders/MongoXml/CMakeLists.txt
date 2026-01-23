@@ -1,11 +1,11 @@
 add_executable(MongoXml_t MongoXml_t.cc)
 
 target_link_libraries(MongoXml_t PRIVATE
-  artdaq-database_BasicTypes
-  artdaq-database_DataFormats_Json
-  artdaq-database_DataFormats_Xml
-  artdaq-database_JsonDocument
-  artdaq-database_StorageProviders_MongoDB
+  artdaq-database::BasicTypes
+  artdaq-database::DataFormats_Json
+  artdaq-database::DataFormats_Xml
+  artdaq-database::JsonDocument
+  artdaq-database::StorageProviders_MongoDB
   Boost::program_options
 )
 

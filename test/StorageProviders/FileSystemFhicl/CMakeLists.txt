@@ -1,11 +1,11 @@
 add_executable(FileSystemFhicl_t FileSystemFhicl_t.cc)
 
 target_link_libraries(FileSystemFhicl_t PRIVATE
-  artdaq-database_BasicTypes
-  artdaq-database_DataFormats_Fhicl
-  artdaq-database_DataFormats_Json
-  artdaq-database_JsonDocument
-  artdaq-database_StorageProviders_FileSystemDB
+  artdaq-database::BasicTypes
+  artdaq-database::DataFormats_Fhicl
+  artdaq-database::DataFormats_Json
+  artdaq-database::JsonDocument
+  artdaq-database::StorageProviders_FileSystemDB
   Boost::program_options
 )
 

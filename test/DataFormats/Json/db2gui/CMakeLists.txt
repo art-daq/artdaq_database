@@ -1,7 +1,7 @@
 add_executable(ConvertJson_t ConvertJson_t.cc)
 
 target_link_libraries(ConvertJson_t PRIVATE
-  artdaq-database_DataFormats_Json
+  artdaq-database::DataFormats_Json
   Boost::program_options
 )
 

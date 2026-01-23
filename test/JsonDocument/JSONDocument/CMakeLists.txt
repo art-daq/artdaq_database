@@ -1,7 +1,7 @@
 add_executable(JSONDocument_t JSONDocument_t.cc)
 
 target_link_libraries(JSONDocument_t PRIVATE
-  artdaq-database_JsonDocument
+  artdaq-database::JsonDocument
   Boost::program_options
 )
 
