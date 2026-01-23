@@ -24,6 +24,11 @@ set(TOP_CMAKE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(TOP_CMAKE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 include(CetCMakeEnv)
+include(SetCompilerFlags)
+include(InstallSource)
+include(InstallHeaders)
+include(InstallFhicl)
+
 cet_cmake_env()
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
