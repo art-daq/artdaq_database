@@ -8,7 +8,7 @@ configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test001.src.fcl ${CMAKE_CURRENT_BIN
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test001.cmp.fcl ${CMAKE_CURRENT_BINARY_DIR}/test001.cmp.${RAND_NAME}.fcl @ONLY )
 # Register test with CTest
 add_test(NAME ${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t
-         COMMAND ${CMAKE_BINARY_DIR}/bin/ConfigurationDB_t -o store -p ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f fhicl -v ${TEST_VERSION_NAME} -s test001.src.${RAND_NAME}.fcl -x test001.cmp.${RAND_NAME}.fcl
+         COMMAND ${TOP_CMAKE_BINARY_DIR}/bin/ConfigurationDB_t -o store -p ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f fhicl -v ${TEST_VERSION_NAME} -s test001.src.${RAND_NAME}.fcl -x test001.cmp.${RAND_NAME}.fcl
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 set_tests_properties(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t PROPERTIES
     ENVIRONMENT "ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}")
@@ -21,7 +21,7 @@ configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test001.src.fcl ${CMAKE_CURRENT_BIN
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/test001.cmp.fcl ${CMAKE_CURRENT_BINARY_DIR}/test001.cmp.${RAND_NAME}.fcl @ONLY )
 # Register test with CTest
 add_test(NAME ${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t
-         COMMAND ${CMAKE_BINARY_DIR}/bin/ConfigurationDB_t -o store -p ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f fhicl -v ${TEST_VERSION_NAME} -s test001.src.${RAND_NAME}.fcl -x test001.cmp.${RAND_NAME}.fcl
+         COMMAND ${TOP_CMAKE_BINARY_DIR}/bin/ConfigurationDB_t -o store -p ${TEST_DBPROVIDER} -c ${TEST_COLLECTION_NAME} -f fhicl -v ${TEST_VERSION_NAME} -s test001.src.${RAND_NAME}.fcl -x test001.cmp.${RAND_NAME}.fcl
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 set_tests_properties(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t PROPERTIES
     ENVIRONMENT "ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_MONGO}")

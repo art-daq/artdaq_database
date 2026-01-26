@@ -1,11 +1,11 @@
 add_executable(UcondJson_t UcondJson_t.cc)
 
 target_link_libraries(UcondJson_t PRIVATE
-  artdaq-database_SharedCommon
-  artdaq-database_BasicTypes
-  artdaq-database_DataFormats_Json
-  artdaq-database_JsonDocument
-  artdaq-database_StorageProviders_UconDB
+  artdaq-database::SharedCommon
+  artdaq-database::BasicTypes
+  artdaq-database::DataFormats_Json
+  artdaq-database::JsonDocument
+  artdaq-database::StorageProviders_UconDB
   Boost::program_options
 )
 

@@ -11,9 +11,8 @@ cet_make_library(
     ovlTimeStamp.cpp
     ovlUpdate.cpp
   LIBRARIES
-    artdaq-database_SharedCommon
-    artdaq-database_DataFormats_Json
-    cetlib_except
+    artdaq-database::SharedCommon
+    artdaq-database::DataFormats_Json
   )
 
 install_headers()

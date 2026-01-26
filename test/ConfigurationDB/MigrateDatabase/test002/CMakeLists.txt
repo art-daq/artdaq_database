@@ -1,14 +1,14 @@
 add_executable(MigrateDatabase_t MigrateDatabase_t.cc)
 
 target_link_libraries(MigrateDatabase_t PRIVATE
-  artdaq-database_BasicTypes
-  artdaq-database_DataFormats_Fhicl
-  artdaq-database_DataFormats_Json
-  artdaq-database_JsonDocument
-  artdaq-database_ConfigurationDB
-  artdaq-database_StorageProviders_MongoDB
-  artdaq-database_StorageProviders_FileSystemDB
-  artdaq-database_StorageProviders_UconDB
+  artdaq-database::BasicTypes
+  artdaq-database::DataFormats_Fhicl
+  artdaq-database::DataFormats_Json
+  artdaq-database::JsonDocument
+  artdaq-database::ConfigurationDB
+  artdaq-database::StorageProviders_MongoDB
+  artdaq-database::StorageProviders_FileSystemDB
+  artdaq-database::StorageProviders_UconDB
   Boost::program_options
 )
 
@@ -25,7 +25,7 @@ COMMAND ${CMAKE_COMMAND} -E tar "xfz" "${CMAKE_CURRENT_SOURCE_DIR}/filesystemdb.
 SET ( TEST_NUMBER "002" )
 # Register test with CTest
 add_test(NAME ${TEST_NAME}_${TEST_NUMBER}_t
-         COMMAND ${CMAKE_BINARY_DIR}/bin/MigrateDatabase_t --uri=${ARTDAQ_DATABASE_URI}
+         COMMAND ${TOP_CMAKE_BINARY_DIR}/bin/MigrateDatabase_t --uri=${ARTDAQ_DATABASE_URI}
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 add_dependencies(untar_MigrateDatabase MigrateDatabase_t)
