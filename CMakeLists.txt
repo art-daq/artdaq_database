@@ -89,8 +89,8 @@ find_package(cetlib_except 1.07.00 REQUIRED QUIET)
 # Build Node Addons
 #include(NodeJSAddon)
 
-find_package(mongocxx REQUIRED)
-find_package(bsoncxx REQUIRED)
+find_package(mongocxx REQUIRED EXPORT)
+find_package(bsoncxx REQUIRED EXPORT)
 
 # testing
 SET(RUN_TESTS $ENV{RUN_TESTS})
