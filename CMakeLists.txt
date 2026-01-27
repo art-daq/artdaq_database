@@ -24,6 +24,11 @@ set(TOP_CMAKE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(TOP_CMAKE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 include(CetCMakeEnv)
+include(SetCompilerFlags)
+include(InstallSource)
+include(InstallHeaders)
+include(InstallFhicl)
+
 cet_cmake_env()
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
@@ -84,8 +89,8 @@ find_package(cetlib_except 1.07.00 REQUIRED QUIET)
 # Build Node Addons
 #include(NodeJSAddon)
 
-find_package(mongocxx REQUIRED)
-find_package(bsoncxx REQUIRED)
+find_package(mongocxx REQUIRED EXPORT)
+find_package(bsoncxx REQUIRED EXPORT)
 
 # testing
 SET(RUN_TESTS $ENV{RUN_TESTS})
