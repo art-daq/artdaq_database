@@ -1,8 +1,8 @@
 add_executable(OtsDaqTests_ReverseLookup_t ReverseLookup_t.cc)
 target_link_libraries(OtsDaqTests_ReverseLookup_t
   test_CaseStudy_OtsDaqTests
-  artdaq-database_ConfigurationDB
-  artdaq-database_BasicTypes
+  artdaq-database::ConfigurationDB
+  artdaq-database::BasicTypes
   Boost::unit_test_framework
 )
 

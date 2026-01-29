@@ -1,5 +1,5 @@
 # project name
-project(artdaq-database_BuildInfo)
+project(artdaq-database::BuildInfo)
 
 # the utcDateTime variable is used by the GetPackageBuildInfo code
 # to report the build datetime
@@ -24,7 +24,7 @@ endif()
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/GetPackageBuildInfo.cc.in
   ${CMAKE_CURRENT_BINARY_DIR}/GetPackageBuildInfo.cc @ONLY )
 
-#art_make_library( LIBRARY_NAME artdaq-database_BuildInfo
+#art_make_library( LIBRARY_NAME artdaq-database::BuildInfo
 #		  SOURCE
 #		  ${CMAKE_CURRENT_BINARY_DIR}/GetPackageBuildInfo.cc
 #                 )

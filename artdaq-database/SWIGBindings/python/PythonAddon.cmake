@@ -1,26 +1,18 @@
 
 set(CAN_BUILD true)
 
-if(NOT EXISTS "$ENV{PYTHON_DIR}")
-    message("Directory \"$ENV{PYTHON_DIR}\" does not exist, can't build Python addons!")
+include(GNUInstallDirs)
+
+FIND_PACKAGE(SWIG)
+INCLUDE(${SWIG_USE_FILE})
+if ( NOT ${SWIG_FOUND} )
   set(CAN_BUILD false)
-endif(NOT EXISTS "$ENV{PYTHON_DIR}")
+endif()
 
-if(NOT EXISTS "$ENV{SWIG_DIR}")
-    message("Directory \"$ENV{SWIG_DIR}\" does not exist, can't build Python addons!")
+FIND_PACKAGE(Python3 COMPONENTS Development.Embed)
+if ( NOT ${Python3_FOUND})
   set(CAN_BUILD false)
-endif(NOT EXISTS "$ENV{SWIG_DIR}")
-
-
-if(CAN_BUILD)
-  #find_ups_product(swig v3)
-  #include(FindSWIG)
-
-  FIND_PACKAGE(SWIG REQUIRED)
-  INCLUDE(${SWIG_USE_FILE})
-
-  FIND_PACKAGE(Python3 COMPONENTS Development)
-endif(CAN_BUILD)
+endif()
 
 macro (create_python_addon)
     if(CAN_BUILD)
@@ -55,22 +47,10 @@ macro (create_python_addon)
 
     set(PIA_ADDON_LIBNAME _${PIA_ADDON_NAME})
 
-    set( mrb_build_dir $ENV{MRB_BUILDDIR} )
-    if( mrb_build_dir )
-        set( this_build_path ${mrb_build_dir}/${product} )
-    else()
-        set( this_build_path $ENV{CETPKG_BUILD} )
-    endif()
-
-    add_custom_command(TARGET ${PIA_ADDON_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/${PIA_ADDON_NAME}.py ${this_build_path}/${artdaq_LIBRARY_DIR})
-
-    install (FILES ${this_build_path}/${artdaq_database_LIBRARY_DIR}/${PIA_ADDON_LIBNAME}.so
-      PERMISSIONS OWNER_EXECUTE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_READ WORLD_EXECUTE
-      DESTINATION ./${flavorqual_dir}/python/)
-
-    install (FILES ${this_build_path}/${PIA_ADDON_NAME}.py DESTINATION ./${flavorqual_dir}/python/)
-
+    get_target_property(PIA_LIB_DIR ${PIA_ADDON_NAME} LIBRARY_OUTPUT_DIRECTORY)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PIA_ADDON_NAME}.py
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages/)
+    install(FILES ${PIA_LIB_DIR}/${PIA_ADDON_LIBNAME}.so DESTINATION ${CMAKE_INSTALL_LIBDIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages/)
 
     else(CAN_BUILD)
         message("Compatible version of Swig found. NOT building ${PIA_ADDON_NAME}")

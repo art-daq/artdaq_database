@@ -1,8 +1,8 @@
 add_executable(JSONOverlay_t JSONOverlay_t.cc)
 
 target_link_libraries(JSONOverlay_t PRIVATE
-  artdaq-database_DataFormats_Json
-  artdaq-database_Overlay
+  artdaq-database::DataFormats_Json
+  artdaq-database::Overlay
   Boost::program_options
 )
 

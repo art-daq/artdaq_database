@@ -1,14 +1,14 @@
 add_executable(ExportDune35tData_t ExportDune35tData_t.cc)
 
 target_link_libraries(ExportDune35tData_t PRIVATE
-  artdaq-database_BasicTypes
-  artdaq-database_DataFormats_Fhicl
-  artdaq-database_DataFormats_Json
-  artdaq-database_JsonDocument
-  artdaq-database_ConfigurationDB
-  artdaq-database_StorageProviders_MongoDB
-  artdaq-database_StorageProviders_FileSystemDB
-  artdaq-database_StorageProviders_UconDB
+  artdaq-database::BasicTypes
+  artdaq-database::DataFormats_Fhicl
+  artdaq-database::DataFormats_Json
+  artdaq-database::JsonDocument
+  artdaq-database::ConfigurationDB
+  artdaq-database::StorageProviders_MongoDB
+  artdaq-database::StorageProviders_FileSystemDB
+  artdaq-database::StorageProviders_UconDB
   Boost::program_options
 )
 
