@@ -5,8 +5,8 @@ cet_make_library(
 	conf_writer.cpp
 	convertconf2json.cpp
   LIBRARIES
-  artdaq-database_SharedCommon
-  artdaq-database_DataFormats_Json
+  artdaq-database::SharedCommon
+  artdaq-database::DataFormats_Json
   )
 
 install_headers()

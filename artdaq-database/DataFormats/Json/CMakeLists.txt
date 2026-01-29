@@ -6,8 +6,7 @@ cet_make_library(
   json_writer.cpp
   presort_json.cpp
   LIBRARIES
-  artdaq-database_SharedCommon
-  cetlib_except
+  artdaq-database::SharedCommon
   )
 
 install_headers()

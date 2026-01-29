@@ -4,8 +4,8 @@ SET ( TEST_NUMBER "016" )
 add_executable(SearchPatterns_t SearchPatterns_t.cc)
 target_link_libraries(SearchPatterns_t PRIVATE
   test_CaseStudy_OtsDaqCPPInterface
-  artdaq-database_BasicTypes
-  artdaq-database_ConfigurationDB
+  artdaq-database::BasicTypes
+  artdaq-database::ConfigurationDB
   Boost::unit_test_framework
 )
 

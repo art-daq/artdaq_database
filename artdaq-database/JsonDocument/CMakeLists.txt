@@ -5,10 +5,9 @@ cet_make_library(
     JSONDocumentMigrator.cpp
     JSONDocument_utils.cpp
   LIBRARIES
-    artdaq-database_BasicTypes
-    artdaq-database_DataFormats_Json
-    artdaq-database_Overlay
-    cetlib_except
+    artdaq-database::BasicTypes
+    artdaq-database::DataFormats_Json
+    artdaq-database::Overlay
   )
 
 install_headers()
