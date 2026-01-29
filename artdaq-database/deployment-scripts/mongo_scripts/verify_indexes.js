@@ -47,7 +47,7 @@ if (indexBuilds.length > 0) {
 }
 
 try {
-    const buildInfo = db.adminCommand({ listIndexBuilds: 1 });
+    db.adminCommand({ listIndexBuilds: 1 });
 } catch (e) {
 }
 
