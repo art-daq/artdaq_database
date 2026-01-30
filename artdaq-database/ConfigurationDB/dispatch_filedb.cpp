@@ -9,6 +9,8 @@
 #include "artdaq-database/StorageProviders/FileSystemDB/provider_filedb.h"
 
 #include <cstdio>
+#include <regex>
+#include <set>
 #include <sstream>
 
 #ifdef TRACE_NAME
@@ -578,76 +580,81 @@ std::vector<JSONDocument> prov::findCompositionsContaining(ManageDocumentOperati
 
   auto config = DBI::DBConfig{};
   auto database = DBI::DB::create(config);
+  auto provider = DBI::DBProvider<JSONDocument>::create(database);
+
   auto db_path = database->connection();
+  db_path = expand_environment_variables(db_path);
 
-  std::string search_dir = db_path + "/SystemConfiguration";
+  auto dir_name = DBI::mkdir(db_path).append("/");
 
-  TLOG(27) << "Searching in directory: " << search_dir;
-
-  if (!DBI::check_if_file_exists(search_dir)) {
-    TLOG(27) << "SystemConfiguration directory does not exist: " << search_dir;
+  auto collection_dir = dir_name + configurationType;
+  if (!DBI::check_if_file_exists(collection_dir)) {
+    TLOG(27) << "Collection directory does not exist: " << collection_dir;
     TLOG(27) << "operation_findcompositionscontaining: end (0 compositions found)";
     return returnValue;
   }
 
-  std::ostringstream grep_cmd;
-  grep_cmd << "grep -l '\"" << configurationType << "\"' " << search_dir << "/*.json 2>/dev/null";
-  grep_cmd << " | xargs grep -l '\"" << version << "\"' 2>/dev/null";
-
+  std::ostringstream search_oss;
+  search_oss << "{\"filter\":{";
+  search_oss << "\"version\":\"" << version << "\"";
   if (!entity.empty() && entity != apiliteral::notprovided) {
-    grep_cmd << " | xargs grep -l '\"" << entity << "\"' 2>/dev/null";
+    search_oss << ",\"entities.name\":\"" << entity << "\"";
   }
+  search_oss << "}, \"collection\":\"" << configurationType << "\"}";
 
-  TLOG(27) << "Executing grep command: " << grep_cmd.str();
+  TLOG(27) << "Search filter: " << search_oss.str();
 
-  FILE* pipe = popen(grep_cmd.str().c_str(), "r");
-  if (!pipe) {
-    TLOG(29) << "Failed to execute grep command";
-    throw runtime_error("operation_findcompositionscontaining") << "Failed to execute grep command.";
-  }
+  auto search_doc = JSONDocument{search_oss.str()};
 
-  char buffer[1024];
-  std::ostringstream grep_output;
-
-  while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
-    grep_output << buffer;
-  }
-
-  int return_code = pclose(pipe);
-
-  TLOG(27) << "Grep return code: " << return_code;
-  TLOG(27) << "Grep output: " << grep_output.str();
-
-  std::string output = grep_output.str();
-  if (output.empty()) {
-    TLOG(27) << "No matching files found";
+  std::vector<JSONDocument> matching_docs;
+  try {
+    matching_docs = provider->readDocument(search_doc);
+  } catch (std::exception const& e) {
+    TLOG(27) << "No matching documents found: " << e.what();
     TLOG(27) << "operation_findcompositionscontaining: end (0 compositions found)";
     return returnValue;
   }
 
-  std::istringstream iss(output);
-  std::string filename;
+  TLOG(27) << "Found " << matching_docs.size() << " matching documents";
 
-  while (std::getline(iss, filename)) {
-    filename.erase(filename.find_last_not_of(" \n\r\t") + 1);
+  std::set<std::string> found_compositions;
 
-    if (filename.empty()) continue;
+  for (auto const& doc : matching_docs) {
+    try {
+      auto doc_str = doc.to_string();
 
-    size_t last_slash = filename.find_last_of('/');
-    size_t last_dot = filename.find_last_of('.');
+      std::regex configs_regex("\"configurations\"\\s*:\\s*\\[([^\\]]+)\\]");
+      std::smatch configs_match;
 
-    if (last_slash != std::string::npos && last_dot != std::string::npos && last_dot > last_slash) {
-      std::string composition_name = filename.substr(last_slash + 1, last_dot - last_slash - 1);
+      if (std::regex_search(doc_str, configs_match, configs_regex)) {
+        std::string configs_section = configs_match[1].str();
 
-      TLOG(28) << "Found composition: " << composition_name << " (from file: " << filename << ")";
+        std::regex name_regex("\"name\"\\s*:\\s*\"([^\"]+)\"");
+        std::smatch match;
+        std::string search_str = configs_section;
 
-      std::ostringstream oss;
-      oss << "{";
-      oss << quoted_(apiliteral::name) << ": " << quoted_(composition_name);
-      oss << "}";
-
-      returnValue.emplace_back(oss.str());
+        while (std::regex_search(search_str, match, name_regex)) {
+          std::string comp_name = match[1].str();
+          if (comp_name != apiliteral::notprovided) {
+            TLOG(28) << "Found composition: " << comp_name;
+            found_compositions.insert(comp_name);
+          }
+          search_str = match.suffix().str();
+        }
+      }
+    } catch (std::exception const& e) {
+      TLOG(28) << "Error extracting configurations from document: " << e.what();
+      continue;
     }
+  }
+
+  for (auto const& comp_name : found_compositions) {
+    std::ostringstream oss;
+    oss << "{";
+    oss << quoted_(apiliteral::name) << ": " << quoted_(comp_name);
+    oss << "}";
+
+    returnValue.emplace_back(oss.str());
   }
 
   TLOG(27) << "operation_findcompositionscontaining: end (found " << returnValue.size() << " compositions)";

@@ -1,0 +1,38 @@
+SET ( TEST_NAME "OtsDaqCPPInterface" )
+SET ( TEST_NUMBER "025" )
+
+add_executable(StringRoundTrip_t StringRoundTrip_t.cc)
+
+target_link_libraries(StringRoundTrip_t PRIVATE
+  test_CaseStudy_OtsDaqCPPInterface
+  artdaq-database_BasicTypes
+  artdaq-database_DataFormats_Fhicl
+  artdaq-database_DataFormats_Json
+  artdaq-database_JsonDocument
+  artdaq-database_ConfigurationDB
+  artdaq-database_StorageProviders_MongoDB
+  artdaq-database_StorageProviders_FileSystemDB
+  artdaq-database_StorageProviders_UconDB
+  Boost::program_options
+  Boost::unit_test_framework
+)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test_cases.json
+               ${CMAKE_CURRENT_BINARY_DIR}/test_cases.json COPYONLY)
+
+SET ( TEST_DBPROVIDER "filesystem" )
+add_test(NAME ${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t
+         COMMAND StringRoundTrip_t
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+set_tests_properties(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t PROPERTIES
+    ENVIRONMENT "ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_FILESYSTEM}_otsdb025")
+
+SET ( TEST_DBPROVIDER "mongo" )
+add_test(NAME ${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t
+         COMMAND StringRoundTrip_t
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+set_tests_properties(${TEST_NAME}_${TEST_DBPROVIDER}_${TEST_NUMBER}_t PROPERTIES
+    ENVIRONMENT "ARTDAQ_DATABASE_URI=${ARTDAQ_DATABASE_URI_MONGO}_otsdb025")
+
+install_headers()
+install_source()

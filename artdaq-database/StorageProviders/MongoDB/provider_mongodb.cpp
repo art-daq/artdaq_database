@@ -692,7 +692,17 @@ std::vector<JSONDocument> StorageProvider<JSONDocument, MongoDB>::searchCollecti
 
   TLOG(20) << "MongoDB::searchcollection() search=<" << search << ">";
 
-  mongocxx::pipeline stages = pipeline_from_document(compat::from_json(search));
+  auto search_bson = compat::from_json(search);
+  auto search_view = search_bson.view();
+  auto pipeline_element = search_view.find("pipeline");
+
+  std::string pipeline_doc;
+  if (pipeline_element != search_view.end()) {
+    pipeline_doc = search;
+  } else {
+    pipeline_doc = std::string("{\"pipeline\":") + search + "}";
+  }
+  mongocxx::pipeline stages = pipeline_from_document(compat::from_json(pipeline_doc));
 
   TLOG(20) << "MongoDB::searchcollection()  query_payload=<" << compat::to_json(stages.view_array()) << ">";
 

