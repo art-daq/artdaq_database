@@ -1,0 +1,444 @@
+{
+  "test_cases": [
+    {
+      "name": "hash_characters",
+      "description": "Hash/pound characters",
+      "input": {"comment": "# This is a comment", "channel": "#general", "hex": "#FF00FF"}
+    },
+    {
+      "name": "ampersand_characters",
+      "description": "Ampersand characters",
+      "input": {"query": "name=foo&value=bar&flag=true", "entity": "Tom & Jerry", "operator": "a && b"}
+    },
+    {
+      "name": "forward_slashes",
+      "description": "Forward slashes and paths",
+      "input": {"path": "/home/user/data/file.txt", "url": "https://example.com/api/v1/data", "regex": "^/api/.*$"}
+    },
+    {
+      "name": "single_quotes",
+      "description": "Single quotes inside strings",
+      "input": {"message": "It's a test", "sql": "SELECT * WHERE name='John'", "nested": "He said 'hello'"}
+    },
+    {
+      "name": "escaped_double_quotes",
+      "description": "Escaped double quotes",
+      "input": {"quoted": "She said \"Hello World\"", "nested": "\"inner\" and \"outer\""}
+    },
+    {
+      "name": "url_with_special_chars",
+      "description": "URL with all special chars",
+      "input": {"url": "https://example.com/path?name=O'Brien&query=\"test\"#section", "alt": "http://host/a/b/c?x=1&y=2&z=3#top"}
+    },
+    {
+      "name": "shell_command_pattern",
+      "description": "Shell command simulation",
+      "input": {"cmd": "grep -r \"pattern\" /var/log/* | awk '{print $1}' && echo 'done' # comment", "pipe": "cat file | head -n 10"}
+    },
+    {
+      "name": "sql_injection_patterns",
+      "description": "SQL injection patterns",
+      "input": {"input1": "'; DROP TABLE users; --", "input2": "\" OR \"1\"=\"1", "input3": "admin'--", "input4": "1 OR 1=1 # bypass"}
+    },
+    {
+      "name": "html_xml_content",
+      "description": "HTML/XML entities and tags",
+      "input": {"html": "<div class=\"test\">Hello &amp; World</div>", "xml": "<?xml version='1.0'?><root attr=\"val\"/>", "entities": "&lt;&gt;&amp;&quot;&#39;"}
+    },
+    {
+      "name": "regex_patterns",
+      "description": "Regex patterns with special chars",
+      "input": {"pattern1": "^[a-zA-Z0-9_#&]+$", "pattern2": "/api/v[0-9]+/.*", "pattern3": "\"([^\"]+)\"", "pattern4": "'([^']*)'|\"([^\"]*)\""}
+    },
+    {
+      "name": "json_in_json",
+      "description": "JSON-in-JSON embedded",
+      "input": {"embedded": "{\"key\": \"value\", \"num\": 123}", "nested": "{\"a\": {\"b\": \"c\"}}"}
+    },
+    {
+      "name": "fhicl_syntax_embedded",
+      "description": "FHiCL-like syntax embedded",
+      "input": {"fhicl": "process_name: \"test\" # comment\nmodule: { type: \"Analyzer\" }", "prolog": "#include \"base.fcl\"\nBEGIN_PROLOG\n@local::value\nEND_PROLOG"}
+    },
+    {
+      "name": "consecutive_special_chars",
+      "description": "Consecutive special characters",
+      "input": {"multi_hash": "###triple###", "multi_amp": "&&&", "multi_slash": "///", "multi_quote": "\"\"\"", "mixed": "#&#/\"'/&#"}
+    },
+    {
+      "name": "special_chars_at_boundaries",
+      "description": "Special chars at string boundaries",
+      "input": {"start_hash": "#starts", "end_hash": "ends#", "start_amp": "&starts", "end_amp": "ends&", "start_slash": "/starts", "end_slash": "ends/", "start_quote": "\"starts", "end_quote": "ends\""}
+    },
+    {
+      "name": "only_special_characters",
+      "description": "Only special characters",
+      "input": {"pure_special": "#&/'\"#&/'\"", "symbols": "!@#$%^&*()_+-=[]{}|;':\",./<>?"}
+    },
+    {
+      "name": "mixed_escapes_and_specials",
+      "description": "Mixed escape sequences with special chars",
+      "input": {"mix1": "line1\nline2#comment\tfield&value", "mix2": "path/to/\"file\"\n#header\n&data", "mix3": "\\n is newline, # is hash, & is amp, / is slash, ' is quote, \" is escaped"}
+    },
+    {
+      "name": "unicode_escape_patterns",
+      "description": "Unicode-like escape sequences",
+      "input": {"unicode": "Hello \\u0048\\u0065\\u006C\\u006C\\u006F", "mixed": "\\u0023 is # and \\u0026 is &"}
+    },
+    {
+      "name": "config_file_patterns",
+      "description": "Configuration file patterns",
+      "input": {"ini": "[section]\nkey=value # comment\npath=/usr/local", "yaml": "key: 'value'\nlist:\n  - item1 # first\n  - item2 & item3", "env": "VAR=\"value with spaces\" && export VAR"}
+    },
+    {
+      "name": "deeply_nested_special_chars",
+      "description": "Deeply nested structure with special chars",
+      "input": {"level1": {"key#1": "val&1", "level2": {"key/2": "val'2", "level3": {"key\"3": "val#3", "level4": {"all": "#&/'\"mixed"}}}}}
+    },
+    {
+      "name": "array_with_special_chars",
+      "description": "Array with varied special char strings",
+      "input": {"items": ["#first", "&second", "/third", "'fourth'", "\"fifth\"", "#&/'\"all", "normal", "", "   ", "#"]}
+    },
+    {
+      "name": "xss_attack_patterns",
+      "description": "XSS attack patterns",
+      "input": {"xss1": "<script>alert('XSS')</script>", "xss2": "javascript:alert(\"test\")", "xss3": "<img src=x onerror=\"alert('#')\">"}
+    },
+    {
+      "name": "path_traversal_patterns",
+      "description": "Path traversal patterns",
+      "input": {"path1": "../../../etc/passwd", "path2": "/var/log/../../../root", "path3": "....//....//etc#comment", "path4": "%2e%2e%2f&encoded"}
+    },
+    {
+      "name": "command_injection_patterns",
+      "description": "Command injection patterns",
+      "input": {"cmd1": "; rm -rf /", "cmd2": "| cat /etc/passwd", "cmd3": "$(whoami)", "cmd4": "`id`", "cmd5": "&& echo 'pwned' #"}
+    },
+    {
+      "name": "ldap_injection_patterns",
+      "description": "LDAP injection patterns",
+      "input": {"ldap1": "*)(uid=*))(|(uid=*", "ldap2": "admin)(&(password=*))", "ldap3": "x][(objectClass=*)]#comment"}
+    },
+    {
+      "name": "log_injection_patterns",
+      "description": "Log injection patterns",
+      "input": {"log1": "user logged in\nAdmin: user deleted all records", "log2": "action=login\r\naction=delete&target=all#hidden"}
+    },
+    {
+      "name": "format_string_patterns",
+      "description": "Format string patterns",
+      "input": {"fmt1": "%s%s%s%s%s%s%s%s%s%s", "fmt2": "%x%x%x%x", "fmt3": "%n%n%n%n", "fmt4": "%(name)s #'\"&/"}
+    },
+    {
+      "name": "nosql_injection_patterns",
+      "description": "NoSQL injection patterns",
+      "input": {"nosql1": "{\"$gt\": \"\"}", "nosql2": "{\"$where\": \"this.password == 'x'\"}", "nosql3": "'; return this.password; var x='"}
+    },
+    {
+      "name": "mixed_quotes_stress",
+      "description": "Mixed quotes stress test",
+      "input": {"q1": "He said \"it's fine\"", "q2": "She said 'he said \"hello\"'", "q3": "\"'\"'\"'\"'", "q4": "'\"'\"'\"'\""}
+    },
+    {
+      "name": "backslash_combinations",
+      "description": "Backslash combinations",
+      "input": {"bs1": "\\\\", "bs2": "\\\"", "bs3": "\\'", "bs4": "\\#", "bs5": "\\&", "bs6": "\\/", "bs7": "\\\\\\\\", "bs8": "\\\"\\'\\#\\&\\/"}
+    },
+    {
+      "name": "truncated_escape_sequences",
+      "description": "Truncated escape sequences",
+      "input": {"trunc1": "ends with backslash\\", "trunc2": "incomplete \\", "trunc3": "text\\more", "trunc4": "a\\b\\c\\d\\"}
+    },
+    {
+      "name": "incomplete_json_like_strings",
+      "description": "Strings that look like incomplete JSON",
+      "input": {"partial1": "{\"incomplete", "partial2": "[1,2,3", "partial3": "\"unterminated", "partial4": "{key:", "partial5": "[{\"a\":1},{"}
+    },
+    {
+      "name": "unbalanced_brackets",
+      "description": "Unbalanced brackets and braces",
+      "input": {"unbal1": "((((", "unbal2": "))))", "unbal3": "{{{{", "unbal4": "}}}}", "unbal5": "[[[[", "unbal6": "]]]]", "mixed": "({[}])"}
+    },
+    {
+      "name": "truncated_urls",
+      "description": "Partial URL-like strings",
+      "input": {"url1": "http://", "url2": "https:/", "url3": "ftp:", "url4": "//host", "url5": "://", "url6": "http://host:port/path?query#", "url7": "?&=#"}
+    },
+    {
+      "name": "partial_escapes_with_specials",
+      "description": "Partial escapes mixed with special chars",
+      "input": {"mix1": "\\n#incomplete", "mix2": "&\\t/partial", "mix3": "'\\\"truncated", "mix4": "#&/\\", "mix5": "\\#\\&\\/"}
+    },
+    {
+      "name": "empty_and_whitespace",
+      "description": "Empty and whitespace-only strings",
+      "input": {"empty": "", "space": " ", "spaces": "     ", "tab": "\t", "newline": "\n", "mixed_ws": " \t\n\r ", "ws_special": " # & / ' \" "}
+    },
+    {
+      "name": "single_char_edge_cases",
+      "description": "Single character edge cases",
+      "input": {"c1": "#", "c2": "&", "c3": "/", "c4": "'", "c5": "\"", "c6": "\\", "c7": "\n", "c8": "\t", "c9": "\r", "c10": " "}
+    },
+    {
+      "name": "null_like_patterns",
+      "description": "Strings with null-like patterns",
+      "input": {"null1": "null", "null2": "NULL", "null3": "Null", "null4": "\\0", "null5": "\\x00", "null6": "nul", "null7": "nil", "null8": "None"}
+    },
+    {
+      "name": "numeric_like_strings",
+      "description": "Numeric-like strings",
+      "input": {"num1": "123", "num2": "-456", "num3": "3.14", "num4": "1e10", "num5": "0x1F", "num6": "0777", "num7": "NaN", "num8": "Infinity", "num9": "-Infinity", "num10": "1#2&3/4'5\"6"}
+    },
+    {
+      "name": "boolean_like_strings",
+      "description": "Boolean-like strings",
+      "input": {"bool1": "true", "bool2": "false", "bool3": "TRUE", "bool4": "FALSE", "bool5": "True", "bool6": "False", "bool7": "yes", "bool8": "no", "bool9": "1", "bool10": "0"}
+    },
+    {
+      "name": "repeated_special_patterns",
+      "description": "Repeated special chars creating patterns",
+      "input": {"rep1": "######", "rep2": "&&&&&&", "rep3": "//////", "rep4": "''''''", "rep5": "\"\"\"\"\"\"", "rep6": "#&#&#&#&", "rep7": "/'/\"/'/\"", "rep8": "&'&\"&'&\""}
+    },
+    {
+      "name": "control_char_representations",
+      "description": "Control character representations",
+      "input": {"ctrl1": "\\x00\\x01\\x02", "ctrl2": "\\a\\b\\f\\v", "ctrl3": "^A^B^C", "ctrl4": "\\cA\\cB\\cC", "ctrl5": "<NUL><SOH><STX>"}
+    },
+    {
+      "name": "binary_like_patterns",
+      "description": "Binary-like data patterns",
+      "input": {"bin1": "\\x89PNG\\r\\n\\x1a\\n", "bin2": "GIF89a", "bin3": "%PDF-1.4", "bin4": "PK\\x03\\x04", "bin5": "\\xff\\xd8\\xff\\xe0"}
+    },
+    {
+      "name": "mixed_line_endings",
+      "description": "Mixed line endings",
+      "input": {"unix": "line1\nline2\nline3", "windows": "line1\r\nline2\r\nline3", "mac": "line1\rline2\rline3", "mixed": "a\nb\r\nc\rd\n\re"}
+    },
+    {
+      "name": "json_key_like_strings",
+      "description": "Strings resembling JSON keys",
+      "input": {"key1": "\"name\":", "key2": "\"value\": 123", "key3": "\"array\": [", "key4": "\"object\": {", "key5": "},", "key6": "],"}
+    },
+    {
+      "name": "template_placeholder_patterns",
+      "description": "Template/placeholder patterns",
+      "input": {"tmpl1": "${variable}", "tmpl2": "{{mustache}}", "tmpl3": "<%=erb%>", "tmpl4": "{#comment#}", "tmpl5": "@{value}", "tmpl6": "$#&/'\"mixed"}
+    },
+    {
+      "name": "env_var_patterns",
+      "description": "Environment variable patterns",
+      "input": {"env1": "$HOME", "env2": "${PATH}", "env3": "$USER/$HOME", "env4": "${VAR:-default}", "env5": "${VAR:+set}", "env6": "$#&special"}
+    },
+    {
+      "name": "worst_case_combination",
+      "description": "Worst case combo - everything together",
+      "input": {"worst": "http://host/path?a=1&b=2#frag\nSQL: '; DROP TABLE x; --\nHTML: <div class=\"test\">&amp;</div>\nShell: `rm -rf /` && echo 'done' # comment\nRegex: ^[#&/'\"]+$\nJSON: {\"key\": \"val\\\"ue\"}\nPath: ../../../etc/passwd\nFmt: %s%n%x\n\\x00\\xFF\\u0000"}
+    },
+    {
+      "name": "quote_basic_single",
+      "description": "Basic single quote patterns",
+      "input": {"q1": "'", "q2": "''", "q3": "'''", "q4": "''''", "q5": "'''''", "q6": "''''''"}
+    },
+    {
+      "name": "quote_basic_double",
+      "description": "Basic double quote patterns",
+      "input": {"q1": "\"", "q2": "\"\"", "q3": "\"\"\"", "q4": "\"\"\"\"", "q5": "\"\"\"\"\"", "q6": "\"\"\"\"\"\""}
+    },
+    {
+      "name": "quote_alternating",
+      "description": "Alternating quote patterns",
+      "input": {"q1": "\"'", "q2": "'\"", "q3": "\"'\"", "q4": "'\"'", "q5": "\"'\"'", "q6": "'\"'\"", "q7": "\"'\"'\"'\"'", "q8": "'\"'\"'\"'\""}
+    },
+    {
+      "name": "quote_nested",
+      "description": "Nested quote patterns",
+      "input": {"q1": "\"'\"", "q2": "'\"'", "q3": "\"'\"'\"", "q4": "'\"'\"'", "q5": "\"'\"'\"'\"'\"", "q6": "'\"'\"'\"'\"'"}
+    },
+    {
+      "name": "quote_repeated_alternating",
+      "description": "Repeated alternating quotes",
+      "input": {"q1": "\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'", "q2": "'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\""}
+    },
+    {
+      "name": "escape_basic_backslash",
+      "description": "Basic backslash escape patterns",
+      "input": {"e1": "\\", "e2": "\\\\", "e3": "\\\\\\", "e4": "\\\\\\\\", "e5": "\\\\\\\\\\", "e6": "\\\\\\\\\\\\", "e7": "\\\\\\\\\\\\\\\\"}
+    },
+    {
+      "name": "escape_newline_patterns",
+      "description": "Newline escape patterns",
+      "input": {"e1": "\n", "e2": "\\n", "e3": "\\\n", "e4": "\\\\n", "e5": "\n\n\n", "e6": "\\n\\n\\n", "e7": "\n\\n\n\\n\n"}
+    },
+    {
+      "name": "escape_tab_patterns",
+      "description": "Tab escape patterns",
+      "input": {"e1": "\t", "e2": "\\t", "e3": "\\\t", "e4": "\\\\t", "e5": "\t\t\t", "e6": "\\t\\t\\t", "e7": "\t\\t\t\\t\t"}
+    },
+    {
+      "name": "escape_carriage_return",
+      "description": "Carriage return escape patterns",
+      "input": {"e1": "\r", "e2": "\\r", "e3": "\\\r", "e4": "\\\\r", "e5": "\r\n", "e6": "\\r\\n", "e7": "\r\n\r\n\r\n"}
+    },
+    {
+      "name": "escape_all_types",
+      "description": "All escape sequence types",
+      "input": {"e1": "\n\t\r", "e2": "\\n\\t\\r", "e3": "\b\f", "e4": "\\b\\f", "e5": "\n\t\r\b\f", "e6": "\\n\\t\\r\\b\\f"}
+    },
+    {
+      "name": "escape_mixed_slashes",
+      "description": "Mixed forward and back slashes",
+      "input": {"e1": "/\\", "e2": "\\/", "e3": "//\\\\", "e4": "\\\\/", "e5": "/\\/\\", "e6": "\\/\\/", "e7": "///\\\\\\", "e8": "\\\\\\///"}
+    },
+    {
+      "name": "quote_escape_combo_basic",
+      "description": "Basic quote-escape combinations",
+      "input": {"qe1": "\"\\", "qe2": "'\\", "qe3": "\\\"", "qe4": "\\'", "qe5": "\"\\\"", "qe6": "'\\'", "qe7": "\\\"\\", "qe8": "\\'\\"}
+    },
+    {
+      "name": "quote_escape_combo_double",
+      "description": "Double quote-escape combinations",
+      "input": {"qe1": "\"\\\\", "qe2": "'\\\\", "qe3": "\\\\\"", "qe4": "\\\\'", "qe5": "\"\\\\\"", "qe6": "'\\\\'" , "qe7": "\\\\\"\\\\", "qe8": "\\\\'\\\\"}
+    },
+    {
+      "name": "quote_escape_combo_triple",
+      "description": "Triple quote-escape combinations",
+      "input": {"qe1": "\"\\\\\\", "qe2": "'\\\\\\", "qe3": "\\\\\\\"", "qe4": "\\\\\\'", "qe5": "\"\\\\\\\"", "qe6": "'\\\\\\'", "qe7": "\\\\\\\"\\\\\\", "qe8": "\\\\\\'\\\\\\"}
+    },
+    {
+      "name": "quote_escape_pathological",
+      "description": "Pathological quote-escape patterns",
+      "input": {"p1": "\"'\\\"'\\'\"", "p2": "'\"\\'\"\\\"'", "p3": "\\\"\\'\\\"\\'\\\"", "p4": "\\'\\\"\\'\\\"\\'", "p5": "\"\\'\\\"\\'\\\"'", "p6": "'\\\"\\'\\\"\\'\""}
+    },
+    {
+      "name": "escaped_quotes_in_text",
+      "description": "Escaped quotes within text",
+      "input": {"t1": "He said \\\"hello\\\"", "t2": "She said \\'hello\\'", "t3": "It's \\\"fine\\\"", "t4": "He said \\\"it's fine\\\"", "t5": "\\\"quoted\\\" and \\'quoted\\'", "t6": "\\\"\\\"\\\" and \\'\\'\\'"}
+    },
+    {
+      "name": "nested_escaped_quotes",
+      "description": "Nested escaped quotes",
+      "input": {"n1": "outer \\\"inner \\\\\\\"deep\\\\\\\" inner\\\" outer", "n2": "outer \\'inner \\\\\\'deep\\\\\\' inner\\' outer", "n3": "\\\"\\\\\\\"\\\\\\\\\\\\\\\"deepest\\\\\\\\\\\\\\\"\\\\\\\"\\\""}
+    },
+    {
+      "name": "quote_at_boundaries",
+      "description": "Quotes at string boundaries",
+      "input": {"b1": "\"start", "b2": "'start", "b3": "end\"", "b4": "end'", "b5": "\"both\"", "b6": "'both'", "b7": "\\\"start", "b8": "\\'start", "b9": "end\\\"", "b10": "end\\'"}
+    },
+    {
+      "name": "escape_at_boundaries",
+      "description": "Escapes at string boundaries",
+      "input": {"b1": "\\start", "b2": "end\\", "b3": "\\both\\", "b4": "\\\\start", "b5": "end\\\\", "b6": "\\\\both\\\\", "b7": "\\n\\start", "b8": "end\\n\\"}
+    },
+    {
+      "name": "json_string_escaping",
+      "description": "JSON string escaping patterns",
+      "input": {"j1": "{\\\"key\\\": \\\"value\\\"}", "j2": "[\\\"item1\\\", \\\"item2\\\"]", "j3": "{\\\"nested\\\": {\\\"deep\\\": \\\"val\\\"}}", "j4": "{\\\"escaped\\\": \\\"\\\\\\\"quoted\\\\\\\"\\\"}", "j5": "{\\\"path\\\": \\\"c:\\\\\\\\dir\\\\\\\\file\\\"}"}
+    },
+    {
+      "name": "sql_string_escaping",
+      "description": "SQL string escaping patterns",
+      "input": {"s1": "O'Brien", "s2": "O''Brien", "s3": "O\\'Brien", "s4": "SELECT * WHERE name='O''Brien'", "s5": "INSERT INTO t VALUES('it''s', 'a \"test\"')", "s6": "name = 'John\\'s'"}
+    },
+    {
+      "name": "shell_escaping",
+      "description": "Shell escaping patterns",
+      "input": {"sh1": "echo 'hello'", "sh2": "echo \"hello\"", "sh3": "echo 'it'\\''s'", "sh4": "echo \"say \\\"hi\\\"\"", "sh5": "path='/home/user/\"dir\"'", "sh6": "cmd=\"echo 'nested'\"; $cmd"}
+    },
+    {
+      "name": "regex_escaping",
+      "description": "Regex escaping patterns",
+      "input": {"r1": "\\\"([^\\\"]+)\\\"", "r2": "\\'([^\\']*)\\'", "r3": "\\\"[^\\\"]*\\\"|'[^']*'", "r4": "\\\\\\\"\\\\\\\"", "r5": "\\\\\\'\\\\\\'", "r6": "^\\\".*\\\"$|^'.*'$"}
+    },
+    {
+      "name": "unicode_quote_escapes",
+      "description": "Unicode escape sequences for quotes",
+      "input": {"u1": "\\u0022", "u2": "\\u0027", "u3": "\\u0022\\u0027", "u4": "\\u0027\\u0022", "u5": "text\\u0022with\\u0022quotes", "u6": "text\\u0027with\\u0027quotes"}
+    },
+    {
+      "name": "hex_quote_escapes",
+      "description": "Hex escape sequences for quotes",
+      "input": {"h1": "\\x22", "h2": "\\x27", "h3": "\\x22\\x27", "h4": "\\x27\\x22", "h5": "text\\x22with\\x22quotes", "h6": "text\\x27with\\x27quotes", "h7": "\\x5c\\x22", "h8": "\\x5c\\x27"}
+    },
+    {
+      "name": "mixed_escape_and_literal",
+      "description": "Mixed escaped and literal quotes",
+      "input": {"m1": "\"literal\" and \\\"escaped\\\"", "m2": "'literal' and \\'escaped\\'", "m3": "\"\\\"\" mix", "m4": "'\\'\" mix", "m5": "\\\"\"\\\"\" pattern", "m6": "\\''\\'' pattern"}
+    },
+    {
+      "name": "consecutive_escapes",
+      "description": "Consecutive escape sequences",
+      "input": {"c1": "\\n\\n\\n\\n\\n", "c2": "\\t\\t\\t\\t\\t", "c3": "\\r\\r\\r\\r\\r", "c4": "\\\"\\\"\\\"\\\"\\\"", "c5": "\\'\\'\\'\\'\\'", "c6": "\\\\\\\\\\\\\\\\\\\\", "c7": "\\n\\t\\r\\\"\\'\\\\" }
+    },
+    {
+      "name": "escape_followed_by_quote",
+      "description": "Escape immediately followed by quote",
+      "input": {"eq1": "\\\"", "eq2": "\\'", "eq3": "\\n\"", "eq4": "\\n'", "eq5": "\\t\"", "eq6": "\\t'", "eq7": "\\\\\"", "eq8": "\\\\'", "eq9": "\\\\\\\"", "eq10": "\\\\\\'"}
+    },
+    {
+      "name": "quote_followed_by_escape",
+      "description": "Quote immediately followed by escape",
+      "input": {"qe1": "\"\\n", "qe2": "'\\n", "qe3": "\"\\t", "qe4": "'\\t", "qe5": "\"\\\\", "qe6": "'\\\\", "qe7": "\"\\\"", "qe8": "'\\'", "qe9": "\"\\n\\t", "qe10": "'\\n\\t"}
+    },
+    {
+      "name": "quote_escape_sandwich",
+      "description": "Quote-escape-quote patterns",
+      "input": {"s1": "\"\\\"\"", "s2": "'\\''", "s3": "\"\\\\\"", "s4": "'\\\\'", "s5": "\"\\n\"", "s6": "'\\n'", "s7": "\"\\t\"", "s8": "'\\t'", "s9": "\"\\\"\\\"\"", "s10": "'\\'\\''" }
+    },
+    {
+      "name": "deeply_nested_escaping",
+      "description": "Deeply nested escape sequences",
+      "input": {"d1": "\\\\\\\\\\\\\\\\", "d2": "\\\"\\\"\\\"\\\"\\\"\\\"\\\"\\\"", "d3": "\\'\\'\\'\\'\\'\\'\\'\\'" , "d4": "\\\\\\\"\\\\\\\"\\\\\\\"\\\\\\\"", "d5": "\\\\\\'\\\\\\'\\\\\\'\\\\\\'" }
+    },
+    {
+      "name": "real_world_json_payloads",
+      "description": "Real world JSON with escaping",
+      "input": {"rw1": "{\"msg\": \"He said \\\"hello\\\"\"}", "rw2": "{\"path\": \"C:\\\\Users\\\\Admin\"}", "rw3": "{\"text\": \"line1\\nline2\\nline3\"}", "rw4": "{\"data\": \"tab\\there\\tand\\there\"}", "rw5": "{\"mixed\": \"\\\"quoted\\\" with 'apos' and \\\\slash\"}"}
+    },
+    {
+      "name": "real_world_config_patterns",
+      "description": "Real world config file patterns",
+      "input": {"cfg1": "path = \"/home/user's/dir\"", "cfg2": "cmd = 'echo \"hello\"'", "cfg3": "regex = \"^\\\"[^\\\"]*\\\"$\"", "cfg4": "sql = \"name='O''Brien'\"", "cfg5": "json = '{\\\"k\\\": \\\"v\\\"}'"}
+    },
+    {
+      "name": "fhicl_quote_escaping",
+      "description": "FHiCL-specific quote escaping",
+      "input": {"f1": "name: \"value with \\\"quotes\\\"\"", "f2": "path: \"/path/to/\\\"file\\\"\"", "f3": "comment: \"# not a comment\"", "f4": "mixed: \"quotes \\\"and\\\" 'apostrophes'\"", "f5": "escape: \"backslash \\\\ here\""}
+    },
+    {
+      "name": "empty_and_whitespace_quotes",
+      "description": "Empty and whitespace with quotes",
+      "input": {"ew1": "\"\"", "ew2": "''", "ew3": "\" \"", "ew4": "' '", "ew5": "\"  \"", "ew6": "'  '", "ew7": "\"\\t\"", "ew8": "'\\t'", "ew9": "\"\\n\"", "ew10": "'\\n'"}
+    },
+    {
+      "name": "quote_only_strings",
+      "description": "Strings containing only quotes",
+      "input": {"qo1": "\"", "qo2": "'", "qo3": "\"\"", "qo4": "''", "qo5": "\"'", "qo6": "'\"", "qo7": "\"\"\"", "qo8": "'''", "qo9": "\"'\"'\"", "qo10": "'\"'\"'"}
+    },
+    {
+      "name": "escape_only_strings",
+      "description": "Strings containing only escapes",
+      "input": {"eo1": "\\", "eo2": "\\\\", "eo3": "\\n", "eo4": "\\t", "eo5": "\\r", "eo6": "\\n\\t\\r", "eo7": "\\\\\\\\", "eo8": "\\n\\n\\n", "eo9": "\\t\\t\\t", "eo10": "\\\\\\n\\\\\\t"}
+    },
+    {
+      "name": "max_complexity_combo",
+      "description": "Maximum complexity combinations",
+      "input": {"mc1": "\"'\\\"'\\'\\\\\\\"\\\\\\'\\\\\\\\'", "mc2": "'\\\"'\\'\\\"\\'\\\\\\'\\\\\\\"\\\\\\\\\\'", "mc3": "\\\"\\'\\\\\\\"\\\\'\\\\\\\\\\\"\\\\\\\\\\'\\\\\\\\\\\\\\\\'", "mc4": "\"\\\"'\\\"'\\\"\\\\\\\"'\\\\\\\"'\\\\\\\\\\\"'\\\\\\\\\\\"'\""}
+    },
+    {
+      "name": "stress_test_long_escapes",
+      "description": "Stress test with long escape sequences",
+      "input": {"st1": "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", "st2": "\\\"\\\"\\\"\\\"\\\"\\\"\\\"\\\"\\\"\\\"\\\"\\\"\\\"\\\"\\\"\\\"", "st3": "\\'\\'\\'\\'\\'\\'\\'\\'\\'\\'\\'\\'\\'\\'\\'\\'", "st4": "\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n"}
+    },
+    {
+      "name": "stress_test_long_quotes",
+      "description": "Stress test with long quote sequences",
+      "input": {"st1": "\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"", "st2": "''''''''''''''''''''''''''''''''", "st3": "\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'", "st4": "'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\"'\""}
+    },
+    {
+      "name": "stress_test_mixed",
+      "description": "Stress test with mixed patterns",
+      "input": {"st1": "\"\\\"'\\''\\\\\\\"\\\\\\'\\\\\\\\'\"\\\"'\\''\\\\\\\"\\\\\\'\\\\\\\\'", "st2": "#&/\"'\\\\#&/\"'\\\\#&/\"'\\\\#&/\"'\\\\", "st3": "\\n\"\\t'\\r\\\\\\n\"\\t'\\r\\\\\\n\"\\t'\\r\\\\"}
+    }
+  ]
+}
