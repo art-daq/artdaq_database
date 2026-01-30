@@ -1,20 +1,20 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE (StringLineRoundTrip test)
 
-#include <boost/test/unit_test.hpp>
 #include <algorithm>
+#include <boost/test/unit_test.hpp>
 #include <fstream>
 #include <numeric>
 #include <random>
 
 #include "../DatabaseConfigurationInterface.h"
-#include "artdaq-database/JsonDocument/JSONDocument.h"
 #include "artdaq-database/DataFormats/Fhicl/helper_functions.h"
+#include "artdaq-database/JsonDocument/JSONDocument.h"
 
 using namespace ots;
 using artdaq::database::docrecord::JSONDocument;
-using artdaq::database::fhicl::to_json_string;
 using artdaq::database::fhicl::from_json_string;
+using artdaq::database::fhicl::to_json_string;
 
 namespace {
 
@@ -32,13 +32,9 @@ std::vector<std::string> loadLines(const std::string& filename) {
   return lines;
 }
 
-std::string wrapInJson(const std::string& value) {
-  return "{\"value\": \"" + to_json_string(value) + "\"}";
-}
+std::string wrapInJson(const std::string& value) { return "{\"value\": \"" + to_json_string(value) + "\"}"; }
 
-std::string extractValue(const std::string& json) {
-  return from_json_string(JSONDocument(json).findChild("value").value());
-}
+std::string extractValue(const std::string& json) { return from_json_string(JSONDocument(json).findChild("value").value()); }
 
 struct TestFixture {
   TestFixture() : baseVersion((srand(time(nullptr)), rand() % 99999 + 100000)) {
@@ -84,10 +80,16 @@ BOOST_AUTO_TEST_CASE(json_roundtrip_ast_comparison) {
     auto writer = std::make_shared<TestConfiguration001>();
     writer->getView().fillFromJSON(inputJson);
     writer->getView().version = version;
-    if (ifc.saveActiveVersion(writer.get()) != 0) { failed++; continue; }
+    if (ifc.saveActiveVersion(writer.get()) != 0) {
+      failed++;
+      continue;
+    }
 
     auto reader = std::make_shared<TestConfiguration001>();
-    if (ifc.fill(reader.get(), version) != 0) { failed++; continue; }
+    if (ifc.fill(reader.get(), version) != 0) {
+      failed++;
+      continue;
+    }
 
     std::string outputJson = reader->getView()._json;
     std::string extractedValue = extractValue(outputJson);
@@ -99,8 +101,8 @@ BOOST_AUTO_TEST_CASE(json_roundtrip_ast_comparison) {
       passed++;
     } else {
       failed++;
-      std::cout << "FAIL: " << line.substr(0, 50) << (line.size() > 50 ? "..." : "")
-                << " [AST:" << (astMatch ? "OK" : "FAIL") << " Verbatim:" << (verbatimMatch ? "OK" : "FAIL") << "]\n";
+      std::cout << "FAIL: " << line.substr(0, 50) << (line.size() > 50 ? "..." : "") << " [AST:" << (astMatch ? "OK" : "FAIL")
+                << " Verbatim:" << (verbatimMatch ? "OK" : "FAIL") << "]\n";
     }
   }
 

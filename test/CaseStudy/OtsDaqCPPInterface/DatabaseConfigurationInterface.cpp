@@ -148,8 +148,9 @@ config_version_map_t DatabaseConfigurationInterface::loadGlobalConfiguration(std
 namespace {
 VersionInfoList_t to_version_info_list(config_version_map_t const& inputMap) {
   auto resultList = VersionInfoList_t{};
-  std::transform(inputMap.begin(), inputMap.end(), std::back_inserter(resultList),
-                 [](auto const& mapEntry) { return VersionInfoList_t::value_type{mapEntry.first, std::to_string(mapEntry.second), default_entity}; });
+  std::transform(inputMap.begin(), inputMap.end(), std::back_inserter(resultList), [](auto const& mapEntry) {
+    return VersionInfoList_t::value_type{mapEntry.first, std::to_string(mapEntry.second), default_entity};
+  });
   return resultList;
 }
 }  // namespace

@@ -1,8 +1,8 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE (StringRoundTrip test)
 
-#include <boost/test/unit_test.hpp>
 #include <algorithm>
+#include <boost/test/unit_test.hpp>
 #include <fstream>
 #include <numeric>
 #include <random>
@@ -38,8 +38,10 @@ std::vector<std::string> loadInputsFromFile(const std::string& filename) {
     int depth = 1;
     size_t end = start + 1;
     while (depth > 0 && end < content.size()) {
-      if (content[end] == '{') depth++;
-      else if (content[end] == '}') depth--;
+      if (content[end] == '{')
+        depth++;
+      else if (content[end] == '}')
+        depth--;
       else if (content[end] == '"') {
         end++;
         while (end < content.size() && content[end] != '"') {
