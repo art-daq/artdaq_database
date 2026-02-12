@@ -20,3 +20,4 @@ obj/*
 spack-build-*
 spack-configure-*
 build-linux-*
+_codeql_*
