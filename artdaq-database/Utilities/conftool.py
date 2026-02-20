@@ -33,8 +33,6 @@ def __copy_default_schema():
     if os.path.isfile(fhicl_schema):
         return
 
-    schema = "schema.fcl"
-
     try:
         schema = os.environ["ARTDAQ_DATABASE_CONFDIR"] + "/" + fhicl_schema
     except KeyError:
