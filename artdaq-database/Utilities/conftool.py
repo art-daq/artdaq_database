@@ -311,7 +311,11 @@ def __list_excluded_files(config, layout, files, configuration_composition):
 
 
 def __create_entity_userdata_map(cfgs):
-    return {cfg[1]: open(cfg[2], "r").read() for cfg in cfgs}
+    entity_userdata_map = {}
+    for cfg in cfgs:
+        with open(cfg[2], "r") as f:
+            entity_userdata_map[cfg[1]] = f.read()
+    return entity_userdata_map
 
 
 def __hashConfiguration(entity_userdata_map):
