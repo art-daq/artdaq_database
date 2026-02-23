@@ -28,4 +28,4 @@ add_test(NAME ${TEST_NAME}_${TEST_NUMBER}_t
          COMMAND ${TOP_CMAKE_BINARY_DIR}/bin/MigrateDatabase_t --uri=${ARTDAQ_DATABASE_URI}
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
-add_dependencies(untar_MigrateDatabase MigrateDatabase_t)
+add_dependencies(MigrateDatabase_t untar_MigrateDatabase )
