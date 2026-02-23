@@ -250,10 +250,6 @@ def __validate_schema(schema):
                 continue
 
             if "entity" in d:
-                re.match(
-                    r"(.*)((gr1)(gr2)(gr3)(gr4)(gr5)(gr6)(gr7)(gr8)(gr9))(\.fcl$)",
-                    "./demo/gr1gr2gr3gr4gr5gr6gr7gr8gr9.fcl",
-                )
                 entity_name_rule = d["entity"]
                 try:
                     eval(entity_name_rule)
