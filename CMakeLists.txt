@@ -89,6 +89,8 @@ find_package(cetlib_except 1.07.00 REQUIRED QUIET)
 # Build Node Addons
 #include(NodeJSAddon)
 
+add_definitions("-DUSE_FHICLCPP=1")
+
 find_package(mongocxx REQUIRED EXPORT)
 find_package(bsoncxx REQUIRED EXPORT)
 
