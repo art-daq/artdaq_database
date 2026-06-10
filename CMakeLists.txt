@@ -18,7 +18,7 @@ cmake_minimum_required (VERSION 3.19 FATAL_ERROR)
 
 find_package(cetmodules 3.08.00 REQUIRED)
 
-project(artdaq-database VERSION 3.03.00)
+project(artdaq-database VERSION 3.03.01)
 
 set(TOP_CMAKE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(TOP_CMAKE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
